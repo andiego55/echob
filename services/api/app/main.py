@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
-from app.core.database import create_pool
+from app.core.database import create_pool, create_supabase_admin
 from app.core.logging import get_logger, setup_logging
 from app.api.v1.router import v1_router
 
@@ -27,7 +27,8 @@ def create_app() -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         # ── Startup ─────────────────────────────────────────────────────
-        app.state.pool = await create_pool()
+        app.state.pool    = await create_pool()
+        app.state.supabase = create_supabase_admin()
         yield
         # ── Shutdown ─────────────────────────────────────────────────────
         if app.state.pool is not None:

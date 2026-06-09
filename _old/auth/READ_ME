@@ -1,0 +1,2 @@
+# Commands to access log-files:
+docker inspect api_container | grep log

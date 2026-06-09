@@ -13,8 +13,7 @@ dependencies = [
     "pydantic[email]>=2.7",
     "pydantic-settings>=2.3",
     "asyncpg>=0.29",
-    # Ab Phase 1 aktivieren:
-    # "supabase>=2.4",
+    "supabase>=2.4",
     # "python-jose[cryptography]>=3.3",
     # Ab Phase 3:
     # "anthropic>=0.25",

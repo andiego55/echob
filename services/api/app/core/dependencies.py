@@ -1,19 +1,16 @@
 """
 FastAPI Dependencies für EchoB.
-
 Werden per `Depends()` in Routen injiziert.
-
-Aktuell: Platzhalter.
-Phase 1: Supabase-JWT-Validierung aktivieren.
 """
 import asyncpg
+from supabase import Client as SupabaseClient
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-# OAuth2-Bearer-Schema für Swagger-UI
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
@@ -22,15 +19,7 @@ bearer_scheme = HTTPBearer(auto_error=False)
 # ---------------------------------------------------------------------------
 
 def get_pool(request: Request) -> asyncpg.Pool:
-    """
-    Gibt den asyncpg-Verbindungspool aus app.state zurück.
-
-    Nutzung in Routen:
-        pool: asyncpg.Pool = Depends(get_pool)
-
-    Wirft 503 wenn der Pool nicht initialisiert ist (DATABASE_URL fehlt).
-    In Tests per dependency_overrides überschreiben.
-    """
+    """Gibt den asyncpg-Pool aus app.state zurück."""
     pool = getattr(request.app.state, "pool", None)
     if pool is None:
         raise HTTPException(
@@ -41,22 +30,33 @@ def get_pool(request: Request) -> asyncpg.Pool:
 
 
 # ---------------------------------------------------------------------------
-# Auth Dependency (Phase 1: Supabase JWT)
+# Supabase-Dependency
+# ---------------------------------------------------------------------------
+
+def get_supabase(request: Request) -> SupabaseClient:
+    """Gibt den Supabase-Admin-Client aus app.state zurück."""
+    client = getattr(request.app.state, "supabase", None)
+    if client is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Auth-Dienst nicht verfügbar.",
+        )
+    return client
+
+
+# ---------------------------------------------------------------------------
+# Auth Dependencies
 # ---------------------------------------------------------------------------
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    supabase: SupabaseClient = Depends(get_supabase),
 ) -> dict:
     """
-    Validiert den Supabase-JWT-Token aus dem Authorization-Header.
+    Validiert den Supabase-JWT aus dem Authorization-Header.
+    Gibt das User-Objekt zurück: { user_id, email, role }
 
-    Platzhalter – gibt aktuell einen Dummy-User zurück.
-    In Phase 1 ersetzen durch:
-
-        from supabase import Client
-        supabase = get_supabase_admin()
-        user = supabase.auth.get_user(credentials.credentials)
-        return user.user
+    Wirft 401 bei fehlendem oder ungültigem Token.
     """
     if credentials is None:
         raise HTTPException(
@@ -65,26 +65,40 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Sicherheitsguard: In Production darf der Platzhalter nie aktiv sein.
-    # Phase 1: Diesen Block durch echte Supabase-JWT-Validierung ersetzen.
-    from app.core.config import settings
-    if settings.is_production:
+    try:
+        response = supabase.auth.get_user(credentials.credentials)
+        user = response.user
+        if user is None:
+            raise ValueError("Kein User im Token")
+    except Exception:
         raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Authentifizierung noch nicht implementiert.",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Ungültiger oder abgelaufener Token.",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
-    logger.debug("Auth-Dependency aufgerufen – Platzhalter aktiv (nur Dev)")
-    return {"user_id": "placeholder", "token": credentials.credentials}
+    return {
+        "user_id": user.id,
+        "email":   user.email,
+        "role":    user.role,
+    }
 
 
 async def get_optional_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    supabase: SupabaseClient = Depends(get_supabase),
 ) -> dict | None:
     """
     Wie get_current_user, aber ohne Fehler wenn kein Token vorhanden.
-    Für Endpunkte, die sowohl anonym als auch authentifiziert funktionieren.
+    Für Endpunkte die sowohl anonym als auch authentifiziert funktionieren.
     """
     if credentials is None:
         return None
-    return await get_current_user(credentials)
+    try:
+        response = supabase.auth.get_user(credentials.credentials)
+        user = response.user
+        if user is None:
+            return None
+        return {"user_id": user.id, "email": user.email, "role": user.role}
+    except Exception:
+        return None
