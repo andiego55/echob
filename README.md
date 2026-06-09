@@ -39,6 +39,32 @@ echob/
 
 ---
 
+## Lokale Entwicklung mit Docker
+
+```bash
+# 1. Einmalig: .env.docker anlegen
+cp .env.docker.example .env.docker
+
+# 2. Alle Services starten (API + Postgres + Worker + Static Site)
+docker compose up --build
+
+# 3. Im Hintergrund starten
+docker compose up -d --build
+```
+
+| Service       | URL                    |
+|---------------|------------------------|
+| API           | http://localhost:8000  |
+| API Docs      | http://localhost:8000/docs |
+| Static Site   | http://localhost:8080  |
+| Postgres      | localhost:5432         |
+
+Hot-Reload ist aktiv: Änderungen in `services/api/app/` werden sofort übernommen.
+
+Weitere Details: [`infra/docker/README.md`](infra/docker/README.md)
+
+---
+
 ## Statische Website lokal öffnen
 
 Die statische Website benötigt kein Build-System und keine Dependencies.

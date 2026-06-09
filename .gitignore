@@ -16,7 +16,12 @@ env/
 .env
 .env.local
 .env.*.local
+.env.docker
 !.env.example
+!.env.docker.example
+
+# pgAdmin – enthält Datenbankpasswort
+infra/docker/pgadmin/pgpassfile
 
 # Node / Frontend
 node_modules/

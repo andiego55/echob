@@ -4,14 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/echob.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="minor change to check deployment">
+      <change afterPath="$PROJECT_DIR$/_old/svpl/services/api/app/resources/endpoint_logic/apply_validation_task.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/logic/validation_tasks/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/logic/validation_tasks/anomaly_detection.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/datamanagement/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/graphics/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/graphics/anomaly_plot.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/reporting/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_old/svpl/services/api/app/resources/endpoint_logic/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/_old/svpl/services/api/app/resources/endpoint_logic/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_old/svpl/services/api/app/resources/endpoint_logic/validate_predictions_logic.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_old/svpl/services/api/app/routers/stages.py" beforeDir="false" afterPath="$PROJECT_DIR$/_old/svpl/services/api/app/routers/stages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/datamanagement/get_predictions_df.py" beforeDir="false" afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/datamanagement/get_predictions_df.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/db/db_reflection.py" beforeDir="false" afterPath="$PROJECT_DIR$/_old/svpl/services/api/src/utils/db/db_reflection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/docker/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/infra/docker/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/api/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/worker/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/services/worker/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/app.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,22 +76,106 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1780945977920</updated>
-      <workItem from="1780945979268" duration="4249000" />
+      <workItem from="1780945979268" duration="10034000" />
     </task>
+    <task id="LOCAL-00001" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1781003446113</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1781003446113</updated>
+    </task>
+    <task id="LOCAL-00002" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1781003473398</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1781003473398</updated>
+    </task>
+    <task id="LOCAL-00003" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1781004308748</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1781004308748</updated>
+    </task>
+    <task id="LOCAL-00004" summary="minor change to check deployment">
+      <option name="closed" value="true" />
+      <created>1781004339015</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1781004339015</updated>
+    </task>
+    <task id="LOCAL-00005" summary="minor change to check deployment">
+      <option name="closed" value="true" />
+      <created>1781004717746</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1781004717746</updated>
+    </task>
+    <task id="LOCAL-00006" summary="minor change to check deployment">
+      <option name="closed" value="true" />
+      <created>1781004908081</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1781004908081</updated>
+    </task>
+    <task id="LOCAL-00007" summary="minor change to check deployment">
+      <option name="closed" value="true" />
+      <created>1781005081198</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1781005081198</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="00fa4d52-89da-43d9-a7c2-30d421c969a9" value="TOOL_WINDOW" />
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
-        <entry key="MAIN">
+        <entry key="00fa4d52-89da-43d9-a7c2-30d421c969a9">
           <value>
             <State />
           </value>
         </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="first commit" />
+    <MESSAGE value="minor change to check deployment" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor change to check deployment" />
   </component>
 </project>

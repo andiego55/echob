@@ -1,0 +1,5 @@
+# Kopiere diese Datei nach pgpassfile und passe die Werte an.
+# Muss mit POSTGRES_USER und POSTGRES_PASSWORD aus .env.docker übereinstimmen.
+#
+# Format: hostname:port:database:username:password
+postgres:5432:echob:echob_dev:echob_dev_password

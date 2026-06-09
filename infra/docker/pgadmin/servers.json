@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "EchoB – Lokale Entwicklung",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "echob",
+      "Username": "echob_dev",
+      "Password": "pgadmin",
+      "SSLMode": "prefer"
+    }
+  }
+}

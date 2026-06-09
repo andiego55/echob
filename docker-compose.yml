@@ -1,0 +1,112 @@
+name: echob
+
+services:
+
+  # ── Lokale Postgres-Datenbank ──────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-echob}
+      POSTGRES_USER:     ${POSTGRES_USER:-echob_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pgadmin}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # SQL-Dateien in diesem Ordner werden beim ersten Start ausgeführt:
+      - ./infra/docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-echob_dev} -d ${POSTGRES_DB:-echob}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── pgAdmin – Datenbank-UI (optional) ─────────────────────────────────
+  # Starten mit: docker compose --profile tools up
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL:    ${PGADMIN_EMAIL:-dev@echob.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-pgadmin}
+      PGADMIN_LISTEN_PORT:      5050
+      # Unterdrückt den langen Disclaimer beim ersten Start
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      # Kein Master-Passwort nötig – erlaubt Plaintext-Passwörter in servers.json
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      # Vorregistrierter Server – kein manuelles Anlegen nötig
+      - ./infra/docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+      # pgpass-Datei: automatische Authentifizierung gegen Postgres
+      - ./infra/docker/pgadmin/pgpassfile:/pgpassfile:ro
+      # Persistenz: Einstellungen und gespeicherte Queries bleiben erhalten
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:5050"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - tools
+
+  # ── FastAPI Backend ────────────────────────────────────────────────────
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-echob_dev}:${POSTGRES_PASSWORD:-pgadmin}@postgres:5432/${POSTGRES_DB:-echob}
+      # JSON-Array: pydantic-settings v2 parst list[str]-Felder aus Env-Vars als JSON.
+      # Kommagetrennte Strings funktionieren nur in .env-Dateien (über BeforeValidator).
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000","http://localhost:8080"]'
+    ports:
+      - "8000:8000"
+    volumes:
+      # Hot-Reload: Änderungen am App-Code sind sofort aktiv
+      - ./services/api/app:/app/app
+    command: >
+      uvicorn app.main:app
+        --host 0.0.0.0
+        --port 8000
+        --reload
+        --reload-dir /app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Python Worker ──────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ./services/worker
+      dockerfile: Dockerfile
+    restart: on-failure   # Platzhalter beendet sich sofort; kein Restart-Loop
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-echob_dev}:${POSTGRES_PASSWORD:-pgadmin}@postgres:5432/${POSTGRES_DB:-echob}
+    volumes:
+      - ./services/worker/app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Statische Website ──────────────────────────────────────────────────
+  static-site:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./static-site:/usr/share/nginx/html:ro
+      - ./infra/docker/nginx/static-site.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:80"
+
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
