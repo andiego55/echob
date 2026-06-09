@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoB – Warteliste</title>
+  <meta name="description" content="Trage dich in die EchoB-Warteliste ein und erhalte frühen Zugang." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .waitlist-form {
+      max-width: 480px;
+      margin-top: 36px;
+    }
+    .waitlist-form label {
+      display: block;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .waitlist-form input,
+    .waitlist-form select,
+    .waitlist-form textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: .92rem;
+      font-family: var(--font);
+      color: var(--text);
+      background: #fff;
+      margin-bottom: 20px;
+      transition: border-color .15s;
+    }
+    .waitlist-form input:focus,
+    .waitlist-form select:focus,
+    .waitlist-form textarea:focus {
+      outline: none;
+      border-color: #3b6a9a;
+    }
+    .waitlist-form textarea { resize: vertical; min-height: 90px; }
+    .form-note {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: -14px;
+      margin-bottom: 20px;
+    }
+    .waitlist-form .btn { width: 100%; text-align: center; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">Echo<span>B</span></a>
+    <nav>
+      <a href="app.html">App</a>
+      <a href="coaching.html">Coaching</a>
+      <a href="wissen.html">Wissen</a>
+      <a href="fachpersonen.html">Fachpersonen</a>
+      <a href="ueber.html">Über EchoB</a>
+      <a href="erstcheck.html" class="nav-cta">Kostenlos starten</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <span class="label">Warteliste</span>
+      <h1>Früher Zugang zu EchoB</h1>
+      <p>EchoB befindet sich in der Entwicklung. Trage dich ein und erhalte als Erste:r Zugang, sobald die App verfügbar ist.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Auf der Warteliste eintragen</h2>
+      <p class="lead">Kein Spam. Keine Weitergabe deiner Daten. Nur eine Nachricht, wenn EchoB startet.</p>
+
+      <form class="waitlist-form" action="#" method="post" onsubmit="handleSubmit(event)">
+        <label for="email">E-Mail-Adresse *</label>
+        <input type="email" id="email" name="email" placeholder="deine@email.de" required />
+
+        <label for="interest">Was interessiert dich am meisten?</label>
+        <select id="interest" name="interest">
+          <option value="">– bitte wählen –</option>
+          <option value="app">Die App (Reflexion &amp; Musterübersicht)</option>
+          <option value="coaching">Orientierungsgespräch / Coaching</option>
+          <option value="fachperson">Fachpersonenbereich</option>
+          <option value="alle">Alles davon</option>
+        </select>
+
+        <label for="note">Optional: Kurze Notiz</label>
+        <textarea id="note" name="note" placeholder="Was bewegt dich gerade? (freiwillig, wird nicht veröffentlicht)"></textarea>
+        <p class="form-note">Freiwillig. Hilft uns, EchoB besser zu gestalten.</p>
+
+        <button type="submit" class="btn btn-primary">Eintragen</button>
+      </form>
+
+      <div class="safety-notice" style="max-width:480px;margin-top:28px;">
+        <strong>Datenschutz:</strong> Deine E-Mail-Adresse wird ausschließlich zur Benachrichtigung über den EchoB-Start verwendet.
+        Keine Weitergabe an Dritte. Abmeldung jederzeit möglich.
+        Weitere Informationen: <a href="datenschutz.html" style="color:inherit;">Datenschutzerklärung</a>.
+      </div>
+
+      <div id="success-msg" style="display:none;margin-top:28px;" class="safety-notice">
+        <strong>Danke!</strong> Du stehst auf der Liste. Wir melden uns, sobald EchoB startet.
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">Echo<span>B</span></a>
+        <p>Belastende Beziehungssituationen sortieren. Wiederkehrende Muster erkennen.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Plattform</h4>
+          <a href="app.html">App</a>
+          <a href="coaching.html">Coaching</a>
+          <a href="wissen.html">Wissen</a>
+          <a href="fachpersonen.html">Fachpersonen</a>
+        </div>
+        <div class="footer-col">
+          <h4>Rechtliches</h4>
+          <a href="datenschutz.html">Datenschutz</a>
+          <a href="impressum.html">Impressum</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 EchoB</span>
+      <span>EchoB ersetzt keine Psychotherapie, keine medizinische Diagnostik und keine Notfallhilfe.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function handleSubmit(e) {
+    e.preventDefault();
+    document.querySelector('.waitlist-form').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>

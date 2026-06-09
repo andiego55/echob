@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoB – Erkenne, was sich wiederholt.</title>
+  <meta name="description" content="EchoB hilft dir, belastende Beziehungssituationen zu sortieren, wiederkehrende Muster sichtbar zu machen und deine nächsten Schritte klarer zu sehen." />
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f1e2e;
+      --navy-mid:   #152840;
+      --navy-light: #1e3a55;
+      --slate:      #2c4a68;
+      --blue-soft:  #3b6a9a;
+      --accent:     #e07b54;
+      --accent-h:   #d06840;
+      --warm:       #f5ede6;
+      --card-bg:    #ffffff;
+      --text-main:  #1a1a2e;
+      --text-muted: #5a6a7a;
+      --text-light: #8899aa;
+      --border:     #e2e8f0;
+      --radius-sm:  8px;
+      --radius-md:  14px;
+      --radius-lg:  22px;
+      --shadow-sm:  0 2px 8px rgba(15,30,46,.07);
+      --shadow-md:  0 6px 24px rgba(15,30,46,.11);
+      --shadow-lg:  0 16px 48px rgba(15,30,46,.14);
+      --font:       system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --max-w:      1100px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      color: var(--text-main);
+      background: #f8fafc;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Utility ──────────────────────────────────────────────────── */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .section { padding: 96px 0; }
+    .section--dark {
+      background: var(--navy);
+      color: #fff;
+    }
+    .section--warm { background: var(--warm); }
+    .section--mid  { background: #f0f5fb; }
+
+    .label {
+      display: inline-block;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .section--dark .label { color: #f0a080; }
+
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      color: var(--navy);
+    }
+    .section--dark h2 { color: #fff; }
+
+    .lead {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.75;
+    }
+    .section--dark .lead { color: #a0bcd8; }
+
+    /* ── Buttons ──────────────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: var(--radius-sm);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      border: none;
+    }
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(224,123,84,.35);
+    }
+    .btn-primary:hover {
+      background: var(--accent-h);
+      box-shadow: 0 6px 24px rgba(224,123,84,.45);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--navy);
+      border: 2px solid var(--navy-light);
+    }
+    .btn-outline:hover { background: var(--navy); color: #fff; }
+
+    .btn-outline-light {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,.35);
+    }
+    .btn-outline-light:hover { background: rgba(255,255,255,.1); }
+
+    .btn-ghost-accent {
+      background: rgba(224,123,84,.12);
+      color: var(--accent);
+      border: 2px solid transparent;
+    }
+    .btn-ghost-accent:hover { background: var(--accent); color: #fff; }
+
+    /* ── Header / Nav ─────────────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15,30,46,.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 66px;
+      gap: 24px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: -.02em;
+    }
+    .logo span { color: var(--accent); }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    nav a {
+      color: rgba(255,255,255,.72);
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 500;
+      transition: color .15s;
+    }
+    nav a:hover { color: #fff; }
+
+    .nav-cta {
+      padding: 9px 20px;
+      font-size: .88rem;
+    }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: .25s;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────────────── */
+    .hero {
+      background: var(--navy);
+      padding: 110px 0 96px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* abstract background shapes */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 55% at 75% 30%, rgba(59,106,154,.28) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(224,123,84,.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      position: relative;
+    }
+
+    .hero-kicker {
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      color: #fff;
+      margin-bottom: 24px;
+      letter-spacing: -.02em;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #9ab5cf;
+      line-height: 1.75;
+      margin-bottom: 40px;
+      max-width: 480px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Visual panel */
+    .hero-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .echo-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      backdrop-filter: blur(6px);
+      transition: transform .2s, background .2s;
+    }
+    .echo-card:hover {
+      transform: translateX(6px);
+      background: rgba(255,255,255,.09);
+    }
+
+    .echo-card-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .echo-card p {
+      font-size: .88rem;
+      color: #b8d0e4;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .echo-card--highlight {
+      background: linear-gradient(135deg, rgba(224,123,84,.18), rgba(59,106,154,.15));
+      border-color: rgba(224,123,84,.25);
+    }
+
+    /* ── Problem ──────────────────────────────────────────────────── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 52px;
+    }
+
+    .problem-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 28px 26px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .problem-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
+
+    .problem-card::before {
+      content: '"';
+      position: absolute;
+      top: 14px;
+      left: 22px;
+      font-size: 3.5rem;
+      line-height: 1;
+      color: var(--accent);
+      opacity: .18;
+      font-family: Georgia, serif;
+    }
+
+    .problem-card p {
+      font-size: .95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      padding-top: 10px;
+    }
+
+    /* ── How it works ─────────────────────────────────────────────── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 60px;
+      position: relative;
+    }
+
+    /* connector line */
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 32px;
+      left: calc(16.67% + 32px);
+      right: calc(16.67% + 32px);
+      height: 2px;
+      background: linear-gradient(to right, var(--accent), var(--blue-soft));
+      opacity: .25;
+    }
+
+    .step {
+      text-align: center;
+      padding: 40px 24px 32px;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .step:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+
+    .step-num {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--blue-soft));
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 22px;
+      box-shadow: 0 4px 14px rgba(15,30,46,.25);
+    }
+
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      font-size: .9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ── Features ─────────────────────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 52px;
+    }
+
+    .feature {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: var(--radius-md);
+      padding: 30px 24px;
+      transition: background .2s, transform .2s;
+    }
+    .feature:hover {
+      background: rgba(255,255,255,.09);
+      transform: translateY(-3px);
+    }
+
+    .feature-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(224,123,84,.25), rgba(59,106,154,.2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      font-size: 1.3rem;
+    }
+
+    .feature h3 {
+      font-size: .98rem;
+      font-weight: 700;
+      color: #e0eaf4;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      font-size: .85rem;
+      color: #7a9ab8;
+      line-height: 1.6;
+    }
+
+    /* ── Coaching ─────────────────────────────────────────────────── */
+    .coaching-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .coaching-visual {
+      background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+      border-radius: var(--radius-lg);
+      padding: 52px 40px;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .coaching-visual h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .coaching-visual p {
+      font-size: .92rem;
+      color: #8fb3d0;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .coaching-points {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+
+    .coaching-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: .9rem;
+      color: #a8c6de;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .coaching-points li:last-child { border-bottom: none; }
+
+    .coaching-points li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .coaching-text h2 { color: var(--navy); }
+
+    .coaching-text p {
+      font-size: 1.02rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    /* ── Safety Notice ────────────────────────────────────────────── */
+    .safety-box {
+      background: var(--card-bg);
+      border: 1.5px solid #d4e0ec;
+      border-left: 5px solid var(--blue-soft);
+      border-radius: var(--radius-md);
+      padding: 32px 36px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .safety-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .safety-box h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .safety-box p {
+      font-size: .9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ── FAQ ──────────────────────────────────────────────────────── */
+    .faq-list {
+      margin-top: 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    details {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+    details:hover { box-shadow: var(--shadow-sm); }
+    details[open] { box-shadow: var(--shadow-md); }
+
+    summary {
+      padding: 22px 26px;
+      font-size: .98rem;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      transition: background .15s;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: '+';
+      font-size: 1.3rem;
+      font-weight: 300;
+      color: var(--accent);
+      flex-shrink: 0;
+      transition: transform .2s;
+    }
+    details[open] summary::after {
+      transform: rotate(45deg);
+    }
+    summary:hover { background: #f8fafc; }
+
+    .faq-body {
+      padding: 0 26px 24px;
+      font-size: .9rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────── */
+    footer {
+      background: #080f18;
+      color: rgba(255,255,255,.5);
+      padding: 60px 0 36px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .footer-brand .logo { font-size: 1.3rem; }
+    .footer-brand p {
+      margin-top: 14px;
+      font-size: .85rem;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 18px;
+    }
+
+    .footer-col a {
+      display: block;
+      color: rgba(255,255,255,.55);
+      text-decoration: none;
+      font-size: .88rem;
+      margin-bottom: 10px;
+      transition: color .15s;
+    }
+    .footer-col a:hover { color: #fff; }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 28px;
+      font-size: .8rem;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .claim-tag {
+      display: inline-block;
+      background: rgba(224,123,84,.15);
+      color: #e0a080;
+      border: 1px solid rgba(224,123,84,.2);
+      border-radius: 50px;
+      padding: 4px 14px;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+
+    /* ── Section header helper ────────────────────────────────────── */
+    .section-header { margin-bottom: 0; }
+    .section-header .lead { margin-top: 12px; }
+
+    /* ── Mobile ───────────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .section { padding: 72px 0; }
+      nav { display: none; }
+      .nav-toggle { display: flex; }
+
+      nav.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 66px;
+        left: 0;
+        right: 0;
+        background: var(--navy);
+        border-top: 1px solid rgba(255,255,255,.08);
+        padding: 20px 24px 28px;
+        gap: 18px;
+        z-index: 99;
+      }
+      nav.open a { font-size: 1rem; }
+
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .hero { padding: 80px 0 72px; }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .steps::before { display: none; }
+
+      .coaching-inner { grid-template-columns: 1fr; gap: 40px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+
+      .safety-box { flex-direction: column; gap: 14px; }
+    }
+
+    @media (max-width: 560px) {
+      .hero h1 { font-size: 1.9rem; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .problem-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ────────────────────────────────────────────────────────── HEADER -->
+<header>
+  <div class="container nav-inner">
+    <a href="#" class="logo">Echo<span>B</span></a>
+
+    <nav id="main-nav">
+      <a href="#app">App</a>
+      <a href="#coaching">Coaching</a>
+      <a href="#wissen">Wissen</a>
+      <a href="#fachpersonen">Fachpersonen</a>
+      <a href="#erstcheck" class="btn btn-primary nav-cta">Kostenlos starten</a>
+    </nav>
+
+    <button class="nav-toggle" aria-label="Menü öffnen" onclick="document.getElementById('main-nav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ────────────────────────────────────────────────────────────── HERO -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <p class="hero-kicker">Erkenne, was sich wiederholt.</p>
+      <h1>Wenn Beziehungen schwer einzuordnen&nbsp;sind.</h1>
+      <p>EchoB hilft dir, belastende Situationen zu sortieren, wiederkehrende Muster sichtbar zu machen und deine nächsten Schritte klarer zu sehen.</p>
+      <div class="hero-actions">
+        <a href="#erstcheck" class="btn btn-primary" id="erstcheck">Kostenlosen Erstcheck starten</a>
+        <a href="#coaching" class="btn btn-outline-light">Orientierungsgespräch buchen</a>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="echo-card echo-card--highlight">
+        <p class="echo-card-label">Musterübersicht</p>
+        <p>3 wiederkehrende Dynamiken erkannt – zuletzt aktiv vor 2 Tagen.</p>
+      </div>
+      <div class="echo-card">
+        <p class="echo-card-label">Reflexionsdialog</p>
+        <p>„Was hat dich nach dem Gespräch am meisten beschäftigt?"</p>
+      </div>
+      <div class="echo-card">
+        <p class="echo-card-label">Ereignisprotokoll</p>
+        <p>8 Einträge diese Woche – Muster werden sichtbarer.</p>
+      </div>
+      <div class="echo-card">
+        <p class="echo-card-label">Bericht für Therapievorbereitung</p>
+        <p>Bereit zum Teilen – strukturierte Zusammenfassung erstellt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── PROBLEM -->
+<section class="section" id="problem">
+  <div class="container">
+    <div class="section-header">
+      <span class="label">Du bist nicht allein</span>
+      <h2>Vielleicht kennst du diese Gedanken</h2>
+      <p class="lead">Viele Menschen stecken in Beziehungssituationen, die sich schwer in Worte fassen lassen. Diese Gedanken kennen wir.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <p>Ich weiß nicht mehr, ob ich übertreibe.</p>
+      </div>
+      <div class="problem-card">
+        <p>Nach jedem Streit bin ich verwirrter als vorher.</p>
+      </div>
+      <div class="problem-card">
+        <p>Manchmal ist alles intensiv nah — und kurz danach wieder kalt.</p>
+      </div>
+      <div class="problem-card">
+        <p>Ich erkenne ein Muster, kann es aber nicht greifen.</p>
+      </div>
+      <div class="problem-card">
+        <p>Ich möchte meine Situation für Therapie oder Coaching sortieren.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────────────────────── HOW IT WORKS -->
+<section class="section section--mid" id="app">
+  <div class="container">
+    <div class="section-header" style="text-align:center;">
+      <span class="label">So funktioniert EchoB</span>
+      <h2>Drei Schritte zu mehr Klarheit</h2>
+      <p class="lead" style="margin: 12px auto 0; text-align:center;">Keine Diagnosen. Keine Schubladen. Nur strukturierte Reflexion, die dir gehört.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Situation beschreiben</h3>
+        <p>Du schilderst, was dich bewegt – im eigenen Tempo, mit eigenen Worten. EchoB fragt behutsam nach, wo es hilft.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Muster strukturiert erkennen</h3>
+        <p>Wiederkehrende Dynamiken werden sichtbar gemacht – ohne Bewertung, ohne Schubladendenken.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Nächste Schritte klarer sehen</h3>
+        <p>Du erhältst Orientierung: was du tun kannst, wen du ansprechen könntest und wie du dich auf professionelle Hilfe vorbereiten kannst.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────── FEATURES -->
+<section class="section section--dark" id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="label">Was EchoB bietet</span>
+      <h2>Werkzeuge für deine Reflexion</h2>
+      <p class="lead">Alles, was du brauchst, um Klarheit zu gewinnen – sicher, vertraulich, in deinem Tempo.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">💬</div>
+        <h3>KI-gestützter Reflexionsdialog</h3>
+        <p>Ein empathisches Gespräch, das hilft, deine Gedanken zu sortieren – ohne Urteile, ohne Diagnosen.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📋</div>
+        <h3>Ereignisprotokoll</h3>
+        <p>Halte Situationen fest, bevor sie verblassen. Dein persönliches Gedächtnisprotokoll für den eigenen Überblick.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔍</div>
+        <h3>Musterübersicht</h3>
+        <p>Wiederkehrende Dynamiken werden strukturiert sichtbar – als Grundlage für eigene Einordnung.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📄</div>
+        <h3>Bericht für Coaching &amp; Therapie</h3>
+        <p>Exportiere einen strukturierten Überblick – als Gesprächsgrundlage für Fachpersonen.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🛡️</div>
+        <h3>Sicherheits- &amp; Krisenhinweise</h3>
+        <p>Bei Anzeichen akuter Belastung weist EchoB auf geeignete Anlaufstellen hin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────────── COACHING -->
+<section class="section" id="coaching">
+  <div class="container coaching-inner">
+    <div class="coaching-text">
+      <span class="label">Menschliche Begleitung</span>
+      <h2>Manchmal reicht eine App nicht.</h2>
+      <p>EchoB ermöglicht dir, ein Orientierungsgespräch zu buchen – um deine Situation gemeinsam mit einem Menschen zu sortieren, ohne Druck und ohne vorgefertigte Antworten.</p>
+      <a href="#" class="btn btn-primary">Orientierungsgespräch vormerken</a>
+    </div>
+    <div class="coaching-visual">
+      <h3>Was dich erwartet</h3>
+      <p>Ein vertrauliches Gespräch, das dir hilft, deine Situation in Worte zu fassen.</p>
+      <ul class="coaching-points">
+        <li>Unverbindliches Erstgespräch (50 Min.)</li>
+        <li>Keine Diagnosen, keine Ratschläge</li>
+        <li>Strukturierte Reflexion auf Augenhöhe</li>
+        <li>Optional: Bericht aus der App als Grundlage</li>
+        <li>Weitervermittlung an Fachpersonen möglich</li>
+      </ul>
+      <a href="#" class="btn btn-outline-light" style="font-size:.88rem;">Mehr erfahren</a>
+    </div>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────── SAFETY NOTICE -->
+<section class="section section--warm">
+  <div class="container">
+    <div class="safety-box">
+      <div class="safety-icon" aria-hidden="true">ℹ️</div>
+      <div>
+        <h3>Wichtiger Hinweis</h3>
+        <p>
+          EchoB ersetzt keine Psychotherapie, keine medizinische Diagnostik und keine Notfallhilfe.
+          Die App hilft dabei, Beobachtungen zu strukturieren und mögliche Beziehungsdynamiken zu reflektieren –
+          als Unterstützung für die eigene Einordnung, nicht als Diagnose.
+          <br><br>
+          Bei akuter Gefahr für dich oder andere wende dich bitte sofort an lokale Notfallstellen,
+          den ärztlichen Bereitschaftsdienst (<strong>116 117</strong>), die Telefonseelsorge
+          (<strong>0800 111 0 111</strong>) oder eine vertraute Person.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────────── FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-header">
+      <span class="label">Häufige Fragen</span>
+      <h2>Was du vielleicht wissen möchtest</h2>
+    </div>
+    <div class="faq-list">
+
+      <details>
+        <summary>Diagnostiziert EchoB Persönlichkeitsstörungen?</summary>
+        <div class="faq-body">
+          Nein. EchoB stellt keine Diagnosen und benennt keine Persönlichkeitsstörungen.
+          Die App hilft dabei, Beobachtungen zu strukturieren und wiederkehrende Dynamiken sichtbar zu machen –
+          als Grundlage für deine eigene Reflexion oder als Vorbereitung auf Gespräche mit Fachpersonen.
+          Medizinische oder psychologische Diagnosen gehören in die Hände qualifizierter Therapeutinnen und Therapeuten.
+        </div>
+      </details>
+
+      <details>
+        <summary>Für wen ist EchoB gedacht?</summary>
+        <div class="faq-body">
+          EchoB richtet sich an Menschen, die belastende oder verwirrende Beziehungssituationen erleben –
+          in bestehenden Beziehungen, nach einer Trennung oder im familiären Umfeld.
+          Auch Menschen, die ihre Situation vor einem Therapie- oder Coachingbeginn sortieren möchten,
+          finden in EchoB einen hilfreichen Ausgangspunkt.
+        </div>
+      </details>
+
+      <details>
+        <summary>Ist EchoB eine Therapie?</summary>
+        <div class="faq-body">
+          Nein. EchoB ist keine Therapie und kein Ersatz dafür.
+          EchoB ist ein Reflexionswerkzeug – es hilft dir, Gedanken zu ordnen und Muster zu erkennen.
+          Wenn du professionelle Unterstützung benötigst, empfehlen wir dir, eine qualifizierte Fachperson aufzusuchen.
+          EchoB kann dir dabei helfen, dich auf dieses Gespräch vorzubereiten.
+        </div>
+      </details>
+
+      <details>
+        <summary>Was passiert mit meinen Daten?</summary>
+        <div class="faq-body">
+          Der Schutz deiner Daten hat höchste Priorität. Deine Einträge und Gespräche werden verschlüsselt gespeichert
+          und nicht an Dritte weitergegeben. Du kannst deine Daten jederzeit einsehen, exportieren oder löschen.
+          Weitere Details findest du in unserer Datenschutzerklärung.
+        </div>
+      </details>
+
+      <details>
+        <summary>Kann ich EchoB zur Vorbereitung auf Coaching oder Therapie nutzen?</summary>
+        <div class="faq-body">
+          Ja – das ist einer der zentralen Anwendungsfälle von EchoB.
+          Du kannst deine Beobachtungen protokollieren, Muster sichten und einen strukturierten Bericht erstellen,
+          den du in ein Erstgespräch mitbringst. Das spart Zeit und hilft dir, das Wesentliche klar zu benennen.
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────────── FOOTER -->
+<footer id="fachpersonen">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo">Echo<span>B</span></a>
+        <p>EchoB hilft Menschen in belastenden Beziehungssituationen, wiederkehrende Muster zu erkennen und ihre nächsten Schritte klarer zu sehen.</p>
+        <div style="margin-top:20px;">
+          <span class="claim-tag">„Erkenne, was sich wiederholt."</span>
+        </div>
+      </div>
+
+      <div class="footer-col" id="wissen">
+        <h4>Plattform</h4>
+        <a href="#">App</a>
+        <a href="#">Coaching</a>
+        <a href="#">Wissen</a>
+        <a href="#">Für Fachpersonen</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Rechtliches</h4>
+        <a href="#">Impressum</a>
+        <a href="#">Datenschutz</a>
+        <a href="#">Kontakt</a>
+        <a href="#">AGB</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2025 EchoB. Alle Rechte vorbehalten.</span>
+      <span>Kein Ersatz für Psychotherapie oder medizinische Diagnostik.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
