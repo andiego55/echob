@@ -1,39 +1,41 @@
 /**
- * /app/profile — Mein Beziehungsprofil
- * Selbstbeschreibung in 9 Modulen mit Scoring und Zusammenfassung.
+ * /app/cases/:caseId/person-profile — Personenprofil
+ * Fremdeinschätzung der anderen Person in 7 Modulen mit Scoring und Zusammenfassung.
  */
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
-import { profileApi } from '@/api/profile'
-import { PROFILE_MODULES } from '@/utils/profileModules'
-import type { ProfileModuleConfig } from '@/utils/profileModules'
-import { computeModuleScores, computeSafetyStatus, computeResourcesIndex, scoreLevel, buildSummaryText } from '@/utils/profileScoring'
-
-const SAFETY_STATUS_INFO: Record<string, { label: string; cls: string; show: boolean }> = {
-  no_indication:       { label: 'Keine Sicherheitshinweise', cls: 'bg-green-50 border-green-200 text-green-800', show: false },
-  unclear:             { label: 'Sicherheitsstatus unklar', cls: 'bg-yellow-50 border-yellow-200 text-yellow-800', show: false },
-  heightened_attention:{ label: 'Erhöhte Aufmerksamkeit', cls: 'bg-orange-50 border-orange-200 text-orange-800', show: true },
-  acute_concern:       { label: 'Akute Sicherheitsbedenken', cls: 'bg-red-50 border-red-200 text-red-800', show: true },
-}
+import CaseNav from '@/components/app/CaseNav'
+import { personProfileApi } from '@/api/personProfile'
+import { casesApi } from '@/api/cases'
+import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
+import type { PersonProfileModuleConfig } from '@/utils/personProfileModules'
+import { computePersonModuleScores, scoreLevel, buildPersonSummaryText } from '@/utils/personProfileScoring'
+import { RELATIONSHIP_TYPE_LABELS } from '@/types'
 
 const LIKERT_LABELS = ['', 'Trifft gar nicht zu', 'Trifft eher nicht zu', 'Teils/teils', 'Trifft eher zu', 'Trifft sehr zu']
 
-export default function ProfilePage() {
+export default function PersonProfilePage() {
+  const { caseId } = useParams<{ caseId: string }>()
   const qc = useQueryClient()
-  const [activeModule, setActiveModule] = useState(PROFILE_MODULES[0].id)
+  const [activeModule, setActiveModule] = useState(PERSON_PROFILE_MODULES[0].id)
   const [showSummary, setShowSummary] = useState(false)
-  // Local answers per module: moduleId → { itemKey: value }
   const [answers, setAnswers] = useState<Record<string, Record<string, unknown>>>({})
   const [isDirty, setIsDirty] = useState(false)
 
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile'],
-    queryFn: profileApi.get,
+  const { data: caseData } = useQuery({
+    queryKey: ['case', caseId],
+    queryFn: () => casesApi.get(caseId!),
+    enabled: !!caseId,
   })
 
-  // Profil in lokalen State laden sobald verfügbar
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ['person-profile', caseId],
+    queryFn: () => personProfileApi.get(caseId!),
+    enabled: !!caseId,
+  })
+
   useEffect(() => {
     if (profile?.modules) {
       setAnswers(profile.modules as Record<string, Record<string, unknown>>)
@@ -43,9 +45,8 @@ export default function ProfilePage() {
   const saveMutation = useMutation({
     mutationFn: (moduleId: string) => {
       const moduleData = answers[moduleId] ?? {}
-      const moduleCfg = PROFILE_MODULES.find(m => m.id === moduleId)!
-      // Scores berechnen
-      const scores = computeModuleScores(
+      const moduleCfg = PERSON_PROFILE_MODULES.find(m => m.id === moduleId)!
+      const scores = computePersonModuleScores(
         moduleData as Record<string, number>,
         moduleCfg.scoreDimensions.map(d => ({
           key: d.key,
@@ -53,16 +54,12 @@ export default function ProfilePage() {
           reverseKeys: d.reverseKeys,
         })),
       )
-      // Ressourcen-Index
-      if (moduleId === 'resources') {
-        scores['resources_index'] = computeResourcesIndex(scores)
-      }
       const dataWithScores = { ...moduleData, ...scores }
-
-      return profileApi.saveModule(moduleId, dataWithScores)
+      return personProfileApi.saveModule(caseId!, moduleId, dataWithScores)
     },
     onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['profile'] })
+      qc.invalidateQueries({ queryKey: ['person-profile', caseId] })
+      // Scores sind nur in den Server-Daten – lokalen State damit aktualisieren
       if (data?.modules) {
         setAnswers(data.modules as Record<string, Record<string, unknown>>)
       }
@@ -70,7 +67,7 @@ export default function ProfilePage() {
     },
   })
 
-  const currentModuleCfg = PROFILE_MODULES.find(m => m.id === activeModule)!
+  const currentModuleCfg = PERSON_PROFILE_MODULES.find(m => m.id === activeModule)!
   const currentAnswers = (answers[activeModule] ?? {}) as Record<string, unknown>
 
   const setAnswer = (key: string, value: unknown) => {
@@ -85,34 +82,40 @@ export default function ProfilePage() {
   }
 
   const completedModules = profile?.completed_modules ?? []
-  const safetyStatus = profile?.safety_status ?? 'no_indication'
-  const safetyInfo = SAFETY_STATUS_INFO[safetyStatus]
-
-  const currentIdx = PROFILE_MODULES.findIndex(m => m.id === activeModule)
-  const canGoNext = currentIdx < PROFILE_MODULES.length - 1
+  const currentIdx = PERSON_PROFILE_MODULES.findIndex(m => m.id === activeModule)
+  const canGoNext = currentIdx < PERSON_PROFILE_MODULES.length - 1
   const canGoPrev = currentIdx > 0
 
   const handleNext = async () => {
     if (isDirty) await saveMutation.mutateAsync(activeModule)
-    if (canGoNext) setActiveModule(PROFILE_MODULES[currentIdx + 1].id)
+    if (canGoNext) setActiveModule(PERSON_PROFILE_MODULES[currentIdx + 1].id)
   }
 
   const handlePrev = async () => {
     if (isDirty) await saveMutation.mutateAsync(activeModule)
-    if (canGoPrev) setActiveModule(PROFILE_MODULES[currentIdx - 1].id)
+    if (canGoPrev) setActiveModule(PERSON_PROFILE_MODULES[currentIdx - 1].id)
   }
 
+  const relationshipLabel = caseData ? RELATIONSHIP_TYPE_LABELS[caseData.relationship_type] : ''
+
   if (isLoading) {
-    return <AppShell><div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div></AppShell>
+    return (
+      <AppShell>
+        <CaseNav caseId={caseId!} />
+        <div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div>
+      </AppShell>
+    )
   }
 
   if (showSummary) {
     return (
       <AppShell>
-        <SummaryView
+        <CaseNav caseId={caseId!} />
+        <PersonProfileSummaryView
+          caseId={caseId!}
           modules={answers}
-          safetyStatus={safetyStatus}
           summaryText={profile?.summary_text ?? null}
+          relationshipLabel={relationshipLabel}
           onEdit={() => setShowSummary(false)}
         />
       </AppShell>
@@ -121,44 +124,36 @@ export default function ProfilePage() {
 
   return (
     <AppShell>
+      <CaseNav caseId={caseId!} />
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         {/* Header */}
         <div className="mb-6">
-          <span className="label">Selbstbeschreibung</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">Mein Beziehungsprofil</h1>
+          <span className="label">Fremdeinschätzung</span>
+          <h1 className="mt-1 text-2xl font-bold text-navy">
+            Profil der anderen Person
+            {relationshipLabel && <span className="text-lg font-normal text-brand-muted ml-2">– {relationshipLabel}</span>}
+          </h1>
           <p className="mt-2 text-sm text-brand-muted max-w-2xl">
-            Dein Beziehungsprofil hilft EchoB, deine Beziehungssituationen besser einzuordnen.
-            Es geht nicht darum, dich zu bewerten oder eine Diagnose zu stellen. Die Angaben helfen dabei,
-            zwischen Beziehungsmustern, eigenen Reaktionsweisen, Belastung, Ressourcen und Sicherheitsaspekten zu unterscheiden.
+            Hier beschreibst du, wie du die andere Person in dieser Beziehung wahrnimmst.
+            Es geht nicht darum, sie zu bewerten oder zu diagnostizieren – sondern darum, deine eigene Erfahrung
+            in Worte zu fassen, damit EchoB die Dynamik besser verstehen kann.
           </p>
-          <div className="mt-3 rounded-brand border border-brand-border bg-brand-bg px-4 py-3 text-sm text-brand-muted max-w-2xl">
-            Du kannst einzelne Fragen überspringen. Besonders persönliche Angaben sind freiwillig.
-            Du kannst deine Antworten später ändern oder löschen.
+          <div className="mt-3 rounded-brand border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 max-w-2xl">
+            Diese Einschätzung basiert auf deiner subjektiven Wahrnehmung und ist keine Diagnose der anderen Person.
+            Du kannst einzelne Fragen überspringen.
           </div>
         </div>
-
-        {/* Sicherheitshinweis */}
-        {safetyInfo.show && (
-          <div className={`mb-6 rounded-brand border px-4 py-3 max-w-2xl ${safetyInfo.cls}`}>
-            <p className="text-sm font-semibold mb-1">⚠ {safetyInfo.label}</p>
-            <p className="text-xs">
-              Deine Angaben enthalten Hinweise, dass Sicherheit eine wichtige Rolle spielen könnte.
-              EchoB ersetzt keine Notfallhilfe. Wenn du akut gefährdet bist, wende dich bitte an
-              lokale Notruf- oder Beratungsstellen (z.B. Notruf 110 / 112, Telefonseelsorge 0800 111 0 111).
-            </p>
-          </div>
-        )}
 
         {/* Fortschrittsanzeige */}
         <div className="mb-6 max-w-2xl">
           <div className="flex items-center justify-between text-xs text-brand-muted mb-1">
-            <span>{completedModules.length} von {PROFILE_MODULES.length} Modulen gespeichert</span>
-            <span>{Math.round((completedModules.length / PROFILE_MODULES.length) * 100)}%</span>
+            <span>{completedModules.length} von {PERSON_PROFILE_MODULES.length} Modulen gespeichert</span>
+            <span>{Math.round((completedModules.length / PERSON_PROFILE_MODULES.length) * 100)}%</span>
           </div>
           <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
             <div
               className="h-full bg-accent transition-all duration-300"
-              style={{ width: `${(completedModules.length / PROFILE_MODULES.length) * 100}%` }}
+              style={{ width: `${(completedModules.length / PERSON_PROFILE_MODULES.length) * 100}%` }}
             />
           </div>
         </div>
@@ -167,7 +162,7 @@ export default function ProfilePage() {
           {/* Modul-Navigation (Sidebar) */}
           <aside className="hidden md:block w-52 flex-shrink-0">
             <nav className="space-y-1 sticky top-20">
-              {PROFILE_MODULES.map((mod) => (
+              {PERSON_PROFILE_MODULES.map((mod) => (
                 <button
                   key={mod.id}
                   onClick={() => { if (isDirty) saveMutation.mutate(activeModule); setActiveModule(mod.id) }}
@@ -200,7 +195,7 @@ export default function ProfilePage() {
 
           {/* Modul-Formular */}
           <div className="flex-1 min-w-0">
-            <ModuleForm
+            <PersonProfileModuleForm
               cfg={currentModuleCfg}
               answers={currentAnswers}
               onAnswer={setAnswer}
@@ -211,7 +206,6 @@ export default function ProfilePage() {
               <p className="mt-3 text-sm text-red-600">Speichern fehlgeschlagen. Bitte versuche es erneut.</p>
             )}
 
-            {/* Buttons */}
             <div className="mt-6 flex items-center gap-3 flex-wrap">
               <button
                 onClick={() => saveMutation.mutate(activeModule)}
@@ -252,15 +246,15 @@ export default function ProfilePage() {
   )
 }
 
-// ── Modul-Formular ────────────────────────────────────────────────────────────
+// ── Modul-Formular ─────────────────────────────────────────────────────────────
 
-function ModuleForm({
+function PersonProfileModuleForm({
   cfg,
   answers,
   onAnswer,
   onToggleMulti,
 }: {
-  cfg: ProfileModuleConfig
+  cfg: PersonProfileModuleConfig
   answers: Record<string, unknown>
   onAnswer: (key: string, value: unknown) => void
   onToggleMulti: (key: string, value: string) => void
@@ -271,11 +265,10 @@ function ModuleForm({
         <span className="label">{cfg.shortLabel}</span>
         <h2 className="mt-1 text-lg font-bold text-navy">{cfg.label}</h2>
         <p className="mt-1 text-sm text-brand-muted">{cfg.description}</p>
-        {cfg.intro && <p className="mt-2 text-xs text-brand-muted/80 italic">{cfg.intro}</p>}
       </div>
 
       {/* Auswahlfelder */}
-      {cfg.selections.map((sel) => (
+      {cfg.selections?.map((sel) => (
         <div key={sel.key}>
           <p className="text-sm font-medium text-brand-text mb-2">{sel.label}</p>
           {sel.multi ? (
@@ -389,47 +382,54 @@ function LikertQuestion({
   )
 }
 
-// ── Zusammenfassung ───────────────────────────────────────────────────────────
+// ── Zusammenfassung ────────────────────────────────────────────────────────────
 
-function SummaryView({
+function PersonProfileSummaryView({
+  caseId,
   modules,
-  safetyStatus,
   summaryText,
+  relationshipLabel,
   onEdit,
 }: {
+  caseId: string
   modules: Record<string, Record<string, unknown>>
-  safetyStatus: string
   summaryText: string | null
+  relationshipLabel: string
   onEdit: () => void
 }) {
   const qc = useQueryClient()
   const [editingText, setEditingText] = useState(false)
   const [editValue, setEditValue] = useState('')
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null)
+  const [showAiSuggestion, setShowAiSuggestion] = useState(false)
 
   const saveTextMutation = useMutation({
-    mutationFn: (text: string) => profileApi.saveSummaryText(text),
+    mutationFn: (text: string) => personProfileApi.saveSummaryText(caseId, text),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['profile'] })
+      qc.invalidateQueries({ queryKey: ['person-profile', caseId] })
       setEditingText(false)
+      setShowAiSuggestion(false)
     },
   })
 
-  const safetyInfo = SAFETY_STATUS_INFO[safetyStatus]
-  const summaryLines = buildSummaryText(modules)
+  const generateMutation = useMutation({
+    mutationFn: () => personProfileApi.generateSummary(caseId),
+    onSuccess: (data) => {
+      setAiSuggestion(data.summary_text)
+      setShowAiSuggestion(true)
+    },
+  })
+
+  const summaryLines = buildPersonSummaryText(modules)
 
   const scoreRows: { label: string; value: number | null; key: string }[] = [
-    { key: 'distress_index', label: 'Aktueller Belastungsgrad', value: (modules.distress?.distress_index as number | null) ?? null },
-    { key: 'attachment_anxiety_score', label: 'Nähebedürfnis und Verlustangst', value: (modules.attachment?.attachment_anxiety_score as number | null) ?? null },
-    { key: 'attachment_avoidance_score', label: 'Rückzug und Distanzschutz', value: (modules.attachment?.attachment_avoidance_score as number | null) ?? null },
-    { key: 'attachment_ambivalence_score', label: 'Ambivalenz Nähe–Distanz', value: (modules.attachment?.attachment_ambivalence_score as number | null) ?? null },
-    { key: 'emotional_overwhelm_score', label: 'Emotionale Überwältigung', value: (modules.emotion_regulation?.emotional_overwhelm_score as number | null) ?? null },
-    { key: 'self_soothing_score', label: 'Selbststabilisierung', value: (modules.emotion_regulation?.self_soothing_score as number | null) ?? null },
-    { key: 'guilt_tendency_score', label: 'Schuld- und Verantwortungsdruck', value: (modules.guilt_shame_selfworth?.guilt_tendency_score as number | null) ?? null },
-    { key: 'shame_score', label: 'Scham und Selbstabwertung', value: (modules.guilt_shame_selfworth?.shame_score as number | null) ?? null },
-    { key: 'boundary_stability_score', label: 'Grenzen halten unter Druck', value: (modules.boundaries_autonomy?.boundary_stability_score as number | null) ?? null },
-    { key: 'autonomy_score', label: 'Autonomieerleben', value: (modules.boundaries_autonomy?.autonomy_score as number | null) ?? null },
-    { key: 'perception_uncertainty_score', label: 'Wahrnehmungsverunsicherung', value: (modules.perception_clarity?.perception_uncertainty_score as number | null) ?? null },
-    { key: 'resources_index', label: 'Ressourcenindex', value: (modules.resources?.resources_index as number | null) ?? null },
+    { key: 'emotional_volatility', label: 'Emotionale Volatilität', value: (modules.emotional_reactions?.emotional_volatility as number | null) ?? null },
+    { key: 'empathy_deficit', label: 'Wahrgenommenes Empathiedefizit', value: (modules.empathy?.empathy_deficit as number | null) ?? null },
+    { key: 'grandiosity', label: 'Wahrgenommene Grandiosität', value: (modules.self_image?.grandiosity as number | null) ?? null },
+    { key: 'manipulation_score', label: 'Manipulationsverhalten', value: (modules.manipulation?.manipulation_score as number | null) ?? null },
+    { key: 'attachment_instability', label: 'Bindungsinstabilität', value: (modules.attachment_patterns?.attachment_instability as number | null) ?? null },
+    { key: 'impulsivity_score', label: 'Impulsivität', value: (modules.impulsivity?.impulsivity_score as number | null) ?? null },
+    { key: 'relational_burden', label: 'Wahrgenommene Beziehungsbelastung', value: (modules.overall_impression?.relational_burden as number | null) ?? null },
   ]
 
   const hasAnyData = scoreRows.some(r => r.value != null)
@@ -438,31 +438,24 @@ function SummaryView({
     <div className="mx-auto max-w-[780px] px-6 py-8">
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
-          <span className="label">Beziehungsprofil</span>
-          <h1 className="mt-1 text-xl font-bold text-navy">Deine vorläufige Selbstbeschreibung</h1>
+          <span className="label">Personenprofil</span>
+          <h1 className="mt-1 text-xl font-bold text-navy">
+            Deine Einschätzung
+            {relationshipLabel && <span className="text-base font-normal text-brand-muted ml-2">– {relationshipLabel}</span>}
+          </h1>
           <p className="text-xs text-brand-muted mt-1">
-            Diese Einschätzung ist vorläufig und ersetzt keine professionelle Diagnostik.
+            Diese Einschätzung basiert auf deiner subjektiven Wahrnehmung und ist keine Diagnose der anderen Person.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button onClick={onEdit} className="btn-outline !py-2 !px-4 !text-sm">
-            Profil bearbeiten
+            Module bearbeiten
           </button>
-          <Link to="/app/profile/echo" className="btn-primary !py-2 !px-4 !text-sm">
+          <Link to={`/app/cases/${caseId}/person-profile/echo`} className="btn-primary !py-2 !px-4 !text-sm">
             Mit Echo besprechen
           </Link>
         </div>
       </div>
-
-      {safetyInfo.show && (
-        <div className={`mb-6 rounded-brand border px-4 py-3 ${safetyInfo.cls}`}>
-          <p className="text-sm font-semibold mb-1">⚠ {safetyInfo.label}</p>
-          <p className="text-xs">
-            Deine Angaben enthalten Hinweise, dass Sicherheit eine wichtige Rolle spielen könnte.
-            EchoB ersetzt keine Notfallhilfe. Bei akuter Gefahr: Notruf 110 / 112, Telefonseelsorge 0800 111 0 111 (kostenlos, 24h).
-          </p>
-        </div>
-      )}
 
       {!hasAnyData && (
         <div className="card text-center py-8 text-brand-muted text-sm">
@@ -473,11 +466,11 @@ function SummaryView({
         </div>
       )}
 
-      {/* Gespeicherte Selbstbeschreibung (editierbar) */}
+      {/* Gespeicherte Beschreibung (editierbar) */}
       {summaryText && (
         <div className="card mb-6 border-accent/30 bg-accent/5">
           <div className="flex items-start justify-between gap-2 mb-3">
-            <p className="text-sm font-semibold text-navy">Meine Selbstbeschreibung</p>
+            <p className="text-sm font-semibold text-navy">Gespeicherte Beschreibung</p>
             {!editingText && (
               <button
                 onClick={() => { setEditValue(summaryText); setEditingText(true) }}
@@ -524,22 +517,69 @@ function SummaryView({
         </div>
       )}
 
+      {/* KI-Zusammenfassung generieren */}
+      {hasAnyData && (
+        <div className="card mb-6 border-brand-border">
+          <p className="text-sm font-semibold text-navy mb-2">KI-Zusammenfassung generieren</p>
+          <p className="text-xs text-brand-muted mb-3">
+            EchoB kann auf Basis deiner Modul-Antworten eine erste vorsichtige Beschreibung formulieren.
+            Du kannst sie dann prüfen und bei Bedarf speichern.
+          </p>
+
+          {!showAiSuggestion ? (
+            <button
+              onClick={() => generateMutation.mutate()}
+              disabled={generateMutation.isPending}
+              className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50"
+            >
+              {generateMutation.isPending ? 'Wird generiert …' : 'KI-Zusammenfassung generieren'}
+            </button>
+          ) : aiSuggestion ? (
+            <div>
+              <div className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3 mb-3">
+                <p className="text-sm text-brand-text whitespace-pre-wrap">{aiSuggestion}</p>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => saveTextMutation.mutate(aiSuggestion)}
+                  disabled={saveTextMutation.isPending}
+                  className="btn-primary !py-2 !px-4 !text-sm disabled:opacity-50"
+                >
+                  {saveTextMutation.isPending ? 'Wird gespeichert …' : 'Beschreibung speichern'}
+                </button>
+                <button
+                  onClick={() => { setShowAiSuggestion(false); setAiSuggestion(null) }}
+                  className="btn-outline !py-2 !px-4 !text-sm"
+                >
+                  Verwerfen
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {generateMutation.isError && (
+            <p className="mt-2 text-xs text-red-600">Generierung fehlgeschlagen. Bitte versuche es erneut.</p>
+          )}
+        </div>
+      )}
+
       {hasAnyData && (
         <>
           {/* Textliche Zusammenfassung */}
           {summaryLines.length > 0 && (
             <div className="card mb-6 space-y-3">
-              <p className="text-sm font-semibold text-navy">Zusammenfassung</p>
+              <p className="text-sm font-semibold text-navy">Zusammenfassung deiner Einschätzung</p>
               {summaryLines.map((line, i) => (
                 <p key={i} className="text-sm text-brand-text" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
               ))}
               <p className="text-xs text-brand-muted/70 pt-2 border-t border-brand-border">
-                Diese Einschätzung basiert auf deinen Selbstangaben und ist vorläufig. Sie ersetzt keine professionelle Beratung oder Diagnostik.
+                Diese Einschätzung basiert auf deinen Angaben zu der anderen Person und ist vorläufig.
+                Sie ist keine Diagnose und stellt keine professionelle Beurteilung dar.
               </p>
             </div>
           )}
 
-          {/* Score-Tabelle */}
+          {/* Score-Balken */}
           <div className="card mb-6">
             <p className="text-sm font-semibold text-navy mb-4">Profilwerte im Überblick</p>
             <div className="space-y-3">

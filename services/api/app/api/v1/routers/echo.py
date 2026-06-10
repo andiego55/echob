@@ -13,6 +13,7 @@ from app.core.dependencies import get_current_user, get_pool
 from app.schemas.echo import EchoChatRequest, EchoChatResponse, EchoMessageResponse
 from app.services.echo_service import build_case_context
 from app.services.profile_service import build_profile_context
+from app.services.person_profile_service import build_person_context
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/echo", tags=["echo"])
@@ -56,6 +57,9 @@ async def chat(
         )
         scale_rows = await conn.fetch(
             "SELECT * FROM scale_scores WHERE case_id = $1", case_id
+        )
+        person_profile_row = await conn.fetchrow(
+            "SELECT * FROM person_profiles WHERE case_id = $1", case_id
         )
 
         # Letzte 20 Nachrichten als Gesprächshistorie
@@ -150,6 +154,20 @@ async def chat(
 
     # ── Normaler Chat: gespeicherten Kontext aus der Session laden ────────────
     extra_context = ""
+    # Personenprofil-Kontext für Nicht-Szenen-Threads einbinden
+    if body.thread_type != "scene" and person_profile_row:
+        pp_data = dict(person_profile_row)
+        pp_modules = pp_data.get("modules") or {}
+        if isinstance(pp_modules, str):
+            import json as _ppj
+            pp_modules = _ppj.loads(pp_modules)
+        pp_summary = pp_data.get("summary") or {}
+        if isinstance(pp_summary, str):
+            import json as _ppj2
+            pp_summary = _ppj2.loads(pp_summary)
+        if pp_modules:
+            extra_context = build_person_context({"modules": pp_modules, "summary": pp_summary})
+
     if body.thread_type == "scene" and body.scene_session_id:
         async with pool.acquire() as conn:
             ctx_row = await conn.fetchrow(

@@ -23,8 +23,10 @@ import ReportsPage       from '@/pages/app/ReportsPage'
 import ReportNewPage      from '@/pages/app/ReportNewPage'
 import ReportDetailPage   from '@/pages/app/ReportDetailPage'
 import HelpPage           from '@/pages/app/HelpPage'
-import ProfilePage        from '@/pages/app/ProfilePage'
-import ProfileEchoPage    from '@/pages/app/ProfileEchoPage'
+import ProfilePage           from '@/pages/app/ProfilePage'
+import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
+import PersonProfilePage     from '@/pages/app/PersonProfilePage'
+import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
 
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
@@ -45,6 +47,8 @@ export default function App() {
       <Route path="/app/profile/echo" element={<ProtectedRoute><ProfileEchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/new" element={<ProtectedRoute><CaseNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId" element={<ProtectedRoute><CaseDetailPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/person-profile" element={<ProtectedRoute><PersonProfilePage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/person-profile/echo" element={<ProtectedRoute><PersonProfileEchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/scenes" element={<ProtectedRoute><ScenesPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/scenes/new" element={<ProtectedRoute><SceneNewPage /></ProtectedRoute>} />

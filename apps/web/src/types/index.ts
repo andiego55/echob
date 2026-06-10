@@ -265,3 +265,17 @@ export interface ProfileModuleUpdate {
   module_id: string
   data: Record<string, unknown>
 }
+
+// ── Personenprofil ────────────────────────────────────────────────────────────
+
+export interface PersonProfile {
+  id: string
+  case_id: string
+  user_id: string
+  modules: Record<string, Record<string, unknown>>
+  summary: Record<string, unknown>
+  completed_modules: string[]
+  summary_text: string | null
+  created_at: string
+  updated_at: string
+}
