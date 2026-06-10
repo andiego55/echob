@@ -12,7 +12,7 @@ import { topicSummariesApi } from '@/api/topicSummaries'
 import type { EchoMessage } from '@/types'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 
-const TOPICS: Record<string, { label: string; description: string; startTrigger: string }> = {
+const TOPICS: Record<string, { label: string; description: string; startTrigger: string; isBlog?: boolean }> = {
   topic_self: {
     label: 'Über mich',
     description: 'Erkunde deine eigenen Muster, Bedürfnisse und Reaktionen in dieser Beziehung.',
@@ -32,6 +32,31 @@ const TOPICS: Record<string, { label: string; description: string; startTrigger:
     label: 'Schuld',
     description: 'Erforsche, woher dein Schuldgefühl kommt und ob es wirklich dir gehört.',
     startTrigger: '__topic_guilt_start__',
+  },
+  // Blog-Themen
+  blog_beziehungsmuster: {
+    label: 'Beziehungsmuster erkennen',
+    description: 'Welche Muster erkennst du in deiner eigenen Beziehungssituation? Echo hilft dir, sie zu benennen und zu verstehen.',
+    startTrigger: '__blog_beziehungsmuster_start__',
+    isBlog: true,
+  },
+  blog_beobachtung_gefuehl: {
+    label: 'Beobachtung, Gefühl, Interpretation',
+    description: 'Übe das Trennen von Wahrnehmung, Emotion und Schlussfolgerung – anhand konkreter Situationen aus deinem Fall.',
+    startTrigger: '__blog_beobachtung_gefuehl_start__',
+    isBlog: true,
+  },
+  blog_professionelle_hilfe: {
+    label: 'Wann professionelle Hilfe sinnvoll ist',
+    description: 'Reflektiere gemeinsam mit Echo, was du gerade erlebst – und ob professionelle Unterstützung ein nächster Schritt sein könnte.',
+    startTrigger: '__blog_professionelle_hilfe_start__',
+    isBlog: true,
+  },
+  blog_krisentelefone: {
+    label: 'Krisentelefone & Anlaufstellen',
+    description: 'Besprich mit Echo, wie es dir gerade geht, und erhalte Orientierung zu verfügbaren Unterstützungsangeboten.',
+    startTrigger: '__blog_krisentelefone_start__',
+    isBlog: true,
   },
 }
 
@@ -184,7 +209,10 @@ export default function TopicDialogPage() {
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
             {/* Kontext-Hinweis */}
-            <div className="rounded-brand border border-brand-border bg-blue-50 px-4 py-3">
+            <div className={`rounded-brand border px-4 py-3 ${topic.isBlog ? 'border-accent/30 bg-accent/5' : 'border-brand-border bg-blue-50'}`}>
+              {topic.isBlog && (
+                <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-accent mb-1">Aus dem Blog</span>
+              )}
               <p className="text-xs font-medium text-navy mb-0.5">{topic.label}</p>
               <p className="text-xs text-brand-muted">{topic.description}</p>
             </div>

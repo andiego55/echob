@@ -88,7 +88,10 @@ CREATE TABLE IF NOT EXISTS echo_messages (
     role             TEXT NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
     content          TEXT NOT NULL,
     thread_type      TEXT CHECK (thread_type IN (
-        'onboarding', 'scene', 'topic', 'glossary', 'report'
+        'onboarding', 'scene', 'topic', 'glossary', 'report',
+        'topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt',
+        'blog_beziehungsmuster', 'blog_beobachtung_gefuehl',
+        'blog_professionelle_hilfe', 'blog_krisentelefone'
     )) DEFAULT 'topic',
     related_scene_id UUID REFERENCES scenes (id) ON DELETE SET NULL,
     metadata         JSONB DEFAULT '{}'::jsonb,

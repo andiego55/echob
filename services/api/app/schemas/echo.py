@@ -11,6 +11,8 @@ MessageRole = Literal["user", "assistant", "system"]
 ThreadType = Literal[
     "onboarding", "scene", "topic", "glossary", "report",
     "topic_self", "topic_person", "topic_responsibility", "topic_guilt",
+    "blog_beziehungsmuster", "blog_beobachtung_gefuehl",
+    "blog_professionelle_hilfe", "blog_krisentelefone",
 ]
 
 # ── Einzel-Nachricht ──────────────────────────────────────────────────────────

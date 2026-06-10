@@ -18,6 +18,13 @@ import {
 
 const TOPIC_ORDER = ['topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt'] as const
 
+const BLOG_TOPICS = [
+  { id: 'blog_beziehungsmuster',     label: 'Beziehungsmuster erkennen' },
+  { id: 'blog_beobachtung_gefuehl',  label: 'Beobachtung, Gefühl, Interpretation' },
+  { id: 'blog_professionelle_hilfe', label: 'Wann professionelle Hilfe sinnvoll ist' },
+  { id: 'blog_krisentelefone',       label: 'Krisentelefone & Anlaufstellen' },
+] as const
+
 export default function CaseDetailPage() {
   const { caseId } = useParams<{ caseId: string }>()
 
@@ -200,19 +207,11 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
 
   return (
     <div className="card">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-xs font-semibold text-brand-muted mb-0.5">Themendialoge</p>
-          <p className="text-sm font-medium text-navy">
-            {hasSummaries ? `${summaries.length} von 4 Zusammenfassungen gespeichert` : 'Keine gespeicherten Zusammenfassungen'}
-          </p>
-        </div>
-        <button
-          onClick={() => navigate(`/app/cases/${caseId}/topics/topic_self`)}
-          className="text-xs text-accent font-medium hover:underline"
-        >
-          Zum Dialog →
-        </button>
+      <div className="mb-4">
+        <p className="text-xs font-semibold text-brand-muted mb-0.5">Themendialoge</p>
+        <p className="text-sm font-medium text-navy">
+          {hasSummaries ? `${summaries.length} von 4 Zusammenfassungen gespeichert` : 'Keine gespeicherten Zusammenfassungen'}
+        </p>
       </div>
 
       <div className="space-y-3">
@@ -274,6 +273,24 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
             </div>
           )
         })}
+
+        {/* Aus dem Blog */}
+        <div className="mt-4 pt-4 border-t border-brand-border">
+          <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Aus dem Blog</p>
+          <div className="space-y-2">
+            {BLOG_TOPICS.map(({ id, label }) => (
+              <div key={id} className="rounded-brand border border-accent/20 bg-accent/5 px-4 py-3 flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold text-navy">{label}</p>
+                <button
+                  onClick={() => navigate(`/app/cases/${caseId}/topics/${id}`)}
+                  className="text-xs text-accent hover:underline flex-shrink-0"
+                >
+                  Dialog →
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )

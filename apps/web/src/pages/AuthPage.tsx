@@ -10,7 +10,8 @@ type Method = 'password' | 'magic'
 export default function AuthPage() {
   const { session } = useAuth()
   const location    = useLocation()
-  const from        = (location.state as { from?: Location })?.from?.pathname ?? '/app'
+  const fromLoc     = (location.state as { from?: Location })?.from
+  const from        = fromLoc ? `${fromLoc.pathname}${(fromLoc as Location & { search?: string }).search ?? ''}` : '/app'
 
   const [tab, setTab]         = useState<Tab>('login')
   const [method, setMethod]   = useState<Method>('password')

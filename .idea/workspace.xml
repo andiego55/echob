@@ -6,12 +6,27 @@
   <component name="ChangeListManager">
     <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="Works with AI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/components/app/CaseNav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/components/app/CaseNav.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/AuthPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/AuthPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/CaseDetailPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/CaseDetailPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/ProfilePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/ProfilePage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/types/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/routers/echo.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/routers/echo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/CasesOverviewPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/CasesOverviewPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/TopicDialogPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/TopicDialogPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/docker/postgres/init/02_app.sql" beforeDir="false" afterPath="$PROJECT_DIR$/infra/docker/postgres/init/02_app.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/routers/topic_summaries.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/routers/topic_summaries.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/schemas/echo.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/schemas/echo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/services/echo_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/services/echo_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/coaching.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/coaching.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/datenschutz.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/datenschutz.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/erstcheck.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/erstcheck.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/fachpersonen.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/fachpersonen.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/impressum.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/impressum.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/onboarding.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/onboarding.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/ueber.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/ueber.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/warteliste.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/warteliste.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static-site/wissen.html" beforeDir="false" afterPath="$PROJECT_DIR$/static-site/wissen.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,18 +45,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Projekte\\echob\\apps\\web\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -59,7 +75,7 @@
       <option name="presentableId" value="Default" />
       <updated>1780945977920</updated>
       <workItem from="1780945979268" duration="14926000" />
-      <workItem from="1781069856317" duration="5073000" />
+      <workItem from="1781069856317" duration="8611000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -157,7 +173,23 @@
       <option name="project" value="LOCAL" />
       <updated>1781077438647</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Works with AI">
+      <option name="closed" value="true" />
+      <created>1781088782576</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1781088782576</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Works with AI">
+      <option name="closed" value="true" />
+      <created>1781096257481</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1781096257481</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

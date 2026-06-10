@@ -195,7 +195,7 @@ class EchoService:
                 history=history or [],
                 extra_context=kwargs.get("extra_context", ""),
             )
-        if thread_type.startswith("topic_"):
+        if thread_type.startswith("topic_") or thread_type.startswith("blog_"):
             if self._use_openai:
                 return await self._openai_topic_chat(
                     topic=thread_type,
@@ -325,6 +325,7 @@ class EchoService:
             for m in history
             if m["role"] in ("user", "assistant")
             and not m["content"].startswith("__topic_")
+            and not m["content"].startswith("__blog_")
         )
         user_message = (
             f"Thema: {_TOPIC_LABELS.get(topic, topic)}\n\n"
@@ -481,12 +482,16 @@ class EchoService:
         extra_context: str = "",
     ) -> str:
         _TOPIC_PROMPTS = {
-            "topic_self":           "topic_self_prompt.md",
-            "topic_person":         "topic_person_prompt.md",
-            "topic_responsibility": "topic_responsibility_prompt.md",
-            "topic_guilt":          "topic_guilt_prompt.md",
+            "topic_self":               "topic_self_prompt.md",
+            "topic_person":             "topic_person_prompt.md",
+            "topic_responsibility":     "topic_responsibility_prompt.md",
+            "topic_guilt":              "topic_guilt_prompt.md",
+            "blog_beziehungsmuster":    "blog_topic_prompt.md",
+            "blog_beobachtung_gefuehl": "blog_topic_prompt.md",
+            "blog_professionelle_hilfe":"blog_topic_prompt.md",
+            "blog_krisentelefone":      "blog_topic_prompt.md",
         }
-        prompt_file = _TOPIC_PROMPTS.get(topic, "topic_self_prompt.md")
+        prompt_file = _TOPIC_PROMPTS.get(topic, "blog_topic_prompt.md")
         system_prompt = _load_prompt(prompt_file)
 
         case_ctx = build_case_context(

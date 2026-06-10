@@ -15,6 +15,11 @@ TOPIC_LABELS = {
     "topic_person":         "Über die Fallperson",
     "topic_responsibility": "Verantwortung",
     "topic_guilt":          "Schuld",
+    # Blog-Themen
+    "blog_beziehungsmuster":     "Beziehungsmuster erkennen",
+    "blog_beobachtung_gefuehl":  "Beobachtung, Gefühl, Interpretation",
+    "blog_professionelle_hilfe": "Wann professionelle Hilfe sinnvoll ist",
+    "blog_krisentelefone":       "Krisentelefone & Anlaufstellen",
 }
 
 

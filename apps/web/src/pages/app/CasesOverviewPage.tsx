@@ -2,7 +2,7 @@
  * /app — Fallübersicht
  * Listet alle Fälle des Nutzers. Einstiegsseite nach Login.
  */
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
@@ -10,7 +10,18 @@ import { profileApi } from '@/api/profile'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { Case } from '@/types'
 
+const BLOG_TOPIC_LABELS: Record<string, string> = {
+  blog_beziehungsmuster:     'Beziehungsmuster erkennen',
+  blog_beobachtung_gefuehl:  'Beobachtung, Gefühl, Interpretation',
+  blog_professionelle_hilfe: 'Wann professionelle Hilfe sinnvoll ist',
+  blog_krisentelefone:       'Krisentelefone & Anlaufstellen',
+}
+
 export default function CasesOverviewPage() {
+  const [searchParams] = useSearchParams()
+  const blogTopic = searchParams.get('blog')
+  const blogLabel = blogTopic ? (BLOG_TOPIC_LABELS[blogTopic] ?? null) : null
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ['cases'],
     queryFn: casesApi.list,
@@ -25,12 +36,28 @@ export default function CasesOverviewPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-[1100px] px-6 py-10">
+        {/* Blog-Topic-Banner */}
+        {blogLabel && (
+          <div className="mb-6 rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-accent mb-1">Aus dem Blog</p>
+            <p className="text-sm font-semibold text-navy mb-1">„{blogLabel}"</p>
+            <p className="text-xs text-brand-muted">
+              Wähle einen Fall aus, um einen geführten Dialog mit Echo zu diesem Thema zu starten.
+              Echo nutzt den Kontext deiner dokumentierten Situationen.
+            </p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-navy">Meine Fälle</h1>
+            <h1 className="text-2xl font-bold text-navy">
+              {blogLabel ? 'Fall auswählen' : 'Meine Fälle'}
+            </h1>
             <p className="mt-1 text-sm text-brand-muted">
-              Jeder Fall steht für eine Beziehungssituation, die du besser verstehen möchtest.
+              {blogLabel
+                ? 'Welchen Fall möchtest du als Kontext für diesen Dialog nutzen?'
+                : 'Jeder Fall steht für eine Beziehungssituation, die du besser verstehen möchtest.'}
             </p>
           </div>
           <Link to="/app/cases/new" className="btn-primary !py-2 !px-5 !text-sm">
@@ -75,7 +102,7 @@ export default function CasesOverviewPage() {
         {data && data.cases.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data.cases.map((c) => (
-              <CaseCard key={c.id} case_={c} />
+              <CaseCard key={c.id} case_={c} blogTopic={blogTopic ?? undefined} />
             ))}
           </div>
         )}
@@ -84,13 +111,16 @@ export default function CasesOverviewPage() {
   )
 }
 
-function CaseCard({ case_: c }: { case_: Case }) {
+function CaseCard({ case_: c, blogTopic }: { case_: Case; blogTopic?: string }) {
   const typeLabel   = RELATIONSHIP_TYPE_LABELS[c.relationship_type]   ?? c.relationship_type
   const statusLabel = RELATIONSHIP_STATUS_LABELS[c.relationship_status] ?? c.relationship_status
+  const to = blogTopic
+    ? `/app/cases/${c.id}/topics/${blogTopic}`
+    : `/app/cases/${c.id}`
 
   return (
     <Link
-      to={`/app/cases/${c.id}`}
+      to={to}
       className="card block no-underline hover:border-accent/40 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between gap-2 mb-3">
@@ -101,7 +131,9 @@ function CaseCard({ case_: c }: { case_: Case }) {
       {c.main_concern && (
         <p className="text-xs text-brand-muted line-clamp-2">{c.main_concern}</p>
       )}
-      <div className="mt-4 text-xs text-accent font-medium">Fall öffnen →</div>
+      <div className="mt-4 text-xs text-accent font-medium">
+        {blogTopic ? 'Dialog starten →' : 'Fall öffnen →'}
+      </div>
     </Link>
   )
 }
