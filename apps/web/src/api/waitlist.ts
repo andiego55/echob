@@ -12,6 +12,6 @@ export interface WaitlistResponse {
 }
 
 export async function joinWaitlist(data: WaitlistRequest): Promise<WaitlistResponse> {
-  const response = await apiClient.post<WaitlistResponse>('/api/v1/waitlist', data)
+  const response = await apiClient.post<WaitlistResponse>('/waitlist', data)
   return response.data
 }

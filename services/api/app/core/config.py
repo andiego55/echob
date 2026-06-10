@@ -44,7 +44,8 @@ class Settings(BaseSettings):
     secret_key: str = _INSECURE_KEY
 
     # ── AI ─────────────────────────────────────────────────────────────
-    anthropic_api_key: str = ""
+    openai_api_key: str = ""
+    anthropic_api_key: str = ""   # Reserviert für zukünftige Nutzung
 
     # ── Logging ────────────────────────────────────────────────────────
     log_level: Literal["debug", "info", "warning", "error"] = "info"

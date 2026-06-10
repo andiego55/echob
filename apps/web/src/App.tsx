@@ -1,28 +1,56 @@
 import { Routes, Route } from 'react-router-dom'
-import LandingPage    from '@/pages/LandingPage'
-import WaitlistPage   from '@/pages/WaitlistPage'
-import ImpressumPage  from '@/pages/ImpressumPage'
+
+// ── Öffentliche Seiten ────────────────────────────────────────────────────────
+import LandingPage     from '@/pages/LandingPage'
+import WaitlistPage    from '@/pages/WaitlistPage'
+import ImpressumPage   from '@/pages/ImpressumPage'
 import DatenschutzPage from '@/pages/DatenschutzPage'
-import AuthPage       from '@/pages/AuthPage'
-import AppPage        from '@/pages/AppPage'
-import NotFoundPage   from '@/pages/NotFoundPage'
+import AuthPage        from '@/pages/AuthPage'
+import NotFoundPage    from '@/pages/NotFoundPage'
+
+// ── App-Bereich ───────────────────────────────────────────────────────────────
+import CasesOverviewPage from '@/pages/app/CasesOverviewPage'
+import CaseNewPage       from '@/pages/app/CaseNewPage'
+import CaseDetailPage    from '@/pages/app/CaseDetailPage'
+import OnboardingPage    from '@/pages/app/OnboardingPage'
+import ScenesPage        from '@/pages/app/ScenesPage'
+import SceneNewPage      from '@/pages/app/SceneNewPage'
+import SceneDetailPage   from '@/pages/app/SceneDetailPage'
+import EchoPage          from '@/pages/app/EchoPage'
+import ScalesPage        from '@/pages/app/ScalesPage'
+import ReportsPage       from '@/pages/app/ReportsPage'
+import ReportNewPage      from '@/pages/app/ReportNewPage'
+import ReportDetailPage   from '@/pages/app/ReportDetailPage'
+import HelpPage           from '@/pages/app/HelpPage'
+
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 export default function App() {
   return (
     <Routes>
-      {/* Öffentliche Seiten */}
+      {/* ── Öffentlich ─────────────────────────────────────────────────────── */}
       <Route path="/"            element={<LandingPage />} />
       <Route path="/warteliste"  element={<WaitlistPage />} />
       <Route path="/impressum"   element={<ImpressumPage />} />
       <Route path="/datenschutz" element={<DatenschutzPage />} />
       <Route path="/auth"        element={<AuthPage />} />
 
-      {/* Eingeloggter Bereich */}
-      <Route path="/app" element={
-        <ProtectedRoute><AppPage /></ProtectedRoute>
-      } />
+      {/* ── App-Bereich (Login erforderlich) ───────────────────────────────── */}
+      <Route path="/app" element={<ProtectedRoute><CasesOverviewPage /></ProtectedRoute>} />
+      <Route path="/app/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
+      <Route path="/app/cases/new" element={<ProtectedRoute><CaseNewPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId" element={<ProtectedRoute><CaseDetailPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/scenes" element={<ProtectedRoute><ScenesPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/scenes/new" element={<ProtectedRoute><SceneNewPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/scenes/:sceneId" element={<ProtectedRoute><SceneDetailPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/echo" element={<ProtectedRoute><EchoPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/scales" element={<ProtectedRoute><ScalesPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/reports/new" element={<ProtectedRoute><ReportNewPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/reports/:reportId" element={<ProtectedRoute><ReportDetailPage /></ProtectedRoute>} />
 
+      {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )

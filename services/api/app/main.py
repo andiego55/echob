@@ -9,6 +9,12 @@ from app.core.config import settings
 from app.core.database import create_pool, create_supabase_admin
 from app.core.logging import get_logger, setup_logging
 from app.api.v1.router import v1_router
+from app.services.echo_service import create_echo_service
+
+
+def _create_echo_service():
+    key = getattr(settings, "openai_api_key", "")
+    return create_echo_service(openai_api_key=key)
 
 logger = get_logger(__name__)
 
@@ -27,8 +33,9 @@ def create_app() -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         # ── Startup ─────────────────────────────────────────────────────
-        app.state.pool    = await create_pool()
-        app.state.supabase = create_supabase_admin()
+        app.state.pool        = await create_pool()
+        app.state.supabase    = create_supabase_admin()
+        app.state.echo_service = _create_echo_service()
         yield
         # ── Shutdown ─────────────────────────────────────────────────────
         if app.state.pool is not None:

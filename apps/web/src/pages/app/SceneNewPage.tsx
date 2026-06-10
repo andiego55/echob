@@ -1,0 +1,239 @@
+/**
+ * /app/cases/:caseId/scenes/new — Szene anlegen
+ * 3 Eingabemodi: Freitext, Geführte Fragen, Chat (Chat → EchoPage).
+ */
+import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import AppShell from '@/components/app/AppShell'
+import CaseNav from '@/components/app/CaseNav'
+import { scenesApi } from '@/api/scenes'
+import type { InputMode } from '@/types'
+
+const GUIDED_QUESTIONS = [
+  { key: 'what',   label: 'Was ist passiert?' },
+  { key: 'said',   label: 'Was wurde gesagt oder getan?' },
+  { key: 'react',  label: 'Wie hast du reagiert?' },
+  { key: 'feel',   label: 'Wie hast du dich gefühlt?' },
+  { key: 'after',  label: 'Was ist danach passiert?' },
+  { key: 'repeat', label: 'Ist so etwas schon öfter vorgekommen?' },
+]
+
+const PATTERN_TAG_OPTIONS = [
+  'Schuldumkehr', 'Grenzverletzung', 'Kontrolle', 'Isolation',
+  'Nähe-Distanz-Wechsel', 'Abwertung', 'Idealisierung',
+  'Wahrnehmungsverunsicherung', 'Konflikteskalation', 'Schweigen/Rückzug',
+]
+
+export default function SceneNewPage() {
+  const { caseId } = useParams<{ caseId: string }>()
+  const navigate    = useNavigate()
+  const qc          = useQueryClient()
+
+  const [mode, setMode]               = useState<InputMode | null>(null)
+  const [title, setTitle]             = useState('')
+  const [sceneDate, setSceneDate]     = useState('')
+  const [freetext, setFreetext]       = useState('')
+  const [guidedAnswers, setGuided]    = useState<Record<string, string>>({})
+  const [distressScore, setDistress]  = useState<number | null>(null)
+  const [tags, setTags]               = useState<string[]>([])
+
+  const mutation = useMutation({
+    mutationFn: (data: Parameters<typeof scenesApi.create>[1]) =>
+      scenesApi.create(caseId!, data),
+    onSuccess: (scene) => {
+      qc.invalidateQueries({ queryKey: ['scenes', caseId] })
+      navigate(`/app/cases/${caseId}/scenes/${scene.id}`)
+    },
+  })
+
+  const toggleTag = (tag: string) => {
+    setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const description = mode === 'guided'
+      ? Object.entries(guidedAnswers).map(([k, v]) => {
+          const q = GUIDED_QUESTIONS.find((q) => q.key === k)
+          return q && v ? `${q.label}\n${v}` : ''
+        }).filter(Boolean).join('\n\n')
+      : freetext
+
+    mutation.mutate({
+      title:         title || 'Szene ohne Titel',
+      scene_date:    sceneDate || undefined,
+      description:   description || undefined,
+      distress_score: distressScore ?? undefined,
+      pattern_tags:  tags,
+      input_mode:    mode ?? 'freetext',
+    })
+  }
+
+  // Modus-Auswahl
+  if (!mode) {
+    return (
+      <AppShell>
+        <CaseNav caseId={caseId!} />
+        <div className="mx-auto max-w-[640px] px-6 py-10">
+          <span className="label">Szene anlegen</span>
+          <h1 className="mt-2 text-xl font-bold text-navy mb-2">Wie möchtest du die Szene beschreiben?</h1>
+          <p className="text-sm text-brand-muted mb-8">
+            Wähle einen Eingabemodus. Du kannst jederzeit wechseln.
+          </p>
+          <div className="grid gap-4">
+            {[
+              { mode: 'freetext' as const, icon: '✍️', label: 'Freitext', desc: 'Beschreibe die Szene in eigenen Worten.' },
+              { mode: 'guided' as const,   icon: '❓', label: 'Geführte Fragen', desc: 'Beantworte strukturierte Fragen zur Szene.' },
+              { mode: 'chat' as const,     icon: '💬', label: 'Mit Echo erarbeiten', desc: 'Echo hilft dir, die Szene gemeinsam zu strukturieren.' },
+            ].map(({ mode: m, icon, label, desc }) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => m === 'chat' ? navigate(`/app/cases/${caseId}/echo`) : setMode(m)}
+                className="card text-left flex items-start gap-4 hover:border-accent/40 transition-all"
+              >
+                <span className="text-2xl">{icon}</span>
+                <div>
+                  <p className="font-semibold text-navy">{label}</p>
+                  <p className="text-sm text-brand-muted">{desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
+
+  return (
+    <AppShell>
+      <CaseNav caseId={caseId!} />
+      <div className="mx-auto max-w-[680px] px-6 py-10">
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => setMode(null)} className="text-sm text-brand-muted hover:text-navy transition-colors">
+            ← Zurück
+          </button>
+          <span className="label">{mode === 'freetext' ? 'Freitext' : 'Geführte Fragen'}</span>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Titel + Datum */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-brand-text mb-1.5">Titel der Szene</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="z.B. Streit nach Freundesbesuch"
+                maxLength={200}
+                className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-brand-text mb-1.5">
+                Datum <span className="text-brand-muted font-normal">(optional)</span>
+              </label>
+              <input
+                type="date"
+                value={sceneDate}
+                onChange={(e) => setSceneDate(e.target.value)}
+                className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+              />
+            </div>
+          </div>
+
+          {/* Beschreibung */}
+          {mode === 'freetext' ? (
+            <div>
+              <label className="block text-sm font-medium text-brand-text mb-1.5">Beschreibung</label>
+              <textarea
+                value={freetext}
+                onChange={(e) => setFreetext(e.target.value)}
+                rows={7}
+                placeholder="Beschreibe die Szene so konkret wie möglich – was ist passiert, was wurde gesagt, wie hast du dich gefühlt?"
+                className="w-full rounded-brand border border-brand-border bg-white px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+              />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {GUIDED_QUESTIONS.map(({ key, label }) => (
+                <div key={key}>
+                  <label className="block text-sm font-medium text-brand-text mb-1.5">{label}</label>
+                  <textarea
+                    value={guidedAnswers[key] ?? ''}
+                    onChange={(e) => setGuided((prev) => ({ ...prev, [key]: e.target.value }))}
+                    rows={2}
+                    className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Belastungsscore */}
+          <div>
+            <label className="block text-sm font-medium text-brand-text mb-2">
+              Belastung <span className="font-normal text-brand-muted">(1 = wenig, 5 = sehr hoch)</span>
+            </label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setDistress(distressScore === n ? null : n)}
+                  className={`w-10 h-10 rounded-brand border text-sm font-semibold transition-all ${
+                    distressScore === n
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-brand-border text-brand-muted hover:border-accent/50'
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Muster-Tags */}
+          <div>
+            <label className="block text-sm font-medium text-brand-text mb-2">
+              Muster-Tags <span className="font-normal text-brand-muted">(optional – Hypothesen, keine Diagnosen)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {PATTERN_TAG_OPTIONS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                    tags.includes(tag)
+                      ? 'border-accent bg-accent/10 text-accent font-medium'
+                      : 'border-brand-border text-brand-muted hover:border-accent/40'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {mutation.isError && (
+            <p role="alert" className="text-sm text-red-600">
+              Szene konnte nicht gespeichert werden. Bitte versuche es erneut.
+            </p>
+          )}
+
+          <div className="flex gap-3">
+            <button type="submit" disabled={mutation.isPending} className="btn-primary">
+              {mutation.isPending ? 'Wird gespeichert …' : 'Szene speichern'}
+            </button>
+            <button type="button" onClick={() => navigate(-1)} className="btn-outline">
+              Abbrechen
+            </button>
+          </div>
+        </form>
+      </div>
+    </AppShell>
+  )
+}

@@ -62,7 +62,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-echob_dev}:${POSTGRES_PASSWORD:-pgadmin}@postgres:5432/${POSTGRES_DB:-echob}
       # JSON-Array: pydantic-settings v2 parst list[str]-Felder aus Env-Vars als JSON.
       # Kommagetrennte Strings funktionieren nur in .env-Dateien (über BeforeValidator).
-      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000","http://localhost:8080"]'
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:5174","http://localhost:3000","http://localhost:8080"]'
     ports:
       - "8000:8000"
     volumes:

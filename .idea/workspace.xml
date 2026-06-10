@@ -5,57 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="First milestone reached">
-      <change afterPath="$PROJECT_DIR$/__private/client_secret_84041573822-ur4i8tpoovmatcqkfbdshfapp31t073k.apps.googleusercontent.com.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/READ_ME" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/create_app.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/routers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/routers/authentication.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/routers/authentication_2fa.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/routers/dependencies.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/routers/info.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/routers/login.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/routers/users.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/schemas/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/app/schemas/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/authentication/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/authentication/authenticate.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/authentication/jwt_handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/authentication/pw_handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/authentication/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/db/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/db/database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/db/db_reflection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/environment.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/README" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/mail/mail.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/setup.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/utils/calendar_utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/utils/connection_strings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/utils/create_service_config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/utils/db_utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/utils/digit_key.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/python_shared/utils/flush_env_files.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_old/auth/run.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/components/auth/ProtectedRoute.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/contexts/AuthContext.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/lib/supabase.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/pages/AppPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/web/src/pages/AuthPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/components/layout/Header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/components/layout/Header.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/main.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/core/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/core/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/core/dependencies.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/core/dependencies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/api/client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/api/client.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/api/waitlist.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/api/waitlist.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/core/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/api/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/schemas/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/api/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/pyproject.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,27 +25,27 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="3EroJa6ARdAPGkpbgdZoMWZqtxn" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -103,7 +62,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1780945977920</updated>
-      <workItem from="1780945979268" duration="12610000" />
+      <workItem from="1780945979268" duration="14926000" />
+      <workItem from="1781069856317" duration="1003000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -169,7 +129,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781011506439</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="First milestone reached">
+      <option name="closed" value="true" />
+      <created>1781023372206</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1781023372206</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
