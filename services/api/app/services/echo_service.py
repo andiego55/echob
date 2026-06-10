@@ -183,12 +183,15 @@ class EchoService:
         onboarding: dict[str, Any] | None = None,
         scenes: list[dict[str, Any]] | None = None,
         scale_scores: list[dict[str, Any]] | None = None,
+        extra_context: str = "",
+        **kwargs: Any,
     ) -> str:
         """Schickt eine Nachricht an Echo und gibt die Antwort zurück."""
         if thread_type == "scene":
             return await self.scene_chat(
                 user_message=user_message,
                 history=history or [],
+                extra_context=kwargs.get("extra_context", ""),
             )
         if self._use_openai:
             return await self._openai_chat(
@@ -212,11 +215,41 @@ class EchoService:
         *,
         user_message: str,
         history: list[dict[str, str]],
+        extra_context: str = "",
     ) -> str:
-        """Geführtes Szenenerfassungs-Gespräch ohne Beziehungskontext."""
+        """Geführtes Szenenerfassungs-Gespräch. extra_context wird als zweites System-Message injiziert."""
         if self._use_openai:
-            return await self._openai_scene_chat(user_message=user_message, history=history)
+            return await self._openai_scene_chat(
+                user_message=user_message, history=history, extra_context=extra_context
+            )
         return self._mock_scene_chat(user_message=user_message)
+
+    async def scene_confirm_context(self, *, context_text: str) -> str:
+        """Lässt Echo den hinzugefügten Beziehungskontext bestätigen."""
+        if self._use_openai:
+            system = (
+                "Du bist Echo, der KI-Assistent von EchoB. "
+                "Der folgende Beziehungskontext wurde soeben vom Nutzer hinzugefügt. "
+                "Bestätige kurz und freundlich, dass du ihn nun kennst. "
+                "Nenne die wichtigsten Eckdaten aus dem Kontext (Beziehungstyp, Anzahl der Szenen, ob ein Profil vorliegt). "
+                "Weise darauf hin, dass du diesen Kontext jetzt im weiteren Szenen-Gespräch berücksichtigen kannst. "
+                "Antworte auf Deutsch, maximal 3 Sätze, keine Diagnosen, kein Druck."
+            )
+            response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": context_text},
+                ],
+                max_tokens=300,
+                temperature=0.4,
+            )
+            return response.choices[0].message.content or ""
+        return (
+            "Danke – ich habe jetzt Zugriff auf den Beziehungskontext, die bisherigen Szenen und das Profil. "
+            "Diese Informationen werde ich ab jetzt in unserem Gespräch berücksichtigen. "
+            "_(Demo-Modus – mit OpenAI-Key werden echte Daten ausgewertet.)_"
+        )
 
     async def extract_scene(
         self,
@@ -322,9 +355,13 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
-    async def _openai_scene_chat(self, *, user_message: str, history: list[dict[str, str]]) -> str:
+    async def _openai_scene_chat(
+        self, *, user_message: str, history: list[dict[str, str]], extra_context: str = ""
+    ) -> str:
         system_prompt = _load_prompt("scene_capture_prompt.md")
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
+        if extra_context:
+            messages.append({"role": "system", "content": extra_context})
         for h in history:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})

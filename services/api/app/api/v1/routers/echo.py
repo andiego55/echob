@@ -7,8 +7,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
+import json as _json
+
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.echo import EchoChatRequest, EchoChatResponse, EchoMessageResponse
+from app.services.echo_service import build_case_context
+from app.services.profile_service import build_profile_context
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/echo", tags=["echo"])
@@ -77,6 +81,88 @@ async def chat(
     scenes = [dict(r) for r in scene_rows]
     scale_scores = [dict(r) for r in scale_rows]
 
+    session_meta = _json.dumps({"scene_session_id": body.scene_session_id}) if body.scene_session_id else "{}"
+
+    # ── Sonderfall: Beziehungskontext hinzufügen ──────────────────────────────
+    if body.message == "__add_context__" and body.thread_type == "scene" and body.scene_session_id:
+        # Profil laden
+        profile_row = None
+        async with pool.acquire() as conn:
+            profile_row = await conn.fetchrow(
+                "SELECT * FROM user_profiles WHERE user_id = $1", user_id
+            )
+
+        # Kontext-String aufbauen
+        context_text = build_case_context(
+            case=case_context,
+            onboarding=onboarding,
+            scenes=scenes,
+            scale_scores=scale_scores,
+        )
+        if profile_row:
+            profile_modules = profile_row.get("modules") or {}
+            if isinstance(profile_modules, str):
+                import json as _pj
+                profile_modules = _pj.loads(profile_modules)
+            context_text += "\n\n" + build_profile_context({
+                "modules": profile_modules,
+                "safety_status": profile_row.get("safety_status", "no_indication"),
+            })
+
+        context_meta = _json.dumps({
+            "scene_session_id": body.scene_session_id,
+            "context_marker": True,
+        })
+
+        # Kontext als System-Nachricht persistent speichern
+        async with pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
+                VALUES ($1, $2, 'system', $3, 'scene', $4::jsonb)
+                """,
+                case_id, user_id, context_text, context_meta,
+            )
+
+        # Echo bestätigt den Kontext
+        answer = await echo_svc.scene_confirm_context(context_text=context_text)
+
+        async with pool.acquire() as conn:
+            user_msg_row = await conn.fetchrow(
+                """
+                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
+                VALUES ($1, $2, 'user', '__add_context__', 'scene', $3::jsonb) RETURNING *
+                """,
+                case_id, user_id, session_meta,
+            )
+            assistant_msg_row = await conn.fetchrow(
+                """
+                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
+                VALUES ($1, $2, 'assistant', $3, 'scene', $4::jsonb) RETURNING *
+                """,
+                case_id, user_id, answer, session_meta,
+            )
+
+        return EchoChatResponse(
+            user_message=_row_to_msg(user_msg_row),
+            assistant_message=_row_to_msg(assistant_msg_row),
+        )
+
+    # ── Normaler Chat: gespeicherten Kontext aus der Session laden ────────────
+    extra_context = ""
+    if body.thread_type == "scene" and body.scene_session_id:
+        async with pool.acquire() as conn:
+            ctx_row = await conn.fetchrow(
+                "SELECT content FROM echo_messages "
+                "WHERE case_id = $1 AND thread_type = 'scene' "
+                "AND metadata->>'scene_session_id' = $2 "
+                "AND metadata->>'context_marker' = 'true' "
+                "ORDER BY created_at ASC LIMIT 1",
+                case_id, body.scene_session_id,
+            )
+        if ctx_row:
+            extra_context = ctx_row["content"]
+
     # Echo antworten lassen
     answer = await echo_svc.chat(
         user_message=body.message,
@@ -87,11 +173,9 @@ async def chat(
         onboarding=onboarding,
         scenes=scenes,
         scale_scores=scale_scores,
+        extra_context=extra_context,
     )
 
-    # Nachrichten speichern
-    import json as _json_msg
-    session_meta = _json_msg.dumps({"scene_session_id": body.scene_session_id}) if body.scene_session_id else "{}"
     async with pool.acquire() as conn:
         user_msg_row = await conn.fetchrow(
             """

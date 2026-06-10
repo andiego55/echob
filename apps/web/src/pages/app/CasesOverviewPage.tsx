@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
+import { profileApi } from '@/api/profile'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { Case } from '@/types'
 
@@ -14,6 +15,12 @@ export default function CasesOverviewPage() {
     queryKey: ['cases'],
     queryFn: casesApi.list,
   })
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: profileApi.get,
+  })
+  const hasProfile = (profile?.completed_modules?.length ?? 0) > 0
 
   return (
     <AppShell>
@@ -30,6 +37,25 @@ export default function CasesOverviewPage() {
             + Fall anlegen
           </Link>
         </div>
+
+        {/* Profil-Hinweis */}
+        {hasProfile ? (
+          <Link
+            to="/app/profile"
+            className="mb-6 flex items-center gap-3 rounded-brand border border-brand-border bg-white px-4 py-3 text-sm text-brand-muted hover:border-accent/40 transition-colors no-underline"
+          >
+            <span className="text-accent font-medium">✓ Beziehungsprofil vorhanden</span>
+            <span className="text-brand-muted/60">→ Profil ansehen</span>
+          </Link>
+        ) : (
+          <Link
+            to="/app/profile"
+            className="mb-6 flex items-center gap-3 rounded-brand border border-dashed border-brand-border bg-white px-4 py-3 text-sm text-brand-muted hover:border-accent/40 transition-colors no-underline"
+          >
+            <span className="text-navy font-medium">Beziehungsprofil noch nicht ausgefüllt</span>
+            <span className="text-accent font-medium ml-auto flex-shrink-0">→ Profil anlegen</span>
+          </Link>
+        )}
 
         {/* Inhalt */}
         {isLoading && (

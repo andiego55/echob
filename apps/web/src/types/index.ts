@@ -244,3 +244,24 @@ export interface ReportCreate {
   report_type: ReportType
   title?: string
 }
+
+// ── Beziehungsprofil ──────────────────────────────────────────────────────────
+
+export type ProfileSafetyStatus = 'no_indication' | 'unclear' | 'heightened_attention' | 'acute_concern'
+
+export interface UserProfile {
+  id: string
+  user_id: string
+  modules: Record<string, Record<string, unknown>>
+  summary: Record<string, unknown>
+  safety_status: ProfileSafetyStatus
+  completed_modules: string[]
+  summary_text: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ProfileModuleUpdate {
+  module_id: string
+  data: Record<string, unknown>
+}

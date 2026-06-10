@@ -32,10 +32,11 @@ export default function SceneEchoPage() {
 
   const [input, setInput] = useState('')
 
-  const { data: history = [] } = useQuery({
+  const { data: history = [], isSuccess: historyLoaded } = useQuery({
     queryKey: ['echo-history', caseId, 'scene', sessionId],
     queryFn: () => echoApi.history(caseId!, 'scene', sessionId),
     enabled: !!caseId && !!sessionId,
+    refetchOnWindowFocus: false,
   })
 
   const chatMutation = useMutation({
@@ -45,6 +46,7 @@ export default function SceneEchoPage() {
       qc.invalidateQueries({ queryKey: ['echo-history', caseId, 'scene', sessionId] })
       setInput('')
     },
+    retry: false,
   })
 
   const finalizeMutation = useMutation({
@@ -55,14 +57,27 @@ export default function SceneEchoPage() {
     },
   })
 
-  // Gespräch automatisch starten wenn noch keine Nachrichten vorhanden
+  const addContextMutation = useMutation({
+    mutationFn: () =>
+      echoApi.chat(caseId!, { message: '__add_context__', thread_type: 'scene', scene_session_id: sessionId }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['echo-history', caseId, 'scene', sessionId] })
+    },
+    retry: false,
+  })
+
+  // Gespräch automatisch starten – erst wenn History-Query erfolgreich
   useEffect(() => {
-    if (startedRef.current) return
-    if (history.length === 0 && !chatMutation.isPending) {
+    if (!historyLoaded || startedRef.current) return
+    if (history.some(m => m.content === '__scene_start__')) {
+      startedRef.current = true
+      return
+    }
+    if (history.length === 0) {
       startedRef.current = true
       chatMutation.mutate('__scene_start__')
     }
-  }, [history])
+  }, [historyLoaded, history.length])
 
   // Auto-scroll
   useEffect(() => {
@@ -75,9 +90,15 @@ export default function SceneEchoPage() {
     chatMutation.mutate(input.trim())
   }
 
-  // Sichtbare Nachrichten: __scene_start__ und die Echo-Antwort darauf bleiben,
-  // aber die Nutzernachricht "__scene_start__" wird ausgeblendet
-  const visibleMessages = history.filter((m) => m.content !== '__scene_start__')
+  // Sichtbare Nachrichten: interne Trigger und Kontext-System-Nachrichten ausblenden
+  const visibleMessages = history.filter(
+    (m) => m.content !== '__scene_start__' && m.content !== '__add_context__' && m.role !== 'system'
+  )
+
+  // Kontext wurde geteilt, wenn eine Nachricht mit context_marker in der History ist
+  const contextShared = history.some(
+    (m) => m.role === 'system' || (m.metadata as Record<string, unknown>)?.context_marker === true
+  )
 
   return (
     <AppShell>
@@ -90,11 +111,25 @@ export default function SceneEchoPage() {
             {/* Kontext-Hinweis */}
             <div className="rounded-brand border border-brand-border bg-amber-50 px-4 py-3 text-sm text-brand-muted">
               <p className="font-medium text-navy mb-1">Szenenerfassung mit Echo</p>
-              <p>
+              <p className="mb-3">
                 In diesem Dialog kennt Echo deinen Beziehungskontext nicht – es geht nur darum,
                 diese eine Szene zu beschreiben. Du kannst die Szene jederzeit über den Button{' '}
                 <strong>„Szene speichern"</strong> erfassen.
               </p>
+              {contextShared ? (
+                <p className="text-xs text-green-700 font-medium">
+                  ✓ Beziehungskontext, bisherige Szenen und Profil sind Echo jetzt bekannt.
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => addContextMutation.mutate()}
+                  disabled={addContextMutation.isPending || chatMutation.isPending}
+                  className="rounded border border-navy/30 bg-white px-3 py-1.5 text-xs font-medium text-navy hover:bg-navy/5 transition-colors disabled:opacity-50"
+                >
+                  {addContextMutation.isPending ? 'Kontext wird geteilt …' : '＋ Beziehungskontext an Echo übergeben'}
+                </button>
+              )}
             </div>
 
             {/* Nachrichten */}

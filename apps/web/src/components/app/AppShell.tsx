@@ -33,8 +33,9 @@ export default function AppShell({ children }: Props) {
 
           <nav className="hidden md:flex items-center gap-1">
             {[
-              { to: '/app',      label: 'Meine Fälle', end: true },
-              { to: '/app/help', label: 'Hilfe',       end: false },
+              { to: '/app',          label: 'Meine Fälle',        end: true },
+              { to: '/app/profile',  label: 'Mein Profil',         end: false },
+              { to: '/app/help',     label: 'Hilfe',               end: false },
             ].map(({ to, label, end }) => (
               <NavLink
                 key={to}

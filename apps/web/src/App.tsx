@@ -23,6 +23,8 @@ import ReportsPage       from '@/pages/app/ReportsPage'
 import ReportNewPage      from '@/pages/app/ReportNewPage'
 import ReportDetailPage   from '@/pages/app/ReportDetailPage'
 import HelpPage           from '@/pages/app/HelpPage'
+import ProfilePage        from '@/pages/app/ProfilePage'
+import ProfileEchoPage    from '@/pages/app/ProfileEchoPage'
 
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
@@ -39,6 +41,8 @@ export default function App() {
       {/* ── App-Bereich (Login erforderlich) ───────────────────────────────── */}
       <Route path="/app" element={<ProtectedRoute><CasesOverviewPage /></ProtectedRoute>} />
       <Route path="/app/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
+      <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/app/profile/echo" element={<ProtectedRoute><ProfileEchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/new" element={<ProtectedRoute><CaseNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId" element={<ProtectedRoute><CaseDetailPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
