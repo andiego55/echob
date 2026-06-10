@@ -27,6 +27,13 @@ import ProfilePage           from '@/pages/app/ProfilePage'
 import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
 import PersonProfilePage     from '@/pages/app/PersonProfilePage'
 import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
+import TopicDialogPage       from '@/pages/app/TopicDialogPage'
+import { useParams }         from 'react-router-dom'
+
+function TopicDialogPageWrapper() {
+  const { topicId } = useParams<{ topicId: string }>()
+  return <TopicDialogPage key={topicId} />
+}
 
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
@@ -59,6 +66,7 @@ export default function App() {
       <Route path="/app/cases/:caseId/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/new" element={<ProtectedRoute><ReportNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/:reportId" element={<ProtectedRoute><ReportDetailPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/topics/:topicId" element={<ProtectedRoute><TopicDialogPageWrapper /></ProtectedRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

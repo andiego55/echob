@@ -14,6 +14,7 @@ from app.schemas.echo import EchoChatRequest, EchoChatResponse, EchoMessageRespo
 from app.services.echo_service import build_case_context
 from app.services.profile_service import build_profile_context
 from app.services.person_profile_service import build_person_context
+from app.services.topic_summary_service import build_topic_context
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/echo", tags=["echo"])
@@ -61,6 +62,9 @@ async def chat(
         person_profile_row = await conn.fetchrow(
             "SELECT * FROM person_profiles WHERE case_id = $1", case_id
         )
+        topic_summary_rows = await conn.fetch(
+            "SELECT topic, summary_text FROM topic_summaries WHERE case_id = $1", case_id
+        )
 
         # Letzte 20 Nachrichten als Gesprächshistorie
         if body.thread_type == "scene" and body.scene_session_id:
@@ -84,6 +88,7 @@ async def chat(
     onboarding = dict(onboarding_row) if onboarding_row else None
     scenes = [dict(r) for r in scene_rows]
     scale_scores = [dict(r) for r in scale_rows]
+    topic_summaries = [dict(r) for r in topic_summary_rows]
 
     session_meta = _json.dumps({"scene_session_id": body.scene_session_id}) if body.scene_session_id else "{}"
 
@@ -112,6 +117,11 @@ async def chat(
                 "modules": profile_modules,
                 "safety_status": profile_row.get("safety_status", "no_indication"),
             })
+
+        if topic_summaries:
+            topic_ctx = build_topic_context(topic_summaries)
+            if topic_ctx:
+                context_text += "\n\n" + topic_ctx
 
         context_meta = _json.dumps({
             "scene_session_id": body.scene_session_id,
@@ -154,19 +164,46 @@ async def chat(
 
     # ── Normaler Chat: gespeicherten Kontext aus der Session laden ────────────
     extra_context = ""
-    # Personenprofil-Kontext für Nicht-Szenen-Threads einbinden
-    if body.thread_type != "scene" and person_profile_row:
-        pp_data = dict(person_profile_row)
-        pp_modules = pp_data.get("modules") or {}
-        if isinstance(pp_modules, str):
-            import json as _ppj
-            pp_modules = _ppj.loads(pp_modules)
-        pp_summary = pp_data.get("summary") or {}
-        if isinstance(pp_summary, str):
-            import json as _ppj2
-            pp_summary = _ppj2.loads(pp_summary)
-        if pp_modules:
-            extra_context = build_person_context({"modules": pp_modules, "summary": pp_summary})
+    if body.thread_type != "scene":
+        context_parts: list[str] = []
+
+        # Selbstprofil
+        if body.thread_type not in ("topic_self", "topic_person", "topic_responsibility", "topic_guilt"):
+            async with pool.acquire() as conn:
+                user_profile_row = await conn.fetchrow(
+                    "SELECT * FROM user_profiles WHERE user_id = $1", user_id
+                )
+            if user_profile_row:
+                up_modules = user_profile_row.get("modules") or {}
+                if isinstance(up_modules, str):
+                    import json as _upj
+                    up_modules = _upj.loads(up_modules)
+                context_parts.append(build_profile_context({
+                    "modules": up_modules,
+                    "safety_status": user_profile_row.get("safety_status", "no_indication"),
+                }))
+
+        # Personenprofil
+        if person_profile_row:
+            pp_data = dict(person_profile_row)
+            pp_modules = pp_data.get("modules") or {}
+            if isinstance(pp_modules, str):
+                import json as _ppj
+                pp_modules = _ppj.loads(pp_modules)
+            pp_summary = pp_data.get("summary") or {}
+            if isinstance(pp_summary, str):
+                import json as _ppj2
+                pp_summary = _ppj2.loads(pp_summary)
+            if pp_modules:
+                context_parts.append(build_person_context({"modules": pp_modules, "summary": pp_summary}))
+
+        # Themendialog-Zusammenfassungen
+        if topic_summaries:
+            topic_ctx = build_topic_context(topic_summaries)
+            if topic_ctx:
+                context_parts.append(topic_ctx)
+
+        extra_context = "\n\n---\n\n".join(context_parts)
 
     if body.thread_type == "scene" and body.scene_session_id:
         async with pool.acquire() as conn:
@@ -322,6 +359,56 @@ async def get_history(
                 case_id, thread_type, limit,
             )
     return [_row_to_msg(r) for r in rows]
+
+
+class TopicSummaryRequest(BaseModel):
+    thread_type: str
+
+
+@router.post("/topic-summary")
+async def topic_summary(
+    case_id: UUID,
+    body: TopicSummaryRequest,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fasst einen Themendialog zusammen."""
+    echo_svc = _get_echo_service(request)
+    async with pool.acquire() as conn:
+        await conn.fetchrow(
+            "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
+            case_id, current_user["user_id"],
+        )
+        rows = await conn.fetch(
+            "SELECT role, content FROM echo_messages "
+            "WHERE case_id = $1 AND thread_type = $2 "
+            "ORDER BY created_at ASC LIMIT 100",
+            case_id, body.thread_type,
+        )
+    history = [{"role": r["role"], "content": r["content"]} for r in rows]
+    summary = await echo_svc.generate_topic_summary(topic=body.thread_type, history=history)
+    return {"summary": summary}
+
+
+@router.delete("/topic-history")
+async def reset_topic_history(
+    case_id: UUID,
+    thread_type: str,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Löscht alle Nachrichten eines Themendialogs."""
+    async with pool.acquire() as conn:
+        await conn.fetchrow(
+            "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
+            case_id, current_user["user_id"],
+        )
+        result = await conn.execute(
+            "DELETE FROM echo_messages WHERE case_id = $1 AND user_id = $2 AND thread_type = $3",
+            case_id, current_user["user_id"], thread_type,
+        )
+    return {"deleted": True, "thread_type": thread_type}
 
 
 def _row_to_msg(row) -> EchoMessageResponse:

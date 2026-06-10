@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { echoApi } from '@/api/echo'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 
 export default function SceneEchoPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -31,6 +32,7 @@ export default function SceneEchoPage() {
   }, [])
 
   const [input, setInput] = useState('')
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null)
 
   const { data: history = [], isSuccess: historyLoaded } = useQuery({
     queryKey: ['echo-history', caseId, 'scene', sessionId],
@@ -45,6 +47,10 @@ export default function SceneEchoPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['echo-history', caseId, 'scene', sessionId] })
       setInput('')
+      setPendingMessage(null)
+    },
+    onError: () => {
+      setPendingMessage(null)
     },
     retry: false,
   })
@@ -87,7 +93,10 @@ export default function SceneEchoPage() {
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!input.trim() || chatMutation.isPending) return
-    chatMutation.mutate(input.trim())
+    const msg = input.trim()
+    setInput('')
+    setPendingMessage(msg)
+    chatMutation.mutate(msg)
   }
 
   // Sichtbare Nachrichten: interne Trigger und Kontext-System-Nachrichten ausblenden
@@ -147,11 +156,21 @@ export default function SceneEchoPage() {
                       ? 'bg-navy text-white'
                       : 'bg-white border border-brand-border text-brand-text'
                   }`}>
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <MarkdownMessage content={msg.content} isUser={isUser} />
                   </div>
                 </div>
               )
             })}
+
+            {/* Optimistische Nutzernachricht */}
+            {pendingMessage && chatMutation.isPending && (
+              <div className="flex gap-3 flex-row-reverse">
+                <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">Du</div>
+                <div className="max-w-[80%] rounded-brand px-4 py-3 text-sm bg-navy text-white">
+                  <p className="whitespace-pre-wrap">{pendingMessage}</p>
+                </div>
+              </div>
+            )}
 
             {/* Tipp-Indikator */}
             {chatMutation.isPending && (

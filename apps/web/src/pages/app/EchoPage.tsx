@@ -9,6 +9,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { echoApi } from '@/api/echo'
 import type { EchoMessage, ThreadType } from '@/types'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -33,6 +34,7 @@ export default function EchoPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const [input, setInput]           = useState('')
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const [showGlossary, setGlossary] = useState(false)
   const [threadType]                = useState<ThreadType>('topic')
 
@@ -49,6 +51,10 @@ export default function EchoPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['echo-history', caseId, threadType] })
       setInput('')
+      setPendingMessage(null)
+    },
+    onError: () => {
+      setPendingMessage(null)
     },
   })
 
@@ -60,16 +66,23 @@ export default function EchoPage() {
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!input.trim() || mutation.isPending) return
-    mutation.mutate({ message: input.trim() })
+    const msg = input.trim()
+    setInput('')
+    setPendingMessage(msg)
+    mutation.mutate({ message: msg })
   }
 
   const handleGlossary = (term: string) => {
+    const msg = `Erkläre mir den Begriff: ${term}`
     setGlossary(false)
-    mutation.mutate({ message: `Erkläre mir den Begriff: ${term}`, glossary_term: term })
+    setPendingMessage(msg)
+    mutation.mutate({ message: msg, glossary_term: term })
   }
 
   const handleTopic = (topic: string) => {
-    mutation.mutate({ message: `Ich möchte über folgendes Thema sprechen: ${topic}` })
+    const msg = `Ich möchte über folgendes Thema sprechen: ${topic}`
+    setPendingMessage(msg)
+    mutation.mutate({ message: msg })
   }
 
   return (
@@ -90,6 +103,16 @@ export default function EchoPage() {
             {history.map((msg) => (
               <MessageBubble key={msg.id} message={msg} />
             ))}
+
+            {/* Optimistische Nutzernachricht */}
+            {pendingMessage && mutation.isPending && (
+              <div className="flex gap-3 flex-row-reverse">
+                <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">Du</div>
+                <div className="max-w-[80%] rounded-brand px-4 py-3 text-sm bg-navy text-white">
+                  <p className="whitespace-pre-wrap">{pendingMessage}</p>
+                </div>
+              </div>
+            )}
 
             {/* Tipp-Indikator */}
             {mutation.isPending && (
@@ -190,7 +213,7 @@ function MessageBubble({ message: msg }: { message: EchoMessage }) {
           ? 'bg-navy text-white'
           : 'bg-white border border-brand-border text-brand-text'
       }`}>
-        <p className="whitespace-pre-wrap">{msg.content}</p>
+        <MarkdownMessage content={msg.content} isUser={isUser} />
       </div>
     </div>
   )

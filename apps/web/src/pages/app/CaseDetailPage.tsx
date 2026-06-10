@@ -1,18 +1,22 @@
 /**
  * /app/cases/:caseId — Fall-Überblick
  */
-import { Link, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { casesApi } from '@/api/cases'
 import { scenesApi } from '@/api/scenes'
 import { personProfileApi } from '@/api/personProfile'
+import { topicSummariesApi, type TopicSummary } from '@/api/topicSummaries'
 import {
   RELATIONSHIP_TYPE_LABELS,
   RELATIONSHIP_STATUS_LABELS,
   CONTACT_FREQUENCY_LABELS,
 } from '@/types'
+
+const TOPIC_ORDER = ['topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt'] as const
 
 export default function CaseDetailPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -32,6 +36,12 @@ export default function CaseDetailPage() {
   const { data: personProfile } = useQuery({
     queryKey: ['person-profile', caseId],
     queryFn: () => personProfileApi.get(caseId!),
+    enabled: !!caseId,
+  })
+
+  const { data: topicSummaries = [] } = useQuery({
+    queryKey: ['topic-summaries', caseId],
+    queryFn: () => topicSummariesApi.list(caseId!),
     enabled: !!caseId,
   })
 
@@ -113,6 +123,11 @@ export default function CaseDetailPage() {
           />
         </div>
 
+        {/* Themendialog-Zusammenfassungen */}
+        <div className="mt-6">
+          <TopicSummariesCard caseId={caseId!} summaries={topicSummaries} />
+        </div>
+
         {/* Disclaimer */}
         <p className="mt-8 text-xs text-brand-muted/70 max-w-xl">
           EchoB analysiert Beziehungsmuster auf Basis deiner eigenen Angaben.
@@ -155,6 +170,112 @@ function PersonProfileCard({ caseId, hasModules, summaryText }: {
         </span>
       </div>
     </Link>
+  )
+}
+
+function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: TopicSummary[] }) {
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+  const [editingTopic, setEditingTopic] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState('')
+
+  const saveMutation = useMutation({
+    mutationFn: ({ topic, text }: { topic: string; text: string }) =>
+      topicSummariesApi.save(caseId, topic, text),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['topic-summaries', caseId] })
+      setEditingTopic(null)
+    },
+  })
+
+  const summaryMap = Object.fromEntries(summaries.map(s => [s.topic, s]))
+  const hasSummaries = summaries.length > 0
+
+  const TOPIC_LABELS: Record<string, string> = {
+    topic_self:           'Über mich',
+    topic_person:         'Über die Fallperson',
+    topic_responsibility: 'Verantwortung',
+    topic_guilt:          'Schuld',
+  }
+
+  return (
+    <div className="card">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="text-xs font-semibold text-brand-muted mb-0.5">Themendialoge</p>
+          <p className="text-sm font-medium text-navy">
+            {hasSummaries ? `${summaries.length} von 4 Zusammenfassungen gespeichert` : 'Keine gespeicherten Zusammenfassungen'}
+          </p>
+        </div>
+        <button
+          onClick={() => navigate(`/app/cases/${caseId}/topics/topic_self`)}
+          className="text-xs text-accent font-medium hover:underline"
+        >
+          Zum Dialog →
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {TOPIC_ORDER.map(topic => {
+          const saved = summaryMap[topic]
+          const isEditing = editingTopic === topic
+
+          return (
+            <div key={topic} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <p className="text-xs font-semibold text-navy">{TOPIC_LABELS[topic]}</p>
+                <div className="flex gap-2">
+                  {saved && !isEditing && (
+                    <button
+                      onClick={() => { setEditingTopic(topic); setEditValue(saved.summary_text) }}
+                      className="text-xs text-brand-muted hover:text-navy transition-colors"
+                    >
+                      Bearbeiten
+                    </button>
+                  )}
+                  <button
+                    onClick={() => navigate(`/app/cases/${caseId}/topics/${topic}`)}
+                    className="text-xs text-accent hover:underline"
+                  >
+                    Dialog →
+                  </button>
+                </div>
+              </div>
+
+              {isEditing ? (
+                <div className="space-y-2 mt-2">
+                  <textarea
+                    className="w-full text-sm text-brand-text border border-brand-border rounded px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-accent resize-y"
+                    rows={4}
+                    value={editValue}
+                    onChange={e => setEditValue(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => saveMutation.mutate({ topic, text: editValue.trim() })}
+                      disabled={saveMutation.isPending || !editValue.trim()}
+                      className="rounded-brand border border-accent bg-accent/10 px-3 py-1 text-xs font-medium text-accent hover:bg-accent/20 transition-colors disabled:opacity-40"
+                    >
+                      {saveMutation.isPending ? 'Speichern …' : 'Speichern'}
+                    </button>
+                    <button
+                      onClick={() => setEditingTopic(null)}
+                      className="rounded-brand border border-brand-border bg-white px-3 py-1 text-xs text-brand-muted hover:text-navy transition-colors"
+                    >
+                      Abbrechen
+                    </button>
+                  </div>
+                </div>
+              ) : saved ? (
+                <p className="text-xs text-brand-muted line-clamp-3 mt-1">{saved.summary_text}</p>
+              ) : (
+                <p className="text-xs text-brand-muted/60 italic mt-1">Noch keine Zusammenfassung gespeichert</p>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 

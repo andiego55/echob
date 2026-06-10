@@ -8,7 +8,10 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 MessageRole = Literal["user", "assistant", "system"]
-ThreadType = Literal["onboarding", "scene", "topic", "glossary", "report"]
+ThreadType = Literal[
+    "onboarding", "scene", "topic", "glossary", "report",
+    "topic_self", "topic_person", "topic_responsibility", "topic_guilt",
+]
 
 # ── Einzel-Nachricht ──────────────────────────────────────────────────────────
 

@@ -1,0 +1,300 @@
+/**
+ * /app/cases/:caseId/topics/:topicId — KI-gestützter Themendialog
+ * Themen: topic_self, topic_person, topic_responsibility, topic_guilt
+ */
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import AppShell from '@/components/app/AppShell'
+import CaseNav from '@/components/app/CaseNav'
+import { echoApi } from '@/api/echo'
+import { topicSummariesApi } from '@/api/topicSummaries'
+import type { EchoMessage } from '@/types'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
+
+const TOPICS: Record<string, { label: string; description: string; startTrigger: string }> = {
+  topic_self: {
+    label: 'Über mich',
+    description: 'Erkunde deine eigenen Muster, Bedürfnisse und Reaktionen in dieser Beziehung.',
+    startTrigger: '__topic_self_start__',
+  },
+  topic_person: {
+    label: 'Über die Fallperson',
+    description: 'Lerne die andere Person besser zu verstehen – ihre mögliche Perspektive und Geschichte.',
+    startTrigger: '__topic_person_start__',
+  },
+  topic_responsibility: {
+    label: 'Verantwortung',
+    description: 'Kläre, was in deiner Verantwortung liegt – und was nicht.',
+    startTrigger: '__topic_responsibility_start__',
+  },
+  topic_guilt: {
+    label: 'Schuld',
+    description: 'Erforsche, woher dein Schuldgefühl kommt und ob es wirklich dir gehört.',
+    startTrigger: '__topic_guilt_start__',
+  },
+}
+
+export default function TopicDialogPage() {
+  const { caseId, topicId } = useParams<{ caseId: string; topicId: string }>()
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const startedRef = useRef(false)
+  const [input, setInput] = useState('')
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null)
+  const [summary, setSummary] = useState<string | null>(null)
+  const [savedSummary, setSavedSummary] = useState(false)
+  const sessionId = topicId ?? ''
+
+  const topic = TOPICS[topicId ?? '']
+
+  const { data: history = [], isSuccess: historyLoaded } = useQuery({
+    queryKey: ['topic-echo-history', caseId, topicId, sessionId],
+    queryFn: () => echoApi.history(caseId!, topicId!),
+    enabled: !!caseId && !!topicId && !!topic,
+    refetchOnWindowFocus: false,
+    retry: false,
+  })
+
+  const chatMutation = useMutation({
+    mutationFn: (message: string) =>
+      echoApi.chat(caseId!, {
+        message,
+        thread_type: topicId!,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['topic-echo-history', caseId, topicId, sessionId] })
+      setInput('')
+      setPendingMessage(null)
+    },
+    onError: () => {
+      setPendingMessage(null)
+    },
+    retry: false,
+  })
+
+  // startedRef zurücksetzen wenn Thema wechselt (selbe Komponenten-Instanz)
+  useEffect(() => {
+    startedRef.current = false
+  }, [topicId])
+
+  // Auto-Start
+  useEffect(() => {
+    if (!historyLoaded || startedRef.current || !topic) return
+    startedRef.current = true
+    const hasGreeting = (history as EchoMessage[]).some(
+      m => m.role === 'assistant' || m.content === topic.startTrigger
+    )
+    if (!hasGreeting) {
+      chatMutation.mutate(topic.startTrigger)
+    }
+  }, [historyLoaded, history.length, topicId])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [history, chatMutation.isPending])
+
+  const summaryMutation = useMutation({
+    mutationFn: () => echoApi.topicSummary(caseId!, topicId!),
+    onSuccess: (data) => { setSummary(data.summary); setSavedSummary(false) },
+  })
+
+  const saveSummaryMutation = useMutation({
+    mutationFn: () => topicSummariesApi.save(caseId!, topicId!, summary!),
+    onSuccess: () => {
+      setSavedSummary(true)
+      qc.invalidateQueries({ queryKey: ['topic-summaries', caseId] })
+    },
+  })
+
+  const resetMutation = useMutation({
+    mutationFn: () => echoApi.resetTopicHistory(caseId!, topicId!),
+    onSuccess: () => {
+      setSummary(null)
+      startedRef.current = false
+      qc.invalidateQueries({ queryKey: ['topic-echo-history', caseId, topicId, sessionId] })
+    },
+  })
+
+  const handleReset = () => {
+    if (window.confirm('Dialog wirklich zurücksetzen? Alle Nachrichten werden gelöscht.')) {
+      resetMutation.mutate()
+    }
+  }
+
+  const handleSend = (e?: React.FormEvent) => {
+    e?.preventDefault()
+    if (!input.trim() || chatMutation.isPending) return
+    const msg = input.trim()
+    setInput('')
+    setPendingMessage(msg)
+    chatMutation.mutate(msg)
+  }
+
+  const visibleMessages = topic
+    ? (history as EchoMessage[]).filter(m => m.content !== topic.startTrigger)
+    : []
+
+  if (!topic) {
+    return (
+      <AppShell>
+        <CaseNav caseId={caseId!} />
+        <div className="px-6 py-10 text-sm text-red-600">Unbekanntes Thema.</div>
+      </AppShell>
+    )
+  }
+
+  return (
+    <AppShell>
+      <CaseNav caseId={caseId!} />
+
+      <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
+        {/* Sub-Header */}
+        <div className="border-b border-brand-border bg-white px-6 py-3 flex items-center justify-between gap-4 flex-shrink-0">
+          <div>
+            <span className="label text-xs">Themendialog</span>
+            <p className="text-sm font-semibold text-navy">{topic.label}</p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => summaryMutation.mutate()}
+              disabled={summaryMutation.isPending || visibleMessages.length === 0}
+              className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-xs font-medium text-navy hover:bg-brand-bg transition-colors disabled:opacity-40"
+            >
+              {summaryMutation.isPending ? 'Wird erstellt …' : 'Zusammenfassung'}
+            </button>
+            <button
+              onClick={handleReset}
+              disabled={resetMutation.isPending || visibleMessages.length === 0}
+              className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40"
+            >
+              Zurücksetzen
+            </button>
+            <button
+              onClick={() => navigate(`/app/cases/${caseId}`)}
+              className="text-xs text-brand-muted hover:text-navy transition-colors ml-2"
+            >
+              ← Zurück
+            </button>
+          </div>
+        </div>
+
+        {/* Chat-Bereich */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
+            {/* Kontext-Hinweis */}
+            <div className="rounded-brand border border-brand-border bg-blue-50 px-4 py-3">
+              <p className="text-xs font-medium text-navy mb-0.5">{topic.label}</p>
+              <p className="text-xs text-brand-muted">{topic.description}</p>
+            </div>
+
+            {/* Nachrichten */}
+            {visibleMessages.map((msg) => {
+              const isUser = msg.role === 'user'
+              return (
+                <div key={msg.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                    isUser ? 'bg-navy text-white' : 'bg-accent/20 text-accent'
+                  }`}>
+                    {isUser ? 'Du' : 'E'}
+                  </div>
+                  <div className={`max-w-[80%] rounded-brand px-4 py-3 text-sm ${
+                    isUser ? 'bg-navy text-white' : 'bg-white border border-brand-border text-brand-text'
+                  }`}>
+                    <MarkdownMessage content={msg.content} isUser={isUser} />
+                  </div>
+                </div>
+              )
+            })}
+
+            {pendingMessage && chatMutation.isPending && (
+              <div className="flex gap-3 flex-row-reverse">
+                <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">Du</div>
+                <div className="max-w-[80%] rounded-brand px-4 py-3 text-sm bg-navy text-white">
+                  <p className="whitespace-pre-wrap">{pendingMessage}</p>
+                </div>
+              </div>
+            )}
+
+            {chatMutation.isPending && (
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm flex-shrink-0">E</div>
+                <div className="rounded-brand bg-white border border-brand-border px-4 py-3 text-sm text-brand-muted">
+                  Echo tippt …
+                </div>
+              </div>
+            )}
+
+            {chatMutation.isError && (
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-sm flex-shrink-0">!</div>
+                <div className="rounded-brand bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  Echo konnte nicht antworten. Bitte versuche es erneut.
+                </div>
+              </div>
+            )}
+
+            {/* Zusammenfassung am Ende des Dialogs */}
+            {summary && (
+              <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold text-accent uppercase tracking-wide">Zusammenfassung</p>
+                  <button
+                    onClick={() => setSummary(null)}
+                    className="text-xs text-brand-muted hover:text-navy transition-colors"
+                  >
+                    ✕ Schließen
+                  </button>
+                </div>
+                <p className="text-sm text-brand-text whitespace-pre-wrap mb-4">{summary}</p>
+                <div className="flex items-center gap-3">
+                  {savedSummary ? (
+                    <span className="text-xs text-green-600 font-medium">✓ Gespeichert</span>
+                  ) : (
+                    <button
+                      onClick={() => saveSummaryMutation.mutate()}
+                      disabled={saveSummaryMutation.isPending}
+                      className="rounded-brand border border-accent bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors disabled:opacity-40"
+                    >
+                      {saveSummaryMutation.isPending ? 'Wird gespeichert …' : 'Zusammenfassung speichern'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {summaryMutation.isError && (
+              <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                Zusammenfassung konnte nicht erstellt werden.
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Eingabe */}
+        <div className="border-t border-brand-border bg-white px-6 py-4 flex-shrink-0">
+          <form onSubmit={handleSend} className="mx-auto max-w-[780px] flex gap-3">
+            <input
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              placeholder="Schreibe Echo …"
+              disabled={chatMutation.isPending}
+              className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={!input.trim() || chatMutation.isPending}
+              className="btn-primary !py-2.5 !px-5 !text-sm disabled:opacity-40"
+            >
+              Senden
+            </button>
+          </form>
+        </div>
+      </div>
+    </AppShell>
+  )
+}

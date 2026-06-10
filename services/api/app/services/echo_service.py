@@ -70,6 +70,8 @@ def build_case_context(
     # ── Onboarding ────────────────────────────────────────────────────────
     if onboarding:
         lines.append("## Onboarding-Antworten\n")
+        if onboarding.get("person_name"):
+            lines.append(f"**Name der Fallperson (Pseudonym):** {onboarding['person_name']}")
         fields = [
             ("relationship_description", "Beziehungsbeschreibung"),
             ("typical_scenes",           "Typische Szenen"),
@@ -82,7 +84,7 @@ def build_case_context(
             if val:
                 lines.append(f"**{label}:** {val}")
         if onboarding.get("distress_score"):
-            lines.append(f"**Vorläufiger Belastungswert:** {onboarding['distress_score']}/5")
+            lines.append(f"**Belastungswert:** {onboarding['distress_score']}/10")
         if onboarding.get("safety_status") and onboarding["safety_status"] != "none":
             lines.append(f"**Sicherheitsstatus:** {onboarding['safety_status']}")
         lines.append("")
@@ -193,6 +195,19 @@ class EchoService:
                 history=history or [],
                 extra_context=kwargs.get("extra_context", ""),
             )
+        if thread_type.startswith("topic_"):
+            if self._use_openai:
+                return await self._openai_topic_chat(
+                    topic=thread_type,
+                    user_message=user_message,
+                    history=history or [],
+                    case_context=case_context,
+                    onboarding=onboarding,
+                    scenes=scenes or [],
+                    scale_scores=scale_scores,
+                    extra_context=extra_context,
+                )
+            return self._mock_chat(user_message=user_message, thread_type=thread_type, glossary_term=None)
         if self._use_openai:
             return await self._openai_chat(
                 user_message=user_message,
@@ -278,6 +293,55 @@ class EchoService:
             return await self._openai_extract_scene(conversation_text, case_context)
         return self._mock_extract_scene(conversation_text)
 
+    async def generate_topic_summary(
+        self,
+        *,
+        topic: str,
+        history: list[dict[str, str]],
+    ) -> str:
+        """Fasst einen Themendialog aus Nutzerperspektive zusammen."""
+        if self._use_openai:
+            return await self._openai_topic_summary(topic=topic, history=history)
+        return (
+            "_(Echo läuft im Demo-Modus – bitte konfiguriere einen OpenAI-API-Key "
+            "für echte Zusammenfassungen.)_"
+        )
+
+    async def _openai_topic_summary(
+        self,
+        *,
+        topic: str,
+        history: list[dict[str, str]],
+    ) -> str:
+        system_prompt = _load_prompt("topic_summary_prompt.md")
+        _TOPIC_LABELS = {
+            "topic_self":           "Über mich",
+            "topic_person":         "Über die Fallperson",
+            "topic_responsibility": "Verantwortung",
+            "topic_guilt":          "Schuld",
+        }
+        conversation = "\n".join(
+            f"{'Du' if m['role'] == 'user' else 'Echo'}: {m['content']}"
+            for m in history
+            if m["role"] in ("user", "assistant")
+            and not m["content"].startswith("__topic_")
+        )
+        user_message = (
+            f"Thema: {_TOPIC_LABELS.get(topic, topic)}\n\n"
+            f"Gesprächsverlauf:\n{conversation}\n\n"
+            f"Erstelle jetzt die Zusammenfassung."
+        )
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=500,
+            temperature=0.4,
+        )
+        return response.choices[0].message.content or ""
+
     async def generate_pattern_hypotheses(
         self,
         *,
@@ -298,11 +362,16 @@ class EchoService:
         scenes: list[dict[str, Any]],
         scale_scores: list[dict[str, Any]],
         onboarding: dict[str, Any] | None = None,
+        user_profile: dict[str, Any] | None = None,
+        person_profile: dict[str, Any] | None = None,
+        topic_summaries: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """Erzeugt einen strukturierten Bericht."""
         if self._use_openai:
             return await self._openai_report(
-                report_type, case_context, scenes, scale_scores, onboarding
+                report_type, case_context, scenes, scale_scores, onboarding,
+                user_profile=user_profile, person_profile=person_profile,
+                topic_summaries=topic_summaries,
             )
         return self._mock_report(report_type, case_context)
 
@@ -399,14 +468,236 @@ class EchoService:
         raw = response.choices[0].message.content or "{}"
         return json.loads(raw)
 
+    async def _openai_topic_chat(
+        self,
+        *,
+        topic: str,
+        user_message: str,
+        history: list[dict[str, str]],
+        case_context: dict[str, Any],
+        onboarding: dict[str, Any] | None,
+        scenes: list[dict[str, Any]],
+        scale_scores: list[dict[str, Any]] | None,
+        extra_context: str = "",
+    ) -> str:
+        _TOPIC_PROMPTS = {
+            "topic_self":           "topic_self_prompt.md",
+            "topic_person":         "topic_person_prompt.md",
+            "topic_responsibility": "topic_responsibility_prompt.md",
+            "topic_guilt":          "topic_guilt_prompt.md",
+        }
+        prompt_file = _TOPIC_PROMPTS.get(topic, "topic_self_prompt.md")
+        system_prompt = _load_prompt(prompt_file)
+
+        case_ctx = build_case_context(
+            case=case_context,
+            onboarding=onboarding,
+            scenes=scenes,
+            scale_scores=scale_scores,
+        )
+
+        messages: list[dict] = [
+            {"role": "system", "content": system_prompt},
+            {"role": "system", "content": case_ctx},
+        ]
+        if extra_context:
+            messages.append({"role": "system", "content": extra_context})
+        for h in history:
+            messages.append(h)
+        messages.append({"role": "user", "content": user_message})
+
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=600,
+            temperature=0.6,
+        )
+        return response.choices[0].message.content or ""
+
     async def _openai_hypotheses(self, *args, **kwargs) -> list:
         raise NotImplementedError("OpenAI-Hypothesen noch nicht implementiert.")
 
-    async def _openai_report(self, *args, **kwargs) -> dict:
-        raise NotImplementedError("OpenAI-Report noch nicht implementiert.")
+    async def _openai_report(
+        self,
+        report_type: str,
+        case_context: dict[str, Any],
+        scenes: list[dict[str, Any]],
+        scale_scores: list[dict[str, Any]],
+        onboarding: dict[str, Any] | None,
+        *,
+        user_profile: dict[str, Any] | None = None,
+        person_profile: dict[str, Any] | None = None,
+        topic_summaries: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        import json
+        from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS
+        from app.services.profile_service import build_profile_context
+        from app.services.person_profile_service import build_person_context
+        from app.services.topic_summary_service import build_topic_context
+
+        system_prompt = _load_prompt("report_generation_prompt.md")
+
+        # Kontext aufbauen
+        context_parts: list[str] = []
+
+        context_parts.append(build_case_context(
+            case=case_context,
+            onboarding=onboarding,
+            scenes=scenes,
+            scale_scores=scale_scores,
+        ))
+
+        if user_profile:
+            up_modules = user_profile.get("modules") or {}
+            if isinstance(up_modules, str):
+                up_modules = json.loads(up_modules)
+            context_parts.append(build_profile_context({
+                "modules": up_modules,
+                "safety_status": user_profile.get("safety_status", "no_indication"),
+                "summary": user_profile.get("summary") or {},
+            }))
+
+        if person_profile:
+            pp_modules = person_profile.get("modules") or {}
+            if isinstance(pp_modules, str):
+                pp_modules = json.loads(pp_modules)
+            pp_summary = person_profile.get("summary") or {}
+            if isinstance(pp_summary, str):
+                pp_summary = json.loads(pp_summary)
+            context_parts.append(build_person_context({
+                "modules": pp_modules,
+                "summary": pp_summary,
+            }))
+
+        if topic_summaries:
+            topic_ctx = build_topic_context(topic_summaries)
+            if topic_ctx:
+                context_parts.append(topic_ctx)
+
+        full_context = "\n\n---\n\n".join(context_parts)
+
+        user_message = (
+            f"Erstelle einen **{REPORT_TYPE_LABELS.get(report_type, report_type)}** "
+            f"(Typ: `{report_type}`) auf Basis der oben stehenden Angaben.\n\n"
+            f"Halte dich exakt an die Abschnittsstruktur für diesen Bericht-Typ "
+            f"gemäß den Anweisungen im System-Prompt.\n"
+            f"Antworte ausschließlich als gültiges JSON-Objekt."
+        )
+
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": full_context},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=3000,
+            temperature=0.5,
+            response_format={"type": "json_object"},
+        )
+        raw = response.choices[0].message.content or "{}"
+        parsed = json.loads(raw)
+        return {
+            "sections": parsed.get("sections", []),
+            "disclaimer": REPORT_DISCLAIMER,
+            "type": report_type,
+            "type_label": REPORT_TYPE_LABELS.get(report_type, report_type),
+        }
 
     async def _openai_safety_check(self, text: str) -> dict:
         raise NotImplementedError("OpenAI-Sicherheitscheck noch nicht implementiert.")
+
+    async def calculate_scales(
+        self,
+        *,
+        case_context: dict[str, Any],
+        scenes: list[dict[str, Any]],
+        onboarding: dict[str, Any] | None = None,
+        person_profile: dict[str, Any] | None = None,
+        topic_summaries: list[dict[str, Any]] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Berechnet alle 15 Skalen per KI aus dem Fallkontext."""
+        if self._client is None:
+            return self._mock_scales()
+        return await self._openai_calculate_scales(
+            case_context=case_context,
+            scenes=scenes,
+            onboarding=onboarding,
+            person_profile=person_profile,
+            topic_summaries=topic_summaries,
+        )
+
+    async def _openai_calculate_scales(
+        self,
+        *,
+        case_context: dict[str, Any],
+        scenes: list[dict[str, Any]],
+        onboarding: dict[str, Any] | None = None,
+        person_profile: dict[str, Any] | None = None,
+        topic_summaries: list[dict[str, Any]] | None = None,
+    ) -> list[dict[str, Any]]:
+        import json
+        from app.services.person_profile_service import build_person_context
+        from app.services.topic_summary_service import build_topic_context
+
+        system_prompt = _load_prompt("scale_calculation_prompt.md")
+
+        context_parts: list[str] = []
+        context_parts.append(build_case_context(
+            case=case_context,
+            onboarding=onboarding,
+            scenes=scenes,
+        ))
+        if person_profile:
+            pp_modules = person_profile.get("modules") or {}
+            if isinstance(pp_modules, str):
+                pp_modules = json.loads(pp_modules)
+            pp_summary = person_profile.get("summary") or {}
+            if isinstance(pp_summary, str):
+                pp_summary = json.loads(pp_summary)
+            context_parts.append(build_person_context({"modules": pp_modules, "summary": pp_summary}))
+        if topic_summaries:
+            topic_ctx = build_topic_context(topic_summaries)
+            if topic_ctx:
+                context_parts.append(topic_ctx)
+
+        full_context = "\n\n---\n\n".join(context_parts)
+        user_message = f"Berechne alle 15 Skalen für diesen Fall:\n\n{full_context}"
+
+        response = await self._client.chat.completions.create(
+            model="gpt-4o",
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=2000,
+            temperature=0.2,
+        )
+        raw = response.choices[0].message.content or "{}"
+        data = json.loads(raw)
+        scales = data.get("scales", [])
+
+        # Sicherstellen dass score im erlaubten Bereich
+        for s in scales:
+            s["score"] = max(0.0, min(100.0, float(s.get("score", 50.0))))
+            s["scene_count"] = int(s.get("scene_count", 0))
+            if s.get("confidence") not in ("low", "medium", "high"):
+                s["confidence"] = "low"
+        return scales
+
+    def _mock_scales(self) -> list[dict[str, Any]]:
+        from app.schemas.scale import SCALE_DEFINITIONS
+        result = []
+        for key in SCALE_DEFINITIONS:
+            result.append({
+                "scale_key": key,
+                "score": 50.0,
+                "confidence": "low",
+                "scene_count": 0,
+                "notes": "Demo-Modus – bitte OpenAI-API-Key konfigurieren.",
+            })
+        return result
 
     # ── Mock-Implementierungen (MVP P0) ───────────────────────────────────────
 

@@ -30,6 +30,14 @@ export type ScaleKey =
   | 'conflict_escalation'
   | 'perception_distortion'
   | 'safety_risk'
+  | 'personality_openness'
+  | 'personality_conscientiousness'
+  | 'personality_extraversion'
+  | 'personality_agreeableness'
+  | 'personality_neuroticism'
+  | 'responsibility_deflection'
+  | 'cluster_b_traits'
+  | 'empathy_deficit'
 
 // ── Labels ────────────────────────────────────────────────────────────────────
 
@@ -65,13 +73,21 @@ export const CONTACT_FREQUENCY_LABELS: Record<ContactFrequency, string> = {
 }
 
 export const SCALE_LABELS: Record<ScaleKey, string> = {
-  boundary_violation:    'Grenzverletzung',
-  guilt_shifting:        'Schuldumkehr',
-  control_isolation:     'Kontrolle & Isolation',
-  proximity_distance:    'Nähe-Distanz-Wechsel',
-  conflict_escalation:   'Konflikteskalation',
-  perception_distortion: 'Wahrnehmungsverunsicherung',
-  safety_risk:           'Sicherheitsrisiko',
+  boundary_violation:             'Grenzverletzung',
+  guilt_shifting:                 'Schuldumkehr',
+  control_isolation:              'Kontrolle & Isolation',
+  proximity_distance:             'Nähe-Distanz-Wechsel',
+  conflict_escalation:            'Konflikteskalation',
+  perception_distortion:          'Realitätsverzerrung',
+  safety_risk:                    'Sicherheitsrisiko',
+  personality_openness:           'Offenheit',
+  personality_conscientiousness:  'Zuverlässigkeit',
+  personality_extraversion:       'Dominanz & Präsenz',
+  personality_agreeableness:      'Kooperationsbereitschaft',
+  personality_neuroticism:        'Emotionale Instabilität',
+  responsibility_deflection:      'Verantwortungsabwehr',
+  cluster_b_traits:               'Cluster-B-Merkmale',
+  empathy_deficit:                'Empathiemangel',
 }
 
 export const REPORT_TYPE_LABELS: Record<ReportType, string> = {

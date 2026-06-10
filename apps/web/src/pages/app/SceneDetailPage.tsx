@@ -336,7 +336,11 @@ export default function SceneDetailPage() {
             💬 Mit Echo besprechen
           </button>
           <button
-            onClick={() => deleteMutation.mutate()}
+            onClick={() => {
+              if (window.confirm(`Szene „${scene.title}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+                deleteMutation.mutate()
+              }
+            }}
             disabled={deleteMutation.isPending}
             className="text-sm text-red-500 hover:text-red-700 transition-colors"
           >

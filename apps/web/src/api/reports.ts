@@ -11,6 +11,9 @@ export const reportsApi = {
   create: (caseId: string, data: ReportCreate) =>
     apiClient.post<Report>(`/cases/${caseId}/reports`, data).then(r => r.data),
 
-  archive: (caseId: string, reportId: string) =>
+  update: (caseId: string, reportId: string, sections: { heading: string; text: string }[]) =>
+    apiClient.put<Report>(`/cases/${caseId}/reports/${reportId}`, { sections }).then(r => r.data),
+
+  delete: (caseId: string, reportId: string) =>
     apiClient.delete(`/cases/${caseId}/reports/${reportId}`),
 }

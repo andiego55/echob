@@ -12,6 +12,16 @@ export const echoApi = {
       })
       .then(r => r.data),
 
+  topicSummary: (caseId: string, thread_type: string) =>
+    apiClient
+      .post<{ summary: string }>(`/cases/${caseId}/echo/topic-summary`, { thread_type })
+      .then(r => r.data),
+
+  resetTopicHistory: (caseId: string, thread_type: string) =>
+    apiClient
+      .delete(`/cases/${caseId}/echo/topic-history`, { params: { thread_type } })
+      .then(r => r.data),
+
   finalizeScene: (caseId: string, sessionId: string) =>
     apiClient
       .post<{ scene_id: string; title: string; _extraction_meta: Record<string, unknown> }>(

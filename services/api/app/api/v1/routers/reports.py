@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from pydantic import BaseModel
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.report import (
@@ -25,8 +27,7 @@ async def list_reports(
     async with pool.acquire() as conn:
         await _assert_case_owner(case_id, current_user["user_id"], conn)
         rows = await conn.fetch(
-            "SELECT * FROM reports WHERE case_id = $1 AND status != 'archived' "
-            "ORDER BY created_at DESC",
+            "SELECT * FROM reports WHERE case_id = $1 ORDER BY created_at DESC",
             case_id,
         )
     reports = [_row_to_report(r) for r in rows]
@@ -48,6 +49,14 @@ async def create_report(
 
     async with pool.acquire() as conn:
         case_row = await _assert_case_owner(case_id, user_id, conn, return_row=True)
+        report_count = await conn.fetchval(
+            "SELECT COUNT(*) FROM reports WHERE case_id = $1", case_id
+        )
+        if report_count >= 20:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Maximale Anzahl von 20 Berichten erreicht. Bitte lösche einen Bericht, bevor du einen neuen erstellst.",
+            )
         scenes = await conn.fetch(
             "SELECT * FROM scenes WHERE case_id = $1 AND confirmed_by_user = true ORDER BY scene_date DESC",
             case_id,
@@ -56,11 +65,23 @@ async def create_report(
         onboarding_row = await conn.fetchrow(
             "SELECT * FROM onboarding_answers WHERE case_id = $1", case_id
         )
+        user_profile_row = await conn.fetchrow(
+            "SELECT * FROM user_profiles WHERE user_id = $1", user_id
+        )
+        person_profile_row = await conn.fetchrow(
+            "SELECT * FROM person_profiles WHERE case_id = $1", case_id
+        )
+        topic_summary_rows = await conn.fetch(
+            "SELECT topic, summary_text FROM topic_summaries WHERE case_id = $1", case_id
+        )
 
     case_context = dict(case_row)
     scenes_data = [dict(r) for r in scenes]
     scale_data = [dict(r) for r in scale_rows]
     onboarding_data = dict(onboarding_row) if onboarding_row else None
+    user_profile_data = dict(user_profile_row) if user_profile_row else None
+    person_profile_data = dict(person_profile_row) if person_profile_row else None
+    topic_summaries_data = [dict(r) for r in topic_summary_rows]
 
     if echo_svc:
         content = await echo_svc.generate_report(
@@ -69,6 +90,9 @@ async def create_report(
             scenes=scenes_data,
             scale_scores=scale_data,
             onboarding=onboarding_data,
+            user_profile=user_profile_data,
+            person_profile=person_profile_data,
+            topic_summaries=topic_summaries_data,
         )
     else:
         content = {
@@ -110,8 +134,44 @@ async def get_report(
     return _row_to_report(row)
 
 
+class ReportSectionUpdate(BaseModel):
+    sections: list[dict[str, Any]]
+
+
+@router.put("/{report_id}", response_model=ReportResponse)
+async def update_report(
+    case_id: UUID,
+    report_id: UUID,
+    body: ReportSectionUpdate,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> ReportResponse:
+    """Berichtsinhalte (Abschnitte) aktualisieren."""
+    import json
+    async with pool.acquire() as conn:
+        await _assert_case_owner(case_id, current_user["user_id"], conn)
+        row = await conn.fetchrow(
+            "SELECT * FROM reports WHERE id = $1 AND case_id = $2",
+            report_id, case_id,
+        )
+        if not row:
+            raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
+        # Bestehenden content mergen, nur sections ersetzen
+        existing = dict(row)
+        content = existing.get("content") or {}
+        if isinstance(content, str):
+            content = json.loads(content)
+        content["sections"] = body.sections
+        updated = await conn.fetchrow(
+            "UPDATE reports SET content = $1::jsonb, updated_at = NOW() "
+            "WHERE id = $2 AND case_id = $3 RETURNING *",
+            json.dumps(content), report_id, case_id,
+        )
+    return _row_to_report(updated)
+
+
 @router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def archive_report(
+async def delete_report(
     case_id: UUID,
     report_id: UUID,
     current_user: dict = Depends(get_current_user),
@@ -120,8 +180,7 @@ async def archive_report(
     async with pool.acquire() as conn:
         await _assert_case_owner(case_id, current_user["user_id"], conn)
         row = await conn.fetchrow(
-            "UPDATE reports SET status = 'archived', updated_at = NOW() "
-            "WHERE id = $1 AND case_id = $2 RETURNING id",
+            "DELETE FROM reports WHERE id = $1 AND case_id = $2 RETURNING id",
             report_id, case_id,
         )
     if not row:
