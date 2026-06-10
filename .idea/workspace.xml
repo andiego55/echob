@@ -4,18 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="First milestone reached">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="Works with AI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/api/client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/api/client.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/api/waitlist.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/api/waitlist.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/core/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/schemas/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/api/echo.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/api/echo.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/SceneDetailPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/SceneDetailPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/SceneNewPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/SceneNewPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/types/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/routers/echo.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/routers/echo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/schemas/echo.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/schemas/echo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/services/echo_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/services/echo_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +61,7 @@
       <option name="presentableId" value="Default" />
       <updated>1780945977920</updated>
       <workItem from="1780945979268" duration="14926000" />
-      <workItem from="1781069856317" duration="1003000" />
+      <workItem from="1781069856317" duration="3241000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -137,7 +135,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781023372206</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Works with AI">
+      <option name="closed" value="true" />
+      <created>1781071912940</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1781071912940</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -180,6 +186,7 @@
     <MESSAGE value="first commit" />
     <MESSAGE value="minor change to check deployment" />
     <MESSAGE value="First milestone reached" />
-    <option name="LAST_COMMIT_MESSAGE" value="First milestone reached" />
+    <MESSAGE value="Works with AI" />
+    <option name="LAST_COMMIT_MESSAGE" value="Works with AI" />
   </component>
 </project>

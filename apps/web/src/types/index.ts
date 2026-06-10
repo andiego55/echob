@@ -152,6 +152,7 @@ export interface EchoChatRequest {
   thread_type?: ThreadType
   related_scene_id?: string
   glossary_term?: string
+  scene_session_id?: string
 }
 
 export interface EchoChatResponse {

@@ -90,7 +90,7 @@ export default function SceneNewPage() {
               <button
                 key={m}
                 type="button"
-                onClick={() => m === 'chat' ? navigate(`/app/cases/${caseId}/echo`) : setMode(m)}
+                onClick={() => m === 'chat' ? navigate(`/app/cases/${caseId}/scenes/echo`) : setMode(m)}
                 className="card text-left flex items-start gap-4 hover:border-accent/40 transition-all"
               >
                 <span className="text-2xl">{icon}</span>

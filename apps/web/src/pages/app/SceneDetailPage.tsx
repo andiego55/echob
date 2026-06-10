@@ -33,8 +33,42 @@ export default function SceneDetailPage() {
   })
 
   const [editMode, setEditMode] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDate, setEditDate] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editReaction, setEditReaction] = useState('')
+  const [editDistress, setEditDistress] = useState<number | null>(null)
+  const [editTags, setEditTags] = useState<string[]>([])
+
   const [tags, setTags] = useState<string[]>([])
   const [distress, setDistress] = useState<number | null>(null)
+
+  const startEdit = () => {
+    if (!scene) return
+    setEditTitle(scene.title)
+    setEditDate(scene.scene_date ?? '')
+    setEditDescription(scene.description ?? '')
+    setEditReaction(scene.user_reaction ?? '')
+    setEditDistress(scene.distress_score)
+    setEditTags(scene.pattern_tags ?? [])
+    setEditMode(true)
+  }
+
+  const updateMutation = useMutation({
+    mutationFn: () => scenesApi.update(caseId!, sceneId!, {
+      title: editTitle || 'Szene ohne Titel',
+      scene_date: editDate || undefined,
+      description: editDescription || undefined,
+      user_reaction: editReaction || undefined,
+      distress_score: editDistress ?? undefined,
+      pattern_tags: editTags,
+    }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['scene', caseId, sceneId] })
+      qc.invalidateQueries({ queryKey: ['scenes', caseId] })
+      setEditMode(false)
+    },
+  })
 
   const confirmMutation = useMutation({
     mutationFn: () => scenesApi.confirm(caseId!, sceneId!, {
@@ -94,6 +128,12 @@ export default function SceneDetailPage() {
                 Unbestätigt
               </span>
             )}
+            <button
+              onClick={startEdit}
+              className="rounded border border-brand-border px-3 py-1.5 text-sm text-brand-text hover:border-accent hover:text-accent transition-colors"
+            >
+              Bearbeiten
+            </button>
           </div>
         </div>
 
@@ -108,7 +148,121 @@ export default function SceneDetailPage() {
           </div>
         )}
 
-        {/* Inhalt */}
+        {/* Bearbeitungsformular */}
+        {editMode && (
+          <div className="card mb-6 space-y-4">
+            <p className="text-sm font-semibold text-navy">Szene bearbeiten</p>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-medium text-brand-muted mb-1">Titel</label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  maxLength={200}
+                  className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-brand-muted mb-1">Datum</label>
+                <input
+                  type="date"
+                  value={editDate}
+                  onChange={(e) => setEditDate(e.target.value)}
+                  className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-brand-muted mb-1">Beschreibung</label>
+              <textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                rows={5}
+                className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-brand-muted mb-1">Deine Reaktion</label>
+              <textarea
+                value={editReaction}
+                onChange={(e) => setEditReaction(e.target.value)}
+                rows={3}
+                className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-brand-muted mb-2">
+                Belastung <span className="font-normal">(1 = wenig, 5 = sehr hoch)</span>
+              </label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setEditDistress(editDistress === n ? null : n)}
+                    className={`w-9 h-9 rounded-brand border text-sm font-semibold transition-all ${
+                      editDistress === n
+                        ? 'border-accent bg-accent text-white'
+                        : 'border-brand-border text-brand-muted hover:border-accent/50'
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-brand-muted mb-2">Muster-Tags</label>
+              <div className="flex flex-wrap gap-2">
+                {PATTERN_TAG_OPTIONS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setEditTags((prev) =>
+                      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+                    )}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                      editTags.includes(tag)
+                        ? 'border-accent bg-accent/10 text-accent font-medium'
+                        : 'border-brand-border text-brand-muted hover:border-accent/40'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {updateMutation.isError && (
+              <p className="text-sm text-red-600">Speichern fehlgeschlagen. Bitte versuche es erneut.</p>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => updateMutation.mutate()}
+                disabled={updateMutation.isPending}
+                className="btn-primary !py-2 !px-4 !text-sm"
+              >
+                {updateMutation.isPending ? 'Wird gespeichert …' : 'Speichern'}
+              </button>
+              <button
+                onClick={() => setEditMode(false)}
+                className="btn-outline !py-2 !px-4 !text-sm"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Inhalt + Muster-Tags + Aktionen */}
+        {!editMode && <>
         <div className="card space-y-5 mb-6">
           {scene.description && (
             <Section label="Beschreibung" text={scene.description} />
@@ -189,6 +343,7 @@ export default function SceneDetailPage() {
             Szene löschen
           </button>
         </div>
+        </>}
       </div>
     </AppShell>
   )

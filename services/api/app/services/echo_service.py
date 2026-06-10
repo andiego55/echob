@@ -185,6 +185,11 @@ class EchoService:
         scale_scores: list[dict[str, Any]] | None = None,
     ) -> str:
         """Schickt eine Nachricht an Echo und gibt die Antwort zurück."""
+        if thread_type == "scene":
+            return await self.scene_chat(
+                user_message=user_message,
+                history=history or [],
+            )
         if self._use_openai:
             return await self._openai_chat(
                 user_message=user_message,
@@ -202,6 +207,17 @@ class EchoService:
             glossary_term=glossary_term,
         )
 
+    async def scene_chat(
+        self,
+        *,
+        user_message: str,
+        history: list[dict[str, str]],
+    ) -> str:
+        """Geführtes Szenenerfassungs-Gespräch ohne Beziehungskontext."""
+        if self._use_openai:
+            return await self._openai_scene_chat(user_message=user_message, history=history)
+        return self._mock_scene_chat(user_message=user_message)
+
     async def extract_scene(
         self,
         *,
@@ -212,6 +228,22 @@ class EchoService:
         if self._use_openai:
             return await self._openai_extract_scene(user_text, case_context)
         return self._mock_extract_scene(user_text)
+
+    async def extract_scene_from_conversation(
+        self,
+        *,
+        history: list[dict[str, str]],
+        case_context: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Extrahiert eine strukturierte Szene aus einem Gesprächsverlauf."""
+        conversation_text = "\n".join(
+            f"{'Nutzer' if m['role'] == 'user' else 'Echo'}: {m['content']}"
+            for m in history
+            if m["role"] in ("user", "assistant") and m.get("content", "").strip() != "__scene_start__"
+        )
+        if self._use_openai:
+            return await self._openai_extract_scene(conversation_text, case_context)
+        return self._mock_extract_scene(conversation_text)
 
     async def generate_pattern_hypotheses(
         self,
@@ -290,9 +322,45 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
+    async def _openai_scene_chat(self, *, user_message: str, history: list[dict[str, str]]) -> str:
+        system_prompt = _load_prompt("scene_capture_prompt.md")
+        messages: list[dict] = [{"role": "system", "content": system_prompt}]
+        for h in history:
+            messages.append(h)
+        messages.append({"role": "user", "content": user_message})
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=400,
+            temperature=0.4,
+        )
+        return response.choices[0].message.content or ""
+
     async def _openai_extract_scene(self, user_text: str, case_context: dict) -> dict:
-        # TODO: structured output mit response_format={"type": "json_object"}
-        raise NotImplementedError("OpenAI-Szenenextraktion noch nicht implementiert.")
+        import json
+        extraction_prompt = _load_prompt("scene_extraction_prompt.md")
+        extraction_prompt = extraction_prompt.replace("{user_text}", user_text)
+        extraction_prompt = extraction_prompt.replace(
+            "{relationship_type}", case_context.get("relationship_type", "unbekannt")
+        )
+        extraction_prompt = extraction_prompt.replace(
+            "{relationship_status}", case_context.get("relationship_status", "unbekannt")
+        )
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Du extrahierst strukturierte Daten aus einem Gespräch. Antworte ausschließlich als gültiges JSON-Objekt.",
+                },
+                {"role": "user", "content": extraction_prompt},
+            ],
+            max_tokens=1000,
+            temperature=0.2,
+            response_format={"type": "json_object"},
+        )
+        raw = response.choices[0].message.content or "{}"
+        return json.loads(raw)
 
     async def _openai_hypotheses(self, *args, **kwargs) -> list:
         raise NotImplementedError("OpenAI-Hypothesen noch nicht implementiert.")
@@ -304,6 +372,18 @@ class EchoService:
         raise NotImplementedError("OpenAI-Sicherheitscheck noch nicht implementiert.")
 
     # ── Mock-Implementierungen (MVP P0) ───────────────────────────────────────
+
+    def _mock_scene_chat(self, *, user_message: str) -> str:
+        if user_message == "__scene_start__":
+            return (
+                "Hallo, schön dass du dir die Zeit nimmst. Ich bin hier, um dir zu helfen, "
+                "die Situation in Worte zu fassen – ganz in deinem Tempo.\n\n"
+                "Was ist passiert – und wann war das ungefähr?"
+            )
+        return (
+            "Danke, dass du das geteilt hast. "
+            "_(Echo läuft im Demo-Modus – bitte konfiguriere einen OpenAI-API-Key für echte KI-Unterstützung.)_"
+        )
 
     def _mock_chat(
         self, *, user_message: str, thread_type: str, glossary_term: str | None

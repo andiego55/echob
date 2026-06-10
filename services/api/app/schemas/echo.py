@@ -38,8 +38,8 @@ class EchoChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=20_000)
     thread_type: ThreadType = "topic"
     related_scene_id: UUID | None = None
-    # Glossarbegriff, der an den Kontext angehängt wird
     glossary_term: str | None = Field(None, max_length=100)
+    scene_session_id: str | None = Field(None, max_length=100)
 
 
 class EchoChatResponse(BaseModel):
