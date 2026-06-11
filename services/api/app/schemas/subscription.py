@@ -1,11 +1,14 @@
-"""Pydantic-Schemas für Subscription."""
+"""Pydantic-Schemas für Subscription & Zahlungen."""
 from __future__ import annotations
 
 from typing import Literal
 from pydantic import BaseModel
 
 
-PlanType = Literal["trial", "early_bird", "regular", "annual"]
+PlanType = Literal["trial", "startpaket", "early_bird", "regular", "annual"]
+
+# Produkte, die gekauft werden können (alles außer trial)
+ProductType = Literal["startpaket", "early_bird", "regular", "annual"]
 
 
 class SubscriptionStatus(BaseModel):
@@ -14,3 +17,17 @@ class SubscriptionStatus(BaseModel):
     trial_days_left: int
     trial_ends_at: str | None
     subscription_ends_at: str | None
+    # True solange Zugriff besteht (Trial aktiv ODER bezahlter Plan nicht abgelaufen)
+    is_active: bool = True
+
+
+class CheckoutRequest(BaseModel):
+    product: ProductType
+
+
+class CheckoutResponse(BaseModel):
+    url: str
+
+
+class PortalResponse(BaseModel):
+    url: str

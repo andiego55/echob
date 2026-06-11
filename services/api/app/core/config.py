@@ -47,6 +47,18 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     anthropic_api_key: str = ""   # Reserviert für zukünftige Nutzung
 
+    # ── Stripe (Zahlungen) ─────────────────────────────────────────────
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    # Optional: feste Price-IDs aus dem Stripe-Dashboard.
+    # Wenn leer, werden Preise inline (price_data) erzeugt — kein Setup nötig.
+    stripe_price_startpaket: str = ""
+    stripe_price_early_bird: str = ""
+    stripe_price_regular: str = ""
+    stripe_price_annual: str = ""
+    # Basis-URL des Frontends für Checkout-Redirects
+    frontend_url: str = "http://localhost:5173"
+
     # ── Logging ────────────────────────────────────────────────────────
     log_level: Literal["debug", "info", "warning", "error"] = "info"
 

@@ -295,7 +295,8 @@ export interface ProfileModuleUpdate {
 
 // ── Subscription ─────────────────────────────────────────────────────────────
 
-export type PlanType = 'trial' | 'early_bird' | 'regular' | 'annual'
+export type PlanType = 'trial' | 'startpaket' | 'early_bird' | 'regular' | 'annual'
+export type ProductType = Exclude<PlanType, 'trial'>
 
 export interface SubscriptionStatus {
   plan: PlanType
@@ -303,6 +304,7 @@ export interface SubscriptionStatus {
   trial_days_left: number
   trial_ends_at: string | null
   subscription_ends_at: string | null
+  is_active: boolean
 }
 
 // ── Personenprofil ────────────────────────────────────────────────────────────

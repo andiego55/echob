@@ -8,9 +8,10 @@ import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import ChatComposer from '@/components/app/ChatComposer'
+import { ChatMessage, TypingIndicator } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
-import type { EchoChatSession, EchoMessage, ThreadType } from '@/types'
-import MarkdownMessage from '@/components/app/MarkdownMessage'
+import type { EchoChatSession, ThreadType } from '@/types'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -170,37 +171,23 @@ export default function EchoPage() {
 
           {/* Chat-Bereich */}
           <div className="flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
+            <div className="mx-auto max-w-[780px] px-6 py-6 space-y-5">
 
               {/* Begrüßung wenn leer */}
               {showEmptyState && <WelcomePrompt onTopic={handleTopic} />}
 
               {/* Nachrichten */}
               {history.map((msg) => (
-                <MessageBubble key={msg.id} message={msg} />
+                <ChatMessage key={msg.id} content={msg.content} isUser={msg.role === 'user'} />
               ))}
 
               {/* Optimistische Nutzernachricht */}
               {pendingMessage && mutation.isPending && (
-                <div className="flex gap-3 flex-row-reverse">
-                  <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">Du</div>
-                  <div className="max-w-[80%] rounded-brand px-4 py-3 text-sm bg-navy text-white">
-                    <p className="whitespace-pre-wrap">{pendingMessage}</p>
-                  </div>
-                </div>
+                <ChatMessage content={pendingMessage} isUser />
               )}
 
               {/* Tipp-Indikator */}
-              {mutation.isPending && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm flex-shrink-0">
-                    E
-                  </div>
-                  <div className="rounded-brand bg-white border border-brand-border px-4 py-3 text-sm text-brand-muted">
-                    Echo tippt …
-                  </div>
-                </div>
-              )}
+              {mutation.isPending && <TypingIndicator />}
 
               <div ref={messagesEndRef} />
             </div>
@@ -208,8 +195,8 @@ export default function EchoPage() {
 
           {/* Glossar-Overlay */}
           {showGlossary && (
-            <div className="border-t border-brand-border bg-white px-6 py-4">
-              <div className="mx-auto max-w-[780px]">
+            <div className="px-6 pb-2">
+              <div className="mx-auto max-w-[780px] rounded-2xl border border-brand-border bg-white shadow-[0_4px_24px_rgba(15,30,46,0.10)] px-5 py-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-semibold text-navy">Glossar – Begriff auswählen</p>
                   <button onClick={() => setGlossary(false)} className="text-xs text-brand-muted hover:text-navy">
@@ -232,43 +219,28 @@ export default function EchoPage() {
           )}
 
           {/* Eingabe */}
-          <div className="border-t border-brand-border bg-white px-6 py-4">
-            <div className="mx-auto max-w-[780px]">
-              <form onSubmit={handleSend} className="flex gap-3">
+          <div className="px-6 pb-5 pt-2">
+            <ChatComposer
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              pending={mutation.isPending}
+              hint="Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung."
+              leftAccessory={
                 <button
                   type="button"
                   onClick={() => setGlossary((v) => !v)}
                   title="Glossar öffnen"
-                  className={`flex-shrink-0 px-3 py-2.5 rounded-brand border text-sm transition-colors ${
+                  className={`h-9 px-3.5 rounded-full border text-xs font-medium transition-colors ${
                     showGlossary
                       ? 'border-accent bg-accent/10 text-accent'
-                      : 'border-brand-border text-brand-muted hover:border-accent/40'
+                      : 'border-brand-border text-brand-muted hover:border-accent/40 hover:text-accent'
                   }`}
                 >
                   Glossar
                 </button>
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
-                  }}
-                  rows={1}
-                  placeholder="Schreib Echo eine Nachricht … (Enter zum Senden, Shift+Enter für neue Zeile)"
-                  className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
-                />
-                <button
-                  type="submit"
-                  disabled={!input.trim() || mutation.isPending}
-                  className="btn-primary !py-2 !px-4 !text-sm flex-shrink-0 disabled:opacity-50"
-                >
-                  Senden
-                </button>
-              </form>
-              <p className="mt-2 text-xs text-brand-muted/70">
-                Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung.
-              </p>
-            </div>
+              }
+            />
           </div>
         </div>
       </div>
@@ -416,27 +388,7 @@ function ChatSidebar({
   )
 }
 
-// ── Nachrichten ───────────────────────────────────────────────────────────────
-
-function MessageBubble({ message: msg }: { message: EchoMessage }) {
-  const isUser = msg.role === 'user'
-  return (
-    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-        isUser ? 'bg-navy text-white' : 'bg-accent/20 text-accent'
-      }`}>
-        {isUser ? 'Du' : 'E'}
-      </div>
-      <div className={`max-w-[80%] rounded-brand px-4 py-3 text-sm ${
-        isUser
-          ? 'bg-navy text-white'
-          : 'bg-white border border-brand-border text-brand-text'
-      }`}>
-        <MarkdownMessage content={msg.content} isUser={isUser} />
-      </div>
-    </div>
-  )
-}
+// ── Begrüßung ─────────────────────────────────────────────────────────────────
 
 function WelcomePrompt({ onTopic }: { onTopic: (t: string) => void }) {
   return (

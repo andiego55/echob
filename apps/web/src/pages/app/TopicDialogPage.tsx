@@ -7,10 +7,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import ChatComposer from '@/components/app/ChatComposer'
+import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import type { EchoMessage } from '@/types'
-import MarkdownMessage from '@/components/app/MarkdownMessage'
 
 const TOPICS: Record<string, { label: string; description: string; startTrigger: string; isBlog?: boolean }> = {
   topic_self: {
@@ -233,50 +234,17 @@ export default function TopicDialogPage() {
             </div>
 
             {/* Nachrichten */}
-            {visibleMessages.map((msg) => {
-              const isUser = msg.role === 'user'
-              return (
-                <div key={msg.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                    isUser ? 'bg-navy text-white' : 'bg-accent/20 text-accent'
-                  }`}>
-                    {isUser ? 'Du' : 'E'}
-                  </div>
-                  <div className={`max-w-[80%] rounded-brand px-4 py-3 text-sm ${
-                    isUser ? 'bg-navy text-white' : 'bg-white border border-brand-border text-brand-text'
-                  }`}>
-                    <MarkdownMessage content={msg.content} isUser={isUser} />
-                  </div>
-                </div>
-              )
-            })}
+            {visibleMessages.map((msg) => (
+              <ChatMessage key={msg.id} content={msg.content} isUser={msg.role === 'user'} />
+            ))}
 
             {pendingMessage && chatMutation.isPending && (
-              <div className="flex gap-3 flex-row-reverse">
-                <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">Du</div>
-                <div className="max-w-[80%] rounded-brand px-4 py-3 text-sm bg-navy text-white">
-                  <p className="whitespace-pre-wrap">{pendingMessage}</p>
-                </div>
-              </div>
+              <ChatMessage content={pendingMessage} isUser />
             )}
 
-            {chatMutation.isPending && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm flex-shrink-0">E</div>
-                <div className="rounded-brand bg-white border border-brand-border px-4 py-3 text-sm text-brand-muted">
-                  Echo tippt …
-                </div>
-              </div>
-            )}
+            {chatMutation.isPending && <TypingIndicator />}
 
-            {chatMutation.isError && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-sm flex-shrink-0">!</div>
-                <div className="rounded-brand bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                  Echo konnte nicht antworten. Bitte versuche es erneut.
-                </div>
-              </div>
-            )}
+            {chatMutation.isError && <ChatErrorMessage />}
 
             {/* Zusammenfassung am Ende des Dialogs */}
             {summary && (
@@ -318,24 +286,14 @@ export default function TopicDialogPage() {
         </div>
 
         {/* Eingabe */}
-        <div className="border-t border-brand-border bg-white px-6 py-4 flex-shrink-0">
-          <form onSubmit={handleSend} className="mx-auto max-w-[780px] flex gap-3">
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder="Schreibe Echo …"
-              disabled={chatMutation.isPending}
-              className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || chatMutation.isPending}
-              className="btn-primary !py-2.5 !px-5 !text-sm disabled:opacity-40"
-            >
-              Senden
-            </button>
-          </form>
+        <div className="px-6 pb-5 pt-2 flex-shrink-0">
+          <ChatComposer
+            value={input}
+            onChange={setInput}
+            onSend={handleSend}
+            pending={chatMutation.isPending}
+            placeholder="Schreibe Echo …"
+          />
         </div>
       </div>
     </AppShell>

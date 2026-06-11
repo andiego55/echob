@@ -6,15 +6,20 @@
   <component name="ChangeListManager">
     <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="Works with AI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/api/echo.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/api/echo.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/FachpersonenPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/FachpersonenPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/UeberPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/UeberPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/CaseDetailPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/CaseDetailPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/api/subscription.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/api/subscription.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/components/app/MarkdownMessage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/components/app/MarkdownMessage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/EchoPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/EchoPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/PersonProfileEchoPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/PersonProfileEchoPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/ProfileEchoPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/ProfileEchoPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/SceneEchoPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/SceneEchoPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/TopicDialogPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/TopicDialogPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/app/UpgradePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/app/UpgradePage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/web/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/types/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/routers/echo.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/routers/echo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/app/schemas/echo.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/schemas/echo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/api/v1/routers/subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/api/v1/routers/subscription.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/core/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/schemas/subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/schemas/subscription.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/app/services/subscription_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/app/services/subscription_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/pyproject.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +73,7 @@
       <option name="presentableId" value="Default" />
       <updated>1780945977920</updated>
       <workItem from="1780945979268" duration="14926000" />
-      <workItem from="1781069856317" duration="17701000" />
+      <workItem from="1781069856317" duration="19869000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -198,7 +203,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781183485369</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Works with AI">
+      <option name="closed" value="true" />
+      <created>1781186288564</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1781186288564</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

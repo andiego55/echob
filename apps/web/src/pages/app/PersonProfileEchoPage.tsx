@@ -6,6 +6,8 @@ import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import ChatComposer from '@/components/app/ChatComposer'
+import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { personProfileApi } from '@/api/personProfile'
 import { casesApi } from '@/api/cases'
 import { RELATIONSHIP_TYPE_LABELS } from '@/types'
@@ -118,43 +120,18 @@ export default function PersonProfileEchoPage() {
             </div>
 
             {/* Nachrichten */}
-            {visibleMessages.map((msg) => {
-              const isUser = msg.role === 'user'
-              return (
-                <div key={msg.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                    isUser ? 'bg-navy text-white' : 'bg-accent/20 text-accent'
-                  }`}>
-                    {isUser ? 'Du' : 'E'}
-                  </div>
-                  <div className={`max-w-[80%] rounded-brand px-4 py-3 text-sm ${
-                    isUser ? 'bg-navy text-white' : 'bg-white border border-brand-border text-brand-text'
-                  }`}>
-                    <p className="whitespace-pre-wrap">
-                      {msg.content.replace(/\[BESCHREIBUNG\]([\s\S]*?)\[\/BESCHREIBUNG\]/g, '$1').trim()}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
+            {visibleMessages.map((msg) => (
+              <ChatMessage
+                key={msg.id}
+                content={msg.content.replace(/\[BESCHREIBUNG\]([\s\S]*?)\[\/BESCHREIBUNG\]/g, '$1').trim()}
+                isUser={msg.role === 'user'}
+                markdown={false}
+              />
+            ))}
 
-            {chatMutation.isPending && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm flex-shrink-0">E</div>
-                <div className="rounded-brand bg-white border border-brand-border px-4 py-3 text-sm text-brand-muted">
-                  Echo tippt …
-                </div>
-              </div>
-            )}
+            {chatMutation.isPending && <TypingIndicator />}
 
-            {chatMutation.isError && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-sm flex-shrink-0">!</div>
-                <div className="rounded-brand bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                  Echo konnte nicht antworten. Bitte versuche es erneut.
-                </div>
-              </div>
-            )}
+            {chatMutation.isError && <ChatErrorMessage />}
 
             <div ref={messagesEndRef} />
           </div>
@@ -186,30 +163,15 @@ export default function PersonProfileEchoPage() {
         )}
 
         {/* Eingabe */}
-        <div className="border-t border-brand-border bg-white px-6 py-4">
-          <div className="mx-auto max-w-[780px]">
-            <form onSubmit={handleSend} className="flex gap-3">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-                rows={1}
-                placeholder="Antworte Echo oder stelle eine Frage …"
-                disabled={chatMutation.isPending}
-                className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || chatMutation.isPending}
-                className="btn-primary !py-2 !px-4 !text-sm flex-shrink-0 disabled:opacity-50"
-              >
-                Senden
-              </button>
-            </form>
-            <p className="mt-2 text-xs text-brand-muted/70">
-              Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung oder Therapie.
-            </p>
-          </div>
+        <div className="px-6 pb-5 pt-2">
+          <ChatComposer
+            value={input}
+            onChange={setInput}
+            onSend={handleSend}
+            pending={chatMutation.isPending}
+            placeholder="Antworte Echo oder stelle eine Frage …"
+            hint="Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung oder Therapie."
+          />
         </div>
       </div>
     </AppShell>

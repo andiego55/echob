@@ -24,6 +24,7 @@ async def get_subscription_status(user_id: str, conn) -> dict:
             "trial_days_left": TRIAL_DAYS,
             "trial_ends_at": (now + timedelta(days=TRIAL_DAYS)).isoformat(),
             "subscription_ends_at": None,
+            "is_active": True,
         }
 
     plan = row["plan"]
@@ -41,12 +42,21 @@ async def get_subscription_status(user_id: str, conn) -> dict:
         trial_days_left = max(0, delta.days)
 
     sub_ends = row["subscription_ends_at"]
+    if sub_ends is not None and sub_ends.tzinfo is None:
+        sub_ends = sub_ends.replace(tzinfo=timezone.utc)
+
+    # Bezahlter Plan ist aktiv, solange kein Ablaufdatum gesetzt oder es in der
+    # Zukunft liegt (Stripe-Webhooks verlängern subscription_ends_at bei Renewal).
+    is_paid_active = plan != "trial" and (sub_ends is None or sub_ends > now)
+    is_active = is_trial_active or is_paid_active
+
     return {
         "plan": plan,
         "is_trial_active": is_trial_active,
         "trial_days_left": trial_days_left,
         "trial_ends_at": trial_ends_at.isoformat() if trial_ends_at else None,
         "subscription_ends_at": sub_ends.isoformat() if sub_ends else None,
+        "is_active": is_active,
     }
 
 
@@ -59,6 +69,13 @@ async def enforce_trial_limits(
 ) -> None:
     sub = await get_subscription_status(user_id, conn)
     plan = sub["plan"]
+
+    # Bezahlter Plan abgelaufen → wie abgelaufener Trial behandeln
+    if plan != "trial" and not sub["is_active"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="TRIAL_EXPIRED",
+        )
 
     if plan == "trial":
         if not sub["is_trial_active"]:

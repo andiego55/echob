@@ -1,11 +1,24 @@
 /**
  * /app/upgrade — Pricing & Subscription
+ * Kauf läuft über Stripe Checkout; Abos werden über das Stripe-Portal verwaltet.
  */
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
+import { subscriptionApi } from '@/api/subscription'
+import type { ProductType } from '@/types'
+
+const PLAN_LABELS: Record<string, string> = {
+  trial: 'Testzugang',
+  startpaket: 'Startpaket',
+  early_bird: 'Early Bird Abo',
+  regular: 'Monatsabo',
+  annual: 'Jahresabo',
+}
 
 const STARTER_PACKAGE = {
-  id: 'startpaket',
+  id: 'startpaket' as ProductType,
   name: 'Startpaket',
   badge: 'Empfohlen zum Einstieg',
   price: '99',
@@ -19,14 +32,13 @@ const STARTER_PACKAGE = {
     'GPT-4o – bestes verfügbares KI-Modell',
     'Echo auf voller Analysestufe: alle Perspektiven & Tiefen aktiv',
     '1 persönliche Coaching-Stunde mit dem EchoB-Gründer (60 min)',
-    'Terminvereinbarung direkt nach Buchungsmail',
+    'Terminvereinbarung direkt nach dem Kauf',
   ],
-  mailSubject: 'EchoB Startpaket',
 }
 
 const PLANS = [
   {
-    id: 'early_bird',
+    id: 'early_bird' as ProductType,
     name: 'Early Bird',
     badge: 'Bis November',
     price: '12,99',
@@ -41,10 +53,9 @@ const PLANS = [
       'Datensicherung & Export',
     ],
     featured: true,
-    mailSubject: 'EchoB Early Bird Abo',
   },
   {
-    id: 'regular',
+    id: 'regular' as ProductType,
     name: 'Monatsabo',
     badge: null,
     price: '24,99',
@@ -59,10 +70,9 @@ const PLANS = [
       'Datensicherung & Export',
     ],
     featured: false,
-    mailSubject: 'EchoB Monatsabo',
   },
   {
-    id: 'annual',
+    id: 'annual' as ProductType,
     name: 'Jahresabo',
     badge: 'Spare 33 %',
     price: '199',
@@ -78,11 +88,50 @@ const PLANS = [
       'Priorität bei neuen Features',
     ],
     featured: false,
-    mailSubject: 'EchoB Jahresabo',
   },
 ]
 
 export default function UpgradePage() {
+  const [searchParams] = useSearchParams()
+  const checkoutStatus = searchParams.get('status') // 'success' | 'cancelled' | null
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [pendingProduct, setPendingProduct] = useState<ProductType | null>(null)
+
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: subscriptionApi.getStatus,
+    // Nach erfolgreichem Kauf kann der Webhook ein paar Sekunden brauchen
+    refetchInterval: checkoutStatus === 'success' ? 4000 : false,
+  })
+
+  const checkoutMutation = useMutation({
+    mutationFn: (product: ProductType) => subscriptionApi.createCheckout(product),
+    onMutate: (product) => { setPendingProduct(product); setCheckoutError(null) },
+    onSuccess: (data) => { window.location.href = data.url },
+    onError: (error: any) => {
+      setPendingProduct(null)
+      const detail = error?.response?.data?.detail
+      setCheckoutError(
+        typeof detail === 'string'
+          ? detail
+          : 'Der Checkout konnte nicht gestartet werden. Bitte versuche es erneut oder kontaktiere uns.',
+      )
+    },
+  })
+
+  const portalMutation = useMutation({
+    mutationFn: subscriptionApi.createPortal,
+    onSuccess: (data) => { window.location.href = data.url },
+  })
+
+  const buy = (product: ProductType) => {
+    if (checkoutMutation.isPending) return
+    checkoutMutation.mutate(product)
+  }
+
+  const isPaid = subscription && subscription.plan !== 'trial'
+  const paidActive = isPaid && subscription.is_active
+
   return (
     <AppShell>
       <div className="mx-auto max-w-[1000px] px-6 py-10">
@@ -91,19 +140,83 @@ export default function UpgradePage() {
           <Link to="/app" className="text-sm text-brand-muted hover:text-navy">← Zurück</Link>
           <h1 className="mt-4 text-2xl font-bold text-navy">Pläne & Angebote</h1>
           <p className="mt-1 text-sm text-brand-muted max-w-xl">
-            Wähle das passende Angebot und schreibe uns eine kurze Mail – wir schalten dein Konto umgehend frei.
+            Sichere Zahlung über Stripe – Kreditkarte, SEPA, PayPal & mehr. Sofortige Freischaltung.
           </p>
         </div>
 
+        {/* Checkout-Ergebnis */}
+        {checkoutStatus === 'success' && (
+          <div className="mb-8 rounded-brand border border-green-200 bg-green-50 px-5 py-4 max-w-2xl">
+            <p className="text-sm font-semibold text-green-800 mb-1">
+              {paidActive ? '✓ Zahlung erfolgreich – dein Zugang ist freigeschaltet!' : '✓ Zahlung erfolgreich!'}
+            </p>
+            <p className="text-xs text-green-700">
+              {paidActive
+                ? `Dein Plan: ${PLAN_LABELS[subscription.plan]}. Viel Erfolg bei deiner Reflexionsarbeit!`
+                : 'Dein Zugang wird in wenigen Sekunden freigeschaltet – diese Seite aktualisiert sich automatisch.'}
+              {searchParams.get('product') === 'startpaket' &&
+                ' Wir melden uns innerhalb von 24 Stunden per E-Mail zur Terminvereinbarung deiner Coaching-Stunde.'}
+            </p>
+          </div>
+        )}
+        {checkoutStatus === 'cancelled' && (
+          <div className="mb-8 rounded-brand border border-brand-border bg-white px-5 py-4 max-w-2xl">
+            <p className="text-sm text-brand-muted">
+              Der Kauf wurde abgebrochen. Du kannst jederzeit erneut buchen – bei Fragen{' '}
+              <a href="mailto:info@echo-b.de" className="text-accent font-medium">schreib uns</a>.
+            </p>
+          </div>
+        )}
+        {checkoutError && (
+          <div className="mb-8 rounded-brand border border-red-200 bg-red-50 px-5 py-4 max-w-2xl">
+            <p className="text-sm text-red-700">
+              {checkoutError}{' '}
+              <a href="mailto:info@echo-b.de?subject=EchoB%20Buchung" className="font-medium underline">
+                Per E-Mail bestellen
+              </a>
+            </p>
+          </div>
+        )}
+
+        {/* Aktueller Plan (bezahlte Nutzer) */}
+        {paidActive && (
+          <div className="mb-8 rounded-brand border border-green-200 bg-green-50/60 px-5 py-4 max-w-2xl flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <p className="text-sm font-semibold text-navy">
+                Dein aktueller Plan: {PLAN_LABELS[subscription.plan]}
+              </p>
+              {subscription.subscription_ends_at && (
+                <p className="text-xs text-brand-muted mt-0.5">
+                  {subscription.plan === 'startpaket' ? 'Zugang bis' : 'Nächste Verlängerung'}:{' '}
+                  {new Date(subscription.subscription_ends_at).toLocaleDateString('de-DE', {
+                    day: '2-digit', month: 'long', year: 'numeric',
+                  })}
+                </p>
+              )}
+            </div>
+            {subscription.plan !== 'startpaket' && (
+              <button
+                onClick={() => portalMutation.mutate()}
+                disabled={portalMutation.isPending}
+                className="text-sm font-medium text-accent hover:underline disabled:opacity-50"
+              >
+                {portalMutation.isPending ? 'Wird geöffnet …' : 'Abo verwalten →'}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Trial info box */}
-        <div className="mb-8 rounded-brand border border-amber-200 bg-amber-50 px-5 py-4 max-w-xl">
-          <p className="text-sm font-semibold text-amber-800 mb-1">Kostenlose Testphase</p>
-          <p className="text-xs text-amber-700">
-            Mit dem Testzugang kannst du EchoB 3 Tage lang erkunden — mit 1 Fall, bis zu 5 Szenen
-            und Zugang zu Kurzbericht & Coaching-Vorbereitung.
-            Alle weiteren Berichte und Features sind ab dem Startpaket verfügbar.
-          </p>
-        </div>
+        {!paidActive && (
+          <div className="mb-8 rounded-brand border border-amber-200 bg-amber-50 px-5 py-4 max-w-xl">
+            <p className="text-sm font-semibold text-amber-800 mb-1">Kostenlose Testphase</p>
+            <p className="text-xs text-amber-700">
+              Mit dem Testzugang kannst du EchoB 3 Tage lang erkunden — mit 1 Fall, bis zu 5 Szenen
+              und Zugang zu Kurzbericht & Coaching-Vorbereitung.
+              Alle weiteren Berichte und Features sind ab dem Startpaket verfügbar.
+            </p>
+          </div>
+        )}
 
         {/* Startpaket */}
         <div className="mb-8 rounded-brand border-2 border-accent bg-accent/5 p-6 max-w-2xl shadow-sm">
@@ -126,14 +239,13 @@ export default function UpgradePage() {
               </div>
             ))}
           </div>
-          <a
-            href={`mailto:info@echo-b.de?subject=${encodeURIComponent(STARTER_PACKAGE.mailSubject)}&body=${encodeURIComponent(
-              `Hallo,\n\nich möchte das Startpaket (99 € einmalig) buchen.\n\nMeine E-Mail-Adresse: \n\nBitte schalte meinen Zugang frei und kontaktiere mich für die Terminvereinbarung der Coaching-Stunde.\n\nVielen Dank!`
-            )}`}
-            className="inline-block text-sm font-semibold px-6 py-2.5 rounded-brand bg-accent text-white hover:bg-accent/90 transition-colors"
+          <button
+            onClick={() => buy(STARTER_PACKAGE.id)}
+            disabled={checkoutMutation.isPending}
+            className="inline-block text-sm font-semibold px-6 py-2.5 rounded-brand bg-accent text-white hover:bg-accent/90 transition-colors disabled:opacity-60"
           >
-            Startpaket buchen
-          </a>
+            {pendingProduct === STARTER_PACKAGE.id ? 'Checkout wird geöffnet …' : 'Startpaket kaufen'}
+          </button>
         </div>
 
         <h2 className="text-sm font-semibold text-navy mb-4">Oder: App-Abo ohne Coaching</h2>
@@ -172,30 +284,36 @@ export default function UpgradePage() {
                   </li>
                 ))}
               </ul>
-              <a
-                href={`mailto:info@echo-b.de?subject=${encodeURIComponent(plan.mailSubject)}&body=${encodeURIComponent(
-                  `Hallo,\n\nich möchte das ${plan.name} (${plan.price} €/${plan.period}) buchen.\n\nMeine E-Mail-Adresse: \n\nBitte schalte meinen Zugang frei.\n\nVielen Dank!`
-                )}`}
-                className={`block text-center text-sm font-semibold py-2.5 rounded-brand transition-colors ${
+              <button
+                onClick={() => buy(plan.id)}
+                disabled={checkoutMutation.isPending || subscription?.plan === plan.id}
+                className={`block w-full text-center text-sm font-semibold py-2.5 rounded-brand transition-colors disabled:opacity-60 ${
                   plan.featured
                     ? 'bg-accent text-white hover:bg-accent/90'
                     : 'bg-navy text-white hover:bg-navy/90'
                 }`}
               >
-                {plan.name} buchen
-              </a>
+                {subscription?.plan === plan.id && subscription.is_active
+                  ? '✓ Dein aktueller Plan'
+                  : pendingProduct === plan.id
+                    ? 'Checkout wird geöffnet …'
+                    : `${plan.name} abonnieren`}
+              </button>
             </div>
           ))}
         </div>
 
-        {/* Contact info */}
+        {/* Info */}
         <div className="rounded-brand border border-brand-border bg-white px-6 py-5 max-w-xl">
           <p className="text-sm font-semibold text-navy mb-2">So läuft die Buchung</p>
           <ol className="space-y-1.5 text-xs text-brand-muted list-decimal list-inside">
-            <li>Klicke auf „Plan buchen" — es öffnet sich dein E-Mail-Programm.</li>
-            <li>Sende die vorausgefüllte Mail an uns.</li>
-            <li>Wir schalten deinen Account innerhalb von 24 Stunden frei.</li>
+            <li>Klicke auf „Kaufen" bzw. „Abonnieren" — du wirst zur sicheren Stripe-Zahlungsseite weitergeleitet.</li>
+            <li>Bezahle per Kreditkarte, SEPA-Lastschrift oder anderen Methoden.</li>
+            <li>Dein Zugang wird automatisch und sofort freigeschaltet.</li>
           </ol>
+          <p className="mt-3 text-xs text-brand-muted">
+            Abos sind jederzeit über „Abo verwalten" kündbar.
+          </p>
           <div className="mt-4 text-xs text-brand-muted">
             Fragen? <a href="tel:+4917359089060" className="text-accent font-medium">0173 5908906</a>
             {' · '}

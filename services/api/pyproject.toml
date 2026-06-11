@@ -15,6 +15,7 @@ dependencies = [
     "asyncpg>=0.29",
     "supabase>=2.4",
     "openai>=1.30",
+    "stripe>=10",
     # "python-jose[cryptography]>=3.3",
     # Ab Phase 3:
     # "anthropic>=0.25",
