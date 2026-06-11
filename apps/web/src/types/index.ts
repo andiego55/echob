@@ -17,7 +17,11 @@ export type ContactFrequency =
 export type SafetyLevel = 'none' | 'unclear' | 'elevated' | 'acute'
 export type InputMode = 'freetext' | 'guided' | 'chat'
 export type MessageRole = 'user' | 'assistant' | 'system'
-export type ThreadType = 'onboarding' | 'scene' | 'topic' | 'glossary' | 'report'
+export type ThreadType =
+  | 'onboarding' | 'scene' | 'topic' | 'glossary' | 'report'
+  | 'topic_self' | 'topic_person' | 'topic_responsibility' | 'topic_guilt'
+  | 'blog_beziehungsmuster' | 'blog_beobachtung_gefuehl'
+  | 'blog_professionelle_hilfe' | 'blog_krisentelefone'
 export type ReportType = 'short' | 'pattern' | 'coaching_prep' | 'therapy_prep' | 'progress'
 export type ReportStatus = 'draft' | 'ready' | 'archived'
 export type Confidence = 'low' | 'medium' | 'high'

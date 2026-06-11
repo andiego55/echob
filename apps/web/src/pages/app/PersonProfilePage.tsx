@@ -348,7 +348,7 @@ function PersonProfileModuleForm({
 }
 
 function LikertQuestion({
-  itemKey, text, value, onChange,
+  text, value, onChange,
 }: {
   itemKey: string
   text: string

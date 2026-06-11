@@ -1,0 +1,12 @@
+// Cloudflare Workers-Konfiguration (nur nötig beim "Workers"-Deploy-Flow
+// mit `npx wrangler deploy`; der klassische Pages-Flow ignoriert diese Datei).
+// Reines Static-Asset-Hosting ohne Worker-Code — kostenlos.
+{
+  "name": "echob-web",
+  "compatibility_date": "2026-01-01",
+  "assets": {
+    "directory": "./dist",
+    // SPA-Routing: unbekannte Pfade liefern index.html (React Router übernimmt)
+    "not_found_handling": "single-page-application"
+  }
+}

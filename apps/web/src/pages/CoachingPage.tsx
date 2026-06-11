@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
 
 const COACHING_PROCESS = [

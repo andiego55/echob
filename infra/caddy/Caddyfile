@@ -1,0 +1,19 @@
+# Caddy – TLS-Terminierung für die EchoB-API.
+# Holt und erneuert Let's-Encrypt-Zertifikate automatisch.
+
+{
+	email info@echo-b.de
+}
+
+api.echo-b.de {
+	reverse_proxy api:8000
+
+	# Security-Header
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}

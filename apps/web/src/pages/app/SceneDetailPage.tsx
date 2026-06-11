@@ -41,7 +41,7 @@ export default function SceneDetailPage() {
   const [editTags, setEditTags] = useState<string[]>([])
 
   const [tags, setTags] = useState<string[]>([])
-  const [distress, setDistress] = useState<number | null>(null)
+  const [distress] = useState<number | null>(null)
 
   const startEdit = () => {
     if (!scene) return

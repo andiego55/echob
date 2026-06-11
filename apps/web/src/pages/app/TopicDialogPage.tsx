@@ -11,7 +11,7 @@ import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
 import { topicSummariesApi } from '@/api/topicSummaries'
-import type { EchoMessage } from '@/types'
+import type { EchoMessage, ThreadType } from '@/types'
 
 const TOPICS: Record<string, { label: string; description: string; startTrigger: string; isBlog?: boolean }> = {
   topic_self: {
@@ -87,7 +87,7 @@ export default function TopicDialogPage() {
     mutationFn: (message: string) =>
       echoApi.chat(caseId!, {
         message,
-        thread_type: topicId!,
+        thread_type: topicId as ThreadType,
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['topic-echo-history', caseId, topicId, sessionId] })

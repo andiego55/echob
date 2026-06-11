@@ -9,7 +9,7 @@ import AppShell from '@/components/app/AppShell'
 import { profileApi } from '@/api/profile'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import type { ProfileModuleConfig } from '@/utils/profileModules'
-import { computeModuleScores, computeSafetyStatus, computeResourcesIndex, scoreLevel, buildSummaryText } from '@/utils/profileScoring'
+import { computeModuleScores, computeResourcesIndex, scoreLevel, buildSummaryText } from '@/utils/profileScoring'
 
 const SAFETY_STATUS_INFO: Record<string, { label: string; cls: string; show: boolean }> = {
   no_indication:       { label: 'Keine Sicherheitshinweise', cls: 'bg-green-50 border-green-200 text-green-800', show: false },
@@ -393,7 +393,7 @@ function ModuleForm({
 }
 
 function LikertQuestion({
-  itemKey, text, value, onChange,
+  text, value, onChange,
 }: {
   itemKey: string
   text: string

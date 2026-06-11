@@ -11,12 +11,6 @@ export function scoreLevel(score: number | null | undefined): ScoreLevel {
   return 'hoch'
 }
 
-export function avg(values: (number | undefined | null)[], reverseItems: string[] = [], allKeys: string[] = [], answers: Record<string, number> = {}): number | null {
-  const nums = values.filter((v): v is number => typeof v === 'number' && !isNaN(v))
-  if (nums.length < 2) return null
-  return nums.reduce((a, b) => a + b, 0) / nums.length
-}
-
 /** Berechnet Durchschnitt aus Antwort-Map, optional mit Reverse-Scoring */
 export function computeScore(
   answers: Record<string, number>,
