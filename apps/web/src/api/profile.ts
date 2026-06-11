@@ -19,4 +19,7 @@ export const profileApi = {
 
   saveSummaryText: (summary_text: string) =>
     apiClient.put<UserProfile>('/profile/summary-text', { summary_text }).then(r => r.data),
+
+  saveDisplayName: (display_name: string) =>
+    apiClient.put<UserProfile>('/profile/display-name', { display_name }).then(r => r.data),
 }

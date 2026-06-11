@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
 import { profileApi } from '@/api/profile'
+import { subscriptionApi } from '@/api/subscription'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { Case } from '@/types'
 
@@ -33,6 +34,11 @@ export default function CasesOverviewPage() {
   })
   const hasProfile = (profile?.completed_modules?.length ?? 0) > 0
 
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription'],
+    queryFn: subscriptionApi.getStatus,
+  })
+
   return (
     <AppShell>
       <div className="mx-auto max-w-[1100px] px-6 py-10">
@@ -46,6 +52,33 @@ export default function CasesOverviewPage() {
               Echo nutzt den Kontext deiner dokumentierten Situationen.
             </p>
           </div>
+        )}
+
+        {/* Trial-Banner */}
+        {subscription?.plan === 'trial' && (
+          subscription.is_trial_active ? (
+            <div className="mb-4 flex items-center justify-between gap-3 rounded-brand border border-amber-200 bg-amber-50 px-4 py-3">
+              <div>
+                <span className="text-xs font-bold text-amber-700">Testzugang aktiv</span>
+                <span className="ml-2 text-xs text-amber-600">
+                  Noch {subscription.trial_days_left} {subscription.trial_days_left === 1 ? 'Tag' : 'Tage'} · 1 Fall · 5 Szenen · Kurzbericht & Coaching-Vorbereitung
+                </span>
+              </div>
+              <Link to="/app/upgrade" className="text-xs font-semibold text-accent shrink-0 hover:underline">
+                Jetzt abonnieren →
+              </Link>
+            </div>
+          ) : (
+            <div className="mb-4 flex items-center justify-between gap-3 rounded-brand border border-red-200 bg-red-50 px-4 py-3">
+              <div>
+                <span className="text-xs font-bold text-red-700">Testzeitraum abgelaufen</span>
+                <span className="ml-2 text-xs text-red-600">Du kannst keine neuen Fälle oder Szenen mehr anlegen.</span>
+              </div>
+              <Link to="/app/upgrade" className="text-xs font-semibold text-accent shrink-0 hover:underline">
+                Abo wählen →
+              </Link>
+            </div>
+          )
         )}
 
         {/* Header */}

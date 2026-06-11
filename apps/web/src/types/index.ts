@@ -273,6 +273,7 @@ export interface UserProfile {
   safety_status: ProfileSafetyStatus
   completed_modules: string[]
   summary_text: string | null
+  display_name: string | null
   created_at: string
   updated_at: string
 }
@@ -280,6 +281,18 @@ export interface UserProfile {
 export interface ProfileModuleUpdate {
   module_id: string
   data: Record<string, unknown>
+}
+
+// ── Subscription ─────────────────────────────────────────────────────────────
+
+export type PlanType = 'trial' | 'early_bird' | 'regular' | 'annual'
+
+export interface SubscriptionStatus {
+  plan: PlanType
+  is_trial_active: boolean
+  trial_days_left: number
+  trial_ends_at: string | null
+  subscription_ends_at: string | null
 }
 
 // ── Personenprofil ────────────────────────────────────────────────────────────

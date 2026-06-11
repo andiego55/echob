@@ -12,6 +12,11 @@ CREATE TABLE IF NOT EXISTS user_profiles (
                           'no_indication', 'unclear', 'heightened_attention', 'acute_concern'
                       )),
     completed_modules TEXT[] NOT NULL DEFAULT '{}',
+    display_name      TEXT,
+    plan              TEXT NOT NULL DEFAULT 'trial'
+                      CHECK (plan IN ('trial', 'early_bird', 'regular', 'annual')),
+    trial_started_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    subscription_ends_at TIMESTAMPTZ,
     created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

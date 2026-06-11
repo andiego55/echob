@@ -3,7 +3,7 @@
  * 3 Pflichtfragen + optionales Freitextfeld.
  */
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
@@ -30,7 +30,7 @@ export default function CaseNewPage() {
     mutationFn: casesApi.create,
     onSuccess: (newCase) => {
       queryClient.invalidateQueries({ queryKey: ['cases'] })
-      navigate(`/app/cases/${newCase.id}/onboarding`)
+      navigate(`/app/cases/${newCase.id}/scenes`)
     },
   })
 
@@ -140,7 +140,7 @@ export default function CaseNewPage() {
                 disabled={mutation.isPending}
                 className="btn-primary"
               >
-                {mutation.isPending ? 'Fall wird erstellt …' : 'Fall anlegen & Onboarding starten'}
+                {mutation.isPending ? 'Fall wird erstellt …' : 'Fall anlegen & loslegen'}
               </button>
               <button
                 type="button"
@@ -152,11 +152,31 @@ export default function CaseNewPage() {
             </div>
           )}
 
-          {mutation.isError && (
-            <p role="alert" className="text-sm text-red-600">
-              Fall konnte nicht erstellt werden. Bitte versuche es erneut.
-            </p>
-          )}
+          {mutation.isError && (() => {
+            const detail = (mutation.error as any)?.response?.data?.detail
+            if (detail === 'TRIAL_CASE_LIMIT' || detail === 'TRIAL_EXPIRED') {
+              return (
+                <div className="rounded-brand border border-amber-200 bg-amber-50 px-4 py-4">
+                  <p className="text-sm font-semibold text-amber-800 mb-1">
+                    {detail === 'TRIAL_EXPIRED' ? 'Testzeitraum abgelaufen' : 'Limit des Testzugangs erreicht'}
+                  </p>
+                  <p className="text-xs text-amber-700 mb-3">
+                    {detail === 'TRIAL_EXPIRED'
+                      ? 'Dein kostenloser Testzugang ist abgelaufen. Wähle ein Abo, um weiter zu machen.'
+                      : 'Im Testzugang kannst du nur einen Fall anlegen. Upgrade für unbegrenzte Fälle.'}
+                  </p>
+                  <Link to="/app/upgrade" className="text-xs font-semibold text-accent hover:underline">
+                    Jetzt abonnieren →
+                  </Link>
+                </div>
+              )
+            }
+            return (
+              <p role="alert" className="text-sm text-red-600">
+                Fall konnte nicht erstellt werden. Bitte versuche es erneut.
+              </p>
+            )
+          })()}
         </form>
       </div>
     </AppShell>

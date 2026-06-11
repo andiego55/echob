@@ -3,7 +3,7 @@
  * 3 Eingabemodi: Freitext, Geführte Fragen, Chat (Chat → EchoPage).
  */
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
@@ -218,11 +218,31 @@ export default function SceneNewPage() {
             </div>
           </div>
 
-          {mutation.isError && (
-            <p role="alert" className="text-sm text-red-600">
-              Szene konnte nicht gespeichert werden. Bitte versuche es erneut.
-            </p>
-          )}
+          {mutation.isError && (() => {
+            const detail = (mutation.error as any)?.response?.data?.detail
+            if (detail === 'TRIAL_SCENE_LIMIT' || detail === 'TRIAL_EXPIRED') {
+              return (
+                <div className="rounded-brand border border-amber-200 bg-amber-50 px-4 py-4">
+                  <p className="text-sm font-semibold text-amber-800 mb-1">
+                    {detail === 'TRIAL_EXPIRED' ? 'Testzeitraum abgelaufen' : 'Szenen-Limit erreicht'}
+                  </p>
+                  <p className="text-xs text-amber-700 mb-3">
+                    {detail === 'TRIAL_EXPIRED'
+                      ? 'Dein kostenloser Testzugang ist abgelaufen. Wähle ein Abo um fortzufahren.'
+                      : 'Im Testzugang sind maximal 5 Szenen möglich. Upgrade für unbegrenzte Szenen.'}
+                  </p>
+                  <Link to="/app/upgrade" className="text-xs font-semibold text-accent hover:underline">
+                    Jetzt abonnieren →
+                  </Link>
+                </div>
+              )
+            }
+            return (
+              <p role="alert" className="text-sm text-red-600">
+                Szene konnte nicht gespeichert werden. Bitte versuche es erneut.
+              </p>
+            )
+          })()}
 
           <div className="flex gap-3">
             <button type="submit" disabled={mutation.isPending} className="btn-primary">

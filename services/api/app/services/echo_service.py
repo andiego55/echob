@@ -193,7 +193,7 @@ class EchoService:
             return await self.scene_chat(
                 user_message=user_message,
                 history=history or [],
-                extra_context=kwargs.get("extra_context", ""),
+                extra_context=extra_context,
             )
         if thread_type.startswith("topic_") or thread_type.startswith("blog_"):
             if self._use_openai:
@@ -467,7 +467,36 @@ class EchoService:
             response_format={"type": "json_object"},
         )
         raw = response.choices[0].message.content or "{}"
-        return json.loads(raw)
+        result = json.loads(raw)
+
+        # ── Safety net: keyword-based override ───────────────────────────────
+        # If the AI underclassified obvious violence, correct it here.
+        _check_text = (user_text + " " + (result.get("description") or "")).lower()
+        _current = result.get("safety_level", "none")
+
+        _ACUTE_FRAGMENTS = [
+            "gehauen", "geschlagen", "hat mich geschlag", "schlägt mich",
+            "hat mich gehauen", "getreten", "tritt mich", "hat mich getreten",
+            "gewürgt", "würgt mich", "gestochen", "mit messer", "mit dem gürtel",
+            "mit dem stock", "mit der faust", "ins gesicht", "am hals",
+            "suizid", "selbstverletzung", "will mich töten", "bringt mich um",
+            "will sich umbringen", "ich will nicht mehr leben",
+        ]
+        _ELEVATED_FRAGMENTS = [
+            "bedroht", "drohung", "droht mir", "geschubst", "gestoßen",
+            "festgehalten", "festgehalten", "eingesperrt", "zugesperrt",
+            "verfolgt", "stalkt", "handy weggenommen", "geld weggenommen",
+            "schlüssel weggenommen", "dokumente weggenommen",
+            "schmeißt sachen", "wirft sachen", "wirft gegenstände",
+        ]
+
+        if _current in ("none", "unclear"):
+            if any(frag in _check_text for frag in _ACUTE_FRAGMENTS):
+                result["safety_level"] = "acute"
+            elif any(frag in _check_text for frag in _ELEVATED_FRAGMENTS):
+                result["safety_level"] = "elevated"
+
+        return result
 
     async def _openai_topic_chat(
         self,
@@ -581,12 +610,51 @@ class EchoService:
 
         full_context = "\n\n---\n\n".join(context_parts)
 
+        _TYPE_CONFIG = {
+            "short":         {"max_tokens": 1200, "temperature": 0.30},
+            "pattern":       {"max_tokens": 5500, "temperature": 0.40},
+            "coaching_prep": {"max_tokens": 3000, "temperature": 0.38},
+            "therapy_prep":  {"max_tokens": 5500, "temperature": 0.25},
+            "progress":      {"max_tokens": 3000, "temperature": 0.38},
+        }
+        cfg = _TYPE_CONFIG.get(report_type, {"max_tokens": 3000, "temperature": 0.40})
+
+        _TYPE_INSTRUCTIONS = {
+            "short": (
+                "Erstelle einen **Kurzbericht** (Typ: `short`). "
+                "Maximale Verdichtung — jedes Wort muss sitzen. "
+                "Halte die 3-Abschnitt-Struktur exakt ein. "
+                "Gesamtlänge: unter 1.200 Zeichen."
+            ),
+            "pattern": (
+                "Erstelle einen **Musterbericht** (Typ: `pattern`). "
+                "Tiefe, umfassende Analyse — alle 9 Abschnitte vollständig und substanziell. "
+                "Benenne konkrete Szenen und Pattern-Tags. Skalenwerte werden grafisch separat dargestellt. "
+                "Analysierend, nicht alarmistisch. Kein Abschnitt unter 100 Wörtern."
+            ),
+            "coaching_prep": (
+                "Erstelle eine **Coaching-Vorbereitung** (Typ: `coaching_prep`). "
+                "Alle 6 Abschnitte. Coaching-Sprache: zielorientiert, ressourcenfokussiert. "
+                "Der Coach soll nach Lektüre sofort produktiv arbeiten können."
+            ),
+            "therapy_prep": (
+                "Erstelle eine **Therapie- und Beratungsvorbereitung** (Typ: `therapy_prep`). "
+                "Alle 9 Abschnitte vollständig und klinisch präzise. "
+                "3. Person: 'Die Person berichtet …', 'Es zeigt sich …'. "
+                "Fachvokabular: Leidensdruck, Symptomatik, Anamnese, Ressourcen, Behandlungsmotivation. "
+                "Keine Diagnosen. Vollständige klinische Dokumentation. "
+                "Grafische Visualisierungen werden separat dargestellt. Kein Abschnitt unter 80 Wörtern."
+            ),
+            "progress": (
+                "Erstelle einen **Verlaufsbericht** (Typ: `progress`). "
+                "Alle 6 Abschnitte. Chronologisch, vergleichend. "
+                "Benenne Veränderungen konkret, beschönige nichts."
+            ),
+        }
         user_message = (
-            f"Erstelle einen **{REPORT_TYPE_LABELS.get(report_type, report_type)}** "
-            f"(Typ: `{report_type}`) auf Basis der oben stehenden Angaben.\n\n"
-            f"Halte dich exakt an die Abschnittsstruktur für diesen Bericht-Typ "
-            f"gemäß den Anweisungen im System-Prompt.\n"
-            f"Antworte ausschließlich als gültiges JSON-Objekt."
+            _TYPE_INSTRUCTIONS.get(report_type,
+                f"Erstelle einen Bericht (Typ: `{report_type}`) auf Basis der oben stehenden Angaben.")
+            + "\n\nAntworte ausschließlich als gültiges JSON-Objekt."
         )
 
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
@@ -596,17 +664,181 @@ class EchoService:
                 {"role": "system", "content": full_context},
                 {"role": "user", "content": user_message},
             ],
-            max_tokens=3000,
-            temperature=0.5,
+            max_tokens=cfg["max_tokens"],
+            temperature=cfg["temperature"],
             response_format={"type": "json_object"},
         )
         raw = response.choices[0].message.content or "{}"
         parsed = json.loads(raw)
+
+        # ── Structured visualization data ─────────────────────────────────────
+
+        # Scale labels (DB has no label column — map from scale_key)
+        _SCALE_LABELS: dict[str, str] = {
+            "boundary_violation":        "Grenzverletzungen",
+            "guilt_shifting":            "Schuldumkehr",
+            "control_isolation":         "Kontrolle & Isolation",
+            "proximity_distance":        "Nähe-Distanz-Wechsel",
+            "conflict_escalation":       "Konflikteskalation",
+            "perception_distortion":     "Wahrnehmungsverzerrung",
+            "safety_risk":               "Sicherheitsrisiko",
+            "responsibility_deflection": "Verantwortungsabwehr",
+            "cluster_b_traits":          "Cluster-B-Muster",
+            "empathy_deficit":           "Empathiedefizit",
+            "personality_openness":      "Offenheit",
+            "personality_conscientiousness": "Zuverlässigkeit",
+            "personality_extraversion":  "Dominanz & Präsenz",
+            "personality_agreeableness": "Kooperationsbereitschaft",
+            "personality_neuroticism":   "Emotionale Instabilität",
+        }
+        _PERSONALITY_KEYS = {
+            "personality_openness", "personality_conscientiousness",
+            "personality_extraversion", "personality_agreeableness",
+            "personality_neuroticism",
+        }
+
+        def _scale_entry(s: dict) -> dict:
+            key = s.get("scale_key", "")
+            raw = float(s.get("score") or 0)
+            return {
+                "key":        key,
+                "label":      _SCALE_LABELS.get(key, key.replace("_", " ").title()),
+                "score":      round(raw / 20, 2),   # DB stores 0–100, normalize to 0–5
+                "confidence": s.get("confidence", "low"),
+            }
+
+        scales_dynamic = sorted(
+            [_scale_entry(s) for s in scale_scores
+             if s.get("scale_key", "") not in _PERSONALITY_KEYS
+             and float(s.get("score") or 0) > 0],
+            key=lambda x: x["score"], reverse=True,
+        )
+        scales_personality = sorted(
+            [_scale_entry(s) for s in scale_scores
+             if s.get("scale_key", "") in _PERSONALITY_KEYS
+             and float(s.get("score") or 0) > 0],
+            key=lambda x: x["score"], reverse=True,
+        )
+
+        # ── User profile scores (Mein Profil) ────────────────────────────────
+        _UP_EXTRACT = [
+            ("resources",              "social_support_score",           "Soziale Unterstützung"),
+            ("resources",              "self_stabilization_score",       "Selbststabilisierung"),
+            ("attachment",             "attachment_anxiety_score",        "Bindungsangst"),
+            ("attachment",             "attachment_avoidance_score",      "Bindungsvermeidung"),
+            ("emotion_regulation",     "emotional_overwhelm_score",       "Emotionale Überwältigung"),
+            ("emotion_regulation",     "impulse_pressure_score",          "Impulsdruck"),
+            ("emotion_regulation",     "self_soothing_score",             "Selbstberuhigung"),
+            ("perception_clarity",     "perception_uncertainty_score",    "Wahrnehmungsunsicherheit"),
+            ("perception_clarity",     "reality_check_need_score",        "Realitätsprüfungsbedarf"),
+            ("boundaries_autonomy",    "boundary_stability_score",        "Grenzstabilität"),
+            ("boundaries_autonomy",    "autonomy_score",                  "Autonomie"),
+            ("guilt_shame_selfworth",  "shame_score",                     "Scham"),
+            ("guilt_shame_selfworth",  "guilt_tendency_score",            "Schuld-Neigung"),
+            ("guilt_shame_selfworth",  "self_worth_dependency_score",     "Selbstwertabhängigkeit"),
+        ]
+        user_profile_scores: list[dict] = []
+        if user_profile:
+            _up_mod = user_profile.get("modules") or {}
+            if isinstance(_up_mod, str):
+                try:
+                    _up_mod = json.loads(_up_mod)
+                except Exception:
+                    _up_mod = {}
+            for _mod, _key, _label in _UP_EXTRACT:
+                val = (_up_mod.get(_mod) or {}).get(_key)
+                if val is not None:
+                    try:
+                        user_profile_scores.append({
+                            "key": f"{_mod}.{_key}",
+                            "label": _label,
+                            "score": round(float(val), 2),
+                        })
+                    except (TypeError, ValueError):
+                        pass
+
+        # ── Person profile scores (Fallprofil) ───────────────────────────────
+        _PP_EXTRACT = [
+            ("overall_impression",   "relational_burden",      "Beziehungsbelastung"),
+            ("empathy",              "empathy_deficit",        "Empathiedefizit"),
+            ("self_image",           "grandiosity",            "Grandiosität"),
+            ("manipulation",         "manipulation_score",     "Manipulationsneigung"),
+            ("impulsivity",          "impulsivity_score",      "Impulsivität"),
+            ("attachment_patterns",  "attachment_instability", "Bindungsinstabilität"),
+            ("emotional_reactions",  "emotional_volatility",   "Emotionale Volatilität"),
+        ]
+        person_profile_scores: list[dict] = []
+        person_perceived_patterns: list[str] = []
+        if person_profile:
+            _pp_mod = person_profile.get("modules") or {}
+            if isinstance(_pp_mod, str):
+                try:
+                    _pp_mod = json.loads(_pp_mod)
+                except Exception:
+                    _pp_mod = {}
+            for _mod, _key, _label in _PP_EXTRACT:
+                val = (_pp_mod.get(_mod) or {}).get(_key)
+                if val is not None:
+                    try:
+                        person_profile_scores.append({
+                            "key": f"{_mod}.{_key}",
+                            "label": _label,
+                            "score": round(float(val), 2),
+                        })
+                    except (TypeError, ValueError):
+                        pass
+            _patterns = ((_pp_mod.get("overall_impression") or {}).get("perceived_patterns") or [])
+            if isinstance(_patterns, list):
+                person_perceived_patterns = [p for p in _patterns if isinstance(p, str)]
+
+        # ── Aggregate pattern tags ────────────────────────────────────────────
+        _tag_counts: dict[str, int] = {}
+        for _scene in scenes:
+            _tags = _scene.get("pattern_tags") or []
+            if isinstance(_tags, str):
+                try:
+                    _tags = json.loads(_tags)
+                except Exception:
+                    _tags = []
+            for _tag in _tags:
+                if isinstance(_tag, str) and _tag.strip():
+                    _tag_counts[_tag] = _tag_counts.get(_tag, 0) + 1
+
+        pattern_tag_counts = [
+            {"tag": k, "count": v}
+            for k, v in sorted(_tag_counts.items(), key=lambda x: x[1], reverse=True)
+        ][:14]
+
+        # ── Scene timeline ────────────────────────────────────────────────────
+        scene_timeline = sorted(
+            [
+                {
+                    "title": _s.get("title") or "Szene",
+                    "date": str(_s.get("scene_date")) if _s.get("scene_date") else None,
+                    "distress": (
+                        float(_s.get("distress_score"))
+                        if _s.get("distress_score") is not None
+                        else None
+                    ),
+                }
+                for _s in scenes
+                if _s.get("confirmed_by_user")
+            ],
+            key=lambda x: x["date"] or "",
+        )
+
         return {
-            "sections": parsed.get("sections", []),
-            "disclaimer": REPORT_DISCLAIMER,
-            "type": report_type,
-            "type_label": REPORT_TYPE_LABELS.get(report_type, report_type),
+            "sections":                 parsed.get("sections", []),
+            "disclaimer":               REPORT_DISCLAIMER,
+            "type":                     report_type,
+            "type_label":               REPORT_TYPE_LABELS.get(report_type, report_type),
+            "scales_dynamic":           scales_dynamic,
+            "scales_personality":       scales_personality,
+            "pattern_tag_counts":       pattern_tag_counts,
+            "scene_timeline":           scene_timeline,
+            "user_profile_scores":      user_profile_scores,
+            "person_profile_scores":    person_profile_scores,
+            "person_perceived_patterns": person_perceived_patterns,
         }
 
     async def _openai_safety_check(self, text: str) -> dict:

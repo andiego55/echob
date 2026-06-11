@@ -13,7 +13,8 @@ export default function AuthPage() {
   const fromLoc     = (location.state as { from?: Location })?.from
   const from        = fromLoc ? `${fromLoc.pathname}${(fromLoc as Location & { search?: string }).search ?? ''}` : '/app'
 
-  const [tab, setTab]         = useState<Tab>('login')
+  const defaultTab = (location.state as { defaultTab?: Tab } | null)?.defaultTab ?? 'login'
+  const [tab, setTab]         = useState<Tab>(defaultTab)
   const [method, setMethod]   = useState<Method>('password')
   const [email, setEmail]     = useState('')
   const [password, setPassword] = useState('')
@@ -59,7 +60,7 @@ export default function AuthPage() {
     setLoading(true)
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/app` },
+      options: { redirectTo: `${window.location.origin}${from}` },
     })
     if (error) {
       setMessage({ type: 'error', text: 'Google-Login fehlgeschlagen.' })
@@ -97,9 +98,15 @@ export default function AuthPage() {
           </div>
 
           <div className="card">
-            <h1 className="mb-6 text-xl font-bold text-navy">
-              {tab === 'login' ? 'Willkommen zurück' : 'Konto erstellen'}
+            <h1 className="mb-1 text-xl font-bold text-navy">
+              {tab === 'login' ? 'Willkommen zurück' : 'Kostenlos 3 Tage testen'}
             </h1>
+            {tab === 'signup' && (
+              <p className="text-xs text-brand-muted mb-6">
+                Keine Kreditkarte · Keine Bindung · Jederzeit aufhören
+              </p>
+            )}
+            {tab === 'login' && <div className="mb-6" />}
 
             {/* Google OAuth */}
             <button

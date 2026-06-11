@@ -108,13 +108,13 @@ export default function TopicDialogPage() {
   useEffect(() => {
     if (!historyLoaded || startedRef.current || !topic) return
     startedRef.current = true
-    const hasGreeting = (history as EchoMessage[]).some(
-      m => m.role === 'assistant' || m.content === topic.startTrigger
+    const alreadyStarted = (history as EchoMessage[]).some(
+      m => m.content === topic.startTrigger || m.role === 'assistant'
     )
-    if (!hasGreeting) {
+    if (!alreadyStarted) {
       chatMutation.mutate(topic.startTrigger)
     }
-  }, [historyLoaded, history.length, topicId])
+  }, [historyLoaded, topicId])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

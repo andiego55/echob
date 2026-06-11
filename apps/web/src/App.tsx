@@ -1,12 +1,29 @@
 import { Routes, Route } from 'react-router-dom'
 
 // ── Öffentliche Seiten ────────────────────────────────────────────────────────
-import LandingPage     from '@/pages/LandingPage'
-import WaitlistPage    from '@/pages/WaitlistPage'
-import ImpressumPage   from '@/pages/ImpressumPage'
-import DatenschutzPage from '@/pages/DatenschutzPage'
-import AuthPage        from '@/pages/AuthPage'
-import NotFoundPage    from '@/pages/NotFoundPage'
+import LandingPage          from '@/pages/LandingPage'
+import ImpressumPage        from '@/pages/ImpressumPage'
+import DatenschutzPage      from '@/pages/DatenschutzPage'
+import AuthPage             from '@/pages/AuthPage'
+import NotFoundPage         from '@/pages/NotFoundPage'
+import CoachingPage         from '@/pages/CoachingPage'
+import UeberPage            from '@/pages/UeberPage'
+import FachpersonenPage     from '@/pages/FachpersonenPage'
+import BlogPage             from '@/pages/BlogPage'
+import BlogBeziehungsmusterPage    from '@/pages/BlogBeziehungsmusterPage'
+import BlogBeobachtungGefuehlPage  from '@/pages/BlogBeobachtungGefuehlPage'
+import BlogProfessionelleHilfePage from '@/pages/BlogProfessionelleHilfePage'
+import BlogKrisentelephonePage     from '@/pages/BlogKrisentelephonePage'
+import WissenPage                    from '@/pages/WissenPage'
+import WissenBeziehungsmusterPage    from '@/pages/wissen/WissenBeziehungsmusterPage'
+import WissenBindungsstilelPage      from '@/pages/wissen/WissenBindungsstilelPage'
+import WissenKommunikationPage       from '@/pages/wissen/WissenKommunikationPage'
+import WissenPersoenlichkeitPage     from '@/pages/wissen/WissenPersoenlichkeitPage'
+import WissenEmotionsregulationPage  from '@/pages/wissen/WissenEmotionsregulationPage'
+import WissenBeobachtungPage         from '@/pages/wissen/WissenBeobachtungPage'
+import WissenGrenzenPage             from '@/pages/wissen/WissenGrenzenPage'
+import WissenProfessionelleHilfePage from '@/pages/wissen/WissenProfessionelleHilfePage'
+import WissenKrisentelephonePage     from '@/pages/wissen/WissenKrisentelephonePage'
 
 // ── App-Bereich ───────────────────────────────────────────────────────────────
 import CasesOverviewPage from '@/pages/app/CasesOverviewPage'
@@ -28,6 +45,7 @@ import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
 import PersonProfilePage     from '@/pages/app/PersonProfilePage'
 import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
 import TopicDialogPage       from '@/pages/app/TopicDialogPage'
+import UpgradePage           from '@/pages/app/UpgradePage'
 import { useParams }         from 'react-router-dom'
 
 function TopicDialogPageWrapper() {
@@ -42,13 +60,31 @@ export default function App() {
     <Routes>
       {/* ── Öffentlich ─────────────────────────────────────────────────────── */}
       <Route path="/"            element={<LandingPage />} />
-      <Route path="/warteliste"  element={<WaitlistPage />} />
       <Route path="/impressum"   element={<ImpressumPage />} />
       <Route path="/datenschutz" element={<DatenschutzPage />} />
       <Route path="/auth"        element={<AuthPage />} />
+      <Route path="/coaching"    element={<CoachingPage />} />
+      <Route path="/ueber"       element={<UeberPage />} />
+      <Route path="/fachpersonen" element={<FachpersonenPage />} />
+      <Route path="/blog"        element={<BlogPage />} />
+      <Route path="/blog/beziehungsmuster"   element={<BlogBeziehungsmusterPage />} />
+      <Route path="/blog/beobachtung-gefuehl" element={<BlogBeobachtungGefuehlPage />} />
+      <Route path="/blog/professionelle-hilfe" element={<BlogProfessionelleHilfePage />} />
+      <Route path="/blog/krisentelefone"     element={<BlogKrisentelephonePage />} />
+      <Route path="/wissen"                          element={<WissenPage />} />
+      <Route path="/wissen/beziehungsmuster"         element={<WissenBeziehungsmusterPage />} />
+      <Route path="/wissen/bindungsstile"            element={<WissenBindungsstilelPage />} />
+      <Route path="/wissen/kommunikation-konflikte"  element={<WissenKommunikationPage />} />
+      <Route path="/wissen/persoenlichkeit-verhalten" element={<WissenPersoenlichkeitPage />} />
+      <Route path="/wissen/emotionsregulation"       element={<WissenEmotionsregulationPage />} />
+      <Route path="/wissen/beobachtung-gefuehl"      element={<WissenBeobachtungPage />} />
+      <Route path="/wissen/grenzen-setzen"           element={<WissenGrenzenPage />} />
+      <Route path="/wissen/professionelle-hilfe"     element={<WissenProfessionelleHilfePage />} />
+      <Route path="/wissen/krisentelefone"           element={<WissenKrisentelephonePage />} />
 
       {/* ── App-Bereich (Login erforderlich) ───────────────────────────────── */}
       <Route path="/app" element={<ProtectedRoute><CasesOverviewPage /></ProtectedRoute>} />
+      <Route path="/app/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
       <Route path="/app/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/profile/echo" element={<ProtectedRoute><ProfileEchoPage /></ProtectedRoute>} />

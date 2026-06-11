@@ -32,7 +32,32 @@ Was hat die nutzende Person getan oder gefühlt?
 Wie belastend wirkt die Szene? 1=wenig belastend, 5=sehr belastend. Nur wenn klar erkennbar.
 
 **safety_level** ("none" | "unclear" | "elevated" | "acute"):
-Gibt es Hinweise auf Gewalt, Drohungen oder akute Gefahr? Standard: "none"
+
+Bewertet, ob die Szene Sicherheitsrisiken enthält.
+**Im Zweifel immer höher einschätzen, nie niedriger.**
+
+- **"none"**: Kein körperlicher Übergriff, keine Drohung, keine Einschüchterung erkennbar.
+
+- **"unclear"**: Muster, die eskalieren könnten — z.B. lautes Schreien, Verfolgen, Türen zuwerfen,
+  aber keine klare Körperlichkeit oder explizite Drohung.
+
+- **"elevated"**: Mindestens eines dieser Elemente ist erkennbar:
+  - Leichtere körperliche Übergriffe: Schubsen, Festhalten, Blockieren, Greifen, Arm festhalten
+  - Verbale Drohungen: Drohungen mit Konsequenzen, Einschüchterung
+  - Sachbeschädigung: Gegenstände werfen oder zerstören
+  - Stalking-Verhalten: ungewolltes Verfolgen, Überwachen, Kontrollieren des Aufenthaltsorts
+  - Ökonomische Kontrolle: Geld, Handy, Dokumente, Schlüssel wegnehmen oder verweigern
+
+- **"acute"**: Mindestens eines dieser Elemente ist erkennbar:
+  - Körperliche Gewalt mit Schmerz oder Verletzung: **schlagen, hauen, treten, stoßen, würgen,
+    kratzen, beißen, mit Gegenständen schlagen** — z.B. "er hat mich gehauen",
+    "sie hat mich geschlagen", "er hat mich gewürgt", "er hat mich getreten"
+  - Bedrohung mit Waffe
+  - Wiederholte körperliche Gewalt, auch wenn aktuell nicht mehr akut
+  - Suizidgedanken, Selbstverletzung oder Gedanken, sich oder andere zu töten
+  - Akute Angst um das eigene Leben oder das Leben anderer
+
+Standard wenn kein Kriterium erkennbar: "none"
 
 **pattern_tags** (Liste, max. 5):
 Mögliche Beziehungsmuster als Tags. Nur aus dieser Liste:

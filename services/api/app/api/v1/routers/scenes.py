@@ -7,6 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.dependencies import get_current_user, get_pool
+from app.services.subscription_service import enforce_trial_limits
 from app.schemas.scene import (
     SceneConfirm, SceneCreate, SceneListResponse, SceneResponse, SceneUpdate,
 )
@@ -51,6 +52,7 @@ async def create_scene(
     import json
     async with pool.acquire() as conn:
         await _assert_case_owner(case_id, user_id, conn)
+        await enforce_trial_limits(user_id, conn, check_scene=True)
         row = await conn.fetchrow(
             """
             INSERT INTO scenes (case_id, user_id, title, scene_date, description,

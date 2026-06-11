@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.case import CaseCreate, CaseListResponse, CaseResponse, CaseUpdate
+from app.services.subscription_service import enforce_trial_limits
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases", tags=["cases"])
@@ -39,6 +40,7 @@ async def create_case(
     """Neuen Fall anlegen."""
     user_id = current_user["user_id"]
     async with pool.acquire() as conn:
+        await enforce_trial_limits(user_id, conn, check_case=True)
         row = await conn.fetchrow(
             """
             INSERT INTO cases (user_id, relationship_type, relationship_status,

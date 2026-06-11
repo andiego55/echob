@@ -42,6 +42,10 @@ def build_profile_context(profile: dict[str, Any]) -> str:
         "Formuliere vorsichtig, stabilisierend und nicht pathologisierend._\n"
     )
 
+    if display_name := profile.get("display_name"):
+        lines.append(f"**Name / Pseudonym der nutzenden Person:** {display_name}")
+        lines.append("_Sprich die Person mit diesem Namen an, wenn es natürlich wirkt._\n")
+
     # Belastung
     d = m.get("distress", {})
     if (di := d.get("distress_index")) is not None:

@@ -17,6 +17,9 @@ from pydantic import BaseModel as _BaseModel
 class SummaryTextUpdate(_BaseModel):
     summary_text: str
 
+class DisplayNameUpdate(_BaseModel):
+    display_name: str
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/profile", tags=["profile"])
 
@@ -140,6 +143,31 @@ async def save_summary_text(
             RETURNING *
             """,
             json.dumps(body.summary_text),
+            datetime.now(timezone.utc),
+            user_id,
+        )
+    return _row_to_response(dict(row))
+
+
+@router.put("/display-name", response_model=ProfileResponse)
+async def save_display_name(
+    body: DisplayNameUpdate,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> ProfileResponse:
+    """Speichert den Anzeigenamen (Pseudonym) des Nutzers."""
+    user_id = current_user["user_id"]
+    name = body.display_name.strip()[:100]
+    async with pool.acquire() as conn:
+        await _get_or_create_profile(conn, user_id)
+        row = await conn.fetchrow(
+            """
+            UPDATE user_profiles
+            SET display_name = $1, updated_at = $2
+            WHERE user_id = $3
+            RETURNING *
+            """,
+            name or None,
             datetime.now(timezone.utc),
             user_id,
         )
@@ -271,6 +299,8 @@ def _row_to_response(row: dict) -> ProfileResponse:
     row["completed_modules"] = list(completed)
     # summary_text aus summary-JSONB extrahieren
     row["summary_text"] = row.get("summary", {}).get("summary_text")
+    # display_name direkt aus der Spalte
+    row.setdefault("display_name", None)
     return ProfileResponse(**row)
 
 

@@ -9,7 +9,7 @@ export const reportsApi = {
     apiClient.get<Report>(`/cases/${caseId}/reports/${reportId}`).then(r => r.data),
 
   create: (caseId: string, data: ReportCreate) =>
-    apiClient.post<Report>(`/cases/${caseId}/reports`, data).then(r => r.data),
+    apiClient.post<Report>(`/cases/${caseId}/reports`, data, { timeout: 120_000 }).then(r => r.data),
 
   update: (caseId: string, reportId: string, sections: { heading: string; text: string }[]) =>
     apiClient.put<Report>(`/cases/${caseId}/reports/${reportId}`, { sections }).then(r => r.data),

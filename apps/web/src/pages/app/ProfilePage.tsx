@@ -24,19 +24,22 @@ export default function ProfilePage() {
   const qc = useQueryClient()
   const [activeModule, setActiveModule] = useState(PROFILE_MODULES[0].id)
   const [showSummary, setShowSummary] = useState(false)
-  // Local answers per module: moduleId → { itemKey: value }
   const [answers, setAnswers] = useState<Record<string, Record<string, unknown>>>({})
   const [isDirty, setIsDirty] = useState(false)
+  const [nameInput, setNameInput] = useState('')
+  const [nameSaved, setNameSaved] = useState(false)
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile'],
     queryFn: profileApi.get,
   })
 
-  // Profil in lokalen State laden sobald verfügbar
   useEffect(() => {
     if (profile?.modules) {
       setAnswers(profile.modules as Record<string, Record<string, unknown>>)
+    }
+    if (profile?.display_name) {
+      setNameInput(profile.display_name)
     }
   }, [profile?.id])
 
@@ -67,6 +70,15 @@ export default function ProfilePage() {
         setAnswers(data.modules as Record<string, Record<string, unknown>>)
       }
       setIsDirty(false)
+    },
+  })
+
+  const saveNameMutation = useMutation({
+    mutationFn: (name: string) => profileApi.saveDisplayName(name),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['profile'] })
+      setNameSaved(true)
+      setTimeout(() => setNameSaved(false), 2500)
     },
   })
 
@@ -160,6 +172,32 @@ export default function ProfilePage() {
               className="h-full bg-accent transition-all duration-300"
               style={{ width: `${(completedModules.length / PROFILE_MODULES.length) * 100}%` }}
             />
+          </div>
+        </div>
+
+        {/* Namens-Karte */}
+        <div className="mb-6 max-w-2xl card">
+          <p className="text-sm font-semibold text-navy mb-0.5">Wie soll Echo dich nennen?</p>
+          <p className="text-xs text-brand-muted mb-3">
+            Bitte verwende einen <strong>Nicknamen oder ein Pseudonym</strong> — keinen echten Namen.
+            Echo spricht dich dann persönlicher an.
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={nameInput}
+              onChange={e => { setNameInput(e.target.value); setNameSaved(false) }}
+              placeholder="z. B. Sky, Alex, M. …"
+              maxLength={50}
+              className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+            <button
+              onClick={() => saveNameMutation.mutate(nameInput.trim())}
+              disabled={saveNameMutation.isPending || !nameInput.trim()}
+              className="rounded-brand border border-accent bg-accent/10 px-4 py-2 text-xs font-medium text-accent hover:bg-accent/20 transition-colors disabled:opacity-40"
+            >
+              {saveNameMutation.isPending ? 'Wird gespeichert …' : nameSaved ? '✓ Gespeichert' : 'Speichern'}
+            </button>
           </div>
         </div>
 
