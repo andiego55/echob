@@ -38,9 +38,10 @@ export default function ScenesPage() {
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold text-navy">Beziehungsszenen</h1>
-            <p className="text-sm text-brand-muted mt-1">
-              Einzelne Ereignisse und wiederkehrende Situationen in dieser Beziehung.
+            <h1 className="text-xl font-bold text-navy">Szenen & Beobachtungen</h1>
+            <p className="text-sm text-brand-muted mt-1 max-w-[560px]">
+              Alles, was in den Kontext dieser Beziehung gehört: konkrete Situationen, Beobachtungen
+              an dir selbst und der anderen Person, eigene Gedanken und Vermutungen.
             </p>
           </div>
           <Link
@@ -118,9 +119,11 @@ function ScenesEmpty({ caseId }: { caseId: string }) {
   return (
     <div className="card text-center py-12 max-w-md mx-auto">
       <div className="text-4xl mb-4">📖</div>
-      <h2 className="text-lg font-semibold text-navy mb-2">Noch keine Szenen</h2>
+      <h2 className="text-lg font-semibold text-navy mb-2">Noch keine Einträge</h2>
       <p className="text-sm text-brand-muted mb-6">
-        Dokumentiere konkrete Ereignisse oder wiederkehrende Situationen, um Muster sichtbar zu machen.
+        Halte alles fest, was zu dieser Beziehung gehört: Situationen und Ereignisse, Beobachtungen
+        an dir selbst und der anderen Person, Gedanken und Vermutungen. Auch Kleinigkeiten zählen –
+        gerade Dinge, die dir nur nebenbei auffallen, machen Muster sichtbar.
       </p>
       <Link to={`/app/cases/${caseId}/scenes/new`} className="btn-primary !py-2 !px-5 !text-sm">
         Erste Szene anlegen

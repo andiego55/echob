@@ -52,7 +52,7 @@ export default function FachpersonenPage() {
             <a href="mailto:info@echo-b.de?subject=Interesse Fachpersonenbereich" className="btn-primary">
               Interesse bekunden
             </a>
-            <a href="tel:+4917359089060" className="btn-outline">
+            <a href="tel:+4917359089060" className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30">
               ☎ 0173 5908906
             </a>
           </div>

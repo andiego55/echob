@@ -1,6 +1,13 @@
 # Szenen-Extraktions-Prompt
 
-Du extrahierst aus einem Freitext eine strukturierte Beziehungsszene für EchoB.
+Du extrahierst aus einem Freitext einen strukturierten Eintrag ("Szene") für EchoB.
+
+Ein Eintrag kann verschiedene Formen haben – alle sind gültig:
+- ein **konkretes Ereignis** (Situation, Gespräch, Streit)
+- eine **Beobachtung** an der nutzenden Person selbst oder der anderen Person
+- ein **Gedanke oder eine persönliche Hypothese** im Kontext der Beziehung
+
+Zwinge Beobachtungen und Gedanken nicht in ein Ereignis-Schema.
 
 ## Eingabe
 
@@ -16,14 +23,15 @@ Fallkontext:
 Extrahiere folgende Felder aus dem Text:
 
 **title** (max. 80 Zeichen):
-Ein knapper Titel, der die Szene beschreibt. Keine Wertung.
-Beispiel: „Streit nach Ankündigung von Freundschaftstreffen"
+Ein knapper Titel, der den Eintrag beschreibt. Keine Wertung.
+Beispiele: „Streit nach Ankündigung von Freundschaftstreffen" · „Beobachtung: Ich entschuldige mich ständig" · „Vermutung: Rückzug seit Jobwechsel"
 
 **scene_date** (optional):
-Falls ein Datum oder Zeitraum erkennbar ist (z.B. „gestern", „letzte Woche"), gib ein ISO-Datum an. Sonst null.
+Falls ein Datum oder Zeitraum erkennbar ist (z.B. „gestern", „letzte Woche"), gib ein ISO-Datum an. Sonst null. Bei Beobachtungen und Gedanken ohne konkreten Zeitpunkt: null.
 
 **description** (max. 2000 Zeichen):
-Die Beschreibung des Ereignisses in neutraler, beobachtbarer Sprache. Keine Interpretationen.
+Bei Ereignissen: die Beschreibung in neutraler, beobachtbarer Sprache, keine Interpretationen.
+Bei Beobachtungen, Gedanken und Hypothesen: die Kernaussage klar wiedergeben und als Wahrnehmung bzw. Vermutung der nutzenden Person kennzeichnen (z.B. „Der nutzenden Person fällt auf, dass …", „Die nutzende Person vermutet, dass …").
 
 **user_reaction** (optional, max. 1000 Zeichen):
 Was hat die nutzende Person getan oder gefühlt?

@@ -77,15 +77,20 @@ export default function SceneNewPage() {
         <CaseNav caseId={caseId!} />
         <div className="mx-auto max-w-[640px] px-6 py-10">
           <span className="label">Szene anlegen</span>
-          <h1 className="mt-2 text-xl font-bold text-navy mb-2">Wie möchtest du die Szene beschreiben?</h1>
+          <h1 className="mt-2 text-xl font-bold text-navy mb-2">Was möchtest du festhalten?</h1>
+          <p className="text-sm text-brand-muted mb-4">
+            Eine Szene kann alles sein, was zur Beziehung gehört: ein konkretes Ereignis, eine
+            Beobachtung an dir selbst oder der anderen Person, ein Gedanke oder eine Vermutung.
+            Auch Kleinigkeiten zählen.
+          </p>
           <p className="text-sm text-brand-muted mb-8">
             Wähle einen Eingabemodus. Du kannst jederzeit wechseln.
           </p>
           <div className="grid gap-4">
             {[
-              { mode: 'freetext' as const, icon: '✍️', label: 'Freitext', desc: 'Beschreibe die Szene in eigenen Worten.' },
-              { mode: 'guided' as const,   icon: '❓', label: 'Geführte Fragen', desc: 'Beantworte strukturierte Fragen zur Szene.' },
-              { mode: 'chat' as const,     icon: '💬', label: 'Mit Echo erarbeiten', desc: 'Echo hilft dir, die Szene gemeinsam zu strukturieren.' },
+              { mode: 'freetext' as const, icon: '✍️', label: 'Freitext', desc: 'Beschreibe frei, was du festhalten willst – Situation, Beobachtung oder Gedanke.' },
+              { mode: 'guided' as const,   icon: '❓', label: 'Geführte Fragen', desc: 'Strukturierte Fragen – ideal für eine konkrete Situation.' },
+              { mode: 'chat' as const,     icon: '💬', label: 'Mit Echo erarbeiten', desc: 'Echo hilft dir im Gespräch, deine Gedanken zu sortieren und festzuhalten.' },
             ].map(({ mode: m, icon, label, desc }) => (
               <button
                 key={m}
@@ -121,12 +126,12 @@ export default function SceneNewPage() {
           {/* Titel + Datum */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-brand-text mb-1.5">Titel der Szene</label>
+              <label className="block text-sm font-medium text-brand-text mb-1.5">Titel</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="z.B. Streit nach Freundesbesuch"
+                placeholder="z.B. Streit nach Besuch · Mir ist aufgefallen, dass …"
                 maxLength={200}
                 className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
               />
@@ -152,7 +157,7 @@ export default function SceneNewPage() {
                 value={freetext}
                 onChange={(e) => setFreetext(e.target.value)}
                 rows={7}
-                placeholder="Beschreibe die Szene so konkret wie möglich – was ist passiert, was wurde gesagt, wie hast du dich gefühlt?"
+                placeholder="Beschreibe, was du festhalten möchtest – ein Ereignis (was ist passiert, was wurde gesagt?), eine Beobachtung an dir oder der anderen Person, einen Gedanken oder eine Vermutung. So konkret wie möglich."
                 className="w-full rounded-brand border border-brand-border bg-white px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
               />
             </div>
@@ -175,7 +180,7 @@ export default function SceneNewPage() {
           {/* Belastungsscore */}
           <div>
             <label className="block text-sm font-medium text-brand-text mb-2">
-              Belastung <span className="font-normal text-brand-muted">(1 = wenig, 5 = sehr hoch)</span>
+              Belastung <span className="font-normal text-brand-muted">(optional, falls zutreffend · 1 = wenig, 5 = sehr hoch)</span>
             </label>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((n) => (

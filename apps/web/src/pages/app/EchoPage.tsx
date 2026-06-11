@@ -1,6 +1,7 @@
 /**
  * /app/cases/:caseId/echo — Echo-Chat
- * Fallbezogener KI-Dialog. Glossar-Begriffe als Schnellauswahl.
+ * Fallbezogener KI-Dialog mit Chat-Sessions (Sidebar wie bei ChatGPT).
+ * Glossar-Begriffe als Schnellauswahl.
  */
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -8,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { echoApi } from '@/api/echo'
-import type { EchoMessage, ThreadType } from '@/types'
+import type { EchoChatSession, EchoMessage, ThreadType } from '@/types'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 
 const GLOSSARY_TERMS = [
@@ -28,6 +29,17 @@ const TOPIC_SHORTCUTS = [
   'Nächste Schritte',
 ]
 
+function formatSessionDate(iso: string): string {
+  const d = new Date(iso)
+  const now = new Date()
+  const sameDay = d.toDateString() === now.toDateString()
+  if (sameDay) return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  if (d.toDateString() === yesterday.toDateString()) return 'Gestern'
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })
+}
+
 export default function EchoPage() {
   const { caseId } = useParams<{ caseId: string }>()
   const qc = useQueryClient()
@@ -38,18 +50,43 @@ export default function EchoPage() {
   const [showGlossary, setGlossary] = useState(false)
   const [threadType]                = useState<ThreadType>('topic')
 
-  // Gesprächsverlauf laden
-  const { data: history = [] } = useQuery({
-    queryKey: ['echo-history', caseId, threadType],
-    queryFn: () => echoApi.history(caseId!, threadType),
+  // undefined = noch nicht initialisiert, null = neuer (ungespeicherter) Chat
+  const [selectedSession, setSelectedSession] = useState<string | null | undefined>(undefined)
+
+  // Sessions laden
+  const { data: sessions = [], isSuccess: sessionsLoaded } = useQuery({
+    queryKey: ['echo-sessions', caseId],
+    queryFn: () => echoApi.listSessions(caseId!),
     enabled: !!caseId,
+  })
+
+  // Beim ersten Laden: jüngste Session auswählen (oder neuen Chat anbieten)
+  useEffect(() => {
+    if (selectedSession === undefined && sessionsLoaded) {
+      setSelectedSession(sessions[0]?.id ?? null)
+    }
+  }, [sessionsLoaded, sessions, selectedSession])
+
+  // Gesprächsverlauf der gewählten Session laden
+  const { data: history = [] } = useQuery({
+    queryKey: ['echo-history', caseId, selectedSession],
+    queryFn: () => echoApi.history(caseId!, threadType, undefined, 50, selectedSession!),
+    enabled: !!caseId && !!selectedSession,
   })
 
   const mutation = useMutation({
     mutationFn: (data: { message: string; glossary_term?: string }) =>
-      echoApi.chat(caseId!, { ...data, thread_type: threadType }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['echo-history', caseId, threadType] })
+      echoApi.chat(caseId!, {
+        ...data,
+        thread_type: threadType,
+        chat_session_id: selectedSession ?? undefined,
+      }),
+    onSuccess: (data) => {
+      if (data.chat_session_id && data.chat_session_id !== selectedSession) {
+        setSelectedSession(data.chat_session_id)
+      }
+      qc.invalidateQueries({ queryKey: ['echo-history', caseId] })
+      qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
       setInput('')
       setPendingMessage(null)
     },
@@ -85,119 +122,301 @@ export default function EchoPage() {
     mutation.mutate({ message: msg })
   }
 
+  const handleNewChat = () => {
+    setSelectedSession(null)
+    setInput('')
+    setPendingMessage(null)
+  }
+
+  const showEmptyState = (!selectedSession || history.length === 0) && !mutation.isPending
+
   return (
     <AppShell>
       <CaseNav caseId={caseId!} />
 
-      <div className="flex flex-col h-[calc(100vh-112px)]">
-        {/* Chat-Bereich */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
+      <div className="flex h-[calc(100vh-112px)]">
+        {/* Chat-Sidebar */}
+        <ChatSidebar
+          caseId={caseId!}
+          sessions={sessions}
+          selected={selectedSession ?? null}
+          onSelect={(id) => { setSelectedSession(id); setPendingMessage(null) }}
+          onNewChat={handleNewChat}
+        />
 
-            {/* Begrüßung wenn leer */}
-            {history.length === 0 && !mutation.isPending && (
-              <WelcomePrompt onTopic={handleTopic} />
-            )}
+        {/* Hauptbereich */}
+        <div className="flex flex-col flex-1 min-w-0">
 
-            {/* Nachrichten */}
-            {history.map((msg) => (
-              <MessageBubble key={msg.id} message={msg} />
-            ))}
-
-            {/* Optimistische Nutzernachricht */}
-            {pendingMessage && mutation.isPending && (
-              <div className="flex gap-3 flex-row-reverse">
-                <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">Du</div>
-                <div className="max-w-[80%] rounded-brand px-4 py-3 text-sm bg-navy text-white">
-                  <p className="whitespace-pre-wrap">{pendingMessage}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Tipp-Indikator */}
-            {mutation.isPending && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm flex-shrink-0">
-                  E
-                </div>
-                <div className="rounded-brand bg-white border border-brand-border px-4 py-3 text-sm text-brand-muted">
-                  Echo tippt …
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
+          {/* Mobile: Session-Auswahl */}
+          <div className="md:hidden border-b border-brand-border bg-white px-4 py-2 flex gap-2 items-center">
+            <select
+              value={selectedSession ?? ''}
+              onChange={(e) => setSelectedSession(e.target.value || null)}
+              className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none"
+            >
+              <option value="">Neuer Chat</option>
+              {sessions.map((s) => (
+                <option key={s.id} value={s.id}>{s.title ?? 'Neuer Chat'}</option>
+              ))}
+            </select>
+            <button
+              onClick={handleNewChat}
+              className="flex-shrink-0 px-3 py-2 rounded-brand border border-brand-border text-sm text-brand-muted hover:border-accent hover:text-accent transition-colors"
+              title="Neuen Chat starten"
+            >
+              +
+            </button>
           </div>
-        </div>
 
-        {/* Glossar-Overlay */}
-        {showGlossary && (
-          <div className="border-t border-brand-border bg-white px-6 py-4">
-            <div className="mx-auto max-w-[780px]">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-navy">Glossar – Begriff auswählen</p>
-                <button onClick={() => setGlossary(false)} className="text-xs text-brand-muted hover:text-navy">
-                  ✕ Schließen
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {GLOSSARY_TERMS.map((term) => (
-                  <button
-                    key={term}
-                    onClick={() => handleGlossary(term)}
-                    className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors"
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
+          {/* Chat-Bereich */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
+
+              {/* Begrüßung wenn leer */}
+              {showEmptyState && <WelcomePrompt onTopic={handleTopic} />}
+
+              {/* Nachrichten */}
+              {history.map((msg) => (
+                <MessageBubble key={msg.id} message={msg} />
+              ))}
+
+              {/* Optimistische Nutzernachricht */}
+              {pendingMessage && mutation.isPending && (
+                <div className="flex gap-3 flex-row-reverse">
+                  <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">Du</div>
+                  <div className="max-w-[80%] rounded-brand px-4 py-3 text-sm bg-navy text-white">
+                    <p className="whitespace-pre-wrap">{pendingMessage}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Tipp-Indikator */}
+              {mutation.isPending && (
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm flex-shrink-0">
+                    E
+                  </div>
+                  <div className="rounded-brand bg-white border border-brand-border px-4 py-3 text-sm text-brand-muted">
+                    Echo tippt …
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
           </div>
-        )}
 
-        {/* Eingabe */}
-        <div className="border-t border-brand-border bg-white px-6 py-4">
-          <div className="mx-auto max-w-[780px]">
-            <form onSubmit={handleSend} className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setGlossary((v) => !v)}
-                title="Glossar öffnen"
-                className={`flex-shrink-0 px-3 py-2.5 rounded-brand border text-sm transition-colors ${
-                  showGlossary
-                    ? 'border-accent bg-accent/10 text-accent'
-                    : 'border-brand-border text-brand-muted hover:border-accent/40'
-                }`}
-              >
-                Glossar
-              </button>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
-                }}
-                rows={1}
-                placeholder="Schreib Echo eine Nachricht … (Enter zum Senden, Shift+Enter für neue Zeile)"
-                className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || mutation.isPending}
-                className="btn-primary !py-2 !px-4 !text-sm flex-shrink-0 disabled:opacity-50"
-              >
-                Senden
-              </button>
-            </form>
-            <p className="mt-2 text-xs text-brand-muted/70">
-              Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung.
-            </p>
+          {/* Glossar-Overlay */}
+          {showGlossary && (
+            <div className="border-t border-brand-border bg-white px-6 py-4">
+              <div className="mx-auto max-w-[780px]">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-semibold text-navy">Glossar – Begriff auswählen</p>
+                  <button onClick={() => setGlossary(false)} className="text-xs text-brand-muted hover:text-navy">
+                    ✕ Schließen
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {GLOSSARY_TERMS.map((term) => (
+                    <button
+                      key={term}
+                      onClick={() => handleGlossary(term)}
+                      className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Eingabe */}
+          <div className="border-t border-brand-border bg-white px-6 py-4">
+            <div className="mx-auto max-w-[780px]">
+              <form onSubmit={handleSend} className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setGlossary((v) => !v)}
+                  title="Glossar öffnen"
+                  className={`flex-shrink-0 px-3 py-2.5 rounded-brand border text-sm transition-colors ${
+                    showGlossary
+                      ? 'border-accent bg-accent/10 text-accent'
+                      : 'border-brand-border text-brand-muted hover:border-accent/40'
+                  }`}
+                >
+                  Glossar
+                </button>
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
+                  }}
+                  rows={1}
+                  placeholder="Schreib Echo eine Nachricht … (Enter zum Senden, Shift+Enter für neue Zeile)"
+                  className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || mutation.isPending}
+                  className="btn-primary !py-2 !px-4 !text-sm flex-shrink-0 disabled:opacity-50"
+                >
+                  Senden
+                </button>
+              </form>
+              <p className="mt-2 text-xs text-brand-muted/70">
+                Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung.
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </AppShell>
   )
 }
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+
+function ChatSidebar({
+  caseId, sessions, selected, onSelect, onNewChat,
+}: {
+  caseId: string
+  sessions: EchoChatSession[]
+  selected: string | null
+  onSelect: (id: string) => void
+  onNewChat: () => void
+}) {
+  const qc = useQueryClient()
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState('')
+
+  const renameMutation = useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
+      echoApi.renameSession(caseId, id, title),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
+      setEditingId(null)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => echoApi.deleteSession(caseId, id),
+    onSuccess: (_data, id) => {
+      qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
+      qc.removeQueries({ queryKey: ['echo-history', caseId, id] })
+      if (id === selected) onNewChat()
+    },
+  })
+
+  const startEditing = (s: EchoChatSession) => {
+    setEditingId(s.id)
+    setEditingTitle(s.title ?? '')
+  }
+
+  const saveTitle = () => {
+    if (!editingId) return
+    const title = editingTitle.trim()
+    if (!title) { setEditingId(null); return }
+    renameMutation.mutate({ id: editingId, title })
+  }
+
+  return (
+    <aside className="hidden md:flex w-60 flex-shrink-0 flex-col border-r border-brand-border bg-white">
+      {/* Neuer Chat */}
+      <div className="p-3 border-b border-brand-border">
+        <button
+          onClick={onNewChat}
+          className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-brand border text-sm font-medium transition-colors ${
+            selected === null
+              ? 'border-accent bg-accent/10 text-accent'
+              : 'border-brand-border text-brand-text hover:border-accent hover:text-accent'
+          }`}
+        >
+          <span className="text-base leading-none">+</span> Neuer Chat
+        </button>
+      </div>
+
+      {/* Session-Liste */}
+      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        {sessions.length === 0 && (
+          <p className="px-3 py-4 text-xs text-brand-muted/70 leading-relaxed">
+            Noch keine Chats. Stell Echo deine erste Frage – der Chat wird automatisch gespeichert.
+          </p>
+        )}
+
+        {sessions.map((s) => {
+          const isActive = s.id === selected
+          const isEditing = s.id === editingId
+
+          return (
+            <div
+              key={s.id}
+              className={`group relative rounded-brand transition-colors ${
+                isActive ? 'bg-accent/10' : 'hover:bg-brand-bg'
+              }`}
+            >
+              {isEditing ? (
+                <input
+                  autoFocus
+                  value={editingTitle}
+                  onChange={(e) => setEditingTitle(e.target.value)}
+                  onBlur={saveTitle}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') saveTitle()
+                    if (e.key === 'Escape') setEditingId(null)
+                  }}
+                  className="w-full rounded-brand border border-accent bg-white px-3 py-2 text-sm text-brand-text outline-none"
+                />
+              ) : (
+                <button
+                  onClick={() => onSelect(s.id)}
+                  className="w-full text-left px-3 py-2 pr-14"
+                >
+                  <span className={`block text-sm truncate ${
+                    isActive ? 'text-accent font-semibold' : 'text-brand-text'
+                  }`}>
+                    {s.title ?? 'Neuer Chat'}
+                  </span>
+                  <span className="block text-[11px] text-brand-muted/70 mt-0.5">
+                    {formatSessionDate(s.updated_at)}
+                  </span>
+                </button>
+              )}
+
+              {/* Hover-Aktionen */}
+              {!isEditing && (
+                <div className="absolute right-1.5 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-0.5">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); startEditing(s) }}
+                    title="Umbenennen"
+                    className="p-1.5 rounded text-brand-muted hover:text-navy hover:bg-white text-xs"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (window.confirm('Diesen Chat endgültig löschen?')) {
+                        deleteMutation.mutate(s.id)
+                      }
+                    }}
+                    title="Löschen"
+                    className="p-1.5 rounded text-brand-muted hover:text-red-600 hover:bg-white text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </aside>
+  )
+}
+
+// ── Nachrichten ───────────────────────────────────────────────────────────────
 
 function MessageBubble({ message: msg }: { message: EchoMessage }) {
   const isUser = msg.role === 'user'

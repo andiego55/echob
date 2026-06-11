@@ -10,7 +10,13 @@ from pydantic import BaseModel
 import json as _json
 
 from app.core.dependencies import get_current_user, get_pool
-from app.schemas.echo import EchoChatRequest, EchoChatResponse, EchoMessageResponse
+from app.schemas.echo import (
+    EchoChatRequest,
+    EchoChatResponse,
+    EchoChatSessionResponse,
+    EchoChatSessionUpdate,
+    EchoMessageResponse,
+)
 from app.services.echo_service import build_case_context
 from app.services.profile_service import build_profile_context
 from app.services.person_profile_service import build_person_context
@@ -66,6 +72,26 @@ async def chat(
             "SELECT topic, summary_text FROM topic_summaries WHERE case_id = $1", case_id
         )
 
+        # Chat-Session auflösen (nur freier Echo-Chat). Ohne ID wird lazy eine
+        # neue Session angelegt — die ID geht in der Response zurück.
+        chat_session_id = None
+        if body.thread_type == "topic":
+            if body.chat_session_id:
+                session_row = await conn.fetchrow(
+                    "SELECT id FROM echo_chat_sessions "
+                    "WHERE id = $1 AND case_id = $2 AND user_id = $3",
+                    body.chat_session_id, case_id, user_id,
+                )
+                if not session_row:
+                    raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+            else:
+                session_row = await conn.fetchrow(
+                    "INSERT INTO echo_chat_sessions (case_id, user_id) "
+                    "VALUES ($1, $2) RETURNING id",
+                    case_id, user_id,
+                )
+            chat_session_id = session_row["id"]
+
         # Letzte 20 Nachrichten als Gesprächshistorie
         if body.thread_type == "scene" and body.scene_session_id:
             history_rows = await conn.fetch(
@@ -74,6 +100,13 @@ async def chat(
                 "AND metadata->>'scene_session_id' = $2 "
                 "ORDER BY created_at DESC LIMIT 20",
                 case_id, body.scene_session_id,
+            )
+        elif chat_session_id:
+            history_rows = await conn.fetch(
+                "SELECT role, content FROM echo_messages "
+                "WHERE session_id = $1 "
+                "ORDER BY created_at DESC LIMIT 20",
+                chat_session_id,
             )
         else:
             history_rows = await conn.fetch(
@@ -234,22 +267,30 @@ async def chat(
     async with pool.acquire() as conn:
         user_msg_row = await conn.fetchrow(
             """
-            INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata)
-            VALUES ($1, $2, 'user', $3, $4, $5, $6::jsonb) RETURNING *
+            INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata, session_id)
+            VALUES ($1, $2, 'user', $3, $4, $5, $6::jsonb, $7) RETURNING *
             """,
-            case_id, user_id, body.message, body.thread_type, body.related_scene_id, session_meta,
+            case_id, user_id, body.message, body.thread_type, body.related_scene_id, session_meta, chat_session_id,
         )
         assistant_msg_row = await conn.fetchrow(
             """
-            INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata)
-            VALUES ($1, $2, 'assistant', $3, $4, $5, $6::jsonb) RETURNING *
+            INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata, session_id)
+            VALUES ($1, $2, 'assistant', $3, $4, $5, $6::jsonb, $7) RETURNING *
             """,
-            case_id, user_id, answer, body.thread_type, body.related_scene_id, session_meta,
+            case_id, user_id, answer, body.thread_type, body.related_scene_id, session_meta, chat_session_id,
         )
+        if chat_session_id:
+            # Session anfassen; erste Nutzernachricht wird zum Titel
+            await conn.execute(
+                "UPDATE echo_chat_sessions SET updated_at = NOW(), "
+                "title = COALESCE(title, LEFT($2, 60)) WHERE id = $1",
+                chat_session_id, body.message.strip(),
+            )
 
     return EchoChatResponse(
         user_message=_row_to_msg(user_msg_row),
         assistant_message=_row_to_msg(assistant_msg_row),
+        chat_session_id=chat_session_id,
     )
 
 
@@ -332,6 +373,7 @@ async def get_history(
     case_id: UUID,
     thread_type: str = "topic",
     session_id: str | None = Query(default=None),
+    chat_session_id: UUID | None = Query(default=None),
     limit: int = 50,
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
@@ -352,6 +394,12 @@ async def get_history(
                 "ORDER BY created_at ASC LIMIT $4",
                 case_id, thread_type, session_id, limit,
             )
+        elif chat_session_id:
+            rows = await conn.fetch(
+                "SELECT * FROM echo_messages WHERE case_id = $1 AND session_id = $2 "
+                "ORDER BY created_at ASC LIMIT $3",
+                case_id, chat_session_id, limit,
+            )
         else:
             rows = await conn.fetch(
                 "SELECT * FROM echo_messages WHERE case_id = $1 AND thread_type = $2 "
@@ -359,6 +407,69 @@ async def get_history(
                 case_id, thread_type, limit,
             )
     return [_row_to_msg(r) for r in rows]
+
+
+# ── Chat-Sessions (Sidebar im freien Echo-Chat) ───────────────────────────────
+
+@router.get("/sessions", response_model=list[EchoChatSessionResponse])
+async def list_chat_sessions(
+    case_id: UUID,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[EchoChatSessionResponse]:
+    """Alle Chat-Sessions eines Falls, neueste zuerst."""
+    async with pool.acquire() as conn:
+        case_row = await conn.fetchrow(
+            "SELECT id FROM cases WHERE id = $1 AND user_id = $2",
+            case_id, current_user["user_id"],
+        )
+        if not case_row:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT * FROM echo_chat_sessions "
+            "WHERE case_id = $1 AND user_id = $2 ORDER BY updated_at DESC",
+            case_id, current_user["user_id"],
+        )
+    return [EchoChatSessionResponse(**dict(r)) for r in rows]
+
+
+@router.patch("/sessions/{chat_session_id}", response_model=EchoChatSessionResponse)
+async def rename_chat_session(
+    case_id: UUID,
+    chat_session_id: UUID,
+    body: EchoChatSessionUpdate,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> EchoChatSessionResponse:
+    """Chat-Session umbenennen."""
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE echo_chat_sessions SET title = $1 "
+            "WHERE id = $2 AND case_id = $3 AND user_id = $4 RETURNING *",
+            body.title.strip(), chat_session_id, case_id, current_user["user_id"],
+        )
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return EchoChatSessionResponse(**dict(row))
+
+
+@router.delete("/sessions/{chat_session_id}")
+async def delete_chat_session(
+    case_id: UUID,
+    chat_session_id: UUID,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Chat-Session samt Nachrichten löschen (ON DELETE CASCADE)."""
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "DELETE FROM echo_chat_sessions "
+            "WHERE id = $1 AND case_id = $2 AND user_id = $3",
+            chat_session_id, case_id, current_user["user_id"],
+        )
+    if result == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return {"deleted": True}
 
 
 class TopicSummaryRequest(BaseModel):

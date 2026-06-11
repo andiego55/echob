@@ -45,6 +45,7 @@ class EchoChatRequest(BaseModel):
     related_scene_id: UUID | None = None
     glossary_term: str | None = Field(None, max_length=100)
     scene_session_id: str | None = Field(None, max_length=100)
+    chat_session_id: UUID | None = None     # Session im freien Echo-Chat
 
 
 class EchoChatResponse(BaseModel):
@@ -52,6 +53,24 @@ class EchoChatResponse(BaseModel):
     assistant_message: EchoMessageResponse
     # optionale strukturierte Ergebnisse (z.B. extrahierte Szene, Hypothesen)
     structured_result: dict[str, Any] | None = None
+    # Session, in der die Nachricht gelandet ist (wird bei Bedarf neu angelegt)
+    chat_session_id: UUID | None = None
+
+
+# ── Chat-Sessions (Sidebar im freien Echo-Chat) ───────────────────────────────
+
+class EchoChatSessionResponse(BaseModel):
+    id: UUID
+    case_id: UUID
+    title: str | None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class EchoChatSessionUpdate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=120)
 
 
 # ── Onboarding-Fortschritt ────────────────────────────────────────────────────

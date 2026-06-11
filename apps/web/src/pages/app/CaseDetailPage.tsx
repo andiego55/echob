@@ -212,6 +212,14 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
         <p className="text-sm font-medium text-navy">
           {hasSummaries ? `${summaries.length} von 4 Zusammenfassungen gespeichert` : 'Keine gespeicherten Zusammenfassungen'}
         </p>
+        <p className="text-xs text-brand-muted mt-2 leading-relaxed">
+          Geführte Dialoge zu vier Kernthemen – sie verbessern dein Nutzer- und Beziehungsprofil.
+          Gespeicherte Zusammenfassungen fließen als Kontext in alle Echo-Gespräche und Berichte ein.
+          Für freie Gespräche nutze den{' '}
+          <Link to={`/app/cases/${caseId}/echo`} className="text-accent font-medium hover:underline">
+            Echo-Chat →
+          </Link>
+        </p>
       </div>
 
       <div className="space-y-3">

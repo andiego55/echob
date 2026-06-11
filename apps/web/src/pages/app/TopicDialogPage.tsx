@@ -3,7 +3,7 @@
  * Themen: topic_self, topic_person, topic_responsibility, topic_guilt
  */
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
@@ -215,6 +215,21 @@ export default function TopicDialogPage() {
               )}
               <p className="text-xs font-medium text-navy mb-0.5">{topic.label}</p>
               <p className="text-xs text-brand-muted">{topic.description}</p>
+
+              {!topic.isBlog && (
+                <p className="text-xs text-brand-muted mt-2 pt-2 border-t border-navy/10">
+                  <strong className="text-navy">Wozu dieser Dialog?</strong>{' '}
+                  Deine Antworten hier verbessern dein Nutzer- und Beziehungsprofil. Erstelle am Ende über{' '}
+                  <strong className="text-navy">„Zusammenfassung"</strong> die Essenz des Gesprächs und speichere sie –
+                  Echo berücksichtigt sie künftig in allen Gesprächen und Berichten.
+                </p>
+              )}
+              <p className="text-xs text-brand-muted mt-2">
+                Du möchtest frei mit Echo sprechen?{' '}
+                <Link to={`/app/cases/${caseId}/echo`} className="text-accent font-medium hover:underline">
+                  Zum Echo-Chat →
+                </Link>
+              </p>
             </div>
 
             {/* Nachrichten */}

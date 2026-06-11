@@ -14,13 +14,17 @@ nächsten API-Request live übernommen — kein Neustart nötig.
 - Enthält: Echo-Persona, Ton, Sicherheitsregeln, was Echo NICHT sagt
 
 ### `scene_capture_prompt.md`
-**Szenen-Dokumentation** — geführtes Gespräch zum Erfassen einer Situation
+**Szenen-Dokumentation** — geführtes Gespräch zum Erfassen eines Eintrags
+(Ereignis, Beobachtung an sich/der anderen Person, Gedanke oder Hypothese)
 - Wann: `thread_type = "scene"`
-- Enthält: 6-Schritt-Struktur, Empathieregeln, wann Echo abschließt
+- Enthält: adaptive Fragestruktur (Ereignis-Fragen vs. Beobachtungs-/Gedanken-Fragen),
+  Empathieregeln, wann Echo abschließt
 
 ### `scene_extraction_prompt.md`
 **Szenen-Extraktion** — strukturierte JSON-Ausgabe aus Gesprächsverlauf
 - Wann: nach Szenen-Dialog beim Abschluss ("Szene finalisieren")
+- Eintragstypen: Ereignis, Beobachtung, Gedanke/Hypothese (description kennzeichnet
+  Beobachtungen/Vermutungen als Wahrnehmung der nutzenden Person)
 - Enthält: Platzhalter `{user_text}`, `{relationship_type}`, `{relationship_status}`
 - Achtung: Muss als JSON-Objekt antworten (response_format: json_object)
 

@@ -121,9 +121,10 @@ export default function SceneEchoPage() {
             <div className="rounded-brand border border-brand-border bg-amber-50 px-4 py-3 text-sm text-brand-muted">
               <p className="font-medium text-navy mb-1">Szenenerfassung mit Echo</p>
               <p className="mb-3">
-                In diesem Dialog kennt Echo deinen Beziehungskontext nicht – es geht nur darum,
-                diese eine Szene zu beschreiben. Du kannst die Szene jederzeit über den Button{' '}
-                <strong>„Szene speichern"</strong> erfassen.
+                Halte fest, was dich beschäftigt – eine konkrete Situation, eine Beobachtung an dir
+                oder der anderen Person, einen Gedanken oder eine Vermutung. Echo hilft dir beim
+                Sortieren. In diesem Dialog kennt Echo deinen Beziehungskontext zunächst nicht.
+                Über <strong>„Szene speichern"</strong> kannst du den Eintrag jederzeit erfassen.
               </p>
               {contextShared ? (
                 <p className="text-xs text-green-700 font-medium">

@@ -169,12 +169,22 @@ export interface EchoChatRequest {
   related_scene_id?: string
   glossary_term?: string
   scene_session_id?: string
+  chat_session_id?: string
 }
 
 export interface EchoChatResponse {
   user_message: EchoMessage
   assistant_message: EchoMessage
   structured_result?: Record<string, unknown>
+  chat_session_id?: string | null
+}
+
+export interface EchoChatSession {
+  id: string
+  case_id: string
+  title: string | null
+  created_at: string
+  updated_at: string
 }
 
 // ── Onboarding ────────────────────────────────────────────────────────────────
