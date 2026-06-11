@@ -103,7 +103,9 @@ async def create_checkout_session(
     params: dict = {
         "mode": product["mode"],
         "line_items": [_line_item(product_key)],
-        "success_url": f"{base}/app/upgrade?status=success&product={product_key}",
+        # {CHECKOUT_SESSION_ID} wird von Stripe ersetzt → Sofort-Verifikation
+        # beim Rückkehren, unabhängig vom Webhook
+        "success_url": f"{base}/app/upgrade?status=success&product={product_key}&session_id={{CHECKOUT_SESSION_ID}}",
         "cancel_url": f"{base}/app/upgrade?status=cancelled",
         "metadata": {"user_id": user_id, "product": product_key},
         "locale": "de",
@@ -176,56 +178,88 @@ async def _upsert_profile_plan(
     )
 
 
+async def fulfill_checkout_session(obj, pool) -> str | None:
+    """Schaltet einen bezahlten Checkout frei (idempotent).
+
+    Wird sowohl vom Webhook als auch von der Sofort-Verifikation nach dem
+    Redirect aufgerufen. Gibt den freigeschalteten Plan zurück (oder None).
+    """
+    meta = obj.get("metadata") or {}
+    user_id_str = meta.get("user_id")
+    product_key = meta.get("product")
+    if not user_id_str or product_key not in PRODUCTS:
+        logger.warning("Checkout-Session ohne verwertbare Metadaten: %s", meta)
+        return None
+
+    user_id = UUID(user_id_str)
+    customer_id = obj.get("customer")
+    subscription_id = obj.get("subscription")
+    now = datetime.now(timezone.utc)
+
+    if PRODUCTS[product_key]["mode"] == "payment":
+        # Startpaket: fester Zugangs-Zeitraum
+        ends_at = now + timedelta(days=STARTPAKET_ACCESS_DAYS)
+    else:
+        # Abo: Periodenende von Stripe holen (Renewals via subscription.updated)
+        ends_at = None
+        if subscription_id:
+            try:
+                stripe = _stripe()
+                sub = await asyncio.to_thread(
+                    stripe.Subscription.retrieve, subscription_id
+                )
+                period_end = sub.get("current_period_end")
+                if period_end:
+                    ends_at = datetime.fromtimestamp(period_end, tz=timezone.utc)
+            except Exception:
+                logger.exception("Konnte Subscription %s nicht laden", subscription_id)
+
+    async with pool.acquire() as conn:
+        await _upsert_profile_plan(
+            conn, user_id=user_id, plan=product_key, ends_at=ends_at,
+            customer_id=customer_id, subscription_id=subscription_id,
+        )
+        await conn.execute(
+            """
+            INSERT INTO payments (user_id, product, stripe_session_id, stripe_customer_id, amount_cents, currency, status)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            ON CONFLICT (stripe_session_id) DO NOTHING
+            """,
+            user_id, product_key, obj.get("id"), customer_id,
+            obj.get("amount_total"), obj.get("currency"), obj.get("payment_status"),
+        )
+    logger.info("Zahlung verarbeitet: user=%s product=%s", user_id, product_key)
+    return product_key
+
+
+async def verify_and_fulfill_session(
+    *, session_id: str, user_id: str, pool,
+) -> str | None:
+    """Sofort-Freischaltung nach Checkout-Redirect: Session bei Stripe prüfen.
+
+    Verifiziert serverseitig, dass die Session bezahlt ist und zum eingeloggten
+    Nutzer gehört. Gibt den Plan zurück, wenn freigeschaltet wurde.
+    """
+    stripe = _stripe()
+    obj = await asyncio.to_thread(stripe.checkout.Session.retrieve, session_id)
+
+    meta = obj.get("metadata") or {}
+    if meta.get("user_id") != user_id:
+        logger.warning("Checkout-Verifikation: Session %s gehört nicht zu User %s", session_id, user_id)
+        return None
+    if obj.get("payment_status") not in ("paid", "no_payment_required"):
+        return None
+
+    return await fulfill_checkout_session(obj, pool)
+
+
 async def handle_event(event, pool) -> None:
     """Verarbeitet relevante Stripe-Events und aktualisiert die DB."""
     etype = event["type"]
     obj = event["data"]["object"]
 
     if etype == "checkout.session.completed":
-        meta = obj.get("metadata") or {}
-        user_id_str = meta.get("user_id")
-        product_key = meta.get("product")
-        if not user_id_str or product_key not in PRODUCTS:
-            logger.warning("Webhook %s ohne verwertbare Metadaten: %s", etype, meta)
-            return
-        user_id = UUID(user_id_str)
-        customer_id = obj.get("customer")
-        subscription_id = obj.get("subscription")
-        now = datetime.now(timezone.utc)
-
-        if PRODUCTS[product_key]["mode"] == "payment":
-            # Startpaket: fester Zugangs-Zeitraum
-            ends_at = now + timedelta(days=STARTPAKET_ACCESS_DAYS)
-        else:
-            # Abo: Periodenende von Stripe holen (Renewals via subscription.updated)
-            ends_at = None
-            if subscription_id:
-                try:
-                    stripe = _stripe()
-                    sub = await asyncio.to_thread(
-                        stripe.Subscription.retrieve, subscription_id
-                    )
-                    period_end = sub.get("current_period_end")
-                    if period_end:
-                        ends_at = datetime.fromtimestamp(period_end, tz=timezone.utc)
-                except Exception:
-                    logger.exception("Konnte Subscription %s nicht laden", subscription_id)
-
-        async with pool.acquire() as conn:
-            await _upsert_profile_plan(
-                conn, user_id=user_id, plan=product_key, ends_at=ends_at,
-                customer_id=customer_id, subscription_id=subscription_id,
-            )
-            await conn.execute(
-                """
-                INSERT INTO payments (user_id, product, stripe_session_id, stripe_customer_id, amount_cents, currency, status)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
-                ON CONFLICT (stripe_session_id) DO NOTHING
-                """,
-                user_id, product_key, obj.get("id"), customer_id,
-                obj.get("amount_total"), obj.get("currency"), obj.get("payment_status"),
-            )
-        logger.info("Zahlung verarbeitet: user=%s product=%s", user_id, product_key)
+        await fulfill_checkout_session(obj, pool)
 
     elif etype == "customer.subscription.updated":
         subscription_id = obj.get("id")

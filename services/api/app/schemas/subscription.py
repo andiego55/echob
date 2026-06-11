@@ -29,5 +29,14 @@ class CheckoutResponse(BaseModel):
     url: str
 
 
+class CheckoutVerifyRequest(BaseModel):
+    session_id: str
+
+
+class CheckoutVerifyResponse(BaseModel):
+    activated: bool
+    plan: str | None = None
+
+
 class PortalResponse(BaseModel):
     url: str

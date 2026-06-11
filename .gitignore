@@ -52,3 +52,6 @@ logs/
 # Misc
 *.tmp
 *.bak
+
+# Lokale Secrets (niemals committen)
+__private/

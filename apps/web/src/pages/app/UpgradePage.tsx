@@ -2,9 +2,9 @@
  * /app/upgrade — Pricing & Subscription
  * Kauf läuft über Stripe Checkout; Abos werden über das Stripe-Portal verwaltet.
  */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { subscriptionApi } from '@/api/subscription'
 import type { ProductType } from '@/types'
@@ -93,16 +93,33 @@ const PLANS = [
 
 export default function UpgradePage() {
   const [searchParams] = useSearchParams()
+  const qc = useQueryClient()
   const checkoutStatus = searchParams.get('status') // 'success' | 'cancelled' | null
+  const checkoutSessionId = searchParams.get('session_id')
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [pendingProduct, setPendingProduct] = useState<ProductType | null>(null)
+  const verifiedRef = useRef(false)
 
   const { data: subscription } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: subscriptionApi.getStatus,
-    // Nach erfolgreichem Kauf kann der Webhook ein paar Sekunden brauchen
+    // Fallback-Polling, falls die Sofort-Verifikation fehlschlägt (dann greift der Webhook)
     refetchInterval: checkoutStatus === 'success' ? 4000 : false,
   })
+
+  // Sofort-Freischaltung: Session nach dem Stripe-Redirect direkt verifizieren
+  const verifyMutation = useMutation({
+    mutationFn: (sessionId: string) => subscriptionApi.verifyCheckout(sessionId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['subscription-status'] }),
+  })
+
+  useEffect(() => {
+    if (checkoutStatus === 'success' && checkoutSessionId && !verifiedRef.current) {
+      verifiedRef.current = true
+      verifyMutation.mutate(checkoutSessionId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutStatus, checkoutSessionId])
 
   const checkoutMutation = useMutation({
     mutationFn: (product: ProductType) => subscriptionApi.createCheckout(product),

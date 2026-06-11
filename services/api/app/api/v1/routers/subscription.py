@@ -9,6 +9,8 @@ from app.core.dependencies import get_current_user, get_pool
 from app.schemas.subscription import (
     CheckoutRequest,
     CheckoutResponse,
+    CheckoutVerifyRequest,
+    CheckoutVerifyResponse,
     PortalResponse,
     SubscriptionStatus,
 )
@@ -61,6 +63,29 @@ async def create_checkout(
         raise HTTPException(status_code=502, detail="Checkout konnte nicht gestartet werden.")
 
     return CheckoutResponse(url=url)
+
+
+@router.post("/checkout/verify", response_model=CheckoutVerifyResponse)
+async def verify_checkout(
+    body: CheckoutVerifyRequest,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CheckoutVerifyResponse:
+    """Sofort-Freischaltung nach dem Stripe-Redirect (unabhängig vom Webhook)."""
+    if not billing_service.is_configured():
+        raise HTTPException(status_code=503, detail="Zahlungen sind derzeit nicht verfügbar.")
+
+    try:
+        plan = await billing_service.verify_and_fulfill_session(
+            session_id=body.session_id,
+            user_id=str(current_user["user_id"]),
+            pool=pool,
+        )
+    except Exception:
+        logger.exception("Checkout-Verifikation fehlgeschlagen (session=%s)", body.session_id)
+        raise HTTPException(status_code=502, detail="Verifikation fehlgeschlagen.")
+
+    return CheckoutVerifyResponse(activated=plan is not None, plan=plan)
 
 
 @router.post("/portal", response_model=PortalResponse)
