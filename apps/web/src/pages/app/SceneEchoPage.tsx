@@ -9,8 +9,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
-import { ChatMessage, TypingIndicator } from '@/components/app/ChatMessage'
+import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
+import { apiErrorText } from '@/utils/apiError'
 
 export default function SceneEchoPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -155,6 +156,10 @@ export default function SceneEchoPage() {
 
             {/* Tipp-Indikator */}
             {chatMutation.isPending && <TypingIndicator />}
+
+            {chatMutation.isError && (
+              <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+            )}
 
             <div ref={messagesEndRef} />
           </div>

@@ -16,6 +16,7 @@ from app.schemas.person_profile import (
 )
 from app.schemas.echo import EchoChatResponse, EchoMessageResponse
 from app.services.person_profile_service import build_person_context
+from app.services.subscription_service import enforce_echo_prompt_limit
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/person-profile", tags=["person-profile"])
@@ -237,6 +238,9 @@ async def person_profile_echo_chat(
     session_id = body.get("session_id", "")
 
     async with pool.acquire() as conn:
+        # Kostenschutz Entwicklungsphase
+        await enforce_echo_prompt_limit(user_id, conn)
+
         case_row = await conn.fetchrow(
             "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
             case_id, user_id,

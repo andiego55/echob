@@ -5,9 +5,31 @@ from datetime import datetime, timezone, timedelta
 
 from fastapi import HTTPException, status
 
+from app.core.config import settings
+
 TRIAL_DAYS = 3
 TRIAL_MAX_SCENES = 5
 TRIAL_MAX_CASES = 1
+
+
+async def enforce_echo_prompt_limit(user_id: str, conn) -> None:
+    """Kostenschutz in der Entwicklungsphase: begrenzt Echo-Prompts pro Nutzer.
+
+    Zählt alle Nutzer-Nachrichten über sämtliche Echo-Chats (Fall-Echo,
+    Themendialoge, Szenen-Erfassung, Profil-Dialoge). 0 = deaktiviert.
+    """
+    limit = settings.echo_prompt_limit
+    if limit <= 0:
+        return
+    count = await conn.fetchval(
+        "SELECT COUNT(*) FROM echo_messages WHERE user_id = $1 AND role = 'user'",
+        user_id,
+    )
+    if count >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="ECHO_LIMIT_REACHED",
+        )
 
 
 async def get_subscription_status(user_id: str, conn) -> dict:

@@ -20,6 +20,7 @@ from app.schemas.echo import (
 from app.services.echo_service import build_case_context
 from app.services.profile_service import build_profile_context
 from app.services.person_profile_service import build_person_context
+from app.services.subscription_service import enforce_echo_prompt_limit
 from app.services.topic_summary_service import build_topic_context
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,9 @@ async def chat(
     echo_svc = _get_echo_service(request)
 
     async with pool.acquire() as conn:
+        # Kostenschutz Entwicklungsphase
+        await enforce_echo_prompt_limit(user_id, conn)
+
         # Fall prüfen
         case_row = await conn.fetchrow(
             "SELECT * FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",

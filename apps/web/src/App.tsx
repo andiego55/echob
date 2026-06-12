@@ -54,9 +54,12 @@ function TopicDialogPageWrapper() {
 }
 
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import DevNoticeModal from '@/components/DevNoticeModal'
 
 export default function App() {
   return (
+    <>
+    <DevNoticeModal />
     <Routes>
       {/* ── Öffentlich ─────────────────────────────────────────────────────── */}
       <Route path="/"            element={<LandingPage />} />
@@ -107,5 +110,6 @@ export default function App() {
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+    </>
   )
 }
