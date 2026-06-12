@@ -215,21 +215,15 @@ export default function PersonProfilePage() {
                 {saveMutation.isPending ? 'Wird gespeichert …' : 'Speichern'}
               </button>
               {canGoPrev && (
-                <button onClick={handlePrev} className="btn-outline !py-2 !px-4 !text-sm">
+                <button onClick={handlePrev} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm">
                   ← Zurück
                 </button>
               )}
               {canGoNext && (
-                <button onClick={handleNext} className="btn-outline !py-2 !px-4 !text-sm">
-                  Weiter →
+                <button onClick={handleNext} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm">
+                  Zum nächsten Modul →
                 </button>
               )}
-              <button
-                onClick={() => { saveMutation.mutate(activeModule); setActiveModule(activeModule) }}
-                className="text-sm text-brand-muted hover:text-navy transition-colors"
-              >
-                Modul überspringen
-              </button>
               {!canGoNext && (
                 <button
                   onClick={() => { saveMutation.mutate(activeModule); setShowSummary(true) }}

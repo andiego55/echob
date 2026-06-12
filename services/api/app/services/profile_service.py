@@ -46,6 +46,27 @@ def build_profile_context(profile: dict[str, Any]) -> str:
         lines.append(f"**Name / Pseudonym der nutzenden Person:** {display_name}")
         lines.append("_Sprich die Person mit diesem Namen an, wenn es natürlich wirkt._\n")
 
+    # Beziehungsgeschichte (Freitexte in eigenen Worten)
+    rh = m.get("relationship_history", {})
+    rh_fields = [
+        ("rh_first_meeting",          "Erstes Treffen"),
+        ("rh_first_weeks",            "Erste Wochen"),
+        ("rh_first_year",             "Erstes Jahr"),
+        ("rh_first_year_discomfort",  "Situationen mit Unwohlsein im ersten Jahr"),
+        ("rh_turning_point",          "Wann sich die Beziehung änderte"),
+        ("rh_anything_else",          "Weiteres zur Beziehung"),
+    ]
+    rh_entries = [
+        (label, str(rh.get(key)).strip())
+        for key, label in rh_fields
+        if rh.get(key) and str(rh.get(key)).strip()
+    ]
+    if rh_entries:
+        lines.append("\n### Beziehungsgeschichte (eigene Worte der nutzenden Person)\n")
+        for label, txt in rh_entries:
+            lines.append(f"**{label}:** {txt[:600]}")
+        lines.append("")
+
     # Belastung
     d = m.get("distress", {})
     if (di := d.get("distress_index")) is not None:

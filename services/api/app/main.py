@@ -81,7 +81,12 @@ def create_app() -> FastAPI:
         )
 
     # ── CORS ────────────────────────────────────────────────────────────
-    allow_methods = ["GET", "POST"] if settings.is_production else ["*"]
+    # PUT/PATCH/DELETE werden von Profil-, Szenen- und Session-Endpoints genutzt
+    allow_methods = (
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+        if settings.is_production
+        else ["*"]
+    )
     allow_headers = ["Content-Type", "Authorization"] if settings.is_production else ["*"]
 
     app.add_middleware(

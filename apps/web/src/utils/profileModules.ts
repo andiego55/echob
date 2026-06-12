@@ -16,6 +16,12 @@ export interface SelectionField {
   multi?: boolean
 }
 
+export interface FreeTextField {
+  key: string
+  label: string
+  rows?: number
+}
+
 export interface ScoreDimension {
   key: string
   label: string
@@ -31,6 +37,7 @@ export interface ProfileModuleConfig {
   intro?: string
   likertItems: LikertItem[]
   selections: SelectionField[]
+  freeTexts?: FreeTextField[]
   freeTextKey?: string
   freeTextLabel?: string
   scoreDimensions: ScoreDimension[]
@@ -115,7 +122,37 @@ export const PROFILE_MODULES: ProfileModuleConfig[] = [
     scoreDimensions: [],
   },
 
-  // ── 2. Aktueller Belastungszustand ────────────────────────────────────────
+  // ── 2. Beziehungsgeschichte (Freitext) ────────────────────────────────────
+  {
+    id: 'relationship_history',
+    label: 'Beziehungsgeschichte',
+    shortLabel: 'Geschichte',
+    description:
+      'Beschreibe in deinen eigenen Worten, wie die Beziehung begann und sich entwickelt hat. ' +
+      'Alle Felder sind optional – schreib so viel oder so wenig, wie sich richtig anfühlt. ' +
+      'Echo nutzt deine Beschreibung, um Muster und Veränderungen besser einzuordnen.',
+    selections: [],
+    likertItems: [],
+    freeTexts: [
+      { key: 'rh_first_meeting', label: 'Wie war das erste Treffen?' },
+      { key: 'rh_first_weeks', label: 'Wie waren die ersten Wochen?' },
+      { key: 'rh_first_year', label: 'Wie war das erste Jahr?' },
+      {
+        key: 'rh_first_year_discomfort',
+        label: 'Bei welchen Situationen im ersten Jahr war dir nicht wohl zumute (in Bezug auf die andere Person)?',
+        rows: 4,
+      },
+      { key: 'rh_turning_point', label: 'Kannst du sagen, wann sich die Beziehung änderte?' },
+      {
+        key: 'rh_anything_else',
+        label: 'Was sollte man sonst über die Beziehung wissen? Trage alles hier ein.',
+        rows: 6,
+      },
+    ],
+    scoreDimensions: [],
+  },
+
+  // ── 3. Aktueller Belastungszustand ────────────────────────────────────────
   {
     id: 'distress',
     label: 'Aktueller Belastungszustand',
