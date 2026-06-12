@@ -49,47 +49,66 @@ export default function CoachingPage() {
 
       {/* Erreichbarkeit */}
       <section className="border-t border-brand-border px-6 py-[72px]">
-        <div className="mx-auto max-w-[960px]">
-          <div className="rounded-brand border border-brand-border bg-white p-6 mb-8">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-green-400" />
-              <span className="text-sm font-bold text-navy">Wir sind erreichbar</span>
+        <div className="mx-auto max-w-[960px] space-y-8">
+
+          {/* Dunkle Karte: Kontakt */}
+          <div
+            className="rounded-2xl bg-navy p-6 md:p-8 shadow-[0_8px_32px_rgba(15,30,46,0.25)] md:flex md:items-center md:gap-10"
+            style={{ backgroundImage: 'radial-gradient(ellipse 60% 70% at 90% 20%, rgba(59,106,154,0.3) 0%, transparent 70%)' }}
+          >
+            <div className="md:w-[260px] flex-shrink-0 mb-6 md:mb-0">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-400" />
+                <span className="text-sm font-bold text-white">Wir sind erreichbar</span>
+              </div>
+              <p className="text-sm text-brand-blue leading-relaxed">
+                Melde dich direkt – ohne Wartezeiten, ohne Formulare. Montag bis Freitag 8–20 Uhr,
+                samstags 10–16 Uhr.
+              </p>
             </div>
-            <p className="text-sm text-brand-muted mb-6">
-              Melde dich direkt – ohne Wartezeiten, ohne Formulare. Montag bis Freitag 8–20 Uhr, samstags 10–16 Uhr.
-            </p>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex-1 grid gap-4 sm:grid-cols-3">
               {[
                 { label: 'Telefon', value: '0173 5908906', sub: 'Mo–Sa, direkt erreichbar', href: 'tel:+4917359089060' },
                 { label: 'Coaching-Anfragen', value: 'coaching@echo-b.de', sub: 'Antwort innerhalb 24h', href: 'mailto:coaching@echo-b.de' },
                 { label: 'Allgemeine Anfragen', value: 'info@echo-b.de', sub: 'Fragen zur App & Plattform', href: 'mailto:info@echo-b.de' },
               ].map(({ label, value, sub, href }) => (
-                <a key={label} href={href} className="card block no-underline hover:border-accent/40 transition-all">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-muted mb-1">{label}</p>
-                  <p className="text-sm font-semibold text-accent mb-1">{value}</p>
-                  <p className="text-xs text-brand-muted">{sub}</p>
+                <a
+                  key={label}
+                  href={href}
+                  className="block rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 no-underline
+                             transition-all hover:border-accent/50 hover:bg-white/[0.07]"
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-blue mb-1">{label}</p>
+                  <p className="text-sm font-bold text-white mb-1 break-all">{value}</p>
+                  <p className="text-xs text-white/45">{sub}</p>
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Echte Menschen */}
-          <div className="rounded-brand border border-brand-border bg-white p-6 flex flex-wrap gap-6 items-start">
-            <div className="text-4xl">👤</div>
-            <div className="flex-1 min-w-[240px]">
-              <h3 className="font-bold text-navy mb-2">Echte Menschen, keine Bot-Antworten</h3>
-              <p className="text-sm text-brand-muted leading-relaxed">
+          {/* Dunkle Karte: Echte Menschen */}
+          <div
+            className="rounded-2xl bg-navy p-6 md:p-8 shadow-[0_8px_32px_rgba(15,30,46,0.25)] flex flex-wrap gap-6 items-center"
+            style={{ backgroundImage: 'radial-gradient(ellipse 60% 70% at 10% 90%, rgba(59,106,154,0.25) 0%, transparent 70%)' }}
+          >
+            <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center text-2xl flex-shrink-0 shadow-[0_4px_16px_rgba(224,123,84,0.4)]">
+              👤
+            </div>
+            <div className="flex-1 min-w-[240px] max-w-[420px]">
+              <h3 className="font-bold text-white mb-2">Echte Menschen, keine Bot-Antworten</h3>
+              <p className="text-sm text-brand-blue leading-relaxed">
                 Hinter EchoB stehen ausgebildete Beraterinnen und Berater mit Erfahrung in Beziehungsthemen,
                 systemischer Beratung und Krisenbegleitung. Wir nutzen KI als Werkzeug – aber du sprichst
                 mit einem Menschen, der zuhört.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5 ml-auto">
               {['🔒 Vertraulich', '📞 Direkt erreichbar', '💬 Kein Skript'].map(b => (
-                <span key={b} className="text-xs font-medium px-3 py-1.5 rounded-full border border-brand-border bg-brand-bg text-navy">{b}</span>
+                <span key={b} className="text-sm font-medium px-4 py-2 rounded-full bg-white text-navy shadow-md">{b}</span>
               ))}
             </div>
           </div>
+
         </div>
       </section>
 
