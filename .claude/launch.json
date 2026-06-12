@@ -2,6 +2,17 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "echob-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Projekte\\echob\\apps\\web",
+        "run",
+        "dev"
+      ],
+      "port": 5173
+    },
+    {
       "name": "new-hp-preview",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
