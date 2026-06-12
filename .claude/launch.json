@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "new-hp-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Homepage\\new_hp",
+        "run",
+        "preview"
+      ],
+      "port": 4321
+    }
+  ]
+}
