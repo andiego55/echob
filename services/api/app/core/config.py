@@ -46,8 +46,10 @@ class Settings(BaseSettings):
     # ── AI ─────────────────────────────────────────────────────────────
     openai_api_key: str = ""
     anthropic_api_key: str = ""   # Reserviert für zukünftige Nutzung
-    # Entwicklungsphase: max. Echo-Prompts pro Nutzer (0 = unbegrenzt)
-    echo_prompt_limit: int = 100
+    # Kostenschutz Entwicklungsphase (0 = jeweils unbegrenzt):
+    echo_prompt_limit: int = 250   # max. Echo-Nachrichten pro Nutzer
+    report_limit: int = 20         # max. Berichts-Generierungen pro Nutzer
+    scale_calc_limit: int = 20     # max. Skalen-Berechnungen pro Nutzer
 
     # ── Stripe (Zahlungen) ─────────────────────────────────────────────
     stripe_secret_key: str = ""

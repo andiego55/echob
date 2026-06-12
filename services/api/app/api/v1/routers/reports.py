@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 
 from app.core.dependencies import get_current_user, get_pool
+from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
 from app.schemas.report import (
     REPORT_DISCLAIMER, REPORT_TYPE_LABELS,
     ReportCreate, ReportListResponse, ReportResponse,
@@ -49,6 +50,8 @@ async def create_report(
 
     async with pool.acquire() as conn:
         case_row = await _assert_case_owner(case_id, user_id, conn, return_row=True)
+        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest)
+        await enforce_ai_usage_limit(user_id, conn, "report")
         report_count = await conn.fetchval(
             "SELECT COUNT(*) FROM reports WHERE case_id = $1", case_id
         )
@@ -111,6 +114,7 @@ async def create_report(
             """,
             case_id, user_id, body.report_type, title, json.dumps(content),
         )
+        await log_ai_usage(user_id, conn, "report")
 
     logger.info("Bericht erstellt: report_id=%s case_id=%s type=%s", row["id"], case_id, body.report_type)
     return _row_to_report(row)

@@ -32,6 +32,38 @@ async def enforce_echo_prompt_limit(user_id: str, conn) -> None:
         )
 
 
+# Kind → (Settings-Feld, Fehlercode). Gezählt wird im löschfesten ai_usage_log.
+_AI_USAGE_LIMITS = {
+    "report":     ("report_limit", "REPORT_LIMIT_REACHED"),
+    "scale_calc": ("scale_calc_limit", "SCALE_LIMIT_REACHED"),
+}
+
+
+async def enforce_ai_usage_limit(user_id: str, conn, kind: str) -> None:
+    """Kostenschutz für kostenintensive KI-Aktionen (Berichte, Skalen)."""
+    setting_name, error_code = _AI_USAGE_LIMITS[kind]
+    limit = getattr(settings, setting_name)
+    if limit <= 0:
+        return
+    count = await conn.fetchval(
+        "SELECT COUNT(*) FROM ai_usage_log WHERE user_id = $1 AND kind = $2",
+        user_id, kind,
+    )
+    if count >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=error_code,
+        )
+
+
+async def log_ai_usage(user_id: str, conn, kind: str) -> None:
+    """Verbucht eine erfolgreich ausgeführte KI-Aktion."""
+    await conn.execute(
+        "INSERT INTO ai_usage_log (user_id, kind) VALUES ($1, $2)",
+        user_id, kind,
+    )
+
+
 async def get_subscription_status(user_id: str, conn) -> dict:
     row = await conn.fetchrow(
         "SELECT plan, trial_started_at, subscription_ends_at FROM user_profiles WHERE user_id = $1",

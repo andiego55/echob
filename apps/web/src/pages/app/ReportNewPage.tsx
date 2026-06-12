@@ -8,6 +8,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { reportsApi } from '@/api/reports'
 import { subscriptionApi } from '@/api/subscription'
+import { apiErrorText } from '@/utils/apiError'
 import type { ReportType } from '@/types'
 
 const TRIAL_ALLOWED: ReportType[] = ['short', 'coaching_prep']
@@ -220,7 +221,7 @@ export default function ReportNewPage() {
         {mutation.isError && (
           <div className="mb-4 rounded-brand border border-red-200 bg-red-50 px-4 py-3">
             <p className="text-sm text-red-700">
-              Bericht konnte nicht erstellt werden. Bitte stelle sicher, dass du bestätigte Szenen gespeichert hast, und versuche es erneut.
+              {apiErrorText(mutation.error, 'Bericht konnte nicht erstellt werden. Bitte stelle sicher, dass du bestätigte Szenen gespeichert hast, und versuche es erneut.')}
             </p>
           </div>
         )}
