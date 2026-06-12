@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.core.dependencies import get_current_user, get_pool
+from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
 from app.schemas.scale import SCALE_DEFINITIONS, SCALE_LABELS, ScalesOverviewResponse
 
 logger = logging.getLogger(__name__)
@@ -87,6 +88,9 @@ async def calculate_scales(
         if not case_row:
             raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
 
+        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest)
+        await enforce_ai_usage_limit(user_id, conn, "scale_calc")
+
         scenes = await conn.fetch(
             "SELECT * FROM scenes WHERE case_id = $1 AND confirmed_by_user = true ORDER BY scene_date DESC NULLS LAST",
             case_id,
@@ -114,6 +118,7 @@ async def calculate_scales(
 
     # Alle bisherigen Werte ersetzen, neu einfügen
     async with pool.acquire() as conn:
+        await log_ai_usage(user_id, conn, "scale_calc")
         await conn.execute(
             "DELETE FROM scale_scores WHERE case_id = $1 AND user_id = $2",
             case_id, user_id,

@@ -9,6 +9,7 @@ import CaseNav from '@/components/app/CaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { personProfileApi } from '@/api/personProfile'
+import { apiErrorText } from '@/utils/apiError'
 import { casesApi } from '@/api/cases'
 import { RELATIONSHIP_TYPE_LABELS } from '@/types'
 
@@ -131,7 +132,9 @@ export default function PersonProfileEchoPage() {
 
             {chatMutation.isPending && <TypingIndicator />}
 
-            {chatMutation.isError && <ChatErrorMessage />}
+            {chatMutation.isError && (
+              <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+            )}
 
             <div ref={messagesEndRef} />
           </div>

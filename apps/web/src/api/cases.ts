@@ -3,7 +3,7 @@ import type { Case, CaseCreate } from '@/types'
 
 export const casesApi = {
   list: () =>
-    apiClient.get<{ cases: Case[]; total: number }>('/cases').then(r => r.data),
+    apiClient.get<{ cases: Case[]; total: number; chat_session_count: number }>('/cases').then(r => r.data),
 
   get: (caseId: string) =>
     apiClient.get<Case>(`/cases/${caseId}`).then(r => r.data),

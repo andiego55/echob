@@ -20,6 +20,7 @@ from app.schemas.echo import (
 from app.services.echo_service import build_case_context
 from app.services.profile_service import build_profile_context
 from app.services.person_profile_service import build_person_context
+from app.services.subscription_service import enforce_echo_prompt_limit
 from app.services.topic_summary_service import build_topic_context
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,9 @@ async def chat(
     echo_svc = _get_echo_service(request)
 
     async with pool.acquire() as conn:
+        # Kostenschutz Entwicklungsphase
+        await enforce_echo_prompt_limit(user_id, conn)
+
         # Fall prüfen
         case_row = await conn.fetchrow(
             "SELECT * FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
@@ -195,25 +199,27 @@ async def chat(
             assistant_message=_row_to_msg(assistant_msg_row),
         )
 
-    # ── Normaler Chat: gespeicherten Kontext aus der Session laden ────────────
+    # ── Normaler Chat: Kontext bei jeder Nachricht frisch aus der DB bauen ────
+    # (Änderungen an Selbstauskunft/Personenprofil wirken so sofort)
     extra_context = ""
     if body.thread_type != "scene":
         context_parts: list[str] = []
 
-        # Selbstprofil
-        if body.thread_type not in ("topic_self", "topic_person", "topic_responsibility", "topic_guilt"):
-            async with pool.acquire() as conn:
-                user_profile_row = await conn.fetchrow(
-                    "SELECT * FROM user_profiles WHERE user_id = $1", user_id
-                )
-            if user_profile_row:
-                up_modules = user_profile_row.get("modules") or {}
-                if isinstance(up_modules, str):
-                    import json as _upj
-                    up_modules = _upj.loads(up_modules)
+        # Selbstauskunft (Beziehungsprofil) — in allen Dialogformen verfügbar
+        async with pool.acquire() as conn:
+            user_profile_row = await conn.fetchrow(
+                "SELECT * FROM user_profiles WHERE user_id = $1", user_id
+            )
+        if user_profile_row:
+            up_modules = user_profile_row.get("modules") or {}
+            if isinstance(up_modules, str):
+                import json as _upj
+                up_modules = _upj.loads(up_modules)
+            if up_modules:
                 context_parts.append(build_profile_context({
                     "modules": up_modules,
                     "safety_status": user_profile_row.get("safety_status", "no_indication"),
+                    "display_name": user_profile_row.get("display_name"),
                 }))
 
         # Personenprofil
@@ -249,7 +255,32 @@ async def chat(
                 case_id, body.scene_session_id,
             )
         if ctx_row:
-            extra_context = ctx_row["content"]
+            # Der Marker dokumentiert nur die Freigabe — der Kontext selbst wird
+            # bei jeder Nachricht frisch gebaut, damit Profil-Änderungen ankommen.
+            async with pool.acquire() as conn:
+                profile_row = await conn.fetchrow(
+                    "SELECT * FROM user_profiles WHERE user_id = $1", user_id
+                )
+            extra_context = build_case_context(
+                case=case_context,
+                onboarding=onboarding,
+                scenes=scenes,
+                scale_scores=scale_scores,
+            )
+            if profile_row:
+                profile_modules = profile_row.get("modules") or {}
+                if isinstance(profile_modules, str):
+                    profile_modules = _json.loads(profile_modules)
+                if profile_modules:
+                    extra_context += "\n\n" + build_profile_context({
+                        "modules": profile_modules,
+                        "safety_status": profile_row.get("safety_status", "no_indication"),
+                        "display_name": profile_row.get("display_name"),
+                    })
+            if topic_summaries:
+                topic_ctx = build_topic_context(topic_summaries)
+                if topic_ctx:
+                    extra_context += "\n\n" + topic_ctx
 
     # Echo antworten lassen
     answer = await echo_svc.chat(

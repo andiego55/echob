@@ -52,6 +52,9 @@ class CaseResponse(BaseModel):
     archived_at: datetime | None
     created_at: datetime
     updated_at: datetime
+    # Angereichert in der Listen-Abfrage (Übersichtsseite)
+    scene_count: int = 0
+    last_activity_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -59,3 +62,5 @@ class CaseResponse(BaseModel):
 class CaseListResponse(BaseModel):
     cases: list[CaseResponse]
     total: int
+    # Aggregat für die Übersichtsseite (Anzahl Echo-Chats des Nutzers)
+    chat_session_count: int = 0

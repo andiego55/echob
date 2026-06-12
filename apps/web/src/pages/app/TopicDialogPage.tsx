@@ -11,6 +11,7 @@ import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
 import { topicSummariesApi } from '@/api/topicSummaries'
+import { apiErrorText } from '@/utils/apiError'
 import type { EchoMessage, ThreadType } from '@/types'
 
 const TOPICS: Record<string, { label: string; description: string; startTrigger: string; isBlog?: boolean }> = {
@@ -244,7 +245,9 @@ export default function TopicDialogPage() {
 
             {chatMutation.isPending && <TypingIndicator />}
 
-            {chatMutation.isError && <ChatErrorMessage />}
+            {chatMutation.isError && (
+              <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+            )}
 
             {/* Zusammenfassung am Ende des Dialogs */}
             {summary && (

@@ -10,6 +10,7 @@ import AppShell from '@/components/app/AppShell'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { profileApi } from '@/api/profile'
+import { apiErrorText } from '@/utils/apiError'
 
 export default function ProfileEchoPage() {
   const qc = useQueryClient()
@@ -117,7 +118,9 @@ export default function ProfileEchoPage() {
 
             {chatMutation.isPending && <TypingIndicator />}
 
-            {chatMutation.isError && <ChatErrorMessage />}
+            {chatMutation.isError && (
+              <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+            )}
 
             <div ref={messagesEndRef} />
           </div>

@@ -9,8 +9,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
-import { ChatMessage, TypingIndicator } from '@/components/app/ChatMessage'
+import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
+import { apiErrorText } from '@/utils/apiError'
 import type { EchoChatSession, ThreadType } from '@/types'
 
 const GLOSSARY_TERMS = [
@@ -188,6 +189,10 @@ export default function EchoPage() {
 
               {/* Tipp-Indikator */}
               {mutation.isPending && <TypingIndicator />}
+
+              {mutation.isError && (
+                <ChatErrorMessage text={apiErrorText(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+              )}
 
               <div ref={messagesEndRef} />
             </div>

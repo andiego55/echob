@@ -5,9 +5,63 @@ from datetime import datetime, timezone, timedelta
 
 from fastapi import HTTPException, status
 
+from app.core.config import settings
+
 TRIAL_DAYS = 3
 TRIAL_MAX_SCENES = 5
 TRIAL_MAX_CASES = 1
+
+
+async def enforce_echo_prompt_limit(user_id: str, conn) -> None:
+    """Kostenschutz in der Entwicklungsphase: begrenzt Echo-Prompts pro Nutzer.
+
+    Zählt alle Nutzer-Nachrichten über sämtliche Echo-Chats (Fall-Echo,
+    Themendialoge, Szenen-Erfassung, Profil-Dialoge). 0 = deaktiviert.
+    """
+    limit = settings.echo_prompt_limit
+    if limit <= 0:
+        return
+    count = await conn.fetchval(
+        "SELECT COUNT(*) FROM echo_messages WHERE user_id = $1 AND role = 'user'",
+        user_id,
+    )
+    if count >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="ECHO_LIMIT_REACHED",
+        )
+
+
+# Kind → (Settings-Feld, Fehlercode). Gezählt wird im löschfesten ai_usage_log.
+_AI_USAGE_LIMITS = {
+    "report":     ("report_limit", "REPORT_LIMIT_REACHED"),
+    "scale_calc": ("scale_calc_limit", "SCALE_LIMIT_REACHED"),
+}
+
+
+async def enforce_ai_usage_limit(user_id: str, conn, kind: str) -> None:
+    """Kostenschutz für kostenintensive KI-Aktionen (Berichte, Skalen)."""
+    setting_name, error_code = _AI_USAGE_LIMITS[kind]
+    limit = getattr(settings, setting_name)
+    if limit <= 0:
+        return
+    count = await conn.fetchval(
+        "SELECT COUNT(*) FROM ai_usage_log WHERE user_id = $1 AND kind = $2",
+        user_id, kind,
+    )
+    if count >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=error_code,
+        )
+
+
+async def log_ai_usage(user_id: str, conn, kind: str) -> None:
+    """Verbucht eine erfolgreich ausgeführte KI-Aktion."""
+    await conn.execute(
+        "INSERT INTO ai_usage_log (user_id, kind) VALUES ($1, $2)",
+        user_id, kind,
+    )
 
 
 async def get_subscription_status(user_id: str, conn) -> dict:

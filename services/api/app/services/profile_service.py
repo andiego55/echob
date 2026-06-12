@@ -11,22 +11,19 @@ _SAFETY_LABELS = {
     "acute_concern": "akute Sicherheitsbedenken vorhanden",
 }
 
-_LEVEL_LABELS = {
-    (1.0, 1.9): "niedrig",
-    (2.0, 2.9): "eher niedrig",
-    (3.0, 3.6): "mittel",
-    (3.7, 4.3): "erhöht",
-    (4.4, 5.0): "hoch",
-}
-
-
 def _level(score: float | None) -> str:
+    """Lückenlose Schwellen — identisch zum Frontend (profileScoring.scoreLevel)."""
     if score is None:
         return "nicht bewertet"
-    for (lo, hi), label in _LEVEL_LABELS.items():
-        if lo <= score <= hi:
-            return label
-    return "nicht bewertet"
+    if score <= 1.9:
+        return "niedrig"
+    if score <= 2.9:
+        return "eher niedrig"
+    if score <= 3.6:
+        return "mittel"
+    if score <= 4.3:
+        return "erhöht"
+    return "hoch"
 
 
 def build_profile_context(profile: dict[str, Any]) -> str:

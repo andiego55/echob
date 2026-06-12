@@ -11,6 +11,7 @@ from app.core.dependencies import get_current_user, get_pool
 from app.schemas.profile import ProfileModuleUpdate, ProfileResponse, ProfileUpdate
 from app.schemas.echo import EchoChatResponse, EchoMessageResponse
 from app.services.profile_service import build_profile_context
+from app.services.subscription_service import enforce_echo_prompt_limit
 from pydantic import BaseModel as _BaseModel
 
 
@@ -191,6 +192,9 @@ async def profile_echo_chat(
     session_id = body.get("session_id", "")
 
     async with pool.acquire() as conn:
+        # Kostenschutz Entwicklungsphase
+        await enforce_echo_prompt_limit(user_id, conn)
+
         profile = await _get_or_create_profile(conn, user_id)
 
         history_rows = await conn.fetch(
