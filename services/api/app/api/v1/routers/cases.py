@@ -19,16 +19,29 @@ async def list_cases(
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CaseListResponse:
-    """Alle Fälle des eingeloggten Nutzers."""
+    """Alle Fälle des eingeloggten Nutzers, sortiert nach letzter Aktivität."""
     user_id = current_user["user_id"]
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT * FROM cases WHERE user_id = $1 AND archived_at IS NULL "
-            "ORDER BY created_at DESC",
+            """
+            SELECT c.*,
+                   (SELECT COUNT(*) FROM scenes s WHERE s.case_id = c.id)::int AS scene_count,
+                   GREATEST(
+                       c.created_at,
+                       COALESCE((SELECT MAX(s.created_at) FROM scenes s WHERE s.case_id = c.id), c.created_at),
+                       COALESCE((SELECT MAX(m.created_at) FROM echo_messages m WHERE m.case_id = c.id), c.created_at)
+                   ) AS last_activity_at
+            FROM cases c
+            WHERE c.user_id = $1 AND c.archived_at IS NULL
+            ORDER BY last_activity_at DESC
+            """,
             user_id,
         )
+        chat_session_count = await conn.fetchval(
+            "SELECT COUNT(*) FROM echo_chat_sessions WHERE user_id = $1", user_id
+        )
     cases = [CaseResponse(**dict(r)) for r in rows]
-    return CaseListResponse(cases=cases, total=len(cases))
+    return CaseListResponse(cases=cases, total=len(cases), chat_session_count=chat_session_count or 0)
 
 
 @router.post("", response_model=CaseResponse, status_code=status.HTTP_201_CREATED)

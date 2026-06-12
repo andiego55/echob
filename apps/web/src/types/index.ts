@@ -114,6 +114,8 @@ export interface Case {
   archived_at: string | null
   created_at: string
   updated_at: string
+  scene_count: number
+  last_activity_at: string | null
 }
 
 export interface CaseCreate {
