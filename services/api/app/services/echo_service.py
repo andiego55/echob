@@ -218,6 +218,7 @@ class EchoService:
                 onboarding=onboarding,
                 scenes=scenes or [],
                 scale_scores=scale_scores,
+                extra_context=extra_context,
             )
         return self._mock_chat(
             user_message=user_message,
@@ -398,6 +399,12 @@ class EchoService:
             scale_scores=kwargs.get("scale_scores"),
         )
         messages.append({"role": "system", "content": case_context_text})
+
+        # Block 2b: Selbstauskunft, Personenprofil & Themen-Zusammenfassungen.
+        # Wird pro Request frisch aus der DB gebaut → Änderungen an den
+        # Profilen sind sofort im nächsten Echo-Gespräch sichtbar.
+        if kwargs.get("extra_context"):
+            messages.append({"role": "system", "content": kwargs["extra_context"]})
 
         # Block 3: Gesprächshistorie
         for h in kwargs.get("history", []):
