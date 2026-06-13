@@ -11,7 +11,7 @@ import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi } from '@/api/professional'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
-  SCALE_LABELS,
+  SCALE_LABELS, SHARE_ELEMENT_LABELS,
 } from '@/types'
 import type { ProfessionalNote, SharedCaseBundle, ScaleKey } from '@/types'
 
@@ -71,6 +71,15 @@ export default function ProfessionalCaseDetailPage() {
           <Link to={`/professional/cases/${caseId}/echo`} className="btn-primary !py-2 !px-5 !text-sm shrink-0">
             💬 Mit Echo über diesen Fall sprechen
           </Link>
+        </div>
+
+        {/* Freigegebene Inhalte auf einen Blick */}
+        <div className="mb-6 flex flex-wrap gap-1.5">
+          {bundle.allowed.map(et => (
+            <span key={et} className="text-[11px] px-2.5 py-1 rounded-full bg-accent/5 border border-accent/20 text-accent">
+              {SHARE_ELEMENT_LABELS[et]}
+            </span>
+          ))}
         </div>
 
         {/* Glossar */}

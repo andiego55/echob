@@ -95,7 +95,6 @@ def build_case_context(
 
     # ── Szenen ────────────────────────────────────────────────────────────
     confirmed = [s for s in scenes if s.get("confirmed_by_user")]
-    unconfirmed = [s for s in scenes if not s.get("confirmed_by_user")]
 
     if include_scene_section and scenes:
         lines.append(f"## Dokumentierte Szenen ({len(scenes)} gesamt, {len(confirmed)} bestätigt)\n")

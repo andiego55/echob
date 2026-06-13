@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import ReactMarkdown from 'react-markdown'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { professionalApi } from '@/api/professional'
 import type { ProfessionalEchoMessage } from '@/types'
@@ -142,7 +142,7 @@ export default function ProfessionalEchoPage() {
                       m.role === 'user' ? 'bg-accent/10 text-brand-text' : 'bg-brand-bg text-brand-text'
                     }`}>
                       {m.role === 'assistant'
-                        ? <div className="prose prose-sm max-w-none"><ReactMarkdown>{m.content}</ReactMarkdown></div>
+                        ? <MarkdownMessage content={m.content} />
                         : <span className="whitespace-pre-wrap">{m.content}</span>}
                     </div>
                   </div>
@@ -179,7 +179,7 @@ export default function ProfessionalEchoPage() {
             {summary && (
               <div className="mt-4 card border-accent/30 bg-accent/5">
                 <p className="text-sm font-semibold text-navy mb-2">Zusammenfassung</p>
-                <div className="prose prose-sm max-w-none text-brand-text"><ReactMarkdown>{summary}</ReactMarkdown></div>
+                <div className="text-sm text-brand-text"><MarkdownMessage content={summary} /></div>
                 <div className="mt-3 flex gap-2 justify-end">
                   <button onClick={() => setSummary(null)} className="text-xs text-brand-muted hover:text-navy px-3 py-1.5">Verwerfen</button>
                   <button onClick={() => summarySave.mutate()} disabled={summarySave.isPending}

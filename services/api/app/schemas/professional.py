@@ -34,11 +34,6 @@ class ProfessionalRegister(BaseModel):
     title: str | None = Field(None, max_length=160)
 
 
-class ProfessionalProfileUpdate(BaseModel):
-    display_name: str = Field(..., min_length=1, max_length=120)
-    title: str | None = Field(None, max_length=160)
-
-
 # ── Einladungen & Verbindungen (nutzerseitig) ─────────────────────────────────
 
 class ProfessionalInviteCreate(BaseModel):
@@ -174,10 +169,6 @@ class ProfessionalEchoSessionResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
-
-
-class ProfessionalEchoSessionUpdate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=120)
 
 
 class ProfessionalEchoSummaryCreate(BaseModel):

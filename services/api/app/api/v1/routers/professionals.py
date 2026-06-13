@@ -5,7 +5,7 @@ Eine Freigabe (case_shares) ist nur an eine 'accepted' verbundene Fachperson mö
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
 from app.services.invite_service import send_invite_email
@@ -44,29 +44,6 @@ async def list_connections(
             uid,
         )
     return [ConnectionResponse(**dict(r)) for r in rows]
-
-
-@router.get("/lookup")
-async def lookup(
-    email: str = Query(...),
-    current_user: dict = Depends(get_current_user),
-    pool=Depends(get_pool),
-) -> dict:
-    """Prüft, ob bereits eine registrierte Fachperson mit dieser E-Mail existiert."""
-    e = _norm_email(email)
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "SELECT user_id, display_name, title FROM professional_profiles WHERE lower(email) = $1",
-            e,
-        )
-    if not row:
-        return {"found": False}
-    return {
-        "found": True,
-        "professional_user_id": str(row["user_id"]),
-        "display_name": row["display_name"],
-        "title": row["title"],
-    }
 
 
 @router.post("/invite", response_model=ConnectionResponse)

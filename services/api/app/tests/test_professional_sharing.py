@@ -110,3 +110,18 @@ async def test_unrelated_professional_has_no_access(db):
     with pytest.raises(HTTPException) as exc:
         await require_active_share(stranger, case_id, db)
     assert exc.value.status_code == 404
+
+
+async def test_response_sanitizers_strip_owner_data():
+    """case_detail-Helfer geben weder Owner-UUID noch Abo-Daten an die Fachperson."""
+    from app.api.v1.routers.professional import _public_row, _public_profile
+
+    out = _public_row({"id": "x", "user_id": "OWNER", "pattern_tags": '["a"]'}, ("pattern_tags",))
+    assert "user_id" not in out
+    assert out["pattern_tags"] == ["a"]
+
+    prof = _public_profile(
+        {"user_id": "OWNER", "plan": "regular", "subscription_ends_at": "2030-01-01",
+         "modules": '{"m": 1}', "summary": "{}"}
+    )
+    assert prof == {"modules": {"m": 1}, "summary": {}}

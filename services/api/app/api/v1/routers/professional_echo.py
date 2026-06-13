@@ -23,7 +23,6 @@ from app.schemas.professional import (
     ProfessionalEchoChatResponse,
     ProfessionalEchoMessageResponse,
     ProfessionalEchoSessionResponse,
-    ProfessionalEchoSessionUpdate,
     ProfessionalEchoSummaryCreate,
     ProfessionalEchoSummaryResponse,
 )
@@ -174,46 +173,6 @@ async def history(
     return [_msg_response(r) for r in rows]
 
 
-@router.patch("/sessions/{session_id}", response_model=ProfessionalEchoSessionResponse)
-async def rename_session(
-    case_id: UUID,
-    session_id: UUID,
-    body: ProfessionalEchoSessionUpdate,
-    current: dict = Depends(get_current_professional),
-    pool=Depends(get_pool),
-) -> ProfessionalEchoSessionResponse:
-    pid = current["user_id"]
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "UPDATE professional_echo_sessions SET title = $1, updated_at = NOW() "
-            "WHERE id = $2 AND professional_user_id = $3 AND case_id = $4 "
-            "RETURNING id, case_id, title, created_at, updated_at",
-            body.title.strip(), session_id, pid, case_id,
-        )
-    if not row:
-        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
-    return ProfessionalEchoSessionResponse(**dict(row))
-
-
-@router.delete("/sessions/{session_id}")
-async def delete_session(
-    case_id: UUID,
-    session_id: UUID,
-    current: dict = Depends(get_current_professional),
-    pool=Depends(get_pool),
-) -> dict:
-    pid = current["user_id"]
-    async with pool.acquire() as conn:
-        result = await conn.execute(
-            "DELETE FROM professional_echo_sessions "
-            "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
-            session_id, pid, case_id,
-        )
-    if result == "DELETE 0":
-        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
-    return {"deleted": True}
-
-
 @router.post("/summary")
 async def generate_summary(
     case_id: UUID,
@@ -242,24 +201,6 @@ async def generate_summary(
     history = [{"role": r["role"], "content": r["content"]} for r in rows]
     summary = await echo_svc.professional_summary(history=history)
     return {"summary": summary}
-
-
-@router.get("/summaries", response_model=list[ProfessionalEchoSummaryResponse])
-async def list_summaries(
-    case_id: UUID,
-    current: dict = Depends(get_current_professional),
-    pool=Depends(get_pool),
-) -> list[ProfessionalEchoSummaryResponse]:
-    pid = current["user_id"]
-    async with pool.acquire() as conn:
-        await require_active_share(pid, case_id, conn)
-        rows = await conn.fetch(
-            "SELECT id, case_id, session_id, title, summary_text, created_at "
-            "FROM professional_echo_summaries WHERE professional_user_id = $1 AND case_id = $2 "
-            "ORDER BY created_at DESC",
-            pid, case_id,
-        )
-    return [ProfessionalEchoSummaryResponse(**dict(r)) for r in rows]
 
 
 @router.post("/summaries", response_model=ProfessionalEchoSummaryResponse)

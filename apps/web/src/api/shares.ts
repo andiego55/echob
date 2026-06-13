@@ -19,8 +19,4 @@ export const professionalsApi = {
     apiClient.get<Connection[]>('/professionals/connections').then(r => r.data),
   invite: (email: string) =>
     apiClient.post<Connection>('/professionals/invite', { email }).then(r => r.data),
-  lookup: (email: string) =>
-    apiClient.get<{ found: boolean; professional_user_id?: string; display_name?: string; title?: string }>(
-      '/professionals/lookup', { params: { email } },
-    ).then(r => r.data),
 }

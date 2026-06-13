@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_current_user, get_current_professional, get_pool
 from app.services.echo_service import _REL_TYPE_LABELS
@@ -17,7 +17,6 @@ from app.services.sharing_service import require_active_share, load_shared_bundl
 from app.schemas.professional import (
     ProfessionalProfileResponse,
     ProfessionalRegister,
-    ProfessionalProfileUpdate,
     InboxItem,
     ProfessionalClientGroup,
     ProfessionalCaseSummary,
@@ -37,11 +36,15 @@ def _case_title(relationship_type: str | None) -> str:
     return _REL_TYPE_LABELS.get(relationship_type or "", "Fall")
 
 
-def _decode_json_fields(row, fields: tuple[str, ...]):
-    """asyncpg liefert JSONB als String — hier in echte Objekte decodieren."""
+def _public_row(row, fields: tuple[str, ...] = ()):
+    """Row als dict für die Fachperson: JSONB decodiert, Owner-UUID entfernt.
+
+    Die Fachperson erhält nie die user_id (Supabase-Auth-UUID) der nutzenden Person.
+    """
     if row is None:
         return None
     d = dict(row)
+    d.pop("user_id", None)
     for f in fields:
         v = d.get(f)
         if isinstance(v, str):
@@ -50,6 +53,23 @@ def _decode_json_fields(row, fields: tuple[str, ...]):
             except (ValueError, TypeError):
                 pass
     return d
+
+
+def _public_profile(row):
+    """Nur die fachlich relevanten Profilteile (modules + summary) — keine IDs,
+    kein Abo/Billing (plan, trial_started_at, subscription_ends_at)."""
+    if row is None:
+        return None
+
+    def _obj(v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except (ValueError, TypeError):
+                return {}
+        return v or {}
+
+    return {"modules": _obj(row.get("modules")), "summary": _obj(row.get("summary"))}
 
 
 # ── Rolle / Profil ────────────────────────────────────────────────────────────
@@ -96,21 +116,6 @@ async def register(
                     "WHERE lower(email) = $2 AND status = 'pending'",
                     user_id, email,
                 )
-    return ProfessionalProfileResponse(**dict(row))
-
-
-@router.put("/me", response_model=ProfessionalProfileResponse)
-async def update_me(
-    body: ProfessionalProfileUpdate,
-    current: dict = Depends(get_current_professional),
-    pool=Depends(get_pool),
-) -> ProfessionalProfileResponse:
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "UPDATE professional_profiles SET display_name = $2, title = $3, updated_at = NOW() "
-            "WHERE user_id = $1 RETURNING *",
-            current["user_id"], body.display_name, body.title,
-        )
     return ProfessionalProfileResponse(**dict(row))
 
 
@@ -224,38 +229,20 @@ async def case_detail(
         "client_display_name": (owner_row["display_name"] if owner_row else None) or "Klient:in",
         "case_title": _case_title(bundle.case.get("relationship_type") if bundle.case else None),
         "allowed": sorted(bundle.allowed),
-        "case": bundle.case,
-        "onboarding": _decode_json_fields(bundle.onboarding, ("pattern_hypotheses",)),
-        "scenes": [_decode_json_fields(s, ("pattern_tags",)) for s in bundle.scenes],
-        "scales": bundle.scale_scores,
-        "reports": [_decode_json_fields(r, ("content",)) for r in bundle.reports],
+        "case": _public_row(bundle.case),
+        "onboarding": _public_row(bundle.onboarding, ("pattern_hypotheses",)),
+        "scenes": [_public_row(s, ("pattern_tags",)) for s in bundle.scenes],
+        "scales": [_public_row(s) for s in bundle.scale_scores],
+        "reports": [_public_row(r, ("content",)) for r in bundle.reports],
         "topic_summaries": bundle.topic_summaries,
-        "person_profile": _decode_json_fields(bundle.person_profile, ("modules", "summary")),
-        "self_profile": _decode_json_fields(bundle.self_profile, ("modules", "summary")),
+        "person_profile": _public_profile(bundle.person_profile),
+        "self_profile": _public_profile(bundle.self_profile),
         "notes": {k: note_row[k] for k in _NOTE_FIELDS} if note_row else None,
         "echo_summaries": [dict(s) for s in summary_rows],
     }
 
 
 # ── Notizen der Fachperson ────────────────────────────────────────────────────
-
-@router.get("/cases/{case_id}/notes", response_model=ProfessionalNote)
-async def get_notes(
-    case_id: UUID,
-    current: dict = Depends(get_current_professional),
-    pool=Depends(get_pool),
-) -> ProfessionalNote:
-    pid = current["user_id"]
-    async with pool.acquire() as conn:
-        await require_active_share(pid, case_id, conn)
-        row = await conn.fetchrow(
-            "SELECT * FROM professional_notes WHERE professional_user_id = $1 AND case_id = $2",
-            pid, case_id,
-        )
-    if not row:
-        return ProfessionalNote()
-    return ProfessionalNote(**{k: row[k] for k in _NOTE_FIELDS})
-
 
 @router.put("/cases/{case_id}/notes", response_model=ProfessionalNote)
 async def save_notes(

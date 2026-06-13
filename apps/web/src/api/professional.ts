@@ -33,8 +33,6 @@ export const professionalApi = {
     apiClient.get<SharedCaseBundle>(`/professional/cases/${caseId}`).then(r => r.data),
 
   // Notizen
-  getNotes: (caseId: string) =>
-    apiClient.get<ProfessionalNote>(`/professional/cases/${caseId}/notes`).then(r => r.data),
   saveNotes: (caseId: string, data: ProfessionalNote) =>
     apiClient.put<ProfessionalNote>(`/professional/cases/${caseId}/notes`, data).then(r => r.data),
 
@@ -60,8 +58,6 @@ export const professionalApi = {
     apiClient.post<{ summary: string }>(
       `/professional/cases/${caseId}/echo/summary`, null, { params: { session_id: sessionId } },
     ).then(r => r.data),
-  echoSummariesList: (caseId: string) =>
-    apiClient.get<ProfessionalEchoSummary[]>(`/professional/cases/${caseId}/echo/summaries`).then(r => r.data),
   echoSummarySave: (caseId: string, data: { session_id?: string; title?: string; summary_text: string }) =>
     apiClient.post<ProfessionalEchoSummary>(`/professional/cases/${caseId}/echo/summaries`, data).then(r => r.data),
 }
