@@ -124,4 +124,7 @@ async def test_response_sanitizers_strip_owner_data():
         {"user_id": "OWNER", "plan": "regular", "subscription_ends_at": "2030-01-01",
          "modules": '{"m": 1}', "summary": "{}"}
     )
-    assert prof == {"modules": {"m": 1}, "summary": {}}
+    assert "user_id" not in prof          # keine Owner-UUID
+    assert "plan" not in prof             # kein Abo/Billing
+    assert "subscription_ends_at" not in prof
+    assert prof["modules"] == {"m": 1}
