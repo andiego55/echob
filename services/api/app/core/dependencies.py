@@ -102,3 +102,27 @@ async def get_optional_user(
         return {"user_id": user.id, "email": user.email, "role": user.role}
     except Exception:
         return None
+
+
+async def get_current_professional(
+    current_user: dict = Depends(get_current_user),
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> dict:
+    """
+    Stellt sicher, dass der eingeloggte Account eine Fachperson ist.
+
+    Lädt die zugehörige professional_profiles-Zeile. Gibt das User-Objekt
+    erweitert um {"professional": <row>} zurück; wirft 403, wenn kein
+    Fachpersonen-Profil existiert. Auf ALLEN /professional/*-Endpunkten verwenden.
+    """
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM professional_profiles WHERE user_id = $1",
+            current_user["user_id"],
+        )
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Kein Fachpersonen-Zugang.",
+        )
+    return {**current_user, "professional": dict(row)}

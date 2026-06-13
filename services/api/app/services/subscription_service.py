@@ -32,6 +32,26 @@ async def enforce_echo_prompt_limit(user_id: str, conn) -> None:
         )
 
 
+async def enforce_professional_echo_limit(professional_user_id: str, conn) -> None:
+    """Kostenschutz Entwicklungsphase: begrenzt Echo-Nachrichten pro Fachperson.
+
+    Gleiche Obergrenze wie für Nutzer (settings.echo_prompt_limit). 0 = deaktiviert.
+    """
+    limit = settings.echo_prompt_limit
+    if limit <= 0:
+        return
+    count = await conn.fetchval(
+        "SELECT COUNT(*) FROM professional_echo_messages "
+        "WHERE professional_user_id = $1 AND role = 'user'",
+        professional_user_id,
+    )
+    if count >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="ECHO_LIMIT_REACHED",
+        )
+
+
 # Kind → (Settings-Feld, Fehlercode). Gezählt wird im löschfesten ai_usage_log.
 _AI_USAGE_LIMITS = {
     "report":     ("report_limit", "REPORT_LIMIT_REACHED"),

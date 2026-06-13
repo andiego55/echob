@@ -51,6 +51,9 @@ def build_case_context(
     onboarding: dict[str, Any] | None,
     scenes: list[dict[str, Any]],
     scale_scores: list[dict[str, Any]] | None = None,
+    *,
+    include_case_header: bool = True,
+    include_scene_section: bool = True,
 ) -> str:
     """
     Erzeugt einen lesbaren Kontext-Block für den System-Prompt.
@@ -60,12 +63,13 @@ def build_case_context(
     lines: list[str] = ["## Fallkontext\n"]
 
     # ── Fallinformationen ─────────────────────────────────────────────────
-    lines.append(f"**Beziehungstyp:** {_REL_TYPE_LABELS.get(case.get('relationship_type', ''), '–')}")
-    lines.append(f"**Status:** {_REL_STATUS_LABELS.get(case.get('relationship_status', ''), '–')}")
-    lines.append(f"**Kontaktfrequenz:** {_CONTACT_LABELS.get(case.get('contact_frequency', ''), '–')}")
-    if case.get("main_concern"):
-        lines.append(f"**Hauptanliegen:** {case['main_concern']}")
-    lines.append("")
+    if include_case_header:
+        lines.append(f"**Beziehungstyp:** {_REL_TYPE_LABELS.get(case.get('relationship_type', ''), '–')}")
+        lines.append(f"**Status:** {_REL_STATUS_LABELS.get(case.get('relationship_status', ''), '–')}")
+        lines.append(f"**Kontaktfrequenz:** {_CONTACT_LABELS.get(case.get('contact_frequency', ''), '–')}")
+        if case.get("main_concern"):
+            lines.append(f"**Hauptanliegen:** {case['main_concern']}")
+        lines.append("")
 
     # ── Onboarding ────────────────────────────────────────────────────────
     if onboarding:
@@ -93,7 +97,7 @@ def build_case_context(
     confirmed = [s for s in scenes if s.get("confirmed_by_user")]
     unconfirmed = [s for s in scenes if not s.get("confirmed_by_user")]
 
-    if scenes:
+    if include_scene_section and scenes:
         lines.append(f"## Dokumentierte Szenen ({len(scenes)} gesamt, {len(confirmed)} bestätigt)\n")
         for i, scene in enumerate(scenes[:20], 1):   # max 20 Szenen
             date_str = f" ({scene['scene_date']})" if scene.get("scene_date") else ""
@@ -126,7 +130,7 @@ def build_case_context(
 
         if len(scenes) > 20:
             lines.append(f"_(+{len(scenes) - 20} weitere Szenen nicht angezeigt)_\n")
-    else:
+    elif include_scene_section:
         lines.append("## Szenen\nNoch keine Szenen dokumentiert.\n")
 
     # ── Skalenwerte ───────────────────────────────────────────────────────
@@ -1034,6 +1038,94 @@ class EchoService:
                 "keywords_found": found,
             }
         return {"status": "none", "note": "", "keywords_found": []}
+
+    # ── Fachpersonen-Echo ─────────────────────────────────────────────────────
+
+    async def professional_chat(
+        self,
+        *,
+        user_message: str,
+        shared_context: str = "",
+        history: list[dict[str, str]] | None = None,
+        glossary_term: str | None = None,
+        glossary_definition: str | None = None,
+    ) -> str:
+        """Echo-Dialog für Fachpersonen — ausschließlich auf Basis des freigegebenen Kontexts."""
+        if self._use_openai:
+            return await self._openai_professional_chat(
+                user_message=user_message,
+                shared_context=shared_context,
+                history=history or [],
+                glossary_term=glossary_term,
+                glossary_definition=glossary_definition,
+            )
+        return self._mock_professional_chat(glossary_term=glossary_term)
+
+    async def _openai_professional_chat(
+        self,
+        *,
+        user_message: str,
+        shared_context: str,
+        history: list[dict[str, str]],
+        glossary_term: str | None,
+        glossary_definition: str | None,
+    ) -> str:
+        system_prompt = _load_prompt("echo_professional_prompt.md")
+        messages: list[dict] = [{"role": "system", "content": system_prompt}]
+        if shared_context:
+            messages.append({"role": "system", "content": shared_context})
+        if glossary_term:
+            messages.append({"role": "system", "content": (
+                f"Die Fachperson möchte den Begriff **{glossary_term}** im Kontext dieses Falls besprechen.\n"
+                f"Definition: {glossary_definition or ''}\n"
+                "Erläutere den Begriff kurz und beziehe ihn nur dann auf den Fall, wenn das freigegebene "
+                "Material konkrete Anhaltspunkte liefert. Keine Diagnosen, keine Therapieanweisungen."
+            )})
+        for h in history:
+            messages.append(h)
+        messages.append({"role": "user", "content": user_message})
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=1200,
+            temperature=0.4,
+        )
+        return response.choices[0].message.content or ""
+
+    def _mock_professional_chat(self, *, glossary_term: str | None = None) -> str:
+        if glossary_term:
+            return (
+                f"**{glossary_term}** – _(Demo-Modus ohne KI-Anbindung.)_ "
+                "Mit konfiguriertem OpenAI-Key bespricht Echo den Begriff im Kontext des freigegebenen Materials."
+            )
+        return (
+            "_(Echo läuft im Demo-Modus ohne KI-Anbindung.)_ Sobald ein OpenAI-API-Key konfiguriert ist, "
+            "antwortet Echo auf Basis der für dich freigegebenen Fallinhalte – ohne Diagnosen."
+        )
+
+    async def professional_summary(self, *, history: list[dict[str, str]]) -> str:
+        """Fasst einen Fachpersonen-Echo-Dialog vorbereitungsorientiert zusammen."""
+        if not self._use_openai:
+            return "_(Echo läuft im Demo-Modus – bitte OpenAI-API-Key konfigurieren.)_"
+        conversation = "\n".join(
+            f"{'Fachperson' if m['role'] == 'user' else 'Echo'}: {m['content']}"
+            for m in history if m["role"] in ("user", "assistant")
+        )
+        system = (
+            "Du bist Echo. Fasse das folgende Vorbereitungsgespräch einer Fachperson sachlich zusammen: "
+            "zentrale Themen, relevante Szenen, hilfreiche Fragen für das Gespräch und Punkte, die vorsichtig "
+            "anzusprechen sind. Keine Diagnosen, keine Therapieanweisungen. Antworte auf Deutsch, strukturiert, kompakt."
+        )
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": conversation},
+            ],
+            max_tokens=600,
+            temperature=0.4,
+        )
+        return response.choices[0].message.content or ""
 
 
 # ── Singleton-Factory für lifespan ────────────────────────────────────────────

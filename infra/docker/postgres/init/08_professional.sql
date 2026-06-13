@@ -16,12 +16,16 @@
 CREATE TABLE IF NOT EXISTS professional_profiles (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id      UUID NOT NULL UNIQUE,                 -- Supabase auth.users.id
+    email        TEXT,                                 -- denormalisiert (lowercased), für Einladungs-Abgleich
     display_name TEXT,
     title        TEXT,                                 -- Fachrichtung / Rolle (optional)
     created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+-- Falls die Tabelle aus einer früheren Version ohne email-Spalte existiert:
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS email TEXT;
 CREATE INDEX IF NOT EXISTS idx_professional_profiles_user_id ON professional_profiles (user_id);
+CREATE INDEX IF NOT EXISTS idx_professional_profiles_email   ON professional_profiles (email);
 
 -- ── 2) Einladungen an Fachpersonen (per E-Mail) ──────────────────────────────
 CREATE TABLE IF NOT EXISTS professional_invites (

@@ -1,0 +1,290 @@
+"""Router: Fachpersonen-Echo — /professional/cases/{case_id}/echo
+
+Jeder Aufruf geht durch get_current_professional + load_shared_bundle. Der Echo-
+Kontext wird ausschließlich aus freigegebenen Inhalten gebaut (build_shared_case_context).
+Nachrichten/Sessions/Zusammenfassungen liegen in den professional_echo_*-Tabellen,
+strikt getrennt von den Echo-Daten der nutzenden Person.
+"""
+from __future__ import annotations
+
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+
+from app.core.dependencies import get_current_professional, get_pool
+from app.services.sharing_service import (
+    require_active_share,
+    load_shared_bundle,
+    build_shared_case_context,
+)
+from app.services.subscription_service import enforce_professional_echo_limit
+from app.schemas.professional import (
+    ProfessionalEchoChatRequest,
+    ProfessionalEchoChatResponse,
+    ProfessionalEchoMessageResponse,
+    ProfessionalEchoSessionResponse,
+    ProfessionalEchoSessionUpdate,
+    ProfessionalEchoSummaryCreate,
+    ProfessionalEchoSummaryResponse,
+)
+
+router = APIRouter(prefix="/professional/cases/{case_id}/echo", tags=["professional-echo"])
+
+
+def _get_echo_service(request: Request):
+    svc = request.app.state.echo_service
+    if svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    return svc
+
+
+def _msg_response(row) -> ProfessionalEchoMessageResponse:
+    return ProfessionalEchoMessageResponse(
+        id=row["id"], session_id=row["session_id"], role=row["role"],
+        content=row["content"], thread_type=row["thread_type"],
+        glossary_slug=row["glossary_slug"], created_at=row["created_at"],
+    )
+
+
+@router.post("/chat", response_model=ProfessionalEchoChatResponse)
+async def chat(
+    case_id: UUID,
+    body: ProfessionalEchoChatRequest,
+    request: Request,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalEchoChatResponse:
+    pid = current["user_id"]
+    echo_svc = _get_echo_service(request)
+
+    async with pool.acquire() as conn:
+        await enforce_professional_echo_limit(pid, conn)
+        bundle = await load_shared_bundle(pid, case_id, conn)   # 404, wenn keine aktive Freigabe
+
+        if body.session_id:
+            session = await conn.fetchrow(
+                "SELECT id FROM professional_echo_sessions "
+                "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+                body.session_id, pid, case_id,
+            )
+            if not session:
+                raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+            session_id = session["id"]
+        else:
+            session = await conn.fetchrow(
+                "INSERT INTO professional_echo_sessions (professional_user_id, case_id) "
+                "VALUES ($1, $2) RETURNING id",
+                pid, case_id,
+            )
+            session_id = session["id"]
+
+        history_rows = await conn.fetch(
+            "SELECT role, content FROM professional_echo_messages "
+            "WHERE session_id = $1 ORDER BY created_at DESC LIMIT 20",
+            session_id,
+        )
+
+    history = [{"role": r["role"], "content": r["content"]} for r in reversed(history_rows)]
+    shared_context = build_shared_case_context(bundle)
+
+    glossary_term = glossary_definition = None
+    if body.thread_type == "glossary" and body.glossary_slug:
+        async with pool.acquire() as conn:
+            g = await conn.fetchrow(
+                "SELECT term, definition FROM glossary_terms WHERE slug = $1",
+                body.glossary_slug,
+            )
+        if g:
+            glossary_term, glossary_definition = g["term"], g["definition"]
+
+    answer = await echo_svc.professional_chat(
+        user_message=body.message,
+        shared_context=shared_context,
+        history=history,
+        glossary_term=glossary_term,
+        glossary_definition=glossary_definition,
+    )
+
+    async with pool.acquire() as conn:
+        user_msg = await conn.fetchrow(
+            "INSERT INTO professional_echo_messages "
+            "(session_id, professional_user_id, case_id, role, content, thread_type, glossary_slug) "
+            "VALUES ($1, $2, $3, 'user', $4, $5, $6) RETURNING *",
+            session_id, pid, case_id, body.message, body.thread_type, body.glossary_slug,
+        )
+        assistant_msg = await conn.fetchrow(
+            "INSERT INTO professional_echo_messages "
+            "(session_id, professional_user_id, case_id, role, content, thread_type, glossary_slug) "
+            "VALUES ($1, $2, $3, 'assistant', $4, $5, $6) RETURNING *",
+            session_id, pid, case_id, answer, body.thread_type, body.glossary_slug,
+        )
+        await conn.execute(
+            "UPDATE professional_echo_sessions SET updated_at = NOW(), "
+            "title = COALESCE(title, LEFT($2, 60)) WHERE id = $1",
+            session_id, body.message.strip(),
+        )
+
+    return ProfessionalEchoChatResponse(
+        user_message=_msg_response(user_msg),
+        assistant_message=_msg_response(assistant_msg),
+        session_id=session_id,
+    )
+
+
+@router.get("/sessions", response_model=list[ProfessionalEchoSessionResponse])
+async def list_sessions(
+    case_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> list[ProfessionalEchoSessionResponse]:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        rows = await conn.fetch(
+            "SELECT id, case_id, title, created_at, updated_at FROM professional_echo_sessions "
+            "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY updated_at DESC",
+            pid, case_id,
+        )
+    return [ProfessionalEchoSessionResponse(**dict(r)) for r in rows]
+
+
+@router.get("/history", response_model=list[ProfessionalEchoMessageResponse])
+async def history(
+    case_id: UUID,
+    session_id: UUID = Query(...),
+    limit: int = 50,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> list[ProfessionalEchoMessageResponse]:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        owns = await conn.fetchrow(
+            "SELECT id FROM professional_echo_sessions "
+            "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+            session_id, pid, case_id,
+        )
+        if not owns:
+            raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT * FROM professional_echo_messages WHERE session_id = $1 "
+            "ORDER BY created_at ASC LIMIT $2",
+            session_id, limit,
+        )
+    return [_msg_response(r) for r in rows]
+
+
+@router.patch("/sessions/{session_id}", response_model=ProfessionalEchoSessionResponse)
+async def rename_session(
+    case_id: UUID,
+    session_id: UUID,
+    body: ProfessionalEchoSessionUpdate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalEchoSessionResponse:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE professional_echo_sessions SET title = $1, updated_at = NOW() "
+            "WHERE id = $2 AND professional_user_id = $3 AND case_id = $4 "
+            "RETURNING id, case_id, title, created_at, updated_at",
+            body.title.strip(), session_id, pid, case_id,
+        )
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return ProfessionalEchoSessionResponse(**dict(row))
+
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(
+    case_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "DELETE FROM professional_echo_sessions "
+            "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+            session_id, pid, case_id,
+        )
+    if result == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return {"deleted": True}
+
+
+@router.post("/summary")
+async def generate_summary(
+    case_id: UUID,
+    request: Request,
+    session_id: UUID = Query(...),
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Erzeugt (ohne zu speichern) eine Zusammenfassung eines Echo-Dialogs."""
+    pid = current["user_id"]
+    echo_svc = _get_echo_service(request)
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        owns = await conn.fetchrow(
+            "SELECT id FROM professional_echo_sessions "
+            "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+            session_id, pid, case_id,
+        )
+        if not owns:
+            raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT role, content FROM professional_echo_messages WHERE session_id = $1 "
+            "ORDER BY created_at ASC LIMIT 100",
+            session_id,
+        )
+    history = [{"role": r["role"], "content": r["content"]} for r in rows]
+    summary = await echo_svc.professional_summary(history=history)
+    return {"summary": summary}
+
+
+@router.get("/summaries", response_model=list[ProfessionalEchoSummaryResponse])
+async def list_summaries(
+    case_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> list[ProfessionalEchoSummaryResponse]:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        rows = await conn.fetch(
+            "SELECT id, case_id, session_id, title, summary_text, created_at "
+            "FROM professional_echo_summaries WHERE professional_user_id = $1 AND case_id = $2 "
+            "ORDER BY created_at DESC",
+            pid, case_id,
+        )
+    return [ProfessionalEchoSummaryResponse(**dict(r)) for r in rows]
+
+
+@router.post("/summaries", response_model=ProfessionalEchoSummaryResponse)
+async def save_summary(
+    case_id: UUID,
+    body: ProfessionalEchoSummaryCreate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalEchoSummaryResponse:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        if body.session_id:
+            owns = await conn.fetchrow(
+                "SELECT id FROM professional_echo_sessions "
+                "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+                body.session_id, pid, case_id,
+            )
+            if not owns:
+                raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+        row = await conn.fetchrow(
+            "INSERT INTO professional_echo_summaries "
+            "(professional_user_id, case_id, session_id, title, summary_text) "
+            "VALUES ($1, $2, $3, $4, $5) "
+            "RETURNING id, case_id, session_id, title, summary_text, created_at",
+            pid, case_id, body.session_id, body.title, body.summary_text,
+        )
+    return ProfessionalEchoSummaryResponse(**dict(row))

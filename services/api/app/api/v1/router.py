@@ -5,7 +5,11 @@ Hier werden alle v1-Router registriert.
 Neue Router einfach importieren und mit include_router() hinzufügen.
 """
 from fastapi import APIRouter
-from app.api.v1.routers import health, waitlist, cases, scenes, echo, scales, reports, profile, person_profile, topic_summaries, onboarding, subscription
+from app.api.v1.routers import (
+    health, waitlist, cases, scenes, echo, scales, reports, profile,
+    person_profile, topic_summaries, onboarding, subscription,
+    professional, professionals, case_shares, professional_echo,
+)
 
 v1_router = APIRouter()
 
@@ -26,3 +30,9 @@ v1_router.include_router(person_profile.router)
 v1_router.include_router(topic_summaries.router)
 v1_router.include_router(onboarding.router)
 v1_router.include_router(subscription.router)
+
+# ── Fachpersonenbereich ───────────────────────────────────────────────────────
+v1_router.include_router(professional.router)
+v1_router.include_router(professionals.router)
+v1_router.include_router(case_shares.router)
+v1_router.include_router(professional_echo.router)
