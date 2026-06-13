@@ -114,6 +114,13 @@ export default function ProfilePage() {
     if (canGoPrev) setActiveModule(PROFILE_MODULES[currentIdx - 1].id)
   }
 
+  // Speichert das aktive Modul, sobald ein Feld den Fokus verliert. Verhindert,
+  // dass getippte Freitext-Antworten verloren gehen, wenn die Seite ohne Klick
+  // auf „Speichern"/„Weiter" verlassen wird.
+  const handleFieldBlur = () => {
+    if (isDirty) saveMutation.mutate(activeModule)
+  }
+
   if (isLoading) {
     return <AppShell><div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div></AppShell>
   }
@@ -243,6 +250,7 @@ export default function ProfilePage() {
               answers={currentAnswers}
               onAnswer={setAnswer}
               onToggleMulti={toggleMulti}
+              onBlurSave={handleFieldBlur}
             />
 
             {saveMutation.isError && (
@@ -291,11 +299,13 @@ function ModuleForm({
   answers,
   onAnswer,
   onToggleMulti,
+  onBlurSave,
 }: {
   cfg: ProfileModuleConfig
   answers: Record<string, unknown>
   onAnswer: (key: string, value: unknown) => void
   onToggleMulti: (key: string, value: string) => void
+  onBlurSave: () => void
 }) {
   return (
     <div className="card space-y-6">
@@ -376,6 +386,7 @@ function ModuleForm({
           <textarea
             value={(answers[ft.key] as string | undefined) ?? ''}
             onChange={(e) => onAnswer(ft.key, e.target.value)}
+            onBlur={onBlurSave}
             rows={ft.rows ?? 3}
             placeholder="Optional – du kannst diese Frage überspringen."
             className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-y"
@@ -390,6 +401,7 @@ function ModuleForm({
           <textarea
             value={(answers[cfg.freeTextKey] as string | undefined) ?? ''}
             onChange={(e) => onAnswer(cfg.freeTextKey!, e.target.value)}
+            onBlur={onBlurSave}
             rows={3}
             placeholder="Optional – du kannst diese Frage überspringen."
             className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
