@@ -1,6 +1,6 @@
 /**
  * /app — Übersichtsseite (Einstieg nach Login)
- * Persönliche Begrüßung, Weitermachen-Karte, Fortschritt, Themendialoge,
+ * Persönliche Begrüßung, Weitermachen-Karte, Fortschritt,
  * Fallliste, Tagesimpuls.
  */
 import { Link, useSearchParams } from 'react-router-dom'
@@ -9,7 +9,6 @@ import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
 import { profileApi } from '@/api/profile'
 import { subscriptionApi } from '@/api/subscription'
-import { topicSummariesApi } from '@/api/topicSummaries'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { Case } from '@/types'
@@ -20,13 +19,6 @@ const BLOG_TOPIC_LABELS: Record<string, string> = {
   blog_professionelle_hilfe: 'Wann professionelle Hilfe sinnvoll ist',
   blog_krisentelefone:       'Krisentelefone & Anlaufstellen',
 }
-
-const CORE_TOPICS = [
-  { id: 'topic_self',           label: 'Über mich' },
-  { id: 'topic_person',         label: 'Über die Fallperson' },
-  { id: 'topic_responsibility', label: 'Verantwortung' },
-  { id: 'topic_guilt',          label: 'Schuld' },
-]
 
 const DAILY_PROMPTS = [
   'Gab es diese Woche einen Moment, der dich beschäftigt hat?',
@@ -79,13 +71,6 @@ export default function CasesOverviewPage() {
 
   const cases = data?.cases ?? []
   const lastCase = cases[0] ?? null   // Backend sortiert nach letzter Aktivität
-
-  const { data: topicSummaries = [] } = useQuery({
-    queryKey: ['topic-summaries', lastCase?.id],
-    queryFn: () => topicSummariesApi.list(lastCase!.id),
-    enabled: !!lastCase,
-  })
-  const savedTopics = new Set(topicSummaries.map(s => s.topic))
 
   const displayName = profile?.display_name?.trim()
   const completedCount = profile?.completed_modules?.length ?? 0
@@ -221,37 +206,6 @@ export default function CasesOverviewPage() {
                 </p>
               </Link>
             </div>
-
-            {/* Themendialoge */}
-            {lastCase && (
-              <div className="mb-8 rounded-brand border border-brand-border bg-white px-5 py-4">
-                <div className="flex items-center justify-between gap-3 mb-1 flex-wrap">
-                  <p className="text-sm font-bold text-navy">Themendialoge</p>
-                  <span className="text-[11px] text-brand-muted">
-                    {savedTopics.size} von {CORE_TOPICS.length} Zusammenfassungen gespeichert
-                  </span>
-                </div>
-                <p className="text-xs text-brand-muted mb-3 max-w-[560px]">
-                  Geführte Dialoge, die dein Nutzer- und Beziehungsprofil verbessern –
-                  gespeicherte Zusammenfassungen fließen in alle Echo-Gespräche und Berichte ein.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {CORE_TOPICS.map(({ id, label }) => (
-                    <Link
-                      key={id}
-                      to={`/app/cases/${lastCase.id}/topics/${id}`}
-                      className={`text-xs px-3.5 py-2 rounded-full border no-underline transition-colors ${
-                        savedTopics.has(id)
-                          ? 'border-accent/40 bg-accent/5 text-accent font-medium'
-                          : 'border-brand-border text-brand-muted hover:border-accent hover:text-accent'
-                      }`}
-                    >
-                      {savedTopics.has(id) ? '✓ ' : ''}{label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </>
         )}
 
