@@ -56,8 +56,8 @@ def _public_row(row, fields: tuple[str, ...] = ()):
 
 
 def _public_profile(row):
-    """Nur die fachlich relevanten Profilteile (modules + summary) — keine IDs,
-    kein Abo/Billing (plan, trial_started_at, subscription_ends_at)."""
+    """Fachlich relevante Profilteile: modules + summary + freie Selbstbeschreibung.
+    Keine IDs, kein Abo/Billing (plan, trial_started_at, subscription_ends_at)."""
     if row is None:
         return None
 
@@ -69,7 +69,11 @@ def _public_profile(row):
                 return {}
         return v or {}
 
-    return {"modules": _obj(row.get("modules")), "summary": _obj(row.get("summary"))}
+    return {
+        "modules": _obj(row.get("modules")),
+        "summary": _obj(row.get("summary")),
+        "summary_text": row.get("summary_text"),   # Freitext-Selbstbeschreibung (nur user_profiles)
+    }
 
 
 # ── Rolle / Profil ────────────────────────────────────────────────────────────

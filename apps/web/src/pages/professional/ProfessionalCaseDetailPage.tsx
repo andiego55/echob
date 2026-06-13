@@ -14,6 +14,8 @@ import {
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
 } from '@/types'
 import type { ProfessionalNote, SharedCaseBundle, ScaleKey } from '@/types'
+import { PROFILE_MODULES } from '@/utils/profileModules'
+import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
 
 const TOPIC_LABELS: Record<string, string> = {
   topic_self: 'Über mich', topic_person: 'Über die Fallperson',
@@ -25,6 +27,70 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className="card">
       <h2 className="text-sm font-bold text-navy mb-3">{title}</h2>
       {children}
+    </div>
+  )
+}
+
+type ProfileLikeConfig = {
+  id: string
+  label: string
+  selections?: { key: string; label: string; multi?: boolean; options: { value: string; label: string }[] }[]
+  likertItems: { key: string; text: string }[]
+  freeTexts?: { key: string; label: string }[]
+  freeTextKey?: string
+  freeTextLabel?: string
+}
+
+/** Rendert die ausgefüllten Antworten eines Profils (modules) anhand der Modul-Konfiguration. */
+function ProfileAnswers({ modules, config }: {
+  modules: Record<string, Record<string, unknown>>
+  config: ProfileLikeConfig[]
+}) {
+  const sections = config
+    .map(mod => {
+      const ans = modules?.[mod.id] ?? {}
+      const items: { label: string; value: string }[] = []
+      for (const sel of mod.selections ?? []) {
+        const v = ans[sel.key]
+        if (v == null || (Array.isArray(v) && v.length === 0)) continue
+        const toLabel = (x: unknown) => sel.options.find(o => o.value === x)?.label ?? String(x)
+        items.push({ label: sel.label, value: Array.isArray(v) ? v.map(toLabel).join(', ') : toLabel(v) })
+      }
+      for (const it of mod.likertItems ?? []) {
+        const v = ans[it.key]
+        if (typeof v === 'number') items.push({ label: it.text, value: `${v}/5` })
+      }
+      for (const ft of mod.freeTexts ?? []) {
+        const v = ans[ft.key]
+        if (typeof v === 'string' && v.trim()) items.push({ label: ft.label, value: v })
+      }
+      if (mod.freeTextKey && mod.freeTextLabel) {
+        const v = ans[mod.freeTextKey]
+        if (typeof v === 'string' && v.trim()) items.push({ label: mod.freeTextLabel, value: v })
+      }
+      return items.length ? { id: mod.id, label: mod.label, items } : null
+    })
+    .filter((x): x is { id: string; label: string; items: { label: string; value: string }[] } => x !== null)
+
+  if (sections.length === 0) {
+    return <p className="text-sm text-brand-muted">Keine ausgefüllten Angaben in diesem Profil.</p>
+  }
+
+  return (
+    <div className="space-y-2">
+      {sections.map(sec => (
+        <details key={sec.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
+          <summary className="text-sm font-semibold text-navy cursor-pointer">{sec.label}</summary>
+          <dl className="mt-2 space-y-2">
+            {sec.items.map((it, i) => (
+              <div key={i}>
+                <dt className="text-xs text-brand-muted">{it.label}</dt>
+                <dd className="text-sm text-brand-text whitespace-pre-wrap">{it.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      ))}
     </div>
   )
 }
@@ -126,6 +192,7 @@ export default function ProfessionalCaseDetailPage() {
                 {bundle.onboarding.typical_scenes && <Row k="Typische Szenen" v={bundle.onboarding.typical_scenes} />}
                 {bundle.onboarding.main_burden && <Row k="Hauptbelastung" v={bundle.onboarding.main_burden} />}
                 {bundle.onboarding.significant_event && <Row k="Prägendes Ereignis" v={bundle.onboarding.significant_event} />}
+                {bundle.onboarding.memorable_scenes && <Row k="Erinnerliche Szenen" v={bundle.onboarding.memorable_scenes} />}
                 {typeof bundle.onboarding.distress_score === 'number' && <Row k="Belastungswert" v={`${bundle.onboarding.distress_score}/10`} />}
               </dl>
             </Section>
@@ -164,15 +231,19 @@ export default function ProfessionalCaseDetailPage() {
             </Section>
           )}
 
-          {/* Profile (Hinweis – Detail fließt in Echo) */}
+          {/* Fragebogen zur Fallperson (vollständig) */}
           {has('person_profile') && bundle.person_profile && (
             <Section title="Fragebogen zur Fallperson">
-              <p className="text-xs text-brand-muted">Freigegeben. Die Einschätzung fließt in den Echo-Fallkontext ein.</p>
+              <ProfileAnswers modules={bundle.person_profile.modules} config={PERSON_PROFILE_MODULES} />
             </Section>
           )}
+          {/* Selbstprofil der nutzenden Person (vollständig) */}
           {has('self_profile') && bundle.self_profile && (
-            <Section title="Nutzerprofil / Selbstprofil">
-              <p className="text-xs text-brand-muted">Freigegeben. Die Selbstbeschreibung fließt in den Echo-Fallkontext ein.</p>
+            <Section title="Selbstprofil der nutzenden Person">
+              {bundle.self_profile.summary_text && (
+                <p className="mb-3 text-sm text-brand-muted whitespace-pre-wrap">{bundle.self_profile.summary_text}</p>
+              )}
+              <ProfileAnswers modules={bundle.self_profile.modules} config={PROFILE_MODULES} />
             </Section>
           )}
         </div>

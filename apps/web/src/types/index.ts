@@ -461,8 +461,8 @@ export interface SharedCaseBundle {
   scales: ScaleScore[]
   reports: Report[]
   topic_summaries: { topic: string; summary_text: string }[]
-  person_profile: { modules: Record<string, unknown>; summary: Record<string, unknown> } | null
-  self_profile: { modules: Record<string, unknown>; summary: Record<string, unknown>; display_name?: string | null } | null
+  person_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null } | null
+  self_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null; display_name?: string | null } | null
   notes: ProfessionalNote | null
   echo_summaries: ProfessionalEchoSummary[]
 }
