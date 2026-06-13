@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 // ── Öffentliche Seiten ────────────────────────────────────────────────────────
 import LandingPage          from '@/pages/LandingPage'
@@ -46,6 +46,7 @@ import PersonProfilePage     from '@/pages/app/PersonProfilePage'
 import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
 import TopicDialogPage       from '@/pages/app/TopicDialogPage'
 import UpgradePage           from '@/pages/app/UpgradePage'
+import CaseSharingPage        from '@/pages/app/CaseSharingPage'
 import { useParams }         from 'react-router-dom'
 
 function TopicDialogPageWrapper() {
@@ -53,7 +54,21 @@ function TopicDialogPageWrapper() {
   return <TopicDialogPage key={topicId} />
 }
 
+// Rollen-Weiche: Fachpersonen landen im Fachpersonenbereich, sonst in der Fallübersicht.
+function AppHome() {
+  const { data, isLoading } = useProfessional()
+  if (isLoading) return <RoleSpinner />
+  if (data) return <Navigate to="/professional" replace />
+  return <CasesOverviewPage />
+}
+
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import ProfessionalRoute, { useProfessional, Spinner as RoleSpinner } from '@/components/auth/ProfessionalRoute'
+import ProfessionalRegisterPage  from '@/pages/professional/ProfessionalRegisterPage'
+import ProfessionalInboxPage     from '@/pages/professional/ProfessionalInboxPage'
+import ProfessionalCasesPage     from '@/pages/professional/ProfessionalCasesPage'
+import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDetailPage'
+import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 
 export default function App() {
@@ -86,7 +101,7 @@ export default function App() {
       <Route path="/wissen/krisentelefone"           element={<WissenKrisentelephonePage />} />
 
       {/* ── App-Bereich (Login erforderlich) ───────────────────────────────── */}
-      <Route path="/app" element={<ProtectedRoute><CasesOverviewPage /></ProtectedRoute>} />
+      <Route path="/app" element={<ProtectedRoute><AppHome /></ProtectedRoute>} />
       <Route path="/app/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
       <Route path="/app/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
@@ -101,11 +116,19 @@ export default function App() {
       <Route path="/app/cases/:caseId/scenes/echo" element={<ProtectedRoute><SceneEchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/scenes/:sceneId" element={<ProtectedRoute><SceneDetailPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/echo" element={<ProtectedRoute><EchoPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/share" element={<ProtectedRoute><CaseSharingPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/scales" element={<ProtectedRoute><ScalesPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/new" element={<ProtectedRoute><ReportNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/:reportId" element={<ProtectedRoute><ReportDetailPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/topics/:topicId" element={<ProtectedRoute><TopicDialogPageWrapper /></ProtectedRoute>} />
+
+      {/* ── Fachpersonenbereich (Login + Rolle erforderlich) ─────────────────── */}
+      <Route path="/professional/register" element={<ProtectedRoute><ProfessionalRegisterPage /></ProtectedRoute>} />
+      <Route path="/professional" element={<ProfessionalRoute><ProfessionalInboxPage /></ProfessionalRoute>} />
+      <Route path="/professional/cases" element={<ProfessionalRoute><ProfessionalCasesPage /></ProfessionalRoute>} />
+      <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
+      <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

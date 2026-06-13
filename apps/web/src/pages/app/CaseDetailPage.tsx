@@ -89,6 +89,12 @@ export default function CaseDetailPage() {
                 💬 Mit Echo sprechen
               </Link>
               <Link
+                to={`/app/cases/${caseId}/share`}
+                className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm"
+              >
+                👥 Freigaben
+              </Link>
+              <Link
                 to={`/app/cases/${caseId}/scenes/new`}
                 className="btn-primary !py-2 !px-4 !text-sm"
               >

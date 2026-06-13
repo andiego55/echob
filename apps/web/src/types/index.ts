@@ -326,3 +326,143 @@ export interface PersonProfile {
   created_at: string
   updated_at: string
 }
+
+// ── Fachpersonenbereich ─────────────────────────────────────────────────────
+
+export type ShareElementType =
+  | 'case_info' | 'onboarding' | 'all_scenes' | 'scene'
+  | 'scales' | 'reports' | 'topic_summaries' | 'person_profile' | 'self_profile'
+
+export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
+  case_info:       'Fallinformationen',
+  onboarding:      'Onboarding-Informationen',
+  all_scenes:      'Alle Szenen',
+  scene:           'Einzelne Szenen',
+  scales:          'Skalen',
+  reports:         'Berichte',
+  topic_summaries: 'Themendialog-Zusammenfassungen',
+  person_profile:  'Fragebogen zur Fallperson',
+  self_profile:    'Nutzerprofil / Selbstprofil',
+}
+
+export interface ProfessionalProfile {
+  user_id: string
+  display_name: string | null
+  title: string | null
+  created_at: string
+}
+
+export interface Connection {
+  email: string
+  status: 'pending' | 'accepted'
+  professional_user_id: string | null
+  display_name: string | null
+  title: string | null
+  created_at: string
+}
+
+export interface ShareElement {
+  element_type: ShareElementType
+  scene_id: string | null
+}
+
+export interface CaseShare {
+  id: string
+  case_id: string
+  professional_user_id: string
+  professional_display_name: string | null
+  status: 'active' | 'revoked'
+  message: string | null
+  elements: ShareElement[]
+  created_at: string
+  updated_at: string
+}
+
+export interface ShareCreate {
+  professional_user_id: string
+  elements: ShareElementType[]
+  scene_ids?: string[]
+  message?: string | null
+}
+
+export interface InboxItem {
+  share_id: string
+  case_id: string
+  client_display_name: string
+  case_title: string
+  element_types: ShareElementType[]
+  shared_at: string
+}
+
+export interface ProfessionalCaseSummary {
+  share_id: string
+  case_id: string
+  case_title: string
+  element_types: ShareElementType[]
+  shared_at: string
+}
+
+export interface ProfessionalClientGroup {
+  client_display_name: string
+  cases: ProfessionalCaseSummary[]
+}
+
+export interface ProfessionalNote {
+  first_impressions?: string | null
+  key_scenes?: string | null
+  open_questions?: string | null
+  conversation_prompts?: string | null
+  next_steps?: string | null
+  free_text?: string | null
+}
+
+export interface GlossaryTerm {
+  slug: string
+  term: string
+  definition: string
+}
+
+export interface ProfessionalEchoMessage {
+  id: string
+  session_id: string
+  role: MessageRole
+  content: string
+  thread_type: 'case' | 'glossary'
+  glossary_slug: string | null
+  created_at: string
+}
+
+export interface ProfessionalEchoSession {
+  id: string
+  case_id: string
+  title: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ProfessionalEchoSummary {
+  id: string
+  case_id: string
+  session_id: string | null
+  title: string | null
+  summary_text: string
+  created_at: string
+}
+
+/** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */
+export interface SharedCaseBundle {
+  case_id: string
+  client_display_name: string
+  case_title: string
+  allowed: ShareElementType[]
+  case: Case | null
+  onboarding: (OnboardingAnswers & { distress_score?: number | null; safety_status?: string | null; person_name?: string | null }) | null
+  scenes: Scene[]
+  scales: ScaleScore[]
+  reports: Report[]
+  topic_summaries: { topic: string; summary_text: string }[]
+  person_profile: { modules: Record<string, unknown>; summary: Record<string, unknown> } | null
+  self_profile: { modules: Record<string, unknown>; summary: Record<string, unknown>; display_name?: string | null } | null
+  notes: ProfessionalNote | null
+  echo_summaries: ProfessionalEchoSummary[]
+}

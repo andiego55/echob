@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { Link } from 'react-router-dom'
@@ -10,10 +10,13 @@ type Method = 'password' | 'magic'
 export default function AuthPage() {
   const { session } = useAuth()
   const location    = useLocation()
+  const [searchParams] = useSearchParams()
+  const role        = searchParams.get('role')
   const fromLoc     = (location.state as { from?: Location })?.from
-  const from        = fromLoc ? `${fromLoc.pathname}${(fromLoc as Location & { search?: string }).search ?? ''}` : '/app'
+  const defaultDest = role === 'professional' ? '/professional/register' : '/app'
+  const from        = fromLoc ? `${fromLoc.pathname}${(fromLoc as Location & { search?: string }).search ?? ''}` : defaultDest
 
-  const defaultTab = (location.state as { defaultTab?: Tab } | null)?.defaultTab ?? 'login'
+  const defaultTab = (location.state as { defaultTab?: Tab } | null)?.defaultTab ?? (role === 'professional' ? 'signup' : 'login')
   const [tab, setTab]         = useState<Tab>(defaultTab)
   const [method, setMethod]   = useState<Method>('password')
   const [email, setEmail]     = useState('')
