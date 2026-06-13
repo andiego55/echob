@@ -386,6 +386,52 @@ class EchoService:
             return await self._openai_safety_check(text)
         return self._mock_safety_check(text)
 
+    async def classify_risk(self, *, text: str) -> dict[str, Any]:
+        """Stuft das Gefährdungs-Risiko einer Nutzernachricht ein.
+
+        Kombiniert den deterministischen Keyword-Floor mit einer optionalen
+        LLM-Triage (gpt-4o-mini); das höhere Risiko gewinnt. Funktioniert auch
+        ohne OpenAI-Key (dann nur Keyword-Floor → die Krisen-Hilfe greift weiterhin).
+        Rückgabe: ``{"level": "none|unclear|elevated|acute", "category": str|None}``
+        """
+        from app.services.safety_service import classify_keywords, max_level
+
+        floor = classify_keywords(text)
+        if not self._use_openai:
+            return {"level": floor, "category": None, "source": "keywords"}
+        try:
+            llm = await self._openai_classify_risk(text)
+        except Exception:
+            logger.exception("Risiko-Triage (LLM) fehlgeschlagen — Keyword-Floor greift.")
+            return {"level": floor, "category": None, "source": "keywords"}
+        return {
+            "level": max_level(floor, llm.get("level", "none")),
+            "category": llm.get("category"),
+            "source": "llm+keywords",
+        }
+
+    async def _openai_classify_risk(self, text: str) -> dict[str, Any]:
+        import json
+        system_prompt = _load_prompt("safety_classify_prompt.md")
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": text[:4000]},
+            ],
+            max_tokens=120,
+            temperature=0.0,
+            response_format={"type": "json_object"},
+        )
+        data = json.loads(response.choices[0].message.content or "{}")
+        level = data.get("level") or data.get("status") or "none"
+        if level not in ("none", "unclear", "elevated", "acute"):
+            level = "unclear"
+        category = data.get("category")
+        if category is not None and not isinstance(category, str):
+            category = None
+        return {"level": level, "category": category}
+
     # ── OpenAI-Implementierungen (Platzhalter bis P1) ─────────────────────────
 
     async def _openai_chat(self, **kwargs) -> str:  # type: ignore[override]

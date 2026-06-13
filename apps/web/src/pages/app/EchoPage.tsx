@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
-import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
+import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
 import { apiErrorText } from '@/utils/apiError'
 import type { EchoChatSession, ThreadType } from '@/types'
@@ -179,7 +179,12 @@ export default function EchoPage() {
 
               {/* Nachrichten */}
               {history.map((msg) => (
-                <ChatMessage key={msg.id} content={msg.content} isUser={msg.role === 'user'} />
+                <ChatMessage
+                  key={msg.id}
+                  content={msg.content}
+                  isUser={msg.role === 'user'}
+                  safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined}
+                />
               ))}
 
               {/* Optimistische Nutzernachricht */}

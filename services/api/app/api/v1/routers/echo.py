@@ -282,18 +282,45 @@ async def chat(
                 if topic_ctx:
                     extra_context += "\n\n" + topic_ctx
 
-    # Echo antworten lassen
-    answer = await echo_svc.chat(
-        user_message=body.message,
-        case_context=case_context,
-        thread_type=body.thread_type,
-        history=history,
-        glossary_term=body.glossary_term,
-        onboarding=onboarding,
-        scenes=scenes,
-        scale_scores=scale_scores,
-        extra_context=extra_context,
-    )
+    # ── Sicherheits-Triage ────────────────────────────────────────────────────
+    # Aktive Krisenerkennung statt passivem Disclaimer: Deutet die Nachricht auf
+    # eine akute Gefährdung hin, antwortet Echo mit konkreter Hilfe statt mit
+    # reflektierender Deutung. Steuertoken (__…__) und das geführte Szenen-
+    # gespräch sind ausgenommen.
+    async def _normal_answer() -> str:
+        return await echo_svc.chat(
+            user_message=body.message,
+            case_context=case_context,
+            thread_type=body.thread_type,
+            history=history,
+            glossary_term=body.glossary_term,
+            onboarding=onboarding,
+            scenes=scenes,
+            scale_scores=scale_scores,
+            extra_context=extra_context,
+        )
+
+    safety_meta: dict = {}
+    is_control_msg = body.message.startswith("__")
+    if body.thread_type != "scene" and not is_control_msg:
+        from app.services.safety_service import build_safety_message
+        risk = await echo_svc.classify_risk(text=body.message)
+        level = risk.get("level", "none")
+        if level == "acute":
+            answer = build_safety_message("acute", category=risk.get("category"))
+            safety_meta = {"safety": {"level": "acute", "category": risk.get("category"), "mode": "intervention"}}
+        else:
+            answer = await _normal_answer()
+            if level == "elevated":
+                answer = answer.rstrip() + "\n\n" + build_safety_message("elevated", category=risk.get("category"))
+                safety_meta = {"safety": {"level": "elevated", "category": risk.get("category"), "mode": "appended"}}
+    else:
+        answer = await _normal_answer()
+
+    # Sicherheits-Markierung in die Metadaten der Assistenten-Nachricht mergen
+    assistant_meta = dict(_json.loads(session_meta))
+    assistant_meta.update(safety_meta)
+    assistant_meta_json = _json.dumps(assistant_meta)
 
     async with pool.acquire() as conn:
         user_msg_row = await conn.fetchrow(
@@ -308,7 +335,7 @@ async def chat(
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata, session_id)
             VALUES ($1, $2, 'assistant', $3, $4, $5, $6::jsonb, $7) RETURNING *
             """,
-            case_id, user_id, answer, body.thread_type, body.related_scene_id, session_meta, chat_session_id,
+            case_id, user_id, answer, body.thread_type, body.related_scene_id, assistant_meta_json, chat_session_id,
         )
         if chat_session_id:
             # Session anfassen; erste Nutzernachricht wird zum Titel

@@ -5,6 +5,13 @@
  */
 import MarkdownMessage from './MarkdownMessage'
 
+/** Liest die Sicherheits-Markierung (metadata.safety.level) einer Echo-Antwort. */
+export function safetyLevelFromMeta(metadata: unknown): 'elevated' | 'acute' | undefined {
+  const safety = (metadata as { safety?: { level?: string } } | null | undefined)?.safety
+  if (safety?.level === 'elevated' || safety?.level === 'acute') return safety.level
+  return undefined
+}
+
 export function EchoAvatar() {
   return (
     <div
@@ -19,11 +26,13 @@ export function EchoAvatar() {
 }
 
 export function ChatMessage({
-  content, isUser, markdown = true,
+  content, isUser, markdown = true, safetyLevel,
 }: {
   content: string
   isUser: boolean
   markdown?: boolean
+  /** Markiert eine Echo-Antwort als Sicherheits-/Krisenhinweis (siehe metadata.safety). */
+  safetyLevel?: 'elevated' | 'acute' | null
 }) {
   if (isUser) {
     return (
@@ -36,13 +45,29 @@ export function ChatMessage({
     )
   }
 
+  const body = markdown
+    ? <MarkdownMessage content={content} />
+    : <p className="whitespace-pre-wrap">{content}</p>
+
+  const safety = safetyLevel === 'acute' || safetyLevel === 'elevated' ? safetyLevel : null
+
   return (
     <div className="flex gap-3 pr-6">
       <EchoAvatar />
       <div className="flex-1 min-w-0 pt-1.5 text-[0.92rem] leading-[1.7] text-brand-text">
-        {markdown
-          ? <MarkdownMessage content={content} />
-          : <p className="whitespace-pre-wrap">{content}</p>}
+        {safety ? (
+          <div className={`rounded-2xl border px-4 py-3 ${
+            safety === 'acute' ? 'border-red-300 bg-red-50/70' : 'border-amber-300 bg-amber-50/60'
+          }`}>
+            <div className={`flex items-center gap-2 mb-2 text-[0.8rem] font-bold ${
+              safety === 'acute' ? 'text-red-700' : 'text-amber-700'
+            }`}>
+              <span aria-hidden="true">{safety === 'acute' ? '🆘' : '⚠'}</span>
+              {safety === 'acute' ? 'Sicherheit zuerst – Hilfe ist erreichbar' : 'Sicherheitshinweis'}
+            </div>
+            {body}
+          </div>
+        ) : body}
       </div>
     </div>
   )
