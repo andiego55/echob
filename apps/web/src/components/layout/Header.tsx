@@ -89,11 +89,11 @@ export default function Header() {
                             opacity-0 pointer-events-none
                             group-hover:opacity-100 group-hover:pointer-events-auto
                             transition-opacity duration-150 z-50">
-              <div className="w-[520px] rounded-brand border border-white/10 bg-navy-dark shadow-2xl overflow-hidden">
+              <div className="w-[520px] rounded-brand border border-brand-border bg-white shadow-2xl overflow-hidden">
                 {/* Topic grid */}
                 <div className="grid grid-cols-2 gap-0 p-5">
                   {WISSEN_COLS.map((col, ci) => (
-                    <div key={ci} className={`flex flex-col gap-5 ${ci === 0 ? 'pr-5 border-r border-white/[0.07]' : 'pl-5'}`}>
+                    <div key={ci} className={`flex flex-col gap-5 ${ci === 0 ? 'pr-5 border-r border-brand-border' : 'pl-5'}`}>
                       {col.map(({ heading, links }) => (
                         <div key={heading}>
                           <p className="text-[0.68rem] font-bold uppercase tracking-[0.1em] text-accent mb-2">
@@ -103,7 +103,7 @@ export default function Header() {
                             <Link
                               key={to}
                               to={to}
-                              className="block py-1.5 text-[0.83rem] text-white/65 hover:text-white no-underline transition-colors leading-tight"
+                              className="block py-1.5 text-[0.83rem] text-brand-text hover:text-accent no-underline transition-colors leading-tight"
                             >
                               {label}
                             </Link>
@@ -115,10 +115,10 @@ export default function Header() {
                 </div>
 
                 {/* Blog-Teaser */}
-                <div className="border-t border-white/[0.07] bg-white/[0.03] px-5 py-3 flex items-center justify-between gap-4">
+                <div className="border-t border-brand-border bg-brand-bg px-5 py-3 flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-[0.82rem] font-semibold text-white">EchoB Blog</p>
-                    <p className="text-[0.76rem] text-white/45 leading-snug">
+                    <p className="text-[0.82rem] font-semibold text-navy">EchoB Blog</p>
+                    <p className="text-[0.76rem] text-brand-muted leading-snug">
                       Tiefergehende Artikel zu Beziehungsthemen
                     </p>
                   </div>
