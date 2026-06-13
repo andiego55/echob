@@ -63,7 +63,6 @@ export default function ProfessionalEchoPage() {
       const term = glossary.find(g => g.slug === glossarySlug)?.term ?? glossarySlug
       setActiveSession(null)
       setMessages([])
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       chat.mutate({ message: `Bitte besprich den Begriff „${term}" im Kontext dieses Falls.`, thread_type: 'glossary', glossary_slug: glossarySlug })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

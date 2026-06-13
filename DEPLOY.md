@@ -64,19 +64,33 @@ ersten Start automatisch. Caddy holt das TLS-Zertifikat selbstständig
 
 ## 6. Updates deployen
 
+> ⚠️ **Der laufende Prod-Server `/opt/echob` ist KEINE Git-Auscheckung, sondern eine Dateikopie.**
+> `git pull` funktioniert dort **nicht**. Code wird von der Dev-Maschine übertragen (in **Git-Bash**,
+> nicht `cmd` – cmd zerbricht die Quotes) und das `api`-Image neu gebaut. Das Frontend deployt separat
+> über Cloudflare beim Push auf `main`.
+
 ```bash
-cd /opt/echob
-git pull
-docker compose -f docker-compose.prod.yml up -d --build
+# Vorher Backup (auf dem Server):
+ssh root@<SERVER-IP> 'cp -r /opt/echob/services/api/app /opt/echob/services/api/app.bak.$(date +%F-%H%M)'
+
+# 1) Backend-Code uebertragen (aus dem Repo-Root der Dev-Maschine):
+tar czf - --exclude='__pycache__' --exclude='*.pyc' -C services/api app \
+  | ssh root@<SERVER-IP> 'tar xzf - -C /opt/echob/services/api'
+
+# 2) Neue Init-SQL-Skripte uebertragen (falls vorhanden):
+scp infra/docker/postgres/init/NN_*.sql root@<SERVER-IP>:/opt/echob/infra/docker/postgres/init/
+
+# 3) Auf dem Server: ggf. Schema einspielen + API neu bauen:
+ssh root@<SERVER-IP> 'cd /opt/echob \
+  && docker compose -f docker-compose.prod.yml exec -T postgres psql -U echob -d echob < infra/docker/postgres/init/NN_*.sql \
+  && docker compose -f docker-compose.prod.yml up -d --build api'
 ```
 
-> **Neue DB-Init-Skripte** (z. B. `infra/docker/postgres/init/08_professional.sql`) laufen nur bei
-> einem frischen Postgres-Volume automatisch. Auf der bestehenden Prod-DB einmalig einspielen
-> (idempotent – siehe Kommentar im Skript):
-> ```bash
-> docker compose -f docker-compose.prod.yml exec -T postgres \
->   psql -U echob -d echob < infra/docker/postgres/init/08_professional.sql
-> ```
+> **Neue DB-Init-Skripte** laufen nur bei einem frischen Postgres-Volume automatisch; auf der bestehenden
+> Prod-DB einmalig wie oben (Schritt 3) einspielen. Die Skripte sind idempotent (`CREATE TABLE IF NOT EXISTS`).
+>
+> **Empfehlung:** den Prod-Host künftig als echte Git-Auscheckung aufsetzen (`git clone` nach `/opt/echob`),
+> dann gilt wieder der einfache `git pull`-Flow.
 
 ## 7. Betrieb
 

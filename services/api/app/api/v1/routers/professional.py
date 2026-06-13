@@ -69,10 +69,14 @@ def _public_profile(row):
                 return {}
         return v or {}
 
+    summary_obj = _obj(row.get("summary"))
+    # Die freie Selbstbeschreibung liegt im summary-JSONB (keine eigene Spalte) —
+    # so speichert/liest es auch routers/profile.py + person_profile.py.
+    summary_text = summary_obj.get("summary_text") if isinstance(summary_obj, dict) else None
     return {
         "modules": _obj(row.get("modules")),
-        "summary": _obj(row.get("summary")),
-        "summary_text": row.get("summary_text"),   # Freitext-Selbstbeschreibung (nur user_profiles)
+        "summary": summary_obj,
+        "summary_text": summary_text,
     }
 
 
