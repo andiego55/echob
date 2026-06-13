@@ -15,6 +15,7 @@ const tabs = [
   { path: '/scenes',     label: 'Szenen'        },
   { path: '/echo',       label: 'Echo'          },
   { path: '/scales',     label: 'Muster'        },
+  { path: '/review',     label: 'Verlauf'       },
   { path: '/reports',    label: 'Berichte'      },
 ]
 

@@ -277,6 +277,55 @@ export interface ReportCreate {
   title?: string
 }
 
+// ── Verlauf / Rückblick ───────────────────────────────────────────────────────
+
+export interface TrendMonth {
+  period: string          // "2026-04"
+  label: string           // "Apr 26"
+  count: number
+  avg_distress: number | null
+}
+
+export interface DistressPoint {
+  date: string            // ISO date
+  distress: number        // 1-5
+  title: string
+}
+
+export interface TagCount {
+  tag: string
+  count: number
+}
+
+export interface ScaleTrend {
+  scale_key: ScaleKey
+  score: number           // 0-5 (normalisiert)
+  confidence: Confidence
+}
+
+export interface CaseTrends {
+  total_scenes: number
+  confirmed_scenes: number
+  dated_scenes: number
+  period_start: string | null
+  period_end: string | null
+  scenes_by_month: TrendMonth[]
+  distress_series: DistressPoint[]
+  top_tags: TagCount[]
+  scales: ScaleTrend[]
+}
+
+export interface CaseReview {
+  id: string
+  case_id: string
+  period_start: string | null
+  period_end: string | null
+  narrative: string
+  stats: CaseTrends
+  scene_count: number
+  created_at: string
+}
+
 // ── Beziehungsprofil ──────────────────────────────────────────────────────────
 
 export type ProfileSafetyStatus = 'no_indication' | 'unclear' | 'heightened_attention' | 'acute_concern'

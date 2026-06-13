@@ -380,6 +380,60 @@ class EchoService:
             )
         return self._mock_report(report_type, case_context)
 
+    async def generate_review(
+        self,
+        *,
+        case_context: dict[str, Any],
+        scenes: list[dict[str, Any]],
+        scale_scores: list[dict[str, Any]],
+        onboarding: dict[str, Any] | None,
+        trend_summary: str,
+    ) -> str:
+        """Erzeugt einen narrativen Rückblick über den Verlauf eines Falls."""
+        if self._use_openai:
+            return await self._openai_review(
+                case_context, scenes, scale_scores, onboarding, trend_summary
+            )
+        return self._mock_review(trend_summary)
+
+    async def _openai_review(
+        self,
+        case_context: dict[str, Any],
+        scenes: list[dict[str, Any]],
+        scale_scores: list[dict[str, Any]],
+        onboarding: dict[str, Any] | None,
+        trend_summary: str,
+    ) -> str:
+        system_prompt = _load_prompt("review_generation_prompt.md")
+        ctx = build_case_context(
+            case=case_context, onboarding=onboarding, scenes=scenes, scale_scores=scale_scores
+        )
+        user_message = (
+            f"{ctx}\n\n## Quantitative Trends (bereits berechnet)\n{trend_summary}\n\n"
+            "Erstelle jetzt den Rückblick."
+        )
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=1200,
+            temperature=0.45,
+        )
+        return response.choices[0].message.content or ""
+
+    def _mock_review(self, trend_summary: str) -> str:
+        return (
+            "**Worum es ging**\n\n"
+            "Echo läuft gerade im Demo-Modus ohne KI-Anbindung – hier siehst du die "
+            "berechneten Trends deines Verlaufs. Mit konfiguriertem OpenAI-Key fasst Echo "
+            "deinen Verlauf in Worte und benennt wiederkehrende Muster.\n\n"
+            "**Berechnete Trends**\n\n"
+            f"{trend_summary}\n\n"
+            "_Dies ist eine Reflexionshilfe, keine Bewertung._"
+        )
+
     async def check_safety(self, *, text: str) -> dict[str, Any]:
         """Prüft einen Text auf Sicherheitshinweise."""
         if self._use_openai:

@@ -36,6 +36,7 @@ import SceneDetailPage   from '@/pages/app/SceneDetailPage'
 import SceneEchoPage     from '@/pages/app/SceneEchoPage'
 import EchoPage          from '@/pages/app/EchoPage'
 import ScalesPage        from '@/pages/app/ScalesPage'
+import ReviewPage        from '@/pages/app/ReviewPage'
 import ReportsPage       from '@/pages/app/ReportsPage'
 import ReportNewPage      from '@/pages/app/ReportNewPage'
 import ReportDetailPage   from '@/pages/app/ReportDetailPage'
@@ -118,6 +119,7 @@ export default function App() {
       <Route path="/app/cases/:caseId/echo" element={<ProtectedRoute><EchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/share" element={<ProtectedRoute><CaseSharingPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/scales" element={<ProtectedRoute><ScalesPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/review" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/new" element={<ProtectedRoute><ReportNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/:reportId" element={<ProtectedRoute><ReportDetailPage /></ProtectedRoute>} />
