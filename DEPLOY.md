@@ -70,6 +70,14 @@ git pull
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
+> **Neue DB-Init-Skripte** (z. B. `infra/docker/postgres/init/08_professional.sql`) laufen nur bei
+> einem frischen Postgres-Volume automatisch. Auf der bestehenden Prod-DB einmalig einspielen
+> (idempotent – siehe Kommentar im Skript):
+> ```bash
+> docker compose -f docker-compose.prod.yml exec -T postgres \
+>   psql -U echob -d echob < infra/docker/postgres/init/08_professional.sql
+> ```
+
 ## 7. Betrieb
 
 ```bash
