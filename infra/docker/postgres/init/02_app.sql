@@ -91,7 +91,8 @@ CREATE TABLE IF NOT EXISTS echo_messages (
         'onboarding', 'scene', 'topic', 'glossary', 'report',
         'topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt',
         'blog_beziehungsmuster', 'blog_beobachtung_gefuehl',
-        'blog_professionelle_hilfe', 'blog_krisentelefone'
+        'blog_professionelle_hilfe', 'blog_krisentelefone',
+        'hyp_dynamics', 'hyp_clusterb', 'hyp_attachment', 'hyp_trauma', 'hyp_own_role'
     )) DEFAULT 'topic',
     related_scene_id UUID REFERENCES scenes (id) ON DELETE SET NULL,
     metadata         JSONB DEFAULT '{}'::jsonb,

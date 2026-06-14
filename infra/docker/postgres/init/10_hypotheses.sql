@@ -18,3 +18,16 @@ CREATE TABLE IF NOT EXISTS case_hypotheses (
     UNIQUE (case_id, hypothesis_type)
 );
 CREATE INDEX IF NOT EXISTS idx_case_hypotheses_case ON case_hypotheses (case_id, updated_at DESC);
+
+-- ── echo_messages.thread_type um die Hypothesen-Threads erweitern ────────────
+-- Die Hypothesen-Dialoge nutzen thread_type = hyp_* in echo_messages. Bestehende
+-- DBs haben die CHECK-Constraint aus 02_app.sql noch ohne diese Werte → erweitern.
+-- Idempotent: DROP IF EXISTS + neu anlegen.
+ALTER TABLE echo_messages DROP CONSTRAINT IF EXISTS echo_messages_thread_type_check;
+ALTER TABLE echo_messages ADD CONSTRAINT echo_messages_thread_type_check CHECK (thread_type IN (
+    'onboarding', 'scene', 'topic', 'glossary', 'report',
+    'topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt',
+    'blog_beziehungsmuster', 'blog_beobachtung_gefuehl',
+    'blog_professionelle_hilfe', 'blog_krisentelefone',
+    'hyp_dynamics', 'hyp_clusterb', 'hyp_attachment', 'hyp_trauma', 'hyp_own_role'
+));
