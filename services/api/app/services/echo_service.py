@@ -297,6 +297,17 @@ class EchoService:
             return await self._openai_extract_scene(conversation_text, case_context)
         return self._mock_extract_scene(conversation_text)
 
+    async def transcribe(self, *, audio_bytes: bytes, filename: str = "audio.webm") -> str:
+        """Transkribiert eine Audioaufnahme (OpenAI Whisper). Mock-Modus: leerer String."""
+        if not self._use_openai:
+            return ""
+        response = await self._client.audio.transcriptions.create(  # type: ignore[union-attr]
+            model="whisper-1",
+            file=(filename, audio_bytes),
+            language="de",
+        )
+        return getattr(response, "text", "") or ""
+
     async def generate_topic_summary(
         self,
         *,

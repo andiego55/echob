@@ -16,6 +16,7 @@ dependencies = [
     "supabase>=2.4",
     "openai>=1.30",
     "stripe>=10",
+    "python-multipart>=0.0.9",   # Form/File-Uploads (Schnellerfassung: Audio)
     # "python-jose[cryptography]>=3.3",
     # Ab Phase 3:
     # "anthropic>=0.25",

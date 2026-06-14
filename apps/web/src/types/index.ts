@@ -155,6 +155,17 @@ export interface SceneCreate {
   input_mode?: InputMode
 }
 
+/** Schnellerfassung: von Echo strukturierter Szenen-Entwurf (noch nicht gespeichert). */
+export interface SceneDraft {
+  title: string
+  description: string | null
+  user_reaction: string | null
+  scene_date: string | null
+  distress_score: number | null
+  safety_level: SafetyLevel
+  pattern_tags: string[]
+}
+
 // ── Echo ──────────────────────────────────────────────────────────────────────
 
 export interface EchoMessage {

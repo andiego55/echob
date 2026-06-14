@@ -4,10 +4,10 @@ from __future__ import annotations
 import logging
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
 from app.core.dependencies import get_current_user, get_pool
-from app.services.subscription_service import enforce_trial_limits
+from app.services.subscription_service import enforce_echo_prompt_limit, enforce_trial_limits
 from app.schemas.scene import (
     SceneConfirm, SceneCreate, SceneListResponse, SceneResponse, SceneUpdate,
 )
@@ -66,6 +66,66 @@ async def create_scene(
         )
     logger.info("Szene erstellt: scene_id=%s case_id=%s", row["id"], case_id)
     return _row_to_scene(row)
+
+
+@router.post("/quick-capture")
+async def quick_capture(
+    case_id: UUID,
+    request: Request,
+    text: str = Form(""),
+    audio: UploadFile | None = File(None),
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Schnellerfassung: Sprache (Whisper) oder Text → strukturierter Szenen-Entwurf.
+
+    Speichert NICHTS — gibt einen Entwurf zurück, den die nutzende Person im
+    Formular prüft, anpasst und dann regulär über POST /scenes speichert.
+    """
+    user_id = current_user["user_id"]
+    echo_svc = getattr(request.app.state, "echo_service", None)
+
+    async with pool.acquire() as conn:
+        case_row = await conn.fetchrow(
+            "SELECT * FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
+            case_id, user_id,
+        )
+        if not case_row:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+        await enforce_echo_prompt_limit(user_id, conn)
+
+    transcript = ""
+    source_text = (text or "").strip()
+
+    if audio is not None:
+        audio_bytes = await audio.read()
+        if len(audio_bytes) > 25 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="Aufnahme zu groß (max. 25 MB).")
+        if echo_svc is None:
+            raise HTTPException(status_code=503, detail="Transkription derzeit nicht verfügbar.")
+        transcript = await echo_svc.transcribe(
+            audio_bytes=audio_bytes, filename=audio.filename or "audio.webm"
+        )
+        source_text = f"{source_text}\n{transcript}".strip() if source_text else transcript
+
+    if not source_text:
+        raise HTTPException(status_code=400, detail="Bitte Text eingeben oder eine Aufnahme machen.")
+
+    if echo_svc is not None:
+        extracted = await echo_svc.extract_scene(user_text=source_text, case_context=dict(case_row))
+    else:
+        extracted = {"title": "", "description": source_text, "pattern_tags": [], "safety_level": "none"}
+
+    draft = {
+        "title": (extracted.get("title") or "")[:200],
+        "description": extracted.get("description") or source_text,
+        "user_reaction": extracted.get("user_reaction"),
+        "scene_date": extracted.get("scene_date"),
+        "distress_score": extracted.get("distress_score"),
+        "safety_level": extracted.get("safety_level") or "none",
+        "pattern_tags": extracted.get("pattern_tags") or [],
+    }
+    return {"transcript": transcript, "draft": draft}
 
 
 @router.get("/{scene_id}", response_model=SceneResponse)

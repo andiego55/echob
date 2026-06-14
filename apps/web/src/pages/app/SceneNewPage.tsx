@@ -7,8 +7,9 @@ import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import QuickCapture from '@/components/app/QuickCapture'
 import { scenesApi } from '@/api/scenes'
-import type { InputMode } from '@/types'
+import type { InputMode, SceneDraft } from '@/types'
 
 const GUIDED_QUESTIONS = [
   { key: 'what',   label: 'Was ist passiert?' },
@@ -37,6 +38,7 @@ export default function SceneNewPage() {
   const [guidedAnswers, setGuided]    = useState<Record<string, string>>({})
   const [distressScore, setDistress]  = useState<number | null>(null)
   const [tags, setTags]               = useState<string[]>([])
+  const [quickOpen, setQuickOpen]     = useState(false)
 
   const mutation = useMutation({
     mutationFn: (data: Parameters<typeof scenesApi.create>[1]) =>
@@ -49,6 +51,24 @@ export default function SceneNewPage() {
 
   const toggleTag = (tag: string) => {
     setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
+  }
+
+  const handleEntry = (key: string) => {
+    if (key === 'chat') { navigate(`/app/cases/${caseId}/scenes/echo`); return }
+    if (key === 'voice') { setQuickOpen(true); setMode('freetext'); return }
+    setQuickOpen(false)
+    setMode(key as InputMode)
+  }
+
+  // Von Echo strukturierten Entwurf ins Formular übernehmen (Nutzer prüft + speichert).
+  const applyDraft = (d: SceneDraft) => {
+    if (d.title) setTitle(d.title)
+    if (d.scene_date) setSceneDate(d.scene_date)
+    const desc = [d.description, d.user_reaction ? `Meine Reaktion: ${d.user_reaction}` : '']
+      .filter(Boolean).join('\n\n')
+    if (desc) setFreetext(desc)
+    if (d.distress_score) setDistress(d.distress_score)
+    if (d.pattern_tags?.length) setTags((prev) => Array.from(new Set([...prev, ...d.pattern_tags])))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -88,14 +108,15 @@ export default function SceneNewPage() {
           </p>
           <div className="grid gap-4">
             {[
-              { mode: 'freetext' as const, icon: '✍️', label: 'Freitext', desc: 'Beschreibe frei, was du festhalten willst – Situation, Beobachtung oder Gedanke.' },
-              { mode: 'guided' as const,   icon: '❓', label: 'Geführte Fragen', desc: 'Strukturierte Fragen – ideal für eine konkrete Situation.' },
-              { mode: 'chat' as const,     icon: '💬', label: 'Mit Echo erarbeiten', desc: 'Echo hilft dir im Gespräch, deine Gedanken zu sortieren und festzuhalten.' },
-            ].map(({ mode: m, icon, label, desc }) => (
+              { key: 'freetext', icon: '✍️', label: 'Freitext', desc: 'Beschreibe frei, was du festhalten willst – Situation, Beobachtung oder Gedanke.' },
+              { key: 'voice',    icon: '🎙️', label: 'Schnell erfassen (Sprache/Text)', desc: 'Sprich oder füge Text ein – Echo macht daraus einen strukturierten Entwurf, den du prüfst.' },
+              { key: 'guided',   icon: '❓', label: 'Geführte Fragen', desc: 'Strukturierte Fragen – ideal für eine konkrete Situation.' },
+              { key: 'chat',     icon: '💬', label: 'Mit Echo erarbeiten', desc: 'Echo hilft dir im Gespräch, deine Gedanken zu sortieren und festzuhalten.' },
+            ].map(({ key, icon, label, desc }) => (
               <button
-                key={m}
+                key={key}
                 type="button"
-                onClick={() => m === 'chat' ? navigate(`/app/cases/${caseId}/scenes/echo`) : setMode(m)}
+                onClick={() => handleEntry(key)}
                 className="card text-left flex items-start gap-4 hover:border-accent/40 transition-all"
               >
                 <span className="text-2xl">{icon}</span>
@@ -120,6 +141,15 @@ export default function SceneNewPage() {
             ← Zurück
           </button>
           <span className="label">{mode === 'freetext' ? 'Freitext' : 'Geführte Fragen'}</span>
+          {mode === 'freetext' && !quickOpen && (
+            <button
+              type="button"
+              onClick={() => setQuickOpen(true)}
+              className="ml-auto text-xs text-accent hover:underline"
+            >
+              🎙️ Schnell erfassen
+            </button>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -151,15 +181,18 @@ export default function SceneNewPage() {
 
           {/* Beschreibung */}
           {mode === 'freetext' ? (
-            <div>
-              <label className="block text-sm font-medium text-brand-text mb-1.5">Beschreibung</label>
-              <textarea
-                value={freetext}
-                onChange={(e) => setFreetext(e.target.value)}
-                rows={7}
-                placeholder="Beschreibe, was du festhalten möchtest – ein Ereignis (was ist passiert, was wurde gesagt?), eine Beobachtung an dir oder der anderen Person, einen Gedanken oder eine Vermutung. So konkret wie möglich."
-                className="w-full rounded-brand border border-brand-border bg-white px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
-              />
+            <div className="space-y-4">
+              {quickOpen && <QuickCapture caseId={caseId!} onDraft={applyDraft} />}
+              <div>
+                <label className="block text-sm font-medium text-brand-text mb-1.5">Beschreibung</label>
+                <textarea
+                  value={freetext}
+                  onChange={(e) => setFreetext(e.target.value)}
+                  rows={7}
+                  placeholder="Beschreibe, was du festhalten möchtest – ein Ereignis (was ist passiert, was wurde gesagt?), eine Beobachtung an dir oder der anderen Person, einen Gedanken oder eine Vermutung. So konkret wie möglich."
+                  className="w-full rounded-brand border border-brand-border bg-white px-4 py-3 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+                />
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
