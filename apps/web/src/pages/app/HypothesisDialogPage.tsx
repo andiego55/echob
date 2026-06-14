@@ -26,6 +26,7 @@ export default function HypothesisDialogPage() {
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const [summary, setSummary] = useState<string | null>(null)
   const [savedSummary, setSavedSummary] = useState(false)
+  const [showExamples, setShowExamples] = useState(true)
 
   const hyp = HYPOTHESES.find(h => h.id === hypothesisId)
   const startTrigger = `__${hypothesisId}_start__`
@@ -91,6 +92,13 @@ export default function HypothesisDialogPage() {
     setInput('')
     setPendingMessage(msg)
     chatMutation.mutate(msg)
+  }
+
+  const handleExample = (q: string) => {
+    if (chatMutation.isPending) return
+    setShowExamples(false)
+    setPendingMessage(q)
+    chatMutation.mutate(q)
   }
 
   const visibleMessages = hyp ? (history as EchoMessage[]).filter(m => m.content !== startTrigger) : []
@@ -198,9 +206,55 @@ export default function HypothesisDialogPage() {
           </div>
         </div>
 
-        {/* Eingabe */}
+        {/* Einstiegsfragen + Eingabe */}
         <div className="px-6 pb-5 pt-2 flex-shrink-0">
-          <ChatComposer value={input} onChange={setInput} onSend={handleSend} pending={chatMutation.isPending} placeholder="Schreibe Echo …" />
+          {showExamples && hyp.introQuestions.length > 0 && (
+            <div className="mx-auto max-w-[780px] mb-2 rounded-2xl border border-brand-border bg-white shadow-[0_4px_24px_rgba(15,30,46,0.08)] px-5 py-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-sm font-semibold text-navy">💡 Beispielfragen zum Einstieg</p>
+                <button onClick={() => setShowExamples(false)} className="text-xs text-brand-muted hover:text-navy">
+                  ✕ Schließen
+                </button>
+              </div>
+              <p className="text-xs text-brand-muted mb-3">
+                Noch unsicher beim Thema? Klick eine Frage – Echo erklärt sie dir, bevor ihr gemeinsam auf deinen Fall schaut.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {hyp.introQuestions.map(q => (
+                  <button
+                    key={q}
+                    onClick={() => handleExample(q)}
+                    disabled={chatMutation.isPending}
+                    className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <ChatComposer
+            value={input}
+            onChange={setInput}
+            onSend={handleSend}
+            pending={chatMutation.isPending}
+            placeholder="Schreibe Echo …"
+            leftAccessory={
+              <button
+                type="button"
+                onClick={() => setShowExamples(v => !v)}
+                title="Beispielfragen zum Einstieg"
+                className={`h-9 px-3.5 rounded-full border text-xs font-medium transition-colors ${
+                  showExamples
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-brand-border text-brand-muted hover:border-accent/40 hover:text-accent'
+                }`}
+              >
+                💡 Beispiele
+              </button>
+            }
+          />
         </div>
       </div>
     </AppShell>
