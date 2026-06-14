@@ -5,6 +5,7 @@
  */
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import QuickExitButton from '@/components/app/QuickExit'
 
 interface Props {
   children: React.ReactNode
@@ -35,6 +36,7 @@ export default function AppShell({ children }: Props) {
             {[
               { to: '/app',          label: 'Meine Fälle',        end: true },
               { to: '/app/profile',  label: 'Mein Profil',         end: false },
+              { to: '/app/privacy',  label: 'Schutz',              end: false },
               { to: '/app/help',     label: 'Hilfe',               end: false },
             ].map(({ to, label, end }) => (
               <NavLink
@@ -55,6 +57,7 @@ export default function AppShell({ children }: Props) {
           </nav>
 
           <div className="flex items-center gap-3">
+            <QuickExitButton />
             <span className="hidden sm:block text-xs text-white/40">{user?.email}</span>
             <button
               onClick={handleSignOut}

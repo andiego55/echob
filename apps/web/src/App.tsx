@@ -49,6 +49,7 @@ import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
 import TopicDialogPage       from '@/pages/app/TopicDialogPage'
 import UpgradePage           from '@/pages/app/UpgradePage'
 import CaseSharingPage        from '@/pages/app/CaseSharingPage'
+import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
 import { useParams }         from 'react-router-dom'
 
 function TopicDialogPageWrapper() {
@@ -72,11 +73,15 @@ import ProfessionalCasesPage     from '@/pages/professional/ProfessionalCasesPag
 import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDetailPage'
 import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
+import LockScreen from '@/components/app/LockScreen'
+import { QuickExitHotkey } from '@/components/app/QuickExit'
 
 export default function App() {
   return (
     <>
     <DevNoticeModal />
+    <LockScreen />
+    <QuickExitHotkey />
     <Routes>
       {/* ── Öffentlich ─────────────────────────────────────────────────────── */}
       <Route path="/"            element={<LandingPage />} />
@@ -107,6 +112,7 @@ export default function App() {
       <Route path="/app/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
       <Route path="/app/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />
       <Route path="/app/profile/echo" element={<ProtectedRoute><ProfileEchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/new" element={<ProtectedRoute><CaseNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId" element={<ProtectedRoute><CaseDetailPage /></ProtectedRoute>} />
