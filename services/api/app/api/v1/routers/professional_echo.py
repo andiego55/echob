@@ -23,6 +23,7 @@ from app.schemas.professional import (
     ProfessionalEchoChatResponse,
     ProfessionalEchoMessageResponse,
     ProfessionalEchoSessionResponse,
+    ProfessionalEchoSessionUpdate,
     ProfessionalEchoSummaryCreate,
     ProfessionalEchoSummaryResponse,
 )
@@ -147,6 +148,53 @@ async def list_sessions(
     return [ProfessionalEchoSessionResponse(**dict(r)) for r in rows]
 
 
+@router.patch("/sessions/{session_id}", response_model=ProfessionalEchoSessionResponse)
+async def rename_session(
+    case_id: UUID,
+    session_id: UUID,
+    body: ProfessionalEchoSessionUpdate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalEchoSessionResponse:
+    """Benennt ein Echo-Gespräch um (nur eigene, bei aktiver Freigabe)."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        row = await conn.fetchrow(
+            "UPDATE professional_echo_sessions SET title = $1, updated_at = NOW() "
+            "WHERE id = $2 AND professional_user_id = $3 AND case_id = $4 "
+            "RETURNING id, case_id, title, created_at, updated_at",
+            body.title.strip(), session_id, pid, case_id,
+        )
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return ProfessionalEchoSessionResponse(**dict(row))
+
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(
+    case_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Löscht ein Echo-Gespräch samt Nachrichten (Nachrichten via ON DELETE CASCADE).
+
+    Gespeicherte Zusammenfassungen bleiben erhalten (summaries.session_id → SET NULL).
+    """
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        result = await conn.execute(
+            "DELETE FROM professional_echo_sessions "
+            "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+            session_id, pid, case_id,
+        )
+    if result == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return {"deleted": True}
+
+
 @router.get("/history", response_model=list[ProfessionalEchoMessageResponse])
 async def history(
     case_id: UUID,
@@ -229,3 +277,24 @@ async def save_summary(
             pid, case_id, body.session_id, body.title, body.summary_text,
         )
     return ProfessionalEchoSummaryResponse(**dict(row))
+
+
+@router.delete("/summaries/{summary_id}")
+async def delete_summary(
+    case_id: UUID,
+    summary_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Löscht eine gespeicherte Echo-Zusammenfassung (nur eigene, bei aktiver Freigabe)."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        result = await conn.execute(
+            "DELETE FROM professional_echo_summaries "
+            "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+            summary_id, pid, case_id,
+        )
+    if result == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Zusammenfassung nicht gefunden.")
+    return {"deleted": True}

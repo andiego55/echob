@@ -28,6 +28,8 @@ export default function ProfessionalEchoPage() {
   const [messages, setMessages] = useState<ProfessionalEchoMessage[]>([])
   const [input, setInput] = useState('')
   const [summary, setSummary] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState('')
   const glossaryStarted = useRef(false)
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -84,6 +86,25 @@ export default function ProfessionalEchoPage() {
     onSuccess: () => { setSummary(null); qc.invalidateQueries({ queryKey: ['prof-case', caseId] }) },
   })
 
+  const renameSession = useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) => professionalApi.echoSessionRename(caseId!, id, title),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['prof-echo-sessions', caseId] }); setEditingId(null) },
+  })
+  const deleteSession = useMutation({
+    mutationFn: (id: string) => professionalApi.echoSessionDelete(caseId!, id),
+    onSuccess: (_d, id) => {
+      qc.invalidateQueries({ queryKey: ['prof-echo-sessions', caseId] })
+      qc.removeQueries({ queryKey: ['prof-echo-history', caseId, id] })
+      if (id === activeSession) { setActiveSession(null); setMessages([]); setSummary(null) }
+    },
+  })
+
+  const submitRename = (id: string) => {
+    const t = editingTitle.trim()
+    if (t) renameSession.mutate({ id, title: t })
+    else setEditingId(null)
+  }
+
   const newChat = () => { setActiveSession(null); setMessages([]); setSummary(null); glossaryStarted.current = true }
 
   return (
@@ -103,17 +124,54 @@ export default function ProfessionalEchoPage() {
           <aside className="hidden md:block w-52 flex-shrink-0">
             <p className="text-xs font-semibold text-brand-muted mb-2">Gespräche</p>
             <nav className="space-y-1">
-              {sessions.map(s => (
-                <button
-                  key={s.id}
-                  onClick={() => { setActiveSession(s.id); setSummary(null) }}
-                  className={`w-full text-left px-3 py-2 rounded-brand text-sm transition-colors truncate ${
-                    activeSession === s.id ? 'bg-accent/10 text-accent font-medium' : 'text-brand-muted hover:text-navy hover:bg-brand-border/30'
-                  }`}
-                >
-                  {s.title || 'Neuer Chat'}
-                </button>
-              ))}
+              {sessions.map(s => {
+                const isActive = s.id === activeSession
+                const isEditing = s.id === editingId
+                return (
+                  <div key={s.id} className={`group relative rounded-brand transition-colors ${isActive ? 'bg-accent/10' : 'hover:bg-brand-border/30'}`}>
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        value={editingTitle}
+                        onChange={e => setEditingTitle(e.target.value)}
+                        onBlur={() => submitRename(s.id)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') submitRename(s.id)
+                          if (e.key === 'Escape') setEditingId(null)
+                        }}
+                        className="w-full rounded-brand border border-accent bg-white px-3 py-2 text-sm outline-none"
+                      />
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => { setActiveSession(s.id); setSummary(null) }}
+                          className={`w-full text-left px-3 py-2 pr-12 rounded-brand text-sm truncate ${
+                            isActive ? 'text-accent font-medium' : 'text-brand-muted hover:text-navy'
+                          }`}
+                        >
+                          {s.title || 'Neuer Chat'}
+                        </button>
+                        <div className="absolute right-1 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-0.5">
+                          <button
+                            onClick={() => { setEditingId(s.id); setEditingTitle(s.title ?? '') }}
+                            title="Umbenennen"
+                            className="p-1 rounded text-brand-muted hover:text-navy hover:bg-white text-xs"
+                          >
+                            ✎
+                          </button>
+                          <button
+                            onClick={() => { if (window.confirm('Dieses Gespräch löschen?')) deleteSession.mutate(s.id) }}
+                            title="Löschen"
+                            className="p-1 rounded text-brand-muted hover:text-red-600 hover:bg-white text-xs"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )
+              })}
               {sessions.length === 0 && <p className="text-xs text-brand-muted/70 px-3">Noch keine Gespräche.</p>}
             </nav>
           </aside>

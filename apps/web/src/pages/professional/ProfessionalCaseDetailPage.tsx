@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi } from '@/api/professional'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
@@ -104,6 +105,12 @@ export default function ProfessionalCaseDetailPage() {
     enabled: !!caseId,
   })
   const { data: glossary = [] } = useQuery({ queryKey: ['prof-glossary'], queryFn: professionalApi.glossary })
+
+  const qc = useQueryClient()
+  const deleteSummary = useMutation({
+    mutationFn: (summaryId: string) => professionalApi.echoSummaryDelete(caseId!, summaryId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-case', caseId] }),
+  })
 
   if (isLoading) return <Spinner />
 
@@ -316,8 +323,21 @@ export default function ProfessionalCaseDetailPage() {
               <div className="space-y-3">
                 {bundle.echo_summaries.map(s => (
                   <div key={s.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
-                    {s.title && <p className="text-sm font-semibold text-navy">{s.title}</p>}
-                    <p className="text-sm text-brand-muted whitespace-pre-wrap">{s.summary_text}</p>
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                      {s.title
+                        ? <p className="text-sm font-semibold text-navy">{s.title}</p>
+                        : <span className="text-xs text-brand-muted">Zusammenfassung</span>}
+                      <button
+                        onClick={() => { if (window.confirm('Diese Zusammenfassung löschen?')) deleteSummary.mutate(s.id) }}
+                        disabled={deleteSummary.isPending}
+                        className="shrink-0 text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
+                      >
+                        Löschen
+                      </button>
+                    </div>
+                    <div className="text-sm text-brand-text leading-relaxed">
+                      <MarkdownMessage content={s.summary_text} />
+                    </div>
                   </div>
                 ))}
               </div>

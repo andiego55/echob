@@ -171,6 +171,10 @@ class ProfessionalEchoSessionResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ProfessionalEchoSessionUpdate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=120)
+
+
 class ProfessionalEchoSummaryCreate(BaseModel):
     session_id: UUID | None = None
     title: str | None = Field(None, max_length=200)

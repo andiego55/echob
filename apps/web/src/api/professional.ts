@@ -60,4 +60,12 @@ export const professionalApi = {
     ).then(r => r.data),
   echoSummarySave: (caseId: string, data: { session_id?: string; title?: string; summary_text: string }) =>
     apiClient.post<ProfessionalEchoSummary>(`/professional/cases/${caseId}/echo/summaries`, data).then(r => r.data),
+  echoSessionRename: (caseId: string, sessionId: string, title: string) =>
+    apiClient
+      .patch<ProfessionalEchoSession>(`/professional/cases/${caseId}/echo/sessions/${sessionId}`, { title })
+      .then(r => r.data),
+  echoSessionDelete: (caseId: string, sessionId: string) =>
+    apiClient.delete(`/professional/cases/${caseId}/echo/sessions/${sessionId}`).then(r => r.data),
+  echoSummaryDelete: (caseId: string, summaryId: string) =>
+    apiClient.delete(`/professional/cases/${caseId}/echo/summaries/${summaryId}`).then(r => r.data),
 }
