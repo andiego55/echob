@@ -11,6 +11,7 @@ import { casesApi } from '@/api/cases'
 import { scenesApi } from '@/api/scenes'
 import { personProfileApi } from '@/api/personProfile'
 import { topicSummariesApi, type TopicSummary } from '@/api/topicSummaries'
+import { hypothesesApi } from '@/api/hypotheses'
 import {
   RELATIONSHIP_TYPE_LABELS,
   RELATIONSHIP_STATUS_LABELS,
@@ -164,6 +165,11 @@ export default function CaseDetailPage() {
         {/* Themendialog-Zusammenfassungen */}
         <div className="mt-6">
           <TopicSummariesCard caseId={caseId!} summaries={topicSummaries} />
+        </div>
+
+        {/* Hypothesen */}
+        <div className="mt-6">
+          <HypothesesOverviewCard caseId={caseId!} />
         </div>
 
         {/* Disclaimer */}
@@ -415,6 +421,48 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function HypothesesOverviewCard({ caseId }: { caseId: string }) {
+  const { data: saved = [] } = useQuery({
+    queryKey: ['hypotheses', caseId],
+    queryFn: () => hypothesesApi.list(caseId),
+    enabled: !!caseId,
+  })
+
+  return (
+    <div className="card">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <div>
+          <p className="text-xs font-semibold text-brand-muted mb-0.5">Hypothesen</p>
+          <p className="text-sm font-medium text-navy">
+            {saved.length > 0
+              ? `${saved.length} Arbeitshypothese${saved.length === 1 ? '' : 'n'} gespeichert`
+              : 'Noch keine Hypothesen entwickelt'}
+          </p>
+        </div>
+        <Link to={`/app/cases/${caseId}/hypotheses`} className="text-xs font-semibold text-accent hover:underline shrink-0">
+          Zu den Hypothesen →
+        </Link>
+      </div>
+
+      {saved.length > 0 ? (
+        <div className="space-y-3">
+          {saved.map(h => (
+            <div key={h.hypothesis_type} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+              <p className="text-xs font-semibold text-navy mb-1">{h.label}</p>
+              <div className="text-sm text-brand-muted leading-relaxed"><MarkdownMessage content={h.summary_text} /></div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-brand-muted/70 leading-relaxed">
+          Geführte Dialoge zu Dynamik, Persönlichkeitsstruktur (Cluster-B), Bindung, Prägungen und eigenem Anteil –
+          tastend, keine Diagnosen. Echo kennt dabei den vollen Fallkontext.
+        </p>
+      )}
     </div>
   )
 }

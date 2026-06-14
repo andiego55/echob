@@ -16,6 +16,7 @@ const tabs = [
   { path: '/echo',       label: 'Echo'          },
   { path: '/scales',     label: 'Muster'        },
   { path: '/review',     label: 'Verlauf'       },
+  { path: '/hypotheses', label: 'Hypothesen'    },
   { path: '/reports',    label: 'Berichte'      },
 ]
 

@@ -198,7 +198,7 @@ class EchoService:
                 history=history or [],
                 extra_context=extra_context,
             )
-        if thread_type.startswith("topic_") or thread_type.startswith("blog_"):
+        if thread_type.startswith("topic_") or thread_type.startswith("blog_") or thread_type.startswith("hyp_"):
             if self._use_openai:
                 return await self._openai_topic_chat(
                     topic=thread_type,
@@ -354,6 +354,43 @@ class EchoService:
                 {"role": "user", "content": user_message},
             ],
             max_tokens=500,
+            temperature=0.4,
+        )
+        return response.choices[0].message.content or ""
+
+    async def generate_hypothesis_summary(
+        self, *, hypothesis_type: str, history: list[dict[str, str]],
+    ) -> str:
+        """Fasst einen Hypothesen-Dialog zu einer tastenden Arbeitshypothese zusammen."""
+        if self._use_openai:
+            return await self._openai_hypothesis_summary(hypothesis_type=hypothesis_type, history=history)
+        return (
+            "_(Echo läuft im Demo-Modus – bitte konfiguriere einen OpenAI-API-Key "
+            "für echte Zusammenfassungen.)_"
+        )
+
+    async def _openai_hypothesis_summary(
+        self, *, hypothesis_type: str, history: list[dict[str, str]],
+    ) -> str:
+        from app.services.hypothesis_service import HYPOTHESIS_LABELS
+        system_prompt = _load_prompt("hypothesis_summary_prompt.md")
+        conversation = "\n".join(
+            f"{'Du' if m['role'] == 'user' else 'Echo'}: {m['content']}"
+            for m in history
+            if m["role"] in ("user", "assistant") and not m["content"].startswith("__hyp_")
+        )
+        user_message = (
+            f"Hypothese: {HYPOTHESIS_LABELS.get(hypothesis_type, hypothesis_type)}\n\n"
+            f"Gesprächsverlauf:\n{conversation}\n\n"
+            f"Erstelle jetzt die Hypothesen-Zusammenfassung."
+        )
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=600,
             temperature=0.4,
         )
         return response.choices[0].message.content or ""
@@ -640,6 +677,11 @@ class EchoService:
             "blog_beobachtung_gefuehl": "blog_topic_prompt.md",
             "blog_professionelle_hilfe":"blog_topic_prompt.md",
             "blog_krisentelefone":      "blog_topic_prompt.md",
+            "hyp_dynamics":             "hypothesis_dynamics_prompt.md",
+            "hyp_clusterb":             "hypothesis_clusterb_prompt.md",
+            "hyp_attachment":           "hypothesis_attachment_prompt.md",
+            "hyp_trauma":               "hypothesis_trauma_prompt.md",
+            "hyp_own_role":             "hypothesis_own_role_prompt.md",
         }
         prompt_file = _TOPIC_PROMPTS.get(topic, "blog_topic_prompt.md")
         system_prompt = _load_prompt(prompt_file)

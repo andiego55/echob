@@ -242,6 +242,28 @@ async def chat(
             if topic_ctx:
                 context_parts.append(topic_ctx)
 
+        # Gespeicherte Hypothesen (tastend) — fließen als Kontext in alle Gespräche ein
+        try:
+            async with pool.acquire() as conn:
+                hyp_rows = await conn.fetch(
+                    "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1",
+                    case_id,
+                )
+            if hyp_rows:
+                from app.services.hypothesis_service import build_hypothesis_context
+                hyp_ctx = build_hypothesis_context([dict(r) for r in hyp_rows])
+                if hyp_ctx:
+                    context_parts.append(hyp_ctx)
+        except Exception:
+            logger.warning("Hypothesen-Kontext konnte nicht geladen werden", exc_info=True)
+
+        # Hypothesen-Dialoge: zusätzlich den quantitativen Verlauf injizieren
+        if body.thread_type.startswith("hyp_"):
+            from app.services.review_service import compute_trends, format_trends_for_prompt
+            trends = compute_trends(scenes, scale_scores)
+            if trends.get("confirmed_scenes"):
+                context_parts.append("## Verlauf (quantitativ)\n" + format_trends_for_prompt(trends))
+
         extra_context = "\n\n---\n\n".join(context_parts)
 
     if body.thread_type == "scene" and body.scene_session_id:

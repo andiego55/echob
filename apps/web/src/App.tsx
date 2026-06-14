@@ -47,6 +47,8 @@ import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
 import PersonProfilePage     from '@/pages/app/PersonProfilePage'
 import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
 import TopicDialogPage       from '@/pages/app/TopicDialogPage'
+import HypothesesPage        from '@/pages/app/HypothesesPage'
+import HypothesisDialogPage  from '@/pages/app/HypothesisDialogPage'
 import UpgradePage           from '@/pages/app/UpgradePage'
 import CaseSharingPage        from '@/pages/app/CaseSharingPage'
 import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
@@ -55,6 +57,11 @@ import { useParams }         from 'react-router-dom'
 function TopicDialogPageWrapper() {
   const { topicId } = useParams<{ topicId: string }>()
   return <TopicDialogPage key={topicId} />
+}
+
+function HypothesisDialogPageWrapper() {
+  const { hypothesisId } = useParams<{ hypothesisId: string }>()
+  return <HypothesisDialogPage key={hypothesisId} />
 }
 
 // Rollen-Weiche: Fachpersonen landen im Fachpersonenbereich, sonst in der Fallübersicht.
@@ -132,6 +139,8 @@ export default function App() {
       <Route path="/app/cases/:caseId/reports/:reportId" element={<ProtectedRoute><ReportDetailPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/export" element={<ProtectedRoute><PrintSummaryPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/topics/:topicId" element={<ProtectedRoute><TopicDialogPageWrapper /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/hypotheses" element={<ProtectedRoute><HypothesesPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/hypotheses/:hypothesisId" element={<ProtectedRoute><HypothesisDialogPageWrapper /></ProtectedRoute>} />
 
       {/* ── Fachpersonenbereich (Login + Rolle erforderlich) ─────────────────── */}
       <Route path="/professional/register" element={<ProtectedRoute><ProfessionalRegisterPage /></ProtectedRoute>} />
