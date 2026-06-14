@@ -57,6 +57,9 @@ export default function ReportsPage() {
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
+            <Link to={`/app/cases/${caseId}/export`} className="btn-outline !py-2 !px-4 !text-sm whitespace-nowrap" title="Druckbare Fall-Zusammenfassung ohne KI – zum Mitnehmen zu Fachpersonen">
+              Zusammenfassung (PDF)
+            </Link>
             {count > 0 && (
               <span className={`text-xs ${atLimit ? 'text-red-500 font-medium' : 'text-brand-muted'}`}>
                 {count} / {MAX_REPORTS}

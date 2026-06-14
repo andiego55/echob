@@ -40,6 +40,7 @@ import ReviewPage        from '@/pages/app/ReviewPage'
 import ReportsPage       from '@/pages/app/ReportsPage'
 import ReportNewPage      from '@/pages/app/ReportNewPage'
 import ReportDetailPage   from '@/pages/app/ReportDetailPage'
+import PrintSummaryPage   from '@/pages/app/PrintSummaryPage'
 import HelpPage           from '@/pages/app/HelpPage'
 import ProfilePage           from '@/pages/app/ProfilePage'
 import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
@@ -123,6 +124,7 @@ export default function App() {
       <Route path="/app/cases/:caseId/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/new" element={<ProtectedRoute><ReportNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/reports/:reportId" element={<ProtectedRoute><ReportDetailPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/export" element={<ProtectedRoute><PrintSummaryPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/topics/:topicId" element={<ProtectedRoute><TopicDialogPageWrapper /></ProtectedRoute>} />
 
       {/* ── Fachpersonenbereich (Login + Rolle erforderlich) ─────────────────── */}
