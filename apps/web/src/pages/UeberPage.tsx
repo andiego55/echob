@@ -197,8 +197,25 @@ export default function UeberPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Gründer-Teaser */}
       <section className="border-t border-brand-border px-6 py-[72px]">
+        <div className="mx-auto max-w-[960px]">
+          <span className="label">Der Mensch dahinter</span>
+          <h2 className="text-[clamp(1.4rem,2.5vw,1.9rem)] font-bold leading-[1.25] text-navy mb-3">
+            Wer hinter EchoB steht
+          </h2>
+          <p className="text-brand-muted max-w-[620px] leading-[1.75] mb-6">
+            EchoB ist aus einer persönlichen Überzeugung entstanden – an der Schnittstelle von IT und
+            Psychologie. Im Interview erzählt der Gründer, warum es EchoB gibt und welche Haltung dahintersteht.
+          </p>
+          <Link to="/ueber/gruender" className="text-accent font-medium hover:underline no-underline">
+            Das Gründer-Interview lesen →
+          </Link>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-brand-border bg-navy/[0.02] px-6 py-[72px]">
         <div className="mx-auto max-w-[960px] flex flex-wrap gap-4 items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-navy mb-1">EchoB selbst erleben</h2>

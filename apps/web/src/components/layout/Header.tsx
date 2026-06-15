@@ -54,6 +54,7 @@ export default function Header() {
   const { session, signOut } = useAuth()
   const location = useLocation()
   const wissenActive = location.pathname.startsWith('/wissen')
+  const ueberActive = location.pathname.startsWith('/ueber')
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-navy border-b border-white/[0.07]">
@@ -133,12 +134,44 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Restliche Links */}
-          {NAV_SIMPLE.slice(2).map(({ to, label }) => (
+          {/* Blog + Fachpersonen */}
+          {NAV_SIMPLE.slice(2, 4).map(({ to, label }) => (
             <NavLink key={to} to={to} end className={({ isActive }) => LINK_CLS(isActive)}>
               {label}
             </NavLink>
           ))}
+
+          {/* Über mit Dropdown */}
+          <div className="relative group">
+            <NavLink
+              to="/ueber"
+              end
+              className={() => LINK_CLS(ueberActive) + ' flex items-center gap-1'}
+            >
+              Über
+              <svg
+                className="w-3 h-3 opacity-60 transition-transform group-hover:rotate-180"
+                fill="none"
+                viewBox="0 0 12 12"
+              >
+                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </NavLink>
+
+            <div className="absolute top-full right-0 pt-3
+                            opacity-0 pointer-events-none
+                            group-hover:opacity-100 group-hover:pointer-events-auto
+                            transition-opacity duration-150 z-50">
+              <div className="w-52 rounded-brand border border-brand-border bg-white shadow-2xl overflow-hidden py-1.5">
+                <Link to="/ueber" className="block px-4 py-2 text-[0.83rem] text-brand-text hover:text-accent hover:bg-brand-bg no-underline transition-colors">
+                  Über EchoB
+                </Link>
+                <Link to="/ueber/gruender" className="block px-4 py-2 text-[0.83rem] text-brand-text hover:text-accent hover:bg-brand-bg no-underline transition-colors">
+                  Der Gründer
+                </Link>
+              </div>
+            </div>
+          </div>
         </nav>
 
         <div className="flex items-center gap-3">

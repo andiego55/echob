@@ -8,6 +8,7 @@ import AuthPage             from '@/pages/AuthPage'
 import NotFoundPage         from '@/pages/NotFoundPage'
 import CoachingPage         from '@/pages/CoachingPage'
 import UeberPage            from '@/pages/UeberPage'
+import GruenderInterviewPage from '@/pages/GruenderInterviewPage'
 import FachpersonenPage     from '@/pages/FachpersonenPage'
 import BlogPage             from '@/pages/BlogPage'
 import BlogBeziehungsmusterPage    from '@/pages/BlogBeziehungsmusterPage'
@@ -97,6 +98,7 @@ export default function App() {
       <Route path="/auth"        element={<AuthPage />} />
       <Route path="/coaching"    element={<CoachingPage />} />
       <Route path="/ueber"       element={<UeberPage />} />
+      <Route path="/ueber/gruender" element={<GruenderInterviewPage />} />
       <Route path="/fachpersonen" element={<FachpersonenPage />} />
       <Route path="/blog"        element={<BlogPage />} />
       <Route path="/blog/beziehungsmuster"   element={<BlogBeziehungsmusterPage />} />
