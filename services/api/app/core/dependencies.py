@@ -3,9 +3,9 @@ FastAPI Dependencies für EchoB.
 Werden per `Depends()` in Routen injiziert.
 """
 import asyncpg
-from supabase import Client as SupabaseClient
 from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from supabase import Client as SupabaseClient
 
 from app.core.logging import get_logger
 

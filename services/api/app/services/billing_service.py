@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from app.core.config import settings
@@ -194,7 +194,7 @@ async def fulfill_checkout_session(obj, pool) -> str | None:
     user_id = UUID(user_id_str)
     customer_id = obj.get("customer")
     subscription_id = obj.get("subscription")
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if PRODUCTS[product_key]["mode"] == "payment":
         # Startpaket: fester Zugangs-Zeitraum
@@ -210,7 +210,7 @@ async def fulfill_checkout_session(obj, pool) -> str | None:
                 )
                 period_end = sub.get("current_period_end")
                 if period_end:
-                    ends_at = datetime.fromtimestamp(period_end, tz=timezone.utc)
+                    ends_at = datetime.fromtimestamp(period_end, tz=UTC)
             except Exception:
                 logger.exception("Konnte Subscription %s nicht laden", subscription_id)
 
@@ -266,7 +266,7 @@ async def handle_event(event, pool) -> None:
         period_end = obj.get("current_period_end")
         if not subscription_id or not period_end:
             return
-        ends_at = datetime.fromtimestamp(period_end, tz=timezone.utc)
+        ends_at = datetime.fromtimestamp(period_end, tz=UTC)
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE user_profiles SET subscription_ends_at = $1, updated_at = NOW() "

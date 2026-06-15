@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 from typing import Literal
-from pydantic import BaseModel
 
+from pydantic import BaseModel
 
 PlanType = Literal["trial", "startpaket", "early_bird", "regular", "annual"]
 

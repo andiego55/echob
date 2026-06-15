@@ -5,10 +5,10 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.v1.router import v1_router
 from app.core.config import settings
 from app.core.database import create_pool, create_supabase_admin
 from app.core.logging import get_logger, setup_logging
-from app.api.v1.router import v1_router
 from app.services.echo_service import create_echo_service
 
 

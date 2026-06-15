@@ -3,18 +3,18 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
+from app.schemas.echo import EchoChatResponse, EchoMessageResponse
 from app.schemas.person_profile import (
     PersonProfileModuleUpdate,
     PersonProfileResponse,
     SummaryTextUpdate,
 )
-from app.schemas.echo import EchoChatResponse, EchoMessageResponse
 from app.services.person_profile_service import build_person_context
 from app.services.subscription_service import enforce_echo_prompt_limit
 
@@ -124,7 +124,7 @@ async def update_module(
             """,
             json.dumps(modules),
             completed,
-            datetime.now(timezone.utc),
+            datetime.now(UTC),
             case_id,
         )
     return _row_to_response(dict(row))
@@ -157,7 +157,7 @@ async def save_summary_text(
             RETURNING *
             """,
             json.dumps(body.summary_text),
-            datetime.now(timezone.utc),
+            datetime.now(UTC),
             case_id,
         )
     return _row_to_response(dict(row))

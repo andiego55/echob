@@ -7,10 +7,9 @@ Keine HTTP-Abhängigkeit – nur Python, damit einfach testbar.
 import hashlib
 
 import asyncpg
-from fastapi import HTTPException, status
 
-from app.schemas.waitlist import WaitlistCreateRequest, WaitlistCreateResponse
 from app.core.logging import get_logger
+from app.schemas.waitlist import WaitlistCreateRequest, WaitlistCreateResponse
 
 logger = get_logger(__name__)
 

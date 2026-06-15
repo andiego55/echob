@@ -395,18 +395,6 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
-    async def generate_pattern_hypotheses(
-        self,
-        *,
-        case_context: dict[str, Any],
-        scenes: list[dict[str, Any]],
-        onboarding: dict[str, Any] | None = None,
-    ) -> list[dict[str, Any]]:
-        """Erzeugt vorsichtige Musterhypothesen auf Basis von Szenen."""
-        if self._use_openai:
-            return await self._openai_hypotheses(case_context, scenes, onboarding)
-        return self._mock_hypotheses(scenes)
-
     async def generate_report(
         self,
         *,
@@ -483,12 +471,6 @@ class EchoService:
             "_Dies ist eine Reflexionshilfe, keine Bewertung._"
         )
 
-    async def check_safety(self, *, text: str) -> dict[str, Any]:
-        """Prüft einen Text auf Sicherheitshinweise."""
-        if self._use_openai:
-            return await self._openai_safety_check(text)
-        return self._mock_safety_check(text)
-
     async def classify_risk(self, *, text: str) -> dict[str, Any]:
         """Stuft das Gefährdungs-Risiko einer Nutzernachricht ein.
 
@@ -535,7 +517,7 @@ class EchoService:
             category = None
         return {"level": level, "category": category}
 
-    # ── OpenAI-Implementierungen (Platzhalter bis P1) ─────────────────────────
+    # ── OpenAI-Implementierungen ──────────────────────────────────────────────
 
     async def _openai_chat(self, **kwargs) -> str:  # type: ignore[override]
         system_prompt = _load_prompt("echo_system_prompt.md")
@@ -712,9 +694,6 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
-    async def _openai_hypotheses(self, *args, **kwargs) -> list:
-        raise NotImplementedError("OpenAI-Hypothesen noch nicht implementiert.")
-
     async def _openai_report(
         self,
         report_type: str,
@@ -729,11 +708,12 @@ class EchoService:
         hypotheses: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         import json
+
         from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS
-        from app.services.profile_service import build_profile_context
-        from app.services.person_profile_service import build_person_context
-        from app.services.topic_summary_service import build_topic_context
         from app.services.hypothesis_service import build_hypothesis_context
+        from app.services.person_profile_service import build_person_context
+        from app.services.profile_service import build_profile_context
+        from app.services.topic_summary_service import build_topic_context
 
         system_prompt = _load_prompt("report_generation_prompt.md")
 
@@ -1012,9 +992,6 @@ class EchoService:
             "person_perceived_patterns": person_perceived_patterns,
         }
 
-    async def _openai_safety_check(self, text: str) -> dict:
-        raise NotImplementedError("OpenAI-Sicherheitscheck noch nicht implementiert.")
-
     async def calculate_scales(
         self,
         *,
@@ -1048,9 +1025,10 @@ class EchoService:
         hypotheses: list[dict[str, Any]] | None = None,
     ) -> list[dict[str, Any]]:
         import json
+
+        from app.services.hypothesis_service import build_hypothesis_context
         from app.services.person_profile_service import build_person_context
         from app.services.topic_summary_service import build_topic_context
-        from app.services.hypothesis_service import build_hypothesis_context
 
         system_prompt = _load_prompt("scale_calculation_prompt.md")
 
@@ -1161,23 +1139,6 @@ class EchoService:
             "_mock": True,
         }
 
-    def _mock_hypotheses(self, scenes: list[dict]) -> list[dict]:
-        if not scenes:
-            return []
-        return [
-            {
-                "label": "Mögliche wiederkehrende Muster",
-                "confidence": "low",
-                "source": "Onboarding und Szenen",
-                "note": (
-                    "Auf Basis deiner bisherigen Angaben wurden noch keine "
-                    "Muster identifiziert. Dokumentiere weitere Szenen, "
-                    "um Muster sichtbar zu machen."
-                ),
-                "_mock": True,
-            }
-        ]
-
     def _mock_report(self, report_type: str, case_context: dict) -> dict:
         from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS
         return {
@@ -1196,17 +1157,6 @@ class EchoService:
             ],
             "_mock": True,
         }
-
-    def _mock_safety_check(self, text: str) -> dict:
-        keywords = ["gewalt", "schlag", "droht", "angst", "stalking", "suizid", "notfall"]
-        found = [k for k in keywords if k in text.lower()]
-        if found:
-            return {
-                "status": "elevated",
-                "note": "Der Text enthält mögliche Sicherheitshinweise. Bitte prüfe, ob Unterstützung benötigt wird.",
-                "keywords_found": found,
-            }
-        return {"status": "none", "note": "", "keywords_found": []}
 
     # ── Fachpersonen-Echo ─────────────────────────────────────────────────────
 

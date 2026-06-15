@@ -96,17 +96,40 @@ nächsten API-Request live übernommen — kein Neustart nötig.
 
 ---
 
-## Noch nicht implementiert (Prompts vorhanden, Code fehlt)
+## Hypothesen-Dialoge (tastend, keine Diagnosen)
 
-### `pattern_hypotheses_prompt.md`
-**Musterhypothesen** — bis zu 5 Beziehungsmuster als JSON-Array
-- Status: Prompt fertig, Python-Implementation fehlt noch
-- Platzhalter: `{case_context}`, `{onboarding}`, `{scenes}`, `{scene_count}`
+Geführte Dialoge, die **Arbeitshypothesen** entwickeln. Wann: `thread_type = hyp_*`.
+Gespeicherte Zusammenfassungen fließen als Kontext in weitere Echo-Gespräche.
 
-### `safety_check_prompt.md`
-**Sicherheits-Check** — Erkennung von Gewalt/Krisen-Hinweisen
-- Status: Prompt fertig, Python-Implementation fehlt noch
-- Platzhalter: `{text}`
+- `hypothesis_dynamics_prompt.md` — Beziehungsdynamik & Mechanik (`hyp_dynamics`)
+- `hypothesis_clusterb_prompt.md` — Persönlichkeitsstruktur / Cluster-B-Spektrum (`hyp_clusterb`)
+- `hypothesis_attachment_prompt.md` — Bindungsmuster (`hyp_attachment`)
+- `hypothesis_trauma_prompt.md` — Prägungen & Trauma (`hyp_trauma`)
+- `hypothesis_own_role_prompt.md` — Eigener Anteil & Muster (`hyp_own_role`)
+- `hypothesis_summary_prompt.md` — Hypothesen-Zusammenfassung (Button „Hypothese zusammenfassen")
+
+---
+
+## Sicherheit & Verlauf
+
+### `safety_classify_prompt.md`
+**Sicherheits-Triage** — klassifiziert jede Nutzernachricht (`none`/`unclear`/`elevated`/`acute`)
+- Wann: vor jeder reflektierenden Echo-Antwort (Modell: gpt-4o-mini)
+- Bei `acute` ersetzt Echo die Deutung durch konkrete DACH-Hotlines (`safety_service.py`)
+
+### `review_generation_prompt.md`
+**Rückblick / Verlauf** — narrativer Rückblick über die Zeit (wiederkehrende Muster, Belastungstendenz)
+- Wann: „Rückblick erzeugen" in der Verlauf-Ansicht
+- Quantitative Trends werden separat (deterministisch) berechnet und vorangestellt
+
+---
+
+## Fachpersonen-Echo
+
+### `echo_professional_prompt.md`
+**Fachpersonen-Dialog** — Echo unterstützt die Fachperson bei der Gesprächsvorbereitung
+- Wann: Fachpersonenbereich, Echo zum freigegebenen Fall
+- Ausschließlich freigegebene Inhalte; keine Diagnosen, keine Therapieanweisungen
 
 ---
 
@@ -122,3 +145,7 @@ nächsten API-Request live übernommen — kein Neustart nötig.
 | Berichtstruktur anpassen | `report_generation_prompt.md` |
 | Skalen-Definitionen ändern | `scale_calculation_prompt.md` |
 | Echo in Profilgesprächen anpassen | `profile_echo_prompt.md` / `person_profile_echo_prompt.md` |
+| Hypothesen-Dialoge anpassen | `hypothesis_*_prompt.md` |
+| Sicherheits-Triage justieren | `safety_classify_prompt.md` |
+| Rückblick-Stil anpassen | `review_generation_prompt.md` |
+| Fachpersonen-Echo anpassen | `echo_professional_prompt.md` |

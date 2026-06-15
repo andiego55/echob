@@ -11,10 +11,10 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.professional import (
-    ShareCreate,
-    ShareUpdate,
     CaseShareResponse,
+    ShareCreate,
     ShareElementResponse,
+    ShareUpdate,
 )
 
 router = APIRouter(prefix="/cases/{case_id}/shares", tags=["shares"])

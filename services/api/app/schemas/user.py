@@ -4,8 +4,9 @@ User-Schemas für EchoB.
 Platzhalter – wird in Phase 1 (Auth) weiter ausgebaut.
 Die eigentliche Nutzerverwaltung liegt bei Supabase Auth.
 """
-from pydantic import BaseModel, EmailStr
 from datetime import datetime
+
+from pydantic import BaseModel, EmailStr
 
 
 class UserPublic(BaseModel):

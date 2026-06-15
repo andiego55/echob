@@ -8,11 +8,11 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
-from app.services.invite_service import send_invite_email
 from app.schemas.professional import (
-    ProfessionalInviteCreate,
     ConnectionResponse,
+    ProfessionalInviteCreate,
 )
+from app.services.invite_service import send_invite_email
 
 router = APIRouter(prefix="/professionals", tags=["professionals"])
 

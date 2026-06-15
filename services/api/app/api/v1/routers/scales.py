@@ -8,8 +8,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.core.dependencies import get_current_user, get_pool
-from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
 from app.schemas.scale import SCALE_DEFINITIONS, SCALE_LABELS, ScalesOverviewResponse
+from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/scales", tags=["scales"])

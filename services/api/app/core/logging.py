@@ -1,5 +1,6 @@
 import logging
 import sys
+
 from app.core.config import settings
 
 _logging_configured = False
@@ -29,6 +30,12 @@ def setup_logging() -> None:
     root_logger.setLevel(level)
     root_logger.handlers.clear()
     root_logger.addHandler(handler)
+
+    # Geschwätzige Drittbibliotheken dämpfen — verhindert u. a., dass komplette
+    # OpenAI-Prompts (mit personenbezogenen Daten) ins Log geschrieben werden,
+    # und reduziert das Rauschen erheblich. Greift auch im DEBUG-Modus.
+    for _noisy in ("httpx", "httpcore", "hpack", "openai", "asyncpg", "watchfiles"):
+        logging.getLogger(_noisy).setLevel(logging.WARNING)
 
     _logging_configured = True
 

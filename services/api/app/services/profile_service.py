@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 _SAFETY_LABELS = {
     "no_indication": "keine Hinweise auf Sicherheitsrisiken",
     "unclear": "Sicherheitsstatus unklar",

@@ -1,6 +1,6 @@
-from pydantic import BaseModel, EmailStr, field_validator
 from typing import Literal
-import re
+
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 class WaitlistCreateRequest(BaseModel):

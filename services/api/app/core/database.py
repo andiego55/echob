@@ -5,7 +5,8 @@ Datenbankverbindung für EchoB.
 - Supabase: Auth-Validierung (JWT) und zukünftig Storage/Realtime
 """
 import asyncpg
-from supabase import create_client, Client as SupabaseClient
+from supabase import Client as SupabaseClient
+from supabase import create_client
 
 from app.core.config import settings
 from app.core.logging import get_logger

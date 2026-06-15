@@ -1,7 +1,7 @@
 """Subscription-Service: Trial-Limits und Plan-Status."""
 from __future__ import annotations
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 
@@ -89,7 +89,7 @@ async def get_subscription_status(user_id: str, conn) -> dict:
         "SELECT plan, trial_started_at, subscription_ends_at FROM user_profiles WHERE user_id = $1",
         user_id,
     )
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if not row:
         return {
@@ -109,7 +109,7 @@ async def get_subscription_status(user_id: str, conn) -> dict:
     if plan == "trial":
         started = row["trial_started_at"]
         if started.tzinfo is None:
-            started = started.replace(tzinfo=timezone.utc)
+            started = started.replace(tzinfo=UTC)
         trial_ends_at = started + timedelta(days=TRIAL_DAYS)
         delta = trial_ends_at - now
         is_trial_active = delta.total_seconds() > 0
@@ -117,7 +117,7 @@ async def get_subscription_status(user_id: str, conn) -> dict:
 
     sub_ends = row["subscription_ends_at"]
     if sub_ends is not None and sub_ends.tzinfo is None:
-        sub_ends = sub_ends.replace(tzinfo=timezone.utc)
+        sub_ends = sub_ends.replace(tzinfo=UTC)
 
     # Bezahlter Plan ist aktiv, solange kein Ablaufdatum gesetzt oder es in der
     # Zukunft liegt (Stripe-Webhooks verlängern subscription_ends_at bei Renewal).

@@ -3,16 +3,16 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel as _BaseModel
 
 from app.core.dependencies import get_current_user, get_pool
-from app.schemas.profile import ProfileModuleUpdate, ProfileResponse, ProfileUpdate
 from app.schemas.echo import EchoChatResponse, EchoMessageResponse
+from app.schemas.profile import ProfileModuleUpdate, ProfileResponse, ProfileUpdate
 from app.services.profile_service import build_profile_context
 from app.services.subscription_service import enforce_echo_prompt_limit
-from pydantic import BaseModel as _BaseModel
 
 
 class SummaryTextUpdate(_BaseModel):
@@ -76,7 +76,7 @@ async def update_profile(
             json.dumps(body.summary),
             body.safety_status,
             body.completed_modules,
-            datetime.now(timezone.utc),
+            datetime.now(UTC),
             user_id,
         )
     return _row_to_response(dict(row))
@@ -119,7 +119,7 @@ async def update_module(
             json.dumps(modules),
             completed,
             safety_status,
-            datetime.now(timezone.utc),
+            datetime.now(UTC),
             user_id,
         )
     return _row_to_response(dict(row))
@@ -144,7 +144,7 @@ async def save_summary_text(
             RETURNING *
             """,
             json.dumps(body.summary_text),
-            datetime.now(timezone.utc),
+            datetime.now(UTC),
             user_id,
         )
     return _row_to_response(dict(row))
@@ -169,7 +169,7 @@ async def save_display_name(
             RETURNING *
             """,
             name or None,
-            datetime.now(timezone.utc),
+            datetime.now(UTC),
             user_id,
         )
     return _row_to_response(dict(row))
@@ -216,7 +216,6 @@ async def profile_echo_chat(
     })
 
     # Profil-Echo nutzt einen eigenen Prompt + Kontext
-    from pathlib import Path
     from app.services.echo_service import _load_prompt
     system_prompt = _load_prompt("profile_echo_prompt.md")
 

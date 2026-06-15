@@ -14,8 +14,8 @@ from typing import Any
 from fastapi import HTTPException
 
 from app.services.echo_service import build_case_context
-from app.services.profile_service import build_profile_context
 from app.services.person_profile_service import build_person_context
+from app.services.profile_service import build_profile_context
 from app.services.topic_summary_service import build_topic_context
 
 

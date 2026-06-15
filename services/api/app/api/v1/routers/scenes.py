@@ -7,10 +7,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
 from app.core.dependencies import get_current_user, get_pool
-from app.services.subscription_service import enforce_echo_prompt_limit, enforce_trial_limits
 from app.schemas.scene import (
-    SceneConfirm, SceneCreate, SceneListResponse, SceneResponse, SceneUpdate,
+    SceneConfirm,
+    SceneCreate,
+    SceneListResponse,
+    SceneResponse,
+    SceneUpdate,
 )
+from app.services.subscription_service import enforce_echo_prompt_limit, enforce_trial_limits
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/scenes", tags=["scenes"])

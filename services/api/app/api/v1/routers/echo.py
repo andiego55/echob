@@ -1,13 +1,12 @@
 """Router: Echo-Chat — /api/v1/cases/{case_id}/echo"""
 from __future__ import annotations
 
+import json as _json
 import logging
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
-
-import json as _json
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.echo import (
@@ -18,11 +17,11 @@ from app.schemas.echo import (
     EchoMessageResponse,
 )
 from app.services.echo_service import build_case_context
-from app.services.profile_service import build_profile_context
+from app.services.hypothesis_service import build_hypothesis_context
 from app.services.person_profile_service import build_person_context
+from app.services.profile_service import build_profile_context
 from app.services.subscription_service import enforce_echo_prompt_limit
 from app.services.topic_summary_service import build_topic_context
-from app.services.hypothesis_service import build_hypothesis_context
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/echo", tags=["echo"])
@@ -600,7 +599,7 @@ async def reset_topic_history(
             "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
             case_id, current_user["user_id"],
         )
-        result = await conn.execute(
+        await conn.execute(
             "DELETE FROM echo_messages WHERE case_id = $1 AND user_id = $2 AND thread_type = $3",
             case_id, current_user["user_id"], thread_type,
         )

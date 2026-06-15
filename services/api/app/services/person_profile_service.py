@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 _LEVEL_LABELS = {
     (1.0, 1.9): "niedrig",
     (2.0, 2.9): "eher niedrig",

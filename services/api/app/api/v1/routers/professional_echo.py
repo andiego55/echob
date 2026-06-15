@@ -12,12 +12,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.core.dependencies import get_current_professional, get_pool
-from app.services.sharing_service import (
-    require_active_share,
-    load_shared_bundle,
-    build_shared_case_context,
-)
-from app.services.subscription_service import enforce_professional_echo_limit
 from app.schemas.professional import (
     ProfessionalEchoChatRequest,
     ProfessionalEchoChatResponse,
@@ -27,6 +21,12 @@ from app.schemas.professional import (
     ProfessionalEchoSummaryCreate,
     ProfessionalEchoSummaryResponse,
 )
+from app.services.sharing_service import (
+    build_shared_case_context,
+    load_shared_bundle,
+    require_active_share,
+)
+from app.services.subscription_service import enforce_professional_echo_limit
 
 router = APIRouter(prefix="/professional/cases/{case_id}/echo", tags=["professional-echo"])
 

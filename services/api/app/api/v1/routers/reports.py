@@ -9,11 +9,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 
 from app.core.dependencies import get_current_user, get_pool
-from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
 from app.schemas.report import (
-    REPORT_DISCLAIMER, REPORT_TYPE_LABELS,
-    ReportCreate, ReportListResponse, ReportResponse,
+    REPORT_DISCLAIMER,
+    REPORT_TYPE_LABELS,
+    ReportCreate,
+    ReportListResponse,
+    ReportResponse,
 )
+from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/reports", tags=["reports"])

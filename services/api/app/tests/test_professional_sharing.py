@@ -19,9 +19,9 @@ import pytest
 from fastapi import HTTPException
 
 from app.services.sharing_service import (
-    require_active_share,
-    load_shared_bundle,
     build_shared_case_context,
+    load_shared_bundle,
+    require_active_share,
 )
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
@@ -114,7 +114,7 @@ async def test_unrelated_professional_has_no_access(db):
 
 async def test_response_sanitizers_strip_owner_data():
     """case_detail-Helfer geben weder Owner-UUID noch Abo-Daten an die Fachperson."""
-    from app.api.v1.routers.professional import _public_row, _public_profile
+    from app.api.v1.routers.professional import _public_profile, _public_row
 
     out = _public_row({"id": "x", "user_id": "OWNER", "pattern_tags": '["a"]'}, ("pattern_tags",))
     assert "user_id" not in out

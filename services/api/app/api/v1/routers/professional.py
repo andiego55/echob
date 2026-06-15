@@ -11,18 +11,18 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from app.core.dependencies import get_current_user, get_current_professional, get_pool
-from app.services.echo_service import _REL_TYPE_LABELS
-from app.services.sharing_service import require_active_share, load_shared_bundle
+from app.core.dependencies import get_current_professional, get_current_user, get_pool
 from app.schemas.professional import (
+    GlossaryTerm,
+    InboxItem,
+    ProfessionalCaseSummary,
+    ProfessionalClientGroup,
+    ProfessionalNote,
     ProfessionalProfileResponse,
     ProfessionalRegister,
-    InboxItem,
-    ProfessionalClientGroup,
-    ProfessionalCaseSummary,
-    ProfessionalNote,
-    GlossaryTerm,
 )
+from app.services.echo_service import _REL_TYPE_LABELS
+from app.services.sharing_service import load_shared_bundle, require_active_share
 
 router = APIRouter(prefix="/professional", tags=["professional"])
 
