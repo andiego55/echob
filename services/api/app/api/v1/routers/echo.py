@@ -22,6 +22,7 @@ from app.services.profile_service import build_profile_context
 from app.services.person_profile_service import build_person_context
 from app.services.subscription_service import enforce_echo_prompt_limit
 from app.services.topic_summary_service import build_topic_context
+from app.services.hypothesis_service import build_hypothesis_context
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/echo", tags=["echo"])
@@ -75,6 +76,9 @@ async def chat(
         topic_summary_rows = await conn.fetch(
             "SELECT topic, summary_text FROM topic_summaries WHERE case_id = $1", case_id
         )
+        hypothesis_rows = await conn.fetch(
+            "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1", case_id
+        )
 
         # Chat-Session auflösen (nur freier Echo-Chat). Ohne ID wird lazy eine
         # neue Session angelegt — die ID geht in der Response zurück.
@@ -126,6 +130,7 @@ async def chat(
     scenes = [dict(r) for r in scene_rows]
     scale_scores = [dict(r) for r in scale_rows]
     topic_summaries = [dict(r) for r in topic_summary_rows]
+    hypotheses = [dict(r) for r in hypothesis_rows]
 
     session_meta = _json.dumps({"scene_session_id": body.scene_session_id}) if body.scene_session_id else "{}"
 
@@ -159,6 +164,11 @@ async def chat(
             topic_ctx = build_topic_context(topic_summaries)
             if topic_ctx:
                 context_text += "\n\n" + topic_ctx
+
+        if hypotheses:
+            hyp_ctx = build_hypothesis_context(hypotheses)
+            if hyp_ctx:
+                context_text += "\n\n" + hyp_ctx
 
         context_meta = _json.dumps({
             "scene_session_id": body.scene_session_id,
@@ -243,19 +253,10 @@ async def chat(
                 context_parts.append(topic_ctx)
 
         # Gespeicherte Hypothesen (tastend) — fließen als Kontext in alle Gespräche ein
-        try:
-            async with pool.acquire() as conn:
-                hyp_rows = await conn.fetch(
-                    "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1",
-                    case_id,
-                )
-            if hyp_rows:
-                from app.services.hypothesis_service import build_hypothesis_context
-                hyp_ctx = build_hypothesis_context([dict(r) for r in hyp_rows])
-                if hyp_ctx:
-                    context_parts.append(hyp_ctx)
-        except Exception:
-            logger.warning("Hypothesen-Kontext konnte nicht geladen werden", exc_info=True)
+        if hypotheses:
+            hyp_ctx = build_hypothesis_context(hypotheses)
+            if hyp_ctx:
+                context_parts.append(hyp_ctx)
 
         # Hypothesen-Dialoge: zusätzlich den quantitativen Verlauf injizieren
         if body.thread_type.startswith("hyp_"):
@@ -303,6 +304,10 @@ async def chat(
                 topic_ctx = build_topic_context(topic_summaries)
                 if topic_ctx:
                     extra_context += "\n\n" + topic_ctx
+            if hypotheses:
+                hyp_ctx = build_hypothesis_context(hypotheses)
+                if hyp_ctx:
+                    extra_context += "\n\n" + hyp_ctx
 
     # ── Sicherheits-Triage ────────────────────────────────────────────────────
     # Aktive Krisenerkennung statt passivem Disclaimer: Deutet die Nachricht auf

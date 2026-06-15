@@ -77,6 +77,9 @@ async def create_report(
         topic_summary_rows = await conn.fetch(
             "SELECT topic, summary_text FROM topic_summaries WHERE case_id = $1", case_id
         )
+        hypothesis_rows = await conn.fetch(
+            "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1", case_id
+        )
 
     case_context = dict(case_row)
     scenes_data = [dict(r) for r in scenes]
@@ -85,6 +88,7 @@ async def create_report(
     user_profile_data = dict(user_profile_row) if user_profile_row else None
     person_profile_data = dict(person_profile_row) if person_profile_row else None
     topic_summaries_data = [dict(r) for r in topic_summary_rows]
+    hypotheses_data = [dict(r) for r in hypothesis_rows]
 
     if echo_svc:
         content = await echo_svc.generate_report(
@@ -96,6 +100,7 @@ async def create_report(
             user_profile=user_profile_data,
             person_profile=person_profile_data,
             topic_summaries=topic_summaries_data,
+            hypotheses=hypotheses_data,
         )
     else:
         content = {

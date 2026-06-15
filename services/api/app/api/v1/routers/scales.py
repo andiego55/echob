@@ -104,6 +104,9 @@ async def calculate_scales(
         topic_summary_rows = await conn.fetch(
             "SELECT topic, summary_text FROM topic_summaries WHERE case_id = $1", case_id
         )
+        hypothesis_rows = await conn.fetch(
+            "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1", case_id
+        )
         scene_count = await conn.fetchval(
             "SELECT COUNT(*) FROM scenes WHERE case_id = $1 AND confirmed_by_user = true", case_id
         )
@@ -114,6 +117,7 @@ async def calculate_scales(
         onboarding=dict(onboarding_row) if onboarding_row else None,
         person_profile=dict(person_profile_row) if person_profile_row else None,
         topic_summaries=[dict(r) for r in topic_summary_rows],
+        hypotheses=[dict(r) for r in hypothesis_rows],
     )
 
     # Alle bisherigen Werte ersetzen, neu einfügen

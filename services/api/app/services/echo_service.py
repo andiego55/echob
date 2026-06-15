@@ -418,13 +418,14 @@ class EchoService:
         user_profile: dict[str, Any] | None = None,
         person_profile: dict[str, Any] | None = None,
         topic_summaries: list[dict[str, Any]] | None = None,
+        hypotheses: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """Erzeugt einen strukturierten Bericht."""
         if self._use_openai:
             return await self._openai_report(
                 report_type, case_context, scenes, scale_scores, onboarding,
                 user_profile=user_profile, person_profile=person_profile,
-                topic_summaries=topic_summaries,
+                topic_summaries=topic_summaries, hypotheses=hypotheses,
             )
         return self._mock_report(report_type, case_context)
 
@@ -725,12 +726,14 @@ class EchoService:
         user_profile: dict[str, Any] | None = None,
         person_profile: dict[str, Any] | None = None,
         topic_summaries: list[dict[str, Any]] | None = None,
+        hypotheses: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         import json
         from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS
         from app.services.profile_service import build_profile_context
         from app.services.person_profile_service import build_person_context
         from app.services.topic_summary_service import build_topic_context
+        from app.services.hypothesis_service import build_hypothesis_context
 
         system_prompt = _load_prompt("report_generation_prompt.md")
 
@@ -770,6 +773,11 @@ class EchoService:
             topic_ctx = build_topic_context(topic_summaries)
             if topic_ctx:
                 context_parts.append(topic_ctx)
+
+        if hypotheses:
+            hyp_ctx = build_hypothesis_context(hypotheses)
+            if hyp_ctx:
+                context_parts.append(hyp_ctx)
 
         full_context = "\n\n---\n\n".join(context_parts)
 
@@ -1015,6 +1023,7 @@ class EchoService:
         onboarding: dict[str, Any] | None = None,
         person_profile: dict[str, Any] | None = None,
         topic_summaries: list[dict[str, Any]] | None = None,
+        hypotheses: list[dict[str, Any]] | None = None,
     ) -> list[dict[str, Any]]:
         """Berechnet alle 15 Skalen per KI aus dem Fallkontext."""
         if self._client is None:
@@ -1025,6 +1034,7 @@ class EchoService:
             onboarding=onboarding,
             person_profile=person_profile,
             topic_summaries=topic_summaries,
+            hypotheses=hypotheses,
         )
 
     async def _openai_calculate_scales(
@@ -1035,10 +1045,12 @@ class EchoService:
         onboarding: dict[str, Any] | None = None,
         person_profile: dict[str, Any] | None = None,
         topic_summaries: list[dict[str, Any]] | None = None,
+        hypotheses: list[dict[str, Any]] | None = None,
     ) -> list[dict[str, Any]]:
         import json
         from app.services.person_profile_service import build_person_context
         from app.services.topic_summary_service import build_topic_context
+        from app.services.hypothesis_service import build_hypothesis_context
 
         system_prompt = _load_prompt("scale_calculation_prompt.md")
 
@@ -1060,6 +1072,11 @@ class EchoService:
             topic_ctx = build_topic_context(topic_summaries)
             if topic_ctx:
                 context_parts.append(topic_ctx)
+
+        if hypotheses:
+            hyp_ctx = build_hypothesis_context(hypotheses)
+            if hyp_ctx:
+                context_parts.append(hyp_ctx)
 
         full_context = "\n\n---\n\n".join(context_parts)
         user_message = f"Berechne alle 15 Skalen für diesen Fall:\n\n{full_context}"
