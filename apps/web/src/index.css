@@ -25,8 +25,9 @@
   }
 
   .btn-primary {
-    @apply btn bg-accent text-white shadow-[0_4px_16px_rgba(224,123,84,0.3)]
-           hover:bg-accent-hover focus-visible:outline-accent;
+    @apply btn bg-accent text-white shadow-[0_6px_18px_rgba(224,123,84,0.28)]
+           hover:bg-accent-hover hover:shadow-[0_8px_22px_rgba(224,123,84,0.34)]
+           focus-visible:outline-accent;
   }
 
   .btn-outline {
@@ -47,9 +48,8 @@
   /* ── Cards ───────────────────────────────────────────────────── */
   .card {
     @apply bg-brand-card border border-brand-border rounded-brand p-6
-           shadow-[0_2px_8px_rgba(15,30,46,0.06)]
-           transition-all duration-200
-           hover:shadow-[0_6px_20px_rgba(15,30,46,0.10)] hover:-translate-y-0.5;
+           shadow-brand transition-all duration-200
+           hover:shadow-brand-lg hover:-translate-y-0.5;
   }
 
   /* ── Safety Notice ───────────────────────────────────────────── */

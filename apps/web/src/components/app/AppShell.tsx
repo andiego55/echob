@@ -23,7 +23,7 @@ export default function AppShell({ children }: Props) {
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col">
       {/* App-Header */}
-      <header className="bg-navy border-b border-white/[0.07] sticky top-0 z-40">
+      <header className="bg-gradient-to-b from-navy to-navy-dark border-b border-white/[0.08] shadow-[0_8px_24px_-12px_rgba(7,14,24,0.55)] sticky top-0 z-40">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 h-14">
           <Link
             to="/app"
@@ -44,10 +44,10 @@ export default function AppShell({ children }: Props) {
                 to={to}
                 end={end}
                 className={({ isActive }) =>
-                  `px-3 py-1.5 rounded-md text-sm font-medium no-underline transition-colors ${
+                  `px-3 py-1.5 rounded-brand-sm text-sm font-medium no-underline transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-white'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'bg-white/[0.12] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]'
+                      : 'text-white/60 hover:text-white hover:bg-white/[0.06]'
                   }`
                 }
               >
