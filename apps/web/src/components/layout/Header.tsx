@@ -59,8 +59,13 @@ export default function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-navy border-b border-white/[0.07]">
       <div className="mx-auto flex max-w-[960px] items-center justify-between gap-5 px-6 h-[60px]">
-        <Link to="/" className="text-[1.35rem] font-extrabold tracking-[-0.02em] text-white no-underline">
-          Echo<span className="text-accent">B</span>
+        <Link to="/" className="flex items-center gap-2.5 text-[1.35rem] font-extrabold tracking-[-0.02em] text-white no-underline">
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6 shrink-0">
+            <circle cx="12" cy="12" r="9.5" fill="none" stroke="#e07b54" strokeWidth="1.5" opacity="0.4" />
+            <circle cx="12" cy="12" r="5.8" fill="none" stroke="#e07b54" strokeWidth="1.9" opacity="0.9" />
+            <circle cx="12" cy="12" r="2.6" fill="#e07b54" />
+          </svg>
+          <span>Echo<span className="text-accent">B</span></span>
         </Link>
 
         <nav className="hidden items-center gap-5 md:flex">
