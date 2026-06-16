@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="EchoB">
+  <defs>
+    <radialGradient id="echob-bg" cx="0.72" cy="0.26" r="0.95">
+      <stop offset="0" stop-color="#1e3a55"/>
+      <stop offset="0.55" stop-color="#0f1e2e"/>
+      <stop offset="1" stop-color="#0a141f"/>
+    </radialGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="url(#echob-bg)"/>
+  <circle cx="16" cy="16" r="10.6" fill="none" stroke="#e07b54" stroke-width="1.8" opacity="0.38"/>
+  <circle cx="16" cy="16" r="6.5" fill="none" stroke="#e07b54" stroke-width="2.2" opacity="0.8"/>
+  <circle cx="16" cy="16" r="2.9" fill="#e07b54"/>
+</svg>

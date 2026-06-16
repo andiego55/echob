@@ -1,0 +1,14 @@
+{
+  "name": "EchoB – Erkenne, was sich wiederholt.",
+  "short_name": "EchoB",
+  "description": "EchoB hilft dir, belastende Beziehungssituationen zu sortieren und wiederkehrende Muster sichtbar zu machen.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1e2e",
+  "theme_color": "#0f1e2e",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }
+  ]
+}
