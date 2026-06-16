@@ -5,6 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { LockProvider } from './contexts/LockContext.tsx'
 import App from './App.tsx'
+// Fonts self-hosted (DSGVO: kein Request an Google Fonts) – Familie bleibt "Inter"
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
+import '@fontsource/inter/700.css'
 import './index.css'
 
 const queryClient = new QueryClient({
