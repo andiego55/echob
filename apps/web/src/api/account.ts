@@ -20,6 +20,7 @@ export interface ConsentRecord {
   version: string
   privacy_policy: boolean
   sensitive_ai: boolean
+  age_confirmed: boolean
   accepted_at: string
 }
 
@@ -34,6 +35,7 @@ export async function recordConsent(body: {
   version: string
   privacy_policy: boolean
   sensitive_ai: boolean
+  age_confirmed: boolean
   items?: Record<string, unknown>
 }): Promise<ConsentRecord> {
   const res = await apiClient.post('/account/consent', body)

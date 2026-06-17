@@ -13,6 +13,15 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
+def _mask_email(email: str) -> str:
+    """Maskiert eine E-Mail fürs Logging (Datenminimierung): a***@domain."""
+    try:
+        local, domain = email.split("@", 1)
+        return f"{local[:1]}***@{domain}"
+    except ValueError:
+        return "***"
+
+
 def send_invite_email(supabase, email: str) -> bool:
     """Versucht der Fachperson eine Einladungs-Mail zu schicken. True bei Erfolg.
 
@@ -27,8 +36,8 @@ def send_invite_email(supabase, email: str) -> bool:
     redirect_to = f"{settings.frontend_url.rstrip('/')}/auth?role=professional"
     try:
         supabase.auth.admin.invite_user_by_email(email, {"redirect_to": redirect_to})
-        logger.info("Invite-Mail an %s versendet.", email)
+        logger.info("Invite-Mail an %s versendet.", _mask_email(email))
         return True
     except Exception as exc:  # noqa: BLE001 — best effort; Invite-Zeile bleibt Quelle der Wahrheit
-        logger.warning("Invite-Mail an %s fehlgeschlagen: %s", email, exc)
+        logger.warning("Invite-Mail an %s fehlgeschlagen: %s", _mask_email(email), exc)
         return False

@@ -42,7 +42,7 @@ export default function DevNoticeModal() {
         <ul className="space-y-2 mb-4">
           <li className="flex gap-2 text-sm text-brand-muted">
             <span className="text-amber-500 font-bold flex-shrink-0">!</span>
-            <span><strong className="text-navy">Keine realen Beziehungssituationen</strong> und keine echten persönlichen Daten eingeben – nutze erfundene oder verfremdete Beispiele.</span>
+            <span><strong className="text-navy">Keine Klarnamen und keine echten Daten Dritter</strong> – auch nicht von der anderen Person. Nutze Pseudonyme und verfremdete Beispiele statt realer Namen, Orte oder Kontaktdaten.</span>
           </li>
           <li className="flex gap-2 text-sm text-brand-muted">
             <span className="text-amber-500 font-bold flex-shrink-0">!</span>

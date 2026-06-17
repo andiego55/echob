@@ -18,7 +18,7 @@ export default function ImpressumPage() {
         <div className="mx-auto max-w-[720px] space-y-10 text-brand-text leading-[1.75]">
 
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">Angaben gemäß § 5 TMG</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">Angaben gemäß § 5 DDG</h2>
             <p>
               Max Mustermann<br />
               Dorfstraße 1<br />
@@ -61,7 +61,7 @@ export default function ImpressumPage() {
             <p className="text-brand-muted text-sm mb-4">
               Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt.
               Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte übernehmen
-              wir jedoch keine Gewähr. Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG
+              wir jedoch keine Gewähr. Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG
               für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen
               verantwortlich.
             </p>

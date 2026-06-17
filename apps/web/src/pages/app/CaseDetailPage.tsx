@@ -177,6 +177,9 @@ export default function CaseDetailPage() {
           EchoB analysiert Beziehungsmuster auf Basis deiner eigenen Angaben.
           Die App ersetzt keine psychologische Beratung und stellt keine Diagnosen.
         </p>
+
+        {/* Gefahrenzone: Fall endgültig löschen */}
+        <DangerZone caseId={caseId!} />
       </div>
     </AppShell>
   )
@@ -477,5 +480,70 @@ function QuickCard({ icon, title, value, to, cta }: {
       <p className="text-sm font-medium text-navy mb-3">{value}</p>
       <span className="text-xs text-accent font-medium">{cta} →</span>
     </Link>
+  )
+}
+
+function DangerZone({ caseId }: { caseId: string }) {
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+  const [open, setOpen] = useState(false)
+  const [confirmText, setConfirmText] = useState('')
+
+  const del = useMutation({
+    mutationFn: () => casesApi.deleteForever(caseId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cases'] })
+      navigate('/app', { replace: true })
+    },
+  })
+
+  return (
+    <div className="mt-8 rounded-brand border border-red-200 bg-red-50/50 px-5 py-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-red-700">Fall endgültig löschen</p>
+          <p className="text-xs text-brand-muted">
+            Entfernt diesen Fall mit allen Szenen, Echo-Gesprächen, Berichten und Hypothesen – unwiderruflich.
+          </p>
+        </div>
+        {!open && (
+          <button onClick={() => setOpen(true)} className="text-sm text-red-600 hover:underline shrink-0">
+            Löschen…
+          </button>
+        )}
+      </div>
+
+      {open && (
+        <div className="mt-3 border-t border-red-200 pt-3">
+          <p className="text-sm text-red-800 mb-2">
+            Tippe <strong>LÖSCHEN</strong>, um diesen Fall unwiderruflich zu entfernen.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder="LÖSCHEN"
+              className="w-40 rounded-brand border border-red-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-500"
+            />
+            <button
+              onClick={() => del.mutate()}
+              disabled={confirmText.trim().toUpperCase() !== 'LÖSCHEN' || del.isPending}
+              className="rounded-brand bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 disabled:hover:bg-red-600"
+            >
+              {del.isPending ? 'Lösche…' : 'Endgültig löschen'}
+            </button>
+            <button
+              onClick={() => { setOpen(false); setConfirmText('') }}
+              className="px-3 py-2 text-sm text-brand-muted hover:text-navy"
+            >
+              Abbrechen
+            </button>
+          </div>
+          {del.isError && (
+            <p className="mt-2 text-sm text-red-600">Löschen fehlgeschlagen. Bitte erneut versuchen.</p>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

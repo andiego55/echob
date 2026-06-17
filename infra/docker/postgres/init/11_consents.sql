@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS user_consents (
     version         TEXT        NOT NULL,                      -- Version des Einwilligungstexts
     privacy_policy  BOOLEAN     NOT NULL DEFAULT FALSE,        -- Datenschutzerklärung akzeptiert
     sensitive_ai    BOOLEAN     NOT NULL DEFAULT FALSE,        -- Art. 9 + KI/OpenAI (USA) ausdrücklich
+    age_confirmed   BOOLEAN     NOT NULL DEFAULT FALSE,        -- Bestätigung: mindestens 18 Jahre
     items           JSONB       NOT NULL DEFAULT '{}'::jsonb,  -- Wortlaut/Details der Zustimmung
     accepted_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

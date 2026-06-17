@@ -153,6 +153,10 @@ export default function SceneNewPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <p className="rounded-brand border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            Bitte <strong>keine Klarnamen oder echten Kontaktdaten</strong> eingeben – auch nicht von der anderen Person. Nutze Pseudonyme (z.&nbsp;B. „M.").
+          </p>
+
           {/* Titel + Datum */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>

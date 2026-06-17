@@ -34,14 +34,21 @@ export default function ConsentGate() {
 
   const [privacy, setPrivacy] = useState(false)
   const [sensitive, setSensitive] = useState(false)
+  const [age, setAge] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   if (!enabled || isLoading || isError) return null
 
   const consented =
-    !!data && data.version === CONSENT_VERSION && data.privacy_policy && data.sensitive_ai
+    !!data &&
+    data.version === CONSENT_VERSION &&
+    data.privacy_policy &&
+    data.sensitive_ai &&
+    data.age_confirmed
   if (consented) return null
+
+  const allChecked = privacy && sensitive && age
 
   const submit = async () => {
     setError(null)
@@ -51,6 +58,7 @@ export default function ConsentGate() {
         version: CONSENT_VERSION,
         privacy_policy: privacy,
         sensitive_ai: sensitive,
+        age_confirmed: age,
       })
       await queryClient.invalidateQueries({ queryKey: ['consent'] })
     } catch {
@@ -61,7 +69,7 @@ export default function ConsentGate() {
 
   return (
     <div className="fixed inset-0 z-[210] flex items-center justify-center bg-navy/70 backdrop-blur-sm px-4">
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl p-6 md:p-8">
+      <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-bold text-navy leading-snug mb-3">
           Bevor es losgeht: deine Einwilligung
         </h2>
@@ -95,13 +103,21 @@ export default function ConsentGate() {
               (Art. 9 DSGVO) KI-gestützt verarbeitet – inkl. Übermittlung an OpenAI (USA).
             </span>
           </label>
+          <label className="flex gap-2.5 text-sm text-brand-text cursor-pointer">
+            <input
+              type="checkbox" checked={age}
+              onChange={(e) => setAge(e.target.checked)}
+              className="mt-0.5 h-4 w-4 flex-shrink-0 accent-accent"
+            />
+            <span>Ich bin <strong>mindestens 18 Jahre</strong> alt.</span>
+          </label>
         </div>
 
         {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
 
         <button
           onClick={submit}
-          disabled={!privacy || !sensitive || saving}
+          disabled={!allChecked || saving}
           className="btn-primary w-full disabled:opacity-50"
         >
           {saving ? 'Speichere…' : 'Einwilligen & fortfahren'}

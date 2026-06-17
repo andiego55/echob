@@ -134,7 +134,7 @@ def _affected(status: str) -> int:
 async def get_latest_consent(conn: asyncpg.Connection, user_id: str) -> dict | None:
     """Neueste erteilte Einwilligung der Person, oder None."""
     row = await conn.fetchrow(
-        "SELECT version, privacy_policy, sensitive_ai, accepted_at "
+        "SELECT version, privacy_policy, sensitive_ai, age_confirmed, accepted_at "
         "FROM user_consents WHERE user_id = $1 ORDER BY accepted_at DESC LIMIT 1",
         user_id,
     )
@@ -147,13 +147,15 @@ async def record_consent(
     version: str,
     privacy_policy: bool,
     sensitive_ai: bool,
+    age_confirmed: bool,
     items: dict | None,
 ) -> dict:
     """Protokolliert eine erteilte Einwilligung (append-only)."""
     row = await conn.fetchrow(
-        "INSERT INTO user_consents (user_id, version, privacy_policy, sensitive_ai, items) "
-        "VALUES ($1, $2, $3, $4, $5::jsonb) "
-        "RETURNING version, privacy_policy, sensitive_ai, accepted_at",
-        user_id, version, privacy_policy, sensitive_ai, json.dumps(items or {}),
+        "INSERT INTO user_consents "
+        "(user_id, version, privacy_policy, sensitive_ai, age_confirmed, items) "
+        "VALUES ($1, $2, $3, $4, $5, $6::jsonb) "
+        "RETURNING version, privacy_policy, sensitive_ai, age_confirmed, accepted_at",
+        user_id, version, privacy_policy, sensitive_ai, age_confirmed, json.dumps(items or {}),
     )
     return dict(row)

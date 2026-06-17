@@ -20,6 +20,12 @@ export default function DatenschutzPage() {
       <section className="px-6 py-[72px]">
         <div className="mx-auto max-w-[720px] space-y-10 text-brand-text leading-[1.75]">
 
+          <div className="rounded-brand border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+            <strong>Vorläufige Entwurfsfassung (Entwicklungsphase).</strong> EchoB befindet sich
+            im Aufbau. Diese Erklärung beschreibt die geplante Verarbeitung und ist noch nicht
+            abschließend rechtlich geprüft. Die Angaben zum Verantwortlichen sind Platzhalter.
+          </div>
+
           {/* 1. Verantwortlicher */}
           <div>
             <h2 className="text-lg font-bold text-navy mb-3">1. Verantwortlicher</h2>
@@ -30,73 +36,174 @@ export default function DatenschutzPage() {
               111 Hellersdorf<br />
               Deutschland<br /><br />
               E-Mail:{' '}
-              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">
-                max.m@echob.de
-              </a>
+              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">max.m@echob.de</a>
             </p>
           </div>
 
-          {/* 2. Datenschutzbeauftragter */}
+          {/* 2. Was EchoB ist */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">2. Datenschutzbeauftragter</h2>
-            <p>
-              Max Mustermann<br />
-              Dorfstraße 1<br />
-              111 Hellersdorf<br /><br />
-              E-Mail:{' '}
-              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">
-                max.m@echob.de
-              </a>
+            <h2 className="text-lg font-bold text-navy mb-3">2. Worum es geht</h2>
+            <p className="text-brand-muted text-sm">
+              EchoB ist eine fallbasierte Reflexionsplattform für belastende Beziehungssituationen.
+              Dabei verarbeiten wir <strong className="text-navy">besonders sensible Inhalte</strong> –
+              Angaben zu deinen Beziehungen, Erlebnissen und deinem psychischen Befinden – und nutzen
+              dafür <strong className="text-navy">KI-Unterstützung</strong>. Diese Erklärung legt offen,
+              welche Daten dabei wie verarbeitet werden.
             </p>
           </div>
 
-          {/* 3. Welche Daten wir verarbeiten */}
+          {/* 3. Konto & Anmeldung */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">3. Welche Daten wir verarbeiten</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">3. Konto und Anmeldung</h2>
+            <p className="text-brand-muted text-sm">
+              Für die Nutzung legst du ein Konto an (E-Mail und Passwort, alternativ Anmeldung über
+              Google). Die Authentifizierung wickeln wir über unseren Dienstleister Supabase ab; dort
+              werden E-Mail-Adresse und ein verschlüsselter Passwort-Hash gespeichert.
+              <br /><br />
+              <strong className="text-navy">Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO
+              (Vertragserfüllung).
+            </p>
+          </div>
+
+          {/* 4. Reflexionsinhalte – besondere Kategorien */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">
+              4. Reflexionsinhalte (besondere Kategorien, Art. 9 DSGVO)
+            </h2>
+            <p className="text-brand-muted text-sm mb-3">
+              Im geschützten Bereich erfasst du u. a. Fälle, Szenen, Gespräche mit „Echo", Skalen,
+              Berichte, Hypothesen und Profile. Diese Inhalte können Angaben zu deiner Gesundheit,
+              deinem psychischen Befinden und deinem Privat-/Sexualleben enthalten und gelten damit
+              als <strong className="text-navy">besondere Kategorien personenbezogener Daten</strong>.
+            </p>
+            <p className="text-brand-muted text-sm">
+              <strong className="text-navy">Rechtsgrundlage:</strong> deine{' '}
+              <strong className="text-navy">ausdrückliche Einwilligung</strong> nach Art. 9 Abs. 2
+              lit. a DSGVO, die wir vor der Nutzung einholen und protokollieren, sowie Art. 6 Abs. 1
+              lit. b DSGVO (Vertrag). Du kannst die Einwilligung jederzeit mit Wirkung für die
+              Zukunft widerrufen (siehe Abschnitt 10).
+            </p>
+          </div>
+
+          {/* 5. KI-Verarbeitung & Drittlandtransfer */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">5. KI-Verarbeitung & Übermittlung in die USA</h2>
+            <p className="text-brand-muted text-sm mb-3">
+              Zur Erzeugung von Antworten, Zusammenfassungen und Berichten übermitteln wir die
+              jeweils relevanten Inhalte an <strong className="text-navy">OpenAI</strong> (OpenAI,
+              L.L.C., USA). Bei der Sprach-Schnellerfassung wird zusätzlich eine Audioaufnahme zur
+              Transkription übermittelt. Eine Verarbeitung in den USA bedeutet ein
+              Drittland ohne generell gleichwertiges Datenschutzniveau.
+            </p>
+            <p className="text-brand-muted text-sm">
+              <strong className="text-navy">Rechtsgrundlage und Garantien:</strong> ausdrückliche
+              Einwilligung nach Art. 9 Abs. 2 lit. a in Verbindung mit Art. 49 Abs. 1 lit. a DSGVO
+              (Einwilligung in die Drittlandübermittlung) sowie – soweit einschlägig – Standard­vertrags­klauseln
+              mit dem Anbieter. API-Inhalte werden vom Anbieter nicht zum Training seiner Modelle genutzt.
+            </p>
+          </div>
+
+          {/* 6. Weitere Verarbeitungen */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">6. Weitere Verarbeitungen</h2>
+
+            <h3 className="font-semibold text-navy mb-1">Zahlungen</h3>
+            <p className="text-brand-muted text-sm mb-4">
+              Für kostenpflichtige Funktionen nutzen wir den Zahlungsdienstleister Stripe. Die
+              Zahlungsdaten verarbeitet Stripe eigenverantwortlich; wir erhalten nur die zur
+              Vertragsabwicklung nötigen Informationen. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+            </p>
 
             <h3 className="font-semibold text-navy mb-1">Warteliste</h3>
             <p className="text-brand-muted text-sm mb-4">
-              Wenn du dich in die Warteliste einträgst, speichern wir:
-            </p>
-            <ul className="list-disc list-inside text-sm text-brand-muted space-y-1 mb-4">
-              <li>Deine E-Mail-Adresse (Pflichtangabe)</li>
-              <li>Dein Interessensbereich, falls angegeben (optional)</li>
-              <li>Eine Freitext-Notiz, falls angegeben (optional)</li>
-              <li>Den Zeitpunkt der Eintragung</li>
-            </ul>
-            <p className="text-brand-muted text-sm">
-              <strong className="text-navy">Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO
-              (Einwilligung). Du kannst deine Einwilligung jederzeit widerrufen, indem du uns
-              eine E-Mail sendest. Deine Daten werden dann unverzüglich aus der Warteliste gelöscht.
+              Trägst du dich in die Warteliste ein, speichern wir E-Mail-Adresse, optional einen
+              Interessensbereich und eine Notiz sowie den Zeitpunkt. Rechtsgrundlage: Art. 6 Abs. 1
+              lit. a DSGVO (Einwilligung), jederzeit widerrufbar.
             </p>
 
-            <h3 className="font-semibold text-navy mt-6 mb-1">Serverprotokolle</h3>
+            <h3 className="font-semibold text-navy mb-1">Serverprotokolle</h3>
             <p className="text-brand-muted text-sm">
-              Beim Aufruf der Website speichert unser Webserver automatisch Informationen in
-              sogenannten Server-Log-Dateien: Browsertyp, Betriebssystem, Referrer-URL,
-              Hostname und Uhrzeit der Anfrage. Diese Daten sind nicht einer bestimmten
-              Person zuordenbar und werden nicht mit anderen Datenquellen zusammengeführt.
-              Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an
-              der technisch fehlerfreien Bereitstellung).
+              Beim Aufruf der Website werden technisch notwendige Protokolldaten verarbeitet
+              (z. B. Browsertyp, Zeitpunkt). Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+              (berechtigtes Interesse an fehlerfreiem Betrieb und Sicherheit).
             </p>
           </div>
 
-          {/* 4. Cookies und Tracking */}
+          {/* 7. Empfänger / Auftragsverarbeiter */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">4. Cookies und Tracking</h2>
-            <p className="text-brand-muted text-sm">
-              Diese Website verwendet <strong className="text-navy">keine Tracking-Cookies</strong>,
-              kein Google Analytics, kein Facebook Pixel und keine vergleichbaren
-              Analyse- oder Werbedienste. Es werden ausschließlich technisch notwendige
-              Daten verarbeitet, die für den Betrieb der Website erforderlich sind.
-            </p>
-          </div>
-
-          {/* 5. Deine Rechte */}
-          <div>
-            <h2 className="text-lg font-bold text-navy mb-3">5. Deine Rechte</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">7. Empfänger und Auftragsverarbeiter</h2>
             <p className="text-brand-muted text-sm mb-3">
-              Du hast gegenüber uns folgende Rechte hinsichtlich deiner personenbezogenen Daten:
+              Wir setzen sorgfältig ausgewählte Dienstleister ein, mit denen Verträge zur
+              Auftragsverarbeitung bestehen:
+            </p>
+            <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5">
+              <li><strong className="text-navy">Hetzner</strong> – Server-Hosting der Anwendung und Datenbank (Deutschland/EU)</li>
+              <li><strong className="text-navy">Supabase</strong> – Authentifizierung und Datenbank</li>
+              <li><strong className="text-navy">Cloudflare</strong> – Auslieferung und Absicherung der Website</li>
+              <li><strong className="text-navy">OpenAI</strong> – KI-gestützte Verarbeitung (USA, siehe Abschnitt 5)</li>
+              <li><strong className="text-navy">Stripe</strong> – Zahlungsabwicklung</li>
+            </ul>
+          </div>
+
+          {/* 8. Trennung von Identität und Inhalt */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">8. Pseudonymisierung und Zugriff</h2>
+            <p className="text-brand-muted text-sm">
+              Deine Inhalte werden in der Anwendungsdatenbank nur unter einer pseudonymen Kennung
+              gespeichert; Klarname und E-Mail liegen getrennt im Authentifizierungssystem. Aus
+              technischen und betrieblichen Gründen (z. B. Fehlersuche, Sicherheit) kann der
+              Verantwortliche grundsätzlich auf gespeicherte Inhalte zugreifen. Wir beschränken
+              solche Zugriffe auf das Notwendige. <strong className="text-navy">Bitte gib während der
+              Entwicklungsphase keine Klarnamen oder echten Daten Dritter ein</strong> und nutze
+              Pseudonyme.
+            </p>
+          </div>
+
+          {/* 9. Freigabe an Fachpersonen */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">9. Freigabe an Fachpersonen</h2>
+            <p className="text-brand-muted text-sm">
+              Du kannst einzelne Inhalte eines Falls gezielt an eine registrierte Fachperson
+              freigeben. Es wird ausschließlich das übermittelt, was du auswählst; die Freigabe ist
+              jederzeit widerrufbar. Rechtsgrundlage: Art. 6 Abs. 1 lit. a / Art. 9 Abs. 2 lit. a
+              DSGVO (Einwilligung).
+            </p>
+          </div>
+
+          {/* 10. Speicherdauer, Widerruf & Löschung */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">10. Speicherdauer, Widerruf und Löschung</h2>
+            <p className="text-brand-muted text-sm">
+              Wir speichern deine Daten, solange dein Konto besteht bzw. bis du sie löschst.
+              Im Bereich <strong className="text-navy">„Datenschutz"</strong> kannst du jederzeit
+              selbst:
+            </p>
+            <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5 mt-2">
+              <li>alle deine Daten als Datei <strong className="text-navy">exportieren</strong> (Art. 15/20),</li>
+              <li>einzelne <strong className="text-navy">Fälle endgültig löschen</strong>,</li>
+              <li>dein <strong className="text-navy">Konto vollständig löschen</strong> (Art. 17) – dabei werden alle Inhalte und das Login-Konto entfernt.</li>
+            </ul>
+            <p className="text-brand-muted text-sm mt-2">
+              Die Löschung deines Kontos gilt zugleich als Widerruf der erteilten Einwilligungen.
+            </p>
+          </div>
+
+          {/* 11. Cookies und Tracking */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">11. Cookies und Tracking</h2>
+            <p className="text-brand-muted text-sm">
+              EchoB verwendet <strong className="text-navy">keine Tracking-Cookies</strong>, kein
+              Google Analytics und keine Werbedienste. Es werden nur technisch notwendige Daten
+              verarbeitet (z. B. für die Anmeldung). Schriftarten werden selbst gehostet – beim
+              Seitenaufruf entsteht kein Abruf bei externen Schrift-Anbietern.
+            </p>
+          </div>
+
+          {/* 12. Deine Rechte */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">12. Deine Rechte</h2>
+            <p className="text-brand-muted text-sm mb-3">
+              Du hast hinsichtlich deiner personenbezogenen Daten folgende Rechte:
             </p>
             <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5">
               <li><strong className="text-navy">Auskunft</strong> (Art. 15 DSGVO)</li>
@@ -108,32 +215,28 @@ export default function DatenschutzPage() {
               <li><strong className="text-navy">Widerruf einer Einwilligung</strong> (Art. 7 Abs. 3 DSGVO)</li>
             </ul>
             <p className="text-brand-muted text-sm mt-4">
-              Zur Ausübung deiner Rechte genügt eine E-Mail an{' '}
-              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">
-                max.m@echob.de
-              </a>.
-              Du hast außerdem das Recht, dich bei der zuständigen Datenschutz-Aufsichtsbehörde
-              zu beschweren.
+              Zur Ausübung genügt eine E-Mail an{' '}
+              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">max.m@echob.de</a>.
+              Du hast außerdem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.
             </p>
           </div>
 
-          {/* 6. Datensicherheit */}
+          {/* 13. Datensicherheit */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">6. Datensicherheit</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">13. Datensicherheit</h2>
             <p className="text-brand-muted text-sm">
-              Wir setzen technische und organisatorische Sicherheitsmaßnahmen ein, um deine
-              Daten gegen Manipulation, Verlust oder unberechtigten Zugriff zu schützen.
-              Die Übertragung erfolgt verschlüsselt über HTTPS.
+              Wir setzen technische und organisatorische Maßnahmen ein, um deine Daten gegen Verlust,
+              Manipulation und unberechtigten Zugriff zu schützen. Die Übertragung erfolgt
+              verschlüsselt über HTTPS.
             </p>
           </div>
 
-          {/* 7. Änderungen */}
+          {/* 14. Änderungen */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">7. Änderungen dieser Erklärung</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">14. Änderungen dieser Erklärung</h2>
             <p className="text-brand-muted text-sm">
-              Wir behalten uns vor, diese Datenschutzerklärung anzupassen, sobald sich die
-              Rechtslage oder unsere Datenverarbeitungen ändern. Die jeweils aktuelle Version
-              ist stets auf dieser Seite abrufbar.
+              Wir passen diese Datenschutzerklärung an, sobald sich die Rechtslage oder unsere
+              Verarbeitungen ändern. Die jeweils aktuelle Version ist stets auf dieser Seite abrufbar.
             </p>
           </div>
 

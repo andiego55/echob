@@ -137,3 +137,22 @@ async def archive_case(
         )
     if not row:
         raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+
+
+@router.delete("/{case_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_case_permanent(
+    case_id: UUID,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> None:
+    """Fall endgültig löschen (Hard-Delete inkl. aller Szenen, Echo-Gespräche,
+    Skalen, Berichte, Hypothesen etc. via ON DELETE CASCADE)."""
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "DELETE FROM cases WHERE id = $1 AND user_id = $2 RETURNING id",
+            case_id,
+            current_user["user_id"],
+        )
+    if not row:
+        raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+    logger.info("Fall endgültig geloescht: case_id=%s user_id=%s", case_id, current_user["user_id"])

@@ -82,6 +82,7 @@ class ConsentBody(BaseModel):
     version: str
     privacy_policy: bool
     sensitive_ai: bool
+    age_confirmed: bool
     items: dict | None = None
 
 
@@ -109,5 +110,6 @@ async def post_consent(
             body.version,
             body.privacy_policy,
             body.sensitive_ai,
+            body.age_confirmed,
             body.items,
         )

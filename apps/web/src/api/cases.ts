@@ -16,4 +16,7 @@ export const casesApi = {
 
   archive: (caseId: string) =>
     apiClient.delete(`/cases/${caseId}`),
+
+  deleteForever: (caseId: string) =>
+    apiClient.delete(`/cases/${caseId}/permanent`),
 }
