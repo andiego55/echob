@@ -6,10 +6,16 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from supabase import Client as SupabaseClient
 
 from app.core.dependencies import get_current_user, get_pool, get_supabase
-from app.services.account_service import delete_user_data, export_user_data
+from app.services.account_service import (
+    delete_user_data,
+    export_user_data,
+    get_latest_consent,
+    record_consent,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/account", tags=["account"])
@@ -70,3 +76,38 @@ async def delete_account(
 
     logger.info("Konto gelöscht (user_id=%s, Zeilen gesamt=%s)", user_id, sum(counts.values()))
     return {"deleted": True, "rows": counts}
+
+
+class ConsentBody(BaseModel):
+    version: str
+    privacy_policy: bool
+    sensitive_ai: bool
+    items: dict | None = None
+
+
+@router.get("/consent")
+async def get_consent(
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict | None:
+    """Neueste erteilte Einwilligung der Person (oder null)."""
+    async with pool.acquire() as conn:
+        return await get_latest_consent(conn, current_user["user_id"])
+
+
+@router.post("/consent")
+async def post_consent(
+    body: ConsentBody,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """DSGVO Art. 7 – protokolliert eine erteilte (granulare, versionierte) Einwilligung."""
+    async with pool.acquire() as conn:
+        return await record_consent(
+            conn,
+            current_user["user_id"],
+            body.version,
+            body.privacy_policy,
+            body.sensitive_ai,
+            body.items,
+        )

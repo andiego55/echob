@@ -23,7 +23,7 @@ _USER_TABLES = (
     "cases", "onboarding_answers", "scenes", "echo_messages", "scale_scores",
     "reports", "topic_summaries", "case_reviews", "case_hypotheses",
     "person_profiles", "echo_chat_sessions", "user_profiles", "payments",
-    "ai_usage_log",
+    "ai_usage_log", "user_consents",
 )
 
 # Tabellen mit Daten in der Fachpersonen-Rolle (Spalte professional_user_id)
@@ -100,6 +100,7 @@ _DELETE_STEPS = (
     ("payments", "user_id = $1"),
     ("ai_usage_log", "user_id = $1"),
     ("user_profiles", "user_id = $1"),
+    ("user_consents", "user_id = $1"),
 )
 
 
@@ -126,3 +127,33 @@ def _affected(status: str) -> int:
         return int(status.rsplit(" ", 1)[-1])
     except (ValueError, AttributeError):
         return 0
+
+
+# ── Einwilligungen (DSGVO Art. 7 Nachweispflicht) ───────────────────────────
+
+async def get_latest_consent(conn: asyncpg.Connection, user_id: str) -> dict | None:
+    """Neueste erteilte Einwilligung der Person, oder None."""
+    row = await conn.fetchrow(
+        "SELECT version, privacy_policy, sensitive_ai, accepted_at "
+        "FROM user_consents WHERE user_id = $1 ORDER BY accepted_at DESC LIMIT 1",
+        user_id,
+    )
+    return dict(row) if row else None
+
+
+async def record_consent(
+    conn: asyncpg.Connection,
+    user_id: str,
+    version: str,
+    privacy_policy: bool,
+    sensitive_ai: bool,
+    items: dict | None,
+) -> dict:
+    """Protokolliert eine erteilte Einwilligung (append-only)."""
+    row = await conn.fetchrow(
+        "INSERT INTO user_consents (user_id, version, privacy_policy, sensitive_ai, items) "
+        "VALUES ($1, $2, $3, $4, $5::jsonb) "
+        "RETURNING version, privacy_policy, sensitive_ai, accepted_at",
+        user_id, version, privacy_policy, sensitive_ai, json.dumps(items or {}),
+    )
+    return dict(row)

@@ -82,6 +82,7 @@ import ProfessionalCasesPage     from '@/pages/professional/ProfessionalCasesPag
 import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDetailPage'
 import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
+import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
 import { QuickExitHotkey } from '@/components/app/QuickExit'
 
@@ -89,6 +90,7 @@ export default function App() {
   return (
     <>
     <DevNoticeModal />
+    <ConsentGate />
     <LockScreen />
     <QuickExitHotkey />
     <Routes>
