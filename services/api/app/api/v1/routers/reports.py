@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.report import (
     REPORT_DISCLAIMER,
@@ -67,6 +68,7 @@ async def create_report(
             "SELECT * FROM scenes WHERE case_id = $1 AND confirmed_by_user = true ORDER BY scene_date DESC",
             case_id,
         )
+        scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scenes]
         scale_rows = await conn.fetch("SELECT * FROM scale_scores WHERE case_id = $1", case_id)
         onboarding_row = await conn.fetchrow(
             "SELECT * FROM onboarding_answers WHERE case_id = $1", case_id

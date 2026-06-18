@@ -58,3 +58,14 @@ def decrypt(value: str | None) -> str | None:
     except InvalidToken:
         logger.error("Entschlüsselung fehlgeschlagen (InvalidToken).")
         return value
+
+
+def decrypt_fields(d: dict, *fields: str) -> dict:
+    """Entschlüsselt benannte Felder eines dicts in-place und gibt es zurück.
+
+    Praktisch beim Lesen aus der DB: SELECT * → dict(row) → decrypt_fields(d, ...).
+    """
+    for field in fields:
+        if d.get(field) is not None:
+            d[field] = decrypt(d[field])
+    return d

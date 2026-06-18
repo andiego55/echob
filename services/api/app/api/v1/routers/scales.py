@@ -7,6 +7,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.scale import SCALE_DEFINITIONS, SCALE_LABELS, ScalesOverviewResponse
 from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
@@ -95,6 +96,7 @@ async def calculate_scales(
             "SELECT * FROM scenes WHERE case_id = $1 AND confirmed_by_user = true ORDER BY scene_date DESC NULLS LAST",
             case_id,
         )
+        scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scenes]
         onboarding_row = await conn.fetchrow(
             "SELECT * FROM onboarding_answers WHERE case_id = $1", case_id
         )

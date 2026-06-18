@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.scene import (
     SceneConfirm,
@@ -64,8 +65,8 @@ async def create_scene(
             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10)
             RETURNING *
             """,
-            case_id, user_id, body.title, body.scene_date, body.description,
-            body.user_reaction, body.distress_score, body.safety_level,
+            case_id, user_id, body.title, body.scene_date, crypto.encrypt(body.description),
+            crypto.encrypt(body.user_reaction), body.distress_score, body.safety_level,
             json.dumps(body.pattern_tags), body.input_mode,
         )
     logger.info("Szene erstellt: scene_id=%s case_id=%s", row["id"], case_id)
@@ -165,6 +166,9 @@ async def update_scene(
     # pattern_tags needs JSON serialization
     if "pattern_tags" in updates:
         updates["pattern_tags"] = json.dumps(updates["pattern_tags"])
+    for _f in ("description", "user_reaction"):
+        if _f in updates:
+            updates[_f] = crypto.encrypt(updates[_f])
     set_clauses = ", ".join(f"{k} = ${i + 2}" for i, k in enumerate(updates.keys()))
     values = list(updates.values())
     async with pool.acquire() as conn:
@@ -237,4 +241,5 @@ def _row_to_scene(row) -> SceneResponse:
         d["pattern_tags"] = json.loads(tags)
     elif tags is None:
         d["pattern_tags"] = []
+    crypto.decrypt_fields(d, "description", "user_reaction")
     return SceneResponse(**d)

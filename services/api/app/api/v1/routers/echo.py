@@ -130,7 +130,7 @@ async def chat(
 
     case_context = dict(case_row)
     onboarding = dict(onboarding_row) if onboarding_row else None
-    scenes = [dict(r) for r in scene_rows]
+    scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
     scale_scores = [dict(r) for r in scale_rows]
     topic_summaries = [dict(r) for r in topic_summary_rows]
     hypotheses = [dict(r) for r in hypothesis_rows]
@@ -444,7 +444,7 @@ async def finalize_scene(
             VALUES ($1,$2,$3,$4,$5,$6::date,$7,$8,$9::jsonb,'chat')
             RETURNING *
             """,
-            case_id, user_id, title[:200], description, user_reaction,
+            case_id, user_id, title[:200], crypto.encrypt(description), crypto.encrypt(user_reaction),
             scene_date, distress_score, safety_level, _json.dumps(pattern_tags),
         )
 

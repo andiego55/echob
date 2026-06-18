@@ -13,6 +13,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
+from app.core import crypto
 from app.services.echo_service import build_case_context
 from app.services.person_profile_service import build_person_context
 from app.services.profile_service import build_profile_context
@@ -82,14 +83,14 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
             "ORDER BY scene_date DESC NULLS LAST, created_at DESC",
             case_id,
         )
-        bundle.scenes = [dict(r) for r in rows]
+        bundle.scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in rows]
     elif scene_ids:
         rows = await conn.fetch(
             "SELECT * FROM scenes WHERE case_id = $1 AND id = ANY($2::uuid[]) "
             "ORDER BY scene_date DESC NULLS LAST, created_at DESC",
             case_id, scene_ids,
         )
-        bundle.scenes = [dict(r) for r in rows]
+        bundle.scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in rows]
 
     if "scales" in allowed:
         rows = await conn.fetch("SELECT * FROM scale_scores WHERE case_id = $1", case_id)

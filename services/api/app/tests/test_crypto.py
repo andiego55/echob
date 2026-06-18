@@ -49,3 +49,18 @@ def test_tampered_token_returns_value():
     tampered = ct[:-3] + ("AAA" if not ct.endswith("AAA") else "BBB")
     # Fail-safe: ungültiges Token → Wert unverändert zurück (kein Crash)
     assert crypto.decrypt(tampered) == tampered
+
+
+def test_decrypt_fields():
+    _enable_key()
+    row = {
+        "description": crypto.encrypt("sensibel beschrieben"),
+        "user_reaction": crypto.encrypt("meine Reaktion"),
+        "title": "Klartext-Titel",
+        "empty": None,
+    }
+    out = crypto.decrypt_fields(row, "description", "user_reaction", "empty")
+    assert out["description"] == "sensibel beschrieben"
+    assert out["user_reaction"] == "meine Reaktion"
+    assert out["title"] == "Klartext-Titel"   # nicht in der Feldliste → unverändert
+    assert out["empty"] is None

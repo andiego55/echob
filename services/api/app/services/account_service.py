@@ -59,6 +59,9 @@ async def export_user_data(
     for msg in data.get("echo_messages", []):
         if isinstance(msg, dict) and msg.get("content") is not None:
             msg["content"] = crypto.decrypt(msg["content"])
+    for sc in data.get("scenes", []):
+        if isinstance(sc, dict):
+            crypto.decrypt_fields(sc, "description", "user_reaction")
 
     return data
 
