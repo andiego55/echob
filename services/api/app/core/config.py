@@ -42,6 +42,9 @@ class Settings(BaseSettings):
 
     # ── Auth / Sicherheit ──────────────────────────────────────────────
     secret_key: str = _INSECURE_KEY
+    # Feldverschlüsselung sensibler Freitexte (Art. 32). Fernet-Key (urlsafe-base64).
+    # Leer = aus (Klartext). Verlust des Keys = Datenverlust → sicher verwahren + sichern!
+    encryption_key: str = ""
 
     # ── AI ─────────────────────────────────────────────────────────────
     openai_api_key: str = ""

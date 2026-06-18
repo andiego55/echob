@@ -17,6 +17,7 @@ dependencies = [
     "openai>=1.30",
     "stripe>=10",
     "python-multipart>=0.0.9",   # Form/File-Uploads (Schnellerfassung: Audio)
+    "cryptography>=42",          # Feldverschlüsselung sensibler Freitexte (Art. 32)
     # "python-jose[cryptography]>=3.3",
     # Ab Phase 3:
     # "anthropic>=0.25",
