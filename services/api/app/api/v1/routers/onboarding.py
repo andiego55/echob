@@ -7,6 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 
 logger = logging.getLogger(__name__)
@@ -79,12 +80,12 @@ async def save_onboarding(
             RETURNING *
             """,
             case_id, user_id,
-            body.person_name,
-            body.relationship_description,
-            body.main_burden,
-            body.typical_scenes,
-            body.significant_event,
-            body.memorable_scenes,
+            crypto.encrypt(body.person_name),
+            crypto.encrypt(body.relationship_description),
+            crypto.encrypt(body.main_burden),
+            crypto.encrypt(body.typical_scenes),
+            crypto.encrypt(body.significant_event),
+            crypto.encrypt(body.memorable_scenes),
             body.distress_score,
             body.safety_status or "none",
         )
@@ -104,4 +105,5 @@ def _row_to_response(row) -> OnboardingResponse:
     d = dict(row)
     completed = d.get("completed_at")
     d["completed_at"] = completed.isoformat() if completed else None
+    crypto.decrypt_fields(d, *crypto.ONBOARDING_FIELDS)
     return OnboardingResponse(**d)

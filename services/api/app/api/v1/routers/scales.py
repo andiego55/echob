@@ -116,7 +116,10 @@ async def calculate_scales(
     scales = await echo_svc.calculate_scales(
         case_context=dict(case_row),
         scenes=[dict(r) for r in scenes],
-        onboarding=dict(onboarding_row) if onboarding_row else None,
+        onboarding=(
+            crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+            if onboarding_row else None
+        ),
         person_profile=dict(person_profile_row) if person_profile_row else None,
         topic_summaries=[dict(r) for r in topic_summary_rows],
         hypotheses=[dict(r) for r in hypothesis_rows],

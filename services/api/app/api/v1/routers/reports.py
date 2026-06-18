@@ -89,7 +89,10 @@ async def create_report(
     case_context = dict(case_row)
     scenes_data = [dict(r) for r in scenes]
     scale_data = [dict(r) for r in scale_rows]
-    onboarding_data = dict(onboarding_row) if onboarding_row else None
+    onboarding_data = (
+        crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+        if onboarding_row else None
+    )
     user_profile_data = dict(user_profile_row) if user_profile_row else None
     person_profile_data = dict(person_profile_row) if person_profile_row else None
     topic_summaries_data = [dict(r) for r in topic_summary_rows]

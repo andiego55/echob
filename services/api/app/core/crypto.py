@@ -69,3 +69,10 @@ def decrypt_fields(d: dict, *fields: str) -> dict:
         if d.get(field) is not None:
             d[field] = decrypt(d[field])
     return d
+
+
+# Verschlüsselte Freitext-Spalten je Tabelle (für decrypt_fields beim Lesen).
+ONBOARDING_FIELDS = (
+    "person_name", "relationship_description", "main_burden",
+    "typical_scenes", "significant_event", "memorable_scenes",
+)

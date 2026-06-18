@@ -75,7 +75,9 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
 
     if "onboarding" in allowed:
         row = await conn.fetchrow("SELECT * FROM onboarding_answers WHERE case_id = $1", case_id)
-        bundle.onboarding = dict(row) if row else None
+        bundle.onboarding = (
+            crypto.decrypt_fields(dict(row), *crypto.ONBOARDING_FIELDS) if row else None
+        )
 
     if "all_scenes" in allowed:
         rows = await conn.fetch(
@@ -83,14 +85,18 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
             "ORDER BY scene_date DESC NULLS LAST, created_at DESC",
             case_id,
         )
-        bundle.scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in rows]
+        bundle.scenes = [
+            crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in rows
+        ]
     elif scene_ids:
         rows = await conn.fetch(
             "SELECT * FROM scenes WHERE case_id = $1 AND id = ANY($2::uuid[]) "
             "ORDER BY scene_date DESC NULLS LAST, created_at DESC",
             case_id, scene_ids,
         )
-        bundle.scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in rows]
+        bundle.scenes = [
+            crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in rows
+        ]
 
     if "scales" in allowed:
         rows = await conn.fetch("SELECT * FROM scale_scores WHERE case_id = $1", case_id)

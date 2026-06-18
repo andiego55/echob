@@ -133,7 +133,10 @@ async def create_review(
             case_context=dict(case_row),
             scenes=confirmed,
             scale_scores=scales,
-            onboarding=dict(onboarding_row) if onboarding_row else None,
+            onboarding=(
+                crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+                if onboarding_row else None
+            ),
             trend_summary=trend_summary,
         )
     else:

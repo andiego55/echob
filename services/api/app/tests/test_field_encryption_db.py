@@ -118,3 +118,28 @@ async def test_export_returns_plaintext(db):
     assert echo_secret in echo_contents
     assert all("enc:v1:" not in (x or "") for x in scene_descs)      # kein Chiffretext im Export
     assert all("enc:v1:" not in (x or "") for x in echo_contents)
+
+
+async def test_onboarding_fields_encrypted_at_rest(db):
+    owner, case_id = await _new_case(db)
+    secret = "SENSIBLE_BEZIEHUNG_" + uuid.uuid4().hex
+    await db.execute(
+        "INSERT INTO onboarding_answers (case_id, user_id, relationship_description) "
+        "VALUES ($1,$2,$3)",
+        case_id, owner, crypto.encrypt(secret),
+    )
+
+    raw = await db.fetchval(
+        "SELECT relationship_description FROM onboarding_answers WHERE case_id=$1", case_id
+    )
+    assert raw.startswith("enc:v1:")
+    assert secret not in raw
+
+    row = await db.fetchrow("SELECT * FROM onboarding_answers WHERE case_id=$1", case_id)
+    d = crypto.decrypt_fields(dict(row), *crypto.ONBOARDING_FIELDS)
+    assert d["relationship_description"] == secret
+
+    export = await export_user_data(db, str(owner), None)
+    descs = [o.get("relationship_description") for o in export["onboarding_answers"]]
+    assert secret in descs
+    assert all("enc:v1:" not in (x or "") for x in descs)

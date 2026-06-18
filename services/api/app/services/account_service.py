@@ -63,6 +63,9 @@ async def export_user_data(
     for sc in data.get("scenes", []):
         if isinstance(sc, dict):
             crypto.decrypt_fields(sc, "description", "user_reaction")
+    for ob in data.get("onboarding_answers", []):
+        if isinstance(ob, dict):
+            crypto.decrypt_fields(ob, *crypto.ONBOARDING_FIELDS)
 
     return data
 
