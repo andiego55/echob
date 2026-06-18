@@ -85,6 +85,10 @@ async def export_user_data(
     for r in data.get("reports", []):
         if isinstance(r, dict) and isinstance(r.get("content"), (dict, list)):
             r["content"] = crypto.decrypt_json_strings(r["content"])
+    for _tbl in ("user_profiles", "person_profiles"):
+        for p in data.get(_tbl, []):
+            if isinstance(p, dict) and isinstance(p.get("summary"), dict):
+                p["summary"] = crypto.decrypt_summary_text(p["summary"])
 
     return data
 

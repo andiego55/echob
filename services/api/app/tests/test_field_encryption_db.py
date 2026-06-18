@@ -17,6 +17,8 @@ import asyncpg
 import pytest
 from cryptography.fernet import Fernet
 
+from app.api.v1.routers.person_profile import _row_to_response as _person_row_to_response
+from app.api.v1.routers.profile import _row_to_response as _profile_row_to_response
 from app.api.v1.routers.reports import _row_to_report
 from app.core import crypto
 from app.core.config import settings
@@ -209,6 +211,47 @@ async def test_reports_content_jsonb_encrypted(db):
     exp_content = export["reports"][0]["content"]
     assert exp_content["sections"][0]["text"] == secret_text
     assert "enc:v1:" not in json.dumps(exp_content)
+
+
+async def test_profile_summary_text_encrypted(db):
+    owner, case_id = await _new_case(db)
+    up_secret = "USER_SUMMARY_" + uuid.uuid4().hex
+    pp_secret = "PERSON_SUMMARY_" + uuid.uuid4().hex
+    await db.execute(
+        "INSERT INTO user_profiles (user_id, summary) VALUES ($1,$2::jsonb)",
+        owner, json.dumps({"summary_text": crypto.encrypt(up_secret)}),
+    )
+    await db.execute(
+        "INSERT INTO person_profiles (case_id, user_id, summary) VALUES ($1,$2,$3::jsonb)",
+        case_id, owner, json.dumps({"summary_text": crypto.encrypt(pp_secret)}),
+    )
+
+    # At rest: nur das summary_text-Blatt ist Chiffretext
+    raw_up = await db.fetchval(
+        "SELECT summary->>'summary_text' FROM user_profiles WHERE user_id=$1", owner
+    )
+    raw_pp = await db.fetchval(
+        "SELECT summary->>'summary_text' FROM person_profiles WHERE case_id=$1", case_id
+    )
+    assert raw_up.startswith("enc:v1:") and up_secret not in raw_up
+    assert raw_pp.startswith("enc:v1:") and pp_secret not in raw_pp
+
+    # Lese-Helfer stellen Klartext wieder her — in summary_text UND im summary-dict
+    up_resp = _profile_row_to_response(
+        dict(await db.fetchrow("SELECT * FROM user_profiles WHERE user_id=$1", owner))
+    )
+    pp_resp = _person_row_to_response(
+        dict(await db.fetchrow("SELECT * FROM person_profiles WHERE case_id=$1", case_id))
+    )
+    assert up_resp.summary_text == up_secret
+    assert up_resp.summary["summary_text"] == up_secret
+    assert pp_resp.summary_text == pp_secret
+
+    # Export liefert Klartext
+    export = await export_user_data(db, str(owner), None)
+    assert export["user_profiles"][0]["summary"]["summary_text"] == up_secret
+    assert export["person_profiles"][0]["summary"]["summary_text"] == pp_secret
+    assert "enc:v1:" not in json.dumps(export["user_profiles"] + export["person_profiles"])
 
 
 async def test_professional_columns_encrypted(db):

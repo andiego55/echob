@@ -70,7 +70,7 @@ def _public_profile(row):
                 return {}
         return v or {}
 
-    summary_obj = _obj(row.get("summary"))
+    summary_obj = crypto.decrypt_summary_text(_obj(row.get("summary")))
     # Die freie Selbstbeschreibung liegt im summary-JSONB (keine eigene Spalte) —
     # so speichert/liest es auch routers/profile.py + person_profile.py.
     summary_text = summary_obj.get("summary_text") if isinstance(summary_obj, dict) else None

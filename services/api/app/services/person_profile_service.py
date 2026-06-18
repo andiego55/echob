@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.core import crypto
+
 _LEVEL_LABELS = {
     (1.0, 1.9): "niedrig",
     (2.0, 2.9): "eher niedrig",
@@ -76,8 +78,8 @@ def build_person_context(profile: dict[str, Any]) -> str:
     if ft := ov.get("free_text"):
         lines.append(f"_Freitext Gesamteinschätzung:_ {str(ft)[:300]}")
 
-    # Gespeicherte KI-Zusammenfassung
-    summary = profile.get("summary", {})
+    # Gespeicherte KI-Zusammenfassung (summary_text ggf. feldverschlüsselt)
+    summary = crypto.decrypt_summary_text(profile.get("summary") or {})
     if isinstance(summary, dict):
         if st := summary.get("summary_text"):
             lines.append(f"\n**Gespeicherte Beschreibung (vom Nutzenden bestätigt):**\n{st}")

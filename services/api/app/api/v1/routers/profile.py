@@ -74,7 +74,7 @@ async def update_profile(
             RETURNING *
             """,
             json.dumps(body.modules),
-            json.dumps(body.summary),
+            json.dumps(crypto.encrypt_summary_text(body.summary)),
             body.safety_status,
             body.completed_modules,
             datetime.now(UTC),
@@ -144,7 +144,7 @@ async def save_summary_text(
             WHERE user_id = $3
             RETURNING *
             """,
-            json.dumps(body.summary_text),
+            json.dumps(crypto.encrypt(body.summary_text)),
             datetime.now(UTC),
             user_id,
         )
@@ -304,8 +304,9 @@ def _row_to_response(row: dict) -> ProfileResponse:
     if isinstance(completed, str):
         completed = json.loads(completed)
     row["completed_modules"] = list(completed)
-    # summary_text aus summary-JSONB extrahieren
-    row["summary_text"] = row.get("summary", {}).get("summary_text")
+    # summary-JSONB enthält ggf. verschlüsselten summary_text → entschlüsseln
+    row["summary"] = crypto.decrypt_summary_text(row.get("summary") or {})
+    row["summary_text"] = row["summary"].get("summary_text")
     # display_name direkt aus der Spalte
     row.setdefault("display_name", None)
     return ProfileResponse(**row)

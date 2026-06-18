@@ -77,3 +77,25 @@ def test_json_strings_roundtrip():
     assert enc["nested"]["b"].startswith("enc:v1:")
     assert enc["list"][0].startswith("enc:v1:") and enc["list"][1] == 1
     assert crypto.decrypt_json_strings(enc) == obj   # vollständiger Round-Trip
+
+
+def test_summary_text_roundtrip():
+    _enable_key()
+    s = {"summary_text": "Sehr persönliche Zusammenfassung", "version": 2}
+    enc = crypto.encrypt_summary_text(s)
+    assert enc["summary_text"].startswith("enc:v1:")
+    assert "persönliche" not in enc["summary_text"]
+    assert enc["version"] == 2                          # nur summary_text, andere Keys unverändert
+    assert crypto.decrypt_summary_text(enc) == s        # Round-Trip
+    assert crypto.encrypt_summary_text({}) == {}        # kein summary_text → unverändert
+    assert crypto.encrypt_summary_text(None) is None    # Nicht-dict → unverändert
+
+
+def test_build_person_context_decrypts_summary():
+    """Die KI-Kontext-Funktion darf nie Chiffretext in den Prompt schreiben."""
+    _enable_key()
+    from app.services.person_profile_service import build_person_context
+    secret = "Eine sehr persönliche Beschreibung der anderen Person."
+    ctx = build_person_context({"modules": {}, "summary": {"summary_text": crypto.encrypt(secret)}})
+    assert secret in ctx
+    assert "enc:v1:" not in ctx

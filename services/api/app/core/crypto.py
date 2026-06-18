@@ -99,3 +99,21 @@ def decrypt_json_strings(obj):
     if isinstance(obj, str):
         return decrypt(obj)
     return obj
+
+
+def encrypt_summary_text(summary):
+    """Verschlüsselt das summary_text-Feld eines summary-JSONB dicts (neue Kopie).
+
+    Gezielt nur dieses eine Freitext-Blatt — restliche Keys/Struktur bleiben Klartext
+    (anders als encrypt_json_strings). None/Nicht-dict bleibt unverändert.
+    """
+    if isinstance(summary, dict) and summary.get("summary_text"):
+        return {**summary, "summary_text": encrypt(summary["summary_text"])}
+    return summary
+
+
+def decrypt_summary_text(summary):
+    """Gegenstück: entschlüsselt summary_text. Alt-Klartext (ohne Prefix) bleibt unverändert."""
+    if isinstance(summary, dict) and summary.get("summary_text"):
+        return {**summary, "summary_text": decrypt(summary["summary_text"])}
+    return summary

@@ -51,7 +51,8 @@ def _row_to_response(row: dict) -> PersonProfileResponse:
     if isinstance(completed, str):
         completed = json.loads(completed)
     row["completed_modules"] = list(completed)
-    row["summary_text"] = row.get("summary", {}).get("summary_text")
+    row["summary"] = crypto.decrypt_summary_text(row.get("summary") or {})
+    row["summary_text"] = row["summary"].get("summary_text")
     return PersonProfileResponse(**row)
 
 
@@ -158,7 +159,7 @@ async def save_summary_text(
             WHERE case_id = $3
             RETURNING *
             """,
-            json.dumps(body.summary_text),
+            json.dumps(crypto.encrypt(body.summary_text)),
             datetime.now(UTC),
             case_id,
         )
