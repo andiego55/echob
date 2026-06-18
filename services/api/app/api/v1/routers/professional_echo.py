@@ -11,6 +11,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
+from app.core import crypto
 from app.core.dependencies import get_current_professional, get_pool
 from app.schemas.professional import (
     ProfessionalEchoChatRequest,
@@ -41,7 +42,7 @@ def _get_echo_service(request: Request):
 def _msg_response(row) -> ProfessionalEchoMessageResponse:
     return ProfessionalEchoMessageResponse(
         id=row["id"], session_id=row["session_id"], role=row["role"],
-        content=row["content"], thread_type=row["thread_type"],
+        content=crypto.decrypt(row["content"]), thread_type=row["thread_type"],
         glossary_slug=row["glossary_slug"], created_at=row["created_at"],
     )
 
@@ -84,7 +85,10 @@ async def chat(
             session_id,
         )
 
-    history = [{"role": r["role"], "content": r["content"]} for r in reversed(history_rows)]
+    history = [
+        {"role": r["role"], "content": crypto.decrypt(r["content"])}
+        for r in reversed(history_rows)
+    ]
     shared_context = build_shared_case_context(bundle)
 
     glossary_term = glossary_definition = None
@@ -110,13 +114,15 @@ async def chat(
             "INSERT INTO professional_echo_messages "
             "(session_id, professional_user_id, case_id, role, content, thread_type, glossary_slug) "
             "VALUES ($1, $2, $3, 'user', $4, $5, $6) RETURNING *",
-            session_id, pid, case_id, body.message, body.thread_type, body.glossary_slug,
+            session_id, pid, case_id, crypto.encrypt(body.message),
+            body.thread_type, body.glossary_slug,
         )
         assistant_msg = await conn.fetchrow(
             "INSERT INTO professional_echo_messages "
             "(session_id, professional_user_id, case_id, role, content, thread_type, glossary_slug) "
             "VALUES ($1, $2, $3, 'assistant', $4, $5, $6) RETURNING *",
-            session_id, pid, case_id, answer, body.thread_type, body.glossary_slug,
+            session_id, pid, case_id, crypto.encrypt(answer),
+            body.thread_type, body.glossary_slug,
         )
         await conn.execute(
             "UPDATE professional_echo_sessions SET updated_at = NOW(), "
@@ -246,7 +252,7 @@ async def generate_summary(
             "ORDER BY created_at ASC LIMIT 100",
             session_id,
         )
-    history = [{"role": r["role"], "content": r["content"]} for r in rows]
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in rows]
     summary = await echo_svc.professional_summary(history=history)
     return {"summary": summary}
 
@@ -274,9 +280,9 @@ async def save_summary(
             "(professional_user_id, case_id, session_id, title, summary_text) "
             "VALUES ($1, $2, $3, $4, $5) "
             "RETURNING id, case_id, session_id, title, summary_text, created_at",
-            pid, case_id, body.session_id, body.title, body.summary_text,
+            pid, case_id, body.session_id, body.title, crypto.encrypt(body.summary_text),
         )
-    return ProfessionalEchoSummaryResponse(**dict(row))
+    return ProfessionalEchoSummaryResponse(**crypto.decrypt_fields(dict(row), "summary_text"))
 
 
 @router.delete("/summaries/{summary_id}")

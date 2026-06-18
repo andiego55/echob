@@ -11,6 +11,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
+from app.core import crypto
 from app.core.dependencies import get_current_professional, get_current_user, get_pool
 from app.schemas.professional import (
     GlossaryTerm,
@@ -245,8 +246,11 @@ async def case_detail(
         "topic_summaries": bundle.topic_summaries,
         "person_profile": _public_profile(bundle.person_profile),
         "self_profile": _public_profile(bundle.self_profile),
-        "notes": {k: note_row[k] for k in _NOTE_FIELDS} if note_row else None,
-        "echo_summaries": [dict(s) for s in summary_rows],
+        "notes": (
+            crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
+            if note_row else None
+        ),
+        "echo_summaries": [crypto.decrypt_fields(dict(s), "summary_text") for s in summary_rows],
     }
 
 
@@ -278,10 +282,13 @@ async def save_notes(
               updated_at = NOW()
             RETURNING *
             """,
-            pid, case_id, body.first_impressions, body.key_scenes,
-            body.open_questions, body.conversation_prompts, body.next_steps, body.free_text,
+            pid, case_id, crypto.encrypt(body.first_impressions), crypto.encrypt(body.key_scenes),
+            crypto.encrypt(body.open_questions), crypto.encrypt(body.conversation_prompts),
+            crypto.encrypt(body.next_steps), crypto.encrypt(body.free_text),
         )
-    return ProfessionalNote(**{k: row[k] for k in _NOTE_FIELDS})
+    return ProfessionalNote(
+        **crypto.decrypt_fields({k: row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
+    )
 
 
 # ── Glossar ───────────────────────────────────────────────────────────────────

@@ -175,3 +175,56 @@ async def test_summary_text_columns_encrypted(db):
     assert topic_secret in topic_texts
     assert hyp_secret in hyp_texts
     assert all("enc:v1:" not in (x or "") for x in topic_texts + hyp_texts)
+
+
+async def test_professional_columns_encrypted(db):
+    pro = uuid.uuid4()
+    owner = uuid.uuid4()
+    case_id = await db.fetchval(
+        "INSERT INTO cases (user_id, relationship_type, relationship_status, contact_frequency) "
+        "VALUES ($1,'partner','together','daily') RETURNING id",
+        owner,
+    )
+    session_id = await db.fetchval(
+        "INSERT INTO professional_echo_sessions (professional_user_id, case_id) "
+        "VALUES ($1,$2) RETURNING id",
+        pro, case_id,
+    )
+    msg_secret = "PROF_ECHO_" + uuid.uuid4().hex
+    note_secret = "PROF_NOTIZ_" + uuid.uuid4().hex
+    sum_secret = "PROF_SUMMARY_" + uuid.uuid4().hex
+    await db.execute(
+        "INSERT INTO professional_echo_messages "
+        "(session_id, professional_user_id, case_id, role, content, thread_type) "
+        "VALUES ($1,$2,$3,'user',$4,'case')",
+        session_id, pro, case_id, crypto.encrypt(msg_secret),
+    )
+    await db.execute(
+        "INSERT INTO professional_notes (professional_user_id, case_id, free_text) "
+        "VALUES ($1,$2,$3)",
+        pro, case_id, crypto.encrypt(note_secret),
+    )
+    await db.execute(
+        "INSERT INTO professional_echo_summaries "
+        "(professional_user_id, case_id, title, summary_text) "
+        "VALUES ($1,$2,'T',$3)",
+        pro, case_id, crypto.encrypt(sum_secret),
+    )
+
+    raw_msg = await db.fetchval(
+        "SELECT content FROM professional_echo_messages WHERE session_id=$1", session_id
+    )
+    raw_note = await db.fetchval(
+        "SELECT free_text FROM professional_notes WHERE professional_user_id=$1", pro
+    )
+    raw_sum = await db.fetchval(
+        "SELECT summary_text FROM professional_echo_summaries WHERE professional_user_id=$1", pro
+    )
+    assert raw_msg.startswith("enc:v1:") and msg_secret not in raw_msg
+    assert raw_note.startswith("enc:v1:") and note_secret not in raw_note
+    assert raw_sum.startswith("enc:v1:") and sum_secret not in raw_sum
+
+    export = await export_user_data(db, str(pro), None)
+    assert msg_secret in [m.get("content") for m in export["professional_echo_messages"]]
+    assert note_secret in [n.get("free_text") for n in export["professional_notes"]]
+    assert sum_secret in [s.get("summary_text") for s in export["professional_echo_summaries"]]

@@ -70,6 +70,18 @@ async def export_user_data(
         for r in data.get(_tbl, []):
             if isinstance(r, dict):
                 crypto.decrypt_fields(r, "summary_text")
+    for m in data.get("professional_echo_messages", []):
+        if isinstance(m, dict) and m.get("content") is not None:
+            m["content"] = crypto.decrypt(m["content"])
+    for s in data.get("professional_echo_summaries", []):
+        if isinstance(s, dict):
+            crypto.decrypt_fields(s, "summary_text")
+    for n in data.get("professional_notes", []):
+        if isinstance(n, dict):
+            crypto.decrypt_fields(
+                n, "first_impressions", "key_scenes", "open_questions",
+                "conversation_prompts", "next_steps", "free_text",
+            )
 
     return data
 
