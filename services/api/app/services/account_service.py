@@ -24,12 +24,13 @@ _USER_TABLES = (
     "cases", "onboarding_answers", "scenes", "echo_messages", "scale_scores",
     "reports", "topic_summaries", "case_reviews", "case_hypotheses",
     "person_profiles", "echo_chat_sessions", "user_profiles", "payments",
-    "ai_usage_log", "user_consents",
+    "ai_usage_log", "user_consents", "professional_profiles",
 )
 
-# Tabellen mit Daten in der Fachpersonen-Rolle (Spalte professional_user_id)
+# Tabellen mit Daten in der Fachpersonen-Rolle (Spalte professional_user_id).
+# professional_profiles NICHT hier — die Tabelle ist über user_id verknüpft (oben).
 _PROFESSIONAL_TABLES = (
-    "professional_profiles", "professional_notes", "professional_echo_sessions",
+    "professional_notes", "professional_echo_sessions",
     "professional_echo_messages", "professional_echo_summaries",
 )
 
