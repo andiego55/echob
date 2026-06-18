@@ -121,8 +121,10 @@ async def calculate_scales(
             if onboarding_row else None
         ),
         person_profile=dict(person_profile_row) if person_profile_row else None,
-        topic_summaries=[dict(r) for r in topic_summary_rows],
-        hypotheses=[dict(r) for r in hypothesis_rows],
+        topic_summaries=[
+            crypto.decrypt_fields(dict(r), "summary_text") for r in topic_summary_rows
+        ],
+        hypotheses=[crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows],
     )
 
     # Alle bisherigen Werte ersetzen, neu einfügen

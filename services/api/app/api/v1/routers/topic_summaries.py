@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 
 router = APIRouter(prefix="/cases/{case_id}/topic-summaries", tags=["topic-summaries"])
@@ -72,7 +73,7 @@ async def upsert_summary(
             DO UPDATE SET summary_text = EXCLUDED.summary_text, updated_at = NOW()
             RETURNING *
             """,
-            case_id, current_user["user_id"], body.topic, body.summary_text,
+            case_id, current_user["user_id"], body.topic, crypto.encrypt(body.summary_text),
         )
     return _to_response(row)
 
@@ -89,4 +90,5 @@ async def _assert_owner(case_id, user_id, conn):
 def _to_response(row) -> TopicSummaryResponse:
     d = dict(row)
     d["topic_label"] = TOPIC_LABELS.get(d["topic"], d["topic"])
+    crypto.decrypt_fields(d, "summary_text")
     return TopicSummaryResponse(**d)

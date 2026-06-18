@@ -52,7 +52,7 @@ def _to_response(row) -> HypothesisResponse:
     return HypothesisResponse(
         hypothesis_type=htype,
         label=HYPOTHESIS_LABELS.get(htype, htype),
-        summary_text=row["summary_text"],
+        summary_text=crypto.decrypt(row["summary_text"]),
         updated_at=row["updated_at"],
     )
 
@@ -91,7 +91,7 @@ async def save_hypothesis(
             "ON CONFLICT (case_id, hypothesis_type) DO UPDATE "
             "SET summary_text = EXCLUDED.summary_text, updated_at = NOW() "
             "RETURNING hypothesis_type, summary_text, updated_at",
-            case_id, user_id, body.hypothesis_type, body.summary_text,
+            case_id, user_id, body.hypothesis_type, crypto.encrypt(body.summary_text),
         )
     logger.info("Hypothese gespeichert: case_id=%s type=%s", case_id, body.hypothesis_type)
     return _to_response(row)

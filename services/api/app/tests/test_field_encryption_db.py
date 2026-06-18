@@ -143,3 +143,35 @@ async def test_onboarding_fields_encrypted_at_rest(db):
     descs = [o.get("relationship_description") for o in export["onboarding_answers"]]
     assert secret in descs
     assert all("enc:v1:" not in (x or "") for x in descs)
+
+
+async def test_summary_text_columns_encrypted(db):
+    owner, case_id = await _new_case(db)
+    topic_secret = "TOPIC_SUMMARY_" + uuid.uuid4().hex
+    hyp_secret = "HYPO_SUMMARY_" + uuid.uuid4().hex
+    await db.execute(
+        "INSERT INTO topic_summaries (case_id, user_id, topic, summary_text) "
+        "VALUES ($1,$2,'topic_self',$3)",
+        case_id, owner, crypto.encrypt(topic_secret),
+    )
+    await db.execute(
+        "INSERT INTO case_hypotheses (case_id, user_id, hypothesis_type, summary_text) "
+        "VALUES ($1,$2,'hyp_dynamics',$3)",
+        case_id, owner, crypto.encrypt(hyp_secret),
+    )
+
+    raw_topic = await db.fetchval(
+        "SELECT summary_text FROM topic_summaries WHERE case_id=$1", case_id
+    )
+    raw_hyp = await db.fetchval(
+        "SELECT summary_text FROM case_hypotheses WHERE case_id=$1", case_id
+    )
+    assert raw_topic.startswith("enc:v1:") and topic_secret not in raw_topic
+    assert raw_hyp.startswith("enc:v1:") and hyp_secret not in raw_hyp
+
+    export = await export_user_data(db, str(owner), None)
+    topic_texts = [t.get("summary_text") for t in export["topic_summaries"]]
+    hyp_texts = [h.get("summary_text") for h in export["case_hypotheses"]]
+    assert topic_secret in topic_texts
+    assert hyp_secret in hyp_texts
+    assert all("enc:v1:" not in (x or "") for x in topic_texts + hyp_texts)

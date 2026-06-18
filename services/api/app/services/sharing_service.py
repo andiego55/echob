@@ -112,7 +112,7 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
         rows = await conn.fetch(
             "SELECT topic, summary_text FROM topic_summaries WHERE case_id = $1", case_id
         )
-        bundle.topic_summaries = [dict(r) for r in rows]
+        bundle.topic_summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in rows]
 
     if "person_profile" in allowed:
         row = await conn.fetchrow("SELECT * FROM person_profiles WHERE case_id = $1", case_id)

@@ -66,6 +66,10 @@ async def export_user_data(
     for ob in data.get("onboarding_answers", []):
         if isinstance(ob, dict):
             crypto.decrypt_fields(ob, *crypto.ONBOARDING_FIELDS)
+    for _tbl in ("topic_summaries", "case_hypotheses"):
+        for r in data.get(_tbl, []):
+            if isinstance(r, dict):
+                crypto.decrypt_fields(r, "summary_text")
 
     return data
 

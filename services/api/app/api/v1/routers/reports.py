@@ -95,8 +95,10 @@ async def create_report(
     )
     user_profile_data = dict(user_profile_row) if user_profile_row else None
     person_profile_data = dict(person_profile_row) if person_profile_row else None
-    topic_summaries_data = [dict(r) for r in topic_summary_rows]
-    hypotheses_data = [dict(r) for r in hypothesis_rows]
+    topic_summaries_data = [
+        crypto.decrypt_fields(dict(r), "summary_text") for r in topic_summary_rows
+    ]
+    hypotheses_data = [crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows]
 
     if echo_svc:
         content = await echo_svc.generate_report(

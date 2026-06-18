@@ -135,8 +135,8 @@ async def chat(
     )
     scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
     scale_scores = [dict(r) for r in scale_rows]
-    topic_summaries = [dict(r) for r in topic_summary_rows]
-    hypotheses = [dict(r) for r in hypothesis_rows]
+    topic_summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in topic_summary_rows]
+    hypotheses = [crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows]
 
     session_meta = _json.dumps({"scene_session_id": body.scene_session_id}) if body.scene_session_id else "{}"
 
