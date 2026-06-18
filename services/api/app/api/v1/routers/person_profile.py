@@ -8,6 +8,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.echo import EchoChatResponse, EchoMessageResponse
 from app.schemas.person_profile import (
@@ -61,6 +62,7 @@ def _row_to_echo_msg(row) -> EchoMessageResponse:
         d["metadata"] = json.loads(meta)
     elif meta is None:
         d["metadata"] = {}
+    d["content"] = crypto.decrypt(d.get("content"))
     return EchoMessageResponse(**d)
 
 
@@ -258,7 +260,10 @@ async def person_profile_echo_chat(
             user_id, case_id, session_id,
         )
 
-    history = [{"role": r["role"], "content": r["content"]} for r in reversed(history_rows)]
+    history = [
+        {"role": r["role"], "content": crypto.decrypt(r["content"])}
+        for r in reversed(history_rows)
+    ]
 
     modules = profile.get("modules") or {}
     if isinstance(modules, str):
@@ -308,14 +313,14 @@ async def person_profile_echo_chat(
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
             VALUES ($1, $2, 'user', $3, 'topic', $4::jsonb) RETURNING *
             """,
-            case_id, user_id, message, session_meta,
+            case_id, user_id, crypto.encrypt(message), session_meta,
         )
         assistant_msg_row = await conn.fetchrow(
             """
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
             VALUES ($1, $2, 'assistant', $3, 'topic', $4::jsonb) RETURNING *
             """,
-            case_id, user_id, answer, session_meta,
+            case_id, user_id, crypto.encrypt(answer), session_meta,
         )
 
     return EchoChatResponse(

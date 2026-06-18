@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel as _BaseModel
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.echo import EchoChatResponse, EchoMessageResponse
 from app.schemas.profile import ProfileModuleUpdate, ProfileResponse, ProfileUpdate
@@ -204,7 +205,10 @@ async def profile_echo_chat(
             "ORDER BY created_at DESC LIMIT 20",
             user_id, session_id,
         )
-    history = [{"role": r["role"], "content": r["content"]} for r in reversed(history_rows)]
+    history = [
+        {"role": r["role"], "content": crypto.decrypt(r["content"])}
+        for r in reversed(history_rows)
+    ]
 
     # Profil-Kontext für System-Prompt aufbauen
     modules = profile.get("modules") or {}
@@ -254,14 +258,14 @@ async def profile_echo_chat(
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
             VALUES (NULL, $1, 'user', $2, 'topic', $3::jsonb) RETURNING *
             """,
-            user_id, message, session_meta,
+            user_id, crypto.encrypt(message), session_meta,
         )
         assistant_msg_row = await conn.fetchrow(
             """
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
             VALUES (NULL, $1, 'assistant', $2, 'topic', $3::jsonb) RETURNING *
             """,
-            user_id, answer, session_meta,
+            user_id, crypto.encrypt(answer), session_meta,
         )
 
     return EchoChatResponse(
@@ -317,6 +321,7 @@ def _row_to_echo_msg(row) -> EchoMessageResponse:
     # case_id kann NULL sein bei Profil-Chats
     if d.get("case_id") is None:
         d["case_id"] = "00000000-0000-0000-0000-000000000000"
+    d["content"] = crypto.decrypt(d.get("content"))
     return EchoMessageResponse(**d)
 
 

@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.echo import (
     EchoChatRequest,
@@ -122,7 +123,10 @@ async def chat(
                 "ORDER BY created_at DESC LIMIT 20",
                 case_id, body.thread_type,
             )
-        history = [{"role": r["role"], "content": r["content"]} for r in reversed(history_rows)]
+        history = [
+        {"role": r["role"], "content": crypto.decrypt(r["content"])}
+        for r in reversed(history_rows)
+    ]
 
     case_context = dict(case_row)
     onboarding = dict(onboarding_row) if onboarding_row else None
@@ -181,7 +185,7 @@ async def chat(
                 INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
                 VALUES ($1, $2, 'system', $3, 'scene', $4::jsonb)
                 """,
-                case_id, user_id, context_text, context_meta,
+                case_id, user_id, crypto.encrypt(context_text), context_meta,
             )
 
         # Echo bestätigt den Kontext
@@ -200,7 +204,7 @@ async def chat(
                 INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
                 VALUES ($1, $2, 'assistant', $3, 'scene', $4::jsonb) RETURNING *
                 """,
-                case_id, user_id, answer, session_meta,
+                case_id, user_id, crypto.encrypt(answer), session_meta,
             )
 
         return EchoChatResponse(
@@ -354,14 +358,16 @@ async def chat(
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata, session_id)
             VALUES ($1, $2, 'user', $3, $4, $5, $6::jsonb, $7) RETURNING *
             """,
-            case_id, user_id, body.message, body.thread_type, body.related_scene_id, session_meta, chat_session_id,
+            case_id, user_id, crypto.encrypt(body.message), body.thread_type,
+            body.related_scene_id, session_meta, chat_session_id,
         )
         assistant_msg_row = await conn.fetchrow(
             """
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata, session_id)
             VALUES ($1, $2, 'assistant', $3, $4, $5, $6::jsonb, $7) RETURNING *
             """,
-            case_id, user_id, answer, body.thread_type, body.related_scene_id, assistant_meta_json, chat_session_id,
+            case_id, user_id, crypto.encrypt(answer), body.thread_type,
+            body.related_scene_id, assistant_meta_json, chat_session_id,
         )
         if chat_session_id:
             # Session anfassen; erste Nutzernachricht wird zum Titel
@@ -413,7 +419,7 @@ async def finalize_scene(
     if not history_rows:
         raise HTTPException(status_code=400, detail="Keine Szenen-Unterhaltung gefunden.")
 
-    history = [{"role": r["role"], "content": r["content"]} for r in history_rows]
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in history_rows]
 
     extracted = await echo_svc.extract_scene_from_conversation(
         history=history,
@@ -581,7 +587,7 @@ async def topic_summary(
             "ORDER BY created_at ASC LIMIT 100",
             case_id, body.thread_type,
         )
-    history = [{"role": r["role"], "content": r["content"]} for r in rows]
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in rows]
     summary = await echo_svc.generate_topic_summary(topic=body.thread_type, history=history)
     return {"summary": summary}
 
@@ -614,4 +620,5 @@ def _row_to_msg(row) -> EchoMessageResponse:
         d["metadata"] = json.loads(meta)
     elif meta is None:
         d["metadata"] = {}
+    d["content"] = crypto.decrypt(d.get("content"))
     return EchoMessageResponse(**d)

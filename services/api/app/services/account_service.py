@@ -14,6 +14,7 @@ import json
 
 import asyncpg
 
+from app.core import crypto
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -53,6 +54,11 @@ async def export_user_data(
     )
     if email:
         data["waitlist"] = await _json_rows_by_email(conn, "waitlist", email)
+
+    # echo_messages-Inhalte sind ggf. feldverschlüsselt → für den Export entschlüsseln
+    for msg in data.get("echo_messages", []):
+        if isinstance(msg, dict) and msg.get("content") is not None:
+            msg["content"] = crypto.decrypt(msg["content"])
 
     return data
 

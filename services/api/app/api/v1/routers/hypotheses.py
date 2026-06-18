@@ -14,6 +14,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.services.hypothesis_service import HYPOTHESIS_LABELS
 
@@ -119,7 +120,7 @@ async def generate_hypothesis(
         )
     if not rows:
         raise HTTPException(status_code=400, detail="Noch kein Dialog zu dieser Hypothese.")
-    history = [{"role": r["role"], "content": r["content"]} for r in rows]
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in rows]
     summary = await echo_svc.generate_hypothesis_summary(
         hypothesis_type=body.hypothesis_type, history=history
     )
