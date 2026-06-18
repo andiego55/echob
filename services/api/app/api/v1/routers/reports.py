@@ -119,6 +119,7 @@ async def create_report(
         }
 
     title = body.title or REPORT_TYPE_LABELS.get(body.report_type, "Bericht")
+    content_json = json.dumps(crypto.encrypt_json_strings(content))
 
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
@@ -127,7 +128,7 @@ async def create_report(
             VALUES ($1, $2, $3, $4, $5::jsonb, 'ready')
             RETURNING *
             """,
-            case_id, user_id, body.report_type, title, json.dumps(content),
+            case_id, user_id, body.report_type, title, content_json,
         )
         await log_ai_usage(user_id, conn, "report")
 
@@ -180,11 +181,12 @@ async def update_report(
         content = existing.get("content") or {}
         if isinstance(content, str):
             content = json.loads(content)
+        content = crypto.decrypt_json_strings(content)
         content["sections"] = body.sections
         updated = await conn.fetchrow(
             "UPDATE reports SET content = $1::jsonb, updated_at = NOW() "
             "WHERE id = $2 AND case_id = $3 RETURNING *",
-            json.dumps(content), report_id, case_id,
+            json.dumps(crypto.encrypt_json_strings(content)), report_id, case_id,
         )
     return _row_to_report(updated)
 
@@ -223,7 +225,8 @@ def _row_to_report(row) -> ReportResponse:
     d = dict(row)
     content = d.get("content")
     if isinstance(content, str):
-        d["content"] = json.loads(content)
+        content = json.loads(content)
+    d["content"] = crypto.decrypt_json_strings(content) if content is not None else content
     d["type_label"] = REPORT_TYPE_LABELS.get(d["report_type"], d["report_type"])
     d.setdefault("disclaimer", REPORT_DISCLAIMER)
     return ReportResponse(**d)

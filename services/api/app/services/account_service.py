@@ -82,6 +82,9 @@ async def export_user_data(
                 n, "first_impressions", "key_scenes", "open_questions",
                 "conversation_prompts", "next_steps", "free_text",
             )
+    for r in data.get("reports", []):
+        if isinstance(r, dict) and isinstance(r.get("content"), (dict, list)):
+            r["content"] = crypto.decrypt_json_strings(r["content"])
 
     return data
 

@@ -64,3 +64,16 @@ def test_decrypt_fields():
     assert out["user_reaction"] == "meine Reaktion"
     assert out["title"] == "Klartext-Titel"   # nicht in der Feldliste → unverändert
     assert out["empty"] is None
+
+
+def test_json_strings_roundtrip():
+    _enable_key()
+    obj = {"a": "geheim", "n": 5, "nested": {"b": "auch geheim", "flag": True}, "list": ["x", 1]}
+    enc = crypto.encrypt_json_strings(obj)
+    assert enc["n"] == 5                       # Zahl bleibt
+    assert enc["nested"]["flag"] is True       # Bool bleibt
+    assert "a" in enc and "nested" in enc      # Keys bleiben
+    assert enc["a"].startswith("enc:v1:") and "geheim" not in enc["a"]
+    assert enc["nested"]["b"].startswith("enc:v1:")
+    assert enc["list"][0].startswith("enc:v1:") and enc["list"][1] == 1
+    assert crypto.decrypt_json_strings(enc) == obj   # vollständiger Round-Trip

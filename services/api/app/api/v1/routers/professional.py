@@ -50,7 +50,7 @@ def _public_row(row, fields: tuple[str, ...] = ()):
         v = d.get(f)
         if isinstance(v, str):
             try:
-                d[f] = json.loads(v)
+                d[f] = crypto.decrypt_json_strings(json.loads(v))
             except (ValueError, TypeError):
                 pass
     return d

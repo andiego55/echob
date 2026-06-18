@@ -76,3 +76,26 @@ ONBOARDING_FIELDS = (
     "person_name", "relationship_description", "main_burden",
     "typical_scenes", "significant_event", "memorable_scenes",
 )
+
+
+def encrypt_json_strings(obj):
+    """Verschlüsselt rekursiv alle String-Blätter in dict/list/str. Keys, Zahlen und
+    Booleans bleiben unverändert. Für JSONB-Spalten mit sensiblen Inhalten."""
+    if isinstance(obj, dict):
+        return {k: encrypt_json_strings(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [encrypt_json_strings(v) for v in obj]
+    if isinstance(obj, str):
+        return encrypt(obj)
+    return obj
+
+
+def decrypt_json_strings(obj):
+    """Gegenstück zu encrypt_json_strings. Alt-Klartext (ohne Prefix) bleibt unverändert."""
+    if isinstance(obj, dict):
+        return {k: decrypt_json_strings(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [decrypt_json_strings(v) for v in obj]
+    if isinstance(obj, str):
+        return decrypt(obj)
+    return obj

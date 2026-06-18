@@ -9,6 +9,7 @@ Testfunktion läuft in einer zurückgerollten Transaktion (keine Datenrückstän
     DATABASE_URL=postgresql://echob_dev:<pw>@localhost:<port>/echob \
     pytest app/tests/test_field_encryption_db.py -v
 """
+import json
 import os
 import uuid
 
@@ -16,6 +17,7 @@ import asyncpg
 import pytest
 from cryptography.fernet import Fernet
 
+from app.api.v1.routers.reports import _row_to_report
 from app.core import crypto
 from app.core.config import settings
 from app.services.account_service import export_user_data
@@ -175,6 +177,38 @@ async def test_summary_text_columns_encrypted(db):
     assert topic_secret in topic_texts
     assert hyp_secret in hyp_texts
     assert all("enc:v1:" not in (x or "") for x in topic_texts + hyp_texts)
+
+
+async def test_reports_content_jsonb_encrypted(db):
+    owner, case_id = await _new_case(db)
+    secret_heading = "BERICHT_HEADING_" + uuid.uuid4().hex
+    secret_text = "BERICHT_TEXT_" + uuid.uuid4().hex
+    content = {
+        "sections": [{"heading": secret_heading, "text": secret_text}],
+        "disclaimer": "Kein Ersatz für Diagnostik.",
+    }
+    report_id = await db.fetchval(
+        "INSERT INTO reports (case_id, user_id, report_type, title, content, status) "
+        "VALUES ($1,$2,'pattern','T',$3::jsonb,'ready') RETURNING id",
+        case_id, owner, json.dumps(crypto.encrypt_json_strings(content)),
+    )
+
+    # At rest: nur die String-Blätter sind Chiffretext, Klartext steht nicht in der DB
+    raw = await db.fetchval("SELECT content::text FROM reports WHERE id=$1", report_id)
+    assert "enc:v1:" in raw
+    assert secret_heading not in raw and secret_text not in raw
+
+    # Lese-Helfer (_row_to_report) stellt den Klartext wieder her
+    row = await db.fetchrow("SELECT * FROM reports WHERE id=$1", report_id)
+    rep = _row_to_report(row)
+    assert rep.content["sections"][0]["heading"] == secret_heading
+    assert rep.content["sections"][0]["text"] == secret_text
+
+    # Export liefert Klartext, kein Chiffretext
+    export = await export_user_data(db, str(owner), None)
+    exp_content = export["reports"][0]["content"]
+    assert exp_content["sections"][0]["text"] == secret_text
+    assert "enc:v1:" not in json.dumps(exp_content)
 
 
 async def test_professional_columns_encrypted(db):
