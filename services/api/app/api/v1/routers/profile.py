@@ -217,6 +217,7 @@ async def profile_echo_chat(
     profile_context = build_profile_context({
         "modules": modules,
         "safety_status": profile.get("safety_status", "no_indication"),
+        "display_name": profile.get("display_name"),
     })
 
     # Profil-Echo nutzt einen eigenen Prompt + Kontext

@@ -252,6 +252,9 @@ async def person_profile_echo_chat(
             raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
 
         profile = await _get_or_create(conn, case_id, user_id)
+        person_name_enc = await conn.fetchval(
+            "SELECT person_name FROM onboarding_answers WHERE case_id = $1", case_id
+        )
 
         history_rows = await conn.fetch(
             "SELECT role, content FROM echo_messages "
@@ -273,7 +276,10 @@ async def person_profile_echo_chat(
     if isinstance(summary, str):
         summary = json.loads(summary)
 
-    person_context = build_person_context({"modules": modules, "summary": summary})
+    person_context = build_person_context({
+        "modules": modules, "summary": summary,
+        "person_name": crypto.decrypt(person_name_enc),
+    })
 
     from app.services.echo_service import _load_prompt
     system_prompt = _load_prompt("person_profile_echo_prompt.md")

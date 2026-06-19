@@ -164,6 +164,7 @@ async def chat(
             context_text += "\n\n" + build_profile_context({
                 "modules": profile_modules,
                 "safety_status": profile_row.get("safety_status", "no_indication"),
+                "display_name": profile_row.get("display_name"),
             })
 
         if topic_summaries:

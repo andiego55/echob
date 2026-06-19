@@ -74,7 +74,10 @@ def build_profile_context(profile: dict[str, Any]) -> str:
 
     if display_name := profile.get("display_name"):
         lines.append(f"**Name / Pseudonym der nutzenden Person:** {display_name}")
-        lines.append("_Sprich die Person mit diesem Namen an, wenn es natürlich wirkt._\n")
+        lines.append(
+            "_Sprich die nutzende Person mit diesem Namen an (als gewählte Anrede, "
+            "nicht zwanghaft in jedem Satz)._\n"
+        )
 
     # Lebenskontext
     lc = m.get("life_context", {})

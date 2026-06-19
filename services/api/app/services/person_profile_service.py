@@ -36,6 +36,10 @@ def build_person_context(profile: dict[str, Any]) -> str:
         "Formuliere vorsichtig, nicht-pathologisierend und mit Bezug auf konkrete Beschreibungen._\n"
     )
 
+    if name := profile.get("person_name"):
+        lines.append(f"**Name (Pseudonym) der anderen Person:** {name}")
+        lines.append(f"_Benenne die andere Person in deinen Antworten mit {name}._\n")
+
     # Emotionale Reaktionen
     er = m.get("emotional_reactions", {})
     if (v := er.get("emotional_volatility")) is not None:

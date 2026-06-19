@@ -76,6 +76,10 @@ def build_case_context(
         lines.append("## Onboarding-Antworten\n")
         if onboarding.get("person_name"):
             lines.append(f"**Name der Fallperson (Pseudonym):** {onboarding['person_name']}")
+            lines.append(
+                f"_Benenne die andere Person in deinen Antworten mit {onboarding['person_name']} "
+                "(statt mit Umschreibungen wie 'die andere Person')._"
+            )
         fields = [
             ("relationship_description", "Beziehungsbeschreibung"),
             ("typical_scenes",           "Typische Szenen"),
