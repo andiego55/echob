@@ -24,7 +24,7 @@ export default function ProfessionalCasesPage() {
         <span className="label">Fachpersonenbereich</span>
         <h1 className="mt-1 text-2xl font-bold text-navy">Klient:innen & Fälle</h1>
         <p className="mt-2 text-sm text-brand-muted max-w-2xl">
-          Alle dir zugewiesenen Fälle, gruppiert nach Klient:in. Eine Klient:in kann mehrere Fälle haben.
+          Alle Ihnen zugewiesenen Fälle, gruppiert nach Klient:in. Eine Klient:in kann mehrere Fälle haben.
         </p>
 
         {isLoading && <p className="mt-6 text-sm text-brand-muted">Wird geladen …</p>}

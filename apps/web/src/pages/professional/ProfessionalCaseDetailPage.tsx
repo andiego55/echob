@@ -121,7 +121,7 @@ export default function ProfessionalCaseDetailPage() {
           <div className="text-4xl mb-4">🔒</div>
           <h1 className="text-lg font-semibold text-navy mb-2">Kein Zugriff</h1>
           <p className="text-sm text-brand-muted">
-            Dieser Fall ist nicht (mehr) für dich freigegeben. Möglicherweise wurde die Freigabe widerrufen.
+            Dieser Fall ist nicht (mehr) für Sie freigegeben. Möglicherweise wurde die Freigabe widerrufen.
           </p>
           <Link to="/professional" className="mt-6 inline-block btn-primary !py-2 !px-5 !text-sm">Zum Postfach</Link>
         </div>
@@ -139,7 +139,7 @@ export default function ProfessionalCaseDetailPage() {
           <div>
             <span className="label">{bundle.client_display_name}</span>
             <h1 className="mt-1 text-2xl font-bold text-navy">{bundle.case_title}</h1>
-            <p className="mt-1 text-xs text-brand-muted">Du siehst nur die freigegebenen Inhalte dieses Falls.</p>
+            <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
           </div>
           <Link to={`/professional/cases/${caseId}/echo`} className="btn-primary !py-2 !px-5 !text-sm shrink-0">
             💬 Mit Echo über diesen Fall sprechen

@@ -42,8 +42,8 @@ export default function ProfessionalRegisterPage() {
           <span className="label">Fachpersonen-Zugang</span>
           <h1 className="mt-1 text-xl font-bold text-navy">Profil als Fachperson anlegen</h1>
           <p className="mt-2 text-sm text-brand-muted mb-6">
-            Mit diesem Profil siehst du Fälle, die Nutzer:innen ausdrücklich für dich freigeben.
-            Du erhältst ausschließlich Inhalte, die freigegeben wurden.
+            Mit diesem Profil sehen Sie Fälle, die Klient:innen ausdrücklich für Sie freigeben.
+            Sie erhalten ausschließlich Inhalte, die freigegeben wurden.
           </p>
 
           <form
@@ -75,7 +75,7 @@ export default function ProfessionalRegisterPage() {
 
             {mutation.isError && (
               <p className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
-                Speichern fehlgeschlagen. Bitte versuche es erneut.
+                Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.
               </p>
             )}
 

@@ -23,8 +23,8 @@ export default function ProfessionalInboxPage() {
         <span className="label">Fachpersonenbereich</span>
         <h1 className="mt-1 text-2xl font-bold text-navy">Postfach</h1>
         <p className="mt-2 text-sm text-brand-muted max-w-2xl">
-          Hier erscheinen Freigaben von Nutzer:innen. Du siehst ausschließlich Inhalte, die
-          ausdrücklich für dich freigegeben wurden – und nur, solange die Freigabe besteht.
+          Hier erscheinen Freigaben von Klient:innen. Sie sehen ausschließlich Inhalte, die
+          ausdrücklich für Sie freigegeben wurden – und nur, solange die Freigabe besteht.
         </p>
 
         {isLoading && <p className="mt-6 text-sm text-brand-muted">Wird geladen …</p>}
@@ -34,7 +34,7 @@ export default function ProfessionalInboxPage() {
             <div className="text-4xl mb-4">📭</div>
             <h2 className="text-lg font-semibold text-navy mb-2">Noch keine Freigaben</h2>
             <p className="text-sm text-brand-muted">
-              Sobald dir jemand Fallinhalte freigibt, erscheinen sie hier.
+              Sobald Ihnen jemand Fallinhalte freigibt, erscheinen sie hier.
             </p>
           </div>
         )}

@@ -12,6 +12,7 @@ export default function AuthPage() {
   const location    = useLocation()
   const [searchParams] = useSearchParams()
   const role        = searchParams.get('role')
+  const isPro       = role === 'professional'
   const fromLoc     = (location.state as { from?: Location })?.from
   const defaultDest = role === 'professional' ? '/professional/register' : '/app'
   const from        = fromLoc ? `${fromLoc.pathname}${(fromLoc as Location & { search?: string }).search ?? ''}` : defaultDest
@@ -101,12 +102,17 @@ export default function AuthPage() {
           </div>
 
           <div className="card">
+            {isPro && <span className="label mb-2 inline-block">Für Fachpersonen</span>}
             <h1 className="mb-1 text-xl font-bold text-navy">
-              {tab === 'login' ? 'Willkommen zurück' : 'Kostenlos 3 Tage testen'}
+              {tab === 'login'
+                ? 'Willkommen zurück'
+                : isPro ? 'Als Fachperson registrieren' : 'Kostenlos 3 Tage testen'}
             </h1>
             {tab === 'signup' && (
               <p className="text-xs text-brand-muted mb-6">
-                Keine Kreditkarte · Keine Bindung · Jederzeit aufhören
+                {isPro
+                  ? 'Sie sehen ausschließlich von Klient:innen ausdrücklich freigegebene Inhalte.'
+                  : 'Keine Kreditkarte · Keine Bindung · Jederzeit aufhören'}
               </p>
             )}
             {tab === 'login' && <div className="mb-6" />}
@@ -160,7 +166,7 @@ export default function AuthPage() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="du@beispiel.de"
+                  placeholder={isPro ? 'name@praxis.de' : 'du@beispiel.de'}
                   className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
                 />
               </div>
