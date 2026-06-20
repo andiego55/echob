@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
+import ExplainerSection from '@/components/landing/ExplainerSection'
 
 const THOUGHTS = [
   '„Ich weiß nicht mehr, ob ich übertreibe."',
@@ -87,6 +88,8 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+
+      <ExplainerSection />
 
       {/* ── Resonanz-Karten ───────────────────────────────────────── */}
       <section className="border-t border-brand-border px-6 py-[72px]">
