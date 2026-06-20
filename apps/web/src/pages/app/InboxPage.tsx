@@ -107,13 +107,14 @@ function AssignmentCard({ item }: { item: Assignment }) {
   const meta = TYPE_META[item.type] ?? { icon: '•', label: item.type }
   const p = item.payload as Record<string, string>
   const [answer, setAnswer] = useState('')
+  const [answers, setAnswers] = useState<Record<string, number>>({})
 
   const seen = useMutation({
     mutationFn: () => collabApi.markSeen(item.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
   })
   const respond = useMutation({
-    mutationFn: () => collabApi.submitResponse(item.id, { text: answer }),
+    mutationFn: (body: Record<string, unknown>) => collabApi.submitResponse(item.id, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
   })
 
@@ -142,22 +143,52 @@ function AssignmentCard({ item }: { item: Assignment }) {
         </div>
       )}
 
-      {item.type === 'questionnaire' && (
-        item.status === 'completed' ? (
-          <p className="text-sm text-green-700">✓ Beantwortet. Danke!</p>
-        ) : (
+      {item.type === 'questionnaire' && (() => {
+        const qp = item.payload as { intro?: string; questions?: { key: string; label: string; max?: number }[] }
+        const questions = qp.questions ?? []
+        if (item.status === 'completed')
+          return <p className="text-sm text-green-700">✓ Beantwortet. Danke!</p>
+        if (questions.length > 0) {
+          const allAnswered = questions.every(q => answers[q.key] != null)
+          return (
+            <div className="text-sm text-brand-text">
+              {qp.intro && <p className="mb-3">{qp.intro}</p>}
+              <p className="mb-3 text-[11px] text-brand-muted">1 = trifft nicht zu · 5 = trifft voll zu</p>
+              <div className="space-y-3">
+                {questions.map(q => (
+                  <div key={q.key}>
+                    <p className="mb-1">{q.label}</p>
+                    <div className="flex gap-1.5">
+                      {Array.from({ length: q.max ?? 5 }, (_, i) => i + 1).map(n => (
+                        <button key={n} type="button" onClick={() => setAnswers(a => ({ ...a, [q.key]: n }))}
+                          className={`w-9 h-9 rounded-brand border text-sm font-medium transition-colors ${answers[q.key] === n ? 'bg-accent text-white border-accent' : 'border-brand-border text-brand-muted hover:border-accent'}`}>
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => respond.mutate({ answers })} disabled={respond.isPending || !allAnswered}
+                className="mt-3 text-sm font-semibold px-4 py-2 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-60">
+                {respond.isPending ? 'Wird gesendet …' : 'Absenden'}
+              </button>
+            </div>
+          )
+        }
+        return (
           <div className="text-sm text-brand-text">
-            {p.intro && <p className="mb-2">{p.intro}</p>}
+            {qp.intro && <p className="mb-2">{qp.intro}</p>}
             <textarea value={answer} onChange={e => setAnswer(e.target.value)} rows={3}
               placeholder="Deine Antwort …"
               className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
-            <button onClick={() => respond.mutate()} disabled={respond.isPending || !answer.trim()}
+            <button onClick={() => respond.mutate({ text: answer })} disabled={respond.isPending || !answer.trim()}
               className="mt-2 text-sm font-semibold px-4 py-2 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-60">
               {respond.isPending ? 'Wird gesendet …' : 'Antwort senden'}
             </button>
           </div>
         )
-      )}
+      })()}
 
       {item.status === 'sent' && item.type !== 'questionnaire' && (
         <button onClick={() => seen.mutate()} disabled={seen.isPending}

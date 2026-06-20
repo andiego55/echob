@@ -33,6 +33,7 @@ export default function AssignPanel({ caseId }: { caseId: string }) {
   const [content, setContent] = useState('')
   const [hypothesis, setHypothesis] = useState('')
   const [url, setUrl] = useState('')
+  const [questions, setQuestions] = useState('')
   const opt = TYPE_OPTIONS.find(o => o.value === type)!
 
   const createAssign = useMutation({
@@ -40,11 +41,18 @@ export default function AssignPanel({ caseId }: { caseId: string }) {
       const payload: Record<string, unknown> = {}
       if (type === 'message') payload.body = content
       if (type === 'dialog') { payload.intention = content; if (hypothesis.trim()) payload.hypothesis_for_echo = hypothesis }
-      if (type === 'questionnaire') payload.intro = content
+      if (type === 'questionnaire') {
+        payload.intro = content
+        const qLines = questions.split('\n').map(s => s.trim()).filter(Boolean)
+        if (qLines.length) {
+          payload.questions = qLines.map((label, i) => ({ key: `q${i}`, label, type: 'likert', max: 5 }))
+          payload.scoring = { type: 'avg' }
+        }
+      }
       if (type === 'resource') { payload.text = content; if (url.trim()) payload.url = url }
       return collabApi.createAssignment(caseId, { type, title: title.trim() || null, payload })
     },
-    onSuccess: () => { setTitle(''); setContent(''); setHypothesis(''); setUrl(''); invalidate() },
+    onSuccess: () => { setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions(''); invalidate() },
   })
 
   // ── Termin ──
@@ -86,6 +94,13 @@ export default function AssignPanel({ caseId }: { caseId: string }) {
           {type === 'resource' && (
             <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Link (optional)" className={inputCls} />
           )}
+          {type === 'questionnaire' && (
+            <>
+              <textarea value={questions} onChange={e => setQuestions(e.target.value)} rows={4}
+                placeholder="Fragen – eine pro Zeile (Skala 1–5). Leer lassen = nur Freitext-Antwort." className={inputCls} />
+              <p className="text-[11px] text-brand-muted -mt-1.5">Jede Zeile wird eine Skala-Frage (1–5); Auswertung als Durchschnitt.</p>
+            </>
+          )}
           <button type="submit" disabled={createAssign.isPending || !content.trim()}
             className="btn-primary !py-2 !text-sm disabled:opacity-60">
             {createAssign.isPending ? 'Wird gesendet …' : 'Zuweisen'}
@@ -112,11 +127,15 @@ export default function AssignPanel({ caseId }: { caseId: string }) {
             {appointments.data?.map(a => (
               <li key={a.id}>📅 {a.title || 'Termin'} · {fmt(a.start_at)} · <span className="text-brand-muted">{a.status}</span></li>
             ))}
-            {assignments.data?.map(a => (
-              <li key={a.id}>
-                {TYPE_OPTIONS.find(o => o.value === a.type)?.label ?? a.type}: {a.title || '–'} · <span className="text-brand-muted">{a.status}</span>
-              </li>
-            ))}
+            {assignments.data?.map(a => {
+              const score = a.type === 'questionnaire' ? (a.response as { score?: number } | null)?.score : undefined
+              return (
+                <li key={a.id}>
+                  {TYPE_OPTIONS.find(o => o.value === a.type)?.label ?? a.type}: {a.title || '–'} · <span className="text-brand-muted">{a.status}</span>
+                  {score != null && <span className="ml-1 font-semibold text-accent">· Ø {score}</span>}
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}

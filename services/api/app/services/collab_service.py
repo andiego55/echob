@@ -110,13 +110,48 @@ async def mark_assignment_seen(conn, *, user_id, assignment_id) -> dict | None:
     return _assignment_user(row) if row else None
 
 
+def compute_questionnaire_score(payload, answers) -> float | None:
+    """Score aus Likert-Antworten (avg|sum, optional reverse_keys). None, wenn keine Likerts."""
+    if not isinstance(payload, dict) or not isinstance(answers, dict):
+        return None
+    scoring = payload.get("scoring") or {}
+    reverse = set(scoring.get("reverse_keys") or [])
+    vals: list[float] = []
+    for q in payload.get("questions") or []:
+        if not isinstance(q, dict) or q.get("type") != "likert":
+            continue
+        v = answers.get(q.get("key"))
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            if q.get("key") in reverse:
+                v = (int(q.get("max", 5)) + 1) - v
+            vals.append(float(v))
+    if not vals:
+        return None
+    total = sum(vals)
+    return round(total if scoring.get("type") == "sum" else total / len(vals), 2)
+
+
 async def submit_assignment_response(conn, *, user_id, assignment_id, response) -> dict | None:
+    existing = await conn.fetchrow(
+        "SELECT type, payload FROM professional_assignments WHERE id = $1 AND user_id = $2",
+        assignment_id, user_id,
+    )
+    if not existing:
+        return None
+    enriched = dict(response or {})
+    if existing["type"] == "questionnaire":
+        answers = enriched.get("answers")
+        if not isinstance(answers, dict):
+            answers = {}
+        score = compute_questionnaire_score(_dec(existing["payload"]), answers)
+        if score is not None:
+            enriched["score"] = score          # abgeleitete Zahl, kein Freitext → bleibt klar
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
         "SET response = $3::jsonb, responded_at = NOW(), status = 'completed', "
         "    completed_at = NOW(), updated_at = NOW() "
         "WHERE id = $1 AND user_id = $2 RETURNING *",
-        assignment_id, user_id, json.dumps(_enc(response or {})),
+        assignment_id, user_id, json.dumps(_enc(enriched)),
     )
     return _assignment_user(row) if row else None
 
