@@ -37,6 +37,8 @@ export default function Footer() {
               </h4>
               <Link to="/datenschutz" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Datenschutz</Link>
               <Link to="/impressum" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Impressum</Link>
+              <Link to="/agb" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">AGB</Link>
+              <Link to="/widerruf" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Widerruf</Link>
             </div>
           </div>
         </div>

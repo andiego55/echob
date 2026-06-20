@@ -4,6 +4,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage          from '@/pages/LandingPage'
 import ImpressumPage        from '@/pages/ImpressumPage'
 import DatenschutzPage      from '@/pages/DatenschutzPage'
+import AGBPage              from '@/pages/AGBPage'
+import WiderrufPage         from '@/pages/WiderrufPage'
 import AuthPage             from '@/pages/AuthPage'
 import NotFoundPage         from '@/pages/NotFoundPage'
 import CoachingPage         from '@/pages/CoachingPage'
@@ -98,6 +100,8 @@ export default function App() {
       <Route path="/"            element={<LandingPage />} />
       <Route path="/impressum"   element={<ImpressumPage />} />
       <Route path="/datenschutz" element={<DatenschutzPage />} />
+      <Route path="/agb"         element={<AGBPage />} />
+      <Route path="/widerruf"    element={<WiderrufPage />} />
       <Route path="/auth"        element={<AuthPage />} />
       <Route path="/coaching"    element={<CoachingPage />} />
       <Route path="/ueber"       element={<UeberPage />} />

@@ -98,6 +98,7 @@ export default function UpgradePage() {
   const checkoutSessionId = searchParams.get('session_id')
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [pendingProduct, setPendingProduct] = useState<ProductType | null>(null)
+  const [consent, setConsent] = useState(false)
   const verifiedRef = useRef(false)
 
   const { data: subscription } = useQuery({
@@ -143,6 +144,10 @@ export default function UpgradePage() {
 
   const buy = (product: ProductType) => {
     if (checkoutMutation.isPending) return
+    if (!consent) {
+      setCheckoutError('Bitte bestätige zuerst die AGB, die Widerrufsbelehrung und den sofortigen Leistungsbeginn (Häkchen).')
+      return
+    }
     checkoutMutation.mutate(product)
   }
 
@@ -158,6 +163,7 @@ export default function UpgradePage() {
           <h1 className="mt-4 text-2xl font-bold text-navy">Pläne & Angebote</h1>
           <p className="mt-1 text-sm text-brand-muted max-w-xl">
             Sichere Zahlung über Stripe – Kreditkarte, SEPA, PayPal & mehr. Sofortige Freischaltung.
+            Alle Preise inkl. gesetzlicher MwSt.
           </p>
         </div>
 
@@ -235,6 +241,23 @@ export default function UpgradePage() {
           </div>
         )}
 
+        {/* Pflicht-Einwilligung vor dem Kauf (Widerruf + AGB) */}
+        <label className="mb-6 flex items-start gap-3 rounded-brand border border-brand-border bg-white px-5 py-4 max-w-2xl cursor-pointer">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => { setConsent(e.target.checked); setCheckoutError(null) }}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+          />
+          <span className="text-xs text-brand-muted leading-relaxed">
+            Ich akzeptiere die <Link to="/agb" className="text-accent hover:underline">AGB</Link> und die{' '}
+            <Link to="/widerruf" className="text-accent hover:underline">Widerrufsbelehrung</Link>. Mir ist
+            bekannt, dass die Leistung mit dem Kauf sofort beginnt und mein Widerrufsrecht bei vollständiger
+            Erfüllung erlischt. Es gilt die{' '}
+            <Link to="/datenschutz" className="text-accent hover:underline">Datenschutzerklärung</Link>.
+          </span>
+        </label>
+
         {/* Startpaket */}
         <div className="mb-8 rounded-brand border-2 border-accent bg-accent/5 p-6 max-w-2xl shadow-sm">
           <div className="flex items-start justify-between mb-1">
@@ -245,7 +268,7 @@ export default function UpgradePage() {
           </div>
           <div className="mb-2">
             <span className="text-3xl font-extrabold text-navy">{STARTER_PACKAGE.price} €</span>
-            <span className="text-xs text-brand-muted ml-1">/ {STARTER_PACKAGE.period}</span>
+            <span className="text-xs text-brand-muted ml-1">/ {STARTER_PACKAGE.period} · inkl. MwSt.</span>
           </div>
           <p className="text-sm text-brand-muted mb-5 leading-relaxed max-w-lg">{STARTER_PACKAGE.desc}</p>
           <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5 mb-6">
@@ -261,7 +284,7 @@ export default function UpgradePage() {
             disabled={checkoutMutation.isPending}
             className="inline-block text-sm font-semibold px-6 py-2.5 rounded-brand bg-accent text-white hover:bg-accent/90 transition-colors disabled:opacity-60"
           >
-            {pendingProduct === STARTER_PACKAGE.id ? 'Checkout wird geöffnet …' : 'Startpaket kaufen'}
+            {pendingProduct === STARTER_PACKAGE.id ? 'Checkout wird geöffnet …' : 'Zahlungspflichtig bestellen'}
           </button>
         </div>
 
@@ -290,7 +313,7 @@ export default function UpgradePage() {
               </div>
               <div className="mb-3">
                 <span className="text-3xl font-extrabold text-navy">{plan.price} €</span>
-                <span className="text-xs text-brand-muted ml-1">/ {plan.period}</span>
+                <span className="text-xs text-brand-muted ml-1">/ {plan.period} · inkl. MwSt.</span>
               </div>
               <p className="text-xs text-brand-muted mb-5 leading-relaxed">{plan.desc}</p>
               <ul className="space-y-1.5 mb-6 flex-1">
@@ -314,7 +337,7 @@ export default function UpgradePage() {
                   ? '✓ Dein aktueller Plan'
                   : pendingProduct === plan.id
                     ? 'Checkout wird geöffnet …'
-                    : `${plan.name} abonnieren`}
+                    : 'Zahlungspflichtig abonnieren'}
               </button>
             </div>
           ))}

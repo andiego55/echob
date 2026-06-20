@@ -168,15 +168,16 @@ export default function LandingPage() {
           {/* Abo-Optionen */}
           <p className="text-xs font-semibold text-brand-muted uppercase tracking-wide mb-4">Oder: App-Abo ohne Coaching</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="card">
+            <Link to="/auth" state={{ defaultTab: 'signup' }} className="card block no-underline transition hover:border-accent hover:shadow-md">
               <span className="label mb-3">Kostenlos</span>
               <div className="text-2xl font-extrabold text-navy mb-1">0 €</div>
               <p className="text-xs text-brand-muted mb-4">3 Tage · 1 Fall · 5 Szenen</p>
               <p className="text-sm text-brand-muted">
-                Kurzbericht & Coaching-Vorbereitung inklusive. Kein Kreditkarte nötig.
+                Kurzbericht & Coaching-Vorbereitung inklusive. Keine Kreditkarte nötig.
               </p>
-            </div>
-            <div className="card border-accent bg-accent/5">
+              <span className="mt-4 block text-sm font-semibold text-accent">Kostenlos testen →</span>
+            </Link>
+            <Link to="/auth" state={{ defaultTab: 'signup' }} className="card border-accent bg-accent/5 block no-underline transition hover:shadow-md">
               <div className="flex items-start justify-between mb-2">
                 <span className="label">Early Bird</span>
                 <span className="text-[10px] font-bold uppercase tracking-wide bg-accent text-white px-2 py-0.5 rounded-full">Bis Nov.</span>
@@ -184,14 +185,16 @@ export default function LandingPage() {
               <div className="text-2xl font-extrabold text-navy mb-1">12,99 €<span className="text-sm font-normal text-brand-muted"> /Mo.</span></div>
               <p className="text-xs text-brand-muted mb-4">Vollzugang · Monatlich kündbar</p>
               <p className="text-sm text-brand-muted">Alle Features, alle Berichte.</p>
-            </div>
-            <div className="card">
+              <span className="mt-4 block text-sm font-semibold text-accent">Auswählen →</span>
+            </Link>
+            <Link to="/auth" state={{ defaultTab: 'signup' }} className="card block no-underline transition hover:border-accent hover:shadow-md">
               <span className="label mb-3">Monatsabo</span>
               <div className="text-2xl font-extrabold text-navy mb-1">24,99 €<span className="text-sm font-normal text-brand-muted"> /Mo.</span></div>
               <p className="text-xs text-brand-muted mb-4">Vollzugang · Monatlich kündbar</p>
               <p className="text-sm text-brand-muted">Regulärer Preis nach Early Bird.</p>
-            </div>
-            <div className="card">
+              <span className="mt-4 block text-sm font-semibold text-accent">Auswählen →</span>
+            </Link>
+            <Link to="/auth" state={{ defaultTab: 'signup' }} className="card block no-underline transition hover:border-accent hover:shadow-md">
               <div className="flex items-start justify-between mb-2">
                 <span className="label">Jahresabo</span>
                 <span className="text-[10px] font-bold uppercase tracking-wide bg-navy text-white px-2 py-0.5 rounded-full">–33 %</span>
@@ -199,8 +202,14 @@ export default function LandingPage() {
               <div className="text-2xl font-extrabold text-navy mb-1">199 €<span className="text-sm font-normal text-brand-muted"> /Jahr</span></div>
               <p className="text-xs text-brand-muted mb-4">≈ 16,58 € / Monat</p>
               <p className="text-sm text-brand-muted">Vollzugang zum Vorzugspreis.</p>
-            </div>
+              <span className="mt-4 block text-sm font-semibold text-accent">Auswählen →</span>
+            </Link>
           </div>
+          <p className="mt-5 text-xs text-brand-muted">
+            Alle Preise inkl. gesetzlicher USt. Abos verlängern sich automatisch und sind jederzeit zum
+            Laufzeitende kündbar. Es gelten die <Link to="/agb" className="underline hover:text-navy">AGB</Link>{' '}
+            und die <Link to="/widerruf" className="underline hover:text-navy">Widerrufsbelehrung</Link>.
+          </p>
         </div>
       </section>
 
