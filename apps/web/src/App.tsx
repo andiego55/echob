@@ -46,6 +46,7 @@ import ReportNewPage      from '@/pages/app/ReportNewPage'
 import ReportDetailPage   from '@/pages/app/ReportDetailPage'
 import PrintSummaryPage   from '@/pages/app/PrintSummaryPage'
 import HelpPage           from '@/pages/app/HelpPage'
+import InboxPage          from '@/pages/app/InboxPage'
 import ProfilePage           from '@/pages/app/ProfilePage'
 import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
 import PersonProfilePage     from '@/pages/app/PersonProfilePage'
@@ -128,6 +129,7 @@ export default function App() {
       <Route path="/app" element={<ProtectedRoute><AppHome /></ProtectedRoute>} />
       <Route path="/app/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
       <Route path="/app/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
+      <Route path="/app/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />
       <Route path="/app/profile/echo" element={<ProtectedRoute><ProfileEchoPage /></ProtectedRoute>} />

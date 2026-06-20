@@ -10,6 +10,7 @@ import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi } from '@/api/professional'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import AssignPanel from '@/components/professional/AssignPanel'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
@@ -178,6 +179,7 @@ export default function ProfessionalCaseDetailPage() {
         )}
 
         <div className="grid gap-4 lg:grid-cols-2">
+          <AssignPanel caseId={caseId!} />
           {/* Fallinformationen */}
           {has('case_info') && bundle.case && (
             <Section title="Fallinformationen">

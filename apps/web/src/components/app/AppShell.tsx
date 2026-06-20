@@ -35,6 +35,7 @@ export default function AppShell({ children }: Props) {
           <nav className="hidden md:flex items-center gap-1">
             {[
               { to: '/app',          label: 'Meine Fälle',        end: true },
+              { to: '/app/inbox',    label: 'Postfach',            end: false },
               { to: '/app/profile',  label: 'Mein Profil',         end: false },
               { to: '/app/privacy',  label: 'Schutz',              end: false },
               { to: '/app/help',     label: 'Hilfe',               end: false },
