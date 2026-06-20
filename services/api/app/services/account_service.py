@@ -25,6 +25,7 @@ _USER_TABLES = (
     "reports", "topic_summaries", "case_reviews", "case_hypotheses",
     "person_profiles", "echo_chat_sessions", "user_profiles", "payments",
     "ai_usage_log", "user_consents", "professional_profiles",
+    "professional_assignments", "professional_appointments",
 )
 
 # Tabellen mit Daten in der Fachpersonen-Rolle (Spalte professional_user_id).
@@ -32,6 +33,7 @@ _USER_TABLES = (
 _PROFESSIONAL_TABLES = (
     "professional_notes", "professional_echo_sessions",
     "professional_echo_messages", "professional_echo_summaries",
+    "professional_templates",
 )
 
 
@@ -89,6 +91,15 @@ async def export_user_data(
         for p in data.get(_tbl, []):
             if isinstance(p, dict) and isinstance(p.get("summary"), dict):
                 p["summary"] = crypto.decrypt_summary_text(p["summary"])
+    for a in data.get("professional_assignments", []):
+        if isinstance(a, dict):
+            for _k in ("payload", "response"):
+                if isinstance(a.get(_k), (dict, list)):
+                    a[_k] = crypto.decrypt_json_strings(a[_k])
+    for _tbl in ("professional_appointments", "professional_templates"):
+        for r in data.get(_tbl, []):
+            if isinstance(r, dict) and isinstance(r.get("payload"), (dict, list)):
+                r["payload"] = crypto.decrypt_json_strings(r["payload"])
 
     return data
 
@@ -129,6 +140,9 @@ _DELETE_STEPS = (
     ("professional_echo_summaries", "professional_user_id = $1"),
     ("professional_echo_sessions", "professional_user_id = $1"),
     ("professional_notes", "professional_user_id = $1"),
+    ("professional_assignments", "user_id = $1 OR professional_user_id = $1"),
+    ("professional_appointments", "user_id = $1 OR professional_user_id = $1"),
+    ("professional_templates", "professional_user_id = $1"),
     ("case_shares", "owner_user_id = $1 OR professional_user_id = $1"),
     ("cases", "user_id = $1"),
     ("professional_invites", "inviter_user_id = $1 OR professional_user_id = $1"),

@@ -13,9 +13,11 @@ from app.api.v1.routers import (
     echo,
     health,
     hypotheses,
+    inbox,
     onboarding,
     person_profile,
     professional,
+    professional_collab,
     professional_echo,
     professionals,
     profile,
@@ -50,9 +52,11 @@ v1_router.include_router(topic_summaries.router)
 v1_router.include_router(hypotheses.router)
 v1_router.include_router(onboarding.router)
 v1_router.include_router(subscription.router)
+v1_router.include_router(inbox.router)
 
 # ── Fachpersonenbereich ───────────────────────────────────────────────────────
 v1_router.include_router(professional.router)
 v1_router.include_router(professionals.router)
 v1_router.include_router(case_shares.router)
 v1_router.include_router(professional_echo.router)
+v1_router.include_router(professional_collab.router)
