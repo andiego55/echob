@@ -136,7 +136,7 @@ function AssignmentCard({ item }: { item: Assignment }) {
       {item.type === 'dialog' && (
         <div className="text-sm text-brand-text">
           {p.intention && <p className="mb-2">{p.intention}</p>}
-          <Link to={`/app/cases/${item.case_id}/echo`} className="inline-block text-sm font-semibold px-4 py-2 rounded-brand bg-accent text-white hover:bg-accent/90 no-underline">
+          <Link to={`/app/cases/${item.case_id}/echo?assignment=${item.id}`} className="inline-block text-sm font-semibold px-4 py-2 rounded-brand bg-accent text-white hover:bg-accent/90 no-underline">
             Dialog mit Echo öffnen →
           </Link>
         </div>

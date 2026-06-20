@@ -274,6 +274,19 @@ async def chat(
 
         extra_context = "\n\n---\n\n".join(context_parts)
 
+        # Zugewiesener Dialog: Steuerung der Fachperson in den Kontext (inkl. interner
+        # Hypothese, die nur Echo sieht). Markiert die Zuweisung als in_progress.
+        if body.assignment_id:
+            from app.services import collab_service
+            async with pool.acquire() as conn:
+                dlg = await collab_service.get_dialog_for_echo(
+                    conn, user_id=user_id, assignment_id=body.assignment_id)
+            if dlg:
+                steering = collab_service.build_assignment_steering(dlg.get("payload") or {})
+                if steering:
+                    extra_context = (
+                        f"{extra_context}\n\n---\n\n{steering}" if extra_context else steering)
+
     if body.thread_type == "scene" and body.scene_session_id:
         async with pool.acquire() as conn:
             ctx_row = await conn.fetchrow(

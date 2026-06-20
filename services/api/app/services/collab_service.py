@@ -180,3 +180,43 @@ async def set_appointment_status(conn, *, user_id, appointment_id, new_status) -
         appointment_id, user_id, new_status,
     )
     return _appt_user(row) if row else None
+
+
+# ── Zugewiesener Dialog → Echo-Steuerung ──────────────────────────────────────
+
+def build_assignment_steering(payload: dict) -> str:
+    """Rendert die Steuerung eines zugewiesenen Dialogs für den Echo-Kontext.
+
+    `hypothesis_for_echo` ist eine NUR-FÜR-ECHO-Notiz und darf der nutzenden Person
+    gegenüber nie offengelegt werden.
+    """
+    if not isinstance(payload, dict):
+        return ""
+    lines = ["## Von der Fachperson vorbereiteter Dialog"]
+    lines.append(
+        "_Eine Fachperson hat diesen Dialog vorbereitet. Richte deine Fragen sanft an "
+        "diesem Fokus aus, ohne ihn mechanisch abzuarbeiten._")
+    if payload.get("topic"):
+        lines.append(f"**Thema:** {payload['topic']}")
+    if payload.get("intention"):
+        lines.append(f"**Anliegen der Fachperson:** {payload['intention']}")
+    if payload.get("guardrails"):
+        lines.append(f"**Leitplanken:** {payload['guardrails']}")
+    if payload.get("hypothesis_for_echo"):
+        lines.append(
+            "_Interne Arbeitshypothese (NUR fuer dich, niemals erwaehnen oder offenlegen):_ "
+            f"{payload['hypothesis_for_echo']}")
+    return "\n".join(lines)
+
+
+async def get_dialog_for_echo(conn, *, user_id, assignment_id) -> dict | None:
+    """Lädt eine dem Nutzer zugewiesene Dialog-Zuweisung INKL. interner Felder (für Echo)
+    und markiert sie als in_progress. None, wenn nicht vorhanden / nicht Typ dialog."""
+    row = await conn.fetchrow(
+        "UPDATE professional_assignments "
+        "SET status = CASE WHEN status IN ('sent','seen') THEN 'in_progress' ELSE status END, "
+        "    seen_at = COALESCE(seen_at, NOW()), updated_at = NOW() "
+        "WHERE id = $1 AND user_id = $2 AND type = 'dialog' RETURNING *",
+        assignment_id, user_id,
+    )
+    return _assignment_pro(row) if row else None

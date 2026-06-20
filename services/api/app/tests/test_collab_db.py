@@ -134,3 +134,23 @@ async def test_appointment_flow(db):
     conf = await collab_service.set_appointment_status(
         db, user_id=owner, appointment_id=appt["id"], new_status="confirmed")
     assert conf["status"] == "confirmed"
+
+
+async def test_assignment_steering_includes_hypothesis():
+    out = collab_service.build_assignment_steering(
+        {"intention": "Grenzen anschauen", "hypothesis_for_echo": "Vermeidung von Konflikt"})
+    assert "Grenzen anschauen" in out and "Vermeidung von Konflikt" in out
+    assert "NUR" in out   # interne Hypothese ist als nur-fuer-Echo markiert
+
+
+async def test_get_dialog_for_echo(db):
+    owner, pro, case_id = await _case_with_share(db)
+    a = await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="dialog", title="X",
+        payload={"intention": "Reden", "hypothesis_for_echo": "Geheim"})
+    dlg = await collab_service.get_dialog_for_echo(db, user_id=owner, assignment_id=a["id"])
+    assert dlg is not None and dlg["status"] == "in_progress"
+    assert dlg["payload"]["hypothesis_for_echo"] == "Geheim"   # Echo bekommt die interne Hypothese
+    other = await collab_service.get_dialog_for_echo(
+        db, user_id=uuid.uuid4(), assignment_id=a["id"])
+    assert other is None

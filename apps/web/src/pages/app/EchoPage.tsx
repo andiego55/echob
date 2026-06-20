@@ -4,7 +4,7 @@
  * Glossar-Begriffe als Schnellauswahl.
  */
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
@@ -44,6 +44,8 @@ function formatSessionDate(iso: string): string {
 
 export default function EchoPage() {
   const { caseId } = useParams<{ caseId: string }>()
+  const [searchParams] = useSearchParams()
+  const assignmentId = searchParams.get('assignment')
   const qc = useQueryClient()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -82,6 +84,7 @@ export default function EchoPage() {
         ...data,
         thread_type: threadType,
         chat_session_id: selectedSession ?? undefined,
+        assignment_id: assignmentId ?? undefined,
       }),
     onSuccess: (data) => {
       if (data.chat_session_id && data.chat_session_id !== selectedSession) {
