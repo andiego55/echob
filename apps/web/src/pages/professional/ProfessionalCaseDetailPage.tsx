@@ -37,12 +37,24 @@ const TABS = [
 ] as const
 type TabKey = (typeof TABS)[number]['key']
 
-/** Zweite Headerleiste des Fall-Arbeitsplatzes – Stil wie die Nutzer-CaseNav. */
-function CaseWorkspaceNav({ active, onSelect }: { active: TabKey; onSelect: (k: TabKey) => void }) {
+/** Zweite Headerleiste des Fall-Arbeitsplatzes – Stil wie die Nutzer-CaseNav.
+ *  Links steht fest die aktuell gewählte Klient:in (bleibt beim Scrollen sichtbar). */
+function CaseWorkspaceNav({ active, onSelect, clientName }: {
+  active: TabKey; onSelect: (k: TabKey) => void; clientName: string
+}) {
   return (
     <div className="border-b border-brand-border bg-white sticky top-14 z-30">
-      <div className="mx-auto max-w-[1100px] px-6">
-        <nav className="flex gap-0 overflow-x-auto" aria-label="Fall-Navigation">
+      <div className="mx-auto max-w-[1100px] px-6 flex items-stretch gap-1">
+        <div className="flex items-center gap-2 flex-shrink-0 pr-3 mr-1 border-r border-brand-border">
+          <Link to="/professional/cases" title="Zu Klient:innen"
+            className="text-brand-muted hover:text-navy no-underline" aria-label="Zu Klient:innen">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+          <span className="text-sm font-semibold text-navy whitespace-nowrap">{clientName}</span>
+        </div>
+        <nav className="flex gap-0 overflow-x-auto flex-1 min-w-0" aria-label="Fall-Navigation">
           {TABS.map(({ key, label }) => (
             <button
               key={key}
@@ -171,12 +183,11 @@ export default function ProfessionalCaseDetailPage() {
 
   return (
     <ProfessionalShell>
-      <CaseWorkspaceNav active={tab} onSelect={setTab} />
+      <CaseWorkspaceNav active={tab} onSelect={setTab} clientName={bundle.client_display_name} />
       <div className="mx-auto max-w-[1100px] px-6 py-10">
-        {/* Fall-Kopf */}
+        {/* Fall-Kopf (Klient:in steht oben in der Leiste) */}
         <div className="mb-6">
-          <span className="label">{bundle.client_display_name}</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">{bundle.case_title}</h1>
+          <h1 className="text-2xl font-bold text-navy">{bundle.case_title}</h1>
           <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
         </div>
 
