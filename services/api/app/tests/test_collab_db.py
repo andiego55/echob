@@ -199,6 +199,25 @@ async def test_set_dialog_session_roundtrip(db):
     assert "enc:v1:" in raw and str(sid) not in raw   # Session-Link verschlüsselt at rest
 
 
+async def test_mark_assignment_read(db):
+    owner, pro, case_id = await _case_with_share(db)
+    a = await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="questionnaire", title="Q",
+        payload={"questions": [{"key": "q0", "type": "likert", "max": 5}]})
+    assert await db.fetchval(
+        "SELECT pro_read_at FROM professional_assignments WHERE id=$1", a["id"]) is None
+
+    ok = await collab_service.mark_assignment_read(
+        db, professional_user_id=pro, assignment_id=a["id"])
+    assert ok is True
+    assert await db.fetchval(
+        "SELECT pro_read_at FROM professional_assignments WHERE id=$1", a["id"]) is not None
+
+    other = await collab_service.mark_assignment_read(
+        db, professional_user_id=uuid.uuid4(), assignment_id=a["id"])
+    assert other is False                                          # fremde Fachperson: kein Treffer
+
+
 async def test_dashboard_cross_case_queries(db):
     owner, pro, case_id = await _case_with_share(db)
     await collab_service.create_assignment(

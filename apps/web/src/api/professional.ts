@@ -27,7 +27,7 @@ export interface DashboardCase {
 export interface DashboardAttention {
   case_id: string
   client_display_name: string
-  kind: 'questionnaire_answered' | 'message_reply'
+  kind: 'questionnaire_answered' | 'message_reply' | 'dialog_summary'
   title: string
   detail: string
   at: string | null
@@ -44,6 +44,27 @@ export interface ProfessionalDashboard {
   cases: DashboardCase[]
   attention: DashboardAttention[]
   appointments: DashboardAppointment[]
+}
+
+export interface PostfachAttention {
+  assignment_id: string
+  case_id: string
+  client_display_name: string
+  kind: 'questionnaire_answered' | 'dialog_summary' | 'message_reply'
+  title: string
+  detail: string
+  at: string | null
+  unread: boolean
+}
+export interface PostfachShare {
+  case_id: string
+  client_display_name: string
+  case_title: string
+  shared_at: string
+}
+export interface ProfessionalPostfach {
+  attention: PostfachAttention[]
+  shares: PostfachShare[]
 }
 
 export type TemplateType = 'questionnaire' | 'resource' | 'message' | 'dialog'
@@ -66,6 +87,12 @@ export const professionalApi = {
   // Dashboard (fallübergreifendes Cockpit)
   dashboard: () =>
     apiClient.get<ProfessionalDashboard>('/professional/dashboard').then(r => r.data),
+
+  // Postfach (alle Eingänge, gelesen/ungelesen)
+  postfach: () =>
+    apiClient.get<ProfessionalPostfach>('/professional/postfach').then(r => r.data),
+  markAssignmentRead: (id: string) =>
+    apiClient.post(`/professional/assignments/${id}/read`).then(r => r.data),
 
   // Postfach / Fälle
   inbox: () =>

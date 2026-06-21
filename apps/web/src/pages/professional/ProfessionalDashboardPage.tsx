@@ -66,11 +66,11 @@ export default function ProfessionalDashboardPage() {
                   className="card flex items-center justify-between gap-3 no-underline hover:border-accent/40 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-lg shrink-0">{a.kind === 'questionnaire_answered' ? '📋' : '✉️'}</span>
+                    <span className="text-lg shrink-0">{a.kind === 'questionnaire_answered' ? '📋' : a.kind === 'dialog_summary' ? '💬' : '✉️'}</span>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-navy truncate">{a.client_display_name} · {a.title}</p>
                       <p className="text-xs text-brand-muted">
-                        {a.kind === 'questionnaire_answered' ? 'Fragebogen beantwortet' : 'Hat dir geantwortet'} · {fmtDate(a.at)}
+                        {a.kind === 'questionnaire_answered' ? 'Fragebogen beantwortet' : a.kind === 'dialog_summary' ? 'Dialog zusammengefasst' : 'Hat dir geantwortet'} · {fmtDate(a.at)}
                       </p>
                     </div>
                   </div>

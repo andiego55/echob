@@ -114,6 +114,16 @@ async def list_assignments_for_cases(conn, *, professional_user_id, case_ids) ->
     return [_assignment_pro(r) for r in rows]
 
 
+async def mark_assignment_read(conn, *, professional_user_id, assignment_id) -> bool:
+    """Fachperson markiert eine Zuweisung als gelesen (pro_read_at = NOW())."""
+    res = await conn.execute(
+        "UPDATE professional_assignments SET pro_read_at = NOW() "
+        "WHERE id = $1 AND professional_user_id = $2",
+        assignment_id, professional_user_id,
+    )
+    return res.split()[-1] != "0"
+
+
 async def mark_assignment_seen(conn, *, user_id, assignment_id) -> dict | None:
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
@@ -228,7 +238,7 @@ async def append_message_from_pro(
     new_payload = _append_thread_message(_dec(existing["payload"]), "professional", text)
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
-        "SET payload = $4::jsonb, status = 'in_progress', updated_at = NOW() "
+        "SET payload = $4::jsonb, status = 'in_progress', updated_at = NOW(), pro_read_at = NOW() "
         "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3 RETURNING *",
         assignment_id, professional_user_id, case_id, json.dumps(_enc(new_payload)),
     )

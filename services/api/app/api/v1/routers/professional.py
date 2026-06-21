@@ -10,7 +10,7 @@ import json
 from datetime import UTC, datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_current_user, get_pool
@@ -37,6 +37,57 @@ _NOTE_FIELDS = (
 
 def _case_title(relationship_type: str | None) -> str:
     return _REL_TYPE_LABELS.get(relationship_type or "", "Fall")
+
+
+_TITLE_BY_KIND = {
+    "questionnaire_answered": "Fragebogen",
+    "dialog_summary": "Dialog",
+    "message_reply": "Nachricht",
+}
+
+
+def _build_attention(assignments: list[dict], case_info: dict) -> list[dict]:
+    """„Braucht Aufmerksamkeit": beantwortete Fragebögen, gesendete Dialog-
+    Zusammenfassungen, Klient-Antworten in Nachrichten — je mit gelesen/ungelesen."""
+    floor = datetime(1970, 1, 1, tzinfo=UTC)
+    items: list[dict] = []
+    for a in assignments:
+        info = case_info.get(a["case_id"])
+        if info is None:
+            continue
+        kind = detail = activity = None
+        if a["type"] == "questionnaire" and a["status"] == "completed":
+            kind = "questionnaire_answered"
+            score = (a.get("response") or {}).get("score")
+            detail = f"Ø {score}" if score is not None else "beantwortet"
+            activity = a.get("responded_at")
+        elif a["type"] == "dialog" and (a.get("response") or {}).get("summary"):
+            kind = "dialog_summary"
+            detail = "Zusammenfassung gesendet"
+            activity = a.get("responded_at")
+        elif a["type"] == "message":
+            thread = (a.get("payload") or {}).get("thread") or []
+            if thread and isinstance(thread[-1], dict) and thread[-1].get("from") == "user":
+                kind = "message_reply"
+                detail = "hat geantwortet"
+                activity = a.get("updated_at")
+        if not kind:
+            continue
+        read_at = a.get("pro_read_at")
+        unread = read_at is None or (activity is not None and activity > read_at)
+        items.append({
+            "assignment_id": str(a["id"]),
+            "case_id": str(a["case_id"]),
+            "client_display_name": info["client_display_name"],
+            "kind": kind,
+            "title": a.get("title") or _TITLE_BY_KIND.get(kind, ""),
+            "detail": detail,
+            "at": activity,
+            "unread": unread,
+        })
+    items.sort(key=lambda x: x["at"] or floor, reverse=True)
+    items.sort(key=lambda x: x["unread"], reverse=True)   # ungelesen zuerst
+    return items
 
 
 def _public_row(row, fields: tuple[str, ...] = ()):
@@ -245,10 +296,8 @@ async def dashboard(
     _open = {"sent", "seen", "in_progress"}
     _floor = datetime(1970, 1, 1, tzinfo=UTC)
     per_case = {cid: {"open": 0, "last": None} for cid in case_ids}
-    attention: list[dict] = []
     for a in assignments:
-        cid = a["case_id"]
-        pc = per_case.get(cid)
+        pc = per_case.get(a["case_id"])
         if pc is None:
             continue
         if a["status"] in _open:
@@ -256,24 +305,8 @@ async def dashboard(
         ua = a.get("updated_at")
         if ua and (pc["last"] is None or ua > pc["last"]):
             pc["last"] = ua
-        info = case_info[cid]
-        if a["type"] == "questionnaire" and a["status"] == "completed":
-            score = (a.get("response") or {}).get("score")
-            attention.append({
-                "case_id": str(cid), "client_display_name": info["client_display_name"],
-                "kind": "questionnaire_answered", "title": a.get("title") or "Fragebogen",
-                "detail": f"Ø {score}" if score is not None else "beantwortet",
-                "at": a.get("responded_at") or a.get("updated_at"),
-            })
-        elif a["type"] == "message":
-            thread = (a.get("payload") or {}).get("thread") or []
-            if thread and isinstance(thread[-1], dict) and thread[-1].get("from") == "user":
-                attention.append({
-                    "case_id": str(cid), "client_display_name": info["client_display_name"],
-                    "kind": "message_reply", "title": a.get("title") or "Nachricht",
-                    "detail": "hat geantwortet", "at": a.get("updated_at"),
-                })
-    attention.sort(key=lambda x: x["at"] or _floor, reverse=True)
+
+    attention = _build_attention(assignments, case_info)
 
     cases_out = [
         {
@@ -302,6 +335,64 @@ async def dashboard(
         for a in appts
     ]
     return {"cases": cases_out, "attention": attention, "appointments": appts_out}
+
+
+@router.get("/postfach")
+async def postfach(
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Profi-Postfach: alle „Braucht Aufmerksamkeit"-Eingänge (gelesen/ungelesen)
+    plus die aktiven Freigaben."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        share_rows = await conn.fetch(
+            "SELECT s.case_id, s.created_at AS shared_at, c.relationship_type, "
+            "       up.display_name AS client_display_name "
+            "FROM case_shares s JOIN cases c ON c.id = s.case_id "
+            "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
+            "WHERE s.professional_user_id = $1 AND s.status = 'active' "
+            "ORDER BY s.created_at DESC",
+            pid,
+        )
+        if not share_rows:
+            return {"attention": [], "shares": []}
+        case_info = {
+            r["case_id"]: {
+                "client_display_name": r["client_display_name"] or "Klient:in",
+                "case_title": _case_title(r["relationship_type"]),
+            }
+            for r in share_rows
+        }
+        assignments = await collab_service.list_assignments_for_cases(
+            conn, professional_user_id=pid, case_ids=list(case_info.keys()))
+
+    attention = _build_attention(assignments, case_info)
+    shares = [
+        {
+            "case_id": str(r["case_id"]),
+            "client_display_name": r["client_display_name"] or "Klient:in",
+            "case_title": _case_title(r["relationship_type"]),
+            "shared_at": r["shared_at"],
+        }
+        for r in share_rows
+    ]
+    return {"attention": attention, "shares": shares}
+
+
+@router.post("/assignments/{assignment_id}/read")
+async def mark_read(
+    assignment_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fachperson markiert einen Eingang als gelesen."""
+    async with pool.acquire() as conn:
+        ok = await collab_service.mark_assignment_read(
+            conn, professional_user_id=current["user_id"], assignment_id=assignment_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return {"status": "read"}
 
 
 # ── Fallansicht (Bundle: nur freigegebene Inhalte) ────────────────────────────
