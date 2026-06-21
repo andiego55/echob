@@ -1,5 +1,9 @@
-"""Unit-Tests für die Fragebogen-Auswertung `compute_questionnaire_score` (rein, ohne DB)."""
-from app.services.collab_service import compute_questionnaire_score
+"""Unit-Tests für reine Collab-Helfer (Scoring, Thema, Begrüßung) – ohne DB."""
+from app.services.collab_service import (
+    assignment_topic,
+    build_assignment_greeting,
+    compute_questionnaire_score,
+)
 
 
 def _payload(scoring=None):
@@ -36,3 +40,16 @@ def test_score_none_without_likert_answers():
     assert compute_questionnaire_score(_payload(), {"q2": "nur text"}) is None
     assert compute_questionnaire_score({}, {}) is None
     assert compute_questionnaire_score(_payload(), "kein dict") is None
+
+
+def test_assignment_topic_prefers_topic_then_intention():
+    assert assignment_topic({"topic": "Grenzen", "intention": "x"}) == "Grenzen"
+    assert assignment_topic({"intention": "  Über Nähe reden  "}) == "Über Nähe reden"
+    assert assignment_topic({}) is None
+    assert assignment_topic("kein dict") is None
+
+
+def test_build_assignment_greeting_mentions_topic_and_fachperson():
+    g = build_assignment_greeting("Grenzen setzen")
+    assert "Grenzen setzen" in g
+    assert "Fachperson" in g

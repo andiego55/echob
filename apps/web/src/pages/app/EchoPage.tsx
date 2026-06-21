@@ -64,12 +64,27 @@ export default function EchoPage() {
     enabled: !!caseId,
   })
 
-  // Beim ersten Laden: jüngste Session auswählen (oder neuen Chat anbieten)
+  // Beim ersten Laden: jüngste Session auswählen (oder neuen Chat anbieten).
+  // Bei zugewiesenem Dialog NICHT – dort öffnet der Effekt unten eine eigene Session.
   useEffect(() => {
-    if (selectedSession === undefined && sessionsLoaded) {
+    if (selectedSession === undefined && sessionsLoaded && !assignmentId) {
       setSelectedSession(sessions[0]?.id ?? null)
     }
-  }, [sessionsLoaded, sessions, selectedSession])
+  }, [sessionsLoaded, sessions, selectedSession, assignmentId])
+
+  // Zugewiesener Dialog: eigene Session mit Echo-Begrüßung öffnen (serverseitig idempotent).
+  const assignmentStarted = useRef(false)
+  useEffect(() => {
+    if (!assignmentId || !caseId || assignmentStarted.current) return
+    assignmentStarted.current = true
+    echoApi.startAssignmentDialog(caseId, assignmentId)
+      .then(({ chat_session_id }) => {
+        setSelectedSession(chat_session_id)
+        qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
+        qc.invalidateQueries({ queryKey: ['echo-history', caseId, chat_session_id] })
+      })
+      .catch(() => { assignmentStarted.current = false; setSelectedSession((s) => s ?? null) })
+  }, [assignmentId, caseId, qc])
 
   // Gesprächsverlauf der gewählten Session laden
   const { data: history = [] } = useQuery({

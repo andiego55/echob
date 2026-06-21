@@ -310,3 +310,42 @@ async def get_dialog_for_echo(conn, *, user_id, assignment_id) -> dict | None:
         assignment_id, user_id,
     )
     return _assignment_pro(row) if row else None
+
+
+def assignment_topic(payload: Any) -> str | None:
+    """Kurzes Thema einer Zuweisung für Titel/Begrüßung (topic, sonst intention)."""
+    if not isinstance(payload, dict):
+        return None
+    for key in ("topic", "intention"):
+        val = payload.get(key)
+        if isinstance(val, str) and val.strip():
+            return val.strip()
+    return None
+
+
+def build_assignment_greeting(thema: str) -> str:
+    """Eröffnungsnachricht von Echo für einen zugewiesenen Dialog (deterministisch, kein LLM)."""
+    return (
+        f"Deine Fachperson hat dir diesen Dialog vorgeschlagen – es geht um **{thema}**.\n\n"
+        "Wir schauen da ganz in deinem Tempo gemeinsam drauf; du musst nichts vorbereiten "
+        "oder „richtig“ machen. Was geht dir zu diesem Thema gerade als Erstes durch den Kopf?"
+    )
+
+
+async def set_dialog_session(conn, *, user_id, assignment_id, session_id) -> None:
+    """Verknüpft die gestartete Echo-Session mit der Zuweisung (Idempotenz beim Öffnen)."""
+    row = await conn.fetchrow(
+        "SELECT response FROM professional_assignments WHERE id = $1 AND user_id = $2",
+        assignment_id, user_id,
+    )
+    if not row:
+        return
+    resp = _dec(row["response"])
+    if not isinstance(resp, dict):
+        resp = {}
+    resp["dialog_session_id"] = str(session_id)
+    await conn.execute(
+        "UPDATE professional_assignments SET response = $3::jsonb, updated_at = NOW() "
+        "WHERE id = $1 AND user_id = $2",
+        assignment_id, user_id, json.dumps(_enc(resp)),
+    )

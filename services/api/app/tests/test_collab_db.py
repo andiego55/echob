@@ -166,6 +166,21 @@ async def test_message_thread_bidirectional(db):
     assert none is None                                            # Fremde dürfen nicht anhängen
 
 
+async def test_set_dialog_session_roundtrip(db):
+    owner, pro, case_id = await _case_with_share(db)
+    a = await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="dialog", title="X",
+        payload={"intention": "Reden"})
+    sid = uuid.uuid4()
+    await collab_service.set_dialog_session(
+        db, user_id=owner, assignment_id=a["id"], session_id=sid)
+    dlg = await collab_service.get_dialog_for_echo(db, user_id=owner, assignment_id=a["id"])
+    assert dlg["response"]["dialog_session_id"] == str(sid)        # für Idempotenz lesbar
+    raw = await db.fetchval(
+        "SELECT response::text FROM professional_assignments WHERE id=$1", a["id"])
+    assert "enc:v1:" in raw and str(sid) not in raw   # Session-Link verschlüsselt at rest
+
+
 async def test_assignment_steering_includes_hypothesis():
     out = collab_service.build_assignment_steering(
         {"intention": "Grenzen anschauen", "hypothesis_for_echo": "Vermeidung von Konflikt"})

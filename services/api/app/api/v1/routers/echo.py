@@ -401,6 +401,77 @@ async def chat(
     )
 
 
+class StartAssignmentDialogRequest(BaseModel):
+    assignment_id: UUID
+
+
+@router.post("/assignment-dialog")
+async def start_assignment_dialog(
+    case_id: UUID,
+    body: StartAssignmentDialogRequest,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Öffnet einen zugewiesenen Dialog als eigene Echo-Session mit Begrüßung.
+
+    Idempotent: existiert bereits eine Session für die Zuweisung, wird sie
+    zurückgegeben (kein Duplikat, keine zweite Begrüßung). Die folgenden
+    Nutzer-Nachrichten laufen über /chat mit `assignment_id` (Steuerung).
+    """
+    from app.services import collab_service
+    user_id = current_user["user_id"]
+    async with pool.acquire() as conn:
+        case_row = await conn.fetchrow(
+            "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
+            case_id, user_id,
+        )
+        if not case_row:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+
+        dlg = await collab_service.get_dialog_for_echo(
+            conn, user_id=user_id, assignment_id=body.assignment_id)
+        if not dlg:
+            raise HTTPException(status_code=404, detail="Zugewiesener Dialog nicht gefunden.")
+
+        # Idempotenz: bereits gestartete Session wiederverwenden
+        existing = (dlg.get("response") or {}).get("dialog_session_id")
+        if existing:
+            try:
+                existing_uuid = UUID(str(existing))
+            except (ValueError, TypeError):
+                existing_uuid = None
+            if existing_uuid:
+                still = await conn.fetchrow(
+                    "SELECT id FROM echo_chat_sessions "
+                    "WHERE id = $1 AND case_id = $2 AND user_id = $3",
+                    existing_uuid, case_id, user_id,
+                )
+                if still:
+                    return {"chat_session_id": str(existing_uuid)}
+
+        payload = dlg.get("payload") or {}
+        thema = dlg.get("title") or collab_service.assignment_topic(payload) or "dein Anliegen"
+        title = f"Zugewiesen: {thema}"[:60]
+        greeting = collab_service.build_assignment_greeting(thema)
+
+        sess = await conn.fetchrow(
+            "INSERT INTO echo_chat_sessions (case_id, user_id, title) "
+            "VALUES ($1, $2, $3) RETURNING id",
+            case_id, user_id, title,
+        )
+        sid = sess["id"]
+        await conn.execute(
+            "INSERT INTO echo_messages "
+            "(case_id, user_id, role, content, thread_type, metadata, session_id) "
+            "VALUES ($1, $2, 'assistant', $3, 'topic', '{}'::jsonb, $4)",
+            case_id, user_id, crypto.encrypt(greeting), sid,
+        )
+        await collab_service.set_dialog_session(
+            conn, user_id=user_id, assignment_id=body.assignment_id, session_id=sid)
+
+    return {"chat_session_id": str(sid)}
+
+
 class FinalizeSceneRequest(BaseModel):
     session_id: str
 
