@@ -37,6 +37,14 @@ export default function AppointmentsPanel({ caseId }: { caseId: string }) {
     mutationFn: (id: string) => collabApi.completeAppointment(caseId, id),
     onSuccess: () => invalidate(),
   })
+  const reopen = useMutation({
+    mutationFn: (id: string) => collabApi.reopenAppointment(caseId, id),
+    onSuccess: () => invalidate(),
+  })
+  const del = useMutation({
+    mutationFn: (id: string) => collabApi.deleteAppointment(caseId, id),
+    onSuccess: () => invalidate(),
+  })
 
   return (
     <div className="space-y-4">
@@ -65,10 +73,25 @@ export default function AppointmentsPanel({ caseId }: { caseId: string }) {
                   </span>
                   <span className="flex items-center gap-2 text-xs text-brand-muted shrink-0">
                     <span>{a.status}</span><span>{fmt(a.start_at)}</span>
-                    {a.status !== 'completed' && a.status !== 'cancelled' && (
+                    {a.status === 'completed' ? (
+                      <button onClick={() => reopen.mutate(a.id)} disabled={reopen.isPending}
+                        className="text-accent hover:underline">Wieder öffnen</button>
+                    ) : a.status !== 'cancelled' ? (
                       <button onClick={() => complete.mutate(a.id)} disabled={complete.isPending}
                         className="text-accent hover:underline">Erledigt</button>
-                    )}
+                    ) : null}
+                    <button
+                      onClick={() => {
+                        const msg = a.status !== 'completed'
+                          ? 'Sind Sie sicher, dass Sie den Termin löschen wollen? Er ist noch nicht als „erledigt" markiert.'
+                          : 'Diesen Termin löschen?'
+                        if (window.confirm(msg)) del.mutate(a.id)
+                      }}
+                      disabled={del.isPending}
+                      className="text-brand-muted hover:text-red-600"
+                    >
+                      Löschen
+                    </button>
                   </span>
                 </li>
               )

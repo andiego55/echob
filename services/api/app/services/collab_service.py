@@ -343,6 +343,32 @@ async def complete_appointment(
     return _appt(row) if row else None
 
 
+async def reopen_appointment(
+    conn, *, professional_user_id, case_id, appointment_id,
+) -> dict | None:
+    """Erledigten Termin wieder öffnen (status → confirmed)."""
+    await require_active_share(professional_user_id, case_id, conn)
+    row = await conn.fetchrow(
+        "UPDATE professional_appointments SET status = 'confirmed', updated_at = NOW() "
+        "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3 RETURNING *",
+        appointment_id, professional_user_id, case_id,
+    )
+    return _appt(row) if row else None
+
+
+async def delete_appointment(
+    conn, *, professional_user_id, case_id, appointment_id,
+) -> bool:
+    """Löscht einen Termin (hart)."""
+    await require_active_share(professional_user_id, case_id, conn)
+    res = await conn.execute(
+        "DELETE FROM professional_appointments "
+        "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",
+        appointment_id, professional_user_id, case_id,
+    )
+    return res.split()[-1] != "0"
+
+
 # ── Zugewiesener Dialog → Echo-Steuerung ──────────────────────────────────────
 
 def build_assignment_steering(payload: dict) -> str:

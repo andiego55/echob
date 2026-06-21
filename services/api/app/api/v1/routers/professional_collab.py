@@ -112,6 +112,40 @@ async def complete_appointment(
     return out
 
 
+@router.post("/appointments/{appointment_id}/reopen")
+async def reopen_appointment(
+    case_id: UUID,
+    appointment_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Erledigten Termin wieder öffnen."""
+    async with pool.acquire() as conn:
+        out = await collab_service.reopen_appointment(
+            conn, professional_user_id=current["user_id"], case_id=case_id,
+            appointment_id=appointment_id)
+    if not out:
+        raise HTTPException(status_code=404, detail="Termin nicht gefunden.")
+    return out
+
+
+@router.delete("/appointments/{appointment_id}")
+async def delete_appointment(
+    case_id: UUID,
+    appointment_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Termin löschen."""
+    async with pool.acquire() as conn:
+        ok = await collab_service.delete_appointment(
+            conn, professional_user_id=current["user_id"], case_id=case_id,
+            appointment_id=appointment_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Termin nicht gefunden.")
+    return {"status": "deleted"}
+
+
 @router.get("/appointments")
 async def list_appointments(
     case_id: UUID,

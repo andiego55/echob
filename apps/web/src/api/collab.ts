@@ -63,4 +63,8 @@ export const collabApi = {
     apiClient.get<Appointment[]>(`/professional/cases/${caseId}/appointments`).then(r => r.data),
   completeAppointment: (caseId: string, appointmentId: string) =>
     apiClient.post(`/professional/cases/${caseId}/appointments/${appointmentId}/complete`).then(r => r.data),
+  reopenAppointment: (caseId: string, appointmentId: string) =>
+    apiClient.post(`/professional/cases/${caseId}/appointments/${appointmentId}/reopen`).then(r => r.data),
+  deleteAppointment: (caseId: string, appointmentId: string) =>
+    apiClient.delete(`/professional/cases/${caseId}/appointments/${appointmentId}`).then(r => r.data),
 }
