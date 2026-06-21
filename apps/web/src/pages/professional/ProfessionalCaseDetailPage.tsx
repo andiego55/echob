@@ -272,12 +272,16 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 
         {has('topic_summaries') && bundle.topic_summaries.length > 0 && (
           <Section title="Themendialog-Zusammenfassungen">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {bundle.topic_summaries.map(t => (
-                <div key={t.topic}>
-                  <p className="text-xs font-semibold text-navy">{TOPIC_LABELS[t.topic] ?? t.topic}</p>
-                  <p className="text-sm text-brand-muted whitespace-pre-wrap">{t.summary_text}</p>
-                </div>
+                <details key={t.topic} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
+                  <summary className="text-sm font-semibold text-navy cursor-pointer">
+                    {TOPIC_LABELS[t.topic] ?? t.topic}
+                  </summary>
+                  <div className="mt-2 text-sm text-brand-text leading-relaxed">
+                    <MarkdownMessage content={t.summary_text} />
+                  </div>
+                </details>
               ))}
             </div>
           </Section>
@@ -291,7 +295,9 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         {has('self_profile') && bundle.self_profile && (
           <Section title="Selbstprofil der nutzenden Person">
             {bundle.self_profile.summary_text && (
-              <p className="mb-3 text-sm text-brand-muted whitespace-pre-wrap">{bundle.self_profile.summary_text}</p>
+              <div className="mb-3 text-sm text-brand-text leading-relaxed">
+                <MarkdownMessage content={bundle.self_profile.summary_text} />
+              </div>
             )}
             <ProfileAnswers modules={bundle.self_profile.modules} config={PROFILE_MODULES} />
           </Section>
@@ -395,25 +401,23 @@ function EchoPanel({ caseId, glossary, summaries, onDelete, deleting }: {
 
       {summaries.length > 0 && (
         <Section title="Gespeicherte Echo-Zusammenfassungen">
-          <div className="space-y-3">
+          <div className="space-y-2">
             {summaries.map(s => (
-              <div key={s.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
-                <div className="flex items-start justify-between gap-3 mb-1">
-                  {s.title
-                    ? <p className="text-sm font-semibold text-navy">{s.title}</p>
-                    : <span className="text-xs text-brand-muted">Zusammenfassung</span>}
+              <details key={s.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
+                <summary className="flex items-center justify-between gap-3 cursor-pointer">
+                  <span className="text-sm font-semibold text-navy">{s.title || 'Zusammenfassung'}</span>
                   <button
-                    onClick={() => { if (window.confirm('Diese Zusammenfassung löschen?')) onDelete(s.id) }}
+                    onClick={(e) => { e.preventDefault(); if (window.confirm('Diese Zusammenfassung löschen?')) onDelete(s.id) }}
                     disabled={deleting}
                     className="shrink-0 text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
                   >
                     Löschen
                   </button>
-                </div>
-                <div className="text-sm text-brand-text leading-relaxed">
+                </summary>
+                <div className="mt-2 text-sm text-brand-text leading-relaxed">
                   <MarkdownMessage content={s.summary_text} />
                 </div>
-              </div>
+              </details>
             ))}
           </div>
         </Section>
