@@ -95,6 +95,23 @@ async def create_appointment(
             title=body.title, payload=body.payload, start_at=body.start_at, end_at=body.end_at)
 
 
+@router.post("/appointments/{appointment_id}/complete")
+async def complete_appointment(
+    case_id: UUID,
+    appointment_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Termin als erledigt abhaken."""
+    async with pool.acquire() as conn:
+        out = await collab_service.complete_appointment(
+            conn, professional_user_id=current["user_id"], case_id=case_id,
+            appointment_id=appointment_id)
+    if not out:
+        raise HTTPException(status_code=404, detail="Termin nicht gefunden.")
+    return out
+
+
 @router.get("/appointments")
 async def list_appointments(
     case_id: UUID,

@@ -3,11 +3,15 @@
  * Eigener Header mit Fachpersonen-Navigation (Postfach, Klient:innen).
  */
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
+import { professionalApi } from '@/api/professional'
 
 export default function ProfessionalShell({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const { data: postfach } = useQuery({ queryKey: ['prof-postfach'], queryFn: professionalApi.postfach })
+  const unread = (postfach?.attention ?? []).filter(a => a.unread).length
 
   const handleSignOut = async () => {
     await signOut()
@@ -48,6 +52,11 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
                 }
               >
                 {label}
+                {to === '/professional' && unread > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-white text-[10px] font-bold align-middle">
+                    {unread}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>

@@ -23,6 +23,10 @@ function fmt(dt: string): string {
   })
 }
 
+function fmtDay(dt: string): string {
+  return new Date(dt).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' })
+}
+
 export default function InboxPage() {
   const { data, isLoading } = useQuery({ queryKey: ['inbox'], queryFn: collabApi.inbox })
 
@@ -144,7 +148,15 @@ function AssignmentCard({ item }: { item: Assignment }) {
           </button>
         </div>
       </div>
-      <p className="text-[11px] text-brand-muted mb-2">{fmt(item.created_at)}</p>
+      <p className="text-[11px] text-brand-muted mb-2">
+        {fmt(item.created_at)}
+        {item.due_at && (
+          <span className={new Date(item.due_at) < new Date() && item.status !== 'completed'
+            ? ' text-red-600 font-semibold' : ''}>
+            {' '}· fällig bis {fmtDay(item.due_at)}
+          </span>
+        )}
+      </p>
 
       {item.type === 'message' && (
         <MessageThread messages={threadFromPayload(item.payload)} mySide="user"

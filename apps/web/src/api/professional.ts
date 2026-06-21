@@ -93,6 +93,8 @@ export const professionalApi = {
     apiClient.get<ProfessionalPostfach>('/professional/postfach').then(r => r.data),
   markAssignmentRead: (id: string) =>
     apiClient.post(`/professional/assignments/${id}/read`).then(r => r.data),
+  markAssignmentUnread: (id: string) =>
+    apiClient.post(`/professional/assignments/${id}/unread`).then(r => r.data),
 
   // Postfach / Fälle
   inbox: () =>

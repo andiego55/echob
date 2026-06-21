@@ -33,6 +33,10 @@ export default function AppointmentsPanel({ caseId }: { caseId: string }) {
     }),
     onSuccess: () => { setApptTitle(''); setApptWhen(''); setApptLocation(''); invalidate() },
   })
+  const complete = useMutation({
+    mutationFn: (id: string) => collabApi.completeAppointment(caseId, id),
+    onSuccess: () => invalidate(),
+  })
 
   return (
     <div className="space-y-4">
@@ -61,6 +65,10 @@ export default function AppointmentsPanel({ caseId }: { caseId: string }) {
                   </span>
                   <span className="flex items-center gap-2 text-xs text-brand-muted shrink-0">
                     <span>{a.status}</span><span>{fmt(a.start_at)}</span>
+                    {a.status !== 'completed' && a.status !== 'cancelled' && (
+                      <button onClick={() => complete.mutate(a.id)} disabled={complete.isPending}
+                        className="text-accent hover:underline">Erledigt</button>
+                    )}
                   </span>
                 </li>
               )

@@ -217,6 +217,12 @@ async def test_mark_assignment_read(db):
         db, professional_user_id=uuid.uuid4(), assignment_id=a["id"])
     assert other is False                                          # fremde Fachperson: kein Treffer
 
+    back = await collab_service.mark_assignment_unread(
+        db, professional_user_id=pro, assignment_id=a["id"])
+    assert back is True
+    assert await db.fetchval(
+        "SELECT pro_read_at FROM professional_assignments WHERE id=$1", a["id"]) is None
+
 
 async def test_dashboard_cross_case_queries(db):
     owner, pro, case_id = await _case_with_share(db)

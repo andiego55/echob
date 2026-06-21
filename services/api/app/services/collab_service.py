@@ -124,6 +124,16 @@ async def mark_assignment_read(conn, *, professional_user_id, assignment_id) -> 
     return res.split()[-1] != "0"
 
 
+async def mark_assignment_unread(conn, *, professional_user_id, assignment_id) -> bool:
+    """Zurück auf ungelesen (pro_read_at = NULL)."""
+    res = await conn.execute(
+        "UPDATE professional_assignments SET pro_read_at = NULL "
+        "WHERE id = $1 AND professional_user_id = $2",
+        assignment_id, professional_user_id,
+    )
+    return res.split()[-1] != "0"
+
+
 async def mark_assignment_seen(conn, *, user_id, assignment_id) -> dict | None:
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
@@ -318,6 +328,19 @@ async def set_appointment_status(conn, *, user_id, appointment_id, new_status) -
         appointment_id, user_id, new_status,
     )
     return _appt_user(row) if row else None
+
+
+async def complete_appointment(
+    conn, *, professional_user_id, case_id, appointment_id,
+) -> dict | None:
+    """Fachperson hakt einen Termin als erledigt ab (hinter aktiver Freigabe)."""
+    await require_active_share(professional_user_id, case_id, conn)
+    row = await conn.fetchrow(
+        "UPDATE professional_appointments SET status = 'completed', updated_at = NOW() "
+        "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3 RETURNING *",
+        appointment_id, professional_user_id, case_id,
+    )
+    return _appt(row) if row else None
 
 
 # ── Zugewiesener Dialog → Echo-Steuerung ──────────────────────────────────────

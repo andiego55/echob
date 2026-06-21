@@ -2,6 +2,7 @@
  * /professional/cases — Übersicht über zugewiesene Klient:innen & Fälle.
  * Nach Klient:in gruppiert; jeder Fall ist ein eigener Echo-Kontext.
  */
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
@@ -17,6 +18,10 @@ export default function ProfessionalCasesPage() {
     queryKey: ['prof-cases'],
     queryFn: professionalApi.cases,
   })
+  const [q, setQ] = useState('')
+  const filtered = q.trim()
+    ? data.filter(g => g.client_display_name.toLowerCase().includes(q.toLowerCase()))
+    : data
 
   return (
     <ProfessionalShell>
@@ -26,6 +31,11 @@ export default function ProfessionalCasesPage() {
         <p className="mt-2 text-sm text-brand-muted max-w-2xl">
           Alle Ihnen zugewiesenen Fälle, gruppiert nach Klient:in. Eine Klient:in kann mehrere Fälle haben.
         </p>
+
+        {data.length > 0 && (
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Klient:in suchen …"
+            className="mt-5 w-full max-w-sm rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
+        )}
 
         {isLoading && <p className="mt-6 text-sm text-brand-muted">Wird geladen …</p>}
 
@@ -38,7 +48,10 @@ export default function ProfessionalCasesPage() {
         )}
 
         <div className="mt-6 space-y-8">
-          {data.map((group, i) => (
+          {data.length > 0 && filtered.length === 0 && (
+            <p className="text-sm text-brand-muted">Keine Klient:in gefunden.</p>
+          )}
+          {filtered.map((group, i) => (
             <section key={i}>
               <h2 className="text-sm font-semibold text-navy mb-3">{group.client_display_name}</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

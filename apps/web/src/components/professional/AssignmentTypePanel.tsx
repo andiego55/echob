@@ -59,6 +59,7 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
   const [hypothesis, setHypothesis] = useState('')
   const [url, setUrl] = useState('')
   const [questions, setQuestions] = useState<Question[]>([])
+  const [due, setDue] = useState('')
 
   const create = useMutation({
     mutationFn: () => {
@@ -77,10 +78,13 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
         }
       }
       if (type === 'resource') { payload.text = content; if (url.trim()) payload.url = url }
-      return collabApi.createAssignment(caseId, { type, title: title.trim() || null, payload })
+      return collabApi.createAssignment(caseId, {
+        type, title: title.trim() || null, payload,
+        due_at: due ? new Date(due).toISOString() : null,
+      })
     },
     onSuccess: () => {
-      setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions([]); invalidate()
+      setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions([]); setDue(''); invalidate()
     },
   })
   const proReply = useMutation({
@@ -121,6 +125,10 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
           {type === 'questionnaire' && (
             <QuestionnaireBuilder value={questions} onChange={setQuestions} />
           )}
+          <label className="flex items-center gap-2 text-xs text-brand-muted">
+            <span className="shrink-0">Fällig bis (optional)</span>
+            <input type="date" value={due} onChange={e => setDue(e.target.value)} className={inputCls + ' max-w-[180px]'} />
+          </label>
           <button type="submit" disabled={create.isPending || !canSubmit} className="btn-primary !py-2 !text-sm disabled:opacity-60">
             {create.isPending ? 'Wird gesendet …' : meta.cta}
           </button>
@@ -165,6 +173,18 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
             </div>
           ) : type === 'questionnaire' ? (
             <div className="space-y-2">
+              {(() => {
+                const scores = items
+                  .filter(a => a.status === 'completed')
+                  .map(a => (a.response as { score?: number } | null)?.score)
+                  .filter((s): s is number => s != null)
+                  .reverse()
+                return scores.length >= 2 ? (
+                  <p className="text-xs text-brand-muted mb-1">
+                    Verlauf: <span className="font-semibold text-accent">{scores.join(' → ')}</span>
+                  </p>
+                ) : null
+              })()}
               {items.map(a => {
                 const resp = a.response as { answers?: Record<string, Answer>; score?: number } | null
                 const qs = (a.payload as { questions?: Question[] }).questions ?? []

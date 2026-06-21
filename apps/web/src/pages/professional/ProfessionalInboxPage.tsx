@@ -33,6 +33,10 @@ export default function ProfessionalInboxPage() {
     mutationFn: (id: string) => professionalApi.markAssignmentRead(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-postfach'] }),
   })
+  const markUnread = useMutation({
+    mutationFn: (id: string) => professionalApi.markAssignmentUnread(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-postfach'] }),
+  })
 
   const attention = data?.attention ?? []
   const shares = data?.shares ?? []
@@ -87,7 +91,17 @@ export default function ProfessionalInboxPage() {
                       <p className="text-xs text-brand-muted">{KIND_LABEL[a.kind]} · {fmtDate(a.at)}</p>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold text-accent shrink-0">{a.detail}</span>
+                  <span className="flex items-center gap-2 shrink-0">
+                    {!a.unread && (
+                      <button
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); markUnread.mutate(a.assignment_id) }}
+                        className="text-[11px] text-brand-muted hover:text-accent"
+                      >
+                        als ungelesen
+                      </button>
+                    )}
+                    <span className="text-sm font-semibold text-accent">{a.detail}</span>
+                  </span>
                 </Link>
               ))}
             </div>

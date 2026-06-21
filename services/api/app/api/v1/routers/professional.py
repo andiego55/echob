@@ -395,6 +395,21 @@ async def mark_read(
     return {"status": "read"}
 
 
+@router.post("/assignments/{assignment_id}/unread")
+async def mark_unread(
+    assignment_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fachperson markiert einen Eingang wieder als ungelesen."""
+    async with pool.acquire() as conn:
+        ok = await collab_service.mark_assignment_unread(
+            conn, professional_user_id=current["user_id"], assignment_id=assignment_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return {"status": "unread"}
+
+
 # ── Fallansicht (Bundle: nur freigegebene Inhalte) ────────────────────────────
 
 @router.get("/cases/{case_id}")
