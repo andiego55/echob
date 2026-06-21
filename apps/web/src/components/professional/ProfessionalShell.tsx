@@ -35,7 +35,6 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
           <nav className="hidden md:flex items-center gap-1">
             {[
               { to: '/professional/dashboard', label: 'Dashboard',    end: false },
-              { to: '/professional/cases',     label: 'Klient:innen', end: false },
               { to: '/professional/templates', label: 'Ressourcen',   end: false },
               { to: '/professional',           label: 'Postfach',     end: true },
             ].map(({ to, label, end }) => (

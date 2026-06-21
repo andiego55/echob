@@ -81,7 +81,6 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import ProfessionalRoute, { useProfessional, Spinner as RoleSpinner } from '@/components/auth/ProfessionalRoute'
 import ProfessionalRegisterPage  from '@/pages/professional/ProfessionalRegisterPage'
 import ProfessionalInboxPage     from '@/pages/professional/ProfessionalInboxPage'
-import ProfessionalCasesPage     from '@/pages/professional/ProfessionalCasesPage'
 import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDetailPage'
 import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
 import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboardPage'
@@ -161,7 +160,6 @@ export default function App() {
       <Route path="/professional" element={<ProfessionalRoute><ProfessionalInboxPage /></ProfessionalRoute>} />
       <Route path="/professional/dashboard" element={<ProfessionalRoute><ProfessionalDashboardPage /></ProfessionalRoute>} />
       <Route path="/professional/templates" element={<ProfessionalRoute><ProfessionalTemplatesPage /></ProfessionalRoute>} />
-      <Route path="/professional/cases" element={<ProfessionalRoute><ProfessionalCasesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
 

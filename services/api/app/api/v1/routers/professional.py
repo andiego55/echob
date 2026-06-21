@@ -273,10 +273,14 @@ async def dashboard(
     pid = current["user_id"]
     async with pool.acquire() as conn:
         share_rows = await conn.fetch(
-            "SELECT s.case_id, c.relationship_type, up.display_name AS client_display_name "
+            "SELECT s.case_id, c.relationship_type, up.display_name AS client_display_name, "
+            "       array_agg(DISTINCT e.element_type) "
+            "         FILTER (WHERE e.element_type IS NOT NULL) AS element_types "
             "FROM case_shares s JOIN cases c ON c.id = s.case_id "
             "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
-            "WHERE s.professional_user_id = $1 AND s.status = 'active'",
+            "LEFT JOIN case_share_elements e ON e.share_id = s.id "
+            "WHERE s.professional_user_id = $1 AND s.status = 'active' "
+            "GROUP BY s.case_id, c.relationship_type, up.display_name",
             pid,
         )
         if not share_rows:
@@ -285,6 +289,7 @@ async def dashboard(
             r["case_id"]: {
                 "client_display_name": r["client_display_name"] or "Klient:in",
                 "case_title": _case_title(r["relationship_type"]),
+                "element_types": list(r["element_types"] or []),
             }
             for r in share_rows
         }
@@ -351,6 +356,7 @@ async def dashboard(
             "case_id": scid,
             "client_display_name": case_info[cid]["client_display_name"],
             "case_title": case_info[cid]["case_title"],
+            "element_types": case_info[cid]["element_types"],
             "unread_count": meta[scid]["unread"],
             "open_count": meta[scid]["open"],
             "next_appointment": next_appt.get(scid),
