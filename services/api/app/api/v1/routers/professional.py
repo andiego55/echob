@@ -265,9 +265,10 @@ async def dashboard(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> dict:
-    """Fallübergreifendes Cockpit: Fälle (Status), „braucht Aufmerksamkeit", nächste Termine.
-
-    Nur aktiv freigegebene Fälle; Widerruf entfernt einen Fall sofort aus allen Listen.
+    """Fallzentriertes Cockpit: Klient:innen/Fälle mit Status (ungelesen, offene Aufgaben,
+    nächster Termin) + je Fall die konkreten Items zum Aufklappen. „Braucht Aufmerksamkeit"
+    (eingehend) lebt im Postfach; offene Aufgaben (ausgehend) sind hier nur Fall-Status.
+    Nur aktiv freigegebene Fälle.
     """
     pid = current["user_id"]
     async with pool.acquire() as conn:
@@ -279,7 +280,7 @@ async def dashboard(
             pid,
         )
         if not share_rows:
-            return {"cases": [], "attention": [], "appointments": []}
+            return {"cases": [], "total_unread": 0}
         case_info = {
             r["case_id"]: {
                 "client_display_name": r["client_display_name"] or "Klient:in",
@@ -294,47 +295,72 @@ async def dashboard(
             conn, professional_user_id=pid, case_ids=case_ids)
 
     _open = {"sent", "seen", "in_progress"}
+    _open_task_types = {"dialog", "questionnaire"}   # nur diese gelten als „Aufgabe"
     _floor = datetime(1970, 1, 1, tzinfo=UTC)
-    per_case = {cid: {"open": 0, "last": None} for cid in case_ids}
+    _kind_tab = {
+        "questionnaire_answered": "questionnaire",
+        "dialog_summary": "dialog",
+        "message_reply": "message",
+    }
+
+    # Nächster Termin je Fall (frühester kommender)
+    next_appt: dict[str, dict] = {}
+    for ap in sorted(appts, key=lambda x: x["start_at"]):
+        scid = str(ap["case_id"])
+        if scid not in next_appt:
+            next_appt[scid] = {"title": ap.get("title") or "Termin", "start_at": ap["start_at"]}
+
+    meta = {str(cid): {"unread": 0, "open": 0, "last": None} for cid in case_ids}
+    items: dict[str, list] = {str(cid): [] for cid in case_ids}
+
+    # Eingehend: „braucht Aufmerksamkeit" je Fall (mit gelesen/ungelesen)
+    for it in _build_attention(assignments, case_info):
+        scid = it["case_id"]
+        items[scid].append({
+            "assignment_id": it["assignment_id"], "direction": "in",
+            "kind": it["kind"], "title": it["title"], "detail": it["detail"],
+            "unread": it["unread"], "tab": _kind_tab.get(it["kind"], "ueber"),
+        })
+        if it["unread"]:
+            meta[scid]["unread"] += 1
+
+    # Ausgehend: offene Aufgaben (zugewiesene Dialoge/Fragebögen, noch nicht erledigt)
     for a in assignments:
-        pc = per_case.get(a["case_id"])
-        if pc is None:
+        scid = str(a["case_id"])
+        m = meta.get(scid)
+        if m is None:
             continue
-        if a["status"] in _open:
-            pc["open"] += 1
         ua = a.get("updated_at")
-        if ua and (pc["last"] is None or ua > pc["last"]):
-            pc["last"] = ua
+        if ua and (m["last"] is None or ua > m["last"]):
+            m["last"] = ua
+        if a["type"] in _open_task_types and a["status"] in _open:
+            m["open"] += 1
+            items[scid].append({
+                "assignment_id": str(a["id"]), "direction": "out",
+                "kind": "open_task", "title": a.get("title") or a["type"],
+                "detail": "wartet auf Klient:in", "unread": False,
+                "tab": "questionnaire" if a["type"] == "questionnaire" else "dialog",
+            })
 
-    attention = _build_attention(assignments, case_info)
-
-    cases_out = [
-        {
-            "case_id": str(cid),
+    cases_out = []
+    for cid in case_ids:
+        scid = str(cid)
+        its = items[scid]
+        its.sort(key=lambda x: (not x["unread"], x["direction"] != "in"))
+        cases_out.append({
+            "case_id": scid,
             "client_display_name": case_info[cid]["client_display_name"],
             "case_title": case_info[cid]["case_title"],
-            "open_count": per_case[cid]["open"],
-            "last_activity": per_case[cid]["last"],
-        }
-        for cid in case_ids
-    ]
+            "unread_count": meta[scid]["unread"],
+            "open_count": meta[scid]["open"],
+            "next_appointment": next_appt.get(scid),
+            "last_activity": meta[scid]["last"],
+            "items": its,
+        })
     cases_out.sort(key=lambda c: c["last_activity"] or _floor, reverse=True)
+    cases_out.sort(key=lambda c: (c["unread_count"], c["open_count"]), reverse=True)
 
-    def _client(cid):
-        return case_info.get(cid, {}).get("client_display_name", "Klient:in")
-
-    appts_out = [
-        {
-            "case_id": str(a["case_id"]),
-            "client_display_name": _client(a["case_id"]),
-            "title": a.get("title") or "Termin",
-            "start_at": a["start_at"],
-            "status": a["status"],
-            "location": (a.get("payload") or {}).get("location"),
-        }
-        for a in appts
-    ]
-    return {"cases": cases_out, "attention": attention, "appointments": appts_out}
+    return {"cases": cases_out, "total_unread": sum(c["unread_count"] for c in cases_out)}
 
 
 @router.get("/postfach")

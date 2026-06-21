@@ -17,33 +17,28 @@ interface EchoChatResult {
   session_id: string
 }
 
+export interface DashboardItem {
+  assignment_id: string
+  direction: 'in' | 'out'
+  kind: 'questionnaire_answered' | 'dialog_summary' | 'message_reply' | 'open_task'
+  title: string
+  detail: string
+  unread: boolean
+  tab: string
+}
 export interface DashboardCase {
   case_id: string
   client_display_name: string
   case_title: string
+  unread_count: number
   open_count: number
+  next_appointment: { title: string; start_at: string } | null
   last_activity: string | null
-}
-export interface DashboardAttention {
-  case_id: string
-  client_display_name: string
-  kind: 'questionnaire_answered' | 'message_reply' | 'dialog_summary'
-  title: string
-  detail: string
-  at: string | null
-}
-export interface DashboardAppointment {
-  case_id: string
-  client_display_name: string
-  title: string
-  start_at: string
-  status: string
-  location?: string | null
+  items: DashboardItem[]
 }
 export interface ProfessionalDashboard {
   cases: DashboardCase[]
-  attention: DashboardAttention[]
-  appointments: DashboardAppointment[]
+  total_unread: number
 }
 
 export interface PostfachAttention {
