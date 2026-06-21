@@ -84,9 +84,9 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
     onSuccess: () => invalidate(),
   })
 
-  // Aus der Ressourcen-Bibliothek teilen (nur Typen mit Vorlagen; Dialog hat keine)
+  // Aus der Ressourcen-Bibliothek teilen (Vorlagen des jeweiligen Typs)
   const templates = useQuery({
-    queryKey: ['prof-templates'], queryFn: professionalApi.templates, enabled: type !== 'dialog',
+    queryKey: ['prof-templates'], queryFn: professionalApi.templates,
   })
   const myTemplates = (templates.data ?? []).filter(t => t.type === type)
   const shareTpl = useMutation({

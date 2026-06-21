@@ -23,7 +23,7 @@ from app.services.sharing_service import require_active_share
 ASSIGNMENT_TYPES = {"dialog", "questionnaire", "message", "resource"}
 
 # Vorlagen-Typen der Bibliothek (Teilmenge der Assignment-Typen; Datei-Typ folgt Phase 4).
-TEMPLATE_TYPES = {"questionnaire", "resource", "message"}
+TEMPLATE_TYPES = {"questionnaire", "resource", "message", "dialog"}
 
 # Payload-Schlüssel, die nur Fachperson/Echo sehen dürfen — nie die nutzende Person.
 _USER_HIDDEN_KEYS = {"hypothesis_for_echo"}

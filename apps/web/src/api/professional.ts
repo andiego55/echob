@@ -46,7 +46,7 @@ export interface ProfessionalDashboard {
   appointments: DashboardAppointment[]
 }
 
-export type TemplateType = 'questionnaire' | 'resource' | 'message'
+export type TemplateType = 'questionnaire' | 'resource' | 'message' | 'dialog'
 export interface ProfessionalTemplate {
   id: string
   type: TemplateType

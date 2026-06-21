@@ -14,9 +14,10 @@ const TYPE_OPTIONS: { value: TemplateType; label: string; contentLabel: string }
   { value: 'resource', label: 'Ressource / Link', contentLabel: 'Beschreibung' },
   { value: 'questionnaire', label: 'Fragebogen', contentLabel: 'Einleitung (optional)' },
   { value: 'message', label: 'Textbaustein', contentLabel: 'Text' },
+  { value: 'dialog', label: 'Dialog-Vorschlag', contentLabel: 'Intention / Worum es gehen soll' },
 ]
 const TYPE_LABEL: Record<TemplateType, string> = {
-  resource: 'Ressource', questionnaire: 'Fragebogen', message: 'Textbaustein',
+  resource: 'Ressource', questionnaire: 'Fragebogen', message: 'Textbaustein', dialog: 'Dialog',
 }
 const inputCls =
   'w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent'
@@ -33,6 +34,8 @@ export default function ProfessionalTemplatesPage() {
   const [content, setContent] = useState('')
   const [url, setUrl] = useState('')
   const [questions, setQuestions] = useState('')
+  const [hypothesis, setHypothesis] = useState('')
+  const [filter, setFilter] = useState<TemplateType | 'all'>('all')
   const opt = TYPE_OPTIONS.find(o => o.value === type)!
 
   const create = useMutation({
@@ -40,6 +43,10 @@ export default function ProfessionalTemplatesPage() {
       const payload: Record<string, unknown> = {}
       if (type === 'message') payload.body = content
       if (type === 'resource') { payload.text = content; if (url.trim()) payload.url = url }
+      if (type === 'dialog') {
+        payload.intention = content
+        if (hypothesis.trim()) payload.hypothesis_for_echo = hypothesis
+      }
       if (type === 'questionnaire') {
         payload.intro = content
         const qLines = questions.split('\n').map(s => s.trim()).filter(Boolean)
@@ -50,7 +57,9 @@ export default function ProfessionalTemplatesPage() {
       }
       return professionalApi.templateCreate({ type, title: title.trim() || null, payload })
     },
-    onSuccess: () => { setTitle(''); setContent(''); setUrl(''); setQuestions(''); invalidate() },
+    onSuccess: () => {
+      setTitle(''); setContent(''); setUrl(''); setQuestions(''); setHypothesis(''); invalidate()
+    },
   })
   const del = useMutation({
     mutationFn: (id: string) => professionalApi.templateDelete(id),
@@ -60,6 +69,7 @@ export default function ProfessionalTemplatesPage() {
   const canSubmit = type === 'questionnaire'
     ? content.trim().length > 0 || questions.trim().length > 0
     : content.trim().length > 0
+  const shown = templates.filter(t => filter === 'all' || t.type === filter)
 
   if (isLoading) return <Spinner />
 
@@ -86,6 +96,10 @@ export default function ProfessionalTemplatesPage() {
               {type === 'resource' && (
                 <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Link (optional)" className={inputCls} />
               )}
+              {type === 'dialog' && (
+                <input value={hypothesis} onChange={e => setHypothesis(e.target.value)}
+                  placeholder="Interne Hypothese für Echo (optional, nicht für Klient:in sichtbar)" className={inputCls} />
+              )}
               {type === 'questionnaire' && (
                 <>
                   <textarea value={questions} onChange={e => setQuestions(e.target.value)} rows={4}
@@ -101,6 +115,16 @@ export default function ProfessionalTemplatesPage() {
 
           {/* Bibliothek */}
           <div>
+            {templates.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {(['all', 'resource', 'questionnaire', 'message', 'dialog'] as const).map(f => (
+                  <button key={f} onClick={() => setFilter(f)}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${filter === f ? 'border-accent bg-accent/10 text-accent font-semibold' : 'border-brand-border text-brand-muted hover:text-navy'}`}>
+                    {f === 'all' ? 'Alle' : TYPE_LABEL[f]}
+                  </button>
+                ))}
+              </div>
+            )}
             {templates.length === 0 ? (
               <div className="card text-center py-10">
                 <div className="text-3xl mb-2">📚</div>
@@ -108,7 +132,8 @@ export default function ProfessionalTemplatesPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {templates.map(t => (
+                {shown.length === 0 && <p className="text-sm text-brand-muted">Nichts in diesem Filter.</p>}
+                {shown.map(t => (
                   <div key={t.id} className="card flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
@@ -116,9 +141,10 @@ export default function ProfessionalTemplatesPage() {
                       </div>
                       <p className="text-sm font-semibold text-navy truncate">{t.title || '(ohne Titel)'}</p>
                       <p className="text-xs text-brand-muted truncate">
-                        {String((t.payload as { text?: string; body?: string; intro?: string }).text
-                          ?? (t.payload as { body?: string }).body
-                          ?? (t.payload as { intro?: string }).intro ?? '')}
+                        {String((t.payload as Record<string, string>).text
+                          ?? (t.payload as Record<string, string>).body
+                          ?? (t.payload as Record<string, string>).intro
+                          ?? (t.payload as Record<string, string>).intention ?? '')}
                       </p>
                     </div>
                     <button
