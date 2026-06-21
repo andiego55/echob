@@ -45,13 +45,37 @@ export default function QuestionnaireBuilder({
             </button>
           </div>
           {q.type === 'likert' && (
-            <div className="flex items-center gap-2 ml-7">
-              <span className="text-xs text-brand-muted">Skala von 1 bis</span>
-              <input
-                type="number" min={2} max={10} value={q.max ?? 5}
-                onChange={e => update(i, { max: Math.max(2, Math.min(10, Number(e.target.value) || 5)) })}
-                className="w-16 rounded-brand border border-brand-border bg-white px-2 py-1.5 text-sm outline-none focus:border-accent"
-              />
+            <div className="ml-7 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-brand-muted">Skala von 1 bis</span>
+                <input
+                  type="number" min={2} max={10} value={q.max ?? 5}
+                  onChange={e => {
+                    const max = Math.max(2, Math.min(10, Number(e.target.value) || 5))
+                    update(i, { max, scaleLabels: (q.scaleLabels ?? []).slice(0, max) })
+                  }}
+                  className="w-16 rounded-brand border border-brand-border bg-white px-2 py-1.5 text-sm outline-none focus:border-accent"
+                />
+                <span className="text-[11px] text-brand-muted">Labels je Wert optional</span>
+              </div>
+              <div className="space-y-1">
+                {Array.from({ length: q.max ?? 5 }, (_, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className="text-xs text-brand-muted w-4 text-right shrink-0">{idx + 1}</span>
+                    <input
+                      value={q.scaleLabels?.[idx] ?? ''}
+                      onChange={e => {
+                        const labels = [...(q.scaleLabels ?? [])]
+                        while (labels.length < (q.max ?? 5)) labels.push('')
+                        labels[idx] = e.target.value
+                        update(i, { scaleLabels: labels })
+                      }}
+                      placeholder={`Label für ${idx + 1} (optional)`}
+                      className="flex-1 rounded-brand border border-brand-border bg-white px-2 py-1.5 text-sm outline-none focus:border-accent"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {(q.type === 'single' || q.type === 'multi') && (

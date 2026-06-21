@@ -41,12 +41,14 @@ function AnswerView({ q, a }: { q: Question; a: Answer | undefined }) {
   if (q.type === 'likert') {
     const v = Number(a)
     const max = q.max ?? 5
+    const lbl = q.scaleLabels?.[v - 1]?.trim()
     return (
-      <div className="flex items-center gap-2">
-        <div className="h-1.5 flex-1 bg-brand-border rounded-full overflow-hidden max-w-[180px]">
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="h-1.5 flex-1 bg-brand-border rounded-full overflow-hidden max-w-[160px] min-w-[80px]">
           <div className="h-full bg-accent" style={{ width: `${Math.min(100, (v / max) * 100)}%` }} />
         </div>
         <span className="text-sm font-semibold text-navy">{v}/{max}</span>
+        {lbl && <span className="text-xs text-brand-muted">· {lbl}</span>}
       </div>
     )
   }

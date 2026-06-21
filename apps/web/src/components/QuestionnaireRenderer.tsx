@@ -28,16 +28,21 @@ export default function QuestionnaireRenderer({
             <p className="mb-1.5 font-medium">{q.label}</p>
 
             {q.type === 'likert' && (
-              <div className="flex gap-1.5">
+              <div className="flex gap-2 flex-wrap">
                 {Array.from({ length: q.max ?? 5 }, (_, i) => i + 1).map(n => (
-                  <button key={n} type="button" onClick={() => set(q.key, n)}
-                    className={`w-9 h-9 rounded-brand border text-sm font-medium transition-colors ${
-                      answers[q.key] === n
-                        ? 'bg-accent text-white border-accent'
-                        : 'border-brand-border text-brand-muted hover:border-accent'
-                    }`}>
-                    {n}
-                  </button>
+                  <div key={n} className="flex flex-col items-center gap-1 w-16">
+                    <button type="button" onClick={() => set(q.key, n)}
+                      className={`w-9 h-9 rounded-brand border text-sm font-medium transition-colors ${
+                        answers[q.key] === n
+                          ? 'bg-accent text-white border-accent'
+                          : 'border-brand-border text-brand-muted hover:border-accent'
+                      }`}>
+                      {n}
+                    </button>
+                    {q.scaleLabels?.[n - 1]?.trim() && (
+                      <span className="text-[10px] text-brand-muted text-center leading-tight">{q.scaleLabels[n - 1]}</span>
+                    )}
+                  </div>
                 ))}
               </div>
             )}

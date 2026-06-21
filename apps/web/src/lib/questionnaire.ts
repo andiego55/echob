@@ -9,14 +9,15 @@ export interface Question {
   key: string
   type: QType
   label: string
-  options?: string[]   // single | multi
-  max?: number         // likert
+  options?: string[]      // single | multi
+  max?: number            // likert
+  scaleLabels?: string[]  // likert: Label je Skalenpunkt (Index 0 = Wert 1)
 }
 
 export type Answer = number | string | string[]
 
 export const Q_TYPE_LABELS: Record<QType, string> = {
-  likert: 'Skala 1–5',
+  likert: 'Likertskala',
   single: 'Einfachauswahl',
   multi: 'Mehrfachauswahl',
   text: 'Freitext',
