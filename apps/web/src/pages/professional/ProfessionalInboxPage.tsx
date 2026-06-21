@@ -18,6 +18,11 @@ const KIND_LABEL: Record<PostfachAttention['kind'], string> = {
   dialog_summary: 'Dialog zusammengefasst',
   message_reply: 'Neue Antwort',
 }
+const KIND_TAB: Record<PostfachAttention['kind'], string> = {
+  questionnaire_answered: 'questionnaire',
+  dialog_summary: 'dialog',
+  message_reply: 'message',
+}
 
 function fmtDate(iso: string | null): string {
   if (!iso) return ''
@@ -73,7 +78,7 @@ export default function ProfessionalInboxPage() {
               {attention.map(a => (
                 <Link
                   key={a.assignment_id}
-                  to={`/professional/cases/${a.case_id}`}
+                  to={`/professional/cases/${a.case_id}?tab=${KIND_TAB[a.kind]}`}
                   onClick={() => { if (a.unread) markRead.mutate(a.assignment_id) }}
                   className={`card flex items-center justify-between gap-3 no-underline transition-colors ${
                     a.unread ? 'border-accent bg-accent/[0.03]' : 'hover:border-accent/40'

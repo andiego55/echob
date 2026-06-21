@@ -62,7 +62,7 @@ export default function ProfessionalDashboardPage() {
               {attention.map((a, i) => (
                 <Link
                   key={i}
-                  to={`/professional/cases/${a.case_id}`}
+                  to={`/professional/cases/${a.case_id}?tab=${a.kind === 'questionnaire_answered' ? 'questionnaire' : a.kind === 'dialog_summary' ? 'dialog' : 'message'}`}
                   className="card flex items-center justify-between gap-3 no-underline hover:border-accent/40 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -91,7 +91,7 @@ export default function ProfessionalDashboardPage() {
                 {appointments.map((a, i) => (
                   <Link
                     key={i}
-                    to={`/professional/cases/${a.case_id}`}
+                    to={`/professional/cases/${a.case_id}?tab=appointments`}
                     className="card flex items-center justify-between gap-3 no-underline hover:border-accent/40 transition-colors"
                   >
                     <div className="min-w-0">

@@ -3,8 +3,8 @@
  * Zeigt NUR freigegebene Inhalte (Server liefert ein gefiltertes Bundle).
  * Bei Widerruf/keinem Zugriff antwortet der Server mit 404 → "Kein Zugriff".
  */
-import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
@@ -149,7 +149,12 @@ function ProfileAnswers({ modules, config }: {
 
 export default function ProfessionalCaseDetailPage() {
   const { caseId } = useParams<{ caseId: string }>()
+  const [searchParams] = useSearchParams()
   const [tab, setTab] = useState<TabKey>('ueber')
+  useEffect(() => {
+    const t = searchParams.get('tab')
+    if (t && TABS.some(x => x.key === t)) setTab(t as TabKey)
+  }, [searchParams])
   const { data: bundle, isLoading, isError } = useQuery({
     queryKey: ['prof-case', caseId],
     queryFn: () => professionalApi.caseDetail(caseId!),
