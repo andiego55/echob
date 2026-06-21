@@ -39,6 +39,8 @@ export const collabApi = {
     apiClient.post<Assignment>(`/inbox/assignments/${id}/response`, { response }).then(r => r.data),
   replyMessage: (id: string, text: string) =>
     apiClient.post<Assignment>(`/inbox/assignments/${id}/message`, { text }).then(r => r.data),
+  dismissAssignment: (id: string) =>
+    apiClient.delete(`/inbox/assignments/${id}`).then(r => r.data),
   setAppointmentStatus: (id: string, status: 'confirmed' | 'cancelled') =>
     apiClient.patch<Appointment>(`/inbox/appointments/${id}`, { status }).then(r => r.data),
 

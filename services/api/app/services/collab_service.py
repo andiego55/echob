@@ -94,7 +94,7 @@ async def list_assignments_for_case(conn, *, professional_user_id, case_id) -> l
 async def list_assignments_for_user(conn, *, user_id) -> list[dict]:
     rows = await conn.fetch(
         "SELECT * FROM professional_assignments "
-        "WHERE user_id = $1 AND status <> 'draft' ORDER BY created_at DESC",
+        "WHERE user_id = $1 AND status NOT IN ('draft', 'dismissed') ORDER BY created_at DESC",
         user_id,
     )
     return [_assignment_user(r) for r in rows]
@@ -105,6 +105,16 @@ async def mark_assignment_seen(conn, *, user_id, assignment_id) -> dict | None:
         "UPDATE professional_assignments "
         "SET status = CASE WHEN status = 'sent' THEN 'seen' ELSE status END, "
         "    seen_at = COALESCE(seen_at, NOW()), updated_at = NOW() "
+        "WHERE id = $1 AND user_id = $2 RETURNING *",
+        assignment_id, user_id,
+    )
+    return _assignment_user(row) if row else None
+
+
+async def dismiss_assignment(conn, *, user_id, assignment_id) -> dict | None:
+    """Soft-Dismiss: aus dem Nutzer-Postfach ausblenden (Profi behält den Datensatz)."""
+    row = await conn.fetchrow(
+        "UPDATE professional_assignments SET status = 'dismissed', updated_at = NOW() "
         "WHERE id = $1 AND user_id = $2 RETURNING *",
         assignment_id, user_id,
     )

@@ -119,6 +119,24 @@ async def test_inbox_seen_and_response(db):
     assert "enc:v1:" in raw and ans not in raw
 
 
+async def test_dismiss_hides_from_user_inbox(db):
+    owner, pro, case_id = await _case_with_share(db)
+    a = await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="message",
+        title="Hi", payload={"body": "Test"})
+    in_inbox = await collab_service.list_assignments_for_user(db, user_id=owner)
+    assert any(x["id"] == a["id"] for x in in_inbox)
+
+    out = await collab_service.dismiss_assignment(db, user_id=owner, assignment_id=a["id"])
+    assert out["status"] == "dismissed"
+
+    after = await collab_service.list_assignments_for_user(db, user_id=owner)
+    assert not any(x["id"] == a["id"] for x in after)             # weg aus Nutzer-Postfach
+    pro_list = await collab_service.list_assignments_for_case(
+        db, professional_user_id=pro, case_id=case_id)
+    assert any(x["id"] == a["id"] for x in pro_list)              # Profi behält den Datensatz
+
+
 async def test_appointment_flow(db):
     owner, pro, case_id = await _case_with_share(db)
     start = datetime.now(UTC) + timedelta(days=3)

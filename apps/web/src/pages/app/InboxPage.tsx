@@ -122,13 +122,28 @@ function AssignmentCard({ item }: { item: Assignment }) {
     mutationFn: (text: string) => collabApi.replyMessage(item.id, text),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
   })
+  const dismiss = useMutation({
+    mutationFn: () => collabApi.dismissAssignment(item.id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
+  })
 
   return (
     <div className="card">
       <div className="flex items-center justify-between gap-3 mb-1">
         <span className="text-sm font-semibold text-navy">{meta.icon} {item.title || meta.label}</span>
-        <span className="text-[11px] uppercase tracking-wide text-brand-muted">{meta.label}</span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-[11px] uppercase tracking-wide text-brand-muted">{meta.label}</span>
+          <button
+            onClick={() => { if (window.confirm('Diese Nachricht wirklich löschen?')) dismiss.mutate() }}
+            disabled={dismiss.isPending}
+            title="Löschen"
+            className="text-brand-muted hover:text-red-600 text-sm leading-none p-1 -m-1 disabled:opacity-50"
+          >
+            ✕
+          </button>
+        </div>
       </div>
+      <p className="text-[11px] text-brand-muted mb-2">{fmt(item.created_at)}</p>
 
       {item.type === 'message' && (
         <MessageThread messages={threadFromPayload(item.payload)} mySide="user"

@@ -78,6 +78,21 @@ async def reply_message(
     return out
 
 
+@router.delete("/assignments/{assignment_id}")
+async def dismiss_assignment(
+    assignment_id: UUID,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Entfernt eine Zuweisung aus dem Postfach der nutzenden Person (Soft-Dismiss)."""
+    async with pool.acquire() as conn:
+        out = await collab_service.dismiss_assignment(
+            conn, user_id=current["user_id"], assignment_id=assignment_id)
+    if not out:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return {"status": "dismissed"}
+
+
 @router.patch("/appointments/{appointment_id}")
 async def update_appointment(
     appointment_id: UUID,
