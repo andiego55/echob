@@ -199,6 +199,28 @@ async def test_set_dialog_session_roundtrip(db):
     assert "enc:v1:" in raw and str(sid) not in raw   # Session-Link verschlüsselt at rest
 
 
+async def test_dashboard_cross_case_queries(db):
+    owner, pro, case_id = await _case_with_share(db)
+    await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="message", title="Hi",
+        payload={"body": "x"})
+    start = datetime.now(UTC) + timedelta(days=2)
+    await collab_service.create_appointment(
+        db, professional_user_id=pro, case_id=case_id, title="T", payload={}, start_at=start)
+
+    a = await collab_service.list_assignments_for_cases(
+        db, professional_user_id=pro, case_ids=[case_id])
+    assert len(a) == 1 and a[0]["case_id"] == case_id
+
+    ap = await collab_service.list_upcoming_appointments_for_cases(
+        db, professional_user_id=pro, case_ids=[case_id])
+    assert len(ap) == 1
+
+    empty = await collab_service.list_assignments_for_cases(
+        db, professional_user_id=pro, case_ids=[])
+    assert empty == []                                             # leere Fall-Liste → leer
+
+
 async def test_assignment_steering_includes_hypothesis():
     out = collab_service.build_assignment_steering(
         {"intention": "Grenzen anschauen", "hypothesis_for_echo": "Vermeidung von Konflikt"})

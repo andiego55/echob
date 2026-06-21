@@ -100,6 +100,17 @@ async def list_assignments_for_user(conn, *, user_id) -> list[dict]:
     return [_assignment_user(r) for r in rows]
 
 
+async def list_assignments_for_cases(conn, *, professional_user_id, case_ids) -> list[dict]:
+    """Alle Zuweisungen der Fachperson über mehrere Fälle (fürs Dashboard)."""
+    rows = await conn.fetch(
+        "SELECT * FROM professional_assignments "
+        "WHERE professional_user_id = $1 AND case_id = ANY($2::uuid[]) "
+        "ORDER BY updated_at DESC",
+        professional_user_id, case_ids,
+    )
+    return [_assignment_pro(r) for r in rows]
+
+
 async def mark_assignment_seen(conn, *, user_id, assignment_id) -> dict | None:
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
@@ -269,6 +280,20 @@ async def list_appointments_for_user(conn, *, user_id) -> list[dict]:
         user_id,
     )
     return [_appt_user(r) for r in rows]
+
+
+async def list_upcoming_appointments_for_cases(
+    conn, *, professional_user_id, case_ids, limit=10,
+) -> list[dict]:
+    """Kommende, nicht abgesagte Termine über mehrere Fälle (Dashboard)."""
+    rows = await conn.fetch(
+        "SELECT * FROM professional_appointments "
+        "WHERE professional_user_id = $1 AND case_id = ANY($2::uuid[]) "
+        "AND start_at >= NOW() AND status <> 'cancelled' "
+        "ORDER BY start_at ASC LIMIT $3",
+        professional_user_id, case_ids, limit,
+    )
+    return [_appt(r) for r in rows]
 
 
 async def set_appointment_status(conn, *, user_id, appointment_id, new_status) -> dict | None:

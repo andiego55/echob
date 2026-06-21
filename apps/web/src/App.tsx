@@ -73,7 +73,7 @@ function HypothesisDialogPageWrapper() {
 function AppHome() {
   const { data, isLoading } = useProfessional()
   if (isLoading) return <RoleSpinner />
-  if (data) return <Navigate to="/professional" replace />
+  if (data) return <Navigate to="/professional/dashboard" replace />
   return <CasesOverviewPage />
 }
 
@@ -84,6 +84,7 @@ import ProfessionalInboxPage     from '@/pages/professional/ProfessionalInboxPag
 import ProfessionalCasesPage     from '@/pages/professional/ProfessionalCasesPage'
 import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDetailPage'
 import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
+import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboardPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -157,6 +158,7 @@ export default function App() {
       {/* ── Fachpersonenbereich (Login + Rolle erforderlich) ─────────────────── */}
       <Route path="/professional/register" element={<ProtectedRoute><ProfessionalRegisterPage /></ProtectedRoute>} />
       <Route path="/professional" element={<ProfessionalRoute><ProfessionalInboxPage /></ProfessionalRoute>} />
+      <Route path="/professional/dashboard" element={<ProfessionalRoute><ProfessionalDashboardPage /></ProfessionalRoute>} />
       <Route path="/professional/cases" element={<ProfessionalRoute><ProfessionalCasesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />

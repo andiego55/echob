@@ -17,12 +17,45 @@ interface EchoChatResult {
   session_id: string
 }
 
+export interface DashboardCase {
+  case_id: string
+  client_display_name: string
+  case_title: string
+  open_count: number
+  last_activity: string | null
+}
+export interface DashboardAttention {
+  case_id: string
+  client_display_name: string
+  kind: 'questionnaire_answered' | 'message_reply'
+  title: string
+  detail: string
+  at: string | null
+}
+export interface DashboardAppointment {
+  case_id: string
+  client_display_name: string
+  title: string
+  start_at: string
+  status: string
+  location?: string | null
+}
+export interface ProfessionalDashboard {
+  cases: DashboardCase[]
+  attention: DashboardAttention[]
+  appointments: DashboardAppointment[]
+}
+
 export const professionalApi = {
   // Rolle / Profil
   me: () =>
     apiClient.get<ProfessionalProfile>('/professional/me').then(r => r.data),
   register: (data: { display_name: string; title?: string | null }) =>
     apiClient.post<ProfessionalProfile>('/professional/register', data).then(r => r.data),
+
+  // Dashboard (fallübergreifendes Cockpit)
+  dashboard: () =>
+    apiClient.get<ProfessionalDashboard>('/professional/dashboard').then(r => r.data),
 
   // Postfach / Fälle
   inbox: () =>

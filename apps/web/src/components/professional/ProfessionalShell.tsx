@@ -19,7 +19,7 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
       <header className="bg-navy border-b border-white/[0.07] sticky top-0 z-40">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 h-14">
           <Link
-            to="/professional"
+            to="/professional/dashboard"
             className="flex items-center gap-2 text-[1.15rem] font-extrabold tracking-[-0.02em] text-white no-underline"
           >
             Echo<span className="text-accent">B</span>
@@ -30,8 +30,9 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
 
           <nav className="hidden md:flex items-center gap-1">
             {[
-              { to: '/professional',        label: 'Postfach',     end: true },
-              { to: '/professional/cases',  label: 'Klient:innen', end: false },
+              { to: '/professional/dashboard', label: 'Dashboard',    end: false },
+              { to: '/professional',           label: 'Postfach',     end: true },
+              { to: '/professional/cases',     label: 'Klient:innen', end: false },
             ].map(({ to, label, end }) => (
               <NavLink
                 key={to}

@@ -7,6 +7,7 @@ eine Fachperson sieht nur freigegebene Inhalte.
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -22,6 +23,7 @@ from app.schemas.professional import (
     ProfessionalProfileResponse,
     ProfessionalRegister,
 )
+from app.services import collab_service
 from app.services.echo_service import _REL_TYPE_LABELS
 from app.services.sharing_service import load_shared_bundle, require_active_share
 
@@ -205,6 +207,101 @@ async def cases(
             shared_at=r["shared_at"],
         ))
     return [ProfessionalClientGroup(**g) for g in groups.values()]
+
+
+@router.get("/dashboard")
+async def dashboard(
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fallübergreifendes Cockpit: Fälle (Status), „braucht Aufmerksamkeit", nächste Termine.
+
+    Nur aktiv freigegebene Fälle; Widerruf entfernt einen Fall sofort aus allen Listen.
+    """
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        share_rows = await conn.fetch(
+            "SELECT s.case_id, c.relationship_type, up.display_name AS client_display_name "
+            "FROM case_shares s JOIN cases c ON c.id = s.case_id "
+            "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
+            "WHERE s.professional_user_id = $1 AND s.status = 'active'",
+            pid,
+        )
+        if not share_rows:
+            return {"cases": [], "attention": [], "appointments": []}
+        case_info = {
+            r["case_id"]: {
+                "client_display_name": r["client_display_name"] or "Klient:in",
+                "case_title": _case_title(r["relationship_type"]),
+            }
+            for r in share_rows
+        }
+        case_ids = list(case_info.keys())
+        assignments = await collab_service.list_assignments_for_cases(
+            conn, professional_user_id=pid, case_ids=case_ids)
+        appts = await collab_service.list_upcoming_appointments_for_cases(
+            conn, professional_user_id=pid, case_ids=case_ids)
+
+    _open = {"sent", "seen", "in_progress"}
+    _floor = datetime(1970, 1, 1, tzinfo=UTC)
+    per_case = {cid: {"open": 0, "last": None} for cid in case_ids}
+    attention: list[dict] = []
+    for a in assignments:
+        cid = a["case_id"]
+        pc = per_case.get(cid)
+        if pc is None:
+            continue
+        if a["status"] in _open:
+            pc["open"] += 1
+        ua = a.get("updated_at")
+        if ua and (pc["last"] is None or ua > pc["last"]):
+            pc["last"] = ua
+        info = case_info[cid]
+        if a["type"] == "questionnaire" and a["status"] == "completed":
+            score = (a.get("response") or {}).get("score")
+            attention.append({
+                "case_id": str(cid), "client_display_name": info["client_display_name"],
+                "kind": "questionnaire_answered", "title": a.get("title") or "Fragebogen",
+                "detail": f"Ø {score}" if score is not None else "beantwortet",
+                "at": a.get("responded_at") or a.get("updated_at"),
+            })
+        elif a["type"] == "message":
+            thread = (a.get("payload") or {}).get("thread") or []
+            if thread and isinstance(thread[-1], dict) and thread[-1].get("from") == "user":
+                attention.append({
+                    "case_id": str(cid), "client_display_name": info["client_display_name"],
+                    "kind": "message_reply", "title": a.get("title") or "Nachricht",
+                    "detail": "hat geantwortet", "at": a.get("updated_at"),
+                })
+    attention.sort(key=lambda x: x["at"] or _floor, reverse=True)
+
+    cases_out = [
+        {
+            "case_id": str(cid),
+            "client_display_name": case_info[cid]["client_display_name"],
+            "case_title": case_info[cid]["case_title"],
+            "open_count": per_case[cid]["open"],
+            "last_activity": per_case[cid]["last"],
+        }
+        for cid in case_ids
+    ]
+    cases_out.sort(key=lambda c: c["last_activity"] or _floor, reverse=True)
+
+    def _client(cid):
+        return case_info.get(cid, {}).get("client_display_name", "Klient:in")
+
+    appts_out = [
+        {
+            "case_id": str(a["case_id"]),
+            "client_display_name": _client(a["case_id"]),
+            "title": a.get("title") or "Termin",
+            "start_at": a["start_at"],
+            "status": a["status"],
+            "location": (a.get("payload") or {}).get("location"),
+        }
+        for a in appts
+    ]
+    return {"cases": cases_out, "attention": attention, "appointments": appts_out}
 
 
 # ── Fallansicht (Bundle: nur freigegebene Inhalte) ────────────────────────────
