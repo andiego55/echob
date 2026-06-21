@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { collabApi, type AssignmentType } from '@/api/collab'
+import MessageThread, { threadFromPayload } from '@/components/MessageThread'
 
 const TYPE_OPTIONS: { value: AssignmentType; label: string; contentLabel: string }[] = [
   { value: 'message', label: 'Nachricht', contentLabel: 'Nachricht an die Klient:in' },
@@ -53,6 +54,10 @@ export default function AssignPanel({ caseId }: { caseId: string }) {
       return collabApi.createAssignment(caseId, { type, title: title.trim() || null, payload })
     },
     onSuccess: () => { setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions(''); invalidate() },
+  })
+  const proReply = useMutation({
+    mutationFn: ({ id, text }: { id: string; text: string }) => collabApi.proReplyMessage(caseId, id, text),
+    onSuccess: () => invalidate(),
   })
 
   // ── Termin ──
@@ -127,7 +132,7 @@ export default function AssignPanel({ caseId }: { caseId: string }) {
             {appointments.data?.map(a => (
               <li key={a.id}>📅 {a.title || 'Termin'} · {fmt(a.start_at)} · <span className="text-brand-muted">{a.status}</span></li>
             ))}
-            {assignments.data?.map(a => {
+            {assignments.data?.filter(a => a.type !== 'message').map(a => {
               const score = a.type === 'questionnaire' ? (a.response as { score?: number } | null)?.score : undefined
               return (
                 <li key={a.id}>
@@ -137,6 +142,15 @@ export default function AssignPanel({ caseId }: { caseId: string }) {
               )
             })}
           </ul>
+
+          {/* Nachrichten-Threads (bidirektional) */}
+          {assignments.data?.filter(a => a.type === 'message').map(a => (
+            <div key={a.id} className="mt-3 rounded-brand border border-brand-border p-3">
+              <p className="text-xs font-semibold text-navy mb-2">✉️ {a.title || 'Nachricht'}</p>
+              <MessageThread messages={threadFromPayload(a.payload)} mySide="professional"
+                onSend={t => proReply.mutate({ id: a.id, text: t })} busy={proReply.isPending} />
+            </div>
+          ))}
         </div>
       )}
     </div>

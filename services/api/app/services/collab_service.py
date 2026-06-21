@@ -10,6 +10,7 @@ Person gehen interne/Echo-only-Felder NIE (Sanitizer-Choke-Point).
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -154,6 +155,60 @@ async def submit_assignment_response(conn, *, user_id, assignment_id, response) 
         assignment_id, user_id, json.dumps(_enc(enriched)),
     )
     return _assignment_user(row) if row else None
+
+
+# ── Nachrichten-Thread (bidirektional) ────────────────────────────────────────
+# Eine 'message'-Zuweisung trägt ihren Verlauf in payload.thread (Liste von
+# {from, text, at}). Anhängen = laden → entschlüsseln → ergänzen → neu
+# verschlüsseln (mixed-state-sicher). Die Eröffnungsnachricht steht weiterhin in
+# payload.body; der Verlauf wird im Frontend body + thread zusammengesetzt.
+
+def _append_thread_message(payload: Any, sender: str, text: str) -> dict:
+    p = dict(payload) if isinstance(payload, dict) else {}
+    thread = list(p.get("thread") or [])
+    thread.append({"from": sender, "text": text, "at": datetime.now(UTC).isoformat()})
+    p["thread"] = thread
+    return p
+
+
+async def append_message_from_user(conn, *, user_id, assignment_id, text) -> dict | None:
+    existing = await conn.fetchrow(
+        "SELECT payload FROM professional_assignments "
+        "WHERE id = $1 AND user_id = $2 AND type = 'message'",
+        assignment_id, user_id,
+    )
+    if not existing:
+        return None
+    new_payload = _append_thread_message(_dec(existing["payload"]), "user", text)
+    row = await conn.fetchrow(
+        "UPDATE professional_assignments "
+        "SET payload = $3::jsonb, status = 'in_progress', "
+        "    seen_at = COALESCE(seen_at, NOW()), updated_at = NOW() "
+        "WHERE id = $1 AND user_id = $2 RETURNING *",
+        assignment_id, user_id, json.dumps(_enc(new_payload)),
+    )
+    return _assignment_user(row) if row else None
+
+
+async def append_message_from_pro(
+    conn, *, professional_user_id, case_id, assignment_id, text,
+) -> dict | None:
+    await require_active_share(professional_user_id, case_id, conn)  # 404 ohne Freigabe
+    existing = await conn.fetchrow(
+        "SELECT payload FROM professional_assignments "
+        "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3 AND type = 'message'",
+        assignment_id, professional_user_id, case_id,
+    )
+    if not existing:
+        return None
+    new_payload = _append_thread_message(_dec(existing["payload"]), "professional", text)
+    row = await conn.fetchrow(
+        "UPDATE professional_assignments "
+        "SET payload = $4::jsonb, status = 'in_progress', updated_at = NOW() "
+        "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3 RETURNING *",
+        assignment_id, professional_user_id, case_id, json.dumps(_enc(new_payload)),
+    )
+    return _assignment_pro(row) if row else None
 
 
 # ── Termine ───────────────────────────────────────────────────────────────────

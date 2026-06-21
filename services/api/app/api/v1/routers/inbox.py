@@ -10,7 +10,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_current_user, get_pool
-from app.schemas.collab import AppointmentStatusUpdate, AssignmentResponseSubmit
+from app.schemas.collab import (
+    AppointmentStatusUpdate,
+    AssignmentResponseSubmit,
+    MessageSend,
+)
 from app.services import collab_service
 
 router = APIRouter(prefix="/inbox", tags=["inbox"])
@@ -53,6 +57,22 @@ async def submit_response(
     async with pool.acquire() as conn:
         out = await collab_service.submit_assignment_response(
             conn, user_id=current["user_id"], assignment_id=assignment_id, response=body.response)
+    if not out:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return out
+
+
+@router.post("/assignments/{assignment_id}/message")
+async def reply_message(
+    assignment_id: UUID,
+    body: MessageSend,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Antwort der nutzenden Person im Nachrichten-Thread."""
+    async with pool.acquire() as conn:
+        out = await collab_service.append_message_from_user(
+            conn, user_id=current["user_id"], assignment_id=assignment_id, text=body.text)
     if not out:
         raise HTTPException(status_code=404, detail="Nicht gefunden.")
     return out

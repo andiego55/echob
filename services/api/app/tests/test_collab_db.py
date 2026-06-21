@@ -136,6 +136,36 @@ async def test_appointment_flow(db):
     assert conf["status"] == "confirmed"
 
 
+async def test_message_thread_bidirectional(db):
+    owner, pro, case_id = await _case_with_share(db)
+    a = await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="message",
+        title="Hallo", payload={"body": "Erste Nachricht"})
+
+    u = "USER_ANTWORT_" + uuid.uuid4().hex
+    r1 = await collab_service.append_message_from_user(
+        db, user_id=owner, assignment_id=a["id"], text=u)
+    assert r1 is not None
+    assert r1["payload"]["thread"][-1]["from"] == "user"
+    assert r1["payload"]["thread"][-1]["text"] == u
+
+    pmsg = "PROFI_ANTWORT_" + uuid.uuid4().hex
+    r2 = await collab_service.append_message_from_pro(
+        db, professional_user_id=pro, case_id=case_id, assignment_id=a["id"], text=pmsg)
+    assert r2 is not None
+    thread = r2["payload"]["thread"]
+    assert [m["from"] for m in thread] == ["user", "professional"]
+    assert thread[-1]["text"] == pmsg
+
+    raw = await db.fetchval(
+        "SELECT payload::text FROM professional_assignments WHERE id=$1", a["id"])
+    assert "enc:v1:" in raw and u not in raw and pmsg not in raw   # Verlauf verschlüsselt at rest
+
+    none = await collab_service.append_message_from_user(
+        db, user_id=uuid.uuid4(), assignment_id=a["id"], text="x")
+    assert none is None                                            # Fremde dürfen nicht anhängen
+
+
 async def test_assignment_steering_includes_hypothesis():
     out = collab_service.build_assignment_steering(
         {"intention": "Grenzen anschauen", "hypothesis_for_echo": "Vermeidung von Konflikt"})

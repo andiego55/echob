@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
+import MessageThread, { threadFromPayload } from '@/components/MessageThread'
 import { collabApi, type Assignment, type Appointment } from '@/api/collab'
 
 const TYPE_META: Record<string, { icon: string; label: string }> = {
@@ -117,6 +118,10 @@ function AssignmentCard({ item }: { item: Assignment }) {
     mutationFn: (body: Record<string, unknown>) => collabApi.submitResponse(item.id, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
   })
+  const reply = useMutation({
+    mutationFn: (text: string) => collabApi.replyMessage(item.id, text),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
+  })
 
   return (
     <div className="card">
@@ -125,7 +130,10 @@ function AssignmentCard({ item }: { item: Assignment }) {
         <span className="text-[11px] uppercase tracking-wide text-brand-muted">{meta.label}</span>
       </div>
 
-      {item.type === 'message' && <p className="text-sm text-brand-text whitespace-pre-wrap">{p.body}</p>}
+      {item.type === 'message' && (
+        <MessageThread messages={threadFromPayload(item.payload)} mySide="user"
+          onSend={t => reply.mutate(t)} busy={reply.isPending} />
+      )}
 
       {item.type === 'resource' && (
         <div className="text-sm text-brand-text">
