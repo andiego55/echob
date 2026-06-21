@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
-import { professionalApi, type TemplateType } from '@/api/professional'
+import { professionalApi, type TemplateType, type ProfessionalTemplate } from '@/api/professional'
 import QuestionnaireBuilder from '@/components/professional/QuestionnaireBuilder'
 import { isValidQuestion, type Question } from '@/lib/questionnaire'
 
@@ -38,9 +38,25 @@ export default function ProfessionalTemplatesPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [hypothesis, setHypothesis] = useState('')
   const [filter, setFilter] = useState<TemplateType | 'all'>('all')
+  const [editingId, setEditingId] = useState<string | null>(null)
   const opt = TYPE_OPTIONS.find(o => o.value === type)!
 
-  const create = useMutation({
+  const resetForm = () => {
+    setEditingId(null); setTitle(''); setContent(''); setUrl(''); setQuestions([]); setHypothesis('')
+  }
+  const startEdit = (t: ProfessionalTemplate) => {
+    const p = t.payload as Record<string, unknown>
+    setEditingId(t.id)
+    setType(t.type)
+    setTitle(t.title ?? '')
+    setContent(String(p.text ?? p.body ?? p.intro ?? p.intention ?? ''))
+    setUrl(String(p.url ?? ''))
+    setHypothesis(String(p.hypothesis_for_echo ?? ''))
+    setQuestions(Array.isArray(p.questions) ? (p.questions as Question[]) : [])
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const save = useMutation({
     mutationFn: () => {
       const payload: Record<string, unknown> = {}
       if (type === 'message') payload.body = content
@@ -57,11 +73,11 @@ export default function ProfessionalTemplatesPage() {
           payload.scoring = { type: 'avg' }
         }
       }
-      return professionalApi.templateCreate({ type, title: title.trim() || null, payload })
+      return editingId
+        ? professionalApi.templateUpdate(editingId, { title: title.trim() || null, payload })
+        : professionalApi.templateCreate({ type, title: title.trim() || null, payload })
     },
-    onSuccess: () => {
-      setTitle(''); setContent(''); setUrl(''); setQuestions([]); setHypothesis(''); invalidate()
-    },
+    onSuccess: () => { resetForm(); invalidate() },
   })
   const del = useMutation({
     mutationFn: (id: string) => professionalApi.templateDelete(id),
@@ -84,12 +100,12 @@ export default function ProfessionalTemplatesPage() {
         </p>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Neue Vorlage */}
+          {/* Neue / Vorlage bearbeiten */}
           <div className="card border-accent/30 self-start">
-            <h2 className="text-sm font-bold text-navy mb-3">Neue Vorlage</h2>
-            <form onSubmit={e => { e.preventDefault(); if (canSubmit) create.mutate() }} className="space-y-2.5">
+            <h2 className="text-sm font-bold text-navy mb-3">{editingId ? 'Vorlage bearbeiten' : 'Neue Vorlage'}</h2>
+            <form onSubmit={e => { e.preventDefault(); if (canSubmit) save.mutate() }} className="space-y-2.5">
               <div className="flex gap-2">
-                <select value={type} onChange={e => setType(e.target.value as TemplateType)} className={inputCls + ' max-w-[48%]'}>
+                <select value={type} disabled={!!editingId} onChange={e => setType(e.target.value as TemplateType)} className={inputCls + ' max-w-[48%] disabled:opacity-60'}>
                   {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
                 <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Titel" className={inputCls} />
@@ -105,9 +121,14 @@ export default function ProfessionalTemplatesPage() {
               {type === 'questionnaire' && (
                 <QuestionnaireBuilder value={questions} onChange={setQuestions} />
               )}
-              <button type="submit" disabled={create.isPending || !canSubmit} className="btn-primary !py-2 !text-sm disabled:opacity-60">
-                {create.isPending ? 'Wird gespeichert …' : 'Vorlage speichern'}
-              </button>
+              <div className="flex items-center gap-3">
+                <button type="submit" disabled={save.isPending || !canSubmit} className="btn-primary !py-2 !text-sm disabled:opacity-60">
+                  {save.isPending ? 'Wird gespeichert …' : editingId ? 'Aktualisieren' : 'Vorlage speichern'}
+                </button>
+                {editingId && (
+                  <button type="button" onClick={resetForm} className="text-sm text-brand-muted hover:text-navy">Abbrechen</button>
+                )}
+              </div>
             </form>
           </div>
 
@@ -132,7 +153,9 @@ export default function ProfessionalTemplatesPage() {
               <div className="space-y-2">
                 {shown.length === 0 && <p className="text-sm text-brand-muted">Nichts in diesem Filter.</p>}
                 {shown.map(t => (
-                  <div key={t.id} className="card flex items-start justify-between gap-3">
+                  <div key={t.id}
+                    onClick={() => startEdit(t)}
+                    className={`card flex items-start justify-between gap-3 cursor-pointer transition-colors hover:border-accent/40 ${editingId === t.id ? 'border-accent' : ''}`}>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-[11px] uppercase tracking-wide text-accent font-semibold">{TYPE_LABEL[t.type]}</span>
@@ -146,7 +169,7 @@ export default function ProfessionalTemplatesPage() {
                       </p>
                     </div>
                     <button
-                      onClick={() => { if (window.confirm('Diese Vorlage löschen?')) del.mutate(t.id) }}
+                      onClick={e => { e.stopPropagation(); if (window.confirm('Diese Vorlage löschen?')) del.mutate(t.id) }}
                       disabled={del.isPending}
                       className="shrink-0 text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
                     >

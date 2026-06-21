@@ -44,6 +44,16 @@ export default function QuestionnaireBuilder({
               ✕
             </button>
           </div>
+          {q.type === 'likert' && (
+            <div className="flex items-center gap-2 ml-7">
+              <span className="text-xs text-brand-muted">Skala von 1 bis</span>
+              <input
+                type="number" min={2} max={10} value={q.max ?? 5}
+                onChange={e => update(i, { max: Math.max(2, Math.min(10, Number(e.target.value) || 5)) })}
+                className="w-16 rounded-brand border border-brand-border bg-white px-2 py-1.5 text-sm outline-none focus:border-accent"
+              />
+            </div>
+          )}
           {(q.type === 'single' || q.type === 'multi') && (
             <input
               value={(q.options ?? []).join(', ')}
