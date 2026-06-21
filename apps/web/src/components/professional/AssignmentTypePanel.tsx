@@ -10,6 +10,7 @@ import { professionalApi } from '@/api/professional'
 import MessageThread, { threadFromPayload } from '@/components/MessageThread'
 import QuestionnaireBuilder from '@/components/professional/QuestionnaireBuilder'
 import QuestionnaireEvaluation from '@/components/professional/QuestionnaireEvaluation'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { isValidQuestion, type Answer, type Question } from '@/lib/questionnaire'
 
 const inputCls =
@@ -181,6 +182,44 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
                       {done
                         ? <QuestionnaireEvaluation questions={qs} answers={resp!.answers!} score={resp?.score} />
                         : <p className="text-xs text-brand-muted">Noch nicht beantwortet · {qs.length} Frage(n)</p>}
+                    </div>
+                  </details>
+                )
+              })}
+            </div>
+          ) : type === 'dialog' ? (
+            <div className="space-y-2">
+              {items.map(a => {
+                const resp = a.response as { summary?: string; note?: string } | null
+                const intention = (a.payload as { intention?: string }).intention
+                return (
+                  <details key={a.id} className="rounded-brand border border-brand-border p-3">
+                    <summary className="flex items-center justify-between gap-3 cursor-pointer text-sm">
+                      <span className="font-medium text-navy">{a.title || 'Dialog'}</span>
+                      <span className="flex items-center gap-2 text-xs text-brand-muted">
+                        {resp?.summary && <span className="font-semibold text-accent">✓ Zusammenfassung</span>}
+                        <span>{a.status}</span>
+                      </span>
+                    </summary>
+                    <div className="mt-3 text-sm">
+                      {resp?.summary ? (
+                        <>
+                          <p className="text-xs font-semibold text-brand-muted mb-1">Zusammenfassung der Klient:in</p>
+                          <div className="rounded-brand border border-brand-border bg-brand-bg p-3 text-brand-text leading-relaxed">
+                            <MarkdownMessage content={resp.summary} />
+                          </div>
+                          {resp.note && (
+                            <>
+                              <p className="text-xs font-semibold text-brand-muted mt-3 mb-1">Notiz der Klient:in</p>
+                              <p className="text-brand-text whitespace-pre-wrap">{resp.note}</p>
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-xs text-brand-muted">
+                          {intention ? `Intention: ${intention} · ` : ''}noch keine Zusammenfassung
+                        </p>
+                      )}
                     </div>
                   </details>
                 )

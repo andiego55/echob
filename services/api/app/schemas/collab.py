@@ -37,6 +37,11 @@ class MessageSend(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
 
 
+class DialogSummarySubmit(BaseModel):
+    summary: str = Field(min_length=1)
+    note: str | None = None
+
+
 class TemplateCreate(BaseModel):
     type: str                                            # questionnaire | resource | message
     title: str | None = None

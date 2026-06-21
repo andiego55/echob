@@ -248,6 +248,27 @@ async def test_template_create_list_and_share(db):
     assert gone is None                                   # archivierte Vorlage nicht teilbar
 
 
+async def test_dialog_summary_stored_in_response(db):
+    owner, pro, case_id = await _case_with_share(db)
+    a = await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="dialog", title="Grenzen",
+        payload={"intention": "Reden"})
+    s = "ZUSAMMENFASSUNG_" + uuid.uuid4().hex
+    n = "NOTIZ_" + uuid.uuid4().hex
+    out = await collab_service.submit_dialog_summary(
+        db, user_id=owner, assignment_id=a["id"], summary=s, note=n)
+    assert out is not None and out["status"] == "completed"
+
+    pro_list = await collab_service.list_assignments_for_case(
+        db, professional_user_id=pro, case_id=case_id)
+    item = next(x for x in pro_list if x["id"] == a["id"])
+    assert item["response"]["summary"] == s          # Profi sieht Zusammenfassung
+    assert item["response"]["note"] == n             # ... und Notiz
+    raw = await db.fetchval(
+        "SELECT response::text FROM professional_assignments WHERE id=$1", a["id"])
+    assert "enc:v1:" in raw and s not in raw   # verschlüsselt at rest
+
+
 async def test_assignment_steering_includes_hypothesis():
     out = collab_service.build_assignment_steering(
         {"intention": "Grenzen anschauen", "hypothesis_for_echo": "Vermeidung von Konflikt"})

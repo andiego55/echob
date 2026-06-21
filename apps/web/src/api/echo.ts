@@ -19,6 +19,13 @@ export const echoApi = {
         assignment_id: assignmentId,
       })
       .then(r => r.data),
+  // Zugewiesenen Dialog zusammenfassen (LLM, ohne Speichern)
+  summarizeAssignmentDialog: (caseId: string, assignmentId: string) =>
+    apiClient
+      .post<{ summary: string }>(`/cases/${caseId}/echo/assignment-dialog/summary`, {
+        assignment_id: assignmentId,
+      })
+      .then(r => r.data),
 
   // ── Chat-Sessions (Sidebar) ──────────────────────────────────────────────
   listSessions: (caseId: string) =>

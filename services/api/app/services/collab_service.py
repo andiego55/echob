@@ -389,6 +389,43 @@ async def set_dialog_session(conn, *, user_id, assignment_id, session_id) -> Non
     )
 
 
+async def get_user_dialog(conn, *, user_id, assignment_id) -> dict | None:
+    """Liest eine dem Nutzer zugewiesene Dialog-Zuweisung (ohne Status-Änderung)."""
+    row = await conn.fetchrow(
+        "SELECT * FROM professional_assignments "
+        "WHERE id = $1 AND user_id = $2 AND type = 'dialog'",
+        assignment_id, user_id,
+    )
+    return _assignment_pro(row) if row else None
+
+
+async def submit_dialog_summary(conn, *, user_id, assignment_id, summary, note) -> dict | None:
+    """Speichert die Zusammenfassung (+ optionale Notiz) eines zugewiesenen Dialogs in der
+    `response` und markiert ihn abgeschlossen → die Fachperson sieht sie. Fließt NICHT in den
+    Fallkontext (liegt nur in der Zuweisung, nicht in topic_summaries/case_hypotheses)."""
+    row = await conn.fetchrow(
+        "SELECT response FROM professional_assignments "
+        "WHERE id = $1 AND user_id = $2 AND type = 'dialog'",
+        assignment_id, user_id,
+    )
+    if not row:
+        return None
+    resp = _dec(row["response"])
+    if not isinstance(resp, dict):
+        resp = {}
+    resp["summary"] = summary
+    if note:
+        resp["note"] = note
+    out = await conn.fetchrow(
+        "UPDATE professional_assignments "
+        "SET response = $3::jsonb, responded_at = NOW(), status = 'completed', "
+        "    completed_at = NOW(), updated_at = NOW() "
+        "WHERE id = $1 AND user_id = $2 RETURNING *",
+        assignment_id, user_id, json.dumps(_enc(resp)),
+    )
+    return _assignment_user(out) if out else None
+
+
 # ── Ressourcen-Bibliothek (wiederverwendbare Vorlagen) ────────────────────────
 # professional_templates: pro Fachperson, feldverschlüsselter payload. „Teilen"
 # erzeugt aus einer Vorlage eine Zuweisung (assignment.template_id) im Fall.

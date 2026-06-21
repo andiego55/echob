@@ -13,6 +13,7 @@ from app.core.dependencies import get_current_user, get_pool
 from app.schemas.collab import (
     AppointmentStatusUpdate,
     AssignmentResponseSubmit,
+    DialogSummarySubmit,
     MessageSend,
 )
 from app.services import collab_service
@@ -91,6 +92,23 @@ async def dismiss_assignment(
     if not out:
         raise HTTPException(status_code=404, detail="Nicht gefunden.")
     return {"status": "dismissed"}
+
+
+@router.post("/assignments/{assignment_id}/dialog-summary")
+async def send_dialog_summary(
+    assignment_id: UUID,
+    body: DialogSummarySubmit,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Zusammenfassung (+ Notiz) eines zugewiesenen Dialogs an die Fachperson senden."""
+    async with pool.acquire() as conn:
+        out = await collab_service.submit_dialog_summary(
+            conn, user_id=current["user_id"], assignment_id=assignment_id,
+            summary=body.summary, note=body.note)
+    if not out:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return out
 
 
 @router.patch("/appointments/{appointment_id}")

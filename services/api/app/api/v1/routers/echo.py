@@ -472,6 +472,57 @@ async def start_assignment_dialog(
     return {"chat_session_id": str(sid)}
 
 
+class AssignmentSummaryRequest(BaseModel):
+    assignment_id: UUID
+
+
+@router.post("/assignment-dialog/summary")
+async def summarize_assignment_dialog(
+    case_id: UUID,
+    body: AssignmentSummaryRequest,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fasst einen zugewiesenen Dialog zusammen (LLM, wie Themendialog) – ohne zu speichern.
+
+    Die Klient:in sendet die Zusammenfassung danach über /inbox an die Fachperson. Die
+    Zusammenfassung fließt NICHT in den Fallkontext (kein topic_summaries/case_hypotheses).
+    """
+    from app.services import collab_service
+    echo_svc = _get_echo_service(request)
+    user_id = current_user["user_id"]
+    async with pool.acquire() as conn:
+        case_row = await conn.fetchrow(
+            "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
+            case_id, user_id,
+        )
+        if not case_row:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+        dlg = await collab_service.get_user_dialog(
+            conn, user_id=user_id, assignment_id=body.assignment_id)
+        if not dlg:
+            raise HTTPException(status_code=404, detail="Zugewiesener Dialog nicht gefunden.")
+        sid = (dlg.get("response") or {}).get("dialog_session_id")
+        if not sid:
+            raise HTTPException(status_code=400, detail="Zu diesem Dialog gibt es kein Gespräch.")
+        try:
+            session_uuid = UUID(str(sid))
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="Ungültige Sitzung.") from None
+        rows = await conn.fetch(
+            "SELECT role, content FROM echo_messages "
+            "WHERE session_id = $1 ORDER BY created_at ASC LIMIT 100",
+            session_uuid,
+        )
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in rows]
+    payload = dlg.get("payload") or {}
+    topic = (payload.get("topic") or payload.get("intention")
+             or dlg.get("title") or "Zugewiesener Dialog")
+    summary = await echo_svc.generate_topic_summary(topic=topic, history=history)
+    return {"summary": summary}
+
+
 class FinalizeSceneRequest(BaseModel):
     session_id: str
 
