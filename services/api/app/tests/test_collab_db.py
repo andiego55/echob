@@ -221,6 +221,33 @@ async def test_dashboard_cross_case_queries(db):
     assert empty == []                                             # leere Fall-Liste → leer
 
 
+async def test_template_create_list_and_share(db):
+    owner, pro, case_id = await _case_with_share(db)
+    secret = "VORLAGE_" + uuid.uuid4().hex
+    tpl = await collab_service.create_template(
+        db, professional_user_id=pro, type="resource", title="Atemübung",
+        payload={"text": secret, "url": "https://example.org"})
+    assert tpl["type"] == "resource"
+    raw = await db.fetchval(
+        "SELECT payload::text FROM professional_templates WHERE id=$1", tpl["id"])
+    assert "enc:v1:" in raw and secret not in raw          # Vorlage verschlüsselt at rest
+
+    lst = await collab_service.list_templates(db, professional_user_id=pro)
+    assert any(t["id"] == tpl["id"] for t in lst)
+
+    a = await collab_service.share_template(
+        db, professional_user_id=pro, case_id=case_id, template_id=tpl["id"])
+    assert a is not None and a["type"] == "resource" and a["template_id"] == tpl["id"]
+    assert a["payload"]["text"] == secret                 # Inhalt aus Vorlage übernommen
+
+    await collab_service.archive_template(db, professional_user_id=pro, template_id=tpl["id"])
+    lst2 = await collab_service.list_templates(db, professional_user_id=pro)
+    assert not any(t["id"] == tpl["id"] for t in lst2)    # archiviert -> weg aus Liste
+    gone = await collab_service.share_template(
+        db, professional_user_id=pro, case_id=case_id, template_id=tpl["id"])
+    assert gone is None                                   # archivierte Vorlage nicht teilbar
+
+
 async def test_assignment_steering_includes_hypothesis():
     out = collab_service.build_assignment_steering(
         {"intention": "Grenzen anschauen", "hypothesis_for_echo": "Vermeidung von Konflikt"})

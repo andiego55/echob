@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { collabApi, type AssignmentType } from '@/api/collab'
+import { professionalApi } from '@/api/professional'
 import MessageThread, { threadFromPayload } from '@/components/MessageThread'
 
 const inputCls =
@@ -83,6 +84,16 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
     onSuccess: () => invalidate(),
   })
 
+  // Aus der Ressourcen-Bibliothek teilen (nur Typen mit Vorlagen; Dialog hat keine)
+  const templates = useQuery({
+    queryKey: ['prof-templates'], queryFn: professionalApi.templates, enabled: type !== 'dialog',
+  })
+  const myTemplates = (templates.data ?? []).filter(t => t.type === type)
+  const shareTpl = useMutation({
+    mutationFn: (templateId: string) => professionalApi.shareTemplate(caseId, templateId),
+    onSuccess: () => invalidate(),
+  })
+
   // Fragebogen: Fragen ODER Einleitung reichen; sonst ist Inhalt Pflicht.
   const canSubmit = type === 'questionnaire'
     ? content.trim().length > 0 || questions.trim().length > 0
@@ -115,6 +126,26 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
           </button>
         </form>
       </div>
+
+      {myTemplates.length > 0 && (
+        <div className="card">
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted mb-3">Aus Bibliothek teilen</p>
+          <ul className="space-y-2 text-sm">
+            {myTemplates.map(t => (
+              <li key={t.id} className="flex items-center justify-between gap-3">
+                <span className="text-brand-text truncate">{t.title || '(ohne Titel)'}</span>
+                <button
+                  onClick={() => shareTpl.mutate(t.id)}
+                  disabled={shareTpl.isPending}
+                  className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-brand border border-accent/40 text-accent hover:bg-accent/5 disabled:opacity-50"
+                >
+                  Teilen
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {items.length > 0 && (
         <div className="card">

@@ -22,6 +22,9 @@ from app.services.sharing_service import require_active_share
 # ein neuer Typ ist reiner App-Code, keine Migration.
 ASSIGNMENT_TYPES = {"dialog", "questionnaire", "message", "resource"}
 
+# Vorlagen-Typen der Bibliothek (Teilmenge der Assignment-Typen; Datei-Typ folgt Phase 4).
+TEMPLATE_TYPES = {"questionnaire", "resource", "message"}
+
 # Payload-Schlüssel, die nur Fachperson/Echo sehen dürfen — nie die nutzende Person.
 _USER_HIDDEN_KEYS = {"hypothesis_for_echo"}
 
@@ -383,4 +386,72 @@ async def set_dialog_session(conn, *, user_id, assignment_id, session_id) -> Non
         "UPDATE professional_assignments SET response = $3::jsonb, updated_at = NOW() "
         "WHERE id = $1 AND user_id = $2",
         assignment_id, user_id, json.dumps(_enc(resp)),
+    )
+
+
+# ── Ressourcen-Bibliothek (wiederverwendbare Vorlagen) ────────────────────────
+# professional_templates: pro Fachperson, feldverschlüsselter payload. „Teilen"
+# erzeugt aus einer Vorlage eine Zuweisung (assignment.template_id) im Fall.
+
+def _template(row) -> dict:
+    d = dict(row)
+    d["payload"] = _dec(d.get("payload"))
+    return d
+
+
+async def create_template(conn, *, professional_user_id, type: str, title, payload) -> dict:
+    if type not in TEMPLATE_TYPES:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Unbekannter Vorlagentyp: {type}")
+    row = await conn.fetchrow(
+        "INSERT INTO professional_templates (professional_user_id, type, title, payload) "
+        "VALUES ($1,$2,$3,$4::jsonb) RETURNING *",
+        professional_user_id, type, title, json.dumps(_enc(payload or {})),
+    )
+    return _template(row)
+
+
+async def list_templates(conn, *, professional_user_id) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT * FROM professional_templates "
+        "WHERE professional_user_id = $1 AND archived_at IS NULL ORDER BY updated_at DESC",
+        professional_user_id,
+    )
+    return [_template(r) for r in rows]
+
+
+async def update_template(
+    conn, *, professional_user_id, template_id, title, payload,
+) -> dict | None:
+    row = await conn.fetchrow(
+        "UPDATE professional_templates SET title = $3, payload = $4::jsonb, updated_at = NOW() "
+        "WHERE id = $1 AND professional_user_id = $2 AND archived_at IS NULL RETURNING *",
+        template_id, professional_user_id, title, json.dumps(_enc(payload or {})),
+    )
+    return _template(row) if row else None
+
+
+async def archive_template(conn, *, professional_user_id, template_id) -> dict | None:
+    row = await conn.fetchrow(
+        "UPDATE professional_templates SET archived_at = NOW(), updated_at = NOW() "
+        "WHERE id = $1 AND professional_user_id = $2 AND archived_at IS NULL RETURNING *",
+        template_id, professional_user_id,
+    )
+    return _template(row) if row else None
+
+
+async def share_template(conn, *, professional_user_id, case_id, template_id) -> dict | None:
+    """Erzeugt aus einer Vorlage eine Zuweisung im Fall (hinter aktiver Freigabe)."""
+    tpl = await conn.fetchrow(
+        "SELECT * FROM professional_templates "
+        "WHERE id = $1 AND professional_user_id = $2 AND archived_at IS NULL",
+        template_id, professional_user_id,
+    )
+    if not tpl:
+        return None
+    t = _template(tpl)
+    return await create_assignment(  # prüft selbst die aktive Freigabe (404 sonst)
+        conn, professional_user_id=professional_user_id, case_id=case_id,
+        type=t["type"], title=t.get("title"), payload=t.get("payload") or {},
+        template_id=template_id,
     )

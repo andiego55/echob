@@ -46,6 +46,16 @@ export interface ProfessionalDashboard {
   appointments: DashboardAppointment[]
 }
 
+export type TemplateType = 'questionnaire' | 'resource' | 'message'
+export interface ProfessionalTemplate {
+  id: string
+  type: TemplateType
+  title: string | null
+  payload: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
 export const professionalApi = {
   // Rolle / Profil
   me: () =>
@@ -68,6 +78,18 @@ export const professionalApi = {
   // Notizen
   saveNotes: (caseId: string, data: ProfessionalNote) =>
     apiClient.put<ProfessionalNote>(`/professional/cases/${caseId}/notes`, data).then(r => r.data),
+
+  // Ressourcen-Bibliothek (Vorlagen)
+  templates: () =>
+    apiClient.get<ProfessionalTemplate[]>('/professional/templates').then(r => r.data),
+  templateCreate: (data: { type: TemplateType; title?: string | null; payload: Record<string, unknown> }) =>
+    apiClient.post<ProfessionalTemplate>('/professional/templates', data).then(r => r.data),
+  templateDelete: (id: string) =>
+    apiClient.delete(`/professional/templates/${id}`).then(r => r.data),
+  shareTemplate: (caseId: string, templateId: string) =>
+    apiClient
+      .post(`/professional/cases/${caseId}/assignments/from-template`, { template_id: templateId })
+      .then(r => r.data),
 
   // Glossar
   glossary: () =>

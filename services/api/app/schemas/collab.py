@@ -35,3 +35,18 @@ class AppointmentStatusUpdate(BaseModel):
 
 class MessageSend(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
+
+
+class TemplateCreate(BaseModel):
+    type: str                                            # questionnaire | resource | message
+    title: str | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class TemplateUpdate(BaseModel):
+    title: str | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class TemplateShare(BaseModel):
+    template_id: UUID

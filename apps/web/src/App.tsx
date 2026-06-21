@@ -85,6 +85,7 @@ import ProfessionalCasesPage     from '@/pages/professional/ProfessionalCasesPag
 import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDetailPage'
 import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
 import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboardPage'
+import ProfessionalTemplatesPage from '@/pages/professional/ProfessionalTemplatesPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -159,6 +160,7 @@ export default function App() {
       <Route path="/professional/register" element={<ProtectedRoute><ProfessionalRegisterPage /></ProtectedRoute>} />
       <Route path="/professional" element={<ProfessionalRoute><ProfessionalInboxPage /></ProfessionalRoute>} />
       <Route path="/professional/dashboard" element={<ProfessionalRoute><ProfessionalDashboardPage /></ProfessionalRoute>} />
+      <Route path="/professional/templates" element={<ProfessionalRoute><ProfessionalTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases" element={<ProfessionalRoute><ProfessionalCasesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
