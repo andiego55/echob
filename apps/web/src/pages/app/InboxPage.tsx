@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import MessageThread, { threadFromPayload } from '@/components/MessageThread'
+import QuestionnaireRenderer from '@/components/QuestionnaireRenderer'
+import type { Question } from '@/lib/questionnaire'
 import { collabApi, type Assignment, type Appointment } from '@/api/collab'
 
 const TYPE_META: Record<string, { icon: string; label: string }> = {
@@ -108,7 +110,6 @@ function AssignmentCard({ item }: { item: Assignment }) {
   const meta = TYPE_META[item.type] ?? { icon: '•', label: item.type }
   const p = item.payload as Record<string, string>
   const [answer, setAnswer] = useState('')
-  const [answers, setAnswers] = useState<Record<string, number>>({})
 
   const seen = useMutation({
     mutationFn: () => collabApi.markSeen(item.id),
@@ -167,36 +168,18 @@ function AssignmentCard({ item }: { item: Assignment }) {
       )}
 
       {item.type === 'questionnaire' && (() => {
-        const qp = item.payload as { intro?: string; questions?: { key: string; label: string; max?: number }[] }
+        const qp = item.payload as { intro?: string; questions?: Question[] }
         const questions = qp.questions ?? []
         if (item.status === 'completed')
           return <p className="text-sm text-green-700">✓ Beantwortet. Danke!</p>
         if (questions.length > 0) {
-          const allAnswered = questions.every(q => answers[q.key] != null)
           return (
-            <div className="text-sm text-brand-text">
-              {qp.intro && <p className="mb-3">{qp.intro}</p>}
-              <p className="mb-3 text-[11px] text-brand-muted">1 = trifft nicht zu · 5 = trifft voll zu</p>
-              <div className="space-y-3">
-                {questions.map(q => (
-                  <div key={q.key}>
-                    <p className="mb-1">{q.label}</p>
-                    <div className="flex gap-1.5">
-                      {Array.from({ length: q.max ?? 5 }, (_, i) => i + 1).map(n => (
-                        <button key={n} type="button" onClick={() => setAnswers(a => ({ ...a, [q.key]: n }))}
-                          className={`w-9 h-9 rounded-brand border text-sm font-medium transition-colors ${answers[q.key] === n ? 'bg-accent text-white border-accent' : 'border-brand-border text-brand-muted hover:border-accent'}`}>
-                          {n}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button onClick={() => respond.mutate({ answers })} disabled={respond.isPending || !allAnswered}
-                className="mt-3 text-sm font-semibold px-4 py-2 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-60">
-                {respond.isPending ? 'Wird gesendet …' : 'Absenden'}
-              </button>
-            </div>
+            <QuestionnaireRenderer
+              intro={qp.intro}
+              questions={questions}
+              onSubmit={(answers) => respond.mutate({ answers })}
+              busy={respond.isPending}
+            />
           )
         }
         return (

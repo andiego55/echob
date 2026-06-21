@@ -9,6 +9,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi, type TemplateType } from '@/api/professional'
+import QuestionnaireBuilder from '@/components/professional/QuestionnaireBuilder'
+import { isValidQuestion, type Question } from '@/lib/questionnaire'
 
 const TYPE_OPTIONS: { value: TemplateType; label: string; contentLabel: string }[] = [
   { value: 'resource', label: 'Ressource / Link', contentLabel: 'Beschreibung' },
@@ -33,7 +35,7 @@ export default function ProfessionalTemplatesPage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [url, setUrl] = useState('')
-  const [questions, setQuestions] = useState('')
+  const [questions, setQuestions] = useState<Question[]>([])
   const [hypothesis, setHypothesis] = useState('')
   const [filter, setFilter] = useState<TemplateType | 'all'>('all')
   const opt = TYPE_OPTIONS.find(o => o.value === type)!
@@ -49,16 +51,16 @@ export default function ProfessionalTemplatesPage() {
       }
       if (type === 'questionnaire') {
         payload.intro = content
-        const qLines = questions.split('\n').map(s => s.trim()).filter(Boolean)
-        if (qLines.length) {
-          payload.questions = qLines.map((label, i) => ({ key: `q${i}`, label, type: 'likert', max: 5 }))
+        const valid = questions.filter(isValidQuestion)
+        if (valid.length) {
+          payload.questions = valid
           payload.scoring = { type: 'avg' }
         }
       }
       return professionalApi.templateCreate({ type, title: title.trim() || null, payload })
     },
     onSuccess: () => {
-      setTitle(''); setContent(''); setUrl(''); setQuestions(''); setHypothesis(''); invalidate()
+      setTitle(''); setContent(''); setUrl(''); setQuestions([]); setHypothesis(''); invalidate()
     },
   })
   const del = useMutation({
@@ -67,7 +69,7 @@ export default function ProfessionalTemplatesPage() {
   })
 
   const canSubmit = type === 'questionnaire'
-    ? content.trim().length > 0 || questions.trim().length > 0
+    ? content.trim().length > 0 || questions.filter(isValidQuestion).length > 0
     : content.trim().length > 0
   const shown = templates.filter(t => filter === 'all' || t.type === filter)
 
@@ -101,11 +103,7 @@ export default function ProfessionalTemplatesPage() {
                   placeholder="Interne Hypothese für Echo (optional, nicht für Klient:in sichtbar)" className={inputCls} />
               )}
               {type === 'questionnaire' && (
-                <>
-                  <textarea value={questions} onChange={e => setQuestions(e.target.value)} rows={4}
-                    placeholder="Fragen – eine pro Zeile (Skala 1–5). Leer lassen = nur Freitext." className={inputCls} />
-                  <p className="text-[11px] text-brand-muted -mt-1.5">Jede Zeile wird eine Skala-Frage (1–5); Auswertung als Durchschnitt.</p>
-                </>
+                <QuestionnaireBuilder value={questions} onChange={setQuestions} />
               )}
               <button type="submit" disabled={create.isPending || !canSubmit} className="btn-primary !py-2 !text-sm disabled:opacity-60">
                 {create.isPending ? 'Wird gespeichert …' : 'Vorlage speichern'}

@@ -8,6 +8,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { collabApi, type AssignmentType } from '@/api/collab'
 import { professionalApi } from '@/api/professional'
 import MessageThread, { threadFromPayload } from '@/components/MessageThread'
+import QuestionnaireBuilder from '@/components/professional/QuestionnaireBuilder'
+import QuestionnaireEvaluation from '@/components/professional/QuestionnaireEvaluation'
+import { isValidQuestion, type Answer, type Question } from '@/lib/questionnaire'
 
 const inputCls =
   'w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent'
@@ -54,7 +57,7 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
   const [content, setContent] = useState('')
   const [hypothesis, setHypothesis] = useState('')
   const [url, setUrl] = useState('')
-  const [questions, setQuestions] = useState('')
+  const [questions, setQuestions] = useState<Question[]>([])
 
   const create = useMutation({
     mutationFn: () => {
@@ -66,9 +69,9 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
       }
       if (type === 'questionnaire') {
         payload.intro = content
-        const qLines = questions.split('\n').map(s => s.trim()).filter(Boolean)
-        if (qLines.length) {
-          payload.questions = qLines.map((label, i) => ({ key: `q${i}`, label, type: 'likert', max: 5 }))
+        const valid = questions.filter(isValidQuestion)
+        if (valid.length) {
+          payload.questions = valid
           payload.scoring = { type: 'avg' }
         }
       }
@@ -76,7 +79,7 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
       return collabApi.createAssignment(caseId, { type, title: title.trim() || null, payload })
     },
     onSuccess: () => {
-      setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions(''); invalidate()
+      setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions([]); invalidate()
     },
   })
   const proReply = useMutation({
@@ -96,7 +99,7 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
 
   // Fragebogen: Fragen ODER Einleitung reichen; sonst ist Inhalt Pflicht.
   const canSubmit = type === 'questionnaire'
-    ? content.trim().length > 0 || questions.trim().length > 0
+    ? content.trim().length > 0 || questions.filter(isValidQuestion).length > 0
     : content.trim().length > 0
 
   return (
@@ -115,11 +118,7 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
             <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Link (optional)" className={inputCls} />
           )}
           {type === 'questionnaire' && (
-            <>
-              <textarea value={questions} onChange={e => setQuestions(e.target.value)} rows={4}
-                placeholder="Fragen – eine pro Zeile (Skala 1–5). Leer lassen = nur Freitext-Antwort." className={inputCls} />
-              <p className="text-[11px] text-brand-muted -mt-1.5">Jede Zeile wird eine Skala-Frage (1–5); Auswertung als Durchschnitt.</p>
-            </>
+            <QuestionnaireBuilder value={questions} onChange={setQuestions} />
           )}
           <button type="submit" disabled={create.isPending || !canSubmit} className="btn-primary !py-2 !text-sm disabled:opacity-60">
             {create.isPending ? 'Wird gesendet …' : meta.cta}
@@ -163,21 +162,41 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
                 </div>
               ))}
             </div>
-          ) : (
-            <ul className="space-y-2 text-sm">
+          ) : type === 'questionnaire' ? (
+            <div className="space-y-2">
               {items.map(a => {
-                const score = type === 'questionnaire' ? (a.response as { score?: number } | null)?.score : undefined
+                const resp = a.response as { answers?: Record<string, Answer>; score?: number } | null
+                const qs = (a.payload as { questions?: Question[] }).questions ?? []
+                const done = a.status === 'completed' && !!resp?.answers
                 return (
-                  <li key={a.id} className="flex items-center justify-between gap-3 border-b border-brand-border pb-2 last:border-0 last:pb-0">
-                    <span className="text-brand-text">{a.title || '–'}</span>
-                    <span className="flex items-center gap-2 text-xs text-brand-muted shrink-0">
-                      {score != null && <span className="font-semibold text-accent">Ø {score}</span>}
-                      <span>{a.status}</span>
-                      <span>{fmt(a.created_at)}</span>
-                    </span>
-                  </li>
+                  <details key={a.id} className="rounded-brand border border-brand-border p-3">
+                    <summary className="flex items-center justify-between gap-3 cursor-pointer text-sm">
+                      <span className="font-medium text-navy">{a.title || 'Fragebogen'}</span>
+                      <span className="flex items-center gap-2 text-xs text-brand-muted">
+                        {resp?.score != null && <span className="font-semibold text-accent">Ø {resp.score}</span>}
+                        <span>{a.status}</span>
+                      </span>
+                    </summary>
+                    <div className="mt-3">
+                      {done
+                        ? <QuestionnaireEvaluation questions={qs} answers={resp!.answers!} score={resp?.score} />
+                        : <p className="text-xs text-brand-muted">Noch nicht beantwortet · {qs.length} Frage(n)</p>}
+                    </div>
+                  </details>
                 )
               })}
+            </div>
+          ) : (
+            <ul className="space-y-2 text-sm">
+              {items.map(a => (
+                <li key={a.id} className="flex items-center justify-between gap-3 border-b border-brand-border pb-2 last:border-0 last:pb-0">
+                  <span className="text-brand-text">{a.title || '–'}</span>
+                  <span className="flex items-center gap-2 text-xs text-brand-muted shrink-0">
+                    <span>{a.status}</span>
+                    <span>{fmt(a.created_at)}</span>
+                  </span>
+                </li>
+              ))}
             </ul>
           )}
         </div>
