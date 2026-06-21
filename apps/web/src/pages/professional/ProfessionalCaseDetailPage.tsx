@@ -37,6 +37,31 @@ const TABS = [
 ] as const
 type TabKey = (typeof TABS)[number]['key']
 
+/** Zweite Headerleiste des Fall-Arbeitsplatzes – Stil wie die Nutzer-CaseNav. */
+function CaseWorkspaceNav({ active, onSelect }: { active: TabKey; onSelect: (k: TabKey) => void }) {
+  return (
+    <div className="border-b border-brand-border bg-white sticky top-14 z-30">
+      <div className="mx-auto max-w-[1100px] px-6">
+        <nav className="flex gap-0 overflow-x-auto" aria-label="Fall-Navigation">
+          {TABS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => onSelect(key)}
+              className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                active === key
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-brand-muted hover:text-brand-text hover:border-brand-border'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      </div>
+    </div>
+  )
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="card">
@@ -146,29 +171,13 @@ export default function ProfessionalCaseDetailPage() {
 
   return (
     <ProfessionalShell>
+      <CaseWorkspaceNav active={tab} onSelect={setTab} />
       <div className="mx-auto max-w-[1100px] px-6 py-10">
         {/* Fall-Kopf */}
-        <div className="mb-5">
+        <div className="mb-6">
           <span className="label">{bundle.client_display_name}</span>
           <h1 className="mt-1 text-2xl font-bold text-navy">{bundle.case_title}</h1>
           <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
-        </div>
-
-        {/* Reitermenü */}
-        <div className="mb-6 flex gap-1 overflow-x-auto border-b border-brand-border">
-          {TABS.map(t => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`px-3 py-2 text-sm whitespace-nowrap border-b-2 -mb-px transition-colors ${
-                tab === t.key
-                  ? 'border-accent text-navy font-semibold'
-                  : 'border-transparent text-brand-muted hover:text-navy'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
         </div>
 
         {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
