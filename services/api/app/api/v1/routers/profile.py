@@ -22,6 +22,12 @@ class SummaryTextUpdate(_BaseModel):
 class DisplayNameUpdate(_BaseModel):
     display_name: str
 
+class EchoSettings(_BaseModel):
+    echo_mode: str = "base"
+    echo_tone: int | None = None
+    echo_depth: int | None = None
+    echo_custom_steering: str | None = None
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/profile", tags=["profile"])
 
@@ -174,6 +180,46 @@ async def save_display_name(
             user_id,
         )
     return _row_to_response(dict(row))
+
+
+@router.get("/echo-settings", response_model=EchoSettings)
+async def get_echo_settings(
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> EchoSettings:
+    """Echo-Aussteuerung der nutzenden Person (Modus + Regler + Freitext)."""
+    async with pool.acquire() as conn:
+        p = await _get_or_create_profile(conn, current_user["user_id"])
+    return EchoSettings(
+        echo_mode=p.get("echo_mode") or "base",
+        echo_tone=p.get("echo_tone"),
+        echo_depth=p.get("echo_depth"),
+        echo_custom_steering=crypto.decrypt(p.get("echo_custom_steering")),
+    )
+
+
+@router.put("/echo-settings", response_model=EchoSettings)
+async def update_echo_settings(
+    body: EchoSettings,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> EchoSettings:
+    """Speichert die Echo-Aussteuerung. Freitext wird gekappt + verschlüsselt."""
+    from app.services import echo_modes
+    user_id = current_user["user_id"]
+    mode = echo_modes.valid_user_mode(body.echo_mode)
+    tone = echo_modes.clean_slider(body.echo_tone)
+    depth = echo_modes.clean_slider(body.echo_depth)
+    custom = echo_modes.clean_custom(body.echo_custom_steering)
+    async with pool.acquire() as conn:
+        await _get_or_create_profile(conn, user_id)
+        await conn.execute(
+            "UPDATE user_profiles SET echo_mode = $1, echo_tone = $2, echo_depth = $3, "
+            "echo_custom_steering = $4, updated_at = $5 WHERE user_id = $6",
+            mode, tone, depth, crypto.encrypt(custom), datetime.now(UTC), user_id,
+        )
+    return EchoSettings(echo_mode=mode, echo_tone=tone, echo_depth=depth,
+                        echo_custom_steering=custom)
 
 
 @router.post("/echo/chat", response_model=EchoChatResponse)

@@ -193,6 +193,8 @@ class EchoService:
         scenes: list[dict[str, Any]] | None = None,
         scale_scores: list[dict[str, Any]] | None = None,
         extra_context: str = "",
+        mode_steering: str = "",
+        mode_temperature: float | None = None,
         **kwargs: Any,
     ) -> str:
         """Schickt eine Nachricht an Echo und gibt die Antwort zurück."""
@@ -226,6 +228,8 @@ class EchoService:
                 scenes=scenes or [],
                 scale_scores=scale_scores,
                 extra_context=extra_context,
+                mode_steering=mode_steering,
+                mode_temperature=mode_temperature,
             )
         return self._mock_chat(
             user_message=user_message,
@@ -529,6 +533,11 @@ class EchoService:
         # Block 1: Echo-Verhalten (stabil → OpenAI cached automatisch)
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
 
+        # Block 1b: Modus-Aussteuerung (nachrangig zum Basis-Prompt). Wirkt nur im
+        # freien Reflexions-Chat; verändert nie Rolle/Sicherheit/Krisenlogik.
+        if kwargs.get("mode_steering"):
+            messages.append({"role": "system", "content": kwargs["mode_steering"]})
+
         # Block 2: Fallkontext (ändert sich selten → ebenfalls gecacht)
         case_context_text = build_case_context(
             case=kwargs.get("case_context", {}),
@@ -562,11 +571,12 @@ class EchoService:
         # Block 4: Aktuelle Nutzernachricht
         messages.append({"role": "user", "content": kwargs["user_message"]})
 
+        mode_temp = kwargs.get("mode_temperature")
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
             model="gpt-4o",
             messages=messages,
             max_tokens=1500,
-            temperature=0.4,
+            temperature=mode_temp if isinstance(mode_temp, (int, float)) else 0.4,
         )
         return response.choices[0].message.content or ""
 
@@ -1172,6 +1182,7 @@ class EchoService:
         history: list[dict[str, str]] | None = None,
         glossary_term: str | None = None,
         glossary_definition: str | None = None,
+        mode_steering: str = "",
     ) -> str:
         """Echo-Dialog für Fachpersonen — ausschließlich auf Basis des freigegebenen Kontexts."""
         if self._use_openai:
@@ -1181,6 +1192,7 @@ class EchoService:
                 history=history or [],
                 glossary_term=glossary_term,
                 glossary_definition=glossary_definition,
+                mode_steering=mode_steering,
             )
         return self._mock_professional_chat(glossary_term=glossary_term)
 
@@ -1192,9 +1204,12 @@ class EchoService:
         history: list[dict[str, str]],
         glossary_term: str | None,
         glossary_definition: str | None,
+        mode_steering: str = "",
     ) -> str:
         system_prompt = _load_prompt("echo_professional_prompt.md")
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
+        if mode_steering:
+            messages.append({"role": "system", "content": mode_steering})
         if shared_context:
             messages.append({"role": "system", "content": shared_context})
         if glossary_term:

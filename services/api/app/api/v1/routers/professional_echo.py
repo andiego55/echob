@@ -22,7 +22,7 @@ from app.schemas.professional import (
     ProfessionalEchoSummaryCreate,
     ProfessionalEchoSummaryResponse,
 )
-from app.services import collab_service
+from app.services import collab_service, echo_modes
 from app.services.sharing_service import (
     build_shared_case_context,
     load_shared_bundle,
@@ -118,6 +118,10 @@ async def chat(
             conn, professional_user_id=pid, case_id=case_id)
         appointments = await collab_service.list_appointments_for_case(
             conn, professional_user_id=pid, case_id=case_id)
+        pro_settings = await conn.fetchrow(
+            "SELECT echo_approach, echo_tone, echo_depth, echo_custom_steering "
+            "FROM professional_profiles WHERE user_id = $1", pid,
+        )
 
     history = [
         {"role": r["role"], "content": crypto.decrypt(r["content"])}
@@ -137,6 +141,13 @@ async def chat(
     if extras:
         shared_context = shared_context + "\n\n" + "\n\n".join(extras)
 
+    pro_mode_steering = echo_modes.build_pro_steering(
+        pro_settings["echo_approach"] if pro_settings else None,
+        pro_settings["echo_tone"] if pro_settings else None,
+        pro_settings["echo_depth"] if pro_settings else None,
+        crypto.decrypt(pro_settings["echo_custom_steering"]) if pro_settings else None,
+    )
+
     glossary_term = glossary_definition = None
     if body.thread_type == "glossary" and body.glossary_slug:
         async with pool.acquire() as conn:
@@ -153,6 +164,7 @@ async def chat(
         history=history,
         glossary_term=glossary_term,
         glossary_definition=glossary_definition,
+        mode_steering=pro_mode_steering,
     )
 
     async with pool.acquire() as conn:

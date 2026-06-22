@@ -1,7 +1,19 @@
 import { apiClient } from './client'
 import type { UserProfile, ProfileModuleUpdate, EchoChatRequest, EchoChatResponse, EchoMessage } from '@/types'
 
+export interface EchoSettings {
+  echo_mode: string
+  echo_tone: number | null
+  echo_depth: number | null
+  echo_custom_steering: string | null
+}
+
 export const profileApi = {
+  getEchoSettings: () =>
+    apiClient.get<EchoSettings>('/profile/echo-settings').then(r => r.data),
+  saveEchoSettings: (data: EchoSettings) =>
+    apiClient.put<EchoSettings>('/profile/echo-settings', data).then(r => r.data),
+
   get: () =>
     apiClient.get<UserProfile>('/profile').then(r => r.data),
 

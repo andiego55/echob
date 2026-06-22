@@ -17,6 +17,13 @@ interface EchoChatResult {
   session_id: string
 }
 
+export interface ProEchoSettings {
+  echo_approach: string
+  echo_tone: number | null
+  echo_depth: number | null
+  echo_custom_steering: string | null
+}
+
 export interface DashboardItem {
   assignment_id: string
   direction: 'in' | 'out'
@@ -80,6 +87,12 @@ export const professionalApi = {
     apiClient.get<ProfessionalProfile>('/professional/me').then(r => r.data),
   register: (data: { display_name: string; title?: string | null }) =>
     apiClient.post<ProfessionalProfile>('/professional/register', data).then(r => r.data),
+
+  // Echo-Aussteuerung (therapeutischer Ansatz + Regler + Freitext)
+  getEchoSettings: () =>
+    apiClient.get<ProEchoSettings>('/professional/echo-settings').then(r => r.data),
+  saveEchoSettings: (data: ProEchoSettings) =>
+    apiClient.put<ProEchoSettings>('/professional/echo-settings', data).then(r => r.data),
 
   // Dashboard (fallübergreifendes Cockpit)
   dashboard: () =>

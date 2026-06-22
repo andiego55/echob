@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { collabApi } from '@/api/collab'
 import QuickExitButton from '@/components/app/QuickExit'
+import GearIcon from '@/components/icons/GearIcon'
 
 interface Props {
   children: React.ReactNode
@@ -72,6 +73,16 @@ export default function AppShell({ children }: Props) {
 
           <div className="flex items-center gap-3">
             <QuickExitButton />
+            <NavLink
+              to="/app/settings"
+              title="Einstellungen"
+              aria-label="Einstellungen"
+              className={({ isActive }) =>
+                `transition-colors ${isActive ? 'text-white' : 'text-white/55 hover:text-white'}`
+              }
+            >
+              <GearIcon />
+            </NavLink>
             <span className="hidden sm:block text-xs text-white/40">{user?.email}</span>
             <button
               onClick={handleSignOut}

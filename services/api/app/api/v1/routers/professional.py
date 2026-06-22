@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel as _BaseModel
 
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_current_user, get_pool
@@ -179,6 +180,54 @@ async def register(
                     user_id, email,
                 )
     return ProfessionalProfileResponse(**dict(row))
+
+
+# ── Echo-Aussteuerung (therapeutischer Ansatz + Regler + Freitext) ────────────
+
+class ProEchoSettings(_BaseModel):
+    echo_approach: str = "balanced"
+    echo_tone: int | None = None
+    echo_depth: int | None = None
+    echo_custom_steering: str | None = None
+
+
+@router.get("/echo-settings", response_model=ProEchoSettings)
+async def get_pro_echo_settings(
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProEchoSettings:
+    async with pool.acquire() as conn:
+        p = await conn.fetchrow(
+            "SELECT echo_approach, echo_tone, echo_depth, echo_custom_steering "
+            "FROM professional_profiles WHERE user_id = $1", current["user_id"],
+        )
+    return ProEchoSettings(
+        echo_approach=(p["echo_approach"] if p else None) or "balanced",
+        echo_tone=p["echo_tone"] if p else None,
+        echo_depth=p["echo_depth"] if p else None,
+        echo_custom_steering=crypto.decrypt(p["echo_custom_steering"]) if p else None,
+    )
+
+
+@router.put("/echo-settings", response_model=ProEchoSettings)
+async def update_pro_echo_settings(
+    body: ProEchoSettings,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProEchoSettings:
+    from app.services import echo_modes
+    approach = echo_modes.valid_pro_approach(body.echo_approach)
+    tone = echo_modes.clean_slider(body.echo_tone)
+    depth = echo_modes.clean_slider(body.echo_depth)
+    custom = echo_modes.clean_custom(body.echo_custom_steering)
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE professional_profiles SET echo_approach = $1, echo_tone = $2, "
+            "echo_depth = $3, echo_custom_steering = $4, updated_at = NOW() WHERE user_id = $5",
+            approach, tone, depth, crypto.encrypt(custom), current["user_id"],
+        )
+    return ProEchoSettings(echo_approach=approach, echo_tone=tone, echo_depth=depth,
+                           echo_custom_steering=custom)
 
 
 # ── Postfach ────────────────────────────────────────────────────────────────

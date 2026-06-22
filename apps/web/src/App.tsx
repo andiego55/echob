@@ -57,6 +57,7 @@ import HypothesisDialogPage  from '@/pages/app/HypothesisDialogPage'
 import UpgradePage           from '@/pages/app/UpgradePage'
 import CaseSharingPage        from '@/pages/app/CaseSharingPage'
 import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
+import SettingsPage           from '@/pages/app/SettingsPage'
 import { useParams }         from 'react-router-dom'
 
 function TopicDialogPageWrapper() {
@@ -85,6 +86,7 @@ import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDet
 import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
 import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboardPage'
 import ProfessionalTemplatesPage from '@/pages/professional/ProfessionalTemplatesPage'
+import ProfessionalSettingsPage  from '@/pages/professional/ProfessionalSettingsPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -133,6 +135,7 @@ export default function App() {
       <Route path="/app/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />
+      <Route path="/app/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
       <Route path="/app/profile/echo" element={<ProtectedRoute><ProfileEchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/new" element={<ProtectedRoute><CaseNewPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId" element={<ProtectedRoute><CaseDetailPage /></ProtectedRoute>} />
@@ -160,6 +163,7 @@ export default function App() {
       <Route path="/professional" element={<ProfessionalRoute><ProfessionalInboxPage /></ProfessionalRoute>} />
       <Route path="/professional/dashboard" element={<ProfessionalRoute><ProfessionalDashboardPage /></ProfessionalRoute>} />
       <Route path="/professional/templates" element={<ProfessionalRoute><ProfessionalTemplatesPage /></ProfessionalRoute>} />
+      <Route path="/professional/settings" element={<ProfessionalRoute><ProfessionalSettingsPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
 

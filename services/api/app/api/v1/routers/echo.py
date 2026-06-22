@@ -329,6 +329,21 @@ async def chat(
                 if hyp_ctx:
                     extra_context += "\n\n" + hyp_ctx
 
+    # Echo-Aussteuerung der nutzenden Person (Modus + Regler + Freitext). Wirkt nur
+    # im freien Reflexions-Chat; geführte Dialoge (Szene/Thema/Hypothese) ignorieren sie.
+    from app.services import echo_modes
+    async with pool.acquire() as conn:
+        settings_row = await conn.fetchrow(
+            "SELECT echo_mode, echo_tone, echo_depth, echo_custom_steering "
+            "FROM user_profiles WHERE user_id = $1", user_id,
+        )
+    mode_steering, mode_temperature = echo_modes.build_user_steering(
+        settings_row["echo_mode"] if settings_row else None,
+        settings_row["echo_tone"] if settings_row else None,
+        settings_row["echo_depth"] if settings_row else None,
+        crypto.decrypt(settings_row["echo_custom_steering"]) if settings_row else None,
+    )
+
     # ── Sicherheits-Triage ────────────────────────────────────────────────────
     # Aktive Krisenerkennung statt passivem Disclaimer: Deutet die Nachricht auf
     # eine akute Gefährdung hin, antwortet Echo mit konkreter Hilfe statt mit
@@ -345,6 +360,8 @@ async def chat(
             scenes=scenes,
             scale_scores=scale_scores,
             extra_context=extra_context,
+            mode_steering=mode_steering,
+            mode_temperature=mode_temperature,
         )
 
     safety_meta: dict = {}

@@ -6,6 +6,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { professionalApi } from '@/api/professional'
+import GearIcon from '@/components/icons/GearIcon'
 
 export default function ProfessionalShell({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth()
@@ -61,6 +62,16 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
           </nav>
 
           <div className="flex items-center gap-3">
+            <NavLink
+              to="/professional/settings"
+              title="Einstellungen"
+              aria-label="Einstellungen"
+              className={({ isActive }) =>
+                `transition-colors ${isActive ? 'text-white' : 'text-white/55 hover:text-white'}`
+              }
+            >
+              <GearIcon />
+            </NavLink>
             <span className="hidden sm:block text-xs text-white/40">{user?.email}</span>
             <button
               onClick={handleSignOut}
