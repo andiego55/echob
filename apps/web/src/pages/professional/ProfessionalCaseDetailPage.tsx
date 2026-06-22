@@ -168,6 +168,11 @@ export default function ProfessionalCaseDetailPage() {
     mutationFn: (summaryId: string) => professionalApi.echoSummaryDelete(caseId!, summaryId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-case', caseId] }),
   })
+  const updateSummary = useMutation({
+    mutationFn: (v: { id: string; title: string | null; summary_text: string }) =>
+      professionalApi.echoSummaryUpdate(caseId!, v.id, { title: v.title, summary_text: v.summary_text }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-case', caseId] }),
+  })
 
   if (isLoading) return <Spinner />
 
@@ -208,6 +213,8 @@ export default function ProfessionalCaseDetailPage() {
             summaries={bundle.echo_summaries}
             onDelete={(id) => deleteSummary.mutate(id)}
             deleting={deleteSummary.isPending}
+            onUpdate={(v) => updateSummary.mutate(v)}
+            updating={updateSummary.isPending}
           />
         )}
         {tab === 'notes' && <NotesEditor caseId={caseId!} initial={bundle.notes} />}
@@ -367,12 +374,14 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 }
 
 /** Reiter „Echo": Fall-Echo öffnen, Glossar, gespeicherte Zusammenfassungen. */
-function EchoPanel({ caseId, glossary, summaries, onDelete, deleting }: {
+function EchoPanel({ caseId, glossary, summaries, onDelete, deleting, onUpdate, updating }: {
   caseId: string
   glossary: GlossaryTerm[]
   summaries: SharedCaseBundle['echo_summaries']
   onDelete: (id: string) => void
   deleting: boolean
+  onUpdate: (v: { id: string; title: string | null; summary_text: string }) => void
+  updating: boolean
 }) {
   return (
     <div className="space-y-4">
@@ -408,26 +417,100 @@ function EchoPanel({ caseId, glossary, summaries, onDelete, deleting }: {
         <Section title="Gespeicherte Echo-Zusammenfassungen">
           <div className="space-y-2">
             {summaries.map(s => (
-              <details key={s.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
-                <summary className="flex items-center justify-between gap-3 cursor-pointer">
-                  <span className="text-sm font-semibold text-navy">{s.title || 'Zusammenfassung'}</span>
-                  <button
-                    onClick={(e) => { e.preventDefault(); if (window.confirm('Diese Zusammenfassung löschen?')) onDelete(s.id) }}
-                    disabled={deleting}
-                    className="shrink-0 text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
-                  >
-                    Löschen
-                  </button>
-                </summary>
-                <div className="mt-2 text-sm text-brand-text leading-relaxed">
-                  <MarkdownMessage content={s.summary_text} />
-                </div>
-              </details>
+              <SummaryItem
+                key={s.id} s={s}
+                onDelete={onDelete} deleting={deleting}
+                onUpdate={onUpdate} updating={updating}
+              />
             ))}
           </div>
         </Section>
       )}
     </div>
+  )
+}
+
+function fmtSummaryDate(iso: string): string {
+  return new Date(iso).toLocaleString('de-DE', {
+    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  })
+}
+
+/** Eine gespeicherte Zusammenfassung: Titel + Datum, aufklappbar, mit Inline-Bearbeitung. */
+function SummaryItem({ s, onDelete, deleting, onUpdate, updating }: {
+  s: SharedCaseBundle['echo_summaries'][number]
+  onDelete: (id: string) => void
+  deleting: boolean
+  onUpdate: (v: { id: string; title: string | null; summary_text: string }) => void
+  updating: boolean
+}) {
+  const [editing, setEditing] = useState(false)
+  const [title, setTitle] = useState(s.title ?? '')
+  const [text, setText] = useState(s.summary_text)
+
+  // „bearbeitet" nur zeigen, wenn merklich nach dem Erstellen geändert (>1 Min).
+  const edited = new Date(s.updated_at).getTime() - new Date(s.created_at).getTime() > 60_000
+
+  const start = () => { setTitle(s.title ?? ''); setText(s.summary_text); setEditing(true) }
+  const save = () => {
+    if (!text.trim()) return
+    onUpdate({ id: s.id, title: title.trim() || null, summary_text: text })
+    setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <div className="rounded-brand border border-accent bg-brand-bg px-4 py-3 space-y-2">
+        <input
+          value={title} onChange={e => setTitle(e.target.value)} maxLength={200}
+          placeholder="Titel (optional)"
+          className="w-full rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm font-semibold text-navy outline-none focus:border-accent"
+        />
+        <textarea
+          value={text} onChange={e => setText(e.target.value)} rows={8}
+          className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+        <div className="flex items-center gap-3">
+          <button onClick={save} disabled={updating || !text.trim()}
+            className="text-sm font-semibold px-4 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+            {updating ? 'Wird gespeichert …' : 'Speichern'}
+          </button>
+          <button onClick={() => setEditing(false)} disabled={updating}
+            className="text-sm text-brand-muted hover:text-navy">Abbrechen</button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <details className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
+      <summary className="flex items-start justify-between gap-3 cursor-pointer">
+        <span className="min-w-0">
+          <span className="text-sm font-semibold text-navy">{s.title || 'Zusammenfassung'}</span>
+          <span className="block text-[11px] text-brand-muted">
+            {fmtSummaryDate(s.created_at)}{edited && ` · bearbeitet ${fmtSummaryDate(s.updated_at)}`}
+          </span>
+        </span>
+        <span className="shrink-0 flex items-center gap-3">
+          <button
+            onClick={(e) => { e.preventDefault(); start() }}
+            className="text-xs text-brand-muted hover:text-accent transition-colors"
+          >
+            Bearbeiten
+          </button>
+          <button
+            onClick={(e) => { e.preventDefault(); if (window.confirm('Diese Zusammenfassung löschen?')) onDelete(s.id) }}
+            disabled={deleting}
+            className="text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
+          >
+            Löschen
+          </button>
+        </span>
+      </summary>
+      <div className="mt-2 text-sm text-brand-text leading-relaxed">
+        <MarkdownMessage content={s.summary_text} />
+      </div>
+    </details>
   )
 }
 

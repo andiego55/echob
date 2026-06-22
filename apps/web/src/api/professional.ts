@@ -162,6 +162,10 @@ export const professionalApi = {
       .then(r => r.data),
   echoSessionDelete: (caseId: string, sessionId: string) =>
     apiClient.delete(`/professional/cases/${caseId}/echo/sessions/${sessionId}`).then(r => r.data),
+  echoSummaryUpdate: (caseId: string, summaryId: string, data: { title?: string | null; summary_text: string }) =>
+    apiClient
+      .patch<ProfessionalEchoSummary>(`/professional/cases/${caseId}/echo/summaries/${summaryId}`, data)
+      .then(r => r.data),
   echoSummaryDelete: (caseId: string, summaryId: string) =>
     apiClient.delete(`/professional/cases/${caseId}/echo/summaries/${summaryId}`).then(r => r.data),
 }

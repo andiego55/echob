@@ -513,7 +513,7 @@ async def case_detail(
             pid, case_id,
         )
         summary_rows = await conn.fetch(
-            "SELECT id, case_id, session_id, title, summary_text, created_at "
+            "SELECT id, case_id, session_id, title, summary_text, created_at, updated_at "
             "FROM professional_echo_summaries WHERE professional_user_id = $1 AND case_id = $2 "
             "ORDER BY created_at DESC",
             pid, case_id,

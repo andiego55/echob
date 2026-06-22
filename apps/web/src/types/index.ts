@@ -509,6 +509,7 @@ export interface ProfessionalEchoSummary {
   title: string | null
   summary_text: string
   created_at: string
+  updated_at: string
 }
 
 /** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */

@@ -21,6 +21,7 @@ from app.schemas.professional import (
     ProfessionalEchoSessionUpdate,
     ProfessionalEchoSummaryCreate,
     ProfessionalEchoSummaryResponse,
+    ProfessionalEchoSummaryUpdate,
 )
 from app.services import collab_service, echo_modes
 from app.services.sharing_service import (
@@ -335,11 +336,35 @@ async def save_summary(
                 raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
         row = await conn.fetchrow(
             "INSERT INTO professional_echo_summaries "
-            "(professional_user_id, case_id, session_id, title, summary_text) "
-            "VALUES ($1, $2, $3, $4, $5) "
-            "RETURNING id, case_id, session_id, title, summary_text, created_at",
+            "(professional_user_id, case_id, session_id, title, summary_text, updated_at) "
+            "VALUES ($1, $2, $3, $4, $5, NOW()) "
+            "RETURNING id, case_id, session_id, title, summary_text, created_at, updated_at",
             pid, case_id, body.session_id, body.title, crypto.encrypt(body.summary_text),
         )
+    return ProfessionalEchoSummaryResponse(**crypto.decrypt_fields(dict(row), "summary_text"))
+
+
+@router.patch("/summaries/{summary_id}", response_model=ProfessionalEchoSummaryResponse)
+async def update_summary(
+    case_id: UUID,
+    summary_id: UUID,
+    body: ProfessionalEchoSummaryUpdate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalEchoSummaryResponse:
+    """Bearbeitet Titel + Text einer gespeicherten Zusammenfassung (eigene, aktive Freigabe)."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await require_active_share(pid, case_id, conn)
+        row = await conn.fetchrow(
+            "UPDATE professional_echo_summaries "
+            "SET title = $4, summary_text = $5, updated_at = NOW() "
+            "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3 "
+            "RETURNING id, case_id, session_id, title, summary_text, created_at, updated_at",
+            summary_id, pid, case_id, body.title, crypto.encrypt(body.summary_text),
+        )
+    if not row:
+        raise HTTPException(status_code=404, detail="Zusammenfassung nicht gefunden.")
     return ProfessionalEchoSummaryResponse(**crypto.decrypt_fields(dict(row), "summary_text"))
 
 

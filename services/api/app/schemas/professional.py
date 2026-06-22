@@ -181,6 +181,11 @@ class ProfessionalEchoSummaryCreate(BaseModel):
     summary_text: str = Field(..., min_length=1)
 
 
+class ProfessionalEchoSummaryUpdate(BaseModel):
+    title: str | None = Field(None, max_length=200)
+    summary_text: str = Field(..., min_length=1)
+
+
 class ProfessionalEchoSummaryResponse(BaseModel):
     id: UUID
     case_id: UUID
@@ -188,5 +193,6 @@ class ProfessionalEchoSummaryResponse(BaseModel):
     title: str | None
     summary_text: str
     created_at: datetime
+    updated_at: datetime
 
     model_config = {"from_attributes": True}
