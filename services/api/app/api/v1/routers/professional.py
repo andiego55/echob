@@ -325,6 +325,7 @@ async def dashboard(
             "assignment_id": it["assignment_id"], "direction": "in",
             "kind": it["kind"], "title": it["title"], "detail": it["detail"],
             "unread": it["unread"], "tab": _kind_tab.get(it["kind"], "ueber"),
+            "at": it["at"],
         })
         if it["unread"]:
             meta[scid]["unread"] += 1
@@ -345,6 +346,7 @@ async def dashboard(
                 "kind": "open_task", "title": a.get("title") or a["type"],
                 "detail": "wartet auf Klient:in", "unread": False,
                 "tab": "questionnaire" if a["type"] == "questionnaire" else "dialog",
+                "at": a.get("due_at") or a.get("created_at"),
             })
 
     cases_out = []

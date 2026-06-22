@@ -21,6 +21,12 @@ function fmtDay(iso: string | null): string {
   if (!iso) return '—'
   return new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' })
 }
+function fmtItem(iso: string | null): string {
+  if (!iso) return ''
+  return new Date(iso).toLocaleString('de-DE', {
+    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+  })
+}
 
 const ITEM_ICON: Record<DashboardItem['kind'], string> = {
   questionnaire_answered: '📋', dialog_summary: '💬', message_reply: '✉️', open_task: '⏳',
@@ -94,76 +100,85 @@ export default function ProfessionalDashboardPage() {
 
             <div className="space-y-2 mt-4">
               {shown.length === 0 && <p className="text-sm text-brand-muted">Nichts gefunden.</p>}
-              {shown.map(c => (
-                <details
-                  key={c.case_id}
-                  open={!!openCases[c.case_id]}
-                  onToggle={e => setOpenCases(o => ({ ...o, [c.case_id]: (e.target as HTMLDetailsElement).open }))}
-                  className={`card ${c.unread_count > 0 ? 'border-accent/40' : ''}`}
-                >
-                  <summary className="flex items-center justify-between gap-3 cursor-pointer">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-accent shrink-0" />}
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-navy truncate">{c.client_display_name} · {c.case_title}</p>
-                        <p className="text-xs text-brand-muted">Zuletzt aktiv: {fmtDay(c.last_activity)}</p>
+              {shown.map(c => {
+                const isOpen = !!openCases[c.case_id]
+                return (
+                  <div key={c.case_id} className={`card ${c.unread_count > 0 ? 'border-accent/40' : ''}`}>
+                    <div className="flex items-center justify-between gap-3">
+                      <Link to={`/professional/cases/${c.case_id}`} className="flex items-center gap-2 min-w-0 no-underline group">
+                        {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-accent shrink-0" />}
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors">
+                            {c.client_display_name} · {c.case_title}
+                          </p>
+                          <p className="text-xs text-brand-muted">Zuletzt aktiv: {fmtDay(c.last_activity)}</p>
+                        </div>
+                      </Link>
+                      <div className="flex items-center gap-2 text-xs shrink-0">
+                        {c.unread_count > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">{c.unread_count} ungelesen</span>
+                        )}
+                        {c.open_count > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-brand-bg text-brand-muted">{c.open_count} offen</span>
+                        )}
+                        <Link to={`/professional/cases/${c.case_id}`}
+                          className="hidden sm:inline text-accent font-medium no-underline hover:underline">Öffnen →</Link>
+                        <button onClick={() => setOpenCases(o => ({ ...o, [c.case_id]: !o[c.case_id] }))}
+                          aria-label={isOpen ? 'Zuklappen' : 'Aufklappen'} className="text-brand-muted hover:text-navy p-1">
+                          <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-xs shrink-0">
-                      {c.unread_count > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">{c.unread_count} ungelesen</span>
-                      )}
-                      {c.open_count > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-brand-bg text-brand-muted">{c.open_count} offen</span>
-                      )}
-                      {c.next_appointment && (
-                        <span className="text-brand-muted hidden sm:inline">📅 {fmtAppt(c.next_appointment.start_at)}</span>
-                      )}
-                    </div>
-                  </summary>
 
-                  <div className="mt-3 space-y-1.5">
-                    {c.element_types.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pb-1">
-                        {c.element_types.map(et => (
-                          <span key={et} className="text-[11px] px-2 py-0.5 rounded-full border border-brand-border text-brand-muted">
-                            {elLabel(et)}
-                          </span>
+                    {isOpen && (
+                      <div className="mt-3 border-t border-brand-border pt-3 space-y-1.5">
+                        {c.element_types.length > 0 && (
+                          <div className="flex flex-wrap gap-1 pb-1">
+                            {c.element_types.map(et => (
+                              <span key={et} className="text-[11px] px-2 py-0.5 rounded-full border border-brand-border text-brand-muted">
+                                {elLabel(et)}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {c.items.length === 0 && !c.next_appointment && (
+                          <p className="text-xs text-brand-muted">Nichts Offenes.</p>
+                        )}
+                        {c.items.map(it => (
+                          <Link
+                            key={it.assignment_id}
+                            to={`/professional/cases/${c.case_id}?tab=${it.tab}`}
+                            className={`flex items-center justify-between gap-3 rounded-brand border px-3 py-2 no-underline transition-colors ${
+                              it.unread ? 'border-accent bg-accent/[0.03]' : 'border-brand-border hover:border-accent/40'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 min-w-0">
+                              <span className="shrink-0">{ITEM_ICON[it.kind]}</span>
+                              <span className="min-w-0">
+                                <span className={`block text-sm truncate text-navy ${it.unread ? 'font-semibold' : ''}`}>{it.title}</span>
+                                {it.at && <span className="block text-[11px] text-brand-muted">{fmtItem(it.at)}</span>}
+                              </span>
+                            </span>
+                            <span className="text-xs text-brand-muted shrink-0">{it.detail}</span>
+                          </Link>
                         ))}
+                        {c.next_appointment && (
+                          <Link
+                            to={`/professional/cases/${c.case_id}?tab=appointments`}
+                            className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3 py-2 no-underline hover:border-accent/40"
+                          >
+                            <span className="text-sm text-navy">📅 {c.next_appointment.title}</span>
+                            <span className="text-xs text-brand-muted">{fmtAppt(c.next_appointment.start_at)}</span>
+                          </Link>
+                        )}
                       </div>
-                    )}
-                    {c.items.length === 0 && !c.next_appointment && (
-                      <p className="text-xs text-brand-muted">
-                        Nichts Offenes. <Link to={`/professional/cases/${c.case_id}`} className="text-accent hover:underline">Fall öffnen →</Link>
-                      </p>
-                    )}
-                    {c.items.map(it => (
-                      <Link
-                        key={it.assignment_id}
-                        to={`/professional/cases/${c.case_id}?tab=${it.tab}`}
-                        className={`flex items-center justify-between gap-3 rounded-brand border px-3 py-2 no-underline transition-colors ${
-                          it.unread ? 'border-accent bg-accent/[0.03]' : 'border-brand-border hover:border-accent/40'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2 min-w-0">
-                          <span>{ITEM_ICON[it.kind]}</span>
-                          <span className={`text-sm truncate text-navy ${it.unread ? 'font-semibold' : ''}`}>{it.title}</span>
-                        </span>
-                        <span className="text-xs text-brand-muted shrink-0">{it.detail}</span>
-                      </Link>
-                    ))}
-                    {c.next_appointment && (
-                      <Link
-                        to={`/professional/cases/${c.case_id}?tab=appointments`}
-                        className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3 py-2 no-underline hover:border-accent/40"
-                      >
-                        <span className="text-sm text-navy">📅 {c.next_appointment.title}</span>
-                        <span className="text-xs text-brand-muted">{fmtAppt(c.next_appointment.start_at)}</span>
-                      </Link>
                     )}
                   </div>
-                </details>
-              ))}
+                )
+              })}
             </div>
           </>
         )}

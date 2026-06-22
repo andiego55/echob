@@ -25,6 +25,7 @@ export interface DashboardItem {
   detail: string
   unread: boolean
   tab: string
+  at: string | null
 }
 export interface DashboardCase {
   case_id: string
