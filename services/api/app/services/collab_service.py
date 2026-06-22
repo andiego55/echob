@@ -95,9 +95,13 @@ async def list_assignments_for_case(conn, *, professional_user_id, case_id) -> l
 
 
 async def list_assignments_for_user(conn, *, user_id) -> list[dict]:
+    # unread = es gibt Aktivität (Erstellen/Profi-Nachricht) nach dem letzten Lesen.
+    # Ungelesenes zuerst, damit Neues im Postfach sofort oben steht.
     rows = await conn.fetch(
-        "SELECT * FROM professional_assignments "
-        "WHERE user_id = $1 AND status NOT IN ('draft', 'dismissed') ORDER BY created_at DESC",
+        "SELECT *, (updated_at > COALESCE(user_read_at, 'epoch'::timestamptz)) AS unread "
+        "FROM professional_assignments "
+        "WHERE user_id = $1 AND status NOT IN ('draft', 'dismissed') "
+        "ORDER BY unread DESC, created_at DESC",
         user_id,
     )
     return [_assignment_user(r) for r in rows]
@@ -138,7 +142,7 @@ async def mark_assignment_seen(conn, *, user_id, assignment_id) -> dict | None:
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
         "SET status = CASE WHEN status = 'sent' THEN 'seen' ELSE status END, "
-        "    seen_at = COALESCE(seen_at, NOW()), updated_at = NOW() "
+        "    seen_at = COALESCE(seen_at, NOW()), user_read_at = NOW(), updated_at = NOW() "
         "WHERE id = $1 AND user_id = $2 RETURNING *",
         assignment_id, user_id,
     )
@@ -194,7 +198,7 @@ async def submit_assignment_response(conn, *, user_id, assignment_id, response) 
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
         "SET response = $3::jsonb, responded_at = NOW(), status = 'completed', "
-        "    completed_at = NOW(), updated_at = NOW() "
+        "    completed_at = NOW(), user_read_at = NOW(), updated_at = NOW() "
         "WHERE id = $1 AND user_id = $2 RETURNING *",
         assignment_id, user_id, json.dumps(_enc(enriched)),
     )
@@ -227,7 +231,7 @@ async def append_message_from_user(conn, *, user_id, assignment_id, text) -> dic
     row = await conn.fetchrow(
         "UPDATE professional_assignments "
         "SET payload = $3::jsonb, status = 'in_progress', "
-        "    seen_at = COALESCE(seen_at, NOW()), updated_at = NOW() "
+        "    seen_at = COALESCE(seen_at, NOW()), user_read_at = NOW(), updated_at = NOW() "
         "WHERE id = $1 AND user_id = $2 RETURNING *",
         assignment_id, user_id, json.dumps(_enc(new_payload)),
     )
@@ -524,7 +528,7 @@ async def submit_dialog_summary(conn, *, user_id, assignment_id, summary, note) 
     out = await conn.fetchrow(
         "UPDATE professional_assignments "
         "SET response = $3::jsonb, responded_at = NOW(), status = 'completed', "
-        "    completed_at = NOW(), updated_at = NOW() "
+        "    completed_at = NOW(), user_read_at = NOW(), updated_at = NOW() "
         "WHERE id = $1 AND user_id = $2 RETURNING *",
         assignment_id, user_id, json.dumps(_enc(resp)),
     )

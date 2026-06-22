@@ -4,7 +4,9 @@
  * Kein Sidebar in MVP – das kommt mit Phase 2.
  */
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
+import { collabApi } from '@/api/collab'
 import QuickExitButton from '@/components/app/QuickExit'
 
 interface Props {
@@ -14,6 +16,12 @@ interface Props {
 export default function AppShell({ children }: Props) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const { data: inboxUnread = 0 } = useQuery({
+    queryKey: ['inbox'],
+    queryFn: collabApi.inbox,
+    select: d => d.assignments.filter(a => a.unread).length,
+    staleTime: 30_000,
+  })
 
   const handleSignOut = async () => {
     await signOut()
@@ -53,6 +61,11 @@ export default function AppShell({ children }: Props) {
                 }
               >
                 {label}
+                {to === '/app/inbox' && inboxUnread > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-accent text-white text-[10px] font-bold align-middle">
+                    {inboxUnread}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>

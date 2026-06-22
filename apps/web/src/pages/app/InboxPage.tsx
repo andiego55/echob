@@ -33,6 +33,7 @@ export default function InboxPage() {
   const assignments = data?.assignments ?? []
   const appointments = data?.appointments ?? []
   const isEmpty = !isLoading && assignments.length === 0 && appointments.length === 0
+  const unreadCount = assignments.filter(a => a.unread).length
 
   return (
     <AppShell>
@@ -66,7 +67,14 @@ export default function InboxPage() {
 
         {assignments.length > 0 && (
           <section className="mt-8">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted mb-3">Aufgaben & Nachrichten</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted mb-3 flex items-center gap-2">
+              Aufgaben & Nachrichten
+              {unreadCount > 0 && (
+                <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-accent text-white text-[11px] font-bold normal-case tracking-normal">
+                  {unreadCount} neu
+                </span>
+              )}
+            </h2>
             <div className="space-y-3">
               {assignments.map(a => <AssignmentCard key={a.id} item={a} />)}
             </div>
@@ -133,9 +141,17 @@ function AssignmentCard({ item }: { item: Assignment }) {
   })
 
   return (
-    <div className="card">
+    <div className={`card ${item.unread ? 'border-accent bg-accent/[0.03]' : ''}`}>
       <div className="flex items-center justify-between gap-3 mb-1">
-        <span className="text-sm font-semibold text-navy">{meta.icon} {item.title || meta.label}</span>
+        <span className="flex items-center gap-2 min-w-0">
+          {item.unread && <span className="w-2 h-2 rounded-full bg-accent shrink-0" aria-label="ungelesen" />}
+          <span className={`text-sm text-navy truncate ${item.unread ? 'font-bold' : 'font-semibold'}`}>
+            {meta.icon} {item.title || meta.label}
+          </span>
+          {item.unread && (
+            <span className="text-[10px] font-bold uppercase tracking-wide text-accent bg-accent/10 px-1.5 py-0.5 rounded shrink-0">Neu</span>
+          )}
+        </span>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-[11px] uppercase tracking-wide text-brand-muted">{meta.label}</span>
           <button
@@ -208,9 +224,9 @@ function AssignmentCard({ item }: { item: Assignment }) {
         )
       })()}
 
-      {item.status === 'sent' && item.type !== 'questionnaire' && (
+      {item.unread && (
         <button onClick={() => seen.mutate()} disabled={seen.isPending}
-          className="mt-3 text-xs text-brand-muted hover:text-navy">Als gelesen markieren</button>
+          className="mt-3 text-xs text-accent hover:underline">Als gelesen markieren</button>
       )}
     </div>
   )

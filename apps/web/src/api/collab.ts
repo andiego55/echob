@@ -12,6 +12,7 @@ export interface Assignment {
   response: Record<string, unknown> | null
   due_at: string | null
   created_at: string
+  unread?: boolean
 }
 
 export interface Appointment {

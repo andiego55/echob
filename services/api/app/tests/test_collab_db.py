@@ -224,6 +224,40 @@ async def test_mark_assignment_read(db):
         "SELECT pro_read_at FROM professional_assignments WHERE id=$1", a["id"]) is None
 
 
+async def test_user_inbox_unread_tracks_pro_activity(db):
+    owner, pro, case_id = await _case_with_share(db)
+    a = await collab_service.create_assignment(
+        db, professional_user_id=pro, case_id=case_id, type="message",
+        title="Hi", payload={"body": "Erste"})
+
+    def _unread(lst):
+        return next(x for x in lst if x["id"] == a["id"])["unread"]
+
+    lst = await collab_service.list_assignments_for_user(db, user_id=owner)
+    assert _unread(lst) is True             # neu zugewiesen → ungelesen
+
+    await collab_service.mark_assignment_seen(db, user_id=owner, assignment_id=a["id"])
+    lst = await collab_service.list_assignments_for_user(db, user_id=owner)
+    assert _unread(lst) is False            # gelesen
+
+    # In einer Test-Transaktion ist NOW() konstant; Lese-/Update-Zeit künstlich
+    # zurückdatieren, damit eine spätere Profi-Nachricht als „neuer" zählt.
+    await db.execute(
+        "UPDATE professional_assignments "
+        "SET user_read_at = NOW() - interval '1 hour', updated_at = NOW() - interval '1 hour' "
+        "WHERE id = $1", a["id"])
+
+    await collab_service.append_message_from_pro(
+        db, professional_user_id=pro, case_id=case_id, assignment_id=a["id"], text="Antwort")
+    lst = await collab_service.list_assignments_for_user(db, user_id=owner)
+    assert _unread(lst) is True             # Profi-Nachricht nach Lesen → wieder ungelesen
+
+    await collab_service.append_message_from_user(
+        db, user_id=owner, assignment_id=a["id"], text="Danke")
+    lst = await collab_service.list_assignments_for_user(db, user_id=owner)
+    assert _unread(lst) is False            # eigene Antwort → gelesen
+
+
 async def test_dashboard_cross_case_queries(db):
     owner, pro, case_id = await _case_with_share(db)
     await collab_service.create_assignment(
