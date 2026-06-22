@@ -16,6 +16,12 @@ import { isValidQuestion, type Answer, type Question } from '@/lib/questionnaire
 const inputCls =
   'w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent'
 
+const DIALOG_PLACEHOLDER = `Worum geht es? Was soll Echo mit der Klient:in erkunden – und worauf achten? Dieser Rahmen steuert Echo im Dialog (er darf ruhig ausführlich sein).
+
+Beispiel:
+Thema: Umgang mit Schuldgefühlen nach einem Streit.
+Echo soll behutsam erkunden, wie sich die Schuld anfühlt und woran die Klient:in sie festmacht – ohne zu bewerten oder Ratschläge zu geben. Auf Selbstabwertung achten und sanft spiegeln. Am Ende offen lassen, kein Lösungsdruck.`
+
 function fmt(dt: string) {
   return new Date(dt).toLocaleString('de-DE', {
     day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
@@ -60,6 +66,7 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
   const [url, setUrl] = useState('')
   const [questions, setQuestions] = useState<Question[]>([])
   const [due, setDue] = useState('')
+  const [keywords, setKeywords] = useState('')
 
   const create = useMutation({
     mutationFn: () => {
@@ -68,6 +75,8 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
       if (type === 'dialog') {
         payload.intention = content
         if (hypothesis.trim()) payload.hypothesis_for_echo = hypothesis
+        const kw = keywords.split(/[\n,]/).map(s => s.trim()).filter(Boolean)
+        if (kw.length) payload.keywords = kw
       }
       if (type === 'questionnaire') {
         payload.intro = content
@@ -84,7 +93,8 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
       })
     },
     onSuccess: () => {
-      setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions([]); setDue(''); invalidate()
+      setTitle(''); setContent(''); setHypothesis(''); setUrl(''); setQuestions([])
+      setDue(''); setKeywords(''); invalidate()
     },
   })
   const proReply = useMutation({
@@ -114,10 +124,16 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
         <p className="text-xs text-brand-muted mb-3">{meta.intro}</p>
         <form onSubmit={e => { e.preventDefault(); if (canSubmit) create.mutate() }} className="space-y-2.5">
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Titel (optional)" className={inputCls} />
-          <textarea value={content} onChange={e => setContent(e.target.value)} rows={3} placeholder={meta.contentLabel} className={inputCls} />
+          <textarea value={content} onChange={e => setContent(e.target.value)}
+            rows={type === 'dialog' ? 7 : 3}
+            placeholder={type === 'dialog' ? DIALOG_PLACEHOLDER : meta.contentLabel} className={inputCls} />
           {type === 'dialog' && (
             <input value={hypothesis} onChange={e => setHypothesis(e.target.value)}
               placeholder="Interne Hypothese für Echo (optional, nicht sichtbar für Klient:in)" className={inputCls} />
+          )}
+          {type === 'dialog' && (
+            <textarea value={keywords} onChange={e => setKeywords(e.target.value)} rows={2}
+              placeholder="Stichworte – eine pro Zeile. Die Klient:in kann sie im Dialog anklicken (optional)." className={inputCls} />
           )}
           {type === 'resource' && (
             <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Link (optional)" className={inputCls} />

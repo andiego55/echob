@@ -432,6 +432,8 @@ async def start_assignment_dialog(
             conn, user_id=user_id, assignment_id=body.assignment_id)
         if not dlg:
             raise HTTPException(status_code=404, detail="Zugewiesener Dialog nicht gefunden.")
+        dlg_payload = dlg.get("payload") or {}
+        keywords = [str(k) for k in (dlg_payload.get("keywords") or []) if isinstance(k, str)]
 
         # Idempotenz: bereits gestartete Session wiederverwenden
         existing = (dlg.get("response") or {}).get("dialog_session_id")
@@ -447,10 +449,9 @@ async def start_assignment_dialog(
                     existing_uuid, case_id, user_id,
                 )
                 if still:
-                    return {"chat_session_id": str(existing_uuid)}
+                    return {"chat_session_id": str(existing_uuid), "keywords": keywords}
 
-        payload = dlg.get("payload") or {}
-        thema = dlg.get("title") or collab_service.assignment_topic(payload) or "dein Anliegen"
+        thema = dlg.get("title") or collab_service.assignment_topic(dlg_payload) or "dein Anliegen"
         title = f"Zugewiesen: {thema}"[:60]
         greeting = collab_service.build_assignment_greeting(thema)
 
@@ -469,7 +470,7 @@ async def start_assignment_dialog(
         await collab_service.set_dialog_session(
             conn, user_id=user_id, assignment_id=body.assignment_id, session_id=sid)
 
-    return {"chat_session_id": str(sid)}
+    return {"chat_session_id": str(sid), "keywords": keywords}
 
 
 class AssignmentSummaryRequest(BaseModel):

@@ -381,17 +381,25 @@ def build_assignment_steering(payload: dict) -> str:
         return ""
     lines = ["## Von der Fachperson vorbereiteter Dialog"]
     lines.append(
-        "_Eine Fachperson hat diesen Dialog vorbereitet. Richte deine Fragen sanft an "
-        "diesem Fokus aus, ohne ihn mechanisch abzuarbeiten._")
+        "Eine Fachperson hat diesen Dialog für die nutzende Person vorbereitet. Der folgende "
+        "Rahmen hat für diesen Dialog **Vorrang**: richte deine Fragen, deinen Fokus und deinen "
+        "Ton konsequent danach aus – ohne ihn mechanisch abzuarbeiten oder Stichpunkte vorzulesen.")
     if payload.get("topic"):
-        lines.append(f"**Thema:** {payload['topic']}")
+        lines.append(f"\n**Thema:** {payload['topic']}")
     if payload.get("intention"):
-        lines.append(f"**Anliegen der Fachperson:** {payload['intention']}")
+        # Kann sehr lang sein → als eigener, maßgeblicher Block (vollständig übernommen).
+        lines.append("\n**Vorbereitung der Fachperson (maßgeblich für diesen Dialog):**")
+        lines.append(str(payload["intention"]))
     if payload.get("guardrails"):
-        lines.append(f"**Leitplanken:** {payload['guardrails']}")
+        lines.append(f"\n**Leitplanken:** {payload['guardrails']}")
+    keywords = payload.get("keywords")
+    if isinstance(keywords, list):
+        kw = ", ".join(str(k).strip() for k in keywords if str(k).strip())
+        if kw:
+            lines.append(f"\n**Stichworte der Fachperson:** {kw}")
     if payload.get("hypothesis_for_echo"):
         lines.append(
-            "_Interne Arbeitshypothese (NUR fuer dich, niemals erwaehnen oder offenlegen):_ "
+            "\n_Interne Arbeitshypothese (NUR für dich, niemals erwähnen oder offenlegen):_ "
             f"{payload['hypothesis_for_echo']}")
     return "\n".join(lines)
 

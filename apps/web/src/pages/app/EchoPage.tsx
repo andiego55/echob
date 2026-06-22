@@ -54,6 +54,7 @@ export default function EchoPage() {
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const [showGlossary, setGlossary] = useState(false)
   const [threadType]                = useState<ThreadType>('topic')
+  const [keywords, setKeywords]     = useState<string[]>([])
 
   // undefined = noch nicht initialisiert, null = neuer (ungespeicherter) Chat
   const [selectedSession, setSelectedSession] = useState<string | null | undefined>(undefined)
@@ -79,10 +80,11 @@ export default function EchoPage() {
     if (!assignmentId || !caseId || assignmentStarted.current) return
     assignmentStarted.current = true
     echoApi.startAssignmentDialog(caseId, assignmentId)
-      .then(({ chat_session_id }) => {
-        setSelectedSession(chat_session_id)
+      .then((d) => {
+        setSelectedSession(d.chat_session_id)
+        setKeywords(d.keywords ?? [])
         qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
-        qc.invalidateQueries({ queryKey: ['echo-history', caseId, chat_session_id] })
+        qc.invalidateQueries({ queryKey: ['echo-history', caseId, d.chat_session_id] })
       })
       .catch(() => { assignmentStarted.current = false; setSelectedSession((s) => s ?? null) })
   }, [assignmentId, caseId, qc])
@@ -139,6 +141,12 @@ export default function EchoPage() {
 
   const handleTopic = (topic: string) => {
     const msg = `Ich möchte über folgendes Thema sprechen: ${topic}`
+    setPendingMessage(msg)
+    mutation.mutate({ message: msg })
+  }
+
+  const handleKeyword = (kw: string) => {
+    const msg = `Lass uns über „${kw}" sprechen.`
     setPendingMessage(msg)
     mutation.mutate({ message: msg })
   }
@@ -253,6 +261,24 @@ export default function EchoPage() {
 
           {/* Eingabe */}
           <div className="px-6 pb-5 pt-2">
+            {assignmentId && (
+              <div className="mx-auto max-w-[780px] mb-2">
+                <p className="text-[11px] text-brand-muted mb-1">
+                  Dieser Dialog wurde von deiner Fachperson vorbereitet – Echo richtet sich danach aus.
+                  {keywords.length > 0 && ' Tipp: Stichworte anklicken.'}
+                </p>
+                {keywords.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {keywords.map(kw => (
+                      <button key={kw} type="button" onClick={() => handleKeyword(kw)} disabled={mutation.isPending}
+                        className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-50">
+                        {kw}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <ChatComposer
               value={input}
               onChange={setInput}

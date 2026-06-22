@@ -15,7 +15,7 @@ export const echoApi = {
   // Zugewiesenen Dialog als eigene Session mit Begrüßung öffnen (idempotent)
   startAssignmentDialog: (caseId: string, assignmentId: string) =>
     apiClient
-      .post<{ chat_session_id: string }>(`/cases/${caseId}/echo/assignment-dialog`, {
+      .post<{ chat_session_id: string; keywords: string[] }>(`/cases/${caseId}/echo/assignment-dialog`, {
         assignment_id: assignmentId,
       })
       .then(r => r.data),
