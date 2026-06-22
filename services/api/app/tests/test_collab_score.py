@@ -2,6 +2,7 @@
 from app.services.collab_service import (
     assignment_topic,
     build_assignment_greeting,
+    build_collaboration_context,
     compute_questionnaire_score,
 )
 
@@ -53,3 +54,19 @@ def test_build_assignment_greeting_mentions_topic_and_fachperson():
     g = build_assignment_greeting("Grenzen setzen")
     assert "Grenzen setzen" in g
     assert "Fachperson" in g
+
+
+def test_build_collaboration_context():
+    out = build_collaboration_context(
+        assignments=[
+            {"type": "dialog", "title": "Grenzen", "status": "completed",
+             "response": {"summary": "ZF-TEXT", "note": "NOTE-X"}, "payload": {}},
+            {"type": "questionnaire", "title": "Belastung", "status": "completed",
+             "response": {"score": 3.4}, "payload": {}},
+        ],
+        appointments=[{"title": "Erstgespräch", "status": "confirmed"}],
+    )
+    assert "Grenzen" in out and "ZF-TEXT" in out and "NOTE-X" in out
+    assert "Belastung" in out and "3.4" in out
+    assert "Erstgespräch" in out
+    assert build_collaboration_context([], []) == ""        # leer → leer

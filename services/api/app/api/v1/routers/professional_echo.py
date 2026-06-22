@@ -22,6 +22,7 @@ from app.schemas.professional import (
     ProfessionalEchoSummaryCreate,
     ProfessionalEchoSummaryResponse,
 )
+from app.services import collab_service
 from app.services.sharing_service import (
     build_shared_case_context,
     load_shared_bundle,
@@ -45,6 +46,31 @@ def _msg_response(row) -> ProfessionalEchoMessageResponse:
         content=crypto.decrypt(row["content"]), thread_type=row["thread_type"],
         glossary_slug=row["glossary_slug"], created_at=row["created_at"],
     )
+
+
+_NOTE_FIELDS = (
+    "first_impressions", "key_scenes", "open_questions",
+    "conversation_prompts", "next_steps", "free_text",
+)
+_NOTE_LABELS = {
+    "first_impressions": "Erste Eindrücke",
+    "key_scenes": "Wichtige Szenen",
+    "open_questions": "Offene Fragen",
+    "conversation_prompts": "Gesprächsimpulse",
+    "next_steps": "Nächste Schritte",
+    "free_text": "Freitext",
+}
+
+
+def _build_notes_context(note: dict | None) -> str:
+    """Eigene Notizen der Fachperson für den Echo-Kontext (Echo soll sie kennen)."""
+    if not note:
+        return ""
+    parts = [
+        f"**{_NOTE_LABELS[k]}:** {(note.get(k) or '').strip()}"
+        for k in _NOTE_FIELDS if (note.get(k) or "").strip()
+    ]
+    return "## Deine Notizen zu diesem Fall\n" + "\n".join(parts) if parts else ""
 
 
 @router.post("/chat", response_model=ProfessionalEchoChatResponse)
@@ -84,12 +110,32 @@ async def chat(
             "WHERE session_id = $1 ORDER BY created_at DESC LIMIT 20",
             session_id,
         )
+        note_row = await conn.fetchrow(
+            "SELECT * FROM professional_notes WHERE professional_user_id = $1 AND case_id = $2",
+            pid, case_id,
+        )
+        assignments = await collab_service.list_assignments_for_case(
+            conn, professional_user_id=pid, case_id=case_id)
+        appointments = await collab_service.list_appointments_for_case(
+            conn, professional_user_id=pid, case_id=case_id)
 
     history = [
         {"role": r["role"], "content": crypto.decrypt(r["content"])}
         for r in reversed(history_rows)
     ]
+    note = (
+        crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
+        if note_row else None
+    )
     shared_context = build_shared_case_context(bundle)
+    extras = [
+        s for s in (
+            _build_notes_context(note),
+            collab_service.build_collaboration_context(assignments, appointments),
+        ) if s
+    ]
+    if extras:
+        shared_context = shared_context + "\n\n" + "\n\n".join(extras)
 
     glossary_term = glossary_definition = None
     if body.thread_type == "glossary" and body.glossary_slug:

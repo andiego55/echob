@@ -404,6 +404,44 @@ def build_assignment_steering(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def build_collaboration_context(assignments: list[dict], appointments: list[dict]) -> str:
+    """Vorgänge eines Falls (Zuweisungen + Termine) fürs Profi-Echo – damit Echo über
+    alles informiert ist, was mit dem Fall passiert ist (Zusammenfassungen, Scores, …)."""
+    lines: list[str] = []
+    if assignments:
+        lines.append("## Vorgänge in diesem Fall (von dir zugewiesen)")
+        for a in assignments:
+            t = a.get("type")
+            title = a.get("title") or t
+            status = a.get("status")
+            resp = a.get("response") if isinstance(a.get("response"), dict) else {}
+            payload = a.get("payload") if isinstance(a.get("payload"), dict) else {}
+            if t == "dialog":
+                bits = [f"Dialog „{title}“ (Status: {status})"]
+                if resp.get("summary"):
+                    bits.append(f"Zusammenfassung der Klient:in: {resp['summary']}")
+                if resp.get("note"):
+                    bits.append(f"Notiz der Klient:in: {resp['note']}")
+                lines.append("- " + " — ".join(bits))
+            elif t == "questionnaire":
+                score = resp.get("score")
+                suffix = f", Ø {score}" if score is not None else ""
+                lines.append(f"- Fragebogen „{title}“ (Status: {status}{suffix})")
+            elif t == "message":
+                thread = payload.get("thread") or []
+                last = thread[-1] if thread else None
+                from_user = isinstance(last, dict) and last.get("from") == "user"
+                who = "Klient:in zuletzt" if from_user else "du zuletzt"
+                lines.append(f"- Nachricht „{title}“ (Status: {status}, {who})")
+            elif t == "resource":
+                lines.append(f"- Ressource „{title}“")
+    if appointments:
+        lines.append("\n## Termine in diesem Fall")
+        for ap in appointments:
+            lines.append(f"- {ap.get('title') or 'Termin'} (Status: {ap.get('status')})")
+    return "\n".join(lines)
+
+
 async def get_dialog_for_echo(conn, *, user_id, assignment_id) -> dict | None:
     """Lädt eine dem Nutzer zugewiesene Dialog-Zuweisung INKL. interner Felder (für Echo)
     und markiert sie als in_progress. None, wenn nicht vorhanden / nicht Typ dialog."""
