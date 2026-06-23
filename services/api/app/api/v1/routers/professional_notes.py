@@ -23,6 +23,7 @@ from app.schemas.professional import (
     SessionNoteCreate,
     SessionNoteUpdate,
 )
+from app.services import seat_service
 from app.services.pro_note_templates import BUILTIN_NOTE_TEMPLATES
 from app.services.sharing_service import require_active_share
 
@@ -160,6 +161,7 @@ async def create_session_note(
     content_json = json.dumps(crypto.encrypt_json_strings({"sections": body.sections}))
     async with pool.acquire() as conn:
         await require_active_share(pid, case_id, conn)
+        await seat_service.assert_case_workable(case_id, current, conn)
         count = await conn.fetchval(
             "SELECT COUNT(*) FROM professional_session_notes "
             "WHERE professional_user_id = $1 AND case_id = $2",
@@ -187,6 +189,7 @@ async def update_session_note(
     pid = current["user_id"]
     async with pool.acquire() as conn:
         await require_active_share(pid, case_id, conn)
+        await seat_service.assert_case_workable(case_id, current, conn)
         row = await conn.fetchrow(
             "SELECT * FROM professional_session_notes "
             "WHERE id = $1 AND professional_user_id = $2 AND case_id = $3",

@@ -63,6 +63,10 @@ class Settings(BaseSettings):
     stripe_price_early_bird: str = ""
     stripe_price_regular: str = ""
     stripe_price_annual: str = ""
+    # Org-Tarife (Praxis) — optional, sonst inline
+    stripe_price_pro_solo: str = ""
+    stripe_price_pro_praxis: str = ""
+    stripe_price_pro_institut: str = ""
     # Basis-URL des Frontends für Checkout-Redirects
     frontend_url: str = "http://localhost:5173"
 

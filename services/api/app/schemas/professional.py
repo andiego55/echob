@@ -366,3 +366,19 @@ class OrgMemberInvite(BaseModel):
 
 class OrgRoleUpdate(BaseModel):
     role: Literal["admin", "member"]        # owner-Rolle nicht über diesen Weg setzbar
+
+
+# ── Org-Abrechnung (Phase 3) ──────────────────────────────────────────────────
+
+class OrgCheckoutRequest(BaseModel):
+    tier: Literal["solo", "praxis", "institut"]
+
+
+class OrgBillingStatus(BaseModel):
+    plan: str                               # free/solo/praxis/institut
+    status: str | None                      # Stripe-Abo-Status
+    subscription_active: bool               # active/trialing
+    active_cases: int                       # aktivierte (nicht-Demo) Sitze der Org
+    included: int                           # Inklusiv-Kontingent des Tarifs
+    role: OrgRole
+    configured: bool                        # Stripe verfügbar?

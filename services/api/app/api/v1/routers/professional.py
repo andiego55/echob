@@ -24,7 +24,7 @@ from app.schemas.professional import (
     ProfessionalProfileResponse,
     ProfessionalRegister,
 )
-from app.services import collab_service
+from app.services import collab_service, seat_service
 from app.services.demo_service import ensure_demo_for_professional
 from app.services.echo_service import _REL_TYPE_LABELS
 from app.services.org_service import ensure_org_for_professional
@@ -572,6 +572,7 @@ async def save_notes(
     pid = current["user_id"]
     async with pool.acquire() as conn:
         await require_active_share(pid, case_id, conn)
+        await seat_service.assert_case_workable(case_id, current, conn)
         row = await conn.fetchrow(
             """
             INSERT INTO professional_notes

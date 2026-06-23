@@ -16,7 +16,7 @@ from app.schemas.collab import (
     MessageSend,
     TemplateShare,
 )
-from app.services import collab_service
+from app.services import collab_service, seat_service
 
 router = APIRouter(prefix="/professional/cases/{case_id}", tags=["professional-collab"])
 
@@ -29,6 +29,7 @@ async def create_assignment(
     pool=Depends(get_pool),
 ) -> dict:
     async with pool.acquire() as conn:
+        await seat_service.assert_case_workable(case_id, current, conn)
         return await collab_service.create_assignment(
             conn, professional_user_id=current["user_id"], case_id=case_id,
             type=body.type, title=body.title, payload=body.payload,
@@ -45,6 +46,7 @@ async def share_template(
 ) -> dict:
     """Teilt eine Bibliotheks-Vorlage mit dem Fall (erzeugt eine Zuweisung daraus)."""
     async with pool.acquire() as conn:
+        await seat_service.assert_case_workable(case_id, current, conn)
         out = await collab_service.share_template(
             conn, professional_user_id=current["user_id"], case_id=case_id,
             template_id=body.template_id)
@@ -74,6 +76,7 @@ async def reply_message(
 ) -> dict:
     """Antwort der Fachperson im Nachrichten-Thread (hinter aktiver Freigabe)."""
     async with pool.acquire() as conn:
+        await seat_service.assert_case_workable(case_id, current, conn)
         out = await collab_service.append_message_from_pro(
             conn, professional_user_id=current["user_id"], case_id=case_id,
             assignment_id=assignment_id, text=body.text)
@@ -90,6 +93,7 @@ async def create_appointment(
     pool=Depends(get_pool),
 ) -> dict:
     async with pool.acquire() as conn:
+        await seat_service.assert_case_workable(case_id, current, conn)
         return await collab_service.create_appointment(
             conn, professional_user_id=current["user_id"], case_id=case_id,
             title=body.title, payload=body.payload, start_at=body.start_at, end_at=body.end_at)

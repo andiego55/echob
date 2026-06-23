@@ -32,7 +32,7 @@ from app.schemas.professional import (
     ProReportTemplateCreate,
     ProReportTemplateUpdate,
 )
-from app.services import collab_service
+from app.services import collab_service, seat_service
 from app.services.hypothesis_service import build_hypothesis_context
 from app.services.pro_report_templates import get_standard
 from app.services.sharing_service import (
@@ -220,6 +220,7 @@ async def create_report(
     # 2) Daten laden (kurz halten — LLM-Aufruf danach ohne gehaltene Verbindung)
     async with pool.acquire() as conn:
         bundle = await load_shared_bundle(pid, case_id, conn)   # 404 ohne aktive Freigabe
+        await seat_service.assert_case_workable(case_id, current, conn)  # Gating (Demo frei)
         count = await conn.fetchval(
             "SELECT COUNT(*) FROM professional_reports "
             "WHERE professional_user_id = $1 AND case_id = $2",

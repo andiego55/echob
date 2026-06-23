@@ -258,6 +258,12 @@ async def handle_event(event, pool) -> None:
     etype = event["type"]
     obj = event["data"]["object"]
 
+    # Org-Abos (Praxis) tragen metadata.org_id → separat verarbeiten.
+    if (obj.get("metadata") or {}).get("org_id"):
+        from app.services import pro_billing_service
+        await pro_billing_service.handle_org_subscription_event(event, pool)
+        return
+
     if etype == "checkout.session.completed":
         await fulfill_checkout_session(obj, pool)
 

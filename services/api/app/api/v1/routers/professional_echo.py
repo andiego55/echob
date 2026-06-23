@@ -27,7 +27,7 @@ from app.schemas.professional import (
     ProfessionalEchoSummaryResponse,
     ProfessionalEchoSummaryUpdate,
 )
-from app.services import collab_service, echo_modes
+from app.services import collab_service, echo_modes, seat_service
 from app.services.sharing_service import (
     build_shared_case_context,
     load_shared_bundle,
@@ -92,6 +92,7 @@ async def chat(
     async with pool.acquire() as conn:
         await enforce_professional_echo_limit(pid, conn)
         bundle = await load_shared_bundle(pid, case_id, conn)   # 404, wenn keine aktive Freigabe
+        await seat_service.assert_case_workable(case_id, current, conn)  # Gating (Demo frei)
 
         if body.session_id:
             session = await conn.fetchrow(
