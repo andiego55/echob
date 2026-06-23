@@ -543,6 +543,7 @@ async def case_detail(
         "client_display_name": (owner_row["display_name"] if owner_row else None) or "Klient:in",
         "case_title": _case_title(bundle.case.get("relationship_type") if bundle.case else None),
         "is_demo": bool(bundle.share.get("is_demo")),
+        "activated": bool(bundle.share.get("activated_at")),
         "allowed": sorted(bundle.allowed),
         "case": _public_row(bundle.case),
         "onboarding": _public_row(bundle.onboarding, ("pattern_hypotheses",)),
