@@ -88,8 +88,105 @@ export default function ProfessionalSettingsPage() {
         </div>
 
         <PracticeSection />
+        <BillingSection />
       </div>
     </ProfessionalShell>
+  )
+}
+
+/** Abrechnung: Tarif/Status, aktive Fälle, Checkout/Portal (nur owner/admin). */
+function BillingSection() {
+  const qc = useQueryClient()
+  const { data: billing } = useQuery({ queryKey: ['pro-billing'], queryFn: professionalApi.orgBilling })
+
+  // Rückkehr vom Checkout (?billing=success&session_id=) → verifizieren.
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search)
+    if (p.get('billing') === 'success' && p.get('session_id')) {
+      professionalApi.orgBillingVerify(p.get('session_id')!).finally(() => {
+        qc.invalidateQueries({ queryKey: ['pro-billing'] })
+        window.history.replaceState({}, '', '/professional/settings')
+      })
+    }
+  }, [qc])
+
+  const checkout = useMutation({
+    mutationFn: (tier: 'solo' | 'praxis' | 'institut') => professionalApi.orgBillingCheckout(tier),
+    onSuccess: (r) => { window.location.href = r.url },
+  })
+  const portal = useMutation({
+    mutationFn: () => professionalApi.orgBillingPortal(),
+    onSuccess: (r) => { window.location.href = r.url },
+  })
+
+  if (!billing) return null
+  const isAdmin = billing.role === 'owner' || billing.role === 'admin'
+  const PLAN_LABELS: Record<string, string> = {
+    free: 'Kostenlos', solo: 'Solo', praxis: 'Praxis', institut: 'Institut',
+  }
+  const planLabel = PLAN_LABELS[billing.plan] ?? billing.plan
+  const tiers = [
+    { key: 'solo', name: 'Solo', price: '59 €', cases: '1 Fall' },
+    { key: 'praxis', name: 'Praxis', price: '149 €', cases: '5 Fälle' },
+    { key: 'institut', name: 'Institut', price: '249 €', cases: '10 Fälle' },
+  ] as const
+
+  return (
+    <div className="mt-8 card">
+      <h2 className="text-lg font-semibold text-navy">Abrechnung</h2>
+      <p className="mt-1 text-sm text-brand-muted">
+        Profi-Werkzeuge (Echo, Berichte, Notizen) je aktivem Fall. Der Beispielfall ist immer frei.
+      </p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
+        <div>
+          <span className="text-brand-muted">Tarif:</span> <span className="font-semibold text-navy">{planLabel}</span>
+          {billing.status && <span className="ml-1 text-xs text-brand-muted">({billing.status})</span>}
+        </div>
+        <div>
+          <span className="text-brand-muted">Aktive Fälle:</span>{' '}
+          <span className="font-semibold text-navy">{billing.active_cases}/{billing.included}</span>
+        </div>
+      </div>
+
+      {!billing.configured && (
+        <p className="mt-3 text-xs text-amber-700">Zahlungen sind derzeit nicht verfügbar.</p>
+      )}
+
+      {isAdmin && billing.configured && (
+        <>
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            {tiers.map(t => (
+              <div key={t.key}
+                className={`rounded-brand border px-3 py-2.5 ${billing.plan === t.key ? 'border-accent bg-accent/5' : 'border-brand-border'}`}>
+                <div className="text-sm font-semibold text-navy">{t.name}</div>
+                <div className="text-lg font-bold text-navy">
+                  {t.price}<span className="text-xs font-normal text-brand-muted">/Mt</span>
+                </div>
+                <div className="text-[11px] text-brand-muted">{t.cases} · 14 Tage gratis</div>
+                {billing.plan === t.key ? (
+                  <div className="mt-1.5 text-[11px] font-semibold text-accent">Aktiv</div>
+                ) : (
+                  <button onClick={() => checkout.mutate(t.key)} disabled={checkout.isPending}
+                    className="mt-1.5 text-xs font-semibold px-2.5 py-1 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+                    {billing.subscription_active ? 'Wechseln' : 'Wählen'}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          {billing.subscription_active && (
+            <button onClick={() => portal.mutate()} disabled={portal.isPending}
+              className="mt-4 text-sm text-brand-muted hover:text-accent">
+              Abrechnung verwalten / kündigen →
+            </button>
+          )}
+        </>
+      )}
+      {!isAdmin && (
+        <p className="mt-3 text-xs text-brand-muted">Nur Inhaber:in/Admin verwaltet die Abrechnung.</p>
+      )}
+    </div>
   )
 }
 

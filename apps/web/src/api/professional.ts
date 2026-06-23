@@ -16,6 +16,7 @@ import type {
   SessionNote,
   Organization,
   OrgInvite,
+  OrgBillingStatus,
 } from '@/types'
 
 interface EchoChatResult {
@@ -258,4 +259,20 @@ export const professionalApi = {
     apiClient.get<OrgInvite[]>('/professional/org/invites').then(r => r.data),
   orgInviteAccept: (inviteId: string) =>
     apiClient.post<Organization>(`/professional/org/invites/${inviteId}/accept`).then(r => r.data),
+
+  // Org-Abrechnung + Fall-Aktivierung (Sitze)
+  orgBilling: () =>
+    apiClient.get<OrgBillingStatus>('/professional/org/billing').then(r => r.data),
+  orgBillingCheckout: (tier: 'solo' | 'praxis' | 'institut') =>
+    apiClient.post<{ url: string }>('/professional/org/billing/checkout', { tier }).then(r => r.data),
+  orgBillingVerify: (session_id: string) =>
+    apiClient
+      .post<{ activated: boolean; plan: string | null }>('/professional/org/billing/checkout/verify', { session_id })
+      .then(r => r.data),
+  orgBillingPortal: () =>
+    apiClient.post<{ url: string }>('/professional/org/billing/portal').then(r => r.data),
+  caseActivate: (caseId: string) =>
+    apiClient.post(`/professional/cases/${caseId}/activate`).then(r => r.data),
+  caseDeactivate: (caseId: string) =>
+    apiClient.delete(`/professional/cases/${caseId}/activate`).then(r => r.data),
 }

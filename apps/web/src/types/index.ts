@@ -593,12 +593,23 @@ export interface OrgInvite {
   created_at: string
 }
 
+export interface OrgBillingStatus {
+  plan: string                 // free/solo/praxis/institut
+  status: string | null
+  subscription_active: boolean
+  active_cases: number
+  included: number
+  role: OrgRole
+  configured: boolean
+}
+
 /** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */
 export interface SharedCaseBundle {
   case_id: string
   client_display_name: string
   case_title: string
   is_demo?: boolean
+  activated?: boolean
   allowed: ShareElementType[]
   case: Case | null
   onboarding: (OnboardingAnswers & { distress_score?: number | null; safety_status?: string | null; person_name?: string | null }) | null

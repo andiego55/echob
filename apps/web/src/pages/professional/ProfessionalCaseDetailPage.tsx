@@ -86,6 +86,50 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
+/** Gate für nicht-aktivierte (nicht-Demo) Fälle: Fall aktivieren (Sitz) oder Abo/Upgrade. */
+function CaseActivationGate({ caseId }: { caseId: string }) {
+  const qc = useQueryClient()
+  const [err, setErr] = useState<string | null>(null)
+  const activate = useMutation({
+    mutationFn: () => professionalApi.caseActivate(caseId),
+    onSuccess: () => { setErr(null); qc.invalidateQueries({ queryKey: ['prof-case', caseId] }) },
+    onError: (e) => {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      setErr(detail ?? 'ERROR')
+    },
+  })
+  const msg = err === 'PLAN_REQUIRED'
+    ? 'Dafür ist ein aktives Praxis-Abo nötig.'
+    : err === 'UPGRADE_REQUIRED'
+      ? 'Das Fall-Kontingent Ihres Tarifs ist erreicht — bitte upgraden.'
+      : err
+        ? 'Aktivierung fehlgeschlagen.'
+        : null
+
+  return (
+    <div className="mb-6 rounded-brand border border-amber-200 bg-amber-50 px-4 py-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-amber-900">Fall nicht aktiviert</p>
+          <p className="mt-0.5 text-xs text-amber-800">
+            Aktivieren Sie diesen Fall, um die Werkzeuge (Echo, Berichte, Notizen) zu nutzen.
+            Er zählt dann als aktiver Fall Ihres Tarifs.
+          </p>
+          {msg && (
+            <p className="mt-1 text-xs text-red-700">
+              {msg} <Link to="/professional/settings" className="underline">Zur Abrechnung</Link>
+            </p>
+          )}
+        </div>
+        <button onClick={() => activate.mutate()} disabled={activate.isPending}
+          className="shrink-0 text-sm font-semibold px-4 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+          {activate.isPending ? 'Aktiviere …' : 'Fall aktivieren'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 /** Hinweis + Schnellstart-Checkliste für den fiktiven Beispielfall (Spielwiese). */
 function DemoIntro({ onGoto }: { onGoto: (t: TabKey) => void }) {
   const [dismissed, setDismissed] = useState(
@@ -251,6 +295,7 @@ export default function ProfessionalCaseDetailPage() {
           <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
         </div>
         {bundle.is_demo && <DemoIntro onGoto={setTab} />}
+        {!bundle.is_demo && !bundle.activated && <CaseActivationGate caseId={caseId!} />}
 
         {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
         {tab === 'dialog' && <AssignmentTypePanel caseId={caseId!} type="dialog" />}
