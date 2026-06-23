@@ -12,6 +12,8 @@ import type {
   ProReportTemplate,
   ProfessionalReport,
   ProfessionalReportListItem,
+  NoteTemplate,
+  SessionNote,
 } from '@/types'
 
 interface EchoChatResult {
@@ -208,4 +210,33 @@ export const professionalApi = {
       .then(r => r.data),
   caseReportDelete: (caseId: string, reportId: string) =>
     apiClient.delete(`/professional/cases/${caseId}/reports/${reportId}`).then(r => r.data),
+
+  // Notiz-Vorlagen (eingebaute + eigene)
+  noteTemplates: () =>
+    apiClient.get<NoteTemplate[]>('/professional/note-templates').then(r => r.data),
+  noteTemplateCreate: (data: { name: string; fields: string[] }) =>
+    apiClient.post<NoteTemplate>('/professional/note-templates', data).then(r => r.data),
+  noteTemplateUpdate: (id: string, data: { name: string; fields: string[] }) =>
+    apiClient.patch<NoteTemplate>(`/professional/note-templates/${id}`, data).then(r => r.data),
+  noteTemplateDelete: (id: string) =>
+    apiClient.delete(`/professional/note-templates/${id}`).then(r => r.data),
+
+  // Sitzungsnotizen (Verlauf)
+  sessionNotes: (caseId: string) =>
+    apiClient.get<SessionNote[]>(`/professional/cases/${caseId}/session-notes`).then(r => r.data),
+  sessionNoteCreate: (
+    caseId: string,
+    data: { session_date?: string | null; title?: string | null; sections: { heading: string; text: string }[] },
+  ) =>
+    apiClient.post<SessionNote>(`/professional/cases/${caseId}/session-notes`, data).then(r => r.data),
+  sessionNoteUpdate: (
+    caseId: string,
+    noteId: string,
+    data: { session_date?: string | null; title?: string | null; sections?: { heading: string; text: string }[] },
+  ) =>
+    apiClient
+      .patch<SessionNote>(`/professional/cases/${caseId}/session-notes/${noteId}`, data)
+      .then(r => r.data),
+  sessionNoteDelete: (caseId: string, noteId: string) =>
+    apiClient.delete(`/professional/cases/${caseId}/session-notes/${noteId}`).then(r => r.data),
 }

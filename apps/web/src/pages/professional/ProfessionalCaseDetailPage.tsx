@@ -16,7 +16,9 @@ import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
 } from '@/types'
-import type { ProfessionalNote, SharedCaseBundle, ScaleKey, GlossaryTerm } from '@/types'
+import type {
+  ProfessionalNote, SharedCaseBundle, ScaleKey, GlossaryTerm, NoteTemplate, SessionNote,
+} from '@/types'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
 
@@ -219,7 +221,7 @@ export default function ProfessionalCaseDetailPage() {
           />
         )}
         {tab === 'reports' && <ReportsPanel caseId={caseId!} />}
-        {tab === 'notes' && <NotesEditor caseId={caseId!} initial={bundle.notes} />}
+        {tab === 'notes' && <NotesPanel caseId={caseId!} overview={bundle.notes} />}
         {tab === 'appointments' && <AppointmentsPanel caseId={caseId!} />}
       </div>
     </ProfessionalShell>
@@ -671,7 +673,39 @@ const NOTE_FIELDS: { key: keyof ProfessionalNote; label: string }[] = [
   { key: 'free_text', label: 'Freitext' },
 ]
 
-function NotesEditor({ caseId, initial }: { caseId: string; initial: ProfessionalNote | null }) {
+function fmtSessionDate(iso: string): string {
+  const d = new Date(iso)
+  return isNaN(d.getTime())
+    ? iso
+    : d.toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })
+}
+const todayISO = () => new Date().toISOString().slice(0, 10)
+
+/** Notizen-Reiter: Sitzungsverlauf (Hauptteil) + aufklappbarer dauerhafter Fallüberblick. */
+function NotesPanel({ caseId, overview }: { caseId: string; overview: ProfessionalNote | null }) {
+  return (
+    <div className="space-y-6">
+      <SessionNotesSection caseId={caseId} />
+
+      <details className="card">
+        <summary className="flex items-center justify-between cursor-pointer list-none">
+          <h2 className="text-sm font-bold text-navy">Fallüberblick</h2>
+          <span className="text-xs text-brand-muted">dauerhafte Notizen · auf-/zuklappen</span>
+        </summary>
+        <p className="mt-2 text-xs text-brand-muted">
+          Stehende Notizen zum Fall (fließen in Echo und Berichte ein). Für einzelne Sitzungen nutze
+          den Verlauf oben.
+        </p>
+        <div className="mt-4">
+          <NotesOverviewEditor caseId={caseId} initial={overview} />
+        </div>
+      </details>
+    </div>
+  )
+}
+
+/** Der bisherige 6-Felder-Editor (stehender Fallüberblick), unverändert in der Logik. */
+function NotesOverviewEditor({ caseId, initial }: { caseId: string; initial: ProfessionalNote | null }) {
   const qc = useQueryClient()
   const [note, setNote] = useState<ProfessionalNote>(initial ?? {})
   const [saved, setSaved] = useState(false)
@@ -686,25 +720,316 @@ function NotesEditor({ caseId, initial }: { caseId: string; initial: Professiona
   })
 
   return (
-    <Section title="Meine Notizen">
-      <div className="space-y-3">
-        {NOTE_FIELDS.map(({ key, label }) => (
-          <div key={key}>
-            <label className="block text-xs font-medium text-brand-text mb-1">{label}</label>
-            <textarea
-              value={note[key] ?? ''}
-              onChange={e => { setNote(p => ({ ...p, [key]: e.target.value })); setSaved(false) }}
-              rows={2}
-              className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-y"
+    <div className="space-y-3">
+      {NOTE_FIELDS.map(({ key, label }) => (
+        <div key={key}>
+          <label className="block text-xs font-medium text-brand-text mb-1">{label}</label>
+          <textarea
+            value={note[key] ?? ''}
+            onChange={e => { setNote(p => ({ ...p, [key]: e.target.value })); setSaved(false) }}
+            rows={2}
+            className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-y"
+          />
+        </div>
+      ))}
+      <div className="flex items-center gap-3">
+        <button onClick={() => mutation.mutate()} disabled={mutation.isPending} className="btn-primary !py-2 !px-5 !text-sm">
+          {mutation.isPending ? 'Wird gespeichert …' : saved ? '✓ Gespeichert' : 'Überblick speichern'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function SessionNotesSection({ caseId }: { caseId: string }) {
+  const qc = useQueryClient()
+  const [creating, setCreating] = useState(false)
+  const [managing, setManaging] = useState(false)
+
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ['prof-session-notes', caseId],
+    queryFn: () => professionalApi.sessionNotes(caseId),
+  })
+  const { data: templates = [] } = useQuery({
+    queryKey: ['prof-note-templates'],
+    queryFn: () => professionalApi.noteTemplates(),
+  })
+
+  const del = useMutation({
+    mutationFn: (id: string) => professionalApi.sessionNoteDelete(caseId, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-session-notes', caseId] }),
+  })
+
+  return (
+    <Section title="Sitzungsverlauf">
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        {!creating && (
+          <button onClick={() => setCreating(true)}
+            className="text-sm font-semibold px-4 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90">
+            + Neue Sitzungsnotiz
+          </button>
+        )}
+        <button onClick={() => setManaging(v => !v)} className="text-sm text-brand-muted hover:text-accent">
+          {managing ? 'Vorlagen schließen' : 'Vorlagen verwalten'}
+        </button>
+      </div>
+
+      {managing && <NoteTemplatesManager templates={templates} />}
+
+      {creating && (
+        <div className="mb-5">
+          <SessionNoteForm caseId={caseId} templates={templates} onDone={() => setCreating(false)} />
+        </div>
+      )}
+
+      {isLoading ? (
+        <p className="text-sm text-brand-muted">Wird geladen …</p>
+      ) : notes.length === 0 ? (
+        <p className="text-sm text-brand-muted">Noch keine Sitzungsnotizen. Lege die erste an.</p>
+      ) : (
+        <div className="space-y-2">
+          {notes.map(n => (
+            <SessionNoteCard
+              key={n.id} caseId={caseId} note={n}
+              onDelete={() => { if (window.confirm('Diese Sitzungsnotiz löschen?')) del.mutate(n.id) }}
+              deleting={del.isPending}
             />
+          ))}
+        </div>
+      )}
+    </Section>
+  )
+}
+
+function SessionNoteCard({ caseId, note, onDelete, deleting }: {
+  caseId: string; note: SessionNote; onDelete: () => void; deleting: boolean
+}) {
+  const [editing, setEditing] = useState(false)
+  const sections = note.content?.sections ?? []
+
+  if (editing) {
+    return (
+      <div className="rounded-brand border border-accent/40 bg-brand-bg p-4">
+        <SessionNoteForm caseId={caseId} note={note} onDone={() => setEditing(false)} />
+      </div>
+    )
+  }
+
+  return (
+    <details className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
+      <summary className="flex items-start justify-between gap-3 cursor-pointer list-none">
+        <span className="min-w-0">
+          <span className="text-sm font-semibold text-navy">{note.title || 'Sitzungsnotiz'}</span>
+          <span className="block text-[11px] text-brand-muted">{fmtSessionDate(note.session_date)}</span>
+        </span>
+        <span className="shrink-0 flex items-center gap-3">
+          <button onClick={(e) => { e.preventDefault(); setEditing(true) }}
+            className="text-xs text-brand-muted hover:text-accent transition-colors">Bearbeiten</button>
+          <button onClick={(e) => { e.preventDefault(); onDelete() }} disabled={deleting}
+            className="text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40">Löschen</button>
+        </span>
+      </summary>
+      <div className="mt-3 space-y-3">
+        {sections.map((s, i) => (
+          <div key={i}>
+            {s.heading && <div className="text-xs font-bold text-navy">{s.heading}</div>}
+            <div className="text-sm text-brand-text leading-relaxed">
+              <MarkdownMessage content={s.text} />
+            </div>
           </div>
         ))}
-        <div className="flex items-center gap-3">
-          <button onClick={() => mutation.mutate()} disabled={mutation.isPending} className="btn-primary !py-2 !px-5 !text-sm">
-            {mutation.isPending ? 'Wird gespeichert …' : saved ? '✓ Gespeichert' : 'Notizen speichern'}
-          </button>
+      </div>
+    </details>
+  )
+}
+
+/** Formular für Erstellen/Bearbeiten einer Sitzungsnotiz (Datum + Titel + Abschnitte). */
+function SessionNoteForm({ caseId, templates, note, onDone }: {
+  caseId: string; templates?: NoteTemplate[]; note?: SessionNote; onDone: () => void
+}) {
+  const qc = useQueryClient()
+  const isEdit = !!note
+  const [date, setDate] = useState(note?.session_date ?? todayISO())
+  const [title, setTitle] = useState(note?.title ?? '')
+  const [sections, setSections] = useState<{ heading: string; text: string }[]>(
+    note?.content?.sections ?? [{ heading: '', text: '' }],
+  )
+
+  const applyTemplate = (t: NoteTemplate) => {
+    setSections(t.fields.map(f => ({ heading: f, text: '' })))
+    if (!title.trim()) setTitle(t.name)
+  }
+  const setSec = (i: number, patch: Partial<{ heading: string; text: string }>) =>
+    setSections(prev => prev.map((s, j) => (j === i ? { ...s, ...patch } : s)))
+
+  const save = useMutation({
+    mutationFn: () => {
+      const payload = { session_date: date, title: title.trim() || null, sections }
+      return isEdit
+        ? professionalApi.sessionNoteUpdate(caseId, note!.id, payload)
+        : professionalApi.sessionNoteCreate(caseId, payload)
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['prof-session-notes', caseId] }); onDone() },
+  })
+
+  const canSave = sections.some(s => s.text.trim() || s.heading.trim())
+
+  return (
+    <div className="rounded-brand border border-brand-border bg-white p-4 space-y-3">
+      {!isEdit && templates && templates.length > 0 && (
+        <div>
+          <div className="text-xs font-semibold text-navy uppercase tracking-wide mb-1.5">Vorlage</div>
+          <div className="flex flex-wrap gap-2">
+            {templates.map(t => (
+              <button key={t.id} onClick={() => applyTemplate(t)}
+                className="text-xs px-2.5 py-1 rounded-full border border-brand-border text-navy hover:border-accent hover:text-accent transition-colors">
+                {t.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-3">
+        <div>
+          <label className="block text-xs font-medium text-brand-text mb-1">Datum</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)}
+            className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+        </div>
+        <div className="flex-1 min-w-[180px]">
+          <label className="block text-xs font-medium text-brand-text mb-1">Titel</label>
+          <input value={title} onChange={e => setTitle(e.target.value)} maxLength={200} placeholder="z. B. Sitzung 3"
+            className="w-full rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
         </div>
       </div>
-    </Section>
+
+      <div className="space-y-3">
+        {sections.map((s, i) => (
+          <div key={i} className="rounded-brand border border-brand-border p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <input value={s.heading} onChange={e => setSec(i, { heading: e.target.value })}
+                placeholder="Abschnitt (z. B. Beobachtungen)"
+                className="flex-1 text-sm font-semibold text-navy bg-white border border-brand-border rounded-brand px-2.5 py-1.5 outline-none focus:border-accent" />
+              {sections.length > 1 && (
+                <button onClick={() => setSections(prev => prev.filter((_, j) => j !== i))}
+                  className="text-xs text-brand-muted hover:text-red-600">Entfernen</button>
+              )}
+            </div>
+            <textarea value={s.text} onChange={e => setSec(i, { text: e.target.value })} rows={4}
+              className="w-full text-sm text-brand-text bg-white border border-brand-border rounded-brand px-2.5 py-2 outline-none focus:border-accent resize-y" />
+          </div>
+        ))}
+        <button onClick={() => setSections(prev => [...prev, { heading: '', text: '' }])}
+          className="text-xs text-accent hover:underline">+ Abschnitt hinzufügen</button>
+      </div>
+
+      <div className="flex items-center gap-3 border-t border-brand-border pt-3">
+        <button onClick={() => save.mutate()} disabled={!canSave || save.isPending}
+          className="text-sm font-semibold px-4 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+          {save.isPending ? 'Speichern …' : isEdit ? 'Änderungen speichern' : 'Sitzungsnotiz speichern'}
+        </button>
+        <button onClick={onDone} disabled={save.isPending} className="text-sm text-brand-muted hover:text-navy">Abbrechen</button>
+        {save.isError && <span className="text-xs text-red-600">Speichern fehlgeschlagen.</span>}
+      </div>
+    </div>
+  )
+}
+
+/** Inline-Verwaltung eigener Notiz-Vorlagen (eingebaute nur lesbar). */
+function NoteTemplatesManager({ templates }: { templates: NoteTemplate[] }) {
+  const qc = useQueryClient()
+  const own = templates.filter(t => !t.builtin)
+  const builtin = templates.filter(t => t.builtin)
+
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [name, setName] = useState('')
+  const [fields, setFields] = useState<string[]>([''])
+
+  const reset = () => { setEditingId(null); setName(''); setFields(['']) }
+  const startEdit = (t: NoteTemplate) => {
+    setEditingId(t.id); setName(t.name); setFields(t.fields.length ? t.fields : [''])
+  }
+
+  const save = useMutation({
+    mutationFn: () => {
+      const data = { name: name.trim(), fields: fields.map(f => f.trim()).filter(Boolean) }
+      return editingId
+        ? professionalApi.noteTemplateUpdate(editingId, data)
+        : professionalApi.noteTemplateCreate(data)
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['prof-note-templates'] }); reset() },
+  })
+  const del = useMutation({
+    mutationFn: (id: string) => professionalApi.noteTemplateDelete(id),
+    onSuccess: (_d, id) => { qc.invalidateQueries({ queryKey: ['prof-note-templates'] }); if (editingId === id) reset() },
+  })
+
+  const canSave = !!name.trim() && fields.some(f => f.trim())
+
+  return (
+    <div className="mb-5 rounded-brand border border-brand-border bg-brand-bg p-4 space-y-4">
+      <div>
+        <div className="text-xs font-semibold text-navy uppercase tracking-wide mb-2">
+          {editingId ? 'Vorlage bearbeiten' : 'Neue Notiz-Vorlage'}
+        </div>
+        <input value={name} onChange={e => setName(e.target.value)} maxLength={160} placeholder="Name der Vorlage"
+          className="w-full rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+        <div className="mt-2 space-y-2">
+          {fields.map((f, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input value={f} onChange={e => setFields(prev => prev.map((x, j) => (j === i ? e.target.value : x)))}
+                placeholder={`Abschnitt ${i + 1}`}
+                className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+              {fields.length > 1 && (
+                <button onClick={() => setFields(prev => prev.filter((_, j) => j !== i))}
+                  className="text-xs text-brand-muted hover:text-red-600">×</button>
+              )}
+            </div>
+          ))}
+          <button onClick={() => setFields(prev => [...prev, ''])} className="text-xs text-accent hover:underline">
+            + Abschnitt
+          </button>
+        </div>
+        <div className="mt-3 flex items-center gap-3">
+          <button onClick={() => save.mutate()} disabled={!canSave || save.isPending}
+            className="text-sm font-semibold px-3 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+            {save.isPending ? 'Speichern …' : editingId ? 'Speichern' : 'Vorlage anlegen'}
+          </button>
+          {editingId && <button onClick={reset} className="text-sm text-brand-muted hover:text-navy">Abbrechen</button>}
+        </div>
+      </div>
+
+      {own.length > 0 && (
+        <div className="border-t border-brand-border pt-3">
+          <div className="text-xs font-semibold text-navy mb-2">Eigene Vorlagen</div>
+          <div className="space-y-1.5">
+            {own.map(t => (
+              <div key={t.id} className="flex items-center justify-between gap-3 text-sm">
+                <span className="min-w-0 truncate">
+                  <span className="font-medium text-navy">{t.name}</span>
+                  <span className="text-brand-muted"> · {t.fields.join(', ')}</span>
+                </span>
+                <span className="shrink-0 flex gap-3">
+                  <button onClick={() => startEdit(t)} className="text-xs text-brand-muted hover:text-accent">Bearbeiten</button>
+                  <button onClick={() => { if (window.confirm('Vorlage löschen?')) del.mutate(t.id) }}
+                    className="text-xs text-brand-muted hover:text-red-600">Löschen</button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="border-t border-brand-border pt-3">
+        <div className="text-xs font-semibold text-navy mb-1.5">Eingebaute Vorlagen</div>
+        <div className="flex flex-wrap gap-1.5">
+          {builtin.map(t => (
+            <span key={t.id} className="text-[11px] px-2 py-0.5 rounded-full bg-white border border-brand-border text-brand-muted">
+              {t.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }

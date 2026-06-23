@@ -545,6 +545,25 @@ export interface ProfessionalReport {
   updated_at: string
 }
 
+// ── Sitzungsnotizen + Notiz-Vorlagen ──────────────────────────────────────────
+
+export interface NoteTemplate {
+  id: string                 // 'builtin:<key>' oder UUID (eigene)
+  name: string
+  fields: string[]           // Abschnitts-Überschriften
+  builtin: boolean
+}
+
+export interface SessionNote {
+  id: string
+  case_id: string
+  session_date: string       // ISO-Datum (YYYY-MM-DD)
+  title: string | null
+  content: ReportContent     // { sections: [{heading,text}] }
+  created_at: string
+  updated_at: string
+}
+
 /** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */
 export interface SharedCaseBundle {
   case_id: string
