@@ -120,9 +120,17 @@ async def get_current_professional(
             "SELECT * FROM professional_profiles WHERE user_id = $1",
             current_user["user_id"],
         )
-    if not row:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Kein Fachpersonen-Zugang.",
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Kein Fachpersonen-Zugang.",
+            )
+        # Org auflösen (lazy ensure → deckt Bestandskonten ab). Solo = 1-Mitglied-Org.
+        from app.services.org_service import ensure_org_for_professional
+        org = await ensure_org_for_professional(
+            current_user["user_id"], conn, row["display_name"],
         )
-    return {**current_user, "professional": dict(row)}
+    return {
+        **current_user, "professional": dict(row),
+        "org_id": org["org_id"], "org_role": org["role"],
+    }

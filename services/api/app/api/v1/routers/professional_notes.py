@@ -49,7 +49,7 @@ async def list_note_templates(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> list[NoteTemplate]:
-    pid = current["user_id"]
+    org_id = current["org_id"]
     builtins = [
         NoteTemplate(id=f"builtin:{t['key']}", name=t["name"], fields=t["fields"], builtin=True)
         for t in BUILTIN_NOTE_TEMPLATES
@@ -57,8 +57,8 @@ async def list_note_templates(
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             "SELECT id, name, fields FROM professional_note_templates "
-            "WHERE professional_user_id = $1 ORDER BY updated_at DESC",
-            pid,
+            "WHERE org_id = $1 ORDER BY updated_at DESC",
+            org_id,
         )
     return builtins + [_own_template_response(r) for r in rows]
 
@@ -69,12 +69,12 @@ async def create_note_template(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> NoteTemplate:
-    pid = current["user_id"]
+    pid, org_id = current["user_id"], current["org_id"]
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "INSERT INTO professional_note_templates (professional_user_id, name, fields) "
-            "VALUES ($1, $2, $3::jsonb) RETURNING id, name, fields",
-            pid, body.name.strip(), json.dumps(body.fields),
+            "INSERT INTO professional_note_templates (professional_user_id, org_id, name, fields) "
+            "VALUES ($1, $2, $3, $4::jsonb) RETURNING id, name, fields",
+            pid, org_id, body.name.strip(), json.dumps(body.fields),
         )
     return _own_template_response(row)
 
@@ -86,13 +86,13 @@ async def update_note_template(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> NoteTemplate:
-    pid = current["user_id"]
+    org_id = current["org_id"]
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "UPDATE professional_note_templates "
             "SET name = $3, fields = $4::jsonb, updated_at = NOW() "
-            "WHERE id = $1 AND professional_user_id = $2 RETURNING id, name, fields",
-            template_id, pid, body.name.strip(), json.dumps(body.fields),
+            "WHERE id = $1 AND org_id = $2 RETURNING id, name, fields",
+            template_id, org_id, body.name.strip(), json.dumps(body.fields),
         )
     if not row:
         raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")
@@ -105,11 +105,11 @@ async def delete_note_template(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> dict:
-    pid = current["user_id"]
+    org_id = current["org_id"]
     async with pool.acquire() as conn:
         result = await conn.execute(
-            "DELETE FROM professional_note_templates WHERE id = $1 AND professional_user_id = $2",
-            template_id, pid,
+            "DELETE FROM professional_note_templates WHERE id = $1 AND org_id = $2",
+            template_id, org_id,
         )
     if result == "DELETE 0":
         raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")

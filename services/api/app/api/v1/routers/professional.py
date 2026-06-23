@@ -27,6 +27,7 @@ from app.schemas.professional import (
 from app.services import collab_service
 from app.services.demo_service import ensure_demo_for_professional
 from app.services.echo_service import _REL_TYPE_LABELS
+from app.services.org_service import ensure_org_for_professional
 from app.services.sharing_service import load_shared_bundle, require_active_share
 
 router = APIRouter(prefix="/professional", tags=["professional"])
@@ -189,6 +190,7 @@ async def register(
                     "WHERE lower(email) = $2 AND status = 'pending'",
                     user_id, email,
                 )
+        await ensure_org_for_professional(user_id, conn, body.display_name)
         await ensure_demo_for_professional(user_id, conn)
     return ProfessionalProfileResponse(**dict(row))
 

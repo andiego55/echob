@@ -67,13 +67,13 @@ async def list_templates(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> list[ProReportTemplate]:
-    pid = current["user_id"]
+    org_id = current["org_id"]
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             "SELECT id, name, instruction, created_at, updated_at "
-            "FROM professional_report_templates WHERE professional_user_id = $1 "
+            "FROM professional_report_templates WHERE org_id = $1 "
             "ORDER BY updated_at DESC",
-            pid,
+            org_id,
         )
     return [_template_response(r) for r in rows]
 
@@ -86,12 +86,13 @@ async def create_template(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> ProReportTemplate:
-    pid = current["user_id"]
+    pid, org_id = current["user_id"], current["org_id"]
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "INSERT INTO professional_report_templates (professional_user_id, name, instruction) "
-            "VALUES ($1, $2, $3) RETURNING *",
-            pid, body.name.strip(), crypto.encrypt(body.instruction),
+            "INSERT INTO professional_report_templates "
+            "(professional_user_id, org_id, name, instruction) "
+            "VALUES ($1, $2, $3, $4) RETURNING *",
+            pid, org_id, body.name.strip(), crypto.encrypt(body.instruction),
         )
     return _template_response(row)
 
@@ -103,13 +104,13 @@ async def update_template(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> ProReportTemplate:
-    pid = current["user_id"]
+    org_id = current["org_id"]
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "UPDATE professional_report_templates "
             "SET name = $3, instruction = $4, updated_at = NOW() "
-            "WHERE id = $1 AND professional_user_id = $2 RETURNING *",
-            template_id, pid, body.name.strip(), crypto.encrypt(body.instruction),
+            "WHERE id = $1 AND org_id = $2 RETURNING *",
+            template_id, org_id, body.name.strip(), crypto.encrypt(body.instruction),
         )
     if not row:
         raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")
@@ -122,11 +123,11 @@ async def delete_template(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> dict:
-    pid = current["user_id"]
+    org_id = current["org_id"]
     async with pool.acquire() as conn:
         result = await conn.execute(
-            "DELETE FROM professional_report_templates WHERE id = $1 AND professional_user_id = $2",
-            template_id, pid,
+            "DELETE FROM professional_report_templates WHERE id = $1 AND org_id = $2",
+            template_id, org_id,
         )
     if result == "DELETE 0":
         raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")
@@ -233,8 +234,8 @@ async def create_report(
         if body.source == "template":
             tpl = await conn.fetchrow(
                 "SELECT name, instruction FROM professional_report_templates "
-                "WHERE id = $1 AND professional_user_id = $2",
-                body.template_id, pid,
+                "WHERE id = $1 AND org_id = $2",
+                body.template_id, current["org_id"],
             )
             if not tpl:
                 raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")

@@ -326,3 +326,43 @@ class SessionNote(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# ── Organisation / Praxis ─────────────────────────────────────────────────────
+
+OrgRole = Literal["owner", "admin", "member"]
+
+
+class OrgMember(BaseModel):
+    user_id: UUID
+    display_name: str | None = None
+    email: str | None = None
+    role: OrgRole
+
+
+class OrganizationResponse(BaseModel):
+    id: UUID
+    name: str
+    plan: str
+    role: OrgRole                            # eigene Rolle in der Praxis
+    members: list[OrgMember]
+
+
+class OrgInviteResponse(BaseModel):
+    id: UUID
+    org_name: str
+    email: str
+    status: Literal["pending", "accepted"]
+    created_at: datetime
+
+
+class OrgRename(BaseModel):
+    name: str = Field(..., min_length=1, max_length=160)
+
+
+class OrgMemberInvite(BaseModel):
+    email: str = Field(..., min_length=3, max_length=254)
+
+
+class OrgRoleUpdate(BaseModel):
+    role: Literal["admin", "member"]        # owner-Rolle nicht über diesen Weg setzbar

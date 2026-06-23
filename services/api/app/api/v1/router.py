@@ -15,6 +15,7 @@ from app.api.v1.routers import (
     hypotheses,
     inbox,
     onboarding,
+    organizations,
     person_profile,
     professional,
     professional_collab,
@@ -60,6 +61,7 @@ v1_router.include_router(inbox.router)
 # ── Fachpersonenbereich ───────────────────────────────────────────────────────
 v1_router.include_router(professional.router)
 v1_router.include_router(professionals.router)
+v1_router.include_router(organizations.router)
 v1_router.include_router(case_shares.router)
 v1_router.include_router(professional_echo.router)
 v1_router.include_router(professional_collab.router)
