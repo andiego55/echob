@@ -11,6 +11,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
+from app.api.v1.routers.professional_notes import (
+    build_session_notes_context,
+    load_session_notes_decrypted,
+)
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_pool
 from app.schemas.professional import (
@@ -119,6 +123,8 @@ async def chat(
             conn, professional_user_id=pid, case_id=case_id)
         appointments = await collab_service.list_appointments_for_case(
             conn, professional_user_id=pid, case_id=case_id)
+        session_notes = await load_session_notes_decrypted(
+            conn, professional_user_id=pid, case_id=case_id)
         pro_settings = await conn.fetchrow(
             "SELECT echo_approach, echo_tone, echo_depth, echo_custom_steering "
             "FROM professional_profiles WHERE user_id = $1", pid,
@@ -136,6 +142,7 @@ async def chat(
     extras = [
         s for s in (
             _build_notes_context(note),
+            build_session_notes_context(session_notes),
             collab_service.build_collaboration_context(assignments, appointments),
         ) if s
     ]

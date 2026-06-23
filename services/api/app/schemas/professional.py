@@ -5,7 +5,7 @@ Sicherheitsmodell: Fachpersonen sind nicht Eigentümer der Falldaten. Zugriff l�
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Literal
 from uuid import UUID
 
@@ -277,6 +277,49 @@ class ProfessionalReport(BaseModel):
     title: str | None
     content: dict[str, Any]                 # {"sections":[{heading,text}], "disclaimer": str}
     disclaimer: str = PRO_REPORT_DISCLAIMER
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── Sitzungsnotizen + Notiz-Vorlagen ──────────────────────────────────────────
+
+class NoteTemplate(BaseModel):
+    id: str                                # 'builtin:<key>' oder UUID (eigene)
+    name: str
+    fields: list[str]                      # Abschnitts-Überschriften
+    builtin: bool = False
+
+
+class NoteTemplateCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=160)
+    fields: list[str] = Field(..., min_length=1, max_length=30)
+
+
+class NoteTemplateUpdate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=160)
+    fields: list[str] = Field(..., min_length=1, max_length=30)
+
+
+class SessionNoteCreate(BaseModel):
+    session_date: date | None = None
+    title: str | None = Field(None, max_length=200)
+    sections: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class SessionNoteUpdate(BaseModel):
+    session_date: date | None = None
+    title: str | None = Field(None, max_length=200)
+    sections: list[dict[str, Any]] | None = None
+
+
+class SessionNote(BaseModel):
+    id: UUID
+    case_id: UUID
+    session_date: date
+    title: str | None
+    content: dict[str, Any]                 # {"sections":[{heading,text}]}
     created_at: datetime
     updated_at: datetime
 

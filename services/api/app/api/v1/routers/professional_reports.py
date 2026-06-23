@@ -14,6 +14,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.api.v1.routers.professional_echo import _NOTE_FIELDS, _build_notes_context
+from app.api.v1.routers.professional_notes import (
+    build_session_notes_context,
+    load_session_notes_decrypted,
+)
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_pool
 from app.schemas.professional import (
@@ -254,6 +258,8 @@ async def create_report(
             conn, professional_user_id=pid, case_id=case_id)
         appointments = await collab_service.list_appointments_for_case(
             conn, professional_user_id=pid, case_id=case_id)
+        session_notes = await load_session_notes_decrypted(
+            conn, professional_user_id=pid, case_id=case_id)
 
     # 3) Kontext zusammenbauen (nur freigegebenes Material + eigene Profi-Materialien)
     note = (
@@ -266,6 +272,7 @@ async def create_report(
         s for s in (
             build_shared_case_context(bundle),
             _build_notes_context(note),
+            build_session_notes_context(session_notes),
             build_hypothesis_context(hypotheses),
             _build_summaries_context(summaries),
             collab_service.build_collaboration_context(assignments, appointments),
