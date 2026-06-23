@@ -86,6 +86,46 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
+/** Hinweis + Schnellstart-Checkliste für den fiktiven Beispielfall (Spielwiese). */
+function DemoIntro({ onGoto }: { onGoto: (t: TabKey) => void }) {
+  const [dismissed, setDismissed] = useState(
+    () => typeof localStorage !== 'undefined' && localStorage.getItem('echob_demo_intro') === 'off',
+  )
+  if (dismissed) return null
+  const close = () => {
+    setDismissed(true)
+    try { localStorage.setItem('echob_demo_intro', 'off') } catch { /* ignore */ }
+  }
+  const steps: { label: string; tab: TabKey }[] = [
+    { label: 'Bericht erzeugen', tab: 'reports' },
+    { label: 'Sitzungsnotiz schreiben', tab: 'notes' },
+    { label: 'Mit Echo sprechen', tab: 'echo' },
+  ]
+  return (
+    <div className="mb-6 rounded-brand border border-amber-200 bg-amber-50 px-4 py-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-amber-900">Fiktiver Beispielfall — Ihre Spielwiese</p>
+          <p className="mt-0.5 text-xs text-amber-800">
+            Probieren Sie hier alle Werkzeuge gefahrlos aus. Erfundener Fall, keine echten Daten.
+          </p>
+        </div>
+        <button onClick={close} className="shrink-0 text-xs text-amber-700 hover:text-amber-900">
+          Ausblenden
+        </button>
+      </div>
+      <div className="mt-2.5 flex flex-wrap gap-2">
+        {steps.map(s => (
+          <button key={s.tab} onClick={() => onGoto(s.tab)}
+            className="text-xs font-medium px-2.5 py-1 rounded-full border border-amber-300 bg-white text-amber-900 hover:border-amber-500 transition-colors">
+            {s.label} →
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 type ProfileLikeConfig = {
   id: string
   label: string
@@ -200,9 +240,17 @@ export default function ProfessionalCaseDetailPage() {
       <div className="mx-auto max-w-[1100px] px-6 py-10">
         {/* Fall-Kopf (Klient:in steht oben in der Leiste) */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-navy">{bundle.case_title}</h1>
+          <h1 className="text-2xl font-bold text-navy">
+            {bundle.case_title}
+            {bundle.is_demo && (
+              <span className="ml-2 align-middle px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">
+                Beispiel
+              </span>
+            )}
+          </h1>
           <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
         </div>
+        {bundle.is_demo && <DemoIntro onGoto={setTab} />}
 
         {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
         {tab === 'dialog' && <AssignmentTypePanel caseId={caseId!} type="dialog" />}

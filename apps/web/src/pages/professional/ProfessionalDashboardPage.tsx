@@ -110,6 +110,11 @@ export default function ProfessionalDashboardPage() {
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors">
                             {c.client_display_name} · {c.case_title}
+                            {c.is_demo && (
+                              <span className="ml-2 align-middle px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">
+                                Beispiel
+                              </span>
+                            )}
                           </p>
                           <p className="text-xs text-brand-muted">Zuletzt aktiv: {fmtDay(c.last_activity)}</p>
                         </div>

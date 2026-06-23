@@ -454,6 +454,7 @@ export interface InboxItem {
   case_title: string
   element_types: ShareElementType[]
   shared_at: string
+  is_demo?: boolean
 }
 
 export interface ProfessionalCaseSummary {
@@ -462,6 +463,7 @@ export interface ProfessionalCaseSummary {
   case_title: string
   element_types: ShareElementType[]
   shared_at: string
+  is_demo?: boolean
 }
 
 export interface ProfessionalClientGroup {
@@ -569,6 +571,7 @@ export interface SharedCaseBundle {
   case_id: string
   client_display_name: string
   case_title: string
+  is_demo?: boolean
   allowed: ShareElementType[]
   case: Case | null
   onboarding: (OnboardingAnswers & { distress_score?: number | null; safety_status?: string | null; person_name?: string | null }) | null

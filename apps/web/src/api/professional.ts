@@ -43,6 +43,7 @@ export interface DashboardCase {
   case_id: string
   client_display_name: string
   case_title: string
+  is_demo?: boolean
   element_types: string[]
   unread_count: number
   open_count: number
