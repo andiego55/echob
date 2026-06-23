@@ -323,10 +323,10 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                 <div key={s.scale_key}>
                   <div className="flex justify-between text-xs mb-0.5">
                     <span className="text-brand-text">{SCALE_LABELS[s.scale_key as ScaleKey] ?? s.scale_key}</span>
-                    <span className="text-brand-muted">{Math.round(s.score)}/100</span>
+                    <span className="text-brand-muted">{s.score.toFixed(1)}/5</span>
                   </div>
                   <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
-                    <div className="h-full bg-accent" style={{ width: `${Math.min(100, Math.round(s.score))}%` }} />
+                    <div className="h-full bg-accent" style={{ width: `${Math.min(100, Math.round((s.score / 5) * 100))}%` }} />
                   </div>
                 </div>
               ))}
