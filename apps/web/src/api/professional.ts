@@ -14,6 +14,8 @@ import type {
   ProfessionalReportListItem,
   NoteTemplate,
   SessionNote,
+  Organization,
+  OrgInvite,
 } from '@/types'
 
 interface EchoChatResult {
@@ -240,4 +242,20 @@ export const professionalApi = {
       .then(r => r.data),
   sessionNoteDelete: (caseId: string, noteId: string) =>
     apiClient.delete(`/professional/cases/${caseId}/session-notes/${noteId}`).then(r => r.data),
+
+  // Organisation / Praxis
+  org: () =>
+    apiClient.get<Organization>('/professional/org').then(r => r.data),
+  orgRename: (name: string) =>
+    apiClient.patch<Organization>('/professional/org', { name }).then(r => r.data),
+  orgInviteMember: (email: string) =>
+    apiClient.post<OrgInvite>('/professional/org/members/invite', { email }).then(r => r.data),
+  orgMemberRole: (userId: string, role: 'admin' | 'member') =>
+    apiClient.post(`/professional/org/members/${userId}/role`, { role }).then(r => r.data),
+  orgMemberRemove: (userId: string) =>
+    apiClient.delete(`/professional/org/members/${userId}`).then(r => r.data),
+  orgInvitesIncoming: () =>
+    apiClient.get<OrgInvite[]>('/professional/org/invites').then(r => r.data),
+  orgInviteAccept: (inviteId: string) =>
+    apiClient.post<Organization>(`/professional/org/invites/${inviteId}/accept`).then(r => r.data),
 }

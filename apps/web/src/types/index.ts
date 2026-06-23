@@ -566,6 +566,33 @@ export interface SessionNote {
   updated_at: string
 }
 
+// ── Organisation / Praxis ─────────────────────────────────────────────────────
+
+export type OrgRole = 'owner' | 'admin' | 'member'
+
+export interface OrgMember {
+  user_id: string
+  display_name: string | null
+  email: string | null
+  role: OrgRole
+}
+
+export interface Organization {
+  id: string
+  name: string
+  plan: string
+  role: OrgRole              // eigene Rolle in der Praxis
+  members: OrgMember[]
+}
+
+export interface OrgInvite {
+  id: string
+  org_name: string
+  email: string
+  status: 'pending' | 'accepted'
+  created_at: string
+}
+
 /** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */
 export interface SharedCaseBundle {
   case_id: string

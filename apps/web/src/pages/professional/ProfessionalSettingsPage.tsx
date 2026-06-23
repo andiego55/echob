@@ -86,7 +86,148 @@ export default function ProfessionalSettingsPage() {
             </div>
           )}
         </div>
+
+        <PracticeSection />
       </div>
     </ProfessionalShell>
+  )
+}
+
+/** Praxis-Verwaltung: Name, Mitglieder/Rollen, Einladungen. Fallinhalte bleiben least-access. */
+function PracticeSection() {
+  const qc = useQueryClient()
+  const { data: org, isLoading } = useQuery({ queryKey: ['pro-org'], queryFn: professionalApi.org })
+  const { data: invites = [] } = useQuery({
+    queryKey: ['pro-org-invites'], queryFn: professionalApi.orgInvitesIncoming,
+  })
+
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  useEffect(() => { if (org) setName(org.name) }, [org])
+
+  const isAdmin = org?.role === 'owner' || org?.role === 'admin'
+
+  const rename = useMutation({
+    mutationFn: () => professionalApi.orgRename(name.trim()),
+    onSuccess: (o) => qc.setQueryData(['pro-org'], o),
+  })
+  const invite = useMutation({
+    mutationFn: () => professionalApi.orgInviteMember(email.trim()),
+    onSuccess: () => setEmail(''),
+  })
+  const role = useMutation({
+    mutationFn: (v: { userId: string; role: 'admin' | 'member' }) =>
+      professionalApi.orgMemberRole(v.userId, v.role),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['pro-org'] }),
+  })
+  const remove = useMutation({
+    mutationFn: (userId: string) => professionalApi.orgMemberRemove(userId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['pro-org'] }),
+  })
+  const accept = useMutation({
+    mutationFn: (id: string) => professionalApi.orgInviteAccept(id),
+    onSuccess: (o) => {
+      qc.setQueryData(['pro-org'], o)
+      qc.invalidateQueries({ queryKey: ['pro-org-invites'] })
+      qc.invalidateQueries({ queryKey: ['prof-report-templates'] })
+      qc.invalidateQueries({ queryKey: ['prof-note-templates'] })
+    },
+  })
+
+  if (isLoading || !org) return null
+
+  const roleLabel = (r: string) => (r === 'owner' ? 'Inhaber:in' : r === 'admin' ? 'Admin' : 'Mitglied')
+
+  return (
+    <div className="mt-8 card">
+      <h2 className="text-lg font-semibold text-navy">Praxis</h2>
+      <p className="mt-1 text-sm text-brand-muted">
+        Mehrere Fachpersonen arbeiten in einer Praxis zusammen und teilen Vorlagen. Fallinhalte
+        bleiben bei der behandelnden Fachperson.
+      </p>
+
+      {invites.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {invites.map(i => (
+            <div key={i.id}
+              className="flex items-center justify-between gap-3 rounded-brand border border-accent/40 bg-accent/5 px-4 py-2.5">
+              <span className="text-sm text-navy">Einladung in „{i.org_name}"</span>
+              <button onClick={() => accept.mutate(i.id)} disabled={accept.isPending}
+                className="text-sm font-semibold px-3 py-1 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+                Annehmen
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-5">
+        <label className="block text-sm font-medium text-navy mb-1">Name der Praxis</label>
+        <div className="flex items-center gap-2">
+          <input value={name} onChange={e => setName(e.target.value)} disabled={!isAdmin} maxLength={160}
+            className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent disabled:bg-brand-bg" />
+          {isAdmin && (
+            <button onClick={() => rename.mutate()}
+              disabled={rename.isPending || !name.trim() || name.trim() === org.name}
+              className="text-sm font-semibold px-3 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+              Speichern
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <div className="text-sm font-medium text-navy mb-2">Mitglieder ({org.members.length})</div>
+        <div className="space-y-1.5">
+          {org.members.map(m => (
+            <div key={m.user_id}
+              className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3 py-2">
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-navy truncate">
+                  {m.display_name || m.email || 'Fachperson'}
+                </div>
+                {m.email && <div className="text-[11px] text-brand-muted truncate">{m.email}</div>}
+              </div>
+              <div className="shrink-0 flex items-center gap-2">
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-brand-bg border border-brand-border text-brand-muted">
+                  {roleLabel(m.role)}
+                </span>
+                {isAdmin && m.role !== 'owner' && m.user_id !== org.members.find(x => x.role === 'owner')?.user_id && (
+                  <>
+                    <button
+                      onClick={() => role.mutate({ userId: m.user_id, role: m.role === 'admin' ? 'member' : 'admin' })}
+                      className="text-xs text-brand-muted hover:text-accent">
+                      {m.role === 'admin' ? 'zu Mitglied' : 'zu Admin'}
+                    </button>
+                    <button
+                      onClick={() => { if (window.confirm('Mitglied entfernen?')) remove.mutate(m.user_id) }}
+                      className="text-xs text-brand-muted hover:text-red-600">
+                      Entfernen
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {isAdmin && (
+        <div className="mt-5 border-t border-brand-border pt-4">
+          <label className="block text-sm font-medium text-navy mb-1">Mitglied einladen</label>
+          <div className="flex items-center gap-2">
+            <input value={email} onChange={e => setEmail(e.target.value)} type="email"
+              placeholder="kolleg:in@praxis.de"
+              className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+            <button onClick={() => invite.mutate()} disabled={invite.isPending || !email.trim()}
+              className="text-sm font-semibold px-3 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+              Einladen
+            </button>
+          </div>
+          {invite.isSuccess && <p className="mt-1 text-xs text-green-700">Einladung gesendet ✓</p>}
+          {invite.isError && <p className="mt-1 text-xs text-red-600">Einladung fehlgeschlagen.</p>}
+        </div>
+      )}
+    </div>
   )
 }
