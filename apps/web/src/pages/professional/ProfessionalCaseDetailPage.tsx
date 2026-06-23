@@ -319,17 +319,20 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         {has('scales') && bundle.scales.length > 0 && (
           <Section title="Skalen">
             <div className="space-y-2">
-              {bundle.scales.filter(s => (s.score ?? 0) > 0).map(s => (
-                <div key={s.scale_key}>
-                  <div className="flex justify-between text-xs mb-0.5">
-                    <span className="text-brand-text">{SCALE_LABELS[s.scale_key as ScaleKey] ?? s.scale_key}</span>
-                    <span className="text-brand-muted">{s.score.toFixed(1)}/5</span>
+              {bundle.scales.filter(s => (Number(s.score) || 0) > 0).map(s => {
+                const score = Number(s.score) || 0
+                return (
+                  <div key={s.scale_key}>
+                    <div className="flex justify-between text-xs mb-0.5">
+                      <span className="text-brand-text">{SCALE_LABELS[s.scale_key as ScaleKey] ?? s.scale_key}</span>
+                      <span className="text-brand-muted">{score.toFixed(1)}/5</span>
+                    </div>
+                    <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
+                      <div className="h-full bg-accent" style={{ width: `${Math.min(100, Math.round((score / 5) * 100))}%` }} />
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
-                    <div className="h-full bg-accent" style={{ width: `${Math.min(100, Math.round((s.score / 5) * 100))}%` }} />
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </Section>
         )}
