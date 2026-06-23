@@ -1,8 +1,12 @@
-"""Org-Billing: Stripe-Abos für Praxen (Solo/Praxis/Institut) mit Trial.
+"""Org-Billing: Stripe-Abos für Praxen (Solo/Praxis/Institut).
 
 Spiegelt billing_service (B2C): Checkout/Portal + Webhook-Verarbeitung. Org-Events werden
 über metadata.org_id erkannt (von billing_service.handle_event hierher delegiert). Reuse
 desselben Stripe-Accounts; Inline-Preise (kein Dashboard-Setup nötig).
+
+Kein Abo-Trial: Der kostenlose Test läuft über die Spielwiese (Beispielfall, alle
+Werkzeuge, ohne Kreditkarte). Abos starten direkt zahlend; abgerechnet wird je
+aktivem Fall.
 """
 from __future__ import annotations
 
@@ -14,8 +18,6 @@ from uuid import UUID
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
-
-TRIAL_DAYS = 14
 
 ORG_TIERS: dict[str, dict] = {
     "solo": {
@@ -72,7 +74,6 @@ async def create_org_checkout_session(*, org_id, email, tier, stripe_customer_id
         "cancel_url": f"{base}/professional/settings?billing=cancelled",
         "metadata": {"org_id": str(org_id), "tier": tier},
         "subscription_data": {
-            "trial_period_days": TRIAL_DAYS,
             "metadata": {"org_id": str(org_id), "tier": tier},
         },
         "locale": "de",
@@ -143,7 +144,7 @@ async def verify_and_fulfill_org_session(*, session_id, org_id, pool) -> str | N
     if (obj.get("metadata") or {}).get("org_id") != str(org_id):
         return None
     if obj.get("payment_status") not in ("paid", "no_payment_required"):
-        # Trial: Session ist 'complete' aber ggf. ohne Zahlung — Status der Subscription zählt.
+        # Defensiv (z. B. 100%-Promo): Session 'complete' ohne direkte Zahlung zählt auch.
         if obj.get("status") != "complete":
             return None
     return await fulfill_org_checkout(obj, pool)

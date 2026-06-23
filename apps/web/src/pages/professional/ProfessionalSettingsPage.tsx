@@ -163,7 +163,7 @@ function BillingSection() {
                 <div className="text-lg font-bold text-navy">
                   {t.price}<span className="text-xs font-normal text-brand-muted">/Mt</span>
                 </div>
-                <div className="text-[11px] text-brand-muted">{t.cases} · 14 Tage gratis</div>
+                <div className="text-[11px] text-brand-muted">{t.cases} · monatlich kündbar</div>
                 {billing.plan === t.key ? (
                   <div className="mt-1.5 text-[11px] font-semibold text-accent">Aktiv</div>
                 ) : (

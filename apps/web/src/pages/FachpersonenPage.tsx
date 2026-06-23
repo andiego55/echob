@@ -62,9 +62,9 @@ const FEATURES = [
 
 const TIERS = [
   { key: 'free', name: 'Gratis', price: '0 €', unit: '', cases: 'Beispielfall · Spielwiese', note: 'Alle Werkzeuge am Beispielfall testen. Ohne Kreditkarte.', cta: 'Kostenlos testen' },
-  { key: 'solo', name: 'Solo', price: '59 €', unit: '/Mo.', cases: '1 aktiver Fall', note: 'Für Einzelpraxen. 14 Tage gratis.', cta: '14 Tage gratis' },
-  { key: 'praxis', name: 'Praxis', price: '149 €', unit: '/Mo.', cases: '5 aktive Fälle', note: 'Bis 3 Fachpersonen, geteilte Vorlagen.', cta: '14 Tage gratis', featured: true },
-  { key: 'institut', name: 'Institut', price: '249 €', unit: '/Mo.', cases: '10 aktive Fälle', note: 'Für Teams/Kliniken, zentrale Verwaltung.', cta: '14 Tage gratis' },
+  { key: 'solo', name: 'Solo', price: '59 €', unit: '/Mo.', cases: '1 aktiver Fall', note: 'Für Einzelpraxen. Monatlich kündbar.', cta: 'Auswählen' },
+  { key: 'praxis', name: 'Praxis', price: '149 €', unit: '/Mo.', cases: '5 aktive Fälle', note: 'Bis 3 Fachpersonen, geteilte Vorlagen.', cta: 'Auswählen', featured: true },
+  { key: 'institut', name: 'Institut', price: '249 €', unit: '/Mo.', cases: '10 aktive Fälle', note: 'Für Teams/Kliniken, zentrale Verwaltung.', cta: 'Auswählen' },
 ] as const
 
 const TRUST = [
@@ -112,7 +112,7 @@ export default function FachpersonenPage() {
             </a>
           </div>
           <p className="mt-4 text-xs text-white/40">
-            Beispielfall inklusive · 14 Tage gratis · Keine Kreditkarte
+            Beispielfall inklusive · Keine Kreditkarte · Monatlich kündbar
           </p>
 
           {/* animierte Mini-Stat-Leiste */}
@@ -177,7 +177,7 @@ export default function FachpersonenPage() {
                 {[
                   ['1', 'Anmelden', 'In 2 Minuten, kostenlos.'],
                   ['2', 'Spielwiese erkunden', 'Beispielfall + alle Werkzeuge.'],
-                  ['3', 'Erster echter Fall', '14 Tage gratis testen.'],
+                  ['3', 'Erster echter Fall', 'Werkzeuge pro Fall freischalten.'],
                 ].map(([n, t, d]) => (
                   <div key={t as string} className="rounded-brand border border-white/12 bg-white/[0.05] px-4 py-3">
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 text-sm font-bold text-accent">{n}</div>
@@ -252,8 +252,8 @@ export default function FachpersonenPage() {
               Fair und planbar – Sie zahlen je aktivem Fall
             </h2>
             <p className="mt-3 max-w-[600px] leading-[1.75] text-brand-muted">
-              Der Beispielfall ist immer frei. Werkzeuge schalten Sie pro echtem Fall frei – jeder
-              Tarif startet mit 14 Tagen gratis.
+              Der Beispielfall ist immer frei. Testen Sie alle Werkzeuge vorab kostenlos an der
+              Spielwiese – ohne Kreditkarte. Bei echten Fällen zahlen Sie je aktivem Fall.
             </p>
           </Reveal>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -340,7 +340,7 @@ export default function FachpersonenPage() {
           </h2>
           <p className="mt-4 mx-auto max-w-xl leading-[1.75] text-brand-blue">
             Profil anlegen, Beispielfall erkunden, erste echte Klient:in einladen – die Werkzeuge
-            schalten Sie pro Fall frei. 14 Tage gratis, ohne Risiko.
+            schalten Sie pro Fall frei. Kostenlos an der Spielwiese testen, ohne Risiko.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/auth?role=professional" className="btn-primary">Kostenlose Fallanalyse starten</Link>
