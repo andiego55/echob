@@ -87,6 +87,8 @@ import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage
 import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboardPage'
 import ProfessionalTemplatesPage from '@/pages/professional/ProfessionalTemplatesPage'
 import ProfessionalSettingsPage  from '@/pages/professional/ProfessionalSettingsPage'
+import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalReportTemplatesPage'
+import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -164,8 +166,10 @@ export default function App() {
       <Route path="/professional/dashboard" element={<ProfessionalRoute><ProfessionalDashboardPage /></ProfessionalRoute>} />
       <Route path="/professional/templates" element={<ProfessionalRoute><ProfessionalTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/settings" element={<ProfessionalRoute><ProfessionalSettingsPage /></ProfessionalRoute>} />
+      <Route path="/professional/report-templates" element={<ProfessionalRoute><ProfessionalReportTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
+      <Route path="/professional/cases/:caseId/reports/:reportId" element={<ProfessionalRoute><ProfessionalReportDetailPage /></ProfessionalRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

@@ -9,6 +9,9 @@ import type {
   ProfessionalEchoMessage,
   ProfessionalEchoSession,
   ProfessionalEchoSummary,
+  ProReportTemplate,
+  ProfessionalReport,
+  ProfessionalReportListItem,
 } from '@/types'
 
 interface EchoChatResult {
@@ -168,4 +171,41 @@ export const professionalApi = {
       .then(r => r.data),
   echoSummaryDelete: (caseId: string, summaryId: string) =>
     apiClient.delete(`/professional/cases/${caseId}/echo/summaries/${summaryId}`).then(r => r.data),
+
+  // Berichtsvorlagen (eigene, fall-unabhängig)
+  reportTemplates: () =>
+    apiClient.get<ProReportTemplate[]>('/professional/report-templates').then(r => r.data),
+  reportTemplateCreate: (data: { name: string; instruction: string }) =>
+    apiClient.post<ProReportTemplate>('/professional/report-templates', data).then(r => r.data),
+  reportTemplateUpdate: (id: string, data: { name: string; instruction: string }) =>
+    apiClient.patch<ProReportTemplate>(`/professional/report-templates/${id}`, data).then(r => r.data),
+  reportTemplateDelete: (id: string) =>
+    apiClient.delete(`/professional/report-templates/${id}`).then(r => r.data),
+  reportTemplateAssist: (description: string) =>
+    apiClient
+      .post<{ instruction: string }>('/professional/report-templates/assist', { description }, { timeout: 120_000 })
+      .then(r => r.data),
+
+  // Fallberichte (generiert) — Erstellen ruft Echo (lange Laufzeit → 120s Timeout)
+  caseReports: (caseId: string) =>
+    apiClient.get<ProfessionalReportListItem[]>(`/professional/cases/${caseId}/reports`).then(r => r.data),
+  caseReport: (caseId: string, reportId: string) =>
+    apiClient.get<ProfessionalReport>(`/professional/cases/${caseId}/reports/${reportId}`).then(r => r.data),
+  caseReportCreate: (
+    caseId: string,
+    data: { source: 'standard' | 'template'; standard_key?: string; template_id?: string; title?: string | null },
+  ) =>
+    apiClient
+      .post<ProfessionalReport>(`/professional/cases/${caseId}/reports`, data, { timeout: 120_000 })
+      .then(r => r.data),
+  caseReportUpdate: (
+    caseId: string,
+    reportId: string,
+    data: { title?: string | null; sections?: { heading: string; text: string }[] },
+  ) =>
+    apiClient
+      .patch<ProfessionalReport>(`/professional/cases/${caseId}/reports/${reportId}`, data)
+      .then(r => r.data),
+  caseReportDelete: (caseId: string, reportId: string) =>
+    apiClient.delete(`/professional/cases/${caseId}/reports/${reportId}`).then(r => r.data),
 }

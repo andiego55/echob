@@ -512,6 +512,39 @@ export interface ProfessionalEchoSummary {
   updated_at: string
 }
 
+// ── Fachpersonen-Berichte ─────────────────────────────────────────────────────
+
+export interface ProReportTemplate {
+  id: string
+  name: string
+  instruction: string
+  created_at: string
+  updated_at: string
+}
+
+/** Schlanke Listendarstellung (ohne content) für die Berichtsübersicht im Fall. */
+export interface ProfessionalReportListItem {
+  id: string
+  case_id: string
+  source: string                 // 'standard:verlauf' | 'standard:uebergabe' | 'standard:standort' | 'template'
+  template_id: string | null
+  title: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ProfessionalReport {
+  id: string
+  case_id: string
+  source: string
+  template_id: string | null
+  title: string | null
+  content: ReportContent
+  disclaimer: string
+  created_at: string
+  updated_at: string
+}
+
 /** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */
 export interface SharedCaseBundle {
   case_id: string

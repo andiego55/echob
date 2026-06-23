@@ -4,7 +4,7 @@
  * Bei Widerruf/keinem Zugriff antwortet der Server mit 404 → "Kein Zugriff".
  */
 import { useEffect, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
@@ -32,6 +32,7 @@ const TABS = [
   { key: 'message', label: 'Nachrichten' },
   { key: 'resource', label: 'Ressourcen' },
   { key: 'echo', label: 'Echo' },
+  { key: 'reports', label: 'Berichte' },
   { key: 'notes', label: 'Notizen' },
   { key: 'appointments', label: 'Termine' },
 ] as const
@@ -217,6 +218,7 @@ export default function ProfessionalCaseDetailPage() {
             updating={updateSummary.isPending}
           />
         )}
+        {tab === 'reports' && <ReportsPanel caseId={caseId!} />}
         {tab === 'notes' && <NotesEditor caseId={caseId!} initial={bundle.notes} />}
         {tab === 'appointments' && <AppointmentsPanel caseId={caseId!} />}
       </div>
@@ -426,6 +428,143 @@ function EchoPanel({ caseId, glossary, summaries, onDelete, deleting, onUpdate, 
           </div>
         </Section>
       )}
+    </div>
+  )
+}
+
+const STANDARD_REPORT_OPTIONS = [
+  { key: 'verlauf', label: 'Verlaufsbericht', hint: 'Entwicklung über die Zeit' },
+  { key: 'uebergabe', label: 'Übergabe-/Überweisung', hint: 'Kompakt zur Weitergabe' },
+  { key: 'standort', label: 'Fall-Standortbestimmung', hint: 'Umfassende Momentaufnahme' },
+] as const
+
+const STANDARD_SOURCE_LABELS: Record<string, string> = {
+  'standard:verlauf': 'Verlaufsbericht',
+  'standard:uebergabe': 'Übergabe-/Überweisungsbericht',
+  'standard:standort': 'Fall-Standortbestimmung',
+}
+
+function sourceLabel(source: string): string {
+  return STANDARD_SOURCE_LABELS[source] || (source === 'template' ? 'Eigene Vorlage' : 'Bericht')
+}
+
+/** Reiter „Berichte": Standardbericht/eigene Vorlage wählen, generieren, Liste verwalten. */
+function ReportsPanel({ caseId }: { caseId: string }) {
+  const qc = useQueryClient()
+  const navigate = useNavigate()
+  const [selected, setSelected] = useState('standard:verlauf')   // 'standard:<key>' | 'template:<id>'
+
+  const { data: reports = [], isLoading } = useQuery({
+    queryKey: ['prof-case-reports', caseId],
+    queryFn: () => professionalApi.caseReports(caseId),
+  })
+  const { data: templates = [] } = useQuery({
+    queryKey: ['prof-report-templates'],
+    queryFn: () => professionalApi.reportTemplates(),
+  })
+
+  const create = useMutation({
+    mutationFn: () => {
+      const sep = selected.indexOf(':')
+      const kind = selected.slice(0, sep)
+      const val = selected.slice(sep + 1)
+      return kind === 'standard'
+        ? professionalApi.caseReportCreate(caseId, { source: 'standard', standard_key: val })
+        : professionalApi.caseReportCreate(caseId, { source: 'template', template_id: val })
+    },
+    onSuccess: (rep) => {
+      qc.invalidateQueries({ queryKey: ['prof-case-reports', caseId] })
+      navigate(`/professional/cases/${caseId}/reports/${rep.id}`)
+    },
+  })
+  const del = useMutation({
+    mutationFn: (id: string) => professionalApi.caseReportDelete(caseId, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-case-reports', caseId] }),
+  })
+
+  const tile = (active: boolean) =>
+    `text-left rounded-brand border px-3 py-2 transition-colors ${
+      active ? 'border-accent bg-accent/5' : 'border-brand-border hover:border-accent/50'
+    }`
+
+  return (
+    <div className="space-y-6">
+      <Section title="Neuen Bericht erstellen">
+        <p className="text-sm text-brand-muted mb-4">
+          Echo erstellt einen strukturierten Bericht aus dem freigegebenen Material sowie Ihren
+          Notizen, Hypothesen und Echo-Zusammenfassungen. Sie können ihn danach bearbeiten und drucken.
+        </p>
+
+        <div className="text-xs font-semibold text-navy uppercase tracking-wide mb-1.5">Standardberichte</div>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {STANDARD_REPORT_OPTIONS.map(o => (
+            <button key={o.key} onClick={() => setSelected(`standard:${o.key}`)}
+              className={tile(selected === `standard:${o.key}`)}>
+              <div className="text-sm font-semibold text-navy">{o.label}</div>
+              <div className="text-[11px] text-brand-muted">{o.hint}</div>
+            </button>
+          ))}
+        </div>
+
+        {templates.length > 0 && (
+          <>
+            <div className="text-xs font-semibold text-navy uppercase tracking-wide mt-4 mb-1.5">Eigene Vorlagen</div>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {templates.map(t => (
+                <button key={t.id} onClick={() => setSelected(`template:${t.id}`)}
+                  className={tile(selected === `template:${t.id}`)}>
+                  <div className="text-sm font-semibold text-navy truncate">{t.name}</div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3 mt-5">
+          <button onClick={() => create.mutate()} disabled={create.isPending}
+            className="text-sm font-semibold px-4 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+            {create.isPending ? 'Echo erstellt den Bericht …' : 'Bericht erstellen'}
+          </button>
+          <Link to="/professional/report-templates" className="text-sm text-brand-muted hover:text-accent">
+            Vorlagen verwalten →
+          </Link>
+          {create.isPending && (
+            <span className="text-[11px] text-brand-muted">Das kann bis zu einer Minute dauern.</span>
+          )}
+        </div>
+        {create.isError && (
+          <p className="text-xs text-red-600 mt-2">Bericht konnte nicht erstellt werden. Bitte erneut versuchen.</p>
+        )}
+      </Section>
+
+      <Section title="Erstellte Berichte">
+        {isLoading ? (
+          <p className="text-sm text-brand-muted">Wird geladen …</p>
+        ) : reports.length === 0 ? (
+          <p className="text-sm text-brand-muted">Noch keine Berichte erstellt.</p>
+        ) : (
+          <div className="space-y-2">
+            {reports.map(r => (
+              <div key={r.id}
+                className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
+                <Link to={`/professional/cases/${caseId}/reports/${r.id}`} className="min-w-0 no-underline">
+                  <div className="text-sm font-semibold text-navy truncate">{r.title || 'Bericht'}</div>
+                  <div className="text-[11px] text-brand-muted">
+                    {sourceLabel(r.source)} · {fmtSummaryDate(r.created_at)}
+                  </div>
+                </Link>
+                <button
+                  onClick={() => { if (window.confirm('Diesen Bericht löschen?')) del.mutate(r.id) }}
+                  disabled={del.isPending}
+                  className="shrink-0 text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
+                >
+                  Löschen
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
     </div>
   )
 }
