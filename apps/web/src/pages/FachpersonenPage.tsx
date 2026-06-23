@@ -2,6 +2,30 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
 import FachpersonenExplainer from '@/components/landing/FachpersonenExplainer'
+import DirectoryWaitlistForm from '@/components/landing/DirectoryWaitlistForm'
+
+const DIRECTORY_BENEFITS = [
+  {
+    icon: '🔎',
+    title: 'Klient:innen finden Sie',
+    text: 'Menschen sortieren mit EchoB ihre Beziehungsmuster – und suchen danach passende Begleitung. Das Verzeichnis bringt Sie gezielt mit ihnen zusammen.',
+  },
+  {
+    icon: '🆓',
+    title: 'Kostenlos & unverbindlich',
+    text: 'Die Vormerkung und die Basis-Listung kosten nichts. Keine Vertragsbindung, kein Abo nötig – ein zusätzlicher Kanal, der nicht schaden kann.',
+  },
+  {
+    icon: '🚀',
+    title: 'Früh dabei = vorne dabei',
+    text: 'Das Verzeichnis startet bald. Wer jetzt vorgemerkt ist, gehört zu den Ersten, die Klient:innen beim Start angezeigt bekommen.',
+  },
+  {
+    icon: '🛡️',
+    title: 'Sie behalten die Kontrolle',
+    text: 'Nichts wird veröffentlicht, bevor wir Ihre Angaben mit Ihnen abgestimmt haben. Jederzeit widerrufbar.',
+  },
+]
 
 const FEATURES = [
   {
@@ -168,6 +192,54 @@ export default function FachpersonenPage() {
               </Link>
             </div>
           </Reveal>
+        </div>
+      </section>
+
+      {/* ── Verzeichnis-Warteliste (Lead-Generierung) ────────────── */}
+      <section id="verzeichnis" className="border-t border-brand-border px-6 py-[72px]">
+        <div className="mx-auto max-w-[960px]">
+          <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.05fr]">
+            {/* Pitch */}
+            <Reveal>
+              <span className="label inline-flex items-center gap-2">
+                <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Neu</span>
+                EchoB-Verzeichnis
+              </span>
+              <h2 className="mt-2 text-[clamp(1.4rem,2.5vw,1.9rem)] font-bold leading-[1.2] text-navy">
+                Werden Sie gefunden – lassen Sie sich kostenlos vormerken
+              </h2>
+              <p className="mt-3 leading-[1.75] text-brand-muted">
+                Wir bauen ein Verzeichnis, in dem Klient:innen passende Fachpersonen, Praxen und
+                Coaches finden. Tragen Sie sich jetzt unverbindlich ein – Sie sichern sich einen
+                Platz, sobald es startet. Kostenlos, ohne Risiko.
+              </p>
+              <div className="mt-7 space-y-5">
+                {DIRECTORY_BENEFITS.map(({ icon, title, text }, i) => (
+                  <Reveal key={title} delay={(i % 4) * 0.06}>
+                    <div className="flex gap-3.5">
+                      <span className="mt-0.5 text-xl" aria-hidden="true">{icon}</span>
+                      <div>
+                        <h3 className="font-semibold text-navy">{title}</h3>
+                        <p className="mt-0.5 text-sm leading-relaxed text-brand-muted">{text}</p>
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </Reveal>
+
+            {/* Formular */}
+            <Reveal delay={0.1}>
+              <div className="rounded-[1.25rem] border border-brand-border bg-white p-6 shadow-sm sm:p-8">
+                <h3 className="text-lg font-bold text-navy">Jetzt vormerken lassen</h3>
+                <p className="mt-1 mb-6 text-sm text-brand-muted">
+                  Nur Name und E-Mail sind nötig. Alles Weitere hilft uns, Sie passend zu listen –
+                  ist aber freiwillig.
+                </p>
+                <DirectoryWaitlistForm />
+              </div>
+            </Reveal>
+          </div>
         </div>
       </section>
 
