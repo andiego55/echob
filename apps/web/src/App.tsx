@@ -7,6 +7,7 @@ import DatenschutzPage      from '@/pages/DatenschutzPage'
 import AGBPage              from '@/pages/AGBPage'
 import WiderrufPage         from '@/pages/WiderrufPage'
 import AuthPage             from '@/pages/AuthPage'
+import ClientInvitePage     from '@/pages/ClientInvitePage'
 import NotFoundPage         from '@/pages/NotFoundPage'
 import CoachingPage         from '@/pages/CoachingPage'
 import UeberPage            from '@/pages/UeberPage'
@@ -93,6 +94,7 @@ import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
 import { QuickExitHotkey } from '@/components/app/QuickExit'
+import PendingInviteHandler from '@/components/PendingInviteHandler'
 
 export default function App() {
   return (
@@ -101,6 +103,7 @@ export default function App() {
     <ConsentGate />
     <LockScreen />
     <QuickExitHotkey />
+    <PendingInviteHandler />
     <Routes>
       {/* ── Öffentlich ─────────────────────────────────────────────────────── */}
       <Route path="/"            element={<LandingPage />} />
@@ -109,6 +112,7 @@ export default function App() {
       <Route path="/agb"         element={<AGBPage />} />
       <Route path="/widerruf"    element={<WiderrufPage />} />
       <Route path="/auth"        element={<AuthPage />} />
+      <Route path="/einladung/:token" element={<ClientInvitePage />} />
       <Route path="/coaching"    element={<CoachingPage />} />
       <Route path="/ueber"       element={<UeberPage />} />
       <Route path="/ueber/gruender" element={<GruenderInterviewPage />} />

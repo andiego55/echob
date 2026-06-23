@@ -3,6 +3,7 @@ import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { Link } from 'react-router-dom'
+import { setPendingInvite } from '@/lib/pendingInvite'
 
 type Tab    = 'login' | 'signup'
 type Method = 'password' | 'magic'
@@ -22,8 +23,15 @@ export default function AuthPage() {
   const [method, setMethod]   = useState<Method>('password')
   const [email, setEmail]     = useState('')
   const [password, setPassword] = useState('')
+  const [inviteCode, setInviteCode] = useState(searchParams.get('code') ?? '')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // Optionalen Einladungscode merken (wird nach Login von PendingInviteHandler eingelöst).
+  const persistInviteCode = () => {
+    const code = inviteCode.trim()
+    if (code && !isPro) setPendingInvite({ code })
+  }
 
   // Bereits eingeloggt → weiterleiten
   if (session) return <Navigate to={from} replace />
@@ -32,6 +40,7 @@ export default function AuthPage() {
     e.preventDefault()
     setLoading(true)
     setMessage(null)
+    persistInviteCode()
 
     try {
       if (method === 'magic') {
@@ -62,6 +71,7 @@ export default function AuthPage() {
 
   const handleGoogle = async () => {
     setLoading(true)
+    persistInviteCode()
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}${from}` },
@@ -186,6 +196,26 @@ export default function AuthPage() {
                     placeholder={tab === 'signup' ? 'Mindestens 6 Zeichen' : '••••••••'}
                     className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
                   />
+                </div>
+              )}
+
+              {!isPro && (
+                <div>
+                  <label htmlFor="invite-code" className="mb-1.5 block text-sm font-medium text-brand-text">
+                    Einladungscode <span className="font-normal text-brand-muted">(optional)</span>
+                  </label>
+                  <input
+                    id="invite-code"
+                    type="text"
+                    value={inviteCode}
+                    onChange={(e) => setInviteCode(e.target.value)}
+                    placeholder="z. B. ABCD-1234"
+                    autoCapitalize="characters"
+                    className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm uppercase tracking-wider text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+                  />
+                  <p className="mt-1 text-[11px] text-brand-muted">
+                    Von einer Fachperson erhalten? Eintragen, um direkt verbunden zu werden.
+                  </p>
                 </div>
               )}
 

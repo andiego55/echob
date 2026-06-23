@@ -10,6 +10,7 @@ from app.api.v1.routers import (
     account,
     case_shares,
     cases,
+    client_invites,
     echo,
     health,
     hypotheses,
@@ -65,6 +66,7 @@ v1_router.include_router(professionals.router)
 v1_router.include_router(organizations.router)
 v1_router.include_router(org_billing.router)
 v1_router.include_router(case_shares.router)
+v1_router.include_router(client_invites.router)
 v1_router.include_router(professional_echo.router)
 v1_router.include_router(professional_collab.router)
 v1_router.include_router(professional_notes.router)

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
+import ClientInviteButton from '@/components/professional/ClientInviteButton'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi, type DashboardItem } from '@/api/professional'
 import { SHARE_ELEMENT_LABELS } from '@/types'
@@ -66,8 +67,13 @@ export default function ProfessionalDashboardPage() {
   return (
     <ProfessionalShell>
       <div className="mx-auto max-w-[1100px] px-6 py-10">
-        <h1 className="text-2xl font-bold text-navy">Dashboard</h1>
-        <p className="mt-1 text-sm text-brand-muted mb-6">Deine Klient:innen auf einen Blick.</p>
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-navy">Dashboard</h1>
+            <p className="mt-1 text-sm text-brand-muted">Deine Klient:innen auf einen Blick.</p>
+          </div>
+          <ClientInviteButton />
+        </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <Tile label="Klient:innen" value={clientsCount} onClick={() => { setFilter('all'); setQ('') }} />
@@ -86,7 +92,13 @@ export default function ProfessionalDashboardPage() {
           <div className="card text-center py-12">
             <div className="text-4xl mb-3">📋</div>
             <h2 className="text-lg font-semibold text-navy mb-1">Noch keine Klient:innen</h2>
-            <p className="text-sm text-brand-muted">Sobald jemand einen Fall mit dir teilt, erscheint er hier.</p>
+            <p className="mx-auto mb-5 max-w-md text-sm text-brand-muted">
+              Laden Sie Ihre erste Klient:in ein – sie bekommt einen Link + Code, registriert sich
+              kostenlos und kann ihren Fall mit Ihnen teilen.
+            </p>
+            <div className="flex justify-center">
+              <ClientInviteButton />
+            </div>
           </div>
         ) : (
           <>
