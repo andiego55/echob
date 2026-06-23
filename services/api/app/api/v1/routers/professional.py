@@ -25,6 +25,7 @@ from app.schemas.professional import (
     ProfessionalRegister,
 )
 from app.services import collab_service
+from app.services.demo_service import ensure_demo_for_professional
 from app.services.echo_service import _REL_TYPE_LABELS
 from app.services.sharing_service import load_shared_bundle, require_active_share
 
@@ -138,8 +139,17 @@ def _public_profile(row):
 # ── Rolle / Profil ────────────────────────────────────────────────────────────
 
 @router.get("/me", response_model=ProfessionalProfileResponse)
-async def get_me(current: dict = Depends(get_current_professional)) -> ProfessionalProfileResponse:
-    """Profil der eingeloggten Fachperson (403, wenn kein Fachpersonen-Zugang)."""
+async def get_me(
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalProfileResponse:
+    """Profil der eingeloggten Fachperson (403, wenn kein Fachpersonen-Zugang).
+
+    Stellt nebenbei die Demo-Spielwiese bereit (idempotent) — so sehen auch Bestands-
+    konten den Beispielfall beim nächsten Laden.
+    """
+    async with pool.acquire() as conn:
+        await ensure_demo_for_professional(current["user_id"], conn)
     return ProfessionalProfileResponse(**current["professional"])
 
 
@@ -179,6 +189,7 @@ async def register(
                     "WHERE lower(email) = $2 AND status = 'pending'",
                     user_id, email,
                 )
+        await ensure_demo_for_professional(user_id, conn)
     return ProfessionalProfileResponse(**dict(row))
 
 
@@ -241,7 +252,7 @@ async def inbox(
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """
-            SELECT s.id AS share_id, s.case_id, s.created_at AS shared_at,
+            SELECT s.id AS share_id, s.case_id, s.created_at AS shared_at, s.is_demo,
                    c.relationship_type,
                    up.display_name AS client_display_name,
                    array_agg(DISTINCT e.element_type) FILTER (WHERE e.element_type IS NOT NULL) AS element_types
@@ -250,8 +261,8 @@ async def inbox(
             LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id
             LEFT JOIN case_share_elements e ON e.share_id = s.id
             WHERE s.professional_user_id = $1 AND s.status = 'active'
-            GROUP BY s.id, s.case_id, s.created_at, c.relationship_type, up.display_name
-            ORDER BY s.created_at DESC
+            GROUP BY s.id, s.case_id, s.created_at, s.is_demo, c.relationship_type, up.display_name
+            ORDER BY s.is_demo ASC, s.created_at DESC
             """,
             pid,
         )
@@ -263,6 +274,7 @@ async def inbox(
             case_title=_case_title(r["relationship_type"]),
             element_types=list(r["element_types"] or []),
             shared_at=r["shared_at"],
+            is_demo=r["is_demo"],
         )
         for r in rows
     ]
@@ -280,7 +292,7 @@ async def cases(
         rows = await conn.fetch(
             """
             SELECT s.id AS share_id, s.case_id, s.owner_user_id, s.created_at AS shared_at,
-                   c.relationship_type,
+                   s.is_demo, c.relationship_type,
                    up.display_name AS client_display_name,
                    array_agg(DISTINCT e.element_type) FILTER (WHERE e.element_type IS NOT NULL) AS element_types
             FROM case_shares s
@@ -288,8 +300,9 @@ async def cases(
             LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id
             LEFT JOIN case_share_elements e ON e.share_id = s.id
             WHERE s.professional_user_id = $1 AND s.status = 'active'
-            GROUP BY s.id, s.case_id, s.owner_user_id, s.created_at, c.relationship_type, up.display_name
-            ORDER BY up.display_name NULLS LAST, s.created_at DESC
+            GROUP BY s.id, s.case_id, s.owner_user_id, s.created_at,
+                     s.is_demo, c.relationship_type, up.display_name
+            ORDER BY s.is_demo ASC, up.display_name NULLS LAST, s.created_at DESC
             """,
             pid,
         )
@@ -305,6 +318,7 @@ async def cases(
             case_title=_case_title(r["relationship_type"]),
             element_types=list(r["element_types"] or []),
             shared_at=r["shared_at"],
+            is_demo=r["is_demo"],
         ))
     return [ProfessionalClientGroup(**g) for g in groups.values()]
 
@@ -322,14 +336,15 @@ async def dashboard(
     pid = current["user_id"]
     async with pool.acquire() as conn:
         share_rows = await conn.fetch(
-            "SELECT s.case_id, c.relationship_type, up.display_name AS client_display_name, "
+            "SELECT s.case_id, s.is_demo, c.relationship_type, "
+            "up.display_name AS client_display_name, "
             "       array_agg(DISTINCT e.element_type) "
             "         FILTER (WHERE e.element_type IS NOT NULL) AS element_types "
             "FROM case_shares s JOIN cases c ON c.id = s.case_id "
             "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
             "LEFT JOIN case_share_elements e ON e.share_id = s.id "
             "WHERE s.professional_user_id = $1 AND s.status = 'active' "
-            "GROUP BY s.case_id, c.relationship_type, up.display_name",
+            "GROUP BY s.case_id, s.is_demo, c.relationship_type, up.display_name",
             pid,
         )
         if not share_rows:
@@ -339,6 +354,7 @@ async def dashboard(
                 "client_display_name": r["client_display_name"] or "Klient:in",
                 "case_title": _case_title(r["relationship_type"]),
                 "element_types": list(r["element_types"] or []),
+                "is_demo": r["is_demo"],
             }
             for r in share_rows
         }
@@ -408,6 +424,7 @@ async def dashboard(
             "client_display_name": case_info[cid]["client_display_name"],
             "case_title": case_info[cid]["case_title"],
             "element_types": case_info[cid]["element_types"],
+            "is_demo": case_info[cid]["is_demo"],
             "unread_count": meta[scid]["unread"],
             "open_count": meta[scid]["open"],
             "next_appointment": next_appt.get(scid),
@@ -523,6 +540,7 @@ async def case_detail(
         "case_id": str(case_id),
         "client_display_name": (owner_row["display_name"] if owner_row else None) or "Klient:in",
         "case_title": _case_title(bundle.case.get("relationship_type") if bundle.case else None),
+        "is_demo": bool(bundle.share.get("is_demo")),
         "allowed": sorted(bundle.allowed),
         "case": _public_row(bundle.case),
         "onboarding": _public_row(bundle.onboarding, ("pattern_hypotheses",)),

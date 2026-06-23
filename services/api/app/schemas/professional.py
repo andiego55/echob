@@ -97,6 +97,7 @@ class InboxItem(BaseModel):
     case_title: str                          # Beziehungstyp-Label
     element_types: list[ShareElementType]
     shared_at: datetime
+    is_demo: bool = False                    # Beispielfall / Spielwiese
 
 
 class ProfessionalCaseSummary(BaseModel):
@@ -105,6 +106,7 @@ class ProfessionalCaseSummary(BaseModel):
     case_title: str
     element_types: list[ShareElementType]
     shared_at: datetime
+    is_demo: bool = False                    # Beispielfall / Spielwiese
 
 
 class ProfessionalClientGroup(BaseModel):
