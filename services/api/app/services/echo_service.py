@@ -1265,6 +1265,81 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
+    # ── Fachpersonen-Berichte ─────────────────────────────────────────────────
+
+    async def professional_generate_report(
+        self,
+        *,
+        instruction: str,
+        context: str,
+        max_tokens: int = 3500,
+        temperature: float = 0.38,
+    ) -> dict[str, Any]:
+        """Generiert einen strukturierten Fachpersonen-Bericht (``{sections:[{heading,text}]}``).
+
+        Spiegelt ``_openai_report``: System-Prompt (erweiterte Latitude) + Fallkontext +
+        Anweisung (Standard oder eigene Vorlage). Erweiterte fachliche Tiefe steckt im Prompt.
+        """
+        if not self._use_openai:
+            return self._mock_professional_report()
+        import json
+
+        from app.schemas.professional import PRO_REPORT_DISCLAIMER
+
+        system_prompt = _load_prompt("echo_professional_report_prompt.md")
+        user_message = instruction + "\n\nAntworte ausschließlich als gültiges JSON-Objekt."
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": context},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=max_tokens,
+            temperature=temperature,
+            response_format={"type": "json_object"},
+        )
+        parsed = json.loads(response.choices[0].message.content or "{}")
+        sections = parsed.get("sections")
+        if not isinstance(sections, list):
+            sections = []
+        return {"sections": sections, "disclaimer": PRO_REPORT_DISCLAIMER}
+
+    def _mock_professional_report(self) -> dict[str, Any]:
+        from app.schemas.professional import PRO_REPORT_DISCLAIMER
+
+        return {
+            "sections": [{
+                "heading": "Hinweis",
+                "text": (
+                    "Echo läuft im Demo-Modus ohne KI-Anbindung. Mit konfiguriertem OpenAI-Key "
+                    "erstellt Echo hier einen strukturierten Fallbericht auf Basis des "
+                    "freigegebenen Materials und Ihrer Notizen, Hypothesen und Zusammenfassungen."
+                ),
+            }],
+            "disclaimer": PRO_REPORT_DISCLAIMER,
+        }
+
+    async def professional_template_assist(self, *, description: str) -> str:
+        """Baut aus einer Zielbeschreibung eine ausgearbeitete Berichtsvorlagen-Anweisung."""
+        if not self._use_openai:
+            return (
+                "_(Echo läuft im Demo-Modus – bitte OpenAI-API-Key konfigurieren.)_ Mit Anbindung "
+                "formuliert Echo aus Ihrer Beschreibung eine vollständige Vorlagen-Anweisung mit "
+                "nummerierter Abschnittsstruktur."
+            )
+        system_prompt = _load_prompt("pro_report_template_assist_prompt.md")
+        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": description},
+            ],
+            max_tokens=1200,
+            temperature=0.5,
+        )
+        return response.choices[0].message.content or ""
+
 
 # ── Singleton-Factory für lifespan ────────────────────────────────────────────
 

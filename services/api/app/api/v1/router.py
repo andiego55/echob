@@ -19,6 +19,7 @@ from app.api.v1.routers import (
     professional,
     professional_collab,
     professional_echo,
+    professional_reports,
     professional_templates,
     professionals,
     profile,
@@ -61,4 +62,5 @@ v1_router.include_router(professionals.router)
 v1_router.include_router(case_shares.router)
 v1_router.include_router(professional_echo.router)
 v1_router.include_router(professional_collab.router)
+v1_router.include_router(professional_reports.router)
 v1_router.include_router(professional_templates.router)
