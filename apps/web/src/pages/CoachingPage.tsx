@@ -148,19 +148,19 @@ export default function CoachingPage() {
                 <a href="mailto:coaching@echo-b.de?subject=Erstgespräch" className="btn-primary text-center text-sm block">Erstgespräch anfragen</a>
               </div>
 
-              {/* Einzelstunde */}
+              {/* Einzeltermin */}
               <div className="card flex flex-col">
                 <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent/15 text-accent self-start mb-3">Inkl. 1 Monat App</span>
-                <p className="font-bold text-navy mb-1">Einzelstunde</p>
-                <p className="text-xs text-brand-muted mb-4 leading-relaxed">Punktuelle Begleitung plus ein Monat voller App-Zugang – wann immer du sie brauchst. Flexibel, ohne Abo.</p>
-                <div className="text-2xl font-extrabold text-navy mb-1">119 € <span className="text-sm font-normal text-brand-muted">/Std.</span></div>
-                <p className="text-xs text-brand-muted mb-4">60 Minuten · Einzeln buchbar</p>
+                <p className="font-bold text-navy mb-1">Einzeltermin</p>
+                <p className="text-xs text-brand-muted mb-4 leading-relaxed">Punktuelle Begleitung plus ein Monat voller App-Zugang – wann immer du ihn brauchst. Flexibel, ohne Abo.</p>
+                <div className="text-2xl font-extrabold text-navy mb-1">119 € <span className="text-sm font-normal text-brand-muted">/Termin</span></div>
+                <p className="text-xs text-brand-muted mb-4">90 Min. · 120 Min. ohne vorheriges Erstgespräch</p>
                 <ul className="space-y-1.5 mb-6 flex-1">
-                  {['Persönliches Coaching-Gespräch (60 Min.)', '1 Monat EchoB-Vollzugang inklusive', 'Auswertung deiner EchoB-Daten auf Wunsch', 'Schriftliche Zusammenfassung im Anschluss', 'Kein Folgecommitment'].map(f => (
+                  {['Persönliches Coaching-Gespräch (90 Min.)', '1 Monat EchoB-Vollzugang inklusive', 'Auf Wunsch: Plattform-Einführung in Echo', 'Auswertung deiner EchoB-Daten auf Wunsch', 'Schriftliche Zusammenfassung im Anschluss', 'Kein Folgecommitment'].map(f => (
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:coaching@echo-b.de?subject=Einzelstunde" className="btn-outline text-center text-sm block">Session buchen</a>
+                <a href="mailto:coaching@echo-b.de?subject=Einzeltermin%20buchen" className="btn-outline text-center text-sm block">Termin buchen</a>
               </div>
 
               {/* Monatspaket */}
@@ -171,7 +171,7 @@ export default function CoachingPage() {
                 <div className="text-2xl font-extrabold text-navy mb-1">499 € <span className="text-sm font-normal text-brand-muted">/Monat</span></div>
                 <p className="text-xs text-brand-muted mb-4">Wöchentliche Online-Check-ins · je 60 Min.</p>
                 <ul className="space-y-1.5 mb-6 flex-1">
-                  {['Wöchentliche 60-Min.-Online-Check-ins', 'Geführte Dialoge in der App zwischen den Terminen (Themen, Bindung, Eigenanteil …)', 'Voller EchoB-Plattformzugang inklusive', 'Auswertung aller Skalenwerte & Muster', 'Bericht für Therapie/Übergabe auf Wunsch', 'Priority-Rückmeldung innerhalb 4 Stunden'].map(f => (
+                  {['Wöchentliche 60-Min.-Online-Check-ins', 'Persönliche Plattform-Einführung in Echo', 'Geführte Dialoge in der App zwischen den Terminen (Themen, Bindung, Eigenanteil …)', 'Voller EchoB-Plattformzugang inklusive', 'Auswertung aller Skalenwerte & Muster', 'Bericht für Therapie/Übergabe auf Wunsch'].map(f => (
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
