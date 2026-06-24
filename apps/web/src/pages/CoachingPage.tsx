@@ -160,7 +160,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:coaching@echo-b.de?subject=Einzeltermin%20buchen" className="btn-outline text-center text-sm block">Termin buchen</a>
+                <a href="mailto:coaching@echo-b.de?subject=Einzeltermin%20buchen" className="block rounded-brand border-2 border-navy/25 py-2.5 text-center text-sm font-semibold text-navy no-underline transition-colors hover:border-navy/50 hover:bg-navy/[0.03]">Termin buchen</a>
               </div>
 
               {/* Monatspaket */}
