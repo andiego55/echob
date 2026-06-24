@@ -13,24 +13,26 @@ const INTERVIEW: { q: string; a: string[] }[] = [
   {
     q: 'Was war der Ausgangspunkt für EchoB?',
     a: [
-      'EchoB ist aus meiner eigenen Erfahrung mit KI entstanden. Mir wurde klar: KI hilft nicht nur, Informationen schneller zu verarbeiten oder Texte zu schreiben – sie kann auch helfen, die eigenen Muster besser zu verstehen.',
-      'Ich arbeite seit rund 15 Jahren in der IT, habe aber einen sozialwissenschaftlichen Hintergrund und Psychologie im Nebenfach studiert. Psychologie hat mich immer fasziniert, IT wurde mein Beruf. In EchoB kommen beide Seiten zusammen.',
-      'Besonders beschäftigt hat mich ein Gedanke: Menschen nutzen KI ohnehin längst zur Selbstreflexion. Das lässt sich weder verhindern noch sinnvoll vermeiden. Die wichtigere Frage ist, wie man diese Nutzung gestaltet – hilfreich, verantwortungsvoll und zugänglich. EchoB ist mein Versuch, genau das in Software zu gießen.',
+      'Der Ausgangspunkt für EchoB war eine Beobachtung: KI wird nicht mehr nur genutzt, um Informationen zu suchen oder Texte zu schreiben. Menschen nutzen sie auch, um eigene Gedanken, Konflikte und Beziehungserfahrungen zu sortieren.',
+      'Ich habe selbst erlebt, wie hilfreich KI sein kann, um Muster, Gefühle und Interpretationen in eine Ordnung zu bringen. Daraus entstand die Idee, diesen Prozess nicht dem Zufall eines beliebigen Chats zu überlassen, sondern ihn in eine verantwortungsvoll gestaltete Software zu übersetzen.',
+      'Ich arbeite seit rund 15 Jahren in der IT, komme aber ursprünglich aus einem sozialwissenschaftlichen Umfeld und habe Psychologie im Nebenfach studiert. Psychologische Fragen haben mich immer interessiert, aber IT wurde mein Beruf. In EchoB verbinden sich diese beiden Perspektiven: technische Umsetzung, psychologisches Interesse und der Wunsch, Menschen in belastenden Beziehungssituationen mehr Struktur und Klarheit zu geben.',
+      'Mich beschäftigt ein Gedanke: Menschen nutzen KI ohnehin zur Selbstreflexion. Die entscheidende Frage ist deshalb nicht, ob das passiert, sondern wie. EchoB ist mein Versuch, diese Nutzung zu verbessern. Mit EchoB wird sie hilfreicher, sicherer und zugänglicher.',
     ],
   },
   {
     q: 'Was bedeutet der Satz „Erkenne, was sich wiederholt"?',
     a: [
-      'Damit meine ich nicht, dass Situationen exakt gleich ablaufen. Beziehungen, Konflikte und persönliche Dynamiken haben eher einen Rhythmus: Etwas kehrt wieder – in anderer Form, mit anderen Worten, in einer anderen Situation.',
-      'Gerade deshalb ist es so schwer zu erkennen. Für viele fühlt es sich fast wie Schicksal an: „Schon wieder gerate ich da hinein." Oder: „Warum passiert mir das immer wieder?"',
-      'Dabei lassen sich oft klare Dynamiken benennen – wiederkehrende Verhaltensweisen, Belastungen, Machtverschiebungen, Manipulationsmuster. EchoB hilft, solche Wiederholungen sichtbar und benennbar zu machen: indem man einzelne Szenen festhält und über die Zeit das Muster dahinter erkennt.',
+      'Damit meine ich nicht, dass Situationen exakt gleich ablaufen. Beziehungen, Konflikte und persönliche Dynamiken haben aber oft einen Rhythmus: Etwas kehrt wieder – in anderer Form, mit anderen Worten, in einer anderen Situation.',
+      'Gerade deshalb ist es so schwer zu erkennen. Für viele fühlt es sich fast wie Schicksal an: „Schon wieder gerate ich da hinein." Oder: „Was passiert hier immer?"',
+      'Dabei lassen sich oft klare Dynamiken benennen – wiederkehrende Verhaltensweisen, Belastungen, Machtverschiebungen oder Manipulationsmuster. Manipulation ist beispielsweise schwer zu durchschauen, wenn man keine innere Struktur aufgebaut hat, die diese erkennt. Dabei folgt Manipulation bestimmten Mechaniken, die für geschulte Personen - oder eben KI - klarer zu sehen sind.',
+      'EchoB hilft, solche Wiederholungen sichtbar zu machen und in Sprache zu übersetzen. Das passiert, indem man einzelne Szenen festhält und über die Zeit das Muster dahinter erkennt.',
     ],
   },
   {
     q: 'Für wen ist EchoB gedacht?',
     a: [
       'Vor allem für Menschen, die in schwierigen Beziehungen oder wiederkehrenden Konflikten stecken und spüren: Hier passiert etwas immer wieder, aber ich kann es noch nicht richtig greifen.',
-      'Das kann eine Partnerschaft sein, eine familiäre Beziehung, ein beruflicher Konflikt, eine Trennung – jede belastende Konstellation. EchoB hilft, diese Erfahrungen zu strukturieren, zu dokumentieren und mit etwas Abstand zu betrachten.',
+      'Das kann eine Partnerschaft sein, eine familiäre Beziehung - häufig zu einem Elternteil, ein beruflicher Konflikt, eine Trennung – jede belastende Konstellation. EchoB hilft, diese Erfahrungen zu strukturieren, zu dokumentieren und mit etwas Abstand zu betrachten.',
       'Und es ist auch für Coaches, Beraterinnen, Berater und Therapeutinnen gedacht – nicht als Ersatz, sondern als Vorbereitung und Begleitung. Wer seine Beobachtungen festhält und Muster über die Zeit sichtbar macht, geht klarer in ein Gespräch, eine Beratung oder eine Therapie. Über den Fachpersonenbereich lassen sich ausgewählte Inhalte gezielt freigeben.',
     ],
   },
