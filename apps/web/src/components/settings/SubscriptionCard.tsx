@@ -11,7 +11,6 @@ import { subscriptionApi } from '@/api/subscription'
  */
 const PLAN_LABELS: Record<string, string> = {
   trial: 'Kostenloser Testzugang',
-  startpaket: 'Startpaket',
   early_bird: 'Early Bird Abo',
   regular: 'Monatsabo',
   annual: 'Jahresabo',

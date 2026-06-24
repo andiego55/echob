@@ -59,7 +59,6 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""
     # Optional: feste Price-IDs aus dem Stripe-Dashboard.
     # Wenn leer, werden Preise inline (price_data) erzeugt — kein Setup nötig.
-    stripe_price_startpaket: str = ""
     stripe_price_early_bird: str = ""
     stripe_price_regular: str = ""
     stripe_price_annual: str = ""

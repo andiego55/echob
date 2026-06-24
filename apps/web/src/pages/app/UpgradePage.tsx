@@ -11,7 +11,6 @@ import type { ProductType } from '@/types'
 
 const PLAN_LABELS: Record<string, string> = {
   trial: 'Testzugang',
-  startpaket: 'Startpaket',
   early_bird: 'Early Bird Abo',
   regular: 'Monatsabo',
   annual: 'Jahresabo',
@@ -158,8 +157,6 @@ export default function UpgradePage() {
               {paidActive
                 ? `Dein Plan: ${PLAN_LABELS[subscription.plan]}. Viel Erfolg bei deiner Reflexionsarbeit!`
                 : 'Dein Zugang wird in wenigen Sekunden freigeschaltet – diese Seite aktualisiert sich automatisch.'}
-              {searchParams.get('product') === 'startpaket' &&
-                ' Wir melden uns innerhalb von 24 Stunden per E-Mail zur Terminvereinbarung deiner Coaching-Stunde.'}
             </p>
           </div>
         )}
@@ -191,22 +188,20 @@ export default function UpgradePage() {
               </p>
               {subscription.subscription_ends_at && (
                 <p className="text-xs text-brand-muted mt-0.5">
-                  {subscription.plan === 'startpaket' ? 'Zugang bis' : 'Nächste Verlängerung'}:{' '}
+                  Nächste Verlängerung:{' '}
                   {new Date(subscription.subscription_ends_at).toLocaleDateString('de-DE', {
                     day: '2-digit', month: 'long', year: 'numeric',
                   })}
                 </p>
               )}
             </div>
-            {subscription.plan !== 'startpaket' && (
-              <button
-                onClick={() => portalMutation.mutate()}
-                disabled={portalMutation.isPending}
-                className="text-sm font-medium text-accent hover:underline disabled:opacity-50"
-              >
-                {portalMutation.isPending ? 'Wird geöffnet …' : 'Abo verwalten →'}
-              </button>
-            )}
+            <button
+              onClick={() => portalMutation.mutate()}
+              disabled={portalMutation.isPending}
+              className="text-sm font-medium text-accent hover:underline disabled:opacity-50"
+            >
+              {portalMutation.isPending ? 'Wird geöffnet …' : 'Abo verwalten →'}
+            </button>
           </div>
         )}
 

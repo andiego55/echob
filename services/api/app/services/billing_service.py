@@ -13,29 +13,16 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-STARTPAKET_ACCESS_DAYS = 31
-
 # ── Produktkatalog ────────────────────────────────────────────────────────────
 
 PRODUCTS: dict[str, dict] = {
-    # STILLGELEGT: nicht mehr kaufbar (nicht in ProductType). Bleibt nur hier,
-    # damit ein evtl. im Deploy-Moment laufender Checkout noch erfüllt wird und
-    # Bestandskäufer im 31-Tage-Fenster gültig bleiben.
-    "startpaket": {
-        "name": "EchoB Startpaket",
-        "description": "1 Monat App-Vollzugang + 1 persönliche Coaching-Stunde (60 min)",
-        "amount_cents": 9900,
-        "mode": "payment",          # Einmalzahlung
-        "interval": None,
-        "price_id_setting": "stripe_price_startpaket",
-    },
     "early_bird": {
         "name": "EchoB Early Bird Abo",
         "description": "Vollzugang zu allen Features – monatlich kündbar",
@@ -197,25 +184,17 @@ async def fulfill_checkout_session(obj, pool) -> str | None:
     user_id = UUID(user_id_str)
     customer_id = obj.get("customer")
     subscription_id = obj.get("subscription")
-    now = datetime.now(UTC)
-
-    if PRODUCTS[product_key]["mode"] == "payment":
-        # Startpaket: fester Zugangs-Zeitraum
-        ends_at = now + timedelta(days=STARTPAKET_ACCESS_DAYS)
-    else:
-        # Abo: Periodenende von Stripe holen (Renewals via subscription.updated)
-        ends_at = None
-        if subscription_id:
-            try:
-                stripe = _stripe()
-                sub = await asyncio.to_thread(
-                    stripe.Subscription.retrieve, subscription_id
-                )
-                period_end = sub.get("current_period_end")
-                if period_end:
-                    ends_at = datetime.fromtimestamp(period_end, tz=UTC)
-            except Exception:
-                logger.exception("Konnte Subscription %s nicht laden", subscription_id)
+    # Abo: Periodenende von Stripe holen (Renewals via subscription.updated)
+    ends_at = None
+    if subscription_id:
+        try:
+            stripe = _stripe()
+            sub = await asyncio.to_thread(stripe.Subscription.retrieve, subscription_id)
+            period_end = sub.get("current_period_end")
+            if period_end:
+                ends_at = datetime.fromtimestamp(period_end, tz=UTC)
+        except Exception:
+            logger.exception("Konnte Subscription %s nicht laden", subscription_id)
 
     async with pool.acquire() as conn:
         await _upsert_profile_plan(
