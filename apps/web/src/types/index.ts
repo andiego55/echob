@@ -364,7 +364,8 @@ export interface ProfileModuleUpdate {
 // ── Subscription ─────────────────────────────────────────────────────────────
 
 export type PlanType = 'trial' | 'startpaket' | 'early_bird' | 'regular' | 'annual'
-export type ProductType = Exclude<PlanType, 'trial'>
+// Startpaket stillgelegt: gültiger Status, aber nicht mehr kaufbar.
+export type ProductType = Exclude<PlanType, 'trial' | 'startpaket'>
 
 export interface SubscriptionStatus {
   plan: PlanType

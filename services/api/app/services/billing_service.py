@@ -25,6 +25,9 @@ STARTPAKET_ACCESS_DAYS = 31
 # ── Produktkatalog ────────────────────────────────────────────────────────────
 
 PRODUCTS: dict[str, dict] = {
+    # STILLGELEGT: nicht mehr kaufbar (nicht in ProductType). Bleibt nur hier,
+    # damit ein evtl. im Deploy-Moment laufender Checkout noch erfüllt wird und
+    # Bestandskäufer im 31-Tage-Fenster gültig bleiben.
     "startpaket": {
         "name": "EchoB Startpaket",
         "description": "1 Monat App-Vollzugang + 1 persönliche Coaching-Stunde (60 min)",

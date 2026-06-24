@@ -5,10 +5,12 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+# 'startpaket' bleibt gültiger Plan-Status (Bestandskäufer im 31-Tage-Fenster),
+# ist aber nicht mehr als Produkt kaufbar (siehe ProductType).
 PlanType = Literal["trial", "startpaket", "early_bird", "regular", "annual"]
 
-# Produkte, die gekauft werden können (alles außer trial)
-ProductType = Literal["startpaket", "early_bird", "regular", "annual"]
+# Produkte, die gekauft werden können. Startpaket stillgelegt (nicht mehr kaufbar).
+ProductType = Literal["early_bird", "regular", "annual"]
 
 
 class SubscriptionStatus(BaseModel):

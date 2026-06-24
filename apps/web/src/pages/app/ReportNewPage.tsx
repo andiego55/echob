@@ -190,7 +190,7 @@ export default function ReportNewPage() {
           <div className="mb-6 flex items-center justify-between gap-3 rounded-brand border border-amber-200 bg-amber-50 px-4 py-3">
             <p className="text-xs text-amber-700">
               Im Testzugang verfügbar: <strong>Kurzbericht</strong> und <strong>Coaching-Vorbereitung</strong>.
-              Alle weiteren Berichte sind im Startpaket oder Abo enthalten.
+              Alle weiteren Berichte sind im Abo enthalten.
             </p>
             <Link to="/app/upgrade" className="text-xs font-semibold text-accent shrink-0 hover:underline">
               Upgrade →

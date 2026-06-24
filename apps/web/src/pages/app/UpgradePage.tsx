@@ -17,25 +17,6 @@ const PLAN_LABELS: Record<string, string> = {
   annual: 'Jahresabo',
 }
 
-const STARTER_PACKAGE = {
-  id: 'startpaket' as ProductType,
-  name: 'Startpaket',
-  badge: 'Empfohlen zum Einstieg',
-  price: '99',
-  period: 'einmalig',
-  desc: 'Der ideale Einstieg: voller App-Zugang für einen Monat — plus eine persönliche Coaching-Stunde, in der wir gemeinsam deine Situation reflektieren und die App in deinen Prozess integrieren.',
-  features: [
-    '1 Monat App-Vollzugang',
-    'Alle 5 Berichtstypen (Muster, Therapie, Coaching, Verlauf, Kurz)',
-    'Alle Dialog- & Analyseformen',
-    'Unbegrenzte Fälle & Szenen',
-    'GPT-4o – bestes verfügbares KI-Modell',
-    'Echo auf voller Analysestufe: alle Perspektiven & Tiefen aktiv',
-    '1 persönliche Coaching-Stunde mit dem EchoB-Gründer (60 min)',
-    'Terminvereinbarung direkt nach dem Kauf',
-  ],
-}
-
 const PLANS = [
   {
     id: 'early_bird' as ProductType,
@@ -236,7 +217,7 @@ export default function UpgradePage() {
             <p className="text-xs text-amber-700">
               Mit dem Testzugang kannst du EchoB 3 Tage lang erkunden — mit 1 Fall, bis zu 5 Szenen
               und Zugang zu Kurzbericht & Coaching-Vorbereitung.
-              Alle weiteren Berichte und Features sind ab dem Startpaket verfügbar.
+              Alle weiteren Berichte und Features sind im Abo verfügbar.
             </p>
           </div>
         )}
@@ -258,37 +239,7 @@ export default function UpgradePage() {
           </span>
         </label>
 
-        {/* Startpaket */}
-        <div className="mb-8 rounded-brand border-2 border-accent bg-accent/5 p-6 max-w-2xl shadow-sm">
-          <div className="flex items-start justify-between mb-1">
-            <span className="text-base font-bold text-navy">{STARTER_PACKAGE.name}</span>
-            <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent text-white">
-              {STARTER_PACKAGE.badge}
-            </span>
-          </div>
-          <div className="mb-2">
-            <span className="text-3xl font-extrabold text-navy">{STARTER_PACKAGE.price} €</span>
-            <span className="text-xs text-brand-muted ml-1">/ {STARTER_PACKAGE.period} · inkl. MwSt.</span>
-          </div>
-          <p className="text-sm text-brand-muted mb-5 leading-relaxed max-w-lg">{STARTER_PACKAGE.desc}</p>
-          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5 mb-6">
-            {STARTER_PACKAGE.features.map((f) => (
-              <div key={f} className="flex items-start gap-2 text-sm text-navy">
-                <span className="text-accent mt-0.5 shrink-0">✓</span>
-                {f}
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={() => buy(STARTER_PACKAGE.id)}
-            disabled={checkoutMutation.isPending}
-            className="inline-block text-sm font-semibold px-6 py-2.5 rounded-brand bg-accent text-white hover:bg-accent/90 transition-colors disabled:opacity-60"
-          >
-            {pendingProduct === STARTER_PACKAGE.id ? 'Checkout wird geöffnet …' : 'Zahlungspflichtig bestellen'}
-          </button>
-        </div>
-
-        <h2 className="text-sm font-semibold text-navy mb-4">Oder: App-Abo ohne Coaching</h2>
+        <h2 className="text-sm font-semibold text-navy mb-4">Wähle deinen Plan</h2>
 
         {/* Pricing grid */}
         <div className="grid gap-5 sm:grid-cols-3 mb-10">

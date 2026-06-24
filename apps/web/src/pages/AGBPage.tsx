@@ -48,7 +48,7 @@ export default function AGBPage() {
             </p>
             <ul className="list-disc list-inside space-y-1 text-brand-muted text-sm">
               <li><strong className="text-navy">App-Abos</strong> (Early Bird, Monatsabo, Jahresabo): digitaler Vollzugang für die jeweilige Laufzeit.</li>
-              <li><strong className="text-navy">Startpaket</strong>: 31 Tage Vollzugang als Einmalleistung zzgl. einer persönlichen Online-Coaching-Stunde (60 Min.).</li>
+              <li><strong className="text-navy">Coaching-Leistungen</strong>: separat buchbare persönliche Online-Coaching-Stunden nach gesonderter Vereinbarung.</li>
             </ul>
             <p className="text-sm text-brand-muted">
               Der kostenlose Testzugang ist kein kostenpflichtiger Vertrag im Sinne dieser AGB.
@@ -81,8 +81,7 @@ export default function AGBPage() {
               sich automatisch um die jeweilige Laufzeit, sofern sie nicht rechtzeitig gekündigt
               werden. Die Kündigung ist jederzeit zum Ende des laufenden Abrechnungszeitraums möglich
               – komfortabel über das Stripe-Kundenportal („Abo verwalten") oder in Textform an die im
-              Impressum genannte Adresse. Das Startpaket ist eine Einmalleistung ohne automatische
-              Verlängerung.
+              Impressum genannte Adresse.
             </p>
           </Section>
 
@@ -97,10 +96,10 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 7 Coaching-Stunde (Startpaket)">
+          <Section title="§ 7 Coaching-Leistungen">
             <p>
-              Die im Startpaket enthaltene Coaching-Stunde wird nach gesonderter Terminvereinbarung
-              online durchgeführt. Sie ersetzt keine Psychotherapie, keine Heilbehandlung und keine
+              Separat gebuchte Coaching-Stunden werden nach gesonderter Terminvereinbarung online
+              durchgeführt. Sie ersetzen keine Psychotherapie, keine Heilbehandlung und keine
               Beratung im Sinne der jeweiligen Berufsordnungen. Terminabsagen sind bis 24 Stunden vor
               dem Termin kostenfrei möglich.
             </p>
