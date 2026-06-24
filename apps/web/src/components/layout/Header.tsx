@@ -172,7 +172,7 @@ export default function Header() {
                   Über EchoB
                 </Link>
                 <Link to="/ueber/gruender" className="block px-4 py-2 text-[0.83rem] text-brand-text hover:text-accent hover:bg-brand-bg no-underline transition-colors">
-                  Der Gründer
+                  Gründer/CEO
                 </Link>
                 <Link to="/ueber/team" className="block px-4 py-2 text-[0.83rem] text-brand-text hover:text-accent hover:bg-brand-bg no-underline transition-colors">
                   Team

@@ -103,7 +103,7 @@ export default function GruenderInterviewPage() {
       >
         <div className="mx-auto max-w-[960px] grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
           <div>
-            <span className="label">Der Gründer</span>
+            <span className="label">Gründer von EchoB</span>
             <h1 className="mt-2 text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold leading-[1.2] tracking-[-0.02em] max-w-[560px]">
               Warum es EchoB gibt
             </h1>
