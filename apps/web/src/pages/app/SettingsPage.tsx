@@ -6,6 +6,9 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@/components/settings/EchoSteeringForm'
+import ConnectProfessionalCard from '@/components/settings/ConnectProfessionalCard'
+import SubscriptionCard from '@/components/settings/SubscriptionCard'
+import DataAccountCard from '@/components/settings/DataAccountCard'
 import { profileApi } from '@/api/profile'
 
 const USER_MODES: EchoModeOption[] = [
@@ -76,6 +79,10 @@ export default function SettingsPage() {
             </div>
           )}
         </div>
+
+        <ConnectProfessionalCard />
+        <SubscriptionCard />
+        <DataAccountCard />
       </div>
     </AppShell>
   )
