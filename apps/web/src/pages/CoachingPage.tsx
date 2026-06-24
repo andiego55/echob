@@ -120,47 +120,12 @@ export default function CoachingPage() {
             Was du bei EchoB buchen kannst
           </h2>
           <p className="mt-3 text-brand-muted max-w-[600px] leading-[1.75]">
-            Zwei Produktlinien – je nachdem, was du gerade brauchst.
+            Von der einzelnen Stunde bis zur kontinuierlichen Begleitung – je nachdem, was du
+            gerade brauchst. Die EchoB-Plattform ist überall mit dabei.
           </p>
 
-          {/* Startpaket */}
-          <div className="mt-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-muted">Einstieg</span>
-            <h3 className="text-lg font-bold text-navy mt-1 mb-2">Startpaket – App + Coaching</h3>
-            <p className="text-sm text-brand-muted mb-6 max-w-xl">
-              Der ideale Start: 1 Monat voller App-Zugang mit GPT-4o plus eine persönliche Coaching-Stunde mit dem EchoB-Gründer.
-            </p>
-            <div className="rounded-brand border-2 border-accent bg-accent/5 p-6 max-w-lg">
-              <div className="flex items-start justify-between mb-2">
-                <span className="text-base font-bold text-navy">Startpaket</span>
-                <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent text-white">Empfohlen</span>
-              </div>
-              <div className="text-3xl font-extrabold text-navy mb-1">99 € <span className="text-sm font-normal text-brand-muted">/ einmalig</span></div>
-              <ul className="space-y-1.5 my-4">
-                {[
-                  '1 Monat App-Vollzugang',
-                  'Alle 5 Berichtstypen & Dialogformen',
-                  'Unbegrenzte Fälle & Szenen',
-                  'GPT-4o – bestes verfügbares KI-Modell',
-                  '1 persönliche Coaching-Stunde (60 min)',
-                  'Terminvereinbarung direkt nach Buchung',
-                ].map(f => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-navy">
-                    <span className="text-accent mt-0.5 shrink-0">✓</span>{f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={`mailto:info@echo-b.de?subject=${encodeURIComponent('EchoB Startpaket')}&body=${encodeURIComponent('Hallo,\n\nich möchte das Startpaket (99 € einmalig) buchen.\n\nMeine E-Mail-Adresse: \n\nBitte schalte meinen Zugang frei und kontaktiere mich für die Terminvereinbarung der Coaching-Stunde.\n\nVielen Dank!')}`}
-                className="btn-primary block text-center"
-              >
-                Startpaket buchen
-              </a>
-            </div>
-          </div>
-
           {/* Beziehungscoaching */}
-          <div className="mt-14">
+          <div className="mt-10">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-muted">Kontinuierliche Begleitung</span>
             <h3 className="text-lg font-bold text-navy mt-1 mb-2">Beziehungscoaching</h3>
             <p className="text-sm text-brand-muted mb-6 max-w-xl">
@@ -185,13 +150,13 @@ export default function CoachingPage() {
 
               {/* Einzelstunde */}
               <div className="card flex flex-col">
-                <div className="h-6 mb-3" />
+                <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent/15 text-accent self-start mb-3">Inkl. 1 Monat App</span>
                 <p className="font-bold text-navy mb-1">Einzelstunde</p>
-                <p className="text-xs text-brand-muted mb-4 leading-relaxed">Punktuelle Begleitung, wann immer du sie brauchst. Flexibel buchbar, ohne Abo.</p>
+                <p className="text-xs text-brand-muted mb-4 leading-relaxed">Punktuelle Begleitung plus ein Monat voller App-Zugang – wann immer du sie brauchst. Flexibel, ohne Abo.</p>
                 <div className="text-2xl font-extrabold text-navy mb-1">119 € <span className="text-sm font-normal text-brand-muted">/Std.</span></div>
                 <p className="text-xs text-brand-muted mb-4">60 Minuten · Einzeln buchbar</p>
                 <ul className="space-y-1.5 mb-6 flex-1">
-                  {['Persönliches Coaching-Gespräch (60 Min.)', 'Auswertung deiner EchoB-Daten auf Wunsch', 'Schriftliche Zusammenfassung im Anschluss', 'Kein Folgecommitment'].map(f => (
+                  {['Persönliches Coaching-Gespräch (60 Min.)', '1 Monat EchoB-Vollzugang inklusive', 'Auswertung deiner EchoB-Daten auf Wunsch', 'Schriftliche Zusammenfassung im Anschluss', 'Kein Folgecommitment'].map(f => (
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
@@ -202,16 +167,16 @@ export default function CoachingPage() {
               <div className="rounded-brand border-2 border-accent bg-accent/5 p-5 flex flex-col">
                 <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent text-white self-start mb-3">Empfohlen</span>
                 <p className="font-bold text-navy mb-1">Monatspaket „Begleitung"</p>
-                <p className="text-xs text-brand-muted mb-4 leading-relaxed">Kontinuierliche Begleitung über einen Monat – für Menschen, die tiefer gehen möchten.</p>
+                <p className="text-xs text-brand-muted mb-4 leading-relaxed">Wöchentlicher Rhythmus aus persönlicher Begleitung und geführter Selbstreflexion – für Menschen, die tiefer gehen möchten.</p>
                 <div className="text-2xl font-extrabold text-navy mb-1">499 € <span className="text-sm font-normal text-brand-muted">/Monat</span></div>
-                <p className="text-xs text-brand-muted mb-4">6 Sessions à 60 Min. · ≈ 83 € pro Session</p>
+                <p className="text-xs text-brand-muted mb-4">Wöchentliche Online-Check-ins · je 60 Min.</p>
                 <ul className="space-y-1.5 mb-6 flex-1">
-                  {['6 persönliche Coaching-Sessions', 'Wöchentliche Check-ins per Chat', 'Voller EchoB-Plattformzugang inklusive', 'Auswertung aller Skalenwerte & Muster', 'Bericht für Therapie erstellen', 'Priority-Rückmeldung innerhalb 4 Stunden'].map(f => (
+                  {['Wöchentliche 60-Min.-Online-Check-ins', 'Geführte Dialoge in der App zwischen den Terminen (Themen, Bindung, Eigenanteil …)', 'Voller EchoB-Plattformzugang inklusive', 'Auswertung aller Skalenwerte & Muster', 'Bericht für Therapie/Übergabe auf Wunsch', 'Priority-Rückmeldung innerhalb 4 Stunden'].map(f => (
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
                 <a href="mailto:coaching@echo-b.de?subject=Monatspaket" className="btn-primary text-center text-sm block">Paket anfragen</a>
-                <p className="text-[10px] text-brand-muted mt-2 text-center">Spart ~30 % gegenüber Einzelstunden · monatlich kündbar</p>
+                <p className="text-[10px] text-brand-muted mt-2 text-center">Wöchentliche Begleitung · monatlich kündbar</p>
               </div>
             </div>
           </div>

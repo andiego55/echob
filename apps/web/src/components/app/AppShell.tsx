@@ -3,12 +3,13 @@
  * Enthält: App-Header (EchoB-Logo, User-Email, Abmelden)
  * Kein Sidebar in MVP – das kommt mit Phase 2.
  */
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { collabApi } from '@/api/collab'
 import QuickExitButton from '@/components/app/QuickExit'
 import GearIcon from '@/components/icons/GearIcon'
+import EchoBLogo from '@/components/EchoBLogo'
 
 interface Props {
   children: React.ReactNode
@@ -34,12 +35,7 @@ export default function AppShell({ children }: Props) {
       {/* App-Header */}
       <header className="bg-gradient-to-b from-navy to-navy-dark border-b border-white/[0.08] shadow-[0_8px_24px_-12px_rgba(7,14,24,0.55)] sticky top-0 z-40">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 h-14">
-          <Link
-            to="/app"
-            className="text-[1.15rem] font-extrabold tracking-[-0.02em] text-white no-underline"
-          >
-            Echo<span className="text-accent">B</span>
-          </Link>
+          <EchoBLogo to="/" />
 
           <nav className="hidden md:flex items-center gap-1">
             {[

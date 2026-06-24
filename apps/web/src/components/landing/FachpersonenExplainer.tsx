@@ -164,6 +164,11 @@ export default function FachpersonenExplainer() {
 
   const goTo = (i: number) => { setActive(i); setDone(false); setPaused(false) }
 
+  const step = (dir: number) => {
+    setActive((a) => (a + dir + SCENES.length) % SCENES.length)
+    setDone(false)
+  }
+
   return (
     <section className="border-t border-brand-border bg-navy/[0.02] px-6 py-[72px]">
       <div className="mx-auto max-w-[960px]">
@@ -196,6 +201,20 @@ export default function FachpersonenExplainer() {
               {SCENES[active].kicker}
             </p>
           </div>
+
+          {/* Pfeile: links/rechts durch die Szenen */}
+          <button type="button" onClick={() => step(-1)} aria-label="Vorherige Szene"
+            className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white sm:left-3">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button type="button" onClick={() => step(1)} aria-label="Nächste Szene"
+            className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white sm:right-3">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
 
           <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 px-6">
             {SCENES.map((_, i) => (

@@ -48,8 +48,8 @@ const FAQ = [
     a: '3 Tage, 1 Fall, 5 Szenen – ohne Kreditkarte. Du kannst Kurzbericht und Coaching-Vorbereitung erstellen. Danach kannst du upgraden oder einfach aufhören.',
   },
   {
-    q: 'Was ist das Startpaket?',
-    a: 'Das Startpaket kostet 99 € einmalig und enthält 1 Monat vollen App-Zugang plus eine persönliche Coaching-Stunde mit dem EchoB-Gründer. Ideal, wenn du wirklich vorankommen willst.',
+    q: 'Was ist der Early-Bird-Tarif?',
+    a: 'Solange das Early-Bird-Fenster (bis November) offen ist, bekommst du den vollen App-Zugang für 12,99 € statt 24,99 € im Monat – alle Funktionen und Berichte inklusive, monatlich kündbar.',
   },
 ]
 
@@ -147,30 +147,31 @@ export default function LandingPage() {
             3 Tage kostenlos testen — keine Kreditkarte erforderlich.
           </p>
 
-          {/* Startpaket */}
+          {/* Early Bird – prominent */}
           <div className="mt-10 rounded-brand border-2 border-accent bg-accent/5 p-6 max-w-2xl shadow-sm mb-6">
             <div className="flex items-start justify-between gap-3 mb-1">
-              <span className="text-base font-bold text-navy">Startpaket</span>
+              <span className="text-base font-bold text-navy">Early Bird</span>
               <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-accent text-white shrink-0">
-                Empfohlen
+                Nur bis November
               </span>
             </div>
-            <div className="mb-1">
-              <span className="text-3xl font-extrabold text-navy">99 €</span>
-              <span className="text-xs text-brand-muted ml-1">/ einmalig</span>
+            <div className="mb-1 flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl font-extrabold text-navy">12,99 €</span>
+              <span className="text-xs text-brand-muted">/ Monat</span>
+              <span className="text-sm text-brand-muted line-through decoration-brand-muted/50">24,99 €</span>
             </div>
             <p className="text-sm text-brand-muted mb-4 max-w-lg leading-relaxed">
-              1 Monat voller App-Zugang plus eine persönliche Coaching-Stunde mit dem EchoB-Gründer.
-              GPT-4o, alle Berichte, unbegrenzte Fälle & Szenen.
+              Voller Zugang zu allen Funktionen und Berichten – zum Vorzugspreis, solange das
+              Early-Bird-Fenster offen ist. Monatlich kündbar, keine Bindung.
             </p>
             <Link to="/auth" state={{ defaultTab: 'signup' }} className="inline-block text-sm font-semibold px-5 py-2.5 rounded-brand bg-accent text-white hover:bg-accent/90 transition-colors">
-              Jetzt starten →
+              Zum Early-Bird-Preis starten →
             </Link>
           </div>
 
-          {/* Abo-Optionen */}
-          <p className="text-xs font-semibold text-brand-muted uppercase tracking-wide mb-4">Oder: App-Abo ohne Coaching</p>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Weitere Optionen */}
+          <p className="text-xs font-semibold text-brand-muted uppercase tracking-wide mb-4">Weitere Optionen</p>
+          <div className="grid gap-5 sm:grid-cols-3">
             <Link to="/auth" state={{ defaultTab: 'signup' }} className="card block no-underline transition hover:border-accent hover:shadow-md">
               <span className="label mb-3">Kostenlos</span>
               <div className="text-2xl font-extrabold text-navy mb-1">0 €</div>
@@ -179,16 +180,6 @@ export default function LandingPage() {
                 Kurzbericht & Coaching-Vorbereitung inklusive. Keine Kreditkarte nötig.
               </p>
               <span className="mt-4 block text-sm font-semibold text-accent">Kostenlos testen →</span>
-            </Link>
-            <Link to="/auth" state={{ defaultTab: 'signup' }} className="card border-accent bg-accent/5 block no-underline transition hover:shadow-md">
-              <div className="flex items-start justify-between mb-2">
-                <span className="label">Early Bird</span>
-                <span className="text-[10px] font-bold uppercase tracking-wide bg-accent text-white px-2 py-0.5 rounded-full">Bis Nov.</span>
-              </div>
-              <div className="text-2xl font-extrabold text-navy mb-1">12,99 €<span className="text-sm font-normal text-brand-muted"> /Mo.</span></div>
-              <p className="text-xs text-brand-muted mb-4">Vollzugang · Monatlich kündbar</p>
-              <p className="text-sm text-brand-muted">Alle Features, alle Berichte.</p>
-              <span className="mt-4 block text-sm font-semibold text-accent">Auswählen →</span>
             </Link>
             <Link to="/auth" state={{ defaultTab: 'signup' }} className="card block no-underline transition hover:border-accent hover:shadow-md">
               <span className="label mb-3">Monatsabo</span>
