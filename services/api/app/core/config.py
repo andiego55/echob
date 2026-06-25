@@ -69,6 +69,10 @@ class Settings(BaseSettings):
     # Basis-URL des Frontends für Checkout-Redirects
     frontend_url: str = "http://localhost:5173"
 
+    # ── Monitoring (Sentry) ────────────────────────────────────────────
+    # Leer = aus. PII-frei konfiguriert (siehe main.py). EU-Region empfohlen.
+    sentry_dsn: str = ""
+
     # ── Logging ────────────────────────────────────────────────────────
     log_level: Literal["debug", "info", "warning", "error"] = "info"
 

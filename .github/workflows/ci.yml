@@ -1,0 +1,80 @@
+name: CI
+
+# Läuft bei jedem Push auf main und bei jedem Pull Request.
+# Backend: ruff + pytest gegen ein frisches Postgres (alle Migrationen angewandt).
+# Frontend: typecheck + build. Rot = nicht deployen.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend · ruff + pytest
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: echob_dev
+          POSTGRES_PASSWORD: pgadmin
+          POSTGRES_DB: echob
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U echob_dev -d echob"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgresql://echob_dev:pgadmin@localhost:5432/echob
+      PGPASSWORD: pgadmin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Dependencies installieren
+        working-directory: services/api
+        run: pip install ".[dev]"
+
+      - name: Migrationen anwenden (frisches Schema wie in Dev)
+        run: |
+          for f in infra/docker/postgres/init/*.sql; do
+            echo "→ $f"
+            psql -h localhost -U echob_dev -d echob -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+
+      - name: Ruff
+        working-directory: services/api
+        run: ruff check .
+
+      - name: Pytest
+        working-directory: services/api
+        run: pytest -q
+
+  frontend:
+    name: Frontend · typecheck + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Dependencies installieren
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: apps/web
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: apps/web
+        run: npm run build

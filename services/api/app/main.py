@@ -19,6 +19,40 @@ def _create_echo_service():
 logger = get_logger(__name__)
 
 
+def _scrub_event(event: dict, _hint: dict) -> dict | None:
+    """Entfernt potenziell sensible Felder, bevor ein Event an Sentry geht."""
+    req = event.get("request")
+    if isinstance(req, dict):
+        req.pop("data", None)  # kein Request-Body (kann Fallinhalte enthalten)
+        headers = req.get("headers")
+        if isinstance(headers, dict):
+            for h in ("authorization", "Authorization", "cookie", "Cookie"):
+                headers.pop(h, None)
+    return event
+
+
+def _init_sentry() -> None:
+    """Error-Monitoring (nur wenn DSN gesetzt). Bewusst PII-frei: keine lokalen
+    Variablen (könnten entschlüsselte Inhalte enthalten), kein Request-Body."""
+    if not settings.sentry_dsn:
+        return
+    try:
+        import sentry_sdk
+    except ImportError:
+        logger.warning("sentry-sdk nicht installiert – Monitoring deaktiviert.")
+        return
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment,
+        send_default_pii=False,
+        include_local_variables=False,
+        max_request_body_size="never",
+        traces_sample_rate=0.0,
+        before_send=_scrub_event,
+    )
+    logger.info("Sentry-Monitoring aktiv (environment=%s).", settings.environment)
+
+
 def create_app() -> FastAPI:
     """
     App Factory – erstellt und konfiguriert die FastAPI-Instanz.
@@ -29,6 +63,7 @@ def create_app() -> FastAPI:
     - Erweiterbar: Lifespan-Events, Plugins etc. zentral hier.
     """
     setup_logging()
+    _init_sentry()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

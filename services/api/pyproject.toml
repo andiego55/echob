@@ -18,6 +18,7 @@ dependencies = [
     "stripe>=10",
     "python-multipart>=0.0.9",   # Form/File-Uploads (Schnellerfassung: Audio)
     "cryptography>=42",          # Feldverschlüsselung sensibler Freitexte (Art. 32)
+    "sentry-sdk[fastapi]>=2.0",  # Error-Monitoring (Prod), PII-frei konfiguriert
     # "python-jose[cryptography]>=3.3",
     # Ab Phase 3:
     # "anthropic>=0.25",
@@ -46,6 +47,10 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+# E501 (Zeilenlänge 100) bewusst deaktiviert: deutscher Text + SQL sprengen die
+# Grenze oft ohne Lesbarkeitsgewinn. Die wertvollen Regeln bleiben aktiv
+# (F = echte Fehler wie ungenutzte/undefinierte Namen, I = Import-Sortierung, UP).
+ignore = ["E501"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
