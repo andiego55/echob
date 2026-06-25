@@ -243,7 +243,14 @@ export default function AuthPage() {
             </form>
           </div>
 
-          <p className="mt-6 text-center text-xs text-brand-muted">
+          {!isPro && (
+            <p className="mt-6 text-center text-xs text-brand-muted">
+              Von einer Fachperson eingeladen?{' '}
+              <Link to="/pseudonym" className="text-accent hover:underline">Mit Pseudonym anmelden</Link>
+            </p>
+          )}
+
+          <p className="mt-3 text-center text-xs text-brand-muted">
             <Link to="/datenschutz" className="hover:underline">Datenschutz</Link>
             {' · '}
             <Link to="/impressum" className="hover:underline">Impressum</Link>

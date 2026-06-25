@@ -8,6 +8,7 @@ import AGBPage              from '@/pages/AGBPage'
 import WiderrufPage         from '@/pages/WiderrufPage'
 import AuthPage             from '@/pages/AuthPage'
 import ClientInvitePage     from '@/pages/ClientInvitePage'
+import PseudonymAuthPage    from '@/pages/PseudonymAuthPage'
 import NotFoundPage         from '@/pages/NotFoundPage'
 import CoachingPage         from '@/pages/CoachingPage'
 import UeberPage            from '@/pages/UeberPage'
@@ -112,6 +113,7 @@ export default function App() {
       <Route path="/agb"         element={<AGBPage />} />
       <Route path="/widerruf"    element={<WiderrufPage />} />
       <Route path="/auth"        element={<AuthPage />} />
+      <Route path="/pseudonym"   element={<PseudonymAuthPage />} />
       <Route path="/einladung/:token" element={<ClientInvitePage />} />
       <Route path="/coaching"    element={<CoachingPage />} />
       <Route path="/ueber"       element={<UeberPage />} />

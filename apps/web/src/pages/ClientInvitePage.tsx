@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { clientInvitesApi } from '@/api/clientInvites'
 import { clearPendingInvite, setPendingInvite } from '@/lib/pendingInvite'
+import PseudonymousSignup from '@/components/landing/PseudonymousSignup'
 
 /**
  * Öffentliche Einladungs-Landingpage (/einladung/:token). Zeigt, wer einlädt,
@@ -32,6 +33,7 @@ export default function ClientInvitePage() {
   const [accepting, setAccepting] = useState(false)
   const [accepted, setAccepted] = useState<{ name: string | null } | null>(null)
   const [acceptErr, setAcceptErr] = useState<string | null>(null)
+  const [showPseudo, setShowPseudo] = useState(false)
 
   useEffect(() => {
     if (!session || !token || ran.current) return
@@ -111,6 +113,18 @@ export default function ClientInvitePage() {
               Anmelden
             </Link>{' '}– die Verbindung wird danach automatisch hergestellt.
           </p>
+
+          {/* Pseudonyme Alternative */}
+          <div className="mt-6 border-t border-brand-border pt-5">
+            {!showPseudo ? (
+              <button type="button" onClick={() => setShowPseudo(true)}
+                className="text-sm font-medium text-accent hover:underline">
+                🔒 Lieber pseudonym beitreten – ohne deine E-Mail →
+              </button>
+            ) : (
+              token && <PseudonymousSignup token={token} />
+            )}
+          </div>
         </div>
       )}
 
