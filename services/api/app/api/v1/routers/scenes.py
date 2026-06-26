@@ -109,7 +109,9 @@ async def quick_capture(
         if echo_svc is None:
             raise HTTPException(status_code=503, detail="Transkription derzeit nicht verfügbar.")
         transcript = await echo_svc.transcribe(
-            audio_bytes=audio_bytes, filename=audio.filename or "audio.webm"
+            audio_bytes=audio_bytes,
+            filename=audio.filename or "audio.webm",
+            content_type=audio.content_type,
         )
         source_text = f"{source_text}\n{transcript}".strip() if source_text else transcript
 

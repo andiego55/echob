@@ -352,13 +352,29 @@ class EchoService:
             return await self._openai_extract_scene(conversation_text, case_context)
         return self._mock_extract_scene(conversation_text)
 
-    async def transcribe(self, *, audio_bytes: bytes, filename: str = "audio.webm") -> str:
-        """Transkribiert eine Audioaufnahme (OpenAI Whisper). Mock-Modus: leerer String."""
+    async def transcribe(
+        self,
+        *,
+        audio_bytes: bytes,
+        filename: str = "audio.webm",
+        content_type: str | None = None,
+    ) -> str:
+        """Transkribiert eine Audioaufnahme (OpenAI Whisper). Mock-Modus: leerer String.
+
+        Whisper erkennt das Containerformat an Dateiendung UND Content-Type — beides
+        durchreichen, damit auch Safari/iOS-Aufnahmen (mp4 statt webm) sauber dekodiert
+        werden.
+        """
         if not self._use_openai:
             return ""
+        file_tuple = (
+            (filename, audio_bytes, content_type)
+            if content_type
+            else (filename, audio_bytes)
+        )
         response = await self._client.audio.transcriptions.create(  # type: ignore[union-attr]
             model=self._model_whisper,
-            file=(filename, audio_bytes),
+            file=file_tuple,
             language="de",
         )
         return getattr(response, "text", "") or ""
@@ -847,6 +863,9 @@ class EchoService:
             "coaching_prep": (
                 "Erstelle eine **Coaching-Vorbereitung** (Typ: `coaching_prep`). "
                 "Alle 6 Abschnitte. Coaching-Sprache: zielorientiert, ressourcenfokussiert. "
+                "Adressat ist der **Coach**: durchgängig 3. Person über die Person "
+                "('die Person', 'sie'), niemals 'du'. Coaching-Ziel als Annäherungsziel, "
+                "z. B. 'Ein stimmiges Coaching-Ziel wäre, dass die Person …' — nicht 'Du möchtest …'. "
                 "Der Coach soll nach Lektüre sofort produktiv arbeiten können."
             ),
             "therapy_prep": (

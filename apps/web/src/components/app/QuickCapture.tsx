@@ -18,6 +18,8 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
+  // null = noch keine Aufnahme versucht · '' = Aufnahme, aber kein Text erkannt · sonst = Transkript
+  const [lastTranscript, setLastTranscript] = useState<string | null>(null)
 
   const recorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
@@ -28,11 +30,23 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
     && typeof window !== 'undefined'
     && 'MediaRecorder' in window
 
+  // Aufnahmeformat: das erste vom Browser unterstützte wählen, damit blob.type
+  // verlässlich stimmt. Safari/iOS kann kein webm → fällt auf mp4 zurück.
+  const pickRecorderMime = (): string => {
+    if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return ''
+    for (const t of ['audio/webm', 'audio/mp4', 'audio/ogg']) {
+      if (MediaRecorder.isTypeSupported(t)) return t
+    }
+    return ''
+  }
+
   const startRecording = async () => {
     setError(null)
+    setLastTranscript(null)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream)
+      const mimeType = pickRecorderMime()
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
       chunksRef.current = []
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data) }
       recorder.onstop = () => {
@@ -60,6 +74,7 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
       setError('Bitte sprich kurz oder füge Text ein.')
       return
     }
+    const hadAudio = !!blobRef.current
     setPending(true)
     setError(null)
     setDone(false)
@@ -69,6 +84,7 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
         audio: blobRef.current ?? undefined,
       })
       onDraft(res.draft)
+      setLastTranscript(hadAudio ? (res.transcript ?? '') : null)
       setText('')
       blobRef.current = null
       setAudioReady(false)
@@ -134,6 +150,19 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
       </div>
 
       {error && <p role="alert" className="mt-2 text-xs text-red-600">{error}</p>}
+      {lastTranscript !== null && (
+        lastTranscript.trim()
+          ? (
+            <p className="mt-2 text-xs text-brand-muted">
+              <span className="font-medium text-navy">Erkannt:</span> „{lastTranscript}"
+            </p>
+          )
+          : (
+            <p role="alert" className="mt-2 text-xs text-amber-600">
+              Aus der Aufnahme wurde kein Text erkannt – bitte deutlicher sprechen oder Text einfügen.
+            </p>
+          )
+      )}
       {done && !error && (
         <p className="mt-2 text-xs text-green-600">Entwurf übernommen – prüfe und ergänze ihn unten, dann speichern.</p>
       )}
