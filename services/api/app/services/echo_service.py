@@ -164,7 +164,17 @@ def build_case_context(
 class EchoService:
     """Zustandsloser Service — eine Instanz pro App-Lifecycle."""
 
-    def __init__(self, openai_api_key: str = "") -> None:
+    def __init__(
+        self,
+        openai_api_key: str = "",
+        *,
+        model_smart: str = "gpt-4o",
+        model_fast: str = "gpt-4o-mini",
+        model_whisper: str = "whisper-1",
+    ) -> None:
+        self._model_smart = model_smart      # Reporte + Skalen
+        self._model_fast = model_fast        # Chat + alles andere (inkl. Krisen-Triage)
+        self._model_whisper = model_whisper  # Audio-Transkription
         self._use_openai = bool(openai_api_key)
         if self._use_openai:
             try:
@@ -263,7 +273,7 @@ class EchoService:
                 "Antworte auf Deutsch, maximal 3 Sätze, keine Diagnosen, kein Druck."
             )
             response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-                model="gpt-4o",
+                model=self._model_fast,
                 messages=[
                     {"role": "system", "content": system},
                     {"role": "user", "content": context_text},
@@ -310,7 +320,7 @@ class EchoService:
         if not self._use_openai:
             return ""
         response = await self._client.audio.transcriptions.create(  # type: ignore[union-attr]
-            model="whisper-1",
+            model=self._model_whisper,
             file=(filename, audio_bytes),
             language="de",
         )
@@ -356,7 +366,7 @@ class EchoService:
             f"Erstelle jetzt die Zusammenfassung."
         )
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
@@ -393,7 +403,7 @@ class EchoService:
             f"Erstelle jetzt die Hypothesen-Zusammenfassung."
         )
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
@@ -458,7 +468,7 @@ class EchoService:
             "Erstelle jetzt den Rückblick."
         )
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
@@ -507,7 +517,7 @@ class EchoService:
         import json
         system_prompt = _load_prompt("safety_classify_prompt.md")
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o-mini",
+            model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": text[:4000]},
@@ -573,7 +583,7 @@ class EchoService:
 
         mode_temp = kwargs.get("mode_temperature")
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=messages,
             max_tokens=1500,
             temperature=mode_temp if isinstance(mode_temp, (int, float)) else 0.4,
@@ -591,7 +601,7 @@ class EchoService:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=messages,
             max_tokens=400,
             temperature=0.4,
@@ -609,7 +619,7 @@ class EchoService:
             "{relationship_status}", case_context.get("relationship_status", "unbekannt")
         )
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=[
                 {
                     "role": "system",
@@ -701,7 +711,7 @@ class EchoService:
         messages.append({"role": "user", "content": user_message})
 
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=messages,
             max_tokens=600,
             temperature=0.6,
@@ -823,7 +833,7 @@ class EchoService:
         )
 
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_smart,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "system", "content": full_context},
@@ -1074,7 +1084,7 @@ class EchoService:
         user_message = f"Berechne alle 15 Skalen für diesen Fall:\n\n{full_context}"
 
         response = await self._client.chat.completions.create(
-            model="gpt-4o",
+            model=self._model_smart,
             response_format={"type": "json_object"},
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -1223,7 +1233,7 @@ class EchoService:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=messages,
             max_tokens=1200,
             temperature=0.4,
@@ -1255,7 +1265,7 @@ class EchoService:
             "anzusprechen sind. Keine Diagnosen, keine Therapieanweisungen. Antworte auf Deutsch, strukturiert, kompakt."
         )
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": conversation},
@@ -1289,7 +1299,7 @@ class EchoService:
         system_prompt = _load_prompt("echo_professional_report_prompt.md")
         user_message = instruction + "\n\nAntworte ausschließlich als gültiges JSON-Objekt."
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_smart,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "system", "content": context},
@@ -1330,7 +1340,7 @@ class EchoService:
             )
         system_prompt = _load_prompt("pro_report_template_assist_prompt.md")
         response = await self._client.chat.completions.create(  # type: ignore[union-attr]
-            model="gpt-4o",
+            model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": description},
@@ -1343,5 +1353,16 @@ class EchoService:
 
 # ── Singleton-Factory für lifespan ────────────────────────────────────────────
 
-def create_echo_service(openai_api_key: str = "") -> EchoService:
-    return EchoService(openai_api_key=openai_api_key)
+def create_echo_service(
+    openai_api_key: str = "",
+    *,
+    model_smart: str = "gpt-4o",
+    model_fast: str = "gpt-4o-mini",
+    model_whisper: str = "whisper-1",
+) -> EchoService:
+    return EchoService(
+        openai_api_key=openai_api_key,
+        model_smart=model_smart,
+        model_fast=model_fast,
+        model_whisper=model_whisper,
+    )

@@ -48,6 +48,15 @@ class Settings(BaseSettings):
 
     # ── AI ─────────────────────────────────────────────────────────────
     openai_api_key: str = ""
+
+    # ── KI-Modelle (OpenAI) ────────────────────────────────────────────
+    # Reporte + Skalen nutzen das „smarte" Modell, Chat + alles andere das
+    # „schnelle". Leichter Notausstieg: echo_models_use_gpt4o=true → alles auf
+    # gpt-4o / gpt-4o-mini (bewährt). Exakte Modell-IDs gegen OpenAI prüfen.
+    echo_model_smart: str = "gpt-5.4"        # Reporte + Skalen
+    echo_model_fast: str = "gpt-5.4-mini"    # Chat + alles andere (inkl. Triage)
+    echo_model_whisper: str = "whisper-1"    # Audio-Transkription
+    echo_models_use_gpt4o: bool = False      # Switch → alles zurück auf gpt-4o
     anthropic_api_key: str = ""   # Reserviert für zukünftige Nutzung
     # Kostenschutz Entwicklungsphase (0 = jeweils unbegrenzt):
     echo_prompt_limit: int = 250   # max. Echo-Nachrichten pro Nutzer
