@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 ShareElementType = Literal[
     "case_info", "onboarding", "all_scenes", "scene",
     "scales", "reports", "topic_summaries", "person_profile", "self_profile",
+    "hypotheses",
 ]
 
 

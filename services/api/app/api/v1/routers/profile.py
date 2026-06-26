@@ -278,8 +278,8 @@ async def profile_echo_chat(
         for h in history:
             messages.append(h)
         messages.append({"role": "user", "content": message})
-        response = await echo_svc._client.chat.completions.create(
-            model="gpt-4o",
+        response = await echo_svc._chat(
+            model=echo_svc._model_fast,
             messages=messages,
             max_tokens=600,
             temperature=0.4,

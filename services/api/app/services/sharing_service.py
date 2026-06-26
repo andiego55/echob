@@ -15,6 +15,7 @@ from fastapi import HTTPException
 
 from app.core import crypto
 from app.services.echo_service import build_case_context
+from app.services.hypothesis_service import build_hypothesis_context
 from app.services.person_profile_service import build_person_context
 from app.services.profile_service import build_profile_context
 from app.services.topic_summary_service import build_topic_context
@@ -31,6 +32,7 @@ class SharedBundle:
     scale_scores: list[dict[str, Any]] = field(default_factory=list)
     reports: list[dict[str, Any]] = field(default_factory=list)
     topic_summaries: list[dict[str, Any]] = field(default_factory=list)
+    hypotheses: list[dict[str, Any]] = field(default_factory=list)
     person_profile: dict[str, Any] | None = None
     self_profile: dict[str, Any] | None = None
 
@@ -114,6 +116,12 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
         )
         bundle.topic_summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in rows]
 
+    if "hypotheses" in allowed:
+        rows = await conn.fetch(
+            "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1", case_id
+        )
+        bundle.hypotheses = [crypto.decrypt_fields(dict(r), "summary_text") for r in rows]
+
     if "person_profile" in allowed:
         row = await conn.fetchrow("SELECT * FROM person_profiles WHERE case_id = $1", case_id)
         bundle.person_profile = dict(row) if row else None
@@ -168,6 +176,11 @@ def build_shared_case_context(bundle: SharedBundle) -> str:
 
     if bundle.topic_summaries:
         ctx = build_topic_context(bundle.topic_summaries)
+        if ctx:
+            parts.append(ctx)
+
+    if bundle.hypotheses:
+        ctx = build_hypothesis_context(bundle.hypotheses)
         if ctx:
             parts.append(ctx)
 

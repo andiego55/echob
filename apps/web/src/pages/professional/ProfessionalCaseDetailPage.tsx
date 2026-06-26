@@ -27,6 +27,14 @@ const TOPIC_LABELS: Record<string, string> = {
   topic_responsibility: 'Verantwortung', topic_guilt: 'Schuld',
 }
 
+const HYP_LABELS: Record<string, string> = {
+  hyp_dynamics: 'Beziehungsdynamik & Mechanik',
+  hyp_clusterb: 'Persönlichkeitsstruktur (Cluster-B)',
+  hyp_attachment: 'Bindungsmuster',
+  hyp_trauma: 'Prägungen & Trauma',
+  hyp_own_role: 'Eigener Anteil & Muster',
+}
+
 const TABS = [
   { key: 'ueber', label: 'Übersicht' },
   { key: 'dialog', label: 'Dialoge' },
@@ -392,6 +400,23 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                   </summary>
                   <div className="mt-2 text-sm text-brand-text leading-relaxed">
                     <MarkdownMessage content={t.summary_text} />
+                  </div>
+                </details>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {has('hypotheses') && bundle.hypotheses.length > 0 && (
+          <Section title="Hypothesen (tastend, keine Diagnose)">
+            <div className="space-y-2">
+              {bundle.hypotheses.map(h => (
+                <details key={h.hypothesis_type} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
+                  <summary className="text-sm font-semibold text-navy cursor-pointer">
+                    {HYP_LABELS[h.hypothesis_type] ?? h.hypothesis_type}
+                  </summary>
+                  <div className="mt-2 text-sm text-brand-text leading-relaxed">
+                    <MarkdownMessage content={h.summary_text} />
                   </div>
                 </details>
               ))}

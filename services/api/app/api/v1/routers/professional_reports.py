@@ -33,7 +33,6 @@ from app.schemas.professional import (
     ProReportTemplateUpdate,
 )
 from app.services import collab_service, seat_service
-from app.services.hypothesis_service import build_hypothesis_context
 from app.services.pro_report_templates import get_standard
 from app.services.sharing_service import (
     build_shared_case_context,
@@ -248,9 +247,6 @@ async def create_report(
             "SELECT * FROM professional_notes WHERE professional_user_id = $1 AND case_id = $2",
             pid, case_id,
         )
-        hyp_rows = await conn.fetch(
-            "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1", case_id,
-        )
         summary_rows = await conn.fetch(
             "SELECT title, summary_text FROM professional_echo_summaries "
             "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY created_at DESC",
@@ -268,14 +264,12 @@ async def create_report(
         crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
         if note_row else None
     )
-    hypotheses = [crypto.decrypt_fields(dict(r), "summary_text") for r in hyp_rows]
     summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in summary_rows]
     parts = [
         s for s in (
             build_shared_case_context(bundle),
             _build_notes_context(note),
             build_session_notes_context(session_notes),
-            build_hypothesis_context(hypotheses),
             _build_summaries_context(summaries),
             collab_service.build_collaboration_context(assignments, appointments),
         ) if s

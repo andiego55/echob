@@ -551,6 +551,7 @@ async def case_detail(
         "scales": [_public_row(s) for s in bundle.scale_scores],
         "reports": [_public_row(r, ("content",)) for r in bundle.reports],
         "topic_summaries": bundle.topic_summaries,
+        "hypotheses": bundle.hypotheses,
         "person_profile": _public_profile(bundle.person_profile),
         "self_profile": _public_profile(bundle.self_profile),
         "notes": (

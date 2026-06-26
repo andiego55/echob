@@ -64,6 +64,9 @@ async def _seed(conn):
     await conn.execute(
         "INSERT INTO scale_scores (case_id, user_id, scale_key, score) VALUES ($1,$2,'boundary_violation',80)",
         case_id, owner)
+    await conn.execute(
+        "INSERT INTO case_hypotheses (case_id, user_id, hypothesis_type, summary_text) "
+        "VALUES ($1,$2,'hyp_clusterb','SECRET_HYPOTHESIS')", case_id, owner)
     share_id = await conn.fetchval(
         "INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status) "
         "VALUES ($1,$2,$3,'active') RETURNING id", case_id, owner, pro)
@@ -94,6 +97,25 @@ async def test_echo_context_excludes_non_shared(db):
     assert "SECRET_CONCERN" in ctx                  # case_info freigegeben
     assert "HIDDEN_DESC" not in ctx                 # nicht freigegebene Szene fehlt
     assert "SECRET_ONBOARDING" not in ctx           # nicht freigegebenes Onboarding fehlt
+    assert "SECRET_HYPOTHESIS" not in ctx           # nicht freigegebene Hypothese fehlt
+
+
+async def test_hypotheses_only_visible_when_shared(db):
+    """Hypothesen sind ein eigenes Freigabe-Element: ohne Freigabe unsichtbar im
+    Bundle UND im Echo-Kontext, nach Freigabe in beiden sichtbar."""
+    _, pro, case_id, share_id = await _seed(db)
+
+    # Standard-Seed teilt nur case_info + eine Szene → Hypothese unsichtbar
+    bundle = await load_shared_bundle(pro, case_id, db)
+    assert bundle.hypotheses == []
+    assert "SECRET_HYPOTHESIS" not in build_shared_case_context(bundle)
+
+    # Nach expliziter Freigabe → im Bundle und im Kontext
+    await db.execute(
+        "INSERT INTO case_share_elements (share_id, element_type) VALUES ($1,'hypotheses')", share_id)
+    shared = await load_shared_bundle(pro, case_id, db)
+    assert any("SECRET_HYPOTHESIS" in (h.get("summary_text") or "") for h in shared.hypotheses)
+    assert "SECRET_HYPOTHESIS" in build_shared_case_context(shared)
 
 
 async def test_revoke_blocks_access(db):
