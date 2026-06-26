@@ -20,9 +20,9 @@ export default function ImpressumPage() {
           <div>
             <h2 className="text-lg font-bold text-navy mb-3">Angaben gemäß § 5 DDG</h2>
             <p>
-              Max Mustermann<br />
-              Dorfstraße 1<br />
-              111 Hellersdorf<br />
+              Andreas Wygrabek<br />
+              Diemelweg 8A<br />
+              34317 Habichtswald<br />
               Deutschland
             </p>
           </div>
@@ -31,8 +31,8 @@ export default function ImpressumPage() {
             <h2 className="text-lg font-bold text-navy mb-3">Kontakt</h2>
             <p>
               E-Mail:{' '}
-              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">
-                max.m@echob.de
+              <a href="mailto:kontakt@echo-b.de" className="text-accent hover:underline">
+                kontakt@echo-b.de
               </a>
             </p>
           </div>
@@ -42,9 +42,9 @@ export default function ImpressumPage() {
               Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV
             </h2>
             <p>
-              Max Mustermann<br />
-              Dorfstraße 1<br />
-              111 Hellersdorf
+              Andreas Wygrabek<br />
+              Diemelweg 8A<br />
+              34317 Habichtswald
             </p>
           </div>
 

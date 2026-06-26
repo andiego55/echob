@@ -22,8 +22,7 @@ export default function DatenschutzPage() {
 
           <div className="rounded-brand border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
             <strong>Vorläufige Entwurfsfassung (Entwicklungsphase).</strong> EchoB befindet sich
-            im Aufbau. Diese Erklärung beschreibt die geplante Verarbeitung und ist noch nicht
-            abschließend rechtlich geprüft. Die Angaben zum Verantwortlichen sind Platzhalter.
+            im Aufbau. Diese Erklärung ist noch nicht abschließend rechtlich geprüft.
           </div>
 
           {/* 1. Verantwortlicher */}
@@ -31,12 +30,12 @@ export default function DatenschutzPage() {
             <h2 className="text-lg font-bold text-navy mb-3">1. Verantwortlicher</h2>
             <p>
               Verantwortlicher im Sinne der DSGVO ist:<br /><br />
-              Max Mustermann<br />
-              Dorfstraße 1<br />
-              111 Hellersdorf<br />
+              Andreas Wygrabek<br />
+              Diemelweg 8A<br />
+              34317 Habichtswald<br />
               Deutschland<br /><br />
               E-Mail:{' '}
-              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">max.m@echob.de</a>
+              <a href="mailto:kontakt@echo-b.de" className="text-accent hover:underline">kontakt@echo-b.de</a>
             </p>
           </div>
 
@@ -133,8 +132,8 @@ export default function DatenschutzPage() {
           <div>
             <h2 className="text-lg font-bold text-navy mb-3">7. Empfänger und Auftragsverarbeiter</h2>
             <p className="text-brand-muted text-sm mb-3">
-              Wir setzen sorgfältig ausgewählte Dienstleister ein, mit denen Verträge zur
-              Auftragsverarbeitung bestehen:
+              Wir setzen sorgfältig ausgewählte Dienstleister als Auftragsverarbeiter ein. Mit ihnen
+              werden Verträge zur Auftragsverarbeitung nach Art. 28 DSGVO geschlossen:
             </p>
             <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5">
               <li><strong className="text-navy">Hetzner</strong> – Server-Hosting der Anwendung und Datenbank (Deutschland/EU)</li>
@@ -216,7 +215,7 @@ export default function DatenschutzPage() {
             </ul>
             <p className="text-brand-muted text-sm mt-4">
               Zur Ausübung genügt eine E-Mail an{' '}
-              <a href="mailto:max.m@echob.de" className="text-accent hover:underline">max.m@echob.de</a>.
+              <a href="mailto:kontakt@echo-b.de" className="text-accent hover:underline">kontakt@echo-b.de</a>.
               Du hast außerdem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.
             </p>
           </div>
@@ -226,9 +225,16 @@ export default function DatenschutzPage() {
             <h2 className="text-lg font-bold text-navy mb-3">13. Datensicherheit</h2>
             <p className="text-brand-muted text-sm">
               Wir setzen technische und organisatorische Maßnahmen ein, um deine Daten gegen Verlust,
-              Manipulation und unberechtigten Zugriff zu schützen. Die Übertragung erfolgt
-              verschlüsselt über HTTPS.
+              Manipulation und unberechtigten Zugriff zu schützen. Dazu gehören:
             </p>
+            <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5 mt-2">
+              <li>verschlüsselte Übertragung über HTTPS/TLS,</li>
+              <li>Verschlüsselung im Ruhezustand: Der Server-Datenträger ist verschlüsselt, und
+                sensible Freitext-Inhalte werden zusätzlich auf Feldebene verschlüsselt gespeichert,</li>
+              <li>verschlüsselte, getrennt aufbewahrte Backups,</li>
+              <li>Pseudonymisierung (Trennung von Inhalt und Identität) sowie Beschränkung interner
+                Zugriffe auf das Notwendige.</li>
+            </ul>
           </div>
 
           {/* 14. Änderungen */}
