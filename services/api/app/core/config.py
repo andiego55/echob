@@ -57,6 +57,8 @@ class Settings(BaseSettings):
     echo_model_fast: str = "gpt-5.4-mini"    # Chat + alles andere (inkl. Triage)
     echo_model_whisper: str = "whisper-1"    # Audio-Transkription
     echo_models_use_gpt4o: bool = False      # Switch → alles zurück auf gpt-4o
+    echo_reasoning_effort: str = "low"       # gpt-5.x: low/medium/high
+    echo_reasoning_headroom: int = 4000      # Extra-Token-Obergrenze fürs Reasoning
     anthropic_api_key: str = ""   # Reserviert für zukünftige Nutzung
     # Kostenschutz Entwicklungsphase (0 = jeweils unbegrenzt):
     echo_prompt_limit: int = 250   # max. Echo-Nachrichten pro Nutzer

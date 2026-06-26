@@ -14,16 +14,20 @@ from app.services.echo_service import create_echo_service
 
 def _create_echo_service():
     key = getattr(settings, "openai_api_key", "")
-    # „Leichter Switch": echo_models_use_gpt4o → alles zurück auf gpt-4o(-mini).
+    # „Leichter Switch": echo_models_use_gpt4o → alles zurück auf gpt-4o(-mini),
+    # klassischer Modus (max_tokens + temperature). Sonst gpt-5.x = Reasoning-Modus.
     if settings.echo_models_use_gpt4o:
-        smart, fast = "gpt-4o", "gpt-4o-mini"
+        smart, fast, reasoning = "gpt-4o", "gpt-4o-mini", False
     else:
-        smart, fast = settings.echo_model_smart, settings.echo_model_fast
+        smart, fast, reasoning = settings.echo_model_smart, settings.echo_model_fast, True
     return create_echo_service(
         openai_api_key=key,
         model_smart=smart,
         model_fast=fast,
         model_whisper=settings.echo_model_whisper,
+        reasoning=reasoning,
+        reasoning_effort=settings.echo_reasoning_effort,
+        reasoning_headroom=settings.echo_reasoning_headroom,
     )
 
 logger = get_logger(__name__)

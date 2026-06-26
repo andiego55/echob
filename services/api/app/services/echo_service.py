@@ -171,10 +171,20 @@ class EchoService:
         model_smart: str = "gpt-4o",
         model_fast: str = "gpt-4o-mini",
         model_whisper: str = "whisper-1",
+        reasoning: bool = False,
+        reasoning_effort: str = "low",
+        reasoning_headroom: int = 4000,
     ) -> None:
         self._model_smart = model_smart      # Reporte + Skalen
         self._model_fast = model_fast        # Chat + alles andere (inkl. Krisen-Triage)
         self._model_whisper = model_whisper  # Audio-Transkription
+        # Reasoning-Modelle (gpt-5.x): reasoning_effort + max_completion_tokens,
+        # kein temperature. Headroom = Extra-Token-Obergrenze für Reasoning (wird
+        # nur berechnet, wenn genutzt) → schützt lange Ausgaben (Berichte) vorm
+        # Abschneiden, da max_completion_tokens Reasoning- UND Output-Tokens zählt.
+        self._reasoning = reasoning
+        self._reasoning_effort = reasoning_effort
+        self._reasoning_headroom = reasoning_headroom
         self._use_openai = bool(openai_api_key)
         if self._use_openai:
             try:
@@ -188,6 +198,33 @@ class EchoService:
         else:
             self._client = None
             logger.info("EchoService: Mock-Modus aktiv (kein OPENAI_API_KEY).")
+
+    async def _chat(
+        self,
+        *,
+        model: str,
+        messages: list,
+        max_tokens: int,
+        temperature: float | None = None,
+        response_format: dict | None = None,
+    ):
+        """Ein Chat-Completion-Aufruf — deckt klassische UND Reasoning-Modelle ab.
+
+        Reasoning (gpt-5.x): reasoning_effort + max_completion_tokens (+ Headroom),
+        kein temperature. Klassisch (gpt-4o): max_tokens + temperature.
+        """
+        kwargs: dict = {"model": model, "messages": messages}
+        if self._reasoning:
+            kwargs["max_completion_tokens"] = max_tokens + self._reasoning_headroom
+            if self._reasoning_effort:
+                kwargs["reasoning_effort"] = self._reasoning_effort
+        else:
+            kwargs["max_tokens"] = max_tokens
+            if temperature is not None:
+                kwargs["temperature"] = temperature
+        if response_format is not None:
+            kwargs["response_format"] = response_format
+        return await self._client.chat.completions.create(**kwargs)  # type: ignore[union-attr]
 
     # ── Öffentliche Methoden ──────────────────────────────────────────────────
 
@@ -272,7 +309,7 @@ class EchoService:
                 "Weise darauf hin, dass du diesen Kontext jetzt im weiteren Szenen-Gespräch berücksichtigen kannst. "
                 "Antworte auf Deutsch, maximal 3 Sätze, keine Diagnosen, kein Druck."
             )
-            response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            response = await self._chat(  # type: ignore[union-attr]
                 model=self._model_fast,
                 messages=[
                     {"role": "system", "content": system},
@@ -365,7 +402,7 @@ class EchoService:
             f"Gesprächsverlauf:\n{conversation}\n\n"
             f"Erstelle jetzt die Zusammenfassung."
         )
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -402,7 +439,7 @@ class EchoService:
             f"Gesprächsverlauf:\n{conversation}\n\n"
             f"Erstelle jetzt die Hypothesen-Zusammenfassung."
         )
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -467,7 +504,7 @@ class EchoService:
             f"{ctx}\n\n## Quantitative Trends (bereits berechnet)\n{trend_summary}\n\n"
             "Erstelle jetzt den Rückblick."
         )
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -516,7 +553,7 @@ class EchoService:
     async def _openai_classify_risk(self, text: str) -> dict[str, Any]:
         import json
         system_prompt = _load_prompt("safety_classify_prompt.md")
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -582,7 +619,7 @@ class EchoService:
         messages.append({"role": "user", "content": kwargs["user_message"]})
 
         mode_temp = kwargs.get("mode_temperature")
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=messages,
             max_tokens=1500,
@@ -600,7 +637,7 @@ class EchoService:
         for h in history:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=messages,
             max_tokens=400,
@@ -618,7 +655,7 @@ class EchoService:
         extraction_prompt = extraction_prompt.replace(
             "{relationship_status}", case_context.get("relationship_status", "unbekannt")
         )
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=[
                 {
@@ -710,7 +747,7 @@ class EchoService:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})
 
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=messages,
             max_tokens=600,
@@ -832,7 +869,7 @@ class EchoService:
             + "\n\nAntworte ausschließlich als gültiges JSON-Objekt."
         )
 
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_smart,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -1083,7 +1120,7 @@ class EchoService:
         full_context = "\n\n---\n\n".join(context_parts)
         user_message = f"Berechne alle 15 Skalen für diesen Fall:\n\n{full_context}"
 
-        response = await self._client.chat.completions.create(
+        response = await self._chat(
             model=self._model_smart,
             response_format={"type": "json_object"},
             messages=[
@@ -1232,7 +1269,7 @@ class EchoService:
         for h in history:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=messages,
             max_tokens=1200,
@@ -1264,7 +1301,7 @@ class EchoService:
             "zentrale Themen, relevante Szenen, hilfreiche Fragen für das Gespräch und Punkte, die vorsichtig "
             "anzusprechen sind. Keine Diagnosen, keine Therapieanweisungen. Antworte auf Deutsch, strukturiert, kompakt."
         )
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=[
                 {"role": "system", "content": system},
@@ -1298,7 +1335,7 @@ class EchoService:
 
         system_prompt = _load_prompt("echo_professional_report_prompt.md")
         user_message = instruction + "\n\nAntworte ausschließlich als gültiges JSON-Objekt."
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_smart,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -1339,7 +1376,7 @@ class EchoService:
                 "nummerierter Abschnittsstruktur."
             )
         system_prompt = _load_prompt("pro_report_template_assist_prompt.md")
-        response = await self._client.chat.completions.create(  # type: ignore[union-attr]
+        response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -1359,10 +1396,16 @@ def create_echo_service(
     model_smart: str = "gpt-4o",
     model_fast: str = "gpt-4o-mini",
     model_whisper: str = "whisper-1",
+    reasoning: bool = False,
+    reasoning_effort: str = "low",
+    reasoning_headroom: int = 4000,
 ) -> EchoService:
     return EchoService(
         openai_api_key=openai_api_key,
         model_smart=model_smart,
         model_fast=model_fast,
         model_whisper=model_whisper,
+        reasoning=reasoning,
+        reasoning_effort=reasoning_effort,
+        reasoning_headroom=reasoning_headroom,
     )
