@@ -19,6 +19,18 @@ from app.services.sharing_service import (
     require_active_share,
 )
 
+# Vorschlagsfragen für das Paar-Echo (UI zeigt sie als Chips).
+COUPLE_SUGGESTED_QUESTIONS = [
+    "Wo decken sich die Schilderungen beider Partner, wo gehen sie am deutlichsten auseinander?",
+    "Welches wiederkehrende Interaktionsmuster zeigt sich aus beiden Perspektiven?",
+    "Welche unterschiedlichen Bedürfnisse und Grenzen werden in den beiden Fällen erkennbar?",
+    "Wie ließe sich die Eskalationsschleife aus beiden Innensichten beschreiben?",
+    "Welche Gesprächsimpulse wären für eine gemeinsame Sitzung vorsichtig hilfreich?",
+    "Gibt es Hinweise auf Kontrolle oder Gefährdung, die gegen ein Paarsetting sprechen?",
+]
+# Slug-Präfix der Paar-Glossarbegriffe (Seed in 26_couples.sql).
+COUPLE_GLOSSARY_PREFIX = "paar_"
+
 
 def _canonical(case_a, case_b) -> tuple:
     """Kanonische (ungeordnete) Paar-Reihenfolge per String-Vergleich der UUIDs."""

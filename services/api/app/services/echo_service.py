@@ -1249,8 +1249,13 @@ class EchoService:
         glossary_term: str | None = None,
         glossary_definition: str | None = None,
         mode_steering: str = "",
+        prompt_file: str = "echo_professional_prompt.md",
     ) -> str:
-        """Echo-Dialog für Fachpersonen — ausschließlich auf Basis des freigegebenen Kontexts."""
+        """Echo-Dialog für Fachpersonen — ausschließlich auf Basis des freigegebenen Kontexts.
+
+        ``prompt_file`` erlaubt einen anderen System-Prompt (z. B. Paar-Modus über zwei
+        gekoppelte Fälle) bei sonst identischer Mechanik (Kontext + Glossar + Verlauf).
+        """
         if self._use_openai:
             return await self._openai_professional_chat(
                 user_message=user_message,
@@ -1259,6 +1264,7 @@ class EchoService:
                 glossary_term=glossary_term,
                 glossary_definition=glossary_definition,
                 mode_steering=mode_steering,
+                prompt_file=prompt_file,
             )
         return self._mock_professional_chat(glossary_term=glossary_term)
 
@@ -1271,8 +1277,9 @@ class EchoService:
         glossary_term: str | None,
         glossary_definition: str | None,
         mode_steering: str = "",
+        prompt_file: str = "echo_professional_prompt.md",
     ) -> str:
-        system_prompt = _load_prompt("echo_professional_prompt.md")
+        system_prompt = _load_prompt(prompt_file)
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
         if mode_steering:
             messages.append({"role": "system", "content": mode_steering})

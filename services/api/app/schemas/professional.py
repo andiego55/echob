@@ -383,3 +383,66 @@ class OrgBillingStatus(BaseModel):
     included: int                           # Inklusiv-Kontingent des Tarifs
     role: OrgRole
     configured: bool                        # Stripe verfügbar?
+
+
+# ── Paar-Analyse (gekoppelte Fälle) ──────────────────────────────────────────
+
+class CoupleCreateRequest(BaseModel):
+    case_id_a: UUID
+    case_id_b: UUID
+
+
+class CoupleResponse(BaseModel):
+    id: UUID
+    case_id_a: UUID
+    case_id_b: UUID
+    is_demo: bool
+    created_at: datetime
+
+
+class CaseCoupleStatus(BaseModel):
+    coupled: bool
+    couple_id: UUID | None = None
+    partner_case_id: UUID | None = None
+
+
+class CoupleEchoChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=20_000)
+    thread_type: Literal["couple", "glossary"] = "couple"
+    glossary_slug: str | None = Field(None, max_length=100)
+    session_id: UUID | None = None
+
+
+class CoupleEchoMessageResponse(BaseModel):
+    id: UUID
+    session_id: UUID
+    role: Literal["user", "assistant"]
+    content: str
+    thread_type: str
+    glossary_slug: str | None = None
+    created_at: datetime
+
+
+class CoupleEchoChatResponse(BaseModel):
+    user_message: CoupleEchoMessageResponse
+    assistant_message: CoupleEchoMessageResponse
+    session_id: UUID
+
+
+class CoupleEchoSessionResponse(BaseModel):
+    id: UUID
+    couple_id: UUID
+    title: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class CoupleGlossaryTerm(BaseModel):
+    slug: str
+    term: str
+    definition: str
+
+
+class CoupleMeta(BaseModel):
+    suggested_questions: list[str]
+    glossary: list[CoupleGlossaryTerm]
