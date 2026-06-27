@@ -339,7 +339,7 @@ function CouplePanel({ caseId }: { caseId: string }) {
   const { data: groups = [] } = useQuery({
     queryKey: ['prof-cases-for-couple'],
     queryFn: professionalApi.cases,
-    enabled: !!status && !status.coupled,
+    enabled: !!status,
   })
   const [partner, setPartner] = useState('')
   const create = useMutation({
@@ -353,11 +353,17 @@ function CouplePanel({ caseId }: { caseId: string }) {
 
   if (!status) return null
 
+  // Pseudonym (client_display_name) als Label — damit sich die Fachperson zurechtfindet.
+  const allCases = groups.flatMap(g =>
+    g.cases.map(c => ({ case_id: c.case_id, label: `${g.client_display_name} · ${c.case_title}` })),
+  )
+
   if (status.coupled && status.couple_id) {
+    const partnerLabel = allCases.find(c => c.case_id === status.partner_case_id)?.label
     return (
       <div className="mb-6 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
         <div className="text-sm">
-          <span className="font-semibold text-navy">🔗 Partner gekoppelt.</span>{' '}
+          <span className="font-semibold text-navy">🔗 Partner gekoppelt{partnerLabel ? ` mit ${partnerLabel}` : ''}.</span>{' '}
           <span className="text-brand-muted">Sie können mit Echo über beide Fälle gemeinsam sprechen.</span>
           {status.partner_case_id && (
             <Link to={`/professional/cases/${status.partner_case_id}`} className="ml-2 text-xs text-accent hover:underline">Partnerfall öffnen →</Link>
@@ -372,7 +378,7 @@ function CouplePanel({ caseId }: { caseId: string }) {
     )
   }
 
-  const others = groups.flatMap(g => g.cases).filter(c => c.case_id !== caseId)
+  const others = allCases.filter(c => c.case_id !== caseId)
   return (
     <div className="mb-6 rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
       <p className="text-sm font-semibold text-navy mb-1">Partner koppeln (Paar-Analyse)</p>
@@ -387,7 +393,7 @@ function CouplePanel({ caseId }: { caseId: string }) {
           <select value={partner} onChange={e => setPartner(e.target.value)}
             className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm">
             <option value="">Partnerfall wählen …</option>
-            {others.map(c => <option key={c.case_id} value={c.case_id}>{c.case_title}</option>)}
+            {others.map(c => <option key={c.case_id} value={c.case_id}>{c.label}</option>)}
           </select>
           <button onClick={() => partner && create.mutate(partner)} disabled={!partner || create.isPending}
             className="btn-primary !py-1.5 !px-4 !text-xs disabled:opacity-40">
