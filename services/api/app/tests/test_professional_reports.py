@@ -27,8 +27,8 @@ _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "post
 # ── Reine Unit-Tests (kein DB/Key nötig) ──────────────────────────────────────
 
 def test_standard_reports_complete():
-    assert set(STANDARD_REPORTS) == {"verlauf", "uebergabe", "standort"}
-    for key in ("verlauf", "uebergabe", "standort"):
+    assert set(STANDARD_REPORTS) == {"verlauf", "uebergabe", "standort", "couple"}
+    for key in ("verlauf", "uebergabe", "standort", "couple"):
         std = get_standard(key)
         assert std["instruction"].strip()
         assert std["max_tokens"] > 0

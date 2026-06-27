@@ -212,7 +212,7 @@ PRO_REPORT_DISCLAIMER = (
 )
 
 # Eingebaute Standardberichte — Spiegel von services/pro_report_templates.py
-StandardReportKey = Literal["verlauf", "uebergabe", "standort"]
+StandardReportKey = Literal["verlauf", "uebergabe", "standort", "couple"]
 
 
 # ── Eigene Berichtsvorlagen ───────────────────────────────────────────────────
