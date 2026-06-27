@@ -104,3 +104,44 @@ async def test_activate_seat_and_upgrade(db):
     with pytest.raises(HTTPException) as e2:
         await seat_service.activate_case(c2, cur, db)
     assert e2.value.detail == "UPGRADE_REQUIRED"
+
+
+async def test_release_does_not_refund_this_period(db):
+    """Abschließen gibt die im Zeitraum verbrauchte Einheit NICHT zurück (Modell B)."""
+    pid, owner = uuid.uuid4(), uuid.uuid4()
+    org = await ensure_org_for_professional(pid, db)
+    await db.execute(
+        "UPDATE organizations SET plan='solo', subscription_status='active' WHERE id=$1", org["org_id"])
+    cur = _current(pid, org)
+
+    c1 = await _make_case(db, owner)
+    await _share(db, c1, owner, pid)
+    await seat_service.activate_case(c1, cur, db)          # verbraucht 1/1
+    await seat_service.release_case(c1, cur, db)           # abgeschlossen → Werkzeuge zu
+    with pytest.raises(HTTPException) as e:
+        await seat_service.assert_case_workable(c1, cur, db)
+    assert e.value.detail == "SEAT_REQUIRED"
+
+    # Einheit bleibt verbraucht → ein NEUER Fall ist nicht mehr frei
+    c2 = await _make_case(db, owner)
+    await _share(db, c2, owner, pid)
+    with pytest.raises(HTTPException) as e2:
+        await seat_service.activate_case(c2, cur, db)
+    assert e2.value.detail == "UPGRADE_REQUIRED"
+
+
+async def test_reactivation_same_period_is_free(db):
+    """Re-Aktivierung desselben Falls im selben Zeitraum ist gratis (kein zweiter Verbrauch)."""
+    pid, owner = uuid.uuid4(), uuid.uuid4()
+    org = await ensure_org_for_professional(pid, db)
+    await db.execute(
+        "UPDATE organizations SET plan='solo', subscription_status='active' WHERE id=$1", org["org_id"])
+    cur = _current(pid, org)
+
+    c1 = await _make_case(db, owner)
+    await _share(db, c1, owner, pid)
+    await seat_service.activate_case(c1, cur, db)
+    await seat_service.release_case(c1, cur, db)
+    await seat_service.activate_case(c1, cur, db)          # re-aktivieren → frei
+    await seat_service.assert_case_workable(c1, cur, db)   # wieder nutzbar, kein Raise
+    assert await seat_service.count_consumed_this_period(org["org_id"], db) == 1
