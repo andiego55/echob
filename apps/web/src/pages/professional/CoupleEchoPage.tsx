@@ -1,0 +1,125 @@
+/**
+ * /professional/couples/:coupleId/echo — Paar-Analyse-Echo über zwei gekoppelte Fälle.
+ *
+ * Kontext = die freigegebenen Inhalte BEIDER Fälle (serverseitig über je load_shared_bundle
+ * erzwungen — kein neuer Datenzugriff). Echo arbeitet systemisch, ohne Partei, ohne Diagnose.
+ */
+import { useEffect, useRef, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
+import ProfessionalShell from '@/components/professional/ProfessionalShell'
+import { professionalApi } from '@/api/professional'
+import type { ProfessionalEchoMessage } from '@/types'
+
+export default function CoupleEchoPage() {
+  const { coupleId } = useParams<{ coupleId: string }>()
+  const [session, setSession] = useState<string | null>(null)
+  const [messages, setMessages] = useState<ProfessionalEchoMessage[]>([])
+  const [input, setInput] = useState('')
+  const endRef = useRef<HTMLDivElement>(null)
+
+  const { data: meta } = useQuery({ queryKey: ['couple-meta'], queryFn: professionalApi.coupleMeta })
+
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+
+  const chat = useMutation({
+    mutationFn: (vars: { message: string; thread_type?: 'couple' | 'glossary'; glossary_slug?: string }) =>
+      professionalApi.coupleEchoChat(coupleId!, { ...vars, session_id: session ?? undefined }),
+    onSuccess: (res) => {
+      setSession(res.session_id)
+      setMessages(prev => [...prev, res.user_message, res.assistant_message])
+    },
+  })
+
+  const send = (text?: string) => {
+    const msg = (text ?? input).trim()
+    if (!msg || chat.isPending) return
+    if (text === undefined) setInput('')
+    chat.mutate({ message: msg })
+  }
+
+  return (
+    <ProfessionalShell>
+      <div className="mx-auto max-w-[1100px] px-6 py-6">
+        <div className="mb-4">
+          <Link to="/professional" className="text-xs text-accent hover:underline">← Zum Postfach</Link>
+          <h1 className="mt-1 text-xl font-bold text-navy">Paar-Analyse mit Echo</h1>
+          <p className="text-xs text-brand-muted max-w-[640px]">
+            Echo betrachtet die <strong>freigegebenen Inhalte beider Fälle</strong> nebeneinander – systemisch,
+            <strong> ohne Partei zu ergreifen</strong> und ohne Diagnose. Die Zusammenführung erfolgt in Ihrer
+            fachlichen Verantwortung; bei Hinweisen auf Gewalt ist ein Paarsetting in der Regel kontraindiziert.
+          </p>
+        </div>
+
+        <div className="flex gap-6">
+          {/* Chat */}
+          <div className="flex-1 min-w-0">
+            <div className="card min-h-[50vh] flex flex-col">
+              <div className="flex-1 space-y-4 overflow-y-auto">
+                {messages.length === 0 && !chat.isPending && (
+                  <div className="text-sm text-brand-muted">
+                    <p className="mb-3">Fragen Sie Echo zu beiden Perspektiven. Zum Beispiel:</p>
+                    <div className="flex flex-col gap-2">
+                      {(meta?.suggested_questions ?? []).map(q => (
+                        <button key={q} onClick={() => send(q)}
+                          className="text-left text-xs px-3 py-2 rounded-brand border border-brand-border hover:border-accent hover:text-accent transition-colors">
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {messages.map(m => (
+                  <div key={m.id} className={m.role === 'user' ? 'text-right' : ''}>
+                    <div className={`inline-block max-w-[85%] rounded-brand px-4 py-2.5 text-sm text-left ${
+                      m.role === 'user' ? 'bg-accent/10 text-brand-text' : 'bg-brand-bg text-brand-text'
+                    }`}>
+                      {m.role === 'assistant'
+                        ? <MarkdownMessage content={m.content} />
+                        : <span className="whitespace-pre-wrap">{m.content}</span>}
+                    </div>
+                  </div>
+                ))}
+                {chat.isPending && <p className="text-sm text-brand-muted">Echo denkt nach …</p>}
+                <div ref={endRef} />
+              </div>
+
+              {/* Composer */}
+              <div className="mt-4 border-t border-brand-border pt-3">
+                <div className="flex gap-2">
+                  <textarea
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
+                    rows={2}
+                    placeholder="Frage zur Paardynamik …"
+                    className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+                  />
+                  <button onClick={() => send()} disabled={chat.isPending || !input.trim()}
+                    className="btn-primary !px-5 !text-sm self-end">Senden</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Glossar Paaranalyse */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <p className="text-xs font-semibold text-brand-muted mb-2">Glossar Paaranalyse</p>
+            <div className="space-y-1.5">
+              {(meta?.glossary ?? []).map(g => (
+                <details key={g.slug} className="rounded-brand border border-brand-border bg-brand-bg px-3 py-2">
+                  <summary className="text-xs font-semibold text-navy cursor-pointer">{g.term}</summary>
+                  <p className="mt-1 text-xs text-brand-muted leading-relaxed">{g.definition}</p>
+                  <button onClick={() => send(`Bitte ordne den Begriff „${g.term}" in diese konkrete Paardynamik ein.`)}
+                    className="mt-1.5 text-[11px] text-accent hover:underline">Im Gespräch besprechen →</button>
+                </details>
+              ))}
+              {(meta?.glossary ?? []).length === 0 && <p className="text-xs text-brand-muted/70">—</p>}
+            </div>
+          </aside>
+        </div>
+      </div>
+    </ProfessionalShell>
+  )
+}

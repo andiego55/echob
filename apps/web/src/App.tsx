@@ -91,6 +91,7 @@ import ProfessionalTemplatesPage from '@/pages/professional/ProfessionalTemplate
 import ProfessionalSettingsPage  from '@/pages/professional/ProfessionalSettingsPage'
 import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalReportTemplatesPage'
 import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
+import CoupleEchoPage from '@/pages/professional/CoupleEchoPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -176,6 +177,7 @@ export default function App() {
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/reports/:reportId" element={<ProfessionalRoute><ProfessionalReportDetailPage /></ProfessionalRoute>} />
+      <Route path="/professional/couples/:coupleId/echo" element={<ProfessionalRoute><CoupleEchoPage /></ProfessionalRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

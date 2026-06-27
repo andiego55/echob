@@ -17,6 +17,9 @@ import type {
   Organization,
   OrgInvite,
   OrgBillingStatus,
+  CaseCoupleStatus,
+  CoupleMeta,
+  CoupleEchoSession,
 } from '@/types'
 
 interface EchoChatResult {
@@ -275,4 +278,28 @@ export const professionalApi = {
     apiClient.post(`/professional/cases/${caseId}/activate`).then(r => r.data),
   caseDeactivate: (caseId: string) =>
     apiClient.delete(`/professional/cases/${caseId}/activate`).then(r => r.data),
+
+  // Paar-Analyse (gekoppelte Fälle) — Freigaben bleiben unverändert; kein neuer Zugriff.
+  caseCoupleStatus: (caseId: string) =>
+    apiClient.get<CaseCoupleStatus>(`/professional/cases/${caseId}/couple`).then(r => r.data),
+  createCouple: (case_id_a: string, case_id_b: string) =>
+    apiClient.post('/professional/couples', { case_id_a, case_id_b }).then(r => r.data),
+  deleteCouple: (coupleId: string) =>
+    apiClient.delete(`/professional/couples/${coupleId}`).then(r => r.data),
+  coupleMeta: () =>
+    apiClient.get<CoupleMeta>('/professional/couples/meta').then(r => r.data),
+  coupleEchoSessions: (coupleId: string) =>
+    apiClient.get<CoupleEchoSession[]>(`/professional/couples/${coupleId}/echo/sessions`).then(r => r.data),
+  coupleEchoHistory: (coupleId: string, sessionId: string) =>
+    apiClient.get<ProfessionalEchoMessage[]>(`/professional/couples/${coupleId}/echo/history`, {
+      params: { session_id: sessionId },
+    }).then(r => r.data),
+  coupleEchoChat: (coupleId: string, data: {
+    message: string
+    thread_type?: 'couple' | 'glossary'
+    glossary_slug?: string
+    session_id?: string
+  }) =>
+    apiClient.post<EchoChatResult>(`/professional/couples/${coupleId}/echo/chat`, data, { timeout: 120_000 })
+      .then(r => r.data),
 }

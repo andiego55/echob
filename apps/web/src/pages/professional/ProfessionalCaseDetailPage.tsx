@@ -330,6 +330,76 @@ export default function ProfessionalCaseDetailPage() {
 }
 
 /** Reiter „Übersicht": ausschließlich die freigegebenen Inhalte des Falls. */
+function CouplePanel({ caseId }: { caseId: string }) {
+  const qc = useQueryClient()
+  const { data: status } = useQuery({
+    queryKey: ['case-couple', caseId],
+    queryFn: () => professionalApi.caseCoupleStatus(caseId),
+  })
+  const { data: groups = [] } = useQuery({
+    queryKey: ['prof-cases-for-couple'],
+    queryFn: professionalApi.cases,
+    enabled: !!status && !status.coupled,
+  })
+  const [partner, setPartner] = useState('')
+  const create = useMutation({
+    mutationFn: (partnerId: string) => professionalApi.createCouple(caseId, partnerId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['case-couple', caseId] }),
+  })
+  const remove = useMutation({
+    mutationFn: (coupleId: string) => professionalApi.deleteCouple(coupleId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['case-couple', caseId] }),
+  })
+
+  if (!status) return null
+
+  if (status.coupled && status.couple_id) {
+    return (
+      <div className="mb-6 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+        <div className="text-sm">
+          <span className="font-semibold text-navy">🔗 Partner gekoppelt.</span>{' '}
+          <span className="text-brand-muted">Sie können mit Echo über beide Fälle gemeinsam sprechen.</span>
+          {status.partner_case_id && (
+            <Link to={`/professional/cases/${status.partner_case_id}`} className="ml-2 text-xs text-accent hover:underline">Partnerfall öffnen →</Link>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <Link to={`/professional/couples/${status.couple_id}/echo`} className="btn-primary !py-1.5 !px-4 !text-xs">Paar-Analyse mit Echo</Link>
+          <button onClick={() => { if (window.confirm('Kopplung lösen?')) remove.mutate(status.couple_id!) }}
+            className="text-xs text-brand-muted hover:text-red-600">Entkoppeln</button>
+        </div>
+      </div>
+    )
+  }
+
+  const others = groups.flatMap(g => g.cases).filter(c => c.case_id !== caseId)
+  return (
+    <div className="mb-6 rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+      <p className="text-sm font-semibold text-navy mb-1">Partner koppeln (Paar-Analyse)</p>
+      <p className="text-xs text-brand-muted mb-2 max-w-[640px]">
+        Wenn auch der/die Partner:in einen Fall an Sie freigegeben hat, können Sie beide Fälle koppeln und
+        mit Echo gemeinsam betrachten. Die Freigaben bleiben unverändert – es entsteht kein neuer Datenzugriff.
+      </p>
+      {others.length === 0 ? (
+        <p className="text-xs text-brand-muted/80">Kein weiterer freigegebener Fall zum Koppeln vorhanden.</p>
+      ) : (
+        <div className="flex items-center gap-2 flex-wrap">
+          <select value={partner} onChange={e => setPartner(e.target.value)}
+            className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm">
+            <option value="">Partnerfall wählen …</option>
+            {others.map(c => <option key={c.case_id} value={c.case_id}>{c.case_title}</option>)}
+          </select>
+          <button onClick={() => partner && create.mutate(partner)} disabled={!partner || create.isPending}
+            className="btn-primary !py-1.5 !px-4 !text-xs disabled:opacity-40">
+            {create.isPending ? 'Koppeln …' : 'Koppeln'}
+          </button>
+        </div>
+      )}
+      {create.isError && <p className="mt-2 text-xs text-red-600">Konnte nicht koppeln. Beide Fälle müssen aktiv freigegeben sein.</p>}
+    </div>
+  )
+}
+
 function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
   const has = (t: SharedCaseBundle['allowed'][number]) => bundle.allowed.includes(t)
   return (
@@ -342,6 +412,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           </span>
         ))}
       </div>
+
+      <CouplePanel caseId={bundle.case_id} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         {has('case_info') && bundle.case && (

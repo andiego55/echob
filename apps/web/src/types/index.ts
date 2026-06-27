@@ -625,3 +625,21 @@ export interface SharedCaseBundle {
   notes: ProfessionalNote | null
   echo_summaries: ProfessionalEchoSummary[]
 }
+
+// ── Paar-Analyse (gekoppelte Fälle) ──────────────────────────────────────────
+export interface CaseCoupleStatus {
+  coupled: boolean
+  couple_id: string | null
+  partner_case_id: string | null
+}
+export interface CoupleEchoSession {
+  id: string
+  couple_id: string
+  title: string | null
+  created_at: string
+  updated_at: string
+}
+export interface CoupleMeta {
+  suggested_questions: string[]
+  glossary: GlossaryTerm[]
+}
