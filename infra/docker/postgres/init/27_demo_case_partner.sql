@@ -36,7 +36,7 @@ VALUES (
     'Das Gefühl, der Böse zu sein, obwohl ich mir solche Mühe gegeben habe.',
     'Mein Geburtstag, an dem ihr ein Abend mit ihren Freundinnen wichtiger war als ein ruhiger Abend mit mir.',
     'Ihr ständiges Hinterfragen, die Andeutungen zu gehen, das Gefühl, mich für jede Kleinigkeit erklären zu müssen.',
-    4, 'no_indication',
+    4, 'none',
     '[{"label":"Gefühl ständiger Kritik","confidence":"high","source":"onboarding"},{"label":"Rückzug bei Überforderung","confidence":"medium","source":"onboarding"},{"label":"Angst, verlassen zu werden","confidence":"medium","source":"onboarding"}]'::jsonb
 )
 ON CONFLICT (case_id) DO NOTHING;
