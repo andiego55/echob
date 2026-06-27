@@ -10,6 +10,7 @@ import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi, type TemplateType, type ProfessionalTemplate } from '@/api/professional'
 import QuestionnaireBuilder from '@/components/professional/QuestionnaireBuilder'
+import { DIALOG_PLACEHOLDER } from '@/components/professional/AssignmentTypePanel'
 import { isValidQuestion, type Question } from '@/lib/questionnaire'
 
 const TYPE_OPTIONS: { value: TemplateType; label: string; contentLabel: string }[] = [
@@ -37,12 +38,13 @@ export default function ProfessionalTemplatesPage() {
   const [url, setUrl] = useState('')
   const [questions, setQuestions] = useState<Question[]>([])
   const [hypothesis, setHypothesis] = useState('')
+  const [keywords, setKeywords] = useState('')
   const [filter, setFilter] = useState<TemplateType | 'all'>('all')
   const [editingId, setEditingId] = useState<string | null>(null)
   const opt = TYPE_OPTIONS.find(o => o.value === type)!
 
   const resetForm = () => {
-    setEditingId(null); setTitle(''); setContent(''); setUrl(''); setQuestions([]); setHypothesis('')
+    setEditingId(null); setTitle(''); setContent(''); setUrl(''); setQuestions([]); setHypothesis(''); setKeywords('')
   }
   const startEdit = (t: ProfessionalTemplate) => {
     const p = t.payload as Record<string, unknown>
@@ -52,6 +54,7 @@ export default function ProfessionalTemplatesPage() {
     setContent(String(p.text ?? p.body ?? p.intro ?? p.intention ?? ''))
     setUrl(String(p.url ?? ''))
     setHypothesis(String(p.hypothesis_for_echo ?? ''))
+    setKeywords(Array.isArray(p.keywords) ? (p.keywords as string[]).join('\n') : '')
     setQuestions(Array.isArray(p.questions) ? (p.questions as Question[]) : [])
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -64,6 +67,8 @@ export default function ProfessionalTemplatesPage() {
       if (type === 'dialog') {
         payload.intention = content
         if (hypothesis.trim()) payload.hypothesis_for_echo = hypothesis
+        const kw = keywords.split(/[\n,]/).map(s => s.trim()).filter(Boolean)
+        if (kw.length) payload.keywords = kw
       }
       if (type === 'questionnaire') {
         payload.intro = content
@@ -110,13 +115,19 @@ export default function ProfessionalTemplatesPage() {
                 </select>
                 <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Titel" className={inputCls} />
               </div>
-              <textarea value={content} onChange={e => setContent(e.target.value)} rows={3} placeholder={opt.contentLabel} className={inputCls} />
+              <textarea value={content} onChange={e => setContent(e.target.value)}
+                rows={type === 'dialog' ? 7 : 3}
+                placeholder={type === 'dialog' ? DIALOG_PLACEHOLDER : opt.contentLabel} className={inputCls} />
               {type === 'resource' && (
                 <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Link (optional)" className={inputCls} />
               )}
               {type === 'dialog' && (
                 <input value={hypothesis} onChange={e => setHypothesis(e.target.value)}
                   placeholder="Interne Hypothese für Echo (optional, nicht für Klient:in sichtbar)" className={inputCls} />
+              )}
+              {type === 'dialog' && (
+                <textarea value={keywords} onChange={e => setKeywords(e.target.value)} rows={2}
+                  placeholder="Stichworte – eine pro Zeile. Die Klient:in kann sie im Dialog anklicken (optional)." className={inputCls} />
               )}
               {type === 'questionnaire' && (
                 <QuestionnaireBuilder value={questions} onChange={setQuestions} />

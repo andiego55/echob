@@ -16,7 +16,7 @@ import { isValidQuestion, type Answer, type Question } from '@/lib/questionnaire
 const inputCls =
   'w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent'
 
-const DIALOG_PLACEHOLDER = `Worum geht es? Was soll Echo mit der Klient:in erkunden – und worauf achten? Dieser Rahmen steuert Echo im Dialog (er darf ruhig ausführlich sein).
+export const DIALOG_PLACEHOLDER = `Worum geht es? Was soll Echo mit der Klient:in erkunden – und worauf achten? Dieser Rahmen steuert Echo im Dialog (er darf ruhig ausführlich sein).
 
 Beispiel:
 Thema: Umgang mit Schuldgefühlen nach einem Streit.
