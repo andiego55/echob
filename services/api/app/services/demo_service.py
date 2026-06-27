@@ -24,6 +24,13 @@ _DEMO_SHARE_ELEMENTS = (
     "hypotheses",
 )
 
+# Beispiel-Partnerfall (Paar-Analyse): Marco K. — Gegenperspektive zu Lena (27_demo_case_partner.sql).
+DEMO_PARTNER_USER_ID = "dec01000-0000-4000-a000-000000000002"
+DEMO_PARTNER_CASE_ID = "dec01000-0000-4000-a000-0000000000cb"
+_DEMO_PARTNER_SHARE_ELEMENTS = (
+    "case_info", "onboarding", "all_scenes", "scales", "topic_summaries", "self_profile",
+)
+
 _DEMO_SESSION_NOTES = [
     {
         "days_ago": 21,
@@ -115,48 +122,65 @@ _DEMO_REPORT = {
 
 
 async def ensure_demo_for_professional(pid, conn) -> None:
-    """Idempotent + nebenläufigkeitssicher: stellt der Fachperson die Demo-Spielwiese bereit."""
-    existing = await conn.fetchrow(
-        "SELECT id FROM case_shares WHERE professional_user_id = $1 AND case_id = $2",
-        pid, DEMO_CASE_ID,
-    )
-    if existing:
-        return
+    """Idempotent + nebenläufigkeitssicher: stellt der Fachperson die Demo-Spielwiese bereit
+    (Lena + Partner Marco als gekoppeltes Paar-Analyse-Beispiel)."""
     # Demo-Fall muss geseedet sein (Migration 18); sonst still überspringen.
     if not await conn.fetchrow("SELECT 1 FROM cases WHERE id = $1", DEMO_CASE_ID):
         return
 
-    share_id = await conn.fetchval(
+    # ── Lena-Fall: Freigabe + eigene Artefakte (Notizen/Bericht nur bei Erstanlage) ──
+    lena_share = await conn.fetchval(
         "INSERT INTO case_shares "
         "(case_id, owner_user_id, professional_user_id, status, is_demo, message) "
         "VALUES ($1, $2, $3, 'active', true, $4) "
         "ON CONFLICT (case_id, professional_user_id) DO NOTHING RETURNING id",
         DEMO_CASE_ID, DEMO_CLIENT_USER_ID, pid, "Beispielfall zum Ausprobieren – fiktiv.",
     )
-    if share_id is None:
-        return  # ein paralleler Aufruf war schneller
-
-    for el in _DEMO_SHARE_ELEMENTS:
+    if lena_share is not None:
+        for el in _DEMO_SHARE_ELEMENTS:
+            await conn.execute(
+                "INSERT INTO case_share_elements (share_id, element_type) VALUES ($1, $2) "
+                "ON CONFLICT DO NOTHING",
+                lena_share, el,
+            )
+        for n in _DEMO_SESSION_NOTES:
+            content = json.dumps(crypto.encrypt_json_strings({"sections": n["sections"]}))
+            await conn.execute(
+                "INSERT INTO professional_session_notes "
+                "(professional_user_id, case_id, session_date, title, content) "
+                "VALUES ($1, $2, $3, $4, $5::jsonb)",
+                pid, DEMO_CASE_ID, date.today() - timedelta(days=n["days_ago"]), n["title"], content,
+            )
+        report_content = json.dumps(crypto.encrypt_json_strings({
+            "sections": _DEMO_REPORT["sections"], "disclaimer": PRO_REPORT_DISCLAIMER,
+        }))
         await conn.execute(
-            "INSERT INTO case_share_elements (share_id, element_type) VALUES ($1, $2) "
-            "ON CONFLICT DO NOTHING",
-            share_id, el,
-        )
-
-    for n in _DEMO_SESSION_NOTES:
-        content = json.dumps(crypto.encrypt_json_strings({"sections": n["sections"]}))
-        await conn.execute(
-            "INSERT INTO professional_session_notes "
-            "(professional_user_id, case_id, session_date, title, content) "
+            "INSERT INTO professional_reports (professional_user_id, case_id, source, title, content) "
             "VALUES ($1, $2, $3, $4, $5::jsonb)",
-            pid, DEMO_CASE_ID, date.today() - timedelta(days=n["days_ago"]), n["title"], content,
+            pid, DEMO_CASE_ID, _DEMO_REPORT["source"], _DEMO_REPORT["title"], report_content,
         )
 
-    report_content = json.dumps(crypto.encrypt_json_strings({
-        "sections": _DEMO_REPORT["sections"], "disclaimer": PRO_REPORT_DISCLAIMER,
-    }))
-    await conn.execute(
-        "INSERT INTO professional_reports (professional_user_id, case_id, source, title, content) "
-        "VALUES ($1, $2, $3, $4, $5::jsonb)",
-        pid, DEMO_CASE_ID, _DEMO_REPORT["source"], _DEMO_REPORT["title"], report_content,
-    )
+    # ── Partner-Fall Marco + Kopplung Lena↔Marco (Paar-Analyse-Beispiel) ──
+    if await conn.fetchrow("SELECT 1 FROM cases WHERE id = $1", DEMO_PARTNER_CASE_ID):
+        marco_share = await conn.fetchval(
+            "INSERT INTO case_shares "
+            "(case_id, owner_user_id, professional_user_id, status, is_demo, message) "
+            "VALUES ($1, $2, $3, 'active', true, $4) "
+            "ON CONFLICT (case_id, professional_user_id) DO NOTHING RETURNING id",
+            DEMO_PARTNER_CASE_ID, DEMO_PARTNER_USER_ID, pid,
+            "Beispiel-Partnerfall (Paar-Analyse) – fiktiv.",
+        )
+        if marco_share is not None:
+            for el in _DEMO_PARTNER_SHARE_ELEMENTS:
+                await conn.execute(
+                    "INSERT INTO case_share_elements (share_id, element_type) VALUES ($1, $2) "
+                    "ON CONFLICT DO NOTHING",
+                    marco_share, el,
+                )
+        # Kopplung (kanonisch: …00ca < …00cb → a=Lena, b=Marco); is_demo, idempotent.
+        await conn.execute(
+            "INSERT INTO case_couples (professional_user_id, case_id_a, case_id_b, is_demo) "
+            "VALUES ($1, $2, $3, true) "
+            "ON CONFLICT (professional_user_id, case_id_a, case_id_b) DO NOTHING",
+            pid, DEMO_CASE_ID, DEMO_PARTNER_CASE_ID,
+        )
