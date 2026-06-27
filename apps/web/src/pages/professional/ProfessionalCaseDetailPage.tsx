@@ -95,6 +95,32 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 /** Gate für nicht-aktivierte (nicht-Demo) Fälle: Fall aktivieren (Sitz) oder Abo/Upgrade. */
+/** Aktiver Fall (Sitz belegt): Hinweis + „Fall abschließen" (Werkzeuge zu, Einheit bleibt für den Monat). */
+function CaseSeatActive({ caseId }: { caseId: string }) {
+  const qc = useQueryClient()
+  const release = useMutation({
+    mutationFn: () => professionalApi.caseDeactivate(caseId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-case', caseId] }),
+  })
+  return (
+    <div className="mb-4 flex items-center justify-between gap-3 flex-wrap rounded-brand border border-green-200 bg-green-50 px-4 py-2.5">
+      <p className="text-xs text-green-800">✓ Fall ist in diesem Abrechnungsmonat aktiviert – Werkzeuge frei.</p>
+      <button
+        onClick={() => {
+          if (window.confirm(
+            'Fall abschließen? Die Werkzeuge werden geschlossen. Die für diesen Abrechnungsmonat '
+            + 'verbrauchte Einheit bleibt – eine erneute Aktivierung im selben Monat ist kostenlos.'))
+            release.mutate()
+        }}
+        disabled={release.isPending}
+        className="text-xs font-medium text-brand-muted hover:text-navy underline disabled:opacity-50"
+      >
+        {release.isPending ? 'Schließe …' : 'Fall abschließen'}
+      </button>
+    </div>
+  )
+}
+
 function CaseActivationGate({ caseId }: { caseId: string }) {
   const qc = useQueryClient()
   const [err, setErr] = useState<string | null>(null)
@@ -304,6 +330,7 @@ export default function ProfessionalCaseDetailPage() {
         </div>
         {bundle.is_demo && <DemoIntro onGoto={setTab} />}
         {!bundle.is_demo && !bundle.activated && <CaseActivationGate caseId={caseId!} />}
+        {!bundle.is_demo && bundle.activated && <CaseSeatActive caseId={caseId!} />}
 
         {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
         {tab === 'dialog' && <AssignmentTypePanel caseId={caseId!} type="dialog" />}

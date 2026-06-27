@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.case import CaseCreate, CaseListResponse, CaseResponse, CaseUpdate
+from app.services import seat_service
 from app.services.subscription_service import enforce_trial_limits
 
 logger = logging.getLogger(__name__)
@@ -128,13 +129,16 @@ async def archive_case(
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> None:
-    """Fall archivieren (Soft-Delete via archived_at)."""
+    """Fall archivieren (Soft-Delete via archived_at). Gibt eine offene Profi-Belegung frei
+    (Werkzeuge zu); die im Abrechnungsmonat verbrauchte Einheit bleibt (kein Refund)."""
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "UPDATE cases SET archived_at = NOW() WHERE id = $1 AND user_id = $2 RETURNING id",
             case_id,
             current_user["user_id"],
         )
+        if row:
+            await seat_service.release_case_by_id(case_id, conn, reason="archived")
     if not row:
         raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
 

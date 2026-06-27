@@ -105,6 +105,15 @@ async def _has_consumed_row(org_id, case_id, period, conn) -> bool:
     ))
 
 
+async def is_active_this_period(org_id, case_id, conn) -> bool:
+    """True, wenn der Fall im laufenden Zeitraum eine OFFENE Belegung hat (Werkzeuge frei).
+
+    Quelle der Wahrheit fürs UI-Flag ``activated`` (statt der überschreibbaren
+    ``case_shares.activated_at``-Denormalisierung), damit es beim Periodenwechsel nicht abweicht.
+    """
+    return await _has_open_row(org_id, case_id, await period_start(org_id, conn), conn)
+
+
 async def assert_case_workable(case_id, current, conn) -> None:
     """Gate für fall-gebundene Profi-Werkzeuge. Demo frei; sonst Abo aktiv + Fall im laufenden
     Zeitraum **offen aktiviert** (sonst 402 SEAT_REQUIRED / PLAN_REQUIRED)."""
@@ -169,6 +178,23 @@ async def release_case(case_id, current, conn, *, reason: str = "manual") -> Non
         "UPDATE case_shares SET activated_at = NULL "
         "WHERE professional_user_id = $1 AND case_id = $2 AND is_demo = false",
         current["user_id"], case_id,
+    )
+
+
+async def release_case_by_id(case_id, conn, *, reason: str) -> None:
+    """Schließt ALLE offenen Belegungen eines Falls (org-agnostisch) — bei Archiv/Widerruf.
+
+    Die im Zeitraum verbrauchte Einheit bleibt erhalten (kein Refund); nur die offene Belegung
+    (Werkzeug-Zugang) wird geschlossen und ``activated_at`` zurückgesetzt.
+    """
+    await conn.execute(
+        "UPDATE case_activations SET released_at = NOW(), release_reason = $2 "
+        "WHERE case_id = $1 AND released_at IS NULL",
+        case_id, reason,
+    )
+    await conn.execute(
+        "UPDATE case_shares SET activated_at = NULL WHERE case_id = $1 AND is_demo = false",
+        case_id,
     )
 
 

@@ -135,7 +135,8 @@ function BillingSection() {
     <div className="mt-8 card">
       <h2 className="text-lg font-semibold text-navy">Abrechnung</h2>
       <p className="mt-1 text-sm text-brand-muted">
-        Profi-Werkzeuge (Echo, Berichte, Notizen) je aktivem Fall. Der Beispielfall ist immer frei.
+        Abgerechnet wird je <span className="font-medium text-navy">im Abrechnungsmonat aktiviertem Fall</span>.
+        Re-Aktivierung desselben Falls im selben Monat ist kostenlos; der Beispielfall ist immer frei.
       </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
@@ -144,7 +145,7 @@ function BillingSection() {
           {billing.status && <span className="ml-1 text-xs text-brand-muted">({billing.status})</span>}
         </div>
         <div>
-          <span className="text-brand-muted">Aktive Fälle:</span>{' '}
+          <span className="text-brand-muted">Diesen Monat aktiviert:</span>{' '}
           <span className="font-semibold text-navy">{billing.active_cases}/{billing.included}</span>
         </div>
       </div>

@@ -112,7 +112,7 @@ async def fulfill_org_checkout(obj, pool) -> str | None:
     org_id = UUID(org_id_str)
     customer_id = obj.get("customer")
     subscription_id = obj.get("subscription")
-    status, ends_at = "active", None
+    status, ends_at, starts_at = "active", None, None
     if subscription_id:
         try:
             stripe = _stripe()
@@ -121,17 +121,20 @@ async def fulfill_org_checkout(obj, pool) -> str | None:
             pe = sub.get("current_period_end")
             if pe:
                 ends_at = datetime.fromtimestamp(pe, tz=UTC)
+            ps = sub.get("current_period_start")
+            if ps:
+                starts_at = datetime.fromtimestamp(ps, tz=UTC)
         except Exception:
             logger.exception("Org-Subscription %s nicht ladbar", subscription_id)
 
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE organizations SET plan = $2, subscription_status = $3, "
-            "subscription_ends_at = $4, "
+            "subscription_ends_at = $4, current_period_start = COALESCE($7, current_period_start), "
             "stripe_customer_id = COALESCE($5, stripe_customer_id), "
             "stripe_subscription_id = COALESCE($6, stripe_subscription_id), updated_at = NOW() "
             "WHERE id = $1",
-            org_id, tier, status, ends_at, customer_id, subscription_id,
+            org_id, tier, status, ends_at, customer_id, subscription_id, starts_at,
         )
     logger.info("Org-Abo aktiviert: org=%s tier=%s status=%s", org_id, tier, status)
     return tier
@@ -160,12 +163,15 @@ async def handle_org_subscription_event(event, pool) -> None:
     elif etype == "customer.subscription.updated":
         pe = obj.get("current_period_end")
         ends_at = datetime.fromtimestamp(pe, tz=UTC) if pe else None
+        ps = obj.get("current_period_start")
+        starts_at = datetime.fromtimestamp(ps, tz=UTC) if ps else None
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE organizations SET subscription_status = $2, "
-                "subscription_ends_at = COALESCE($3, subscription_ends_at), updated_at = NOW() "
+                "subscription_ends_at = COALESCE($3, subscription_ends_at), "
+                "current_period_start = COALESCE($4, current_period_start), updated_at = NOW() "
                 "WHERE stripe_subscription_id = $1",
-                obj.get("id"), obj.get("status") or "active", ends_at,
+                obj.get("id"), obj.get("status") or "active", ends_at, starts_at,
             )
     elif etype == "customer.subscription.deleted":
         async with pool.acquire() as conn:

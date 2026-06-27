@@ -16,6 +16,7 @@ from app.schemas.professional import (
     ShareElementResponse,
     ShareUpdate,
 )
+from app.services import seat_service
 
 router = APIRouter(prefix="/cases/{case_id}/shares", tags=["shares"])
 
@@ -169,6 +170,8 @@ async def revoke_share(
             "WHERE id = $1 AND case_id = $2 AND owner_user_id = $3 AND status = 'active'",
             share_id, case_id, uid,
         )
+        if result != "UPDATE 0":
+            await seat_service.release_case_by_id(case_id, conn, reason="revoked")
     if result == "UPDATE 0":
         raise HTTPException(status_code=404, detail="Freigabe nicht gefunden.")
     return {"revoked": True}
