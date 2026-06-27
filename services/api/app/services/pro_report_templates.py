@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-StandardReportKey = Literal["verlauf", "uebergabe", "standort"]
+StandardReportKey = Literal["verlauf", "uebergabe", "standort", "couple"]
 
 STANDARD_REPORTS: dict[str, dict] = {
     "verlauf": {
@@ -79,6 +79,53 @@ STANDARD_REPORTS: dict[str, dict] = {
             "Veränderungsmotivation.\n"
             "6. **Nächste Schritte** — differenzierte, fachlich begründete Optionen für das "
             "weitere Vorgehen."
+        ),
+    },
+    "couple": {
+        "label": "Paaranalyse-Bericht",
+        "max_tokens": 5000,
+        "temperature": 0.40,
+        "instruction": (
+            "Erstelle einen **Paaranalyse-Bericht** über die beiden gekoppelten Fälle (Person A "
+            "und Person B). Zweck: eine fachliche, **allparteiliche** Gesamtschau der Paardynamik "
+            "aus **beiden Innensichten** — als Grundlage für Indikationsstellung und weiteres "
+            "Vorgehen. Ton: analytisch, differenziert, ruhig; durchgehend beide Perspektiven "
+            "nebeneinander, ohne Partei zu ergreifen.\n\n"
+            "Abschnittsstruktur:\n"
+            "1. **Anliegen und Auftrag beider Partner** — was jede Seite einbringt; wo die Anliegen "
+            "sich decken und wo sie auseinandergehen; vorsichtig, ob ein gemeinsames Ziel erkennbar "
+            "ist.\n"
+            "2. **Beziehungskontext und Rahmen** — Beziehungsart, Dauer, aktueller Status "
+            "(zusammen/getrennt), strukturelle Faktoren (Kinder, Wohnen, Finanzen, Umfeld), "
+            "aktuelle Phase.\n"
+            "3. **Die beiden Perspektiven** — der Kern der Erzählung jeder Seite zur Beziehung, je "
+            "als subjektiver Selbstbericht (Muster: Fall A schildert …; Fall B schildert …).\n"
+            "4. **Übereinstimmungen und Divergenzen** — wo sich die Schilderungen treffen, wo sie am "
+            "deutlichsten auseinandergehen (Perspektivdivergenz) — informativ, ohne zu werten, wer "
+            "recht hat.\n"
+            "5. **Paardynamik und Interaktionsmuster (systemisch)** — die zentralen **zirkulären** "
+            "Muster (z. B. Rückzug↔Verfolgung, Vorwurf↔Rechtfertigung, Eskalationsschleifen): wie "
+            "das Verhalten der einen Seite die Reaktion der anderen auslöst, aus beiden Innensichten, "
+            "mit konkreten Szenenbelegen beider Fälle.\n"
+            "6. **Bindung und Bedürfnisse beider** — erkennbare Bindungsmuster und dahinterliegende "
+            "Bedürfnisse (Nähe, Sicherheit, Autonomie, Anerkennung) jeder Person; welche unerfüllten "
+            "Bedürfnisse die Konflikte speisen.\n"
+            "7. **Kommunikation und Konfliktverhalten** — wie gestritten und (versucht) repariert "
+            "wird; beobachtbare Muster (Kritik, Abwehr, Rückzug, Eskalation) — beschreibend, nicht "
+            "etikettierend; Reparaturversuche und was sie gelingen oder scheitern lässt.\n"
+            "8. **Ressourcen und Schutzfaktoren des Paares** — tragende Bindungen, gemeinsame "
+            "Geschichte, individuelle Stärken, Veränderungsmotivation beider.\n"
+            "9. **Risiken, Machtgefälle und Kontraindikationen** — Hinweise auf Gewalt, Kontrolle, "
+            "Zwang oder deutliches Machtungleichgewicht; was gegen ein gemeinsames Setting spricht; "
+            "Sicherheitsaspekte. Liegen keine Hinweise vor, halte das sachlich fest.\n"
+            "10. **Systemische Hypothesen und Indikationseinschätzung** — tastende Hypothesen zur "
+            "Paardynamik; eine vorsichtige Einschätzung, ob Paararbeit indiziert, (noch) "
+            "kontraindiziert oder ob zunächst anderes nötig ist (z. B. individuelle Stabilisierung, "
+            "Sicherheit, getrennte Gespräche). Keine Diagnose einer Person, mit "
+            "Validierungsvorbehalt.\n"
+            "11. **Mögliche Ansatzpunkte und nächste Schritte** — allparteiliche, konkrete Optionen "
+            "für die Arbeit: woran sich mit beiden arbeiten ließe, was jede Seite einbringen könnte, "
+            "mögliche Settings und wann individuelle oder andere Formate sinnvoll sind."
         ),
     },
 }

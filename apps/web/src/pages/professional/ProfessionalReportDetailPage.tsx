@@ -14,6 +14,7 @@ const SOURCE_LABELS: Record<string, string> = {
   'standard:verlauf': 'Verlaufsbericht',
   'standard:uebergabe': 'Übergabe-/Überweisungsbericht',
   'standard:standort': 'Fall-Standortbestimmung',
+  'standard:couple': 'Paaranalyse-Bericht',
 }
 const sourceLabel = (s: string) => SOURCE_LABELS[s] || (s === 'template' ? 'Eigene Vorlage' : 'Bericht')
 

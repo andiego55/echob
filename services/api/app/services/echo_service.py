@@ -1347,11 +1347,13 @@ class EchoService:
         context: str,
         max_tokens: int = 3500,
         temperature: float = 0.38,
+        prompt_file: str = "echo_professional_report_prompt.md",
     ) -> dict[str, Any]:
         """Generiert einen strukturierten Fachpersonen-Bericht (``{sections:[{heading,text}]}``).
 
         Spiegelt ``_openai_report``: System-Prompt (erweiterte Latitude) + Fallkontext +
-        Anweisung (Standard oder eigene Vorlage). Erweiterte fachliche Tiefe steckt im Prompt.
+        Anweisung (Standard oder eigene Vorlage). ``prompt_file`` erlaubt einen anderen
+        System-Prompt (z. B. Paaranalyse über zwei gekoppelte Fälle).
         """
         if not self._use_openai:
             return self._mock_professional_report()
@@ -1359,7 +1361,7 @@ class EchoService:
 
         from app.schemas.professional import PRO_REPORT_DISCLAIMER
 
-        system_prompt = _load_prompt("echo_professional_report_prompt.md")
+        system_prompt = _load_prompt(prompt_file)
         user_message = instruction + "\n\nAntworte ausschließlich als gültiges JSON-Objekt."
         response = await self._chat(  # type: ignore[union-attr]
             model=self._model_smart,

@@ -643,6 +643,7 @@ const STANDARD_SOURCE_LABELS: Record<string, string> = {
   'standard:verlauf': 'Verlaufsbericht',
   'standard:uebergabe': 'Übergabe-/Überweisungsbericht',
   'standard:standort': 'Fall-Standortbestimmung',
+  'standard:couple': 'Paaranalyse-Bericht',
 }
 
 function sourceLabel(source: string): string {
@@ -662,6 +663,10 @@ function ReportsPanel({ caseId }: { caseId: string }) {
   const { data: templates = [] } = useQuery({
     queryKey: ['prof-report-templates'],
     queryFn: () => professionalApi.reportTemplates(),
+  })
+  const { data: coupleStatus } = useQuery({
+    queryKey: ['case-couple', caseId],
+    queryFn: () => professionalApi.caseCoupleStatus(caseId),
   })
 
   const create = useMutation({
@@ -706,6 +711,19 @@ function ReportsPanel({ caseId }: { caseId: string }) {
             </button>
           ))}
         </div>
+
+        {coupleStatus?.coupled && (
+          <>
+            <div className="text-xs font-semibold text-navy uppercase tracking-wide mt-4 mb-1.5">Paar-Analyse</div>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <button onClick={() => setSelected('standard:couple')}
+                className={tile(selected === 'standard:couple')}>
+                <div className="text-sm font-semibold text-navy">🔗 Paaranalyse-Bericht</div>
+                <div className="text-[11px] text-brand-muted">Über beide gekoppelten Fälle</div>
+              </button>
+            </div>
+          </>
+        )}
 
         {templates.length > 0 && (
           <>

@@ -32,7 +32,7 @@ from app.schemas.professional import (
     ProReportTemplateCreate,
     ProReportTemplateUpdate,
 )
-from app.services import collab_service, seat_service
+from app.services import collab_service, couple_service, seat_service
 from app.services.pro_report_templates import get_standard
 from app.services.sharing_service import (
     build_shared_case_context,
@@ -200,9 +200,15 @@ async def create_report(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> ProfessionalReport:
-    """Generiert einen Fallbericht aus Standardvorlage oder eigener Vorlage."""
+    """Generiert einen Fallbericht aus Standardvorlage oder eigener Vorlage.
+
+    Sonderfall **Paaranalyse-Bericht** (``standard_key='couple'``): Kontext = die freigegebenen
+    Daten BEIDER gekoppelten Fälle (``load_combined_context`` über je ``load_shared_bundle`` —
+    kein neuer Datenzugriff).
+    """
     pid = current["user_id"]
     echo_svc = _get_echo_service(request)
+    is_couple = body.source == "standard" and body.standard_key == "couple"
 
     # 1) Anweisung + Aussteuerung auflösen
     if body.source == "standard":
@@ -218,8 +224,6 @@ async def create_report(
 
     # 2) Daten laden (kurz halten — LLM-Aufruf danach ohne gehaltene Verbindung)
     async with pool.acquire() as conn:
-        bundle = await load_shared_bundle(pid, case_id, conn)   # 404 ohne aktive Freigabe
-        await seat_service.assert_case_workable(case_id, current, conn)  # Gating (Demo frei)
         count = await conn.fetchval(
             "SELECT COUNT(*) FROM professional_reports "
             "WHERE professional_user_id = $1 AND case_id = $2",
@@ -231,55 +235,72 @@ async def create_report(
                 detail=f"Maximale Anzahl von {_MAX_REPORTS_PER_CASE} Berichten erreicht. "
                        "Bitte löschen Sie einen Bericht, bevor Sie einen neuen erstellen.",
             )
-        if body.source == "template":
-            tpl = await conn.fetchrow(
-                "SELECT name, instruction FROM professional_report_templates "
-                "WHERE id = $1 AND org_id = $2",
-                body.template_id, current["org_id"],
+
+        if is_couple:
+            # Paaranalyse: beide gekoppelten Fälle, jeder einzeln durchs Freigabe-Gate (kein neuer Zugriff).
+            partner = await couple_service.get_partner_case(pid, case_id, conn)
+            if not partner:
+                raise HTTPException(
+                    status_code=422,
+                    detail="Dieser Fall ist nicht mit einem Partnerfall gekoppelt.",
+                )
+            couple = await couple_service.require_couple(pid, partner["couple_id"], conn)
+            await couple_service.assert_couple_workable(couple, current, conn)
+            context = await couple_service.load_combined_context(pid, couple, conn)
+        else:
+            bundle = await load_shared_bundle(pid, case_id, conn)   # 404 ohne aktive Freigabe
+            await seat_service.assert_case_workable(case_id, current, conn)  # Gating (Demo frei)
+            if body.source == "template":
+                tpl = await conn.fetchrow(
+                    "SELECT name, instruction FROM professional_report_templates "
+                    "WHERE id = $1 AND org_id = $2",
+                    body.template_id, current["org_id"],
+                )
+                if not tpl:
+                    raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")
+                instruction = crypto.decrypt(tpl["instruction"])
+                max_tokens, temperature = 3500, 0.38
+                source_str, template_id, default_title = "template", body.template_id, tpl["name"]
+
+            note_row = await conn.fetchrow(
+                "SELECT * FROM professional_notes WHERE professional_user_id = $1 AND case_id = $2",
+                pid, case_id,
             )
-            if not tpl:
-                raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")
-            instruction = crypto.decrypt(tpl["instruction"])
-            max_tokens, temperature = 3500, 0.38
-            source_str, template_id, default_title = "template", body.template_id, tpl["name"]
+            summary_rows = await conn.fetch(
+                "SELECT title, summary_text FROM professional_echo_summaries "
+                "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY created_at DESC",
+                pid, case_id,
+            )
+            assignments = await collab_service.list_assignments_for_case(
+                conn, professional_user_id=pid, case_id=case_id)
+            appointments = await collab_service.list_appointments_for_case(
+                conn, professional_user_id=pid, case_id=case_id)
+            session_notes = await load_session_notes_decrypted(
+                conn, professional_user_id=pid, case_id=case_id)
 
-        note_row = await conn.fetchrow(
-            "SELECT * FROM professional_notes WHERE professional_user_id = $1 AND case_id = $2",
-            pid, case_id,
+    # 3) Einzelfall-Kontext zusammenbauen (Paar-Kontext steht oben bereits)
+    if not is_couple:
+        note = (
+            crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
+            if note_row else None
         )
-        summary_rows = await conn.fetch(
-            "SELECT title, summary_text FROM professional_echo_summaries "
-            "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY created_at DESC",
-            pid, case_id,
-        )
-        assignments = await collab_service.list_assignments_for_case(
-            conn, professional_user_id=pid, case_id=case_id)
-        appointments = await collab_service.list_appointments_for_case(
-            conn, professional_user_id=pid, case_id=case_id)
-        session_notes = await load_session_notes_decrypted(
-            conn, professional_user_id=pid, case_id=case_id)
-
-    # 3) Kontext zusammenbauen (nur freigegebenes Material + eigene Profi-Materialien)
-    note = (
-        crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
-        if note_row else None
-    )
-    summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in summary_rows]
-    parts = [
-        s for s in (
-            build_shared_case_context(bundle),
-            _build_notes_context(note),
-            build_session_notes_context(session_notes),
-            _build_summaries_context(summaries),
-            collab_service.build_collaboration_context(assignments, appointments),
-        ) if s
-    ]
-    context = "\n\n---\n\n".join(parts)
+        summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in summary_rows]
+        parts = [
+            s for s in (
+                build_shared_case_context(bundle),
+                _build_notes_context(note),
+                build_session_notes_context(session_notes),
+                _build_summaries_context(summaries),
+                collab_service.build_collaboration_context(assignments, appointments),
+            ) if s
+        ]
+        context = "\n\n---\n\n".join(parts)
 
     # 4) Generieren (synchron) + verschlüsselt speichern
     content = await echo_svc.professional_generate_report(
         instruction=instruction, context=context,
         max_tokens=max_tokens, temperature=temperature,
+        prompt_file="echo_couple_report_prompt.md" if is_couple else "echo_professional_report_prompt.md",
     )
     title = body.title or default_title or "Bericht"
     content_json = json.dumps(crypto.encrypt_json_strings(content))
