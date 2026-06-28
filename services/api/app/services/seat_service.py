@@ -198,5 +198,21 @@ async def release_case_by_id(case_id, conn, *, reason: str) -> None:
     )
 
 
+async def list_activations(org_id, conn, *, limit: int = 100) -> list[dict]:
+    """Aktivierungs-Historie der Org (nachvollziehbar): wer hat wann welchen Fall belegt/freigegeben."""
+    rows = await conn.fetch(
+        "SELECT ca.case_id, ca.billing_period_start, ca.activated_at, ca.released_at, "
+        "ca.release_reason, c.relationship_type, "
+        "up.display_name AS client_name, pp.display_name AS professional_name "
+        "FROM case_activations ca "
+        "JOIN cases c ON c.id = ca.case_id "
+        "LEFT JOIN user_profiles up ON up.user_id = c.user_id "
+        "LEFT JOIN professional_profiles pp ON pp.user_id = ca.professional_user_id "
+        "WHERE ca.org_id = $1 ORDER BY ca.activated_at DESC LIMIT $2",
+        org_id, limit,
+    )
+    return [dict(r) for r in rows]
+
+
 # Rückwärtskompatibler Alias (org_billing-Router ruft deactivate_case).
 deactivate_case = release_case

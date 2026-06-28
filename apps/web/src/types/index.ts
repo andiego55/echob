@@ -605,6 +605,17 @@ export interface OrgBillingStatus {
   configured: boolean
 }
 
+export interface ActivationLogEntry {
+  case_id: string
+  client_name: string | null
+  relationship_type: string | null
+  professional_name: string | null
+  billing_period_start: string
+  activated_at: string
+  released_at: string | null
+  release_reason: string | null
+}
+
 /** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */
 export interface SharedCaseBundle {
   case_id: string

@@ -11,7 +11,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_current_professional, get_pool
-from app.schemas.professional import OrgBillingStatus, OrgCheckoutRequest
+from app.schemas.professional import ActivationLogEntry, OrgBillingStatus, OrgCheckoutRequest
 from app.schemas.subscription import (
     CheckoutResponse,
     CheckoutVerifyRequest,
@@ -72,6 +72,17 @@ async def billing_status(
         active_cases=b["active_cases"], included=b["included"],
         role=current["org_role"], configured=is_configured(),
     )
+
+
+@router.get("/org/billing/activations", response_model=list[ActivationLogEntry])
+async def billing_activations(
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> list[ActivationLogEntry]:
+    """Nachvollziehbare Aktivierungs-Historie der Org (für die Abrechnung)."""
+    async with pool.acquire() as conn:
+        rows = await seat_service.list_activations(current["org_id"], conn)
+    return [ActivationLogEntry(**r) for r in rows]
 
 
 @router.post("/org/billing/checkout", response_model=CheckoutResponse)

@@ -98,6 +98,9 @@ export default function ProfessionalSettingsPage() {
 function BillingSection() {
   const qc = useQueryClient()
   const { data: billing } = useQuery({ queryKey: ['pro-billing'], queryFn: professionalApi.orgBilling })
+  const { data: activations = [] } = useQuery({
+    queryKey: ['pro-billing-activations'], queryFn: professionalApi.orgBillingActivations,
+  })
 
   // Rückkehr vom Checkout (?billing=success&session_id=) → verifizieren.
   useEffect(() => {
@@ -130,6 +133,12 @@ function BillingSection() {
     { key: 'praxis', name: 'Praxis', price: '149 €', cases: '5 Fälle' },
     { key: 'institut', name: 'Institut', price: '249 €', cases: '10 Fälle' },
   ] as const
+  const REASON_LABELS: Record<string, string> = {
+    manual: 'manuell abgeschlossen', archived: 'vom Klienten archiviert',
+    revoked: 'Freigabe widerrufen', period_end: 'Periodenende',
+  }
+  const fmtD = (s: string) =>
+    new Date(s).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' })
 
   return (
     <div className="mt-8 card">
@@ -186,6 +195,28 @@ function BillingSection() {
       )}
       {!isAdmin && (
         <p className="mt-3 text-xs text-brand-muted">Nur Inhaber:in/Admin verwaltet die Abrechnung.</p>
+      )}
+
+      {activations.length > 0 && (
+        <details className="mt-5">
+          <summary className="text-xs font-semibold text-navy cursor-pointer">
+            Aktivierungs-Historie ({activations.length})
+          </summary>
+          <div className="mt-2 space-y-1.5 max-h-72 overflow-y-auto pr-1">
+            {activations.map((a, i) => (
+              <div key={i} className="text-xs border-b border-brand-border/60 pb-1.5 last:border-0">
+                <span className="font-medium text-navy">{a.client_name || 'Fall'}</span>
+                {a.professional_name && <span className="text-brand-muted"> · {a.professional_name}</span>}
+                <div className="text-brand-muted">
+                  aktiviert {fmtD(a.activated_at)}
+                  {a.released_at
+                    ? ` · abgeschlossen ${fmtD(a.released_at)}${a.release_reason ? ` (${REASON_LABELS[a.release_reason] ?? a.release_reason})` : ''}`
+                    : ' · aktiv'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </details>
       )}
     </div>
   )

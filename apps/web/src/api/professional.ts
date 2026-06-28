@@ -17,6 +17,7 @@ import type {
   Organization,
   OrgInvite,
   OrgBillingStatus,
+  ActivationLogEntry,
   CaseCoupleStatus,
   CoupleMeta,
   CoupleEchoSession,
@@ -266,6 +267,8 @@ export const professionalApi = {
   // Org-Abrechnung + Fall-Aktivierung (Sitze)
   orgBilling: () =>
     apiClient.get<OrgBillingStatus>('/professional/org/billing').then(r => r.data),
+  orgBillingActivations: () =>
+    apiClient.get<ActivationLogEntry[]>('/professional/org/billing/activations').then(r => r.data),
   orgBillingCheckout: (tier: 'solo' | 'praxis' | 'institut') =>
     apiClient.post<{ url: string }>('/professional/org/billing/checkout', { tier }).then(r => r.data),
   orgBillingVerify: (session_id: string) =>

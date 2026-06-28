@@ -446,3 +446,16 @@ class CoupleGlossaryTerm(BaseModel):
 class CoupleMeta(BaseModel):
     suggested_questions: list[str]
     glossary: list[CoupleGlossaryTerm]
+
+
+# ── Aktivierungs-Historie (Abrechnung) ────────────────────────────────────────
+
+class ActivationLogEntry(BaseModel):
+    case_id: UUID
+    client_name: str | None = None
+    relationship_type: str | None = None
+    professional_name: str | None = None
+    billing_period_start: datetime
+    activated_at: datetime
+    released_at: datetime | None = None
+    release_reason: str | None = None
