@@ -16,7 +16,7 @@ Quelle der Wahrheit ist das Ledger ``case_activations`` (nachvollziehbar/auditie
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException
 
@@ -27,7 +27,7 @@ _ACTIVE_SUB = ("active", "trialing")
 
 def _month_start(dt: datetime | None = None) -> datetime:
     """Kalendermonats-Anker (UTC) als Fallback, falls keine Stripe-Periode gesetzt ist."""
-    dt = dt or datetime.now(timezone.utc)
+    dt = dt or datetime.now(UTC)
     return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
