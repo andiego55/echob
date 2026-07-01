@@ -55,7 +55,7 @@ export default function DevNoticeModal() {
         </ul>
 
         <p className="text-xs text-brand-muted/80 mb-5">
-          Fragen oder Feedback? <a href="mailto:info@echo-b.de" className="text-accent font-medium">info@echo-b.de</a>
+          Fragen oder Feedback? <a href="mailto:kontakt@echo-b.de" className="text-accent font-medium">kontakt@echo-b.de</a>
         </p>
 
         <button onClick={dismiss} className="btn-primary w-full">

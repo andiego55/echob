@@ -41,7 +41,7 @@ export default function TeamPage() {
           </div>
           <p className="mt-8 text-center text-sm text-brand-muted">
             Du möchtest mitwirken?{' '}
-            <a href="mailto:info@echo-b.de" className="text-accent font-medium hover:underline">info@echo-b.de</a>
+            <a href="mailto:kontakt@echo-b.de" className="text-accent font-medium hover:underline">kontakt@echo-b.de</a>
           </p>
         </div>
       </section>

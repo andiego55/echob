@@ -50,7 +50,7 @@ function ErrorFallback() {
           Etwas ist schiefgelaufen.
         </p>
         <p style={{ color: '#5b6b7a', fontSize: '.9rem', margin: '0 0 1.25rem', lineHeight: 1.6 }}>
-          Bitte lade die Seite neu. Falls es erneut auftritt, melde dich bei info@echo-b.de.
+          Bitte lade die Seite neu. Falls es erneut auftritt, melde dich bei kontakt@echo-b.de.
         </p>
         <button
           onClick={() => window.location.reload()}

@@ -164,7 +164,7 @@ export default function UpgradePage() {
           <div className="mb-8 rounded-brand border border-brand-border bg-white px-5 py-4 max-w-2xl">
             <p className="text-sm text-brand-muted">
               Der Kauf wurde abgebrochen. Du kannst jederzeit erneut buchen – bei Fragen{' '}
-              <a href="mailto:info@echo-b.de" className="text-accent font-medium">schreib uns</a>.
+              <a href="mailto:kontakt@echo-b.de" className="text-accent font-medium">schreib uns</a>.
             </p>
           </div>
         )}
@@ -172,7 +172,7 @@ export default function UpgradePage() {
           <div className="mb-8 rounded-brand border border-red-200 bg-red-50 px-5 py-4 max-w-2xl">
             <p className="text-sm text-red-700">
               {checkoutError}{' '}
-              <a href="mailto:info@echo-b.de?subject=EchoB%20Buchung" className="font-medium underline">
+              <a href="mailto:kontakt@echo-b.de?subject=EchoB%20Buchung" className="font-medium underline">
                 Per E-Mail bestellen
               </a>
             </p>
@@ -303,7 +303,7 @@ export default function UpgradePage() {
           <div className="mt-4 text-xs text-brand-muted">
             Fragen? <a href="tel:+4917359089060" className="text-accent font-medium">0173 5908906</a>
             {' · '}
-            <a href="mailto:info@echo-b.de" className="text-accent font-medium">info@echo-b.de</a>
+            <a href="mailto:kontakt@echo-b.de" className="text-accent font-medium">kontakt@echo-b.de</a>
           </div>
         </div>
 

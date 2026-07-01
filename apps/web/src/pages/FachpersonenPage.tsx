@@ -344,7 +344,7 @@ export default function FachpersonenPage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/auth?role=professional" className="btn-primary">Kostenlose Fallanalyse starten</Link>
-            <a href="mailto:coaching@echo-b.de?subject=Fachpersonenbereich"
+            <a href="mailto:kontakt@echo-b.de?subject=Fachpersonenbereich"
               className="btn bg-white text-navy border-2 border-transparent hover:border-navy/20">
               Persönliche Demo anfragen
             </a>

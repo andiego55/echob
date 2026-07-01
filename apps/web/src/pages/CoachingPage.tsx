@@ -41,7 +41,7 @@ export default function CoachingPage() {
             Wenn du mehr willst als eine App, sind wir persönlich für dich da.
           </p>
           <div className="mt-9 flex flex-wrap gap-3.5">
-            <a href="mailto:coaching@echo-b.de" className="btn-primary">Erstgespräch anfragen</a>
+            <a href="mailto:kontakt@echo-b.de" className="btn-primary">Erstgespräch anfragen</a>
             <a href="tel:+4917359089060" className="btn-outline">☎ 0173 5908906</a>
           </div>
         </div>
@@ -69,8 +69,8 @@ export default function CoachingPage() {
             <div className="flex-1 grid gap-4 sm:grid-cols-3">
               {[
                 { label: 'Telefon', value: '0173 5908906', sub: 'Mo–Sa, direkt erreichbar', href: 'tel:+4917359089060' },
-                { label: 'Coaching-Anfragen', value: 'coaching@echo-b.de', sub: 'Antwort innerhalb 24h', href: 'mailto:coaching@echo-b.de' },
-                { label: 'Allgemeine Anfragen', value: 'info@echo-b.de', sub: 'Fragen zur App & Plattform', href: 'mailto:info@echo-b.de' },
+                { label: 'Coaching-Anfragen', value: 'kontakt@echo-b.de', sub: 'Antwort innerhalb 24h', href: 'mailto:kontakt@echo-b.de' },
+                { label: 'Allgemeine Anfragen', value: 'kontakt@echo-b.de', sub: 'Fragen zur App & Plattform', href: 'mailto:kontakt@echo-b.de' },
               ].map(({ label, value, sub, href }) => (
                 <a
                   key={label}
@@ -145,7 +145,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:coaching@echo-b.de?subject=Erstgespräch" className="btn-primary text-center text-sm block">Erstgespräch anfragen</a>
+                <a href="mailto:kontakt@echo-b.de?subject=Erstgespräch" className="btn-primary text-center text-sm block">Erstgespräch anfragen</a>
               </div>
 
               {/* Einzeltermin */}
@@ -160,7 +160,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:coaching@echo-b.de?subject=Einzeltermin%20buchen" className="block rounded-brand border-2 border-navy/25 py-2.5 text-center text-sm font-semibold text-navy no-underline transition-colors hover:border-navy/50 hover:bg-navy/[0.03]">Termin buchen</a>
+                <a href="mailto:kontakt@echo-b.de?subject=Einzeltermin%20buchen" className="block rounded-brand border-2 border-navy/25 py-2.5 text-center text-sm font-semibold text-navy no-underline transition-colors hover:border-navy/50 hover:bg-navy/[0.03]">Termin buchen</a>
               </div>
 
               {/* Monatspaket */}
@@ -175,7 +175,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:coaching@echo-b.de?subject=Monatspaket" className="btn-primary text-center text-sm block">Paket anfragen</a>
+                <a href="mailto:kontakt@echo-b.de?subject=Monatspaket" className="btn-primary text-center text-sm block">Paket anfragen</a>
                 <p className="text-[10px] text-brand-muted mt-2 text-center">Wöchentliche Begleitung · monatlich kündbar</p>
               </div>
             </div>
@@ -261,7 +261,7 @@ export default function CoachingPage() {
             Schreib uns eine kurze Nachricht oder ruf direkt an. Das Erstgespräch ist kostenlos und unverbindlich.
           </p>
           <div className="mt-8 flex justify-center flex-wrap gap-4">
-            <a href="mailto:coaching@echo-b.de" className="btn-primary">Erstgespräch anfragen</a>
+            <a href="mailto:kontakt@echo-b.de" className="btn-primary">Erstgespräch anfragen</a>
             <a href="tel:+4917359089060" className="btn-outline">☎ 0173 5908906</a>
           </div>
           <p className="mt-6 text-xs text-white/30 max-w-lg mx-auto">

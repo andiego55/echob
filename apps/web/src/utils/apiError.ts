@@ -3,13 +3,13 @@
 const ERROR_TEXTS: Record<string, string> = {
   ECHO_LIMIT_REACHED:
     'Dein Echo-Kontingent für die Entwicklungsphase ist aufgebraucht. ' +
-    'Melde dich unter info@echo-b.de, wenn du weiter testen möchtest.',
+    'Melde dich unter kontakt@echo-b.de, wenn du weiter testen möchtest.',
   REPORT_LIMIT_REACHED:
     'Dein Berichts-Kontingent für die Entwicklungsphase ist aufgebraucht. ' +
-    'Melde dich unter info@echo-b.de, wenn du weiter testen möchtest.',
+    'Melde dich unter kontakt@echo-b.de, wenn du weiter testen möchtest.',
   SCALE_LIMIT_REACHED:
     'Dein Kontingent für Skalen-Berechnungen in der Entwicklungsphase ist aufgebraucht. ' +
-    'Melde dich unter info@echo-b.de, wenn du weiter testen möchtest.',
+    'Melde dich unter kontakt@echo-b.de, wenn du weiter testen möchtest.',
   TRIAL_EXPIRED: 'Dein Testzeitraum ist abgelaufen. Wähle einen Plan, um fortzufahren.',
   TRIAL_SCENE_LIMIT: 'Im Testzugang sind maximal 5 Szenen möglich.',
   TRIAL_CASE_LIMIT: 'Im Testzugang ist maximal 1 Fall möglich.',

@@ -221,7 +221,7 @@ export default function LandingPage() {
           </div>
           <p className="mt-8 text-sm text-brand-muted">
             Weitere Fragen?{' '}
-            <a href="mailto:info@echo-b.de" className="text-accent font-medium hover:underline">info@echo-b.de</a>
+            <a href="mailto:kontakt@echo-b.de" className="text-accent font-medium hover:underline">kontakt@echo-b.de</a>
             {' '}·{' '}
             <a href="tel:+4917359089060" className="text-accent font-medium hover:underline">0173 5908906</a>
           </p>

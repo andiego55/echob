@@ -131,7 +131,7 @@ export default function ConsentGate() {
 
         <p className="mt-4 text-xs text-brand-muted/80">
           Du kannst deine Einwilligung jederzeit widerrufen – indem du dein Konto unter
-          „Datenschutz" löschst oder uns unter info@echo-b.de kontaktierst.
+          „Datenschutz" löschst oder uns unter kontakt@echo-b.de kontaktierst.
         </p>
       </div>
     </div>

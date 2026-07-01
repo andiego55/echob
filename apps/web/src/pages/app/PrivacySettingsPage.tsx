@@ -72,7 +72,7 @@ export default function PrivacySettingsPage() {
       await signOut()
       navigate('/', { replace: true })
     } catch {
-      setError('Löschen fehlgeschlagen. Bitte später erneut versuchen oder info@echo-b.de kontaktieren.')
+      setError('Löschen fehlgeschlagen. Bitte später erneut versuchen oder kontakt@echo-b.de kontaktieren.')
       setDeleting(false)
     }
   }
