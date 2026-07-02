@@ -262,7 +262,9 @@ async def handle_event(event, pool) -> None:
     obj = _plain(event["data"]["object"])
 
     # Org-Abos (Praxis) tragen metadata.org_id → separat verarbeiten.
-    if (obj.get("metadata") or {}).get("org_id"):
+    org_meta_id = (obj.get("metadata") or {}).get("org_id")
+    logger.info("Webhook-Event: type=%s org_id=%s", etype, org_meta_id)
+    if org_meta_id:
         from app.services import pro_billing_service
         await pro_billing_service.handle_org_subscription_event(event, pool)
         return

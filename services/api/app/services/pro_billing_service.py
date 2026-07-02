@@ -108,6 +108,8 @@ async def fulfill_org_checkout(obj, pool) -> str | None:
     org_id_str = meta.get("org_id")
     tier = meta.get("tier")
     if not org_id_str or tier not in ORG_TIERS:
+        logger.warning("Org-Fulfillment übersprungen — org_id=%s tier=%s (keys=%s)",
+                       org_id_str, tier, list(obj)[:12])
         return None
 
     org_id = UUID(org_id_str)

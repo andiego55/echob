@@ -1,6 +1,7 @@
 """Router: Subscription & Zahlungen — /api/v1/subscription"""
 from __future__ import annotations
 
+import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -128,11 +129,14 @@ async def stripe_webhook(request: Request, pool=Depends(get_pool)) -> dict:
     sig_header = request.headers.get("stripe-signature")
 
     try:
-        event = billing_service.construct_event(payload, sig_header)
+        billing_service.construct_event(payload, sig_header)
     except Exception:
         logger.warning("Ungültige Webhook-Signatur oder Payload", exc_info=True)
         raise HTTPException(status_code=400, detail="Ungültige Signatur.")
 
+    # Signatur ist geprüft — ab hier das rohe JSON als plain dict verarbeiten.
+    # (StripeObject ist ab stripe v10 nicht dict-kompatibel; .get() darauf schlägt fehl.)
+    event = json.loads(payload)
     try:
         await billing_service.handle_event(event, pool)
     except Exception:
