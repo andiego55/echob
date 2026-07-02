@@ -16,6 +16,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.config import settings
+from app.services.billing_service import _plain
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +117,7 @@ async def fulfill_org_checkout(obj, pool) -> str | None:
     if subscription_id:
         try:
             stripe = _stripe()
-            sub = await asyncio.to_thread(stripe.Subscription.retrieve, subscription_id)
+            sub = _plain(await asyncio.to_thread(stripe.Subscription.retrieve, subscription_id))
             status = sub.get("status") or "active"
             pe = sub.get("current_period_end")
             if pe:
@@ -143,7 +144,7 @@ async def fulfill_org_checkout(obj, pool) -> str | None:
 async def verify_and_fulfill_org_session(*, session_id, org_id, pool) -> str | None:
     """Sofort-Freischaltung nach dem Stripe-Redirect (unabhängig vom Webhook)."""
     stripe = _stripe()
-    obj = await asyncio.to_thread(stripe.checkout.Session.retrieve, session_id)
+    obj = _plain(await asyncio.to_thread(stripe.checkout.Session.retrieve, session_id))
     if (obj.get("metadata") or {}).get("org_id") != str(org_id):
         return None
     if obj.get("payment_status") not in ("paid", "no_payment_required"):
@@ -156,7 +157,7 @@ async def verify_and_fulfill_org_session(*, session_id, org_id, pool) -> str | N
 async def handle_org_subscription_event(event, pool) -> None:
     """Org-Events (metadata.org_id) — von billing_service.handle_event delegiert."""
     etype = event["type"]
-    obj = event["data"]["object"]
+    obj = _plain(event["data"]["object"])
 
     if etype == "checkout.session.completed":
         await fulfill_org_checkout(obj, pool)

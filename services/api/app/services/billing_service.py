@@ -60,6 +60,27 @@ def _stripe():
     return stripe
 
 
+def _plain(obj) -> dict:
+    """Stripe-Objekt → einfaches, rekursives dict.
+
+    Ab stripe-python v10 ist ``StripeObject`` nicht mehr dict-kompatibel: ``obj.get(...)``
+    wird als (fehlendes) Feld interpretiert und wirft (``__getattr__``/``__getitem__``).
+    Vor jedem Feldzugriff wandeln wir Stripe-Objekte daher in echte dicts um, damit
+    ``.get()`` verlässlich funktioniert – im Webhook UND im Redirect-Verify.
+    """
+    if obj is None:
+        return {}
+    if isinstance(obj, dict):
+        return obj
+    to_dict = getattr(obj, "to_dict_recursive", None)
+    if callable(to_dict):
+        return to_dict()
+    try:  # Fallback ohne .get(): rekursiv über keys() + Item-Access (immer unterstützt)
+        return {k: (_plain(obj[k]) if hasattr(obj[k], "keys") else obj[k]) for k in obj.keys()}
+    except Exception:
+        return {}
+
+
 def _line_item(product_key: str) -> dict:
     """Price-ID aus Env wenn gesetzt, sonst Inline-Preis (kein Dashboard-Setup nötig)."""
     product = PRODUCTS[product_key]
@@ -189,7 +210,7 @@ async def fulfill_checkout_session(obj, pool) -> str | None:
     if subscription_id:
         try:
             stripe = _stripe()
-            sub = await asyncio.to_thread(stripe.Subscription.retrieve, subscription_id)
+            sub = _plain(await asyncio.to_thread(stripe.Subscription.retrieve, subscription_id))
             period_end = sub.get("current_period_end")
             if period_end:
                 ends_at = datetime.fromtimestamp(period_end, tz=UTC)
@@ -223,7 +244,7 @@ async def verify_and_fulfill_session(
     Nutzer gehört. Gibt den Plan zurück, wenn freigeschaltet wurde.
     """
     stripe = _stripe()
-    obj = await asyncio.to_thread(stripe.checkout.Session.retrieve, session_id)
+    obj = _plain(await asyncio.to_thread(stripe.checkout.Session.retrieve, session_id))
 
     meta = obj.get("metadata") or {}
     if meta.get("user_id") != user_id:
@@ -238,7 +259,7 @@ async def verify_and_fulfill_session(
 async def handle_event(event, pool) -> None:
     """Verarbeitet relevante Stripe-Events und aktualisiert die DB."""
     etype = event["type"]
-    obj = event["data"]["object"]
+    obj = _plain(event["data"]["object"])
 
     # Org-Abos (Praxis) tragen metadata.org_id → separat verarbeiten.
     if (obj.get("metadata") or {}).get("org_id"):

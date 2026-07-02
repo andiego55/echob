@@ -137,7 +137,7 @@ async def stripe_webhook(request: Request, pool=Depends(get_pool)) -> dict:
         await billing_service.handle_event(event, pool)
     except Exception:
         # 500 → Stripe versucht es erneut (Retry-Mechanismus)
-        logger.exception("Webhook-Verarbeitung fehlgeschlagen: %s", event.get("type"))
+        logger.exception("Webhook-Verarbeitung fehlgeschlagen: %s", event["type"])
         raise HTTPException(status_code=500, detail="Verarbeitung fehlgeschlagen.")
 
     return {"received": True}
