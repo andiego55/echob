@@ -35,7 +35,16 @@ def send_invite_email(supabase, email: str) -> bool:
         return False
     redirect_to = f"{settings.frontend_url.rstrip('/')}/auth?role=professional"
     try:
-        supabase.auth.admin.invite_user_by_email(email, {"redirect_to": redirect_to})
+        supabase.auth.admin.invite_user_by_email(
+            email,
+            {
+                "redirect_to": redirect_to,
+                # Metadaten überleben jede Navigation. Das Frontend erzwingt damit
+                # den Passwort-Schritt (needs_password) und routet Eingeladene in
+                # den Fachpersonen-Bereich (pending_role) statt in den B2C-Bereich.
+                "data": {"pending_role": "professional", "needs_password": True},
+            },
+        )
         logger.info("Invite-Mail an %s versendet.", _mask_email(email))
         return True
     except Exception as exc:  # noqa: BLE001 — best effort; Invite-Zeile bleibt Quelle der Wahrheit

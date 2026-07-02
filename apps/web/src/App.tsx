@@ -97,6 +97,7 @@ import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
 import { QuickExitHotkey } from '@/components/app/QuickExit'
 import PendingInviteHandler from '@/components/PendingInviteHandler'
+import OnboardingGate from '@/components/auth/OnboardingGate'
 
 export default function App() {
   return (
@@ -104,6 +105,7 @@ export default function App() {
     <DevNoticeModal />
     <ConsentGate />
     <LockScreen />
+    <OnboardingGate />
     <QuickExitHotkey />
     <PendingInviteHandler />
     <Routes>

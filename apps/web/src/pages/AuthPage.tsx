@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { setPendingInvite } from '@/lib/pendingInvite'
+import SetPasswordForm from '@/components/auth/SetPasswordForm'
 
 type Tab    = 'login' | 'signup'
 type Method = 'password' | 'magic'
@@ -281,16 +282,10 @@ export default function AuthPage() {
 function CompleteInvite({
   isPro, callbackType,
 }: { isPro: boolean; callbackType: 'invite' | 'recovery' }) {
-  const navigate = useNavigate()
   const [phase, setPhase] = useState<'establishing' | 'ready' | 'invalid'>('establishing')
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const dest = isPro ? '/professional/register' : '/app'
-
-  // Session aus den Hash-Tokens etablieren (einmalig beim Mounten).
+  // Session aus den Hash-Tokens etablieren (einmalig beim Mounten) – die
+  // Auto-Erkennung von supabase-js greift bei diesen Links nicht zuverlässig.
   useEffect(() => {
     const h = new URLSearchParams(window.location.hash.slice(1))
     const access_token = h.get('access_token')
@@ -315,33 +310,9 @@ function CompleteInvite({
       .catch(() => setPhase('invalid'))
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    if (password.length < 8) { setError('Das Passwort muss mindestens 8 Zeichen haben.'); return }
-    if (password !== confirm) { setError('Die Passwörter stimmen nicht überein.'); return }
-    setSubmitting(true)
-    try {
-      const { error } = await supabase.auth.updateUser({ password })
-      if (error) throw error
-      navigate(dest, { replace: true })
-    } catch (err: unknown) {
-      setError(err instanceof Error ? translateError(err.message) : 'Speichern fehlgeschlagen.')
-      setSubmitting(false)
-    }
-  }
-
-  const title = callbackType === 'recovery' ? 'Neues Passwort festlegen' : 'Zugang aktivieren'
-  const intro =
-    callbackType === 'recovery'
-      ? 'Wähle ein neues Passwort für deinen Zugang.'
-      : 'Willkommen bei EchoB. Lege ein Passwort fest, um deinen Zugang zu aktivieren.'
-
   return (
     <AuthShell>
       {isPro && <span className="label mb-2 inline-block">Für Fachpersonen</span>}
-      <h1 className="mb-1 text-xl font-bold text-navy">{title}</h1>
-      <p className="mb-6 text-xs text-brand-muted">{intro}</p>
 
       {phase === 'establishing' && (
         <p className="text-sm text-brand-muted">Einladung wird geprüft …</p>
@@ -349,6 +320,7 @@ function CompleteInvite({
 
       {phase === 'invalid' && (
         <div className="space-y-4">
+          <h1 className="text-xl font-bold text-navy">Link ungültig</h1>
           <p className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
             Dieser Link ist ungültig oder abgelaufen. Bitte fordere eine neue Einladung an.
           </p>
@@ -358,42 +330,7 @@ function CompleteInvite({
         </div>
       )}
 
-      {phase === 'ready' && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="new-password" className="mb-1.5 block text-sm font-medium text-brand-text">
-              Passwort
-            </label>
-            <input
-              id="new-password" type="password" required autoComplete="new-password"
-              value={password} onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mindestens 8 Zeichen"
-              className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
-            />
-          </div>
-          <div>
-            <label htmlFor="confirm-password" className="mb-1.5 block text-sm font-medium text-brand-text">
-              Passwort bestätigen
-            </label>
-            <input
-              id="confirm-password" type="password" required autoComplete="new-password"
-              value={confirm} onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Passwort wiederholen"
-              className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
-            />
-          </div>
-
-          {error && (
-            <p role="alert" className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
-              {error}
-            </p>
-          )}
-
-          <button type="submit" disabled={submitting} className="btn-primary w-full">
-            {submitting ? 'Bitte warten …' : callbackType === 'recovery' ? 'Passwort speichern' : 'Zugang aktivieren'}
-          </button>
-        </form>
-      )}
+      {phase === 'ready' && <SetPasswordForm variant={callbackType} />}
     </AuthShell>
   )
 }
