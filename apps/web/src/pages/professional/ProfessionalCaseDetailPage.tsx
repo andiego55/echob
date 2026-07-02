@@ -100,7 +100,11 @@ function CaseSeatActive({ caseId }: { caseId: string }) {
   const qc = useQueryClient()
   const release = useMutation({
     mutationFn: () => professionalApi.caseDeactivate(caseId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-case', caseId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['prof-case', caseId] })
+      qc.invalidateQueries({ queryKey: ['pro-billing'] })
+      qc.invalidateQueries({ queryKey: ['pro-billing-activations'] })
+    },
   })
   return (
     <div className="mb-4 flex items-center justify-between gap-3 flex-wrap rounded-brand border border-green-200 bg-green-50 px-4 py-2.5">
@@ -126,7 +130,12 @@ function CaseActivationGate({ caseId }: { caseId: string }) {
   const [err, setErr] = useState<string | null>(null)
   const activate = useMutation({
     mutationFn: () => professionalApi.caseActivate(caseId),
-    onSuccess: () => { setErr(null); qc.invalidateQueries({ queryKey: ['prof-case', caseId] }) },
+    onSuccess: () => {
+      setErr(null)
+      qc.invalidateQueries({ queryKey: ['prof-case', caseId] })
+      qc.invalidateQueries({ queryKey: ['pro-billing'] })
+      qc.invalidateQueries({ queryKey: ['pro-billing-activations'] })
+    },
     onError: (e) => {
       const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
       setErr(detail ?? 'ERROR')
