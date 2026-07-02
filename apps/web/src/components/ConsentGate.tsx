@@ -22,6 +22,9 @@ export default function ConsentGate() {
 
   const inProtected =
     location.pathname.startsWith('/app') || location.pathname.startsWith('/professional')
+  // Fachpersonen verarbeiten nicht ihre eigenen, sondern von Klient:innen
+  // freigegebene Daten – daher ein anders formulierter Einwilligungstext.
+  const isProfessional = location.pathname.startsWith('/professional')
   const enabled = !!session && inProtected
 
   const { data, isLoading, isError } = useQuery({
@@ -74,8 +77,19 @@ export default function ConsentGate() {
           Bevor es losgeht: deine Einwilligung
         </h2>
         <p className="text-sm text-brand-muted leading-relaxed mb-4">
-          EchoB verarbeitet besonders sensible Angaben – zu deinen Beziehungen und deinem Befinden –
-          und nutzt dafür auch KI. Das geht nur mit deiner ausdrücklichen Einwilligung.
+          {isProfessional ? (
+            <>
+              Als Fachperson siehst du bei EchoB ausschließlich Inhalte, die Klient:innen
+              ausdrücklich für dich freigeben – darunter besonders sensible Angaben (zu Beziehungen
+              und Befinden) – und nutzt dafür KI-gestützte Analyse. Das geht nur mit deiner
+              ausdrücklichen Einwilligung.
+            </>
+          ) : (
+            <>
+              EchoB verarbeitet besonders sensible Angaben – zu deinen Beziehungen und deinem
+              Befinden – und nutzt dafür auch KI. Das geht nur mit deiner ausdrücklichen Einwilligung.
+            </>
+          )}
         </p>
 
         <div className="space-y-3 mb-4">
@@ -99,7 +113,10 @@ export default function ConsentGate() {
               className="mt-0.5 h-4 w-4 flex-shrink-0 accent-accent"
             />
             <span>
-              Ich willige <strong>ausdrücklich</strong> ein, dass EchoB meine besonderen Daten
+              Ich willige <strong>ausdrücklich</strong> ein, dass EchoB{' '}
+              {isProfessional
+                ? 'die von Klient:innen für mich freigegebenen besonderen Daten'
+                : 'meine besonderen Daten'}{' '}
               (Art. 9 DSGVO) KI-gestützt verarbeitet – inkl. Übermittlung an OpenAI (USA).
             </span>
           </label>
