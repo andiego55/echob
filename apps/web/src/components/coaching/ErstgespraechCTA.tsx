@@ -5,11 +5,14 @@ import { Link } from 'react-router-dom'
 import { submitContact } from '@/api/contact'
 
 /**
- * „Erstgespräch anfragen" – niedrigschwelliges Lead-Formular als Button + Modal.
- * E-Mail ODER Telefon genügt. Der Button erbt sein Styling über `className`,
- * damit er die bisherigen CTAs 1:1 ersetzen kann. Der direkte Weg (Mail/Telefon)
+ * Niedrigschwelliges Lead-Formular als Button + Modal.
+ * E-Mail ODER Telefon genügt. Der Button erbt sein Styling über `className`
+ * (ersetzt bisherige CTAs 1:1). Die Texte passen sich per `kind` an den Kontext
+ * an – Coaching duzt, die Fachpersonen-Demo siezt. Direktweg (Mail/Telefon)
  * bleibt im Modal-Footer erhalten.
  */
+
+type Kind = 'coaching' | 'demo' | 'general'
 
 const inputCls =
   'w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent'
@@ -17,6 +20,45 @@ const inputCls =
 const CONTACT_EMAIL = 'kontakt@echo-b.de'
 const CONTACT_TEL = '+4917359089060'
 const CONTACT_TEL_LABEL = '0173 5908906'
+
+const COPY: Record<Kind, {
+  intro: string; namePh: string; msgLabel: string; msgPh: string
+  hint: string; consent: string; submit: string; successTitle: string; successBody: string
+}> = {
+  coaching: {
+    intro: 'Sag uns kurz, wie wir dich erreichen — E-Mail oder Telefon genügt. Wir melden uns innerhalb von 24 Stunden. Kein Druck, keine Verpflichtung.',
+    namePh: 'Wie dürfen wir dich ansprechen?',
+    msgLabel: "Worum geht's?",
+    msgPh: 'Ein, zwei Sätze genügen — oder lass es einfach leer.',
+    hint: 'Eines von beiden reicht — wir melden uns auf dem Weg, den du angibst.',
+    consent: 'Ich willige ein, dass EchoB mich zu meiner Anfrage kontaktiert.',
+    submit: 'Anfrage senden',
+    successTitle: 'Danke — wir melden uns!',
+    successBody: 'Wir antworten innerhalb von 24 Stunden. Wenn es dringend ist, ruf gern direkt an:',
+  },
+  demo: {
+    intro: 'Wir zeigen Ihnen EchoB in rund 20 Minuten an einem echten Fall — E-Mail oder Telefon genügt. Wir melden uns innerhalb von 24 Stunden, um einen Termin zu finden.',
+    namePh: 'Ihr Name',
+    msgLabel: 'Ihre Praxis / Frage',
+    msgPh: 'z. B. Berufsgruppe, Team-Größe oder eine konkrete Frage — oder lassen Sie es leer.',
+    hint: 'Eines von beiden reicht — wir melden uns auf dem Weg, den Sie angeben.',
+    consent: 'Ich willige ein, dass EchoB mich zu meiner Demo-Anfrage kontaktiert.',
+    submit: 'Demo anfragen',
+    successTitle: 'Danke — wir melden uns!',
+    successBody: 'Wir melden uns innerhalb von 24 Stunden für einen Demo-Termin. Dringend? Rufen Sie gern direkt an:',
+  },
+  general: {
+    intro: 'Sag uns kurz, wie wir dich erreichen — E-Mail oder Telefon genügt. Wir melden uns innerhalb von 24 Stunden.',
+    namePh: 'Dein Name',
+    msgLabel: 'Deine Nachricht',
+    msgPh: 'Ein, zwei Sätze genügen — oder lass es leer.',
+    hint: 'Eines von beiden reicht.',
+    consent: 'Ich willige ein, dass EchoB mich zu meiner Anfrage kontaktiert.',
+    submit: 'Absenden',
+    successTitle: 'Danke — wir melden uns!',
+    successBody: 'Wir antworten innerhalb von 24 Stunden.',
+  },
+}
 
 function errMsg(error: unknown): string {
   if (isAxiosError(error)) {
@@ -33,8 +75,7 @@ export default function ErstgespraechCTA({
   kind = 'coaching',
   source,
 }: {
-  className?: string; label?: string; heading?: string
-  kind?: 'coaching' | 'demo' | 'general'; source?: string
+  className?: string; label?: string; heading?: string; kind?: Kind; source?: string
 }) {
   const [open, setOpen] = useState(false)
   return (
@@ -46,8 +87,9 @@ export default function ErstgespraechCTA({
 }
 
 function LeadModal({ kind, heading, source, onClose }: {
-  kind: 'coaching' | 'demo' | 'general'; heading: string; source?: string; onClose: () => void
+  kind: Kind; heading: string; source?: string; onClose: () => void
 }) {
+  const c = COPY[kind]
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -72,7 +114,7 @@ function LeadModal({ kind, heading, source, onClose }: {
       email: email.trim() || null,
       phone: phone.trim() || null,
       message: message.trim() || null,
-      source: source ?? 'coaching',
+      source: source ?? kind,
       consent,
       company: company || null,
     })
@@ -103,34 +145,30 @@ function LeadModal({ kind, heading, source, onClose }: {
         {mutation.isSuccess ? (
           <div role="status" aria-live="polite" className="py-4 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-2xl text-accent" aria-hidden="true">✓</div>
-            <p className="text-lg font-semibold text-navy">Danke – wir melden uns!</p>
+            <p className="text-lg font-semibold text-navy">{c.successTitle}</p>
             <p className="mt-2 text-sm text-brand-muted">
-              Wir antworten innerhalb von 24 Stunden. Wenn es dringend ist, ruf gern direkt an:{' '}
+              {c.successBody}{' '}
               <a href={`tel:${CONTACT_TEL}`} className="text-accent hover:underline">{CONTACT_TEL_LABEL}</a>.
             </p>
             <button onClick={onClose} className="btn-primary mt-6 w-full">Schließen</button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <p className="text-sm text-brand-muted">
-              Sag uns kurz, wie wir dich erreichen – <strong className="text-navy">E-Mail oder Telefon
-              genügt</strong>. Wir melden uns innerhalb von 24 Stunden. Kein Druck, keine Verpflichtung.
-            </p>
+            <p className="text-sm text-brand-muted">{c.intro}</p>
 
             <div>
               <label htmlFor="lead-name" className="mb-1.5 block text-sm font-medium text-brand-text">
                 Name <span className="font-normal text-brand-muted">(optional)</span>
               </label>
               <input id="lead-name" type="text" autoComplete="name" value={name}
-                onChange={(e) => setName(e.target.value)} placeholder="Wie dürfen wir dich ansprechen?"
-                className={inputCls} />
+                onChange={(e) => setName(e.target.value)} placeholder={c.namePh} className={inputCls} />
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label htmlFor="lead-email" className="mb-1.5 block text-sm font-medium text-brand-text">E-Mail</label>
                 <input id="lead-email" type="email" autoComplete="email" value={email}
-                  onChange={(e) => setEmail(e.target.value)} placeholder="du@beispiel.de" className={inputCls} />
+                  onChange={(e) => setEmail(e.target.value)} placeholder="name@beispiel.de" className={inputCls} />
               </div>
               <div>
                 <label htmlFor="lead-phone" className="mb-1.5 block text-sm font-medium text-brand-text">Telefon</label>
@@ -138,15 +176,14 @@ function LeadModal({ kind, heading, source, onClose }: {
                   onChange={(e) => setPhone(e.target.value)} placeholder="0170 1234567" className={inputCls} />
               </div>
             </div>
-            <p className="-mt-2 text-xs text-brand-muted">Eines von beiden reicht – wir melden uns auf dem Weg, den du angibst.</p>
+            <p className="-mt-2 text-xs text-brand-muted">{c.hint}</p>
 
             <div>
               <label htmlFor="lead-msg" className="mb-1.5 block text-sm font-medium text-brand-text">
-                Worum geht's? <span className="font-normal text-brand-muted">(optional)</span>
+                {c.msgLabel} <span className="font-normal text-brand-muted">(optional)</span>
               </label>
               <textarea id="lead-msg" rows={3} value={message} maxLength={2000}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Ein, zwei Sätze genügen – oder lass es einfach leer."
+                onChange={(e) => setMessage(e.target.value)} placeholder={c.msgPh}
                 className={`${inputCls} resize-none`} />
             </div>
 
@@ -162,7 +199,7 @@ function LeadModal({ kind, heading, source, onClose }: {
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
                 className="mt-0.5 h-4 w-4 shrink-0 accent-accent" />
               <span>
-                Ich willige ein, dass EchoB mich zu meiner Anfrage kontaktiert.{' '}
+                {c.consent}{' '}
                 <Link to="/datenschutz" target="_blank" className="underline hover:text-navy">Datenschutz</Link>.
               </span>
             </label>
@@ -174,7 +211,7 @@ function LeadModal({ kind, heading, source, onClose }: {
             )}
 
             <button type="submit" disabled={!canSubmit} className="btn-primary w-full disabled:opacity-50">
-              {mutation.isPending ? 'Wird gesendet …' : 'Anfrage senden'}
+              {mutation.isPending ? 'Wird gesendet …' : c.submit}
             </button>
 
             <p className="text-center text-xs text-brand-muted">

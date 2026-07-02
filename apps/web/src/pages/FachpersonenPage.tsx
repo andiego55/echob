@@ -108,6 +108,10 @@ export default function FachpersonenPage() {
             <Link to="/auth?role=professional" className="btn-primary">
               Kostenlose Fallanalyse starten
             </Link>
+            <ErstgespraechCTA
+              className="btn bg-white text-navy hover:bg-white/90"
+              label="Persönliche Demo anfragen" heading="Persönliche Demo anfragen"
+              kind="demo" source="fachpersonen_hero" />
             <a href="#erklaert" className="btn border-2 border-white/25 text-white hover:bg-white/10">
               So funktioniert's
             </a>
