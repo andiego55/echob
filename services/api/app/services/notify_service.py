@@ -32,7 +32,9 @@ def _send_sync(subject: str, text: str, reply_to: str | None) -> None:
         json=payload,
         timeout=10.0,
     )
-    resp.raise_for_status()
+    if resp.status_code >= 400:
+        # Resends Fehlerdetail (z. B. „domain not verified") ins Log holen.
+        raise RuntimeError(f"Resend {resp.status_code}: {resp.text[:300]}")
 
 
 async def notify_lead(subject: str, text: str, *, reply_to: str | None = None) -> None:
