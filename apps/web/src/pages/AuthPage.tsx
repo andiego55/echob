@@ -1,8 +1,7 @@
-import { useState } from 'react'
-import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import { Link } from 'react-router-dom'
 import { setPendingInvite } from '@/lib/pendingInvite'
 
 type Tab    = 'login' | 'signup'
@@ -32,6 +31,16 @@ export default function AuthPage() {
     const code = inviteCode.trim()
     if (code && !isPro) setPendingInvite({ code })
   }
+
+  // Supabase-Callback (Einladung / Passwort-Reset): die Tokens stehen im URL-Hash.
+  // Einmalig beim Mounten auslesen – bevor der Client den Hash abräumt.
+  const callbackType = useMemo<'invite' | 'recovery' | null>(() => {
+    const t = new URLSearchParams(window.location.hash.slice(1)).get('type')
+    return t === 'invite' || t === 'recovery' ? t : null
+  }, [])
+
+  // Eingeladene Nutzer (und Passwort-Reset) haben noch kein Passwort → eigener Schritt.
+  if (callbackType) return <CompleteInvite isPro={isPro} callbackType={callbackType} />
 
   // Bereits eingeloggt → weiterleiten
   if (session) return <Navigate to={from} replace />
@@ -256,6 +265,149 @@ export default function AuthPage() {
             <Link to="/impressum" className="hover:underline">Impressum</Link>
           </p>
         </div>
+      </main>
+    </div>
+  )
+}
+
+// ── Einladungs-/Reset-Callback ──────────────────────────────────────────────
+
+/**
+ * Verarbeitet den Supabase-Callback aus einer Einladungs- oder Passwort-Reset-
+ * Mail. Die Session-Tokens stehen im URL-Hash (`#access_token=…&type=invite`).
+ * Wir setzen die Session explizit (unabhängig von detectSessionInUrl), räumen
+ * den Hash aus der Adresszeile und lassen die Person ein Passwort festlegen.
+ */
+function CompleteInvite({
+  isPro, callbackType,
+}: { isPro: boolean; callbackType: 'invite' | 'recovery' }) {
+  const navigate = useNavigate()
+  const [phase, setPhase] = useState<'establishing' | 'ready' | 'invalid'>('establishing')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const dest = isPro ? '/professional/register' : '/app'
+
+  // Session aus den Hash-Tokens etablieren (einmalig beim Mounten).
+  useEffect(() => {
+    const h = new URLSearchParams(window.location.hash.slice(1))
+    const access_token = h.get('access_token')
+    const refresh_token = h.get('refresh_token')
+
+    const cleanHash = () =>
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+
+    if (!access_token || !refresh_token) {
+      // Kein Token im Hash – prüfen, ob schon eine Session besteht.
+      supabase.auth.getSession().then(({ data }) => setPhase(data.session ? 'ready' : 'invalid'))
+      return
+    }
+
+    supabase.auth
+      .setSession({ access_token, refresh_token })
+      .then(({ error }) => {
+        if (error) { setPhase('invalid'); return }
+        cleanHash()
+        setPhase('ready')
+      })
+      .catch(() => setPhase('invalid'))
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    if (password.length < 8) { setError('Das Passwort muss mindestens 8 Zeichen haben.'); return }
+    if (password !== confirm) { setError('Die Passwörter stimmen nicht überein.'); return }
+    setSubmitting(true)
+    try {
+      const { error } = await supabase.auth.updateUser({ password })
+      if (error) throw error
+      navigate(dest, { replace: true })
+    } catch (err: unknown) {
+      setError(err instanceof Error ? translateError(err.message) : 'Speichern fehlgeschlagen.')
+      setSubmitting(false)
+    }
+  }
+
+  const title = callbackType === 'recovery' ? 'Neues Passwort festlegen' : 'Zugang aktivieren'
+  const intro =
+    callbackType === 'recovery'
+      ? 'Wähle ein neues Passwort für deinen Zugang.'
+      : 'Willkommen bei EchoB. Lege ein Passwort fest, um deinen Zugang zu aktivieren.'
+
+  return (
+    <AuthShell>
+      {isPro && <span className="label mb-2 inline-block">Für Fachpersonen</span>}
+      <h1 className="mb-1 text-xl font-bold text-navy">{title}</h1>
+      <p className="mb-6 text-xs text-brand-muted">{intro}</p>
+
+      {phase === 'establishing' && (
+        <p className="text-sm text-brand-muted">Einladung wird geprüft …</p>
+      )}
+
+      {phase === 'invalid' && (
+        <div className="space-y-4">
+          <p className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+            Dieser Link ist ungültig oder abgelaufen. Bitte fordere eine neue Einladung an.
+          </p>
+          <Link to={isPro ? '/auth?role=professional' : '/auth'} className="btn-primary inline-block">
+            Zur Anmeldung
+          </Link>
+        </div>
+      )}
+
+      {phase === 'ready' && (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="new-password" className="mb-1.5 block text-sm font-medium text-brand-text">
+              Passwort
+            </label>
+            <input
+              id="new-password" type="password" required autoComplete="new-password"
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder="Mindestens 8 Zeichen"
+              className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+          </div>
+          <div>
+            <label htmlFor="confirm-password" className="mb-1.5 block text-sm font-medium text-brand-text">
+              Passwort bestätigen
+            </label>
+            <input
+              id="confirm-password" type="password" required autoComplete="new-password"
+              value={confirm} onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Passwort wiederholen"
+              className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+          </div>
+
+          {error && (
+            <p role="alert" className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+
+          <button type="submit" disabled={submitting} className="btn-primary w-full">
+            {submitting ? 'Bitte warten …' : callbackType === 'recovery' ? 'Passwort speichern' : 'Zugang aktivieren'}
+          </button>
+        </form>
+      )}
+    </AuthShell>
+  )
+}
+
+function AuthShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-brand-bg flex flex-col">
+      <header className="bg-navy border-b border-white/[0.07] px-6 py-4">
+        <Link to="/" className="text-[1.2rem] font-extrabold tracking-[-0.02em] text-white">
+          Echo<span className="text-accent">B</span>
+        </Link>
+      </header>
+      <main className="flex flex-1 items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md card">{children}</div>
       </main>
     </div>
   )
