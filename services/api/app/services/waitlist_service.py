@@ -15,6 +15,7 @@ from app.schemas.waitlist import (
     WaitlistCreateRequest,
     WaitlistCreateResponse,
 )
+from app.services.notify_service import notify_lead
 
 logger = get_logger(__name__)
 
@@ -131,6 +132,24 @@ async def add_to_directory_waitlist(
     inserted = bool(row["inserted"]) if row else True
     if inserted:
         logger.info(f"Verzeichnis-Warteliste: neuer Eintrag ({masked}, beruf={payload.profession})")
+        _lines = [
+            "Neue Fachpersonen-Vormerkung (Verzeichnis) über echo-b.de:", "",
+            f"Name:         {payload.name}",
+            f"E-Mail:       {email}",
+        ]
+        for _label, _value in (
+            ("Organisation", payload.organization), ("Berufsgruppe", payload.profession),
+            ("Schwerpunkte", payload.specialization), ("Ort/PLZ", payload.location),
+            ("Telefon", payload.phone), ("Webseite", payload.website),
+        ):
+            if _value:
+                _lines.append(f"{_label}: {_value}")
+        if payload.note:
+            _lines += ["", "Anmerkung:", payload.note]
+        await notify_lead(
+            f"[EchoB] Fachpersonen-Vormerkung – {payload.name}",
+            "\n".join(_lines), reply_to=email,
+        )
         return WaitlistCreateResponse(message=_MSG_DIR_NEW, email=email)
 
     logger.info(f"Verzeichnis-Warteliste: aktualisiert ({masked})")

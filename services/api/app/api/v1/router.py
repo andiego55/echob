@@ -11,6 +11,7 @@ from app.api.v1.routers import (
     case_shares,
     cases,
     client_invites,
+    contact,
     echo,
     health,
     hypotheses,
@@ -43,8 +44,9 @@ v1_router = APIRouter()
 # ── System ───────────────────────────────────────────────────────────────────
 v1_router.include_router(health.router)
 
-# ── Phase 0: Warteliste ───────────────────────────────────────────────────────
+# ── Phase 0: Warteliste + Kontakt ─────────────────────────────────────────────
 v1_router.include_router(waitlist.router)
+v1_router.include_router(contact.router)
 
 # ── Phase 1: Kern-App ─────────────────────────────────────────────────────────
 v1_router.include_router(cases.router)

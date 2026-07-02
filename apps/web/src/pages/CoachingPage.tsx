@@ -1,4 +1,5 @@
 import PageLayout from '@/components/layout/PageLayout'
+import ErstgespraechCTA from '@/components/coaching/ErstgespraechCTA'
 
 const COACHING_PROCESS = [
   { icon: '✉', title: '1. Kontakt aufnehmen', text: 'Schreib uns eine kurze E-Mail oder ruf direkt an. Wir melden uns innerhalb von 24 Stunden – ohne Formulare, ohne Warteschleife.' },
@@ -41,7 +42,7 @@ export default function CoachingPage() {
             Wenn du mehr willst als eine App, sind wir persönlich für dich da.
           </p>
           <div className="mt-9 flex flex-wrap gap-3.5">
-            <a href="mailto:kontakt@echo-b.de" className="btn-primary">Erstgespräch anfragen</a>
+            <ErstgespraechCTA className="btn-primary" label="Erstgespräch anfragen" source="coaching_hero" />
             <a href="tel:+4917359089060" className="btn-outline">☎ 0173 5908906</a>
           </div>
         </div>
@@ -145,7 +146,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:kontakt@echo-b.de?subject=Erstgespräch" className="btn-primary text-center text-sm block">Erstgespräch anfragen</a>
+                <ErstgespraechCTA className="btn-primary text-center text-sm block w-full" label="Erstgespräch anfragen" source="coaching_erstgespraech" />
               </div>
 
               {/* Einzeltermin */}
@@ -160,7 +161,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:kontakt@echo-b.de?subject=Einzeltermin%20buchen" className="block rounded-brand border-2 border-navy/25 py-2.5 text-center text-sm font-semibold text-navy no-underline transition-colors hover:border-navy/50 hover:bg-navy/[0.03]">Termin buchen</a>
+                <ErstgespraechCTA className="w-full rounded-brand border-2 border-navy/25 py-2.5 text-center text-sm font-semibold text-navy transition-colors hover:border-navy/50 hover:bg-navy/[0.03]" label="Termin buchen" source="coaching_einzeltermin" />
               </div>
 
               {/* Monatspaket */}
@@ -175,7 +176,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <a href="mailto:kontakt@echo-b.de?subject=Monatspaket" className="btn-primary text-center text-sm block">Paket anfragen</a>
+                <ErstgespraechCTA className="btn-primary text-center text-sm block w-full" label="Paket anfragen" source="coaching_monatspaket" />
                 <p className="text-[10px] text-brand-muted mt-2 text-center">Wöchentliche Begleitung · monatlich kündbar</p>
               </div>
             </div>
@@ -261,7 +262,7 @@ export default function CoachingPage() {
             Schreib uns eine kurze Nachricht oder ruf direkt an. Das Erstgespräch ist kostenlos und unverbindlich.
           </p>
           <div className="mt-8 flex justify-center flex-wrap gap-4">
-            <a href="mailto:kontakt@echo-b.de" className="btn-primary">Erstgespräch anfragen</a>
+            <ErstgespraechCTA className="btn-primary" label="Erstgespräch anfragen" source="coaching_cta" />
             <a href="tel:+4917359089060" className="btn-outline">☎ 0173 5908906</a>
           </div>
           <p className="mt-6 text-xs text-white/30 max-w-lg mx-auto">

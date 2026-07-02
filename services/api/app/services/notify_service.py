@@ -1,0 +1,47 @@
+"""Lead-Benachrichtigung per E-Mail über die Resend-HTTP-API.
+
+Best-effort: Ohne ``RESEND_API_KEY`` (oder bei einem Fehler) passiert nichts
+weiter – der Lead ist bereits in der DB gespeichert; der Mailversand ist
+nachrangig und darf den Request nie scheitern lassen.
+"""
+from __future__ import annotations
+
+import asyncio
+
+from app.core.config import settings
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+def _send_sync(subject: str, text: str, reply_to: str | None) -> None:
+    import httpx  # lazy importiert → kein harter Dependency-Zwang beim Modul-Import
+
+    payload: dict = {
+        "from": f"EchoB Leads <{settings.lead_from_email}>",
+        "to": [settings.lead_notify_to],
+        "subject": subject,
+        "text": text,
+    }
+    if reply_to:
+        payload["reply_to"] = reply_to
+
+    resp = httpx.post(
+        "https://api.resend.com/emails",
+        headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+        json=payload,
+        timeout=10.0,
+    )
+    resp.raise_for_status()
+
+
+async def notify_lead(subject: str, text: str, *, reply_to: str | None = None) -> None:
+    """Schickt eine Lead-Benachrichtigung an ``settings.lead_notify_to`` (best-effort)."""
+    if not settings.resend_api_key:
+        logger.info("Lead-Benachrichtigung übersprungen — RESEND_API_KEY nicht gesetzt.")
+        return
+    try:
+        await asyncio.to_thread(_send_sync, subject, text, reply_to)
+        logger.info("Lead-Benachrichtigung gesendet: %s", subject)
+    except Exception as exc:  # noqa: BLE001 — best effort, darf den Request nicht scheitern lassen
+        logger.warning("Lead-Benachrichtigung fehlgeschlagen: %s", exc)

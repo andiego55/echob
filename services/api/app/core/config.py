@@ -80,6 +80,12 @@ class Settings(BaseSettings):
     # Basis-URL des Frontends für Checkout-Redirects
     frontend_url: str = "http://localhost:5173"
 
+    # ── Lead-Benachrichtigung (Resend) ─────────────────────────────────
+    # Leer = kein Mailversand (Leads werden trotzdem in der DB gespeichert).
+    resend_api_key: str = ""
+    lead_notify_to: str = "kontakt@echo-b.de"     # Empfänger der Lead-Mails
+    lead_from_email: str = "kontakt@echo-b.de"    # verifizierte Resend-Absenderadresse
+
     # ── Monitoring (Sentry) ────────────────────────────────────────────
     # Leer = aus. PII-frei konfiguriert (siehe main.py). EU-Region empfohlen.
     sentry_dsn: str = ""
