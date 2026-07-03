@@ -84,7 +84,9 @@ class Settings(BaseSettings):
     # Leer = kein Mailversand (Leads werden trotzdem in der DB gespeichert).
     resend_api_key: str = ""
     lead_notify_to: str = "kontakt@echo-b.de"     # Empfänger der Lead-Mails
-    lead_from_email: str = "kontakt@echo-b.de"    # verifizierte Resend-Absenderadresse
+    # Absender != Empfänger → weniger „an mich selbst"-Spam-Verdacht (M365).
+    # leads@echo-b.de braucht kein Postfach, nur die verifizierte Resend-Domain.
+    lead_from_email: str = "leads@echo-b.de"
 
     # ── Monitoring (Sentry) ────────────────────────────────────────────
     # Leer = aus. PII-frei konfiguriert (siehe main.py). EU-Region empfohlen.
