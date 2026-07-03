@@ -68,12 +68,13 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[960px]">
           <span className="label">Erkenne, was sich wiederholt.</span>
           <h1 className="mt-2 text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold leading-[1.2] tracking-[-0.02em] max-w-2xl">
-            Wenn Beziehungen schwer einzuordnen sind.
+            Verstehe die Muster in deinen Beziehungen.
           </h1>
-          <p className="mt-5 text-[1.05rem] text-brand-blue max-w-[560px] leading-[1.75]">
-            EchoB hilft dir, belastende Situationen zu sortieren, wiederkehrende
-            Muster sichtbar zu machen und deine nächsten Schritte klarer zu sehen.
-            KI-gestützt, menschlich begleitet.
+          <p className="mt-5 text-[1.05rem] text-brand-blue max-w-[600px] leading-[1.75]">
+            EchoB ist ein privates Reflexionswerkzeug für belastende oder verwirrende
+            Beziehungssituationen. Du hältst fest, was passiert – EchoB macht sichtbar,
+            was sich wiederholt, und hilft dir, die nächsten Schritte klarer zu sehen.
+            KI-gestützt, menschlich begleitet – kein Therapieersatz.
           </p>
           <div className="mt-9 flex flex-wrap gap-3.5">
             <Link to="/auth" state={{ defaultTab: 'signup' }} className="btn-primary">
@@ -86,6 +87,11 @@ export default function LandingPage() {
           <p className="mt-4 text-xs text-white/40">
             Keine Kreditkarte · Kein Download · Jederzeit aufhören
           </p>
+          <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55 list-none p-0 m-0">
+            <li className="inline-flex items-center gap-1.5"><span aria-hidden="true">🔒</span> Privat &amp; verschlüsselt</li>
+            <li className="inline-flex items-center gap-1.5"><span aria-hidden="true">🇪🇺</span> Server in der EU, DSGVO-konform</li>
+            <li className="inline-flex items-center gap-1.5"><span aria-hidden="true">🧭</span> Kein Ersatz für Therapie</li>
+          </ul>
         </div>
       </section>
 

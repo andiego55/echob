@@ -98,10 +98,12 @@ import LockScreen from '@/components/app/LockScreen'
 import { QuickExitHotkey } from '@/components/app/QuickExit'
 import PendingInviteHandler from '@/components/PendingInviteHandler'
 import OnboardingGate from '@/components/auth/OnboardingGate'
+import RouteSeo from '@/components/RouteSeo'
 
 export default function App() {
   return (
     <>
+    <RouteSeo />
     <DevNoticeModal />
     <ConsentGate />
     <LockScreen />
