@@ -120,6 +120,27 @@ export default function DatenschutzPage() {
               lit. a DSGVO (Einwilligung), jederzeit widerrufbar.
             </p>
 
+            <h3 className="font-semibold text-navy mb-1">Kontakt- und Anfrageformulare</h3>
+            <p className="text-brand-muted text-sm mb-4">
+              Über die Anfrageformulare (z. B. „Erstgespräch anfragen", „Persönliche Demo anfragen",
+              Fachpersonen-Vormerkung) verarbeiten wir die von dir angegebenen Daten – Name
+              (optional), E-Mail und/oder Telefonnummer sowie eine optionale Nachricht –, um dich zu
+              deiner Anfrage zu kontaktieren. Die Angaben werden gespeichert und uns per E-Mail
+              zugestellt und nur so lange aufbewahrt, wie es zur Bearbeitung deiner Anfrage
+              erforderlich ist. Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) sowie
+              Art. 6 Abs. 1 lit. b DSGVO (Anbahnung eines Vertrags), jederzeit widerrufbar.
+            </p>
+
+            <h3 className="font-semibold text-navy mb-1">E-Mail-Versand</h3>
+            <p className="text-brand-muted text-sm mb-4">
+              Für den Versand von System- und Benachrichtigungs-E-Mails (z. B. Anmeldebestätigung,
+              Passwort-Zurücksetzen, Einladungen, Benachrichtigung über Anfragen) nutzen wir den
+              Dienst <strong className="text-navy">Resend</strong> (Resend, Inc., USA). Dabei werden
+              die Empfänger-Adresse und der E-Mail-Inhalt verarbeitet und in ein Drittland (USA)
+              übermittelt. Rechtsgrundlage: Art. 6 Abs. 1 lit. b und lit. f DSGVO; als Garantie für
+              die Drittlandübermittlung dienen Standardvertragsklauseln mit dem Anbieter.
+            </p>
+
             <h3 className="font-semibold text-navy mb-1">Serverprotokolle</h3>
             <p className="text-brand-muted text-sm">
               Beim Aufruf der Website werden technisch notwendige Protokolldaten verarbeitet
@@ -141,6 +162,7 @@ export default function DatenschutzPage() {
               <li><strong className="text-navy">Cloudflare</strong> – Auslieferung und Absicherung der Website</li>
               <li><strong className="text-navy">OpenAI</strong> – KI-gestützte Verarbeitung (USA, siehe Abschnitt 5)</li>
               <li><strong className="text-navy">Stripe</strong> – Zahlungsabwicklung</li>
+              <li><strong className="text-navy">Resend</strong> – Versand von System- und Benachrichtigungs-E-Mails (Resend, Inc., USA – siehe Abschnitt 6)</li>
             </ul>
           </div>
 
