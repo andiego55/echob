@@ -135,10 +135,12 @@ export default function DatenschutzPage() {
             <p className="text-brand-muted text-sm mb-4">
               Für den Versand von System- und Benachrichtigungs-E-Mails (z. B. Anmeldebestätigung,
               Passwort-Zurücksetzen, Einladungen, Benachrichtigung über Anfragen) nutzen wir den
-              Dienst <strong className="text-navy">Resend</strong> (Resend, Inc., USA). Dabei werden
-              die Empfänger-Adresse und der E-Mail-Inhalt verarbeitet und in ein Drittland (USA)
-              übermittelt. Rechtsgrundlage: Art. 6 Abs. 1 lit. b und lit. f DSGVO; als Garantie für
-              die Drittlandübermittlung dienen Standardvertragsklauseln mit dem Anbieter.
+              Dienst <strong className="text-navy">Resend</strong> (Resend, Inc., USA). Der Versand
+              erfolgt über die <strong className="text-navy">EU-Region des Anbieters (Irland)</strong>,
+              sodass die dabei verarbeiteten Daten (Empfänger-Adresse, E-Mail-Inhalt) innerhalb der EU
+              verarbeitet werden. Da der Anbieter seinen Unternehmenssitz in den USA hat, kann ein
+              Zugriff aus einem Drittland nicht vollständig ausgeschlossen werden; hierfür bestehen
+              Standardvertragsklauseln. Rechtsgrundlage: Art. 6 Abs. 1 lit. b und lit. f DSGVO.
             </p>
 
             <h3 className="font-semibold text-navy mb-1">Serverprotokolle</h3>
@@ -162,7 +164,7 @@ export default function DatenschutzPage() {
               <li><strong className="text-navy">Cloudflare</strong> – Auslieferung und Absicherung der Website</li>
               <li><strong className="text-navy">OpenAI</strong> – KI-gestützte Verarbeitung (USA, siehe Abschnitt 5)</li>
               <li><strong className="text-navy">Stripe</strong> – Zahlungsabwicklung</li>
-              <li><strong className="text-navy">Resend</strong> – Versand von System- und Benachrichtigungs-E-Mails (Resend, Inc., USA – siehe Abschnitt 6)</li>
+              <li><strong className="text-navy">Resend</strong> – Versand von System- und Benachrichtigungs-E-Mails (Resend, Inc., USA; Verarbeitung in der EU-Region Irland – siehe Abschnitt 6)</li>
             </ul>
           </div>
 
