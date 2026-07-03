@@ -44,11 +44,14 @@ for (const route of PUBLIC_ROUTES) {
     .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${escAttr(head.title)}$2`)
     .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${escAttr(head.description)}$2`)
 
-  const outDir = route === '/' ? dist : path.join(dist, route)
-  fs.mkdirSync(outDir, { recursive: true })
-  fs.writeFileSync(path.join(outDir, 'index.html'), html, 'utf-8')
+  // Flache Dateien (/fachpersonen -> fachpersonen.html), damit Cloudflare die
+  // Seite ohne Trailing-Slash-Redirect ausliefert – passend zu canonical und
+  // den internen Links (kein /foo -> /foo/ 307, keine widersprüchlichen Signale).
+  const outFile = route === '/' ? path.join(dist, 'index.html') : path.join(dist, `${route.slice(1)}.html`)
+  fs.mkdirSync(path.dirname(outFile), { recursive: true })
+  fs.writeFileSync(outFile, html, 'utf-8')
   count++
-  console.log(`  ${route}  (${appHtml.length} B)`)
+  console.log(`  ${route}  ->  ${path.relative(dist, outFile)}  (${appHtml.length} B)`)
 }
 
 // Server-Bundle nicht mit ausliefern.
