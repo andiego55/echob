@@ -143,6 +143,22 @@ export const ROUTE_META: Record<string, PageMeta> = {
 /** Login-/App-Bereiche sollen nicht indexiert werden. */
 const NOINDEX_RE = /^\/(app|professional|auth|pseudonym|einladung)(\/|$)/
 
+export type Head = { title: string; description: string; url: string; robots: string }
+
+/** Reine Metadaten je Pfad – ohne DOM. Von Client (applyHead) und Prerender genutzt. */
+export function headFor(pathname: string): Head {
+  const meta = ROUTE_META[pathname]
+  return {
+    title: meta?.title ?? DEFAULT_TITLE,
+    description: meta?.description ?? DEFAULT_DESC,
+    url: SITE + (pathname === '/' ? '/' : pathname),
+    robots: NOINDEX_RE.test(pathname) ? 'noindex,nofollow' : 'index,follow',
+  }
+}
+
+/** Öffentliche, indexierbare Routen – Grundlage fürs Prerendering (ohne Login-Bereiche). */
+export const PUBLIC_ROUTES = Object.keys(ROUTE_META).filter((p) => !NOINDEX_RE.test(p))
+
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`)
   if (!el) {
@@ -165,15 +181,11 @@ function upsertLink(rel: string, href: string) {
 
 /** Setzt Titel/Description/Canonical/OG/robots passend zum Pfad. */
 export function applyHead(pathname: string) {
-  const meta = ROUTE_META[pathname]
-  const noindex = NOINDEX_RE.test(pathname)
-  const title = meta?.title ?? DEFAULT_TITLE
-  const description = meta?.description ?? DEFAULT_DESC
-  const url = SITE + (pathname === '/' ? '/' : pathname)
+  const { title, description, url, robots } = headFor(pathname)
 
   document.title = title
   upsertMeta('name', 'description', description)
-  upsertMeta('name', 'robots', noindex ? 'noindex,nofollow' : 'index,follow')
+  upsertMeta('name', 'robots', robots)
   upsertLink('canonical', url)
   upsertMeta('property', 'og:title', title)
   upsertMeta('property', 'og:description', description)

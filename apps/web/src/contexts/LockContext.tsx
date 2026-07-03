@@ -18,6 +18,8 @@ async function hashPin(pin: string): Promise<string> {
 }
 
 function isConfigured(): boolean {
+  // Beim Prerender/SSR gibt es kein localStorage – dann gilt: nicht eingerichtet.
+  if (typeof localStorage === 'undefined') return false
   return localStorage.getItem(ENABLED_KEY) === '1' && !!localStorage.getItem(PIN_KEY)
 }
 

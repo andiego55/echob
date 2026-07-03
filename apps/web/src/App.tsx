@@ -110,6 +110,16 @@ export default function App() {
     <OnboardingGate />
     <QuickExitHotkey />
     <PendingInviteHandler />
+    <AppRoutes />
+    </>
+  )
+}
+
+// Nur die Routen – ohne die App-Shell-Modals (DevNotice/Consent/Lock/…).
+// Wird von <App> und vom Prerender (entry-server) gerendert, damit die
+// statische HTML ausschließlich den eigentlichen Seiteninhalt enthält.
+export function AppRoutes() {
+  return (
     <Routes>
       {/* ── Öffentlich ─────────────────────────────────────────────────────── */}
       <Route path="/"            element={<LandingPage />} />
@@ -186,6 +196,5 @@ export default function App() {
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
-    </>
   )
 }

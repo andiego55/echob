@@ -13,6 +13,20 @@
       "port": 5173
     },
     {
+      "name": "echob-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Projekte\\echob\\apps\\web",
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4173"
+      ],
+      "port": 4173
+    },
+    {
       "name": "new-hp-preview",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
