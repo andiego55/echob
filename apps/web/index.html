@@ -8,11 +8,75 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#0f1e2e" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="EchoB hilft dir, belastende Beziehungssituationen zu sortieren und wiederkehrende Muster sichtbar zu machen." />
-    <title>EchoB – Erkenne, was sich wiederholt.</title>
+
+    <title>EchoB – Beziehungsmuster erkennen | Erkenne, was sich wiederholt.</title>
+    <meta name="description" content="EchoB hilft dir, belastende Beziehungssituationen zu sortieren und wiederkehrende Muster sichtbar zu machen – privat, DSGVO-konform, mit KI-Unterstützung. Kein Therapieersatz." />
+    <link rel="canonical" href="https://echo-b.de/" />
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="EchoB" />
+    <meta property="og:title" content="EchoB – Erkenne, was sich wiederholt." />
+    <meta property="og:description" content="EchoB hilft dir, belastende Beziehungssituationen zu sortieren und wiederkehrende Muster sichtbar zu machen – privat, DSGVO-konform, mit KI-Unterstützung." />
+    <meta property="og:url" content="https://echo-b.de/" />
+    <meta property="og:image" content="https://echo-b.de/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="de_DE" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EchoB – Erkenne, was sich wiederholt." />
+    <meta name="twitter:description" content="EchoB hilft dir, wiederkehrende Muster in belastenden Beziehungen zu erkennen – privat und DSGVO-konform." />
+    <meta name="twitter:image" content="https://echo-b.de/og-image.png" />
+
+    <!-- Structured Data (Marken-Disambiguierung gegenüber „Echo-B" Audio) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://echo-b.de/#org",
+          "name": "EchoB",
+          "url": "https://echo-b.de/",
+          "email": "kontakt@echo-b.de",
+          "description": "Fallbasierte Reflexionsplattform für belastende Beziehungssituationen mit KI-Unterstützung. Kein Therapieersatz."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://echo-b.de/#website",
+          "url": "https://echo-b.de/",
+          "name": "EchoB – Erkenne, was sich wiederholt.",
+          "inLanguage": "de-DE",
+          "publisher": { "@id": "https://echo-b.de/#org" }
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="h-full bg-brand-bg text-brand-text antialiased">
     <div id="root" class="h-full"></div>
+
+    <!-- Fallback für Crawler/Screenreader ohne JavaScript-Rendering. -->
+    <noscript>
+      <div style="max-width:640px;margin:0 auto;padding:48px 24px;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:#1a2b3c;line-height:1.65">
+        <h1 style="color:#0f1e2e;font-size:26px">EchoB – Erkenne, was sich wiederholt.</h1>
+        <p><strong>EchoB ist eine fallbasierte Reflexionsplattform für belastende Beziehungssituationen.</strong>
+          Halte Situationen, Gefühle und Auslöser fest und mache über die Zeit sichtbar, was sich wiederholt –
+          privat, DSGVO-konform und mit KI-Unterstützung. EchoB ist kein Ersatz für Therapie oder Beratung.</p>
+        <p><strong>Für Fachpersonen</strong> (Therapie, Beratung, Coaching): ein Arbeitsplatz mit ausschließlich
+          freigegebenem Fallkontext, KI-gestützten Berichten und Sitzungsnotizen – streng einwilligungsbasiert.</p>
+        <p style="margin-top:20px">
+          <a href="/fachpersonen">Für Fachpersonen</a> &middot;
+          <a href="/coaching">Coaching</a> &middot;
+          <a href="/wissen">Wissen</a> &middot;
+          <a href="/datenschutz">Datenschutz</a> &middot;
+          <a href="/impressum">Impressum</a>
+        </p>
+        <p style="color:#667788;font-size:14px;margin-top:24px">Diese Anwendung benötigt JavaScript für die volle
+          Nutzung. Bitte aktiviere JavaScript in deinem Browser.</p>
+      </div>
+    </noscript>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
