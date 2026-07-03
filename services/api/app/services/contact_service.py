@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import asyncpg
 
+from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.contact import ContactRequest
-from app.services.notify_service import notify_lead
+from app.services.notify_service import notify_lead, send_email
 
 logger = get_logger(__name__)
 
@@ -46,3 +47,15 @@ async def create_contact_request(pool: asyncpg.Pool, payload: ContactRequest) ->
 
     subject = f"[EchoB] {label}" + (f" – {name}" if name else "")
     await notify_lead(subject, "\n".join(lines), reply_to=email)
+
+    # Auto-Bestätigung an die anfragende Person (nur wenn E-Mail angegeben).
+    if email:
+        greeting = f"Hallo {name}," if name else "Hallo,"
+        ack = (
+            f"{greeting}\n\n"
+            "danke für deine Anfrage bei EchoB. Wir haben sie erhalten und melden uns "
+            "innerhalb von 24 Stunden.\n\n"
+            "Wenn es dringend ist, erreichst du uns direkt unter 0173 5908906.\n\n"
+            "Herzliche Grüße\nEchoB"
+        )
+        await send_email(email, "Deine Anfrage bei EchoB", ack, reply_to=settings.lead_notify_to)

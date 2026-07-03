@@ -78,6 +78,14 @@ async def add_to_waitlist(
         return WaitlistCreateResponse(message=_MSG_DUPLICATE, email=email)
 
     logger.info(f"Warteliste: neuer Eintrag ({masked}, interest={payload.interest})")
+    await notify_lead(
+        f"[EchoB] Warteliste – {payload.interest or 'app'}",
+        "Neue Warteliste-Anmeldung über echo-b.de:\n\n"
+        f"E-Mail:    {email}\n"
+        f"Interesse: {payload.interest or '-'}\n"
+        f"Notiz:     {payload.note or '-'}",
+        reply_to=email,
+    )
     return WaitlistCreateResponse(message=_MSG_SUCCESS, email=email)
 
 

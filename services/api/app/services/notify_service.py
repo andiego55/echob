@@ -1,8 +1,7 @@
-"""Lead-Benachrichtigung per E-Mail über die Resend-HTTP-API.
+"""E-Mail-Versand über die Resend-HTTP-API (Lead-Benachrichtigungen + Auto-Bestätigungen).
 
-Best-effort: Ohne ``RESEND_API_KEY`` (oder bei einem Fehler) passiert nichts
-weiter – der Lead ist bereits in der DB gespeichert; der Mailversand ist
-nachrangig und darf den Request nie scheitern lassen.
+Best-effort: Ohne ``RESEND_API_KEY`` (oder bei einem Fehler) passiert nichts weiter –
+der aufrufende Request darf daran nie scheitern.
 """
 from __future__ import annotations
 
@@ -14,12 +13,12 @@ from app.core.logging import get_logger
 logger = get_logger(__name__)
 
 
-def _send_sync(subject: str, text: str, reply_to: str | None) -> None:
-    import httpx  # lazy importiert → kein harter Dependency-Zwang beim Modul-Import
+def _send_sync(to: str, subject: str, text: str, reply_to: str | None) -> None:
+    import httpx  # lazy → kein harter Dependency-Zwang beim Modul-Import
 
     payload: dict = {
-        "from": f"EchoB Leads <{settings.lead_from_email}>",
-        "to": [settings.lead_notify_to],
+        "from": f"EchoB <{settings.lead_from_email}>",
+        "to": [to],
         "subject": subject,
         "text": text,
     }
@@ -37,13 +36,18 @@ def _send_sync(subject: str, text: str, reply_to: str | None) -> None:
         raise RuntimeError(f"Resend {resp.status_code}: {resp.text[:300]}")
 
 
-async def notify_lead(subject: str, text: str, *, reply_to: str | None = None) -> None:
-    """Schickt eine Lead-Benachrichtigung an ``settings.lead_notify_to`` (best-effort)."""
+async def send_email(to: str, subject: str, text: str, *, reply_to: str | None = None) -> None:
+    """Verschickt eine E-Mail an ``to`` (best-effort)."""
     if not settings.resend_api_key:
-        logger.info("Lead-Benachrichtigung übersprungen — RESEND_API_KEY nicht gesetzt.")
+        logger.info("E-Mail übersprungen — RESEND_API_KEY nicht gesetzt.")
         return
     try:
-        await asyncio.to_thread(_send_sync, subject, text, reply_to)
-        logger.info("Lead-Benachrichtigung gesendet: %s", subject)
+        await asyncio.to_thread(_send_sync, to, subject, text, reply_to)
+        logger.info("E-Mail gesendet an %s: %s", to, subject)
     except Exception as exc:  # noqa: BLE001 — best effort, darf den Request nicht scheitern lassen
-        logger.warning("Lead-Benachrichtigung fehlgeschlagen: %s", exc)
+        logger.warning("E-Mail-Versand fehlgeschlagen (%s): %s", subject, exc)
+
+
+async def notify_lead(subject: str, text: str, *, reply_to: str | None = None) -> None:
+    """Lead-Benachrichtigung an ``settings.lead_notify_to``."""
+    await send_email(settings.lead_notify_to, subject, text, reply_to=reply_to)

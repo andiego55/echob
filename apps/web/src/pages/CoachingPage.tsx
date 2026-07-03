@@ -161,7 +161,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <ErstgespraechCTA className="w-full rounded-brand border-2 border-navy/25 py-2.5 text-center text-sm font-semibold text-navy transition-colors hover:border-navy/50 hover:bg-navy/[0.03]" label="Termin buchen" source="coaching_einzeltermin" />
+                <ErstgespraechCTA className="w-full rounded-brand border-2 border-navy/25 py-2.5 text-center text-sm font-semibold text-navy transition-colors hover:border-navy/50 hover:bg-navy/[0.03]" label="Termin buchen" heading="Einzeltermin buchen" source="coaching_einzeltermin" />
               </div>
 
               {/* Monatspaket */}
@@ -176,7 +176,7 @@ export default function CoachingPage() {
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>
-                <ErstgespraechCTA className="btn-primary text-center text-sm block w-full" label="Paket anfragen" source="coaching_monatspaket" />
+                <ErstgespraechCTA className="btn-primary text-center text-sm block w-full" label="Paket anfragen" heading="Monatspaket anfragen" source="coaching_monatspaket" />
                 <p className="text-[10px] text-brand-muted mt-2 text-center">Wöchentliche Begleitung · monatlich kündbar</p>
               </div>
             </div>

@@ -61,6 +61,10 @@ export default function AuthPage() {
       }
 
       if (tab === 'signup') {
+        if (password.length < 8) {
+          setMessage({ type: 'error', text: 'Das Passwort muss mindestens 8 Zeichen haben.' })
+          return
+        }
         const { error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
         setMessage({ type: 'success', text: 'Bestätigungsmail gesendet – prüfe dein Postfach.' })
@@ -203,7 +207,7 @@ export default function AuthPage() {
                     autoComplete={tab === 'signup' ? 'new-password' : 'current-password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={tab === 'signup' ? 'Mindestens 6 Zeichen' : '••••••••'}
+                    placeholder={tab === 'signup' ? 'Mindestens 8 Zeichen' : '••••••••'}
                     className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
                   />
                 </div>

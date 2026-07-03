@@ -255,7 +255,7 @@ export default function DatenschutzPage() {
               <li>verschlüsselte Übertragung über HTTPS/TLS,</li>
               <li>Verschlüsselung im Ruhezustand: Der Server-Datenträger ist verschlüsselt, und
                 sensible Freitext-Inhalte werden zusätzlich auf Feldebene verschlüsselt gespeichert,</li>
-              <li>verschlüsselte, getrennt aufbewahrte Backups,</li>
+              <li>verschlüsselte, regelmäßige Backups,</li>
               <li>Pseudonymisierung (Trennung von Inhalt und Identität) sowie Beschränkung interner
                 Zugriffe auf das Notwendige.</li>
             </ul>
