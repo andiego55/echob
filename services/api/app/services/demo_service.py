@@ -21,7 +21,7 @@ DEMO_CASE_ID = "dec01000-0000-4000-a000-0000000000ca"
 # Freigegebene Inhalte des Demo-Falls (alle relevanten).
 _DEMO_SHARE_ELEMENTS = (
     "case_info", "onboarding", "all_scenes", "scales", "topic_summaries", "self_profile",
-    "hypotheses",
+    "hypotheses", "person_profile",
 )
 
 # Beispiel-Partnerfall (Paar-Analyse): Marco K. — Gegenperspektive zu Lena (27_demo_case_partner.sql).
@@ -29,6 +29,7 @@ DEMO_PARTNER_USER_ID = "dec01000-0000-4000-a000-000000000002"
 DEMO_PARTNER_CASE_ID = "dec01000-0000-4000-a000-0000000000cb"
 _DEMO_PARTNER_SHARE_ELEMENTS = (
     "case_info", "onboarding", "all_scenes", "scales", "topic_summaries", "self_profile",
+    "hypotheses", "person_profile",
 )
 
 _DEMO_SESSION_NOTES = [
