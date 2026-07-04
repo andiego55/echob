@@ -26,7 +26,7 @@ PRODUCTS: dict[str, dict] = {
     "early_bird": {
         "name": "EchoB Early Bird Abo",
         "description": "Vollzugang zu allen Features – monatlich kündbar",
-        "amount_cents": 1299,
+        "amount_cents": 1599,
         "mode": "subscription",
         "interval": "month",
         "price_id_setting": "stripe_price_early_bird",
