@@ -26,6 +26,7 @@ if (!template.includes('<div id="root" class="h-full"></div>')) {
 
 const { renderPage, PUBLIC_ROUTES } = await import(pathToFileURL(ssrEntry).href)
 
+const urls = []
 let count = 0
 for (const route of PUBLIC_ROUTES) {
   const { appHtml, head } = renderPage(route)
@@ -50,9 +51,21 @@ for (const route of PUBLIC_ROUTES) {
   const outFile = route === '/' ? path.join(dist, 'index.html') : path.join(dist, `${route.slice(1)}.html`)
   fs.mkdirSync(path.dirname(outFile), { recursive: true })
   fs.writeFileSync(outFile, html, 'utf-8')
+  urls.push(head.url)
   count++
   console.log(`  ${route}  ->  ${path.relative(dist, outFile)}  (${appHtml.length} B)`)
 }
+
+// sitemap.xml aus den öffentlichen URLs erzeugen (bleibt automatisch synchron
+// mit PUBLIC_ROUTES). robots.txt (public/) verweist darauf.
+const lastmod = new Date().toISOString().slice(0, 10)
+const sitemap =
+  '<?xml version="1.0" encoding="UTF-8"?>\n' +
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+  urls.map((u) => `  <url><loc>${u}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n') +
+  '\n</urlset>\n'
+fs.writeFileSync(path.join(dist, 'sitemap.xml'), sitemap, 'utf-8')
+console.log(`  sitemap.xml (${urls.length} URLs)`)
 
 // Server-Bundle nicht mit ausliefern.
 fs.rmSync(path.join(webRoot, 'dist-ssr'), { recursive: true, force: true })
