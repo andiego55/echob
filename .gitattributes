@@ -1,0 +1,13 @@
+# Binärdateien nie zeilenende-konvertieren (autocrlf) – sonst korrupte Assets
+# beim Checkout (z. B. PDF/Fonts/Bilder auf dem Cloudflare-Build).
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
