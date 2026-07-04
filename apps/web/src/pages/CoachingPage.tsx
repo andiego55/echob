@@ -70,7 +70,7 @@ export default function CoachingPage() {
             <div className="flex-1 grid gap-4 sm:grid-cols-3">
               {[
                 { label: 'Telefon', value: '0173 5908906', sub: 'Mo–Sa, direkt erreichbar', href: 'tel:+4917359089060' },
-                { label: 'Coaching-Anfragen', value: 'kontakt@echo-b.de', sub: 'Antwort innerhalb 24h', href: 'mailto:kontakt@echo-b.de' },
+                { label: 'Coaching-Anfragen', value: 'coaching@echo-b.de', sub: 'Antwort innerhalb 24h', href: 'mailto:coaching@echo-b.de' },
                 { label: 'Allgemeine Anfragen', value: 'kontakt@echo-b.de', sub: 'Fragen zur App & Plattform', href: 'mailto:kontakt@echo-b.de' },
               ].map(({ label, value, sub, href }) => (
                 <a
@@ -170,9 +170,9 @@ export default function CoachingPage() {
                 <p className="font-bold text-navy mb-1">Monatspaket „Begleitung"</p>
                 <p className="text-xs text-brand-muted mb-4 leading-relaxed">Wöchentlicher Rhythmus aus persönlicher Begleitung und geführter Selbstreflexion – für Menschen, die tiefer gehen möchten.</p>
                 <div className="text-2xl font-extrabold text-navy mb-1">499 € <span className="text-sm font-normal text-brand-muted">/Monat</span></div>
-                <p className="text-xs text-brand-muted mb-4">Wöchentliche Online-Check-ins · je 60 Min.</p>
+                <p className="text-xs text-brand-muted mb-4">4 wöchentliche Online-Check-ins · je 60 Min.</p>
                 <ul className="space-y-1.5 mb-6 flex-1">
-                  {['Wöchentliche 60-Min.-Online-Check-ins', 'Persönliche Plattform-Einführung in Echo', 'Geführte Dialoge in der App zwischen den Terminen (Themen, Bindung, Eigenanteil …)', 'Voller EchoB-Plattformzugang inklusive', 'Auswertung aller Skalenwerte & Muster', 'Bericht für Therapie/Übergabe auf Wunsch'].map(f => (
+                  {['4 wöchentliche 60-Min.-Online-Check-ins', 'Persönliche Plattform-Einführung in Echo', 'Geführte Dialoge in der App zwischen den Terminen (Themen, Bindung, Eigenanteil …)', 'Voller EchoB-Plattformzugang inklusive', 'Auswertung aller Skalenwerte & Muster', 'Bericht für Therapie/Übergabe auf Wunsch'].map(f => (
                     <li key={f} className="flex items-start gap-2 text-xs text-navy"><span className="text-accent mt-0.5 shrink-0">✓</span>{f}</li>
                   ))}
                 </ul>

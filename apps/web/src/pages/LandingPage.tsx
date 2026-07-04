@@ -49,7 +49,7 @@ const FAQ = [
   },
   {
     q: 'Was ist der Early-Bird-Tarif?',
-    a: 'Solange das Early-Bird-Fenster (bis November) offen ist, bekommst du den vollen App-Zugang für 12,99 € statt 24,99 € im Monat – alle Funktionen und Berichte inklusive, monatlich kündbar.',
+    a: 'Solange das Early-Bird-Fenster (bis November) offen ist, bekommst du den vollen App-Zugang für 15,99 € statt 24,99 € im Monat – alle Funktionen und Berichte inklusive, monatlich kündbar.',
   },
 ]
 
@@ -156,7 +156,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="mb-1 flex items-baseline gap-2 flex-wrap">
-              <span className="text-3xl font-extrabold text-navy">12,99 €</span>
+              <span className="text-3xl font-extrabold text-navy">15,99 €</span>
               <span className="text-xs text-brand-muted">/ Monat</span>
               <span className="text-sm text-brand-muted line-through decoration-brand-muted/50">24,99 €</span>
             </div>

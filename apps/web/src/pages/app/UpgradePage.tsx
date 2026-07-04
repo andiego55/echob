@@ -21,7 +21,7 @@ const PLANS = [
     id: 'early_bird' as ProductType,
     name: 'Early Bird',
     badge: 'Bis November',
-    price: '12,99',
+    price: '15,99',
     period: 'Monat',
     desc: 'Vollzugang zu allen Features. Günstigster Einstiegspreis – nur für kurze Zeit.',
     features: [
