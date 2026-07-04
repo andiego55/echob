@@ -28,34 +28,75 @@ const DIRECTORY_BENEFITS = [
   },
 ]
 
+const iconCls = 'h-6 w-6'
 const FEATURES = [
   {
-    icon: '💬',
+    // Echo-Wellen
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="6.5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+        <path d="M10.5 8.5a5 5 0 0 1 0 7" />
+        <path d="M13.8 6a9 9 0 0 1 0 12" />
+      </svg>
+    ),
     title: 'Profi-Echo im Fallkontext',
     text: 'Besprechen Sie den freigegebenen Fall mit Echo – fachlich substanziell: Traitvergleiche zu Störungsbildern und Wahrscheinlichkeits-Einschätzungen, aber keine abschließende Diagnose.',
   },
   {
-    icon: '📊',
+    // Bericht: Dokument mit Balken
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="5" y="3.5" width="14" height="17" rx="2" />
+        <path d="M9 16v-3M12 16V9M15 16v-5" />
+      </svg>
+    ),
     title: 'KI-Fallberichte auf Knopfdruck',
     text: 'Verlaufsbericht, Übergabe-/Überweisungsbericht und Fall-Standortbestimmung – oder eigene Vorlagen, die Echo aus Ihrer Beschreibung entwirft. Editierbar und als PDF druckbar.',
   },
   {
-    icon: '🗒️',
+    // Timeline / Notizen im Verlauf
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 4v16" />
+        <circle cx="7" cy="7" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="7" cy="12" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="7" cy="17" r="1.4" fill="currentColor" stroke="none" />
+        <path d="M11 7h7M11 12h7M11 17h5" />
+      </svg>
+    ),
     title: 'Sitzungsnotizen mit Verlauf',
     text: 'Strukturierte, datierte Notizen als Timeline – aus Vorlagen wie SOAP oder Erstgespräch, oder eigenen. Ihre Falldoku an einem Ort.',
   },
   {
-    icon: '🧩',
+    // Glühbirne: Hypothese
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3a6 6 0 0 1 4 10.4c-.7.6-1 1.2-1 2.1H9c0-.9-.3-1.5-1-2.1A6 6 0 0 1 12 3z" />
+        <path d="M9.5 18h5M10.5 20.5h3" />
+      </svg>
+    ),
     title: 'Arbeitshypothesen',
     text: 'Tastende Hypothesen zu Beziehungsdynamik, Bindung, Prägungen, Cluster-B-Spektrum und Eigenanteil – als Arbeitsgrundlage, ausdrücklich keine Diagnose.',
   },
   {
-    icon: '🏛️',
+    // Gebäude: Praxis
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="5" y="4" width="14" height="16" rx="1.5" />
+        <path d="M9 8h.01M12 8h.01M15 8h.01M9 12h.01M12 12h.01M15 12h.01" />
+        <path d="M10.5 20v-3h3v3" />
+      </svg>
+    ),
     title: 'Praxis-Accounts',
     text: 'Mehrere Fachpersonen unter einem Dach: Rollen, gemeinsame Berichts- und Notiz-Vorlagen, zentrale Verwaltung. Vom Solo-Sitz bis zum Institut.',
   },
   {
-    icon: '🗂️',
+    // Ordner: Fallakte
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 7a2 2 0 0 1 2-2h3l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" />
+      </svg>
+    ),
     title: 'Vollständiger Fallkontext',
     text: 'Szenen, Skalen, Onboarding, Themen-Reflexionen und Profile – sauber aufbereitet. Sie sehen ausschließlich, was Ihre Klient:in freigibt.',
   },
@@ -151,14 +192,39 @@ export default function FachpersonenPage() {
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map(({ icon, title, text }, i) => (
               <Reveal key={title} delay={(i % 3) * 0.08}>
-                <div className="card h-full transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-md">
-                  <div className="text-2xl mb-3" aria-hidden="true">{icon}</div>
+                <div className="group card h-full hover:border-accent/50">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent transition-colors duration-200 group-hover:bg-accent group-hover:text-white">
+                    {icon}
+                  </div>
                   <h3 className="font-bold text-navy mb-2">{title}</h3>
                   <p className="text-sm text-brand-muted leading-relaxed">{text}</p>
                 </div>
               </Reveal>
             ))}
           </div>
+
+          {/* 1-Pager zum Download */}
+          <Reveal delay={0.1}>
+            <div className="mt-8 flex flex-col items-center gap-5 rounded-[1.25rem] border border-brand-border bg-navy/[0.03] p-6 sm:flex-row sm:justify-between sm:p-7">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 4v9" />
+                    <path d="M8.5 10.5 12 14l3.5-3.5" />
+                    <path d="M5 16.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1.5" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-bold text-navy">EchoB für Fachpersonen – der 1-Pager</p>
+                  <p className="mt-0.5 text-sm text-brand-muted">Kompakte Produktbeschreibung zum Weitergeben – inklusive Verzeichnis-Partnerschaft.</p>
+                </div>
+              </div>
+              <a href="/echob-fachpersonen-1pager.pdf" download
+                className="btn-primary shrink-0 whitespace-nowrap">
+                PDF herunterladen
+              </a>
+            </div>
+          </Reveal>
         </div>
       </section>
 
