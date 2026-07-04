@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL  as string
 const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -11,7 +11,10 @@ if (!import.meta.env.SSR && (!supabaseUrl || !supabaseAnon)) {
   )
 }
 
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnon || 'placeholder-anon-key',
-)
+// Beim SSR-Prerender wird der Client nie benutzt (öffentliche Seiten, keine
+// Auth-Calls im Render). Den echten createClient dort NICHT konstruieren:
+// supabase-js initialisiert sonst den Realtime-Client, der auf Node < 22 ohne
+// globales WebSocket abstürzt und den Build kippt (z. B. CI mit Node 20).
+export const supabase: SupabaseClient = import.meta.env.SSR
+  ? ({} as unknown as SupabaseClient)
+  : createClient(supabaseUrl, supabaseAnon)
