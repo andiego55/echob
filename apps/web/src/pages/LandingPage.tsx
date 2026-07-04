@@ -11,26 +11,55 @@ const THOUGHTS = [
   '„Ich möchte meine Situation für Therapie sortieren."',
 ]
 
+const svg = 'h-6 w-6'
 const FEATURES = [
   {
-    icon: '📝',
+    // Notiz/Dokument mit Zeilen – „festhalten"
+    icon: (
+      <svg className={svg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="5" y="3.5" width="14" height="17" rx="2" />
+        <path d="M8.5 8h7M8.5 11.5h7M8.5 15h4.5" />
+      </svg>
+    ),
     title: 'Situationen strukturiert festhalten',
-    text: 'Du beschreibst, was passiert ist – in eigenen Worten, im eigenen Tempo. Echo hilft dir, das Chaos in klare Szenen zu verwandeln.',
+    text: 'Du beschreibst, was passiert ist – in eigenen Worten, im eigenen Tempo. EchoB verwandelt das Chaos in klare, geordnete Szenen.',
   },
   {
-    icon: '🔍',
+    // Echo-Wellen – „mit Echo reflektieren"
+    icon: (
+      <svg className={svg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="6.5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+        <path d="M10.5 8.5a5 5 0 0 1 0 7" />
+        <path d="M13.8 6a9 9 0 0 1 0 12" />
+      </svg>
+    ),
+    title: 'Mit Echo reflektieren',
+    text: 'Echo stellt Fragen, fasst zusammen und hilft dir, Zusammenhänge zu sehen. Kein Ratschlag, keine Bewertung – ein Spiegel, der dir hilft zu denken.',
+  },
+  {
+    // Verbundene Punkte / Verlauf – „Muster sichtbar"
+    icon: (
+      <svg className={svg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="4,15 9,10 13,13 20,5" />
+        <circle cx="4" cy="15" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="9" cy="10" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="13" cy="13" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="20" cy="5" r="1.4" fill="currentColor" stroke="none" />
+      </svg>
+    ),
     title: 'Muster sichtbar machen',
     text: 'Was sich wiederholt, zeigt sich erst über mehrere Situationen. EchoB macht Dynamiken wie Schuldumkehr, Kontrolle oder Nähe-Distanz-Wechsel sichtbar – ohne Diagnose.',
   },
   {
-    icon: '📊',
+    // Dokument mit Balken – „Berichte"
+    icon: (
+      <svg className={svg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="5" y="3.5" width="14" height="17" rx="2" />
+        <path d="M9 16v-3M12 16V9M15 16v-5" />
+      </svg>
+    ),
     title: 'Berichte für dich und Fachpersonen',
-    text: 'Ob für dich selbst, für Coaching oder als Vorbereitung auf Therapie – EchoB erstellt strukturierte Berichte, die das Wesentliche auf den Punkt bringen.',
-  },
-  {
-    icon: '💬',
-    title: 'Mit Echo reflektieren',
-    text: 'Echo stellt Fragen, fasst zusammen und hilft dir, Zusammenhänge zu sehen. Kein Ratschlag, keine Bewertung – ein Spiegel, der hilft zu denken.',
+    text: 'Ob für dich selbst, fürs Coaching oder als Vorbereitung auf die Therapie – EchoB erstellt strukturierte Berichte, die das Wesentliche auf den Punkt bringen.',
   },
 ]
 
@@ -124,14 +153,22 @@ export default function LandingPage() {
           </p>
           <div className="mt-10 grid gap-5 sm:grid-cols-2">
             {FEATURES.map(({ icon, title, text }) => (
-              <div key={title} className="card flex gap-4">
-                <span className="text-2xl leading-none mt-0.5 shrink-0">{icon}</span>
-                <div>
-                  <h3 className="font-bold text-navy mb-1.5">{title}</h3>
-                  <p className="text-sm text-brand-muted leading-relaxed">{text}</p>
+              <div key={title} className="group card flex flex-col hover:border-accent/50">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent transition-colors duration-200 group-hover:bg-accent group-hover:text-white">
+                  {icon}
                 </div>
+                <h3 className="font-bold text-navy mb-1.5">{title}</h3>
+                <p className="text-sm text-brand-muted leading-relaxed">{text}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-11 flex flex-col items-center text-center">
+            <p className="text-lg font-semibold text-navy">Sieh selbst, was sichtbar wird.</p>
+            <Link to="/auth" state={{ defaultTab: 'signup' }} className="btn-primary mt-4">
+              Kostenlos ausprobieren
+            </Link>
+            <p className="mt-3 text-xs text-brand-muted">3 Tage · 1 Fall · ohne Kreditkarte</p>
           </div>
         </div>
       </section>
