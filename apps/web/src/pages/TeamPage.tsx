@@ -29,7 +29,9 @@ export default function TeamPage() {
       <section className="border-t border-brand-border px-6 py-[72px]">
         <div className="mx-auto max-w-[760px]">
           <div className="card text-center py-12">
-            <div className="text-3xl mb-4">👥</div>
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+              <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8.5" r="3" /><path d="M2.5 19a6.5 6.5 0 0 1 13 0" /><path d="M16 6.3a2.8 2.8 0 0 1 0 5.4" /><path d="M17.5 13.5a5.5 5.5 0 0 1 4 5.3" /></svg>
+            </div>
             <h2 className="text-lg font-bold text-navy mb-2">Inhalte folgen in Kürze</h2>
             <p className="text-sm text-brand-muted max-w-md mx-auto leading-relaxed mb-6">
               Wir arbeiten gerade daran, das Team hinter EchoB hier vorzustellen. Bis dahin erfährst du
