@@ -65,7 +65,16 @@ export default function AuthPage() {
           setMessage({ type: 'error', text: 'Das Passwort muss mindestens 8 Zeichen haben.' })
           return
         }
-        const { error } = await supabase.auth.signUp({ email, password })
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            // Nach der Bestätigung im App-Bereich landen; dort routet AppHome
+            // eine Fachperson anhand von pending_role weiter zur Profil-Anlage.
+            emailRedirectTo: `${window.location.origin}/app`,
+            ...(isPro ? { data: { pending_role: 'professional' } } : {}),
+          },
+        })
         if (error) throw error
         setMessage({ type: 'success', text: 'Bestätigungsmail gesendet – prüfe dein Postfach.' })
         return

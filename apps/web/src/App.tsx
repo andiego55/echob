@@ -61,6 +61,7 @@ import CaseSharingPage        from '@/pages/app/CaseSharingPage'
 import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
 import SettingsPage           from '@/pages/app/SettingsPage'
 import { useParams }         from 'react-router-dom'
+import { useAuth }           from '@/contexts/AuthContext'
 
 function TopicDialogPageWrapper() {
   const { topicId } = useParams<{ topicId: string }>()
@@ -74,9 +75,14 @@ function HypothesisDialogPageWrapper() {
 
 // Rollen-Weiche: Fachpersonen landen im Fachpersonenbereich, sonst in der Fallübersicht.
 function AppHome() {
+  const { session } = useAuth()
   const { data, isLoading } = useProfessional()
   if (isLoading) return <RoleSpinner />
   if (data) return <Navigate to="/professional/dashboard" replace />
+  // Selbst-registrierte Fachperson (Absicht aus dem Signup) → Profil anlegen,
+  // statt fälschlich im Klientenbereich zu landen.
+  if (session?.user?.user_metadata?.pending_role === 'professional')
+    return <Navigate to="/professional/register" replace />
   return <CasesOverviewPage />
 }
 
