@@ -5,30 +5,55 @@ import FachpersonenExplainer from '@/components/landing/FachpersonenExplainer'
 import DirectoryWaitlistForm from '@/components/landing/DirectoryWaitlistForm'
 import ErstgespraechCTA from '@/components/coaching/ErstgespraechCTA'
 
+const iconCls = 'h-6 w-6'
+
 const DIRECTORY_BENEFITS = [
   {
-    icon: '🔎',
+    // Lupe: gefunden werden
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="10.5" cy="10.5" r="6" />
+        <path d="M15 15l4.5 4.5" />
+      </svg>
+    ),
     title: 'Klient:innen finden Sie',
     text: 'Menschen sortieren mit EchoB ihre Beziehungsmuster – und suchen danach passende Begleitung. Das Verzeichnis bringt Sie gezielt mit ihnen zusammen.',
   },
   {
-    icon: '🆓',
+    // Preisschild: kostenlos
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 12.8V5.5A1.5 1.5 0 0 1 5.5 4h7.3c.4 0 .78.16 1.06.44l6 6a1.5 1.5 0 0 1 0 2.12l-6.32 6.32a1.5 1.5 0 0 1-2.12 0l-6-6A1.5 1.5 0 0 1 4 12.8z" />
+        <circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none" />
+      </svg>
+    ),
     title: 'Kostenlos & unverbindlich',
     text: 'Die Vormerkung und die Basis-Listung kosten nichts. Keine Vertragsbindung, kein Abo nötig – ein zusätzlicher Kanal, der nicht schaden kann.',
   },
   {
-    icon: '🚀',
+    // Aufwärtstrend: früh/vorne dabei
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3.5 17l6-6 4 4 7-7" />
+        <path d="M16.5 8h4v4" />
+      </svg>
+    ),
     title: 'Früh dabei = vorne dabei',
     text: 'Das Verzeichnis startet bald. Wer jetzt vorgemerkt ist, gehört zu den Ersten, die Klient:innen beim Start angezeigt bekommen.',
   },
   {
-    icon: '🛡️',
+    // Schild mit Haken: Kontrolle
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l7 2.6v5.2c0 4.4-3 7.4-7 8.9-4-1.5-7-4.5-7-8.9V5.6z" />
+        <path d="M9.2 11.8l2 2 3.6-3.8" />
+      </svg>
+    ),
     title: 'Sie behalten die Kontrolle',
     text: 'Nichts wird veröffentlicht, bevor wir Ihre Angaben mit Ihnen abgestimmt haben. Jederzeit widerrufbar.',
   },
 ]
 
-const iconCls = 'h-6 w-6'
 const FEATURES = [
   {
     // Echo-Wellen
@@ -117,10 +142,52 @@ const TRUST = [
 ]
 
 const AUDIENCE = [
-  { icon: '🏥', title: 'Psychotherapeut:innen', text: 'Strukturierter Fallkontext + klinisch sortierte Berichte als Grundlage fürs Erstgespräch.' },
-  { icon: '🧭', title: 'Berater:innen', text: 'Schneller in die Tiefe, wenn Klient:innen ihre Beobachtungen bereits sortiert haben.' },
-  { icon: '🎯', title: 'Coaches', text: 'Konkrete Situationen und Muster benennen – als Basis für die Coaching-Arbeit.' },
-  { icon: '🏛️', title: 'Praxen & Teams', text: 'Mehrere Fachpersonen, gemeinsame Vorlagen, klare Rollen und Abrechnung pro Fall.' },
+  {
+    // Herz: Versorgung/Therapie
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 20.3C10 18.8 4 14.4 4 9.4A3.9 3.9 0 0 1 12 7a3.9 3.9 0 0 1 8 2.4c0 5-6 9.4-8 10.9z" />
+      </svg>
+    ),
+    title: 'Psychotherapeut:innen',
+    text: 'Strukturierter Fallkontext + klinisch sortierte Berichte als Grundlage fürs Erstgespräch.',
+  },
+  {
+    // Kompass: Beratung
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M15.5 8.5l-2.2 5.3-5.3 2.2 2.2-5.3z" />
+      </svg>
+    ),
+    title: 'Berater:innen',
+    text: 'Schneller in die Tiefe, wenn Klient:innen ihre Beobachtungen bereits sortiert haben.',
+  },
+  {
+    // Zielscheibe: Coaching
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="8.5" />
+        <circle cx="12" cy="12" r="4.5" />
+        <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+    title: 'Coaches',
+    text: 'Konkrete Situationen und Muster benennen – als Basis für die Coaching-Arbeit.',
+  },
+  {
+    // Gruppe: Praxen & Teams
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="8.5" r="3" />
+        <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+        <path d="M16 6.3a2.8 2.8 0 0 1 0 5.4" />
+        <path d="M17 13.6a5.2 5.2 0 0 1 3.5 5.1" />
+      </svg>
+    ),
+    title: 'Praxen & Teams',
+    text: 'Mehrere Fachpersonen, gemeinsame Vorlagen, klare Rollen und Abrechnung pro Fall.',
+  },
 ]
 
 export default function FachpersonenPage() {
@@ -287,8 +354,10 @@ export default function FachpersonenPage() {
               <div className="mt-7 space-y-5">
                 {DIRECTORY_BENEFITS.map(({ icon, title, text }, i) => (
                   <Reveal key={title} delay={(i % 4) * 0.06}>
-                    <div className="flex gap-3.5">
-                      <span className="mt-0.5 text-xl" aria-hidden="true">{icon}</span>
+                    <div className="flex gap-4">
+                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                        {icon}
+                      </div>
                       <div>
                         <h3 className="font-semibold text-navy">{title}</h3>
                         <p className="mt-0.5 text-sm leading-relaxed text-brand-muted">{text}</p>
@@ -390,8 +459,10 @@ export default function FachpersonenPage() {
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {AUDIENCE.map(({ icon, title, text }, i) => (
               <Reveal key={title} delay={(i % 4) * 0.07}>
-                <div className="card h-full transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-md">
-                  <div className="text-2xl mb-3" aria-hidden="true">{icon}</div>
+                <div className="group card h-full hover:border-accent/50">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent transition-colors duration-200 group-hover:bg-accent group-hover:text-white">
+                    {icon}
+                  </div>
                   <h3 className="font-bold text-navy mb-2">{title}</h3>
                   <p className="text-sm text-brand-muted leading-relaxed">{text}</p>
                 </div>

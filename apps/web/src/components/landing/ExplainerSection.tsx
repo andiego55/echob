@@ -55,13 +55,29 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
     kicker: 'Echo trennt Beobachtung, Gefühl und Interpretation.',
     visual: (
       <div className="flex flex-wrap items-center justify-center gap-2.5">
-        {[['👁', 'Beobachtung'], ['💭', 'Gefühl'], ['🧩', 'Interpretation']].map(([e, t], i) => (
+        {[
+          { label: 'Beobachtung', icon: (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="2.5" />
+            </svg>
+          ) },
+          { label: 'Gefühl', icon: (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20.3C10 18.8 4 14.4 4 9.4A3.9 3.9 0 0 1 12 7a3.9 3.9 0 0 1 8 2.4c0 5-6 9.4-8 10.9z" />
+            </svg>
+          ) },
+          { label: 'Interpretation', icon: (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3a6 6 0 0 1 4 10.4c-.7.6-1 1.2-1 2.1H9c0-.9-.3-1.5-1-2.1A6 6 0 0 1 12 3z" /><path d="M9.5 18h5" />
+            </svg>
+          ) },
+        ].map(({ label, icon }, i) => (
           <span
-            key={t}
-            className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-medium text-white"
+            key={label}
+            className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-medium text-white"
             style={{ animation: 'explainer-pop 0.5s ease-out both', animationDelay: `${i * 0.15}s` }}
           >
-            {e} {t}
+            {icon}{label}
           </span>
         ))}
       </div>
@@ -101,7 +117,7 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
           <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-white/45">Allgemeiner KI-Chat</p>
           {['Vergisst nach dem Chat', 'Urteilt über andere', 'Daten in die US-Cloud'].map((t) => (
             <p key={t} className="mb-1 flex gap-1.5 text-xs text-white/70">
-              <span className="text-red-400">✗</span>
+              <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
               {t}
             </p>
           ))}
@@ -110,7 +126,7 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
           <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-accent">EchoB</p>
           {['Strukturierte Fallakte', 'Keine Diagnosen', 'EU-verschlüsselt'].map((t) => (
             <p key={t} className="mb-1 flex gap-1.5 text-xs text-white">
-              <span className="text-accent">✓</span>
+              <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
               {t}
             </p>
           ))}
