@@ -181,7 +181,14 @@ export default function AuthPage() {
                         : 'border-brand-border text-brand-muted hover:border-accent/40'
                     }`}
                   >
-                    {m === 'password' ? '🔑 Passwort' : '✉️ Magic Link'}
+                    <span className="inline-flex items-center justify-center gap-1.5">
+                      {m === 'password' ? (
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+                      ) : (
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M4 7l8 5 8-5" /></svg>
+                      )}
+                      {m === 'password' ? 'Passwort' : 'Magic Link'}
+                    </span>
                   </button>
                 ))}
               </div>
