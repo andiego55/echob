@@ -65,20 +65,44 @@ const FEATURES = [
 
 const FAQ = [
   {
+    q: 'Wie hilft mir EchoB konkret?',
+    a: 'Du hältst belastende Situationen fest – in eigenen Worten, in deinem Tempo. EchoB ordnet sie zu klaren Szenen, trennt Beobachtung von Bewertung und macht über die Zeit sichtbar, was sich wiederholt. Aus dem Gefühl, sich im Kreis zu drehen, werden greifbare Muster – und ein klarerer nächster Schritt.',
+  },
+  {
     q: 'Ist EchoB eine Psychotherapie?',
-    a: 'Nein. EchoB ist ein strukturiertes Reflexionswerkzeug. Es stellt keine Diagnosen und ersetzt keine professionelle Behandlung. Bei akuter Not wende dich bitte an eine Fachperson.',
+    a: 'Nein. EchoB ist ein strukturiertes Reflexionswerkzeug, kein Ersatz für Therapie oder Beratung. Es stellt keine Diagnosen und bewertet niemanden. Wenn du professionelle Unterstützung brauchst, hilft dir EchoB, dich darauf vorzubereiten – und zeigt dir passende Anlaufstellen.',
   },
   {
-    q: 'Wer sieht meine Eingaben?',
-    a: 'Nur du. Deine Daten werden verschlüsselt und DSGVO-konform auf europäischen Servern gespeichert. Wir geben nichts weiter.',
+    q: 'Was unterscheidet EchoB von einem KI-Chat wie ChatGPT?',
+    a: 'Ein normaler KI-Chat vergisst nach dem Gespräch, urteilt schnell und speichert oft in US-Clouds. EchoB ist das Gegenteil: eine strukturierte Fallakte statt flüchtigem Chat, die über viele Situationen hinweg Muster sichtbar macht – vorsichtig, ohne Diagnosen, verschlüsselt auf Servern in Europa.',
   },
   {
-    q: 'Wie funktioniert der kostenlose Testzugang?',
-    a: '3 Tage, 1 Fall, 5 Szenen – ohne Kreditkarte. Du kannst Kurzbericht und Coaching-Vorbereitung erstellen. Danach kannst du upgraden oder einfach aufhören.',
+    q: 'Wer sieht meine Eingaben – sind meine Daten sicher?',
+    a: 'Nur du. Deine Einträge werden verschlüsselt und DSGVO-konform auf Servern in Europa gespeichert. Wir geben nichts weiter, trainieren keine KI mit deinen Inhalten und zeigen keine Werbung. Eine Fachperson sieht ausschließlich das, was du ausdrücklich freigibst.',
   },
   {
-    q: 'Was ist der Early-Bird-Tarif?',
-    a: 'Solange das Early-Bird-Fenster (bis November) offen ist, bekommst du den vollen App-Zugang für 15,99 € statt 24,99 € im Monat – alle Funktionen und Berichte inklusive, monatlich kündbar.',
+    q: 'Muss ich gut schreiben können oder viel Zeit haben?',
+    a: 'Nein. Du schreibst in eigenen Worten, so kurz oder ausführlich, wie es dir passt – ein paar Sätze genügen. Echo stellt behutsame Fragen und hilft beim Sortieren. Du bestimmst das Tempo, und es gibt kein Richtig oder Falsch.',
+  },
+  {
+    q: 'Bekomme ich auch menschliche Unterstützung – oder nur KI?',
+    a: 'Beides gehört zusammen. Die KI hilft dir jederzeit beim Ordnen und Erkennen. Wenn du mehr möchtest, kannst du über EchoB ein Erstgespräch mit ausgebildeten Berater:innen anfragen – und deine sortierten Erkenntnisse gleich als Grundlage mitnehmen.',
+  },
+  {
+    q: 'Was, wenn es mir gerade akut schlecht geht?',
+    a: 'EchoB ist keine Notfallhilfe. Wenn du in einer akuten Krise bist oder dich oder andere in Gefahr siehst, wende dich bitte sofort an die Telefonseelsorge (0800 111 0 111, kostenlos, rund um die Uhr) oder den Notruf 112. EchoB weist dich in solchen Momenten auch selbst auf diese Stellen hin.',
+  },
+  {
+    q: 'Kann ich meine Erkenntnisse für Therapie oder Coaching nutzen?',
+    a: 'Ja – dafür ist EchoB gemacht. Du kannst strukturierte Berichte erstellen, die das Wesentliche auf den Punkt bringen: für dich selbst, als Vorbereitung auf ein Erstgespräch oder zum Mitnehmen in Beratung und Therapie. So gehst du klarer und vorbereiteter ins Gespräch.',
+  },
+  {
+    q: 'Was kostet EchoB, und wie funktioniert der Test?',
+    a: 'Du startest 3 Tage kostenlos – 1 Fall, 5 Szenen, inklusive Kurzbericht, ohne Kreditkarte. Danach entscheidest du frei: Im Early-Bird-Fenster gibt es den vollen Zugang für 15,99 € statt 24,99 € im Monat, monatlich kündbar. Kein Abo-Zwang, kein Kleingedrucktes.',
+  },
+  {
+    q: 'Kann ich jederzeit aufhören und meine Daten löschen?',
+    a: 'Ja. Es gibt keine Bindung: Du kannst monatlich kündigen und deine Daten jederzeit exportieren oder vollständig löschen. Was du EchoB anvertraust, bleibt in deiner Hand.',
   },
 ]
 
@@ -246,23 +270,42 @@ export default function LandingPage() {
 
       {/* ── FAQ ───────────────────────────────────────────────────── */}
       <section className="border-t border-brand-border bg-navy/[0.02] px-6 py-[72px]">
-        <div className="mx-auto max-w-[960px]">
+        <div className="mx-auto max-w-[760px]">
           <span className="label">Häufige Fragen</span>
-          <h2 className="text-[clamp(1.4rem,2.5vw,1.9rem)] font-bold leading-[1.25] text-navy mb-10">
-            Deine Fragen, klar beantwortet.
+          <h2 className="text-[clamp(1.4rem,2.5vw,1.9rem)] font-bold leading-[1.25] text-navy">
+            Alles, was du wissen willst
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 max-w-3xl">
-            {FAQ.map(({ q, a }) => (
-              <FaqCard key={q} q={q} a={a} />
+          <p className="mt-3 mb-10 text-brand-muted leading-[1.75] max-w-[600px]">
+            Ehrlich beantwortet – zu Nutzen, Datenschutz und dem, was EchoB kann und was bewusst nicht.
+          </p>
+          <div className="flex flex-col gap-3.5">
+            {FAQ.map(({ q, a }, i) => (
+              <FaqCard key={q} q={q} a={a} defaultOpen={i === 0} />
             ))}
           </div>
-          <p className="mt-8 text-sm text-brand-muted">
-            Weitere Fragen?{' '}
+          <p className="mt-9 text-sm text-brand-muted">
+            Noch eine Frage offen? Schreib uns an{' '}
             <a href="mailto:kontakt@echo-b.de" className="text-accent font-medium hover:underline">kontakt@echo-b.de</a>
-            {' '}·{' '}
-            <a href="tel:+4917359089060" className="text-accent font-medium hover:underline">0173 5908906</a>
+            {' '}oder ruf an:{' '}
+            <a href="tel:+4917359089060" className="text-accent font-medium hover:underline">0173 5908906</a>.
           </p>
         </div>
+
+        {/* FAQ als strukturierte Daten (Chance auf Rich Results bei Google) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: FAQ.map(({ q, a }) => ({
+                '@type': 'Question',
+                name: q,
+                acceptedAnswer: { '@type': 'Answer', text: a },
+              })),
+            }),
+          }}
+        />
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────── */}
@@ -289,23 +332,22 @@ export default function LandingPage() {
   )
 }
 
-function FaqCard({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false)
+function FaqCard({ q, a, defaultOpen = false }: { q: string; a: string; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
   return (
     <button
       type="button"
       onClick={() => setOpen(o => !o)}
+      aria-expanded={open}
       className="card text-left w-full hover:border-accent/40 transition-all"
     >
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-semibold text-navy">{q}</p>
-        <span className={`text-accent text-lg leading-none shrink-0 transition-transform ${open ? 'rotate-45' : ''}`}>+</span>
+      <div className="flex items-start justify-between gap-4">
+        <p className="text-[0.98rem] font-semibold text-navy leading-snug">{q}</p>
+        <span className={`text-accent text-xl leading-none shrink-0 mt-0.5 transition-transform ${open ? 'rotate-45' : ''}`} aria-hidden="true">+</span>
       </div>
-      {open && (
-        <p className="mt-3 text-sm text-brand-muted leading-relaxed border-t border-brand-border pt-3">
-          {a}
-        </p>
-      )}
+      <p className={`text-sm text-brand-muted leading-[1.7] ${open ? 'mt-3 border-t border-brand-border pt-3' : 'hidden'}`}>
+        {a}
+      </p>
     </button>
   )
 }
