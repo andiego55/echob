@@ -48,27 +48,30 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* Für Fachpersonen: Produkt-1-Pager */}
+      {/* Für Fachpersonen: 1-Pager (Produkt + Partnerprogramm) */}
       <section className="border-t border-brand-border px-6 py-[56px]">
         <div className="mx-auto max-w-[760px]">
           <span className="label">Für Fachpersonen</span>
-          <div className="mt-4 flex flex-col items-center gap-4 rounded-[1.25rem] border border-brand-border bg-navy/[0.03] p-6 text-center sm:flex-row sm:justify-between sm:p-7 sm:text-left">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 4v9" />
-                  <path d="M8.5 10.5 12 14l3.5-3.5" />
-                  <path d="M5 16.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1.5" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-bold text-navy">EchoB für Fachpersonen – 1-Pager</p>
-                <p className="mt-0.5 text-sm text-brand-muted">Produkt- und Feature-Überblick als PDF zum Weitergeben.</p>
-              </div>
-            </div>
-            <a href="/echob-fachpersonen-1pager.pdf" download className="btn-primary shrink-0 whitespace-nowrap">
-              PDF herunterladen
-            </a>
+          <h2 className="mt-1 mb-5 text-lg font-bold text-navy">Zwei 1-Pager zum Weitergeben</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { title: 'EchoB – Produkt & Features', sub: 'Was EchoB für Fachpersonen kann.', href: '/echob-fachpersonen-1pager.pdf' },
+              { title: 'EchoB-Partnerprogramm', sub: 'Kostenlos prüfen, sichtbar werden, Klient:innen gewinnen.', href: '/echob-partnerprogramm-1pager.pdf' },
+            ].map(({ title, sub, href }) => (
+              <a key={href} href={href} download
+                className="flex items-center gap-4 rounded-[1.25rem] border border-brand-border bg-navy/[0.03] p-5 no-underline transition-colors hover:border-accent/50">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 4v9" /><path d="M8.5 10.5 12 14l3.5-3.5" /><path d="M5 16.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1.5" />
+                  </svg>
+                </span>
+                <span>
+                  <span className="block text-sm font-bold text-navy">{title}</span>
+                  <span className="block text-xs text-brand-muted leading-snug">{sub}</span>
+                  <span className="mt-1 block text-xs font-semibold text-accent">PDF herunterladen →</span>
+                </span>
+              </a>
+            ))}
           </div>
         </div>
       </section>
