@@ -7,50 +7,55 @@ import ErstgespraechCTA from '@/components/coaching/ErstgespraechCTA'
 
 const iconCls = 'h-6 w-6'
 
-const DIRECTORY_BENEFITS = [
+const PARTNER_PILLARS = [
   {
-    // Lupe: gefunden werden
+    // Kolben: ausprobieren / prüfen
     icon: (
       <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="10.5" cy="10.5" r="6" />
-        <path d="M15 15l4.5 4.5" />
+        <path d="M9 3h6M10 3v5.4L5.4 16.2A2 2 0 0 0 7.1 19h9.8a2 2 0 0 0 1.7-2.8L14 8.4V3" />
+        <path d="M8 14.5h8" />
       </svg>
     ),
-    title: 'Klient:innen finden Sie',
-    text: 'Menschen sortieren mit EchoB ihre Beziehungsmuster – und suchen danach passende Begleitung. Das Verzeichnis bringt Sie gezielt mit ihnen zusammen.',
+    title: 'Risikofrei prüfen',
+    points: [
+      'Eigener EchoB-Fachpersonenaccount',
+      'Demo-Fall und Spielwiese zum Ausprobieren',
+      'EchoB in Ruhe fachlich prüfen',
+      '3 Monate kostenlos – ohne Karte, ohne Verpflichtung',
+    ],
   },
   {
-    // Preisschild: kostenlos
+    // Person + Plus: Sichtbarkeit / neue Klient:innen
     icon: (
       <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 12.8V5.5A1.5 1.5 0 0 1 5.5 4h7.3c.4 0 .78.16 1.06.44l6 6a1.5 1.5 0 0 1 0 2.12l-6.32 6.32a1.5 1.5 0 0 1-2.12 0l-6-6A1.5 1.5 0 0 1 4 12.8z" />
-        <circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none" />
+        <circle cx="10" cy="8" r="3.5" />
+        <path d="M4 19a6 6 0 0 1 10.4-4.1" />
+        <path d="M17.5 14.5v5M15 17h5" />
       </svg>
     ),
-    title: 'Kostenlos & unverbindlich',
-    text: 'Die Vormerkung und die Basis-Listung kosten nichts. Keine Vertragsbindung, kein Abo nötig – ein zusätzlicher Kanal, der nicht schaden kann.',
+    title: 'Sichtbarkeit & neue Klient:innen',
+    points: [
+      'Aufnahme ins EchoB-Partnerverzeichnis',
+      'Kurzprofil: Schwerpunkte, Ort, Online-Angebot, Website-Link, Kontakt',
+      'Vorstellung auf EchoB – mit Link auf Ihre Website',
+      'Empfehlung an passende Nutzer:innen',
+    ],
   },
   {
-    // Aufwärtstrend: früh/vorne dabei
+    // Dokument mit Haken: vorbereiteter Fallkontext
     icon: (
       <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3.5 17l6-6 4 4 7-7" />
-        <path d="M16.5 8h4v4" />
+        <rect x="5" y="3" width="14" height="18" rx="2" />
+        <path d="M9 12.5l2 2 4-4" />
       </svg>
     ),
-    title: 'Früh dabei = vorne dabei',
-    text: 'Das Verzeichnis startet bald. Wer jetzt vorgemerkt ist, gehört zu den Ersten, die Klient:innen beim Start angezeigt bekommen.',
-  },
-  {
-    // Schild mit Haken: Kontrolle
-    icon: (
-      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3l7 2.6v5.2c0 4.4-3 7.4-7 8.9-4-1.5-7-4.5-7-8.9V5.6z" />
-        <path d="M9.2 11.8l2 2 3.6-3.8" />
-      </svg>
-    ),
-    title: 'Sie behalten die Kontrolle',
-    text: 'Nichts wird veröffentlicht, bevor wir Ihre Angaben mit Ihnen abgestimmt haben. Jederzeit widerrufbar.',
+    title: 'Vorbereitete Gespräche',
+    points: [
+      'Strukturierter Fallkontext – nur bei ausdrücklicher Freigabe',
+      'Reports, Szenen und Verlauf als Gesprächsvorbereitung',
+      'Ergänzendes Arbeitsmittel zwischen den Sitzungen',
+      'Bei voller Kapazität Klient:innen zumindest teilversorgen',
+    ],
   },
 ]
 
@@ -269,29 +274,6 @@ export default function FachpersonenPage() {
               </Reveal>
             ))}
           </div>
-
-          {/* 1-Pager zum Download */}
-          <Reveal delay={0.1}>
-            <div className="mt-8 flex flex-col items-center gap-5 rounded-[1.25rem] border border-brand-border bg-navy/[0.03] p-6 sm:flex-row sm:justify-between sm:p-7">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 4v9" />
-                    <path d="M8.5 10.5 12 14l3.5-3.5" />
-                    <path d="M5 16.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1.5" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-bold text-navy">EchoB für Fachpersonen – der 1-Pager</p>
-                  <p className="mt-0.5 text-sm text-brand-muted">Kompakte Produktbeschreibung zum Weitergeben – inklusive Verzeichnis-Partnerschaft.</p>
-                </div>
-              </div>
-              <a href="/echob-fachpersonen-1pager.pdf" download
-                className="btn-primary shrink-0 whitespace-nowrap">
-                PDF herunterladen
-              </a>
-            </div>
-          </Reveal>
         </div>
       </section>
 
@@ -333,48 +315,100 @@ export default function FachpersonenPage() {
         </div>
       </section>
 
-      {/* ── Verzeichnis-Warteliste (Lead-Generierung) ────────────── */}
-      <section id="verzeichnis" className="border-t border-brand-border px-6 py-[72px]">
+      {/* ── Partnerprogramm (Lead-Generierung) ────────────────────── */}
+      <section id="partner" className="border-t border-brand-border px-6 py-[72px]">
         <div className="mx-auto max-w-[960px]">
-          <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.05fr]">
-            {/* Pitch */}
-            <Reveal>
-              <span className="label inline-flex items-center gap-2">
-                <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Neu</span>
-                EchoB-Verzeichnis
-              </span>
-              <h2 className="mt-2 text-[clamp(1.4rem,2.5vw,1.9rem)] font-bold leading-[1.2] text-navy">
-                Werden Sie gefunden – lassen Sie sich kostenlos vormerken
-              </h2>
-              <p className="mt-3 leading-[1.75] text-brand-muted">
-                Wir bauen ein Verzeichnis, in dem Klient:innen passende Fachpersonen, Praxen und
-                Coaches finden. Tragen Sie sich jetzt unverbindlich ein – Sie sichern sich einen
-                Platz, sobald es startet. Kostenlos, ohne Risiko.
+          <Reveal>
+            <span className="label inline-flex items-center gap-2">
+              <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Neu</span>
+              EchoB-Partnerprogramm
+            </span>
+            <h2 className="mt-2 max-w-2xl text-[clamp(1.5rem,2.8vw,2.1rem)] font-bold leading-[1.15] tracking-[-0.01em] text-navy">
+              Werden Sie EchoB-Partner
+            </h2>
+            <p className="mt-4 max-w-[660px] leading-[1.75] text-brand-muted">
+              EchoB ist kein Ersatz für Ihre Arbeit – sondern eine Brücke zu ihr. Menschen sortieren mit
+              EchoB ihre Situation und suchen danach qualifizierte Begleitung. Als Partner werden Sie für
+              diese Nutzer:innen sichtbar, bekommen strukturierte Fälle vorbereitet auf den Tisch – und
+              öffnen sich einer neuen, technologiegestützten Art zu arbeiten. Kostenlos prüfen, zahlen
+              erst beim ersten echten Fall.
+            </p>
+          </Reveal>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {PARTNER_PILLARS.map(({ icon, title, points }, i) => (
+              <Reveal key={title} delay={(i % 3) * 0.08}>
+                <div className="card h-full">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                    {icon}
+                  </div>
+                  <h3 className="mb-3 font-bold text-navy">{title}</h3>
+                  <ul className="space-y-2">
+                    {points.map((p) => (
+                      <li key={p} className="flex items-start gap-2 text-sm leading-relaxed text-brand-muted">
+                        <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Konditionen */}
+          <Reveal delay={0.1}>
+            <div className="mt-8 rounded-[1.25rem] border-2 border-accent/30 bg-accent/[0.05] p-6 sm:p-7">
+              <h3 className="text-lg font-bold text-navy">3 Monate in Ruhe prüfen – ganz ohne Risiko</h3>
+              <p className="mt-2 max-w-[720px] text-sm leading-[1.7] text-brand-muted">
+                Kostenlos mit Demo-Fall und Spielwiese, ohne Kreditkarte, ohne Verpflichtung. Der
+                Monatsbeitrag startet erst, wenn Sie Ihren <strong className="text-navy">ersten echten Fall</strong> betreuen.
               </p>
-              <div className="mt-7 space-y-5">
-                {DIRECTORY_BENEFITS.map(({ icon, title, text }, i) => (
-                  <Reveal key={title} delay={(i % 4) * 0.06}>
-                    <div className="flex gap-4">
-                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-                        {icon}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-navy">{title}</h3>
-                        <p className="mt-0.5 text-sm leading-relaxed text-brand-muted">{text}</p>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
+              <p className="mt-3 max-w-[720px] text-xs leading-[1.7] text-brand-muted">
+                <strong className="text-navy">Was ist ein „Fall"?</strong> Eine Klient:in nutzt EchoB im
+                Zusammenhang mit Ihnen, gibt Inhalte gezielt für Sie frei oder wird über Ihren
+                Praxis-Account begleitet. Demo-Fall, Spielwiese und Kennenlernen bleiben immer kostenfrei.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1fr_1.05fr]">
+            {/* Direkt starten + 1-Pager */}
+            <Reveal>
+              <h3 className="text-lg font-bold text-navy">Direkt loslegen</h3>
+              <p className="mt-1 mb-5 text-sm leading-relaxed text-brand-muted">
+                Legen Sie Ihren kostenlosen Fachpersonenaccount an und prüfen Sie EchoB am Beispielfall –
+                in zwei Minuten, ohne Kreditkarte.
+              </p>
+              <Link to="/auth?role=professional" className="btn-primary">
+                Kostenlos als Partner starten
+              </Link>
+              <a
+                href="/echob-fachpersonen-1pager.pdf"
+                download
+                className="mt-6 flex items-center gap-4 rounded-[1rem] border border-brand-border bg-navy/[0.02] p-4 no-underline transition-colors hover:border-accent/50"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 4v9" />
+                    <path d="M8.5 10.5 12 14l3.5-3.5" />
+                    <path d="M5 16.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1.5" />
+                  </svg>
+                </span>
+                <span>
+                  <span className="block text-sm font-bold text-navy">Partnerprogramm als 1-Pager (PDF)</span>
+                  <span className="block text-xs text-brand-muted">Zum Weitergeben in der Praxis oder ans Team.</span>
+                </span>
+              </a>
             </Reveal>
 
-            {/* Formular */}
+            {/* Verzeichnis-Formular */}
             <Reveal delay={0.1}>
               <div className="rounded-[1.25rem] border border-brand-border bg-white p-6 shadow-sm sm:p-8">
-                <h3 className="text-lg font-bold text-navy">Jetzt vormerken lassen</h3>
+                <h3 className="text-lg font-bold text-navy">Ins Partnerverzeichnis aufnehmen lassen</h3>
                 <p className="mt-1 mb-6 text-sm text-brand-muted">
-                  Nur Name und E-Mail sind nötig. Alles Weitere hilft uns, Sie passend zu listen –
-                  ist aber freiwillig.
+                  Kurz vormerken – wir melden uns, sobald das Verzeichnis startet, und stimmen Ihr
+                  Kurzprofil mit Ihnen ab. Nur Name und E-Mail sind Pflicht, alles Weitere ist freiwillig.
                 </p>
                 <DirectoryWaitlistForm />
               </div>
