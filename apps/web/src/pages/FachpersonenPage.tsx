@@ -274,6 +274,29 @@ export default function FachpersonenPage() {
               </Reveal>
             ))}
           </div>
+
+          {/* Produkt-1-Pager zum Download */}
+          <Reveal delay={0.1}>
+            <div className="mt-8 flex flex-col items-center gap-5 rounded-[1.25rem] border border-brand-border bg-navy/[0.03] p-6 sm:flex-row sm:justify-between sm:p-7">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 4v9" />
+                    <path d="M8.5 10.5 12 14l3.5-3.5" />
+                    <path d="M5 16.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1.5" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-bold text-navy">EchoB für Fachpersonen – der 1-Pager</p>
+                  <p className="mt-0.5 text-sm text-brand-muted">Kompakter Produkt- und Feature-Überblick zum Weitergeben.</p>
+                </div>
+              </div>
+              <a href="/echob-fachpersonen-1pager.pdf" download
+                className="btn-primary shrink-0 whitespace-nowrap">
+                PDF herunterladen
+              </a>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -384,7 +407,7 @@ export default function FachpersonenPage() {
                 Kostenlos als Partner starten
               </Link>
               <a
-                href="/echob-fachpersonen-1pager.pdf"
+                href="/echob-partnerprogramm-1pager.pdf"
                 download
                 className="mt-6 flex items-center gap-4 rounded-[1rem] border border-brand-border bg-navy/[0.02] p-4 no-underline transition-colors hover:border-accent/50"
               >

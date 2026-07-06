@@ -47,6 +47,31 @@ export default function TeamPage() {
           </p>
         </div>
       </section>
+
+      {/* Für Fachpersonen: Produkt-1-Pager */}
+      <section className="border-t border-brand-border px-6 py-[56px]">
+        <div className="mx-auto max-w-[760px]">
+          <span className="label">Für Fachpersonen</span>
+          <div className="mt-4 flex flex-col items-center gap-4 rounded-[1.25rem] border border-brand-border bg-navy/[0.03] p-6 text-center sm:flex-row sm:justify-between sm:p-7 sm:text-left">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 4v9" />
+                  <path d="M8.5 10.5 12 14l3.5-3.5" />
+                  <path d="M5 16.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1.5" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-bold text-navy">EchoB für Fachpersonen – 1-Pager</p>
+                <p className="mt-0.5 text-sm text-brand-muted">Produkt- und Feature-Überblick als PDF zum Weitergeben.</p>
+              </div>
+            </div>
+            <a href="/echob-fachpersonen-1pager.pdf" download className="btn-primary shrink-0 whitespace-nowrap">
+              PDF herunterladen
+            </a>
+          </div>
+        </div>
+      </section>
     </PageLayout>
   )
 }
