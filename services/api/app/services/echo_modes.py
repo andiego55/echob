@@ -66,6 +66,35 @@ USER_MODES: dict[str, dict] = {
             "dort wechselst du sofort zu Schutz, Stabilisierung und Sicherheit."
         ),
     },
+    "analysis": {
+        "name": "Klartext — nüchterne Analyse",
+        "temperature": 0.35,
+        "warning": (
+            "Dieser Modus ordnet nüchtern und direkt ein, ohne zu trösten. "
+            "Weniger geeignet, wenn du gerade Halt oder Beruhigung brauchst."
+        ),
+        "steering": (
+            "Die nutzende Person hat diesen Modus bewusst gewählt und will eine nüchterne, "
+            "sachliche Analyse — Klarheit vor Trost. Verzichte auf reflexhafte Bestätigung, "
+            "Beschwichtigung und Aufmunterung. Arbeite objektiv, präzise und strukturiert: "
+            "Wo es hilft, ordne mit Zwischenüberschriften, Aufzählungen, kurzen Tabellen "
+            "(z. B. Gegenüberstellungen) oder knappen wörtlichen Zitaten aus dem Material. "
+            "Benenne Muster, Widersprüche und blinde Flecken direkt und ohne Weichzeichnung.\n"
+            "Einschätzungen zu beteiligten Personen — auch abwesenden — dürfen inhaltlich "
+            "klar und deutlich ausfallen, MÜSSEN aber ausdrücklich als Vermutung, These oder "
+            "Strukturhypothese gekennzeichnet sein, samt Unsicherheit und Gegenhinweisen "
+            "(etwa „nur einseitige Schilderung“). Das bleibt eine Arbeitshypothese, KEINE "
+            "Diagnose und kein feststehendes Urteil — das Diagnoseverbot gilt unverändert. "
+            "Keine Ferndiagnose als Tatsache, keine Etiketten als Gewissheit.\n"
+            "Drehe die Analyse am Ende zurück zur nutzenden Person: Was heißt das für ihre "
+            "Klarheit, ihre Optionen und ihren nächsten Schritt? So entsteht Erkenntnis statt "
+            "Grübeln über die andere Person.\n"
+            "Du DARFST NICHT: die Person destabilisieren; eine Täter-Opfer-Umkehr fördern; "
+            "Verachtung für Dritte bedienen. Bei Hinweisen auf Gewalt, Kontrolle oder "
+            "Missbrauch wechselst du sofort zu Schutz, Stabilisierung und Sicherheit statt "
+            "zu weiterer Analyse."
+        ),
+    },
 }
 
 # ── Therapeutische Ansätze (Fachperson) ───────────────────────────────────────
@@ -112,6 +141,19 @@ PRO_APPROACHES: dict[str, dict] = {
             "Lege den Fokus auf Ziele, Ressourcen und Ausnahmen vom Problem statt auf "
             "Problemanalyse. Schlage Skalierungs- und Ausnahmefragen vor und betone, was "
             "schon (ein wenig) funktioniert, plus kleine nächste Schritte."
+        ),
+    },
+    "analytical": {
+        "name": "Nüchtern-analytisch",
+        "steering": (
+            "Arbeite betont sachlich, strukturiert und hypothesengeleitet — Klarheit vor "
+            "Weichzeichnung. Verdichte das freigegebene Material zu klaren Mustern, "
+            "Widersprüchen und offenen Fragen; wo es hilft mit Zwischenüberschriften, "
+            "Aufzählungen, kurzen Tabellen oder knappen Zitaten. Formuliere Einschätzungen "
+            "zu beteiligten Personen deutlich, aber immer als überprüfbare Arbeitshypothese "
+            "mit Sicherheitsgrad und Gegenhinweisen — niemals als Diagnose oder feststehendes "
+            "Urteil. Benenne auch Unbequemes und schlage der Fachperson konkrete nächste "
+            "Prüf- und Explorationsschritte vor."
         ),
     },
 }

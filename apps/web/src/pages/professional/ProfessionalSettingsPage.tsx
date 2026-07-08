@@ -19,6 +19,8 @@ const PRO_APPROACHES: EchoModeOption[] = [
     description: 'Gedanken–Gefühle–Verhalten, Auslöser und Konsequenzen, kleine überprüfbare nächste Schritte.' },
   { key: 'solution_focused', name: 'Lösungsorientiert',
     description: 'Ziele, Ressourcen und Ausnahmen vom Problem; Skalierungs- und Ausnahmefragen statt Problemanalyse.' },
+  { key: 'analytical', name: 'Nüchtern-analytisch',
+    description: 'Sachlich, strukturiert und hypothesengeleitet; benennt Muster und Einschätzungen klar — immer als überprüfbare Arbeitshypothese, nie als Diagnose — plus konkrete nächste Prüfschritte.' },
 ]
 
 export default function ProfessionalSettingsPage() {

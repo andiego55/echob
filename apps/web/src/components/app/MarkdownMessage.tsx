@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface Props {
   content: string
@@ -12,6 +13,7 @@ export default function MarkdownMessage({ content, isUser = false }: Props) {
 
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
       components={{
         h1: ({ children }) => (
           <p className="font-bold text-navy text-[1.05rem] mt-4 first:mt-0 mb-1.5">{children}</p>
@@ -47,6 +49,18 @@ export default function MarkdownMessage({ content, isUser = false }: Props) {
           </code>
         ),
         hr: () => <hr className="my-3 border-brand-border" />,
+        table: ({ children }) => (
+          <div className="my-2.5 overflow-x-auto">
+            <table className="w-full border-collapse text-[0.92em]">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead>{children}</thead>,
+        th: ({ children }) => (
+          <th className="border-b border-brand-border px-2.5 py-1.5 text-left font-semibold text-navy align-top">{children}</th>
+        ),
+        td: ({ children }) => (
+          <td className="border-b border-brand-border/50 px-2.5 py-1.5 align-top">{children}</td>
+        ),
         a: ({ children, href }) => (
           <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-2 hover:text-accent-hover">
             {children}

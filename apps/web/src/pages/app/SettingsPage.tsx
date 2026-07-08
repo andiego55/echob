@@ -22,6 +22,9 @@ const USER_MODES: EchoModeOption[] = [
   { key: 'radical', name: 'Radikale Offenheit — ehrlich mit mir selbst',
     description: 'Fragt direkter nach eigenen Anteilen, blinden Flecken und Mustern — respektvoll und ohne Beschämung.',
     warning: 'Dieser Modus fragt direkter nach eigenen Anteilen. Nicht geeignet, wenn du gerade sehr aufgewühlt bist.' },
+  { key: 'analysis', name: 'Klartext — nüchterne Analyse',
+    description: 'Sachlich, strukturiert und direkt — Klarheit vor Trost. Ordnet Muster und mögliche Einschätzungen klar ein (immer als gekennzeichnete Vermutung, nie als Diagnose) und dreht zurück zu deinem nächsten Schritt.',
+    warning: 'Ordnet nüchtern ein, ohne zu trösten. Weniger geeignet, wenn du gerade Halt oder Beruhigung brauchst.' },
 ]
 
 export default function SettingsPage() {

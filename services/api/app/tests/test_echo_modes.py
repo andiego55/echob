@@ -38,6 +38,21 @@ def test_pro_steering_approach_and_fallback():
     assert "Ausgewogen" in echo_modes.build_pro_steering("nonsense", None, None, None)
 
 
+def test_analysis_mode_available_and_hypothesis_framed():
+    text, temp = echo_modes.build_user_steering("analysis", None, None, None)
+    assert "Klartext" in text                       # Modus-Name im Header
+    assert echo_modes.valid_user_mode("analysis") == "analysis"
+    assert "Diagnoseverbot" in text                 # Diagnoseverbot bleibt benannt
+    assert "Hypothese" in text or "Vermutung" in text  # Personen-Einordnung als These
+    assert temp <= 0.4                              # nüchtern/konsistent
+
+
+def test_analytical_pro_approach_available():
+    text = echo_modes.build_pro_steering("analytical", None, None, None)
+    assert "analytisch" in text.lower()
+    assert echo_modes.valid_pro_approach("analytical") == "analytical"
+
+
 def test_validation_helpers():
     assert echo_modes.clean_slider(3) == 3
     assert echo_modes.clean_slider(0) is None and echo_modes.clean_slider(9) is None
