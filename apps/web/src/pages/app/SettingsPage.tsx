@@ -8,6 +8,7 @@ import AppShell from '@/components/app/AppShell'
 import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@/components/settings/EchoSteeringForm'
 import ConnectProfessionalCard from '@/components/settings/ConnectProfessionalCard'
 import SubscriptionCard from '@/components/settings/SubscriptionCard'
+import UsageCard from '@/components/settings/UsageCard'
 import DataAccountCard from '@/components/settings/DataAccountCard'
 import { profileApi } from '@/api/profile'
 
@@ -82,6 +83,7 @@ export default function SettingsPage() {
 
         <ConnectProfessionalCard />
         <SubscriptionCard />
+        <UsageCard />
         <DataAccountCard />
       </div>
     </AppShell>

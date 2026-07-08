@@ -13,62 +13,148 @@ TRIAL_MAX_CASES = 1
 
 
 async def enforce_echo_prompt_limit(user_id: str, conn) -> None:
-    """Kostenschutz in der Entwicklungsphase: begrenzt Echo-Prompts pro Nutzer.
+    """Kostenschutz: begrenzt Echo-Prompts pro Nutzer — Gesamt- und Tagesdeckel.
 
     Zählt alle Nutzer-Nachrichten über sämtliche Echo-Chats (Fall-Echo,
-    Themendialoge, Szenen-Erfassung, Profil-Dialoge). 0 = deaktiviert.
+    Themendialoge, Szenen-Erfassung, Profil-Dialoge). Beide Grenzen: 0 = aus.
     """
-    limit = settings.echo_prompt_limit
-    if limit <= 0:
-        return
-    count = await conn.fetchval(
-        "SELECT COUNT(*) FROM echo_messages WHERE user_id = $1 AND role = 'user'",
-        user_id,
-    )
-    if count >= limit:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="ECHO_LIMIT_REACHED",
+    total_limit = settings.echo_prompt_limit
+    if total_limit > 0:
+        total = await conn.fetchval(
+            "SELECT COUNT(*) FROM echo_messages WHERE user_id = $1 AND role = 'user'",
+            user_id,
         )
+        if total >= total_limit:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="ECHO_LIMIT_REACHED",
+            )
+    daily_limit = settings.echo_prompt_daily_limit
+    if daily_limit > 0:
+        today = await conn.fetchval(
+            "SELECT COUNT(*) FROM echo_messages "
+            "WHERE user_id = $1 AND role = 'user' AND created_at >= $2",
+            user_id, _start_of_day(datetime.now(UTC)),
+        )
+        if today >= daily_limit:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="ECHO_LIMIT_REACHED",
+            )
 
 
 async def enforce_professional_echo_limit(professional_user_id: str, conn) -> None:
-    """Kostenschutz Entwicklungsphase: begrenzt Echo-Nachrichten pro Fachperson.
+    """Kostenschutz: begrenzt Echo-Nachrichten pro Fachperson — Gesamt- und Tagesdeckel.
 
-    Gleiche Obergrenze wie für Nutzer (settings.echo_prompt_limit). 0 = deaktiviert.
+    Gleiche Obergrenzen wie für Nutzer (settings.echo_prompt_limit /
+    echo_prompt_daily_limit). 0 = jeweils deaktiviert.
     """
-    limit = settings.echo_prompt_limit
+    total_limit = settings.echo_prompt_limit
+    if total_limit > 0:
+        total = await conn.fetchval(
+            "SELECT COUNT(*) FROM professional_echo_messages "
+            "WHERE professional_user_id = $1 AND role = 'user'",
+            professional_user_id,
+        )
+        if total >= total_limit:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="ECHO_LIMIT_REACHED",
+            )
+    daily_limit = settings.echo_prompt_daily_limit
+    if daily_limit > 0:
+        today = await conn.fetchval(
+            "SELECT COUNT(*) FROM professional_echo_messages "
+            "WHERE professional_user_id = $1 AND role = 'user' AND created_at >= $2",
+            professional_user_id, _start_of_day(datetime.now(UTC)),
+        )
+        if today >= daily_limit:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="ECHO_LIMIT_REACHED",
+            )
+
+
+_DEMO_LIMIT_MSG = (
+    "Die Spielwiese ist zum Ausprobieren gedacht und hier bewusst begrenzt. "
+    "Für unbegrenztes Arbeiten lege einen echten Fall an."
+)
+
+
+async def enforce_demo_echo_limit(professional_user_id: str, case_id, conn) -> None:
+    """Harter Deckel der kostenlosen Spielwiese: begrenzt Echo-Nachrichten auf Demo-Fällen."""
+    from app.services.demo_service import (
+        DEMO_CASE_ID,
+        DEMO_PARTNER_CASE_ID,
+        is_demo_case,
+    )
+    if not is_demo_case(case_id):
+        return
+    limit = settings.demo_echo_limit
     if limit <= 0:
         return
     count = await conn.fetchval(
         "SELECT COUNT(*) FROM professional_echo_messages "
-        "WHERE professional_user_id = $1 AND role = 'user'",
-        professional_user_id,
+        "WHERE professional_user_id = $1 AND role = 'user' AND case_id IN ($2, $3)",
+        professional_user_id, DEMO_CASE_ID, DEMO_PARTNER_CASE_ID,
     )
     if count >= limit:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="ECHO_LIMIT_REACHED",
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=_DEMO_LIMIT_MSG)
 
 
-# Kind → (Settings-Feld, Fehlercode). Gezählt wird im löschfesten ai_usage_log.
+# Kind → (Settings-Feld, Fehlercode, Anzeigename). Monatliches Kontingent,
+# gezählt im löschfesten ai_usage_log: setzt sich am Monatsersten zurück und
+# lässt sich nicht durch Löschen von Berichten/Skalen umgehen.
 _AI_USAGE_LIMITS = {
-    "report":     ("report_limit", "REPORT_LIMIT_REACHED"),
-    "scale_calc": ("scale_calc_limit", "SCALE_LIMIT_REACHED"),
+    "report":     ("report_limit", "REPORT_LIMIT_REACHED", "Berichte"),
+    "scale_calc": ("scale_calc_limit", "SCALE_LIMIT_REACHED", "Skalen-Analysen"),
 }
 
 
+def _start_of_day(now: datetime) -> datetime:
+    """Beginn des laufenden Tages, 00:00 UTC (Reset des Tages-Deckels)."""
+    return now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def _month_start(now: datetime) -> datetime:
+    """Beginn des laufenden Kalendermonats, 00:00 UTC."""
+    return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+
+def _next_month_start(now: datetime) -> datetime:
+    """Beginn des Folgemonats, 00:00 UTC — Zeitpunkt des Kontingent-Resets."""
+    if now.month == 12:
+        return now.replace(year=now.year + 1, month=1, day=1,
+                           hour=0, minute=0, second=0, microsecond=0)
+    return now.replace(month=now.month + 1, day=1,
+                       hour=0, minute=0, second=0, microsecond=0)
+
+
+async def _count_ai_usage_this_month(user_id: str, conn, kind: str) -> int:
+    """Zählt KI-Aktionen seit Beginn des laufenden Kalendermonats (UTC).
+
+    Enforcement und Status-Anzeige teilen sich diese Grenze, damit Counter
+    und Sperre garantiert übereinstimmen.
+    """
+    month_start = _month_start(datetime.now(UTC))
+    count = await conn.fetchval(
+        "SELECT COUNT(*) FROM ai_usage_log "
+        "WHERE user_id = $1 AND kind = $2 AND created_at >= $3",
+        user_id, kind, month_start,
+    )
+    return count or 0
+
+
 async def enforce_ai_usage_limit(user_id: str, conn, kind: str) -> None:
-    """Kostenschutz für kostenintensive KI-Aktionen (Berichte, Skalen)."""
-    setting_name, error_code = _AI_USAGE_LIMITS[kind]
+    """Kostenschutz für kostenintensive KI-Aktionen (Berichte, Skalen).
+
+    Monatliches Kontingent pro Nutzer. 0 = deaktiviert.
+    """
+    setting_name, error_code, _label = _AI_USAGE_LIMITS[kind]
     limit = getattr(settings, setting_name)
     if limit <= 0:
         return
-    count = await conn.fetchval(
-        "SELECT COUNT(*) FROM ai_usage_log WHERE user_id = $1 AND kind = $2",
-        user_id, kind,
-    )
+    count = await _count_ai_usage_this_month(user_id, conn, kind)
     if count >= limit:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -82,6 +168,27 @@ async def log_ai_usage(user_id: str, conn, kind: str) -> None:
         "INSERT INTO ai_usage_log (user_id, kind) VALUES ($1, $2)",
         user_id, kind,
     )
+
+
+async def get_ai_usage_status(user_id: str, conn) -> dict:
+    """Kontingent-Übersicht des laufenden Monats (Counter + Einstellungen)."""
+    quotas = []
+    for kind, (setting_name, _code, label) in _AI_USAGE_LIMITS.items():
+        limit = getattr(settings, setting_name)
+        used = await _count_ai_usage_this_month(user_id, conn, kind)
+        unlimited = limit <= 0
+        quotas.append({
+            "kind": kind,
+            "label": label,
+            "used": used,
+            "limit": None if unlimited else limit,
+            "remaining": None if unlimited else max(0, limit - used),
+            "unlimited": unlimited,
+        })
+    return {
+        "period_resets_at": _next_month_start(datetime.now(UTC)).isoformat(),
+        "quotas": quotas,
+    }
 
 
 async def get_subscription_status(user_id: str, conn) -> dict:

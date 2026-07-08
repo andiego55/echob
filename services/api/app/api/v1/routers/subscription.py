@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.subscription import (
+    AiUsageStatus,
     CheckoutRequest,
     CheckoutResponse,
     CheckoutVerifyRequest,
@@ -16,7 +17,7 @@ from app.schemas.subscription import (
     SubscriptionStatus,
 )
 from app.services import billing_service
-from app.services.subscription_service import get_subscription_status
+from app.services.subscription_service import get_ai_usage_status, get_subscription_status
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/subscription", tags=["subscription"])
@@ -31,6 +32,17 @@ async def subscription_status(
     async with pool.acquire() as conn:
         data = await get_subscription_status(current_user["user_id"], conn)
     return SubscriptionStatus(**data)
+
+
+@router.get("/usage", response_model=AiUsageStatus)
+async def ai_usage_status(
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> AiUsageStatus:
+    """Monatliche KI-Kontingente (Berichte, Skalen) für Counter + Einstellungen."""
+    async with pool.acquire() as conn:
+        data = await get_ai_usage_status(current_user["user_id"], conn)
+    return AiUsageStatus(**data)
 
 
 @router.post("/checkout", response_model=CheckoutResponse)

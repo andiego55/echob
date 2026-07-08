@@ -1,9 +1,13 @@
 import { apiClient } from './client'
-import type { ProductType, SubscriptionStatus } from '@/types'
+import type { AiUsageStatus, ProductType, SubscriptionStatus } from '@/types'
 
 export const subscriptionApi = {
   getStatus: () =>
     apiClient.get<SubscriptionStatus>('/subscription/status').then(r => r.data),
+
+  /** Monatliche KI-Kontingente (Berichte, Skalen) für Counter + Einstellungen. */
+  getUsage: () =>
+    apiClient.get<AiUsageStatus>('/subscription/usage').then(r => r.data),
 
   /** Startet einen Stripe-Checkout und liefert die Redirect-URL. */
   createCheckout: (product: ProductType) =>

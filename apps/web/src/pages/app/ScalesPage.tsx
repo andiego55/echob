@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { apiClient } from '@/api/client'
+import { subscriptionApi } from '@/api/subscription'
 import { apiErrorText } from '@/utils/apiError'
 import type { ScalesOverview, ScaleScore } from '@/types'
 
@@ -69,10 +70,18 @@ export default function ScalesPage() {
     enabled: !!caseId,
   })
 
+  // Monats-Kontingent: Hinweis erst ab ≤3 Rest, Sperre bei 0 (Backend erzwingt hart).
+  const { data: usage } = useQuery({ queryKey: ['ai-usage'], queryFn: subscriptionApi.getUsage })
+  const scaleQuota = usage?.quotas.find(q => q.kind === 'scale_calc')
+  const scalesLeft = scaleQuota && !scaleQuota.unlimited ? scaleQuota.remaining : null
+  const scalesExhausted = scalesLeft !== null && scalesLeft <= 0
+  const showScaleHint = scalesLeft !== null && scalesLeft <= 3
+
   const calcMutation = useMutation({
     mutationFn: () => calculateScales(caseId!),
     onSuccess: (result) => {
       qc.setQueryData(['scales', caseId], result)
+      qc.invalidateQueries({ queryKey: ['ai-usage'] })
     },
   })
 
@@ -94,7 +103,7 @@ export default function ScalesPage() {
           </div>
           <button
             onClick={() => calcMutation.mutate()}
-            disabled={calcMutation.isPending}
+            disabled={calcMutation.isPending || scalesExhausted}
             className="btn-primary !py-2 !px-4 !text-sm flex-shrink-0 disabled:opacity-50"
           >
             {calcMutation.isPending ? 'Wird berechnet …' : hasScores ? 'Neu berechnen' : 'Skalen berechnen'}
@@ -102,6 +111,14 @@ export default function ScalesPage() {
         </div>
 
         {isLoading && <p className="text-sm text-brand-muted">Wird geladen …</p>}
+
+        {showScaleHint && (
+          <div className={`mb-4 rounded-brand border px-4 py-3 text-sm ${scalesExhausted ? 'border-red-200 bg-red-50 text-red-700' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+            {scalesExhausted
+              ? 'Du hast dein Monatskontingent an Skalen-Analysen aufgebraucht. Es setzt sich zu Beginn des nächsten Monats zurück.'
+              : `In diesem Abrechnungsmonat kannst du noch ${scalesLeft} ${scalesLeft === 1 ? 'Skalen-Analyse' : 'Skalen-Analysen'} berechnen.`}
+          </div>
+        )}
 
         {calcMutation.isError && (
           <div className="mb-4 rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -131,7 +148,7 @@ export default function ScalesPage() {
             </div>
 
             {!hasScores ? (
-              <EmptyScales onCalculate={() => calcMutation.mutate()} isPending={calcMutation.isPending} />
+              <EmptyScales onCalculate={() => calcMutation.mutate()} isPending={calcMutation.isPending} disabled={scalesExhausted} />
             ) : (
               <div className="space-y-8">
                 {(['behavior', 'personality', 'dynamics'] as const).map(group => {
@@ -244,7 +261,7 @@ function ScaleCard({ score: s, colorScheme, expanded, onToggle }: {
   )
 }
 
-function EmptyScales({ onCalculate, isPending }: { onCalculate: () => void; isPending: boolean }) {
+function EmptyScales({ onCalculate, isPending, disabled }: { onCalculate: () => void; isPending: boolean; disabled?: boolean }) {
   return (
     <div className="card text-center py-12 max-w-md mx-auto">
       <div className="text-4xl mb-4">📊</div>
@@ -254,7 +271,7 @@ function EmptyScales({ onCalculate, isPending }: { onCalculate: () => void; isPe
       </p>
       <button
         onClick={onCalculate}
-        disabled={isPending}
+        disabled={isPending || disabled}
         className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50"
       >
         {isPending ? 'Wird berechnet …' : 'Skalen berechnen'}

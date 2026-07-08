@@ -89,6 +89,13 @@ export default function ReportNewPage() {
   const isTrial = subscription?.plan === 'trial'
   const isLocked = (type: ReportType) => isTrial && !TRIAL_ALLOWED.includes(type)
 
+  // Monats-Kontingent: Hinweis erst ab ≤3 Rest, Sperre bei 0 (Backend erzwingt hart).
+  const { data: usage } = useQuery({ queryKey: ['ai-usage'], queryFn: subscriptionApi.getUsage })
+  const reportQuota = usage?.quotas.find(q => q.kind === 'report')
+  const reportsLeft = reportQuota && !reportQuota.unlimited ? reportQuota.remaining : null
+  const reportsExhausted = reportsLeft !== null && reportsLeft <= 0
+  const showReportHint = reportsLeft !== null && reportsLeft <= 3
+
   const selectedDef = REPORT_TYPES.find(r => r.type === selected)
 
   const mutation = useMutation({
@@ -98,6 +105,7 @@ export default function ReportNewPage() {
     }),
     onSuccess: (report) => {
       qc.invalidateQueries({ queryKey: ['reports', caseId] })
+      qc.invalidateQueries({ queryKey: ['ai-usage'] })
       navigate(`/app/cases/${caseId}/reports/${report.id}`)
     },
   })
@@ -218,6 +226,16 @@ export default function ReportNewPage() {
           </div>
         )}
 
+        {showReportHint && (
+          <div className={`mb-4 rounded-brand border px-4 py-3 ${reportsExhausted ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
+            <p className={`text-sm ${reportsExhausted ? 'text-red-700' : 'text-amber-800'}`}>
+              {reportsExhausted
+                ? 'Du hast dein Monatskontingent an Berichten aufgebraucht. Es setzt sich zu Beginn des nächsten Monats zurück.'
+                : `In diesem Abrechnungsmonat kannst du noch ${reportsLeft} ${reportsLeft === 1 ? 'Bericht' : 'Berichte'} erstellen.`}
+            </p>
+          </div>
+        )}
+
         {mutation.isError && (
           <div className="mb-4 rounded-brand border border-red-200 bg-red-50 px-4 py-3">
             <p className="text-sm text-red-700">
@@ -229,7 +247,7 @@ export default function ReportNewPage() {
         <div className="flex gap-3">
           <button
             type="button"
-            disabled={!selected}
+            disabled={!selected || reportsExhausted}
             onClick={() => mutation.mutate()}
             className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
           >

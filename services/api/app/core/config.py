@@ -61,9 +61,13 @@ class Settings(BaseSettings):
     echo_reasoning_headroom: int = 4000      # Extra-Token-Obergrenze fürs Reasoning
     anthropic_api_key: str = ""   # Reserviert für zukünftige Nutzung
     # Kostenschutz Entwicklungsphase (0 = jeweils unbegrenzt):
-    echo_prompt_limit: int = 250   # max. Echo-Nachrichten pro Nutzer
-    report_limit: int = 20         # max. Berichts-Generierungen pro Nutzer
-    scale_calc_limit: int = 20     # max. Skalen-Berechnungen pro Nutzer
+    echo_prompt_limit: int = 250          # max. Echo-Nachrichten pro Nutzer (gesamt)
+    echo_prompt_daily_limit: int = 120    # harter Tages-Deckel Echo-Nachrichten/Nutzer
+    report_limit: int = 10         # max. Berichts-Generierungen pro Nutzer/Monat
+    scale_calc_limit: int = 10     # max. Skalen-Analysen pro Nutzer/Monat
+    # Harter Deckel der kostenlosen Spielwiese (Demo-Fälle), pro Fachperson:
+    demo_echo_limit: int = 30      # max. Echo-Nachrichten auf Demo-Fällen (gesamt)
+    demo_report_limit: int = 6     # max. Berichte pro Demo-Fall (inkl. Beispielbericht)
 
     # ── Stripe (Zahlungen) ─────────────────────────────────────────────
     stripe_secret_key: str = ""

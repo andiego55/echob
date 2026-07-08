@@ -33,7 +33,10 @@ from app.services.sharing_service import (
     load_shared_bundle,
     require_active_share,
 )
-from app.services.subscription_service import enforce_professional_echo_limit
+from app.services.subscription_service import (
+    enforce_demo_echo_limit,
+    enforce_professional_echo_limit,
+)
 
 router = APIRouter(prefix="/professional/cases/{case_id}/echo", tags=["professional-echo"])
 
@@ -91,6 +94,7 @@ async def chat(
 
     async with pool.acquire() as conn:
         await enforce_professional_echo_limit(pid, conn)
+        await enforce_demo_echo_limit(pid, case_id, conn)   # harter Spielwiese-Deckel
         bundle = await load_shared_bundle(pid, case_id, conn)   # 404, wenn keine aktive Freigabe
         await seat_service.assert_case_workable(case_id, current, conn)  # Gating (Demo frei)
 

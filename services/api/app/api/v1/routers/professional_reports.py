@@ -19,6 +19,7 @@ from app.api.v1.routers.professional_notes import (
     load_session_notes_decrypted,
 )
 from app.core import crypto
+from app.core.config import settings
 from app.core.dependencies import get_current_professional, get_pool
 from app.schemas.professional import (
     PRO_REPORT_DISCLAIMER,
@@ -32,7 +33,7 @@ from app.schemas.professional import (
     ProReportTemplateCreate,
     ProReportTemplateUpdate,
 )
-from app.services import collab_service, couple_service, seat_service
+from app.services import collab_service, couple_service, demo_service, seat_service
 from app.services.pro_report_templates import get_standard
 from app.services.sharing_service import (
     build_shared_case_context,
@@ -224,16 +225,23 @@ async def create_report(
 
     # 2) Daten laden (kurz halten — LLM-Aufruf danach ohne gehaltene Verbindung)
     async with pool.acquire() as conn:
+        is_demo = demo_service.is_demo_case(case_id)
+        max_reports = settings.demo_report_limit if is_demo else _MAX_REPORTS_PER_CASE
         count = await conn.fetchval(
             "SELECT COUNT(*) FROM professional_reports "
             "WHERE professional_user_id = $1 AND case_id = $2",
             pid, case_id,
         )
-        if count >= _MAX_REPORTS_PER_CASE:
+        if count >= max_reports:
             raise HTTPException(
                 status_code=422,
-                detail=f"Maximale Anzahl von {_MAX_REPORTS_PER_CASE} Berichten erreicht. "
-                       "Bitte löschen Sie einen Bericht, bevor Sie einen neuen erstellen.",
+                detail=(
+                    "Die Spielwiese ist zum Ausprobieren gedacht und hier bewusst begrenzt. "
+                    "Für unbegrenztes Arbeiten legen Sie einen echten Fall an."
+                    if is_demo
+                    else f"Maximale Anzahl von {max_reports} Berichten erreicht. "
+                         "Bitte löschen Sie einen Bericht, bevor Sie einen neuen erstellen."
+                ),
             )
 
         if is_couple:

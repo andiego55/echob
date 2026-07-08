@@ -375,6 +375,20 @@ export interface SubscriptionStatus {
   is_active: boolean
 }
 
+export interface AiUsageQuota {
+  kind: 'report' | 'scale_calc'
+  label: string
+  used: number
+  limit: number | null       // null = unbegrenzt/deaktiviert
+  remaining: number | null
+  unlimited: boolean
+}
+
+export interface AiUsageStatus {
+  period_resets_at: string    // ISO-Zeitpunkt, an dem sich das Kontingent zurücksetzt
+  quotas: AiUsageQuota[]
+}
+
 // ── Personenprofil ────────────────────────────────────────────────────────────
 
 export interface PersonProfile {

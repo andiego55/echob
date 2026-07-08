@@ -32,6 +32,14 @@ _DEMO_PARTNER_SHARE_ELEMENTS = (
     "hypotheses", "person_profile",
 )
 
+# Feste IDs der kostenlosen Spielwiese — Grundlage für den harten Demo-Deckel.
+DEMO_CASE_IDS = (DEMO_CASE_ID, DEMO_PARTNER_CASE_ID)
+
+
+def is_demo_case(case_id) -> bool:
+    """True, wenn der Fall zur kostenlosen Spielwiese gehört (Lena/Marco-Demo)."""
+    return str(case_id) in {DEMO_CASE_ID, DEMO_PARTNER_CASE_ID}
+
 _DEMO_SESSION_NOTES = [
     {
         "days_ago": 21,

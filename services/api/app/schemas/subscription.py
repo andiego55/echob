@@ -21,6 +21,20 @@ class SubscriptionStatus(BaseModel):
     is_active: bool = True
 
 
+class AiUsageQuota(BaseModel):
+    kind: str
+    label: str
+    used: int
+    limit: int | None       # None = unbegrenzt/deaktiviert
+    remaining: int | None
+    unlimited: bool
+
+
+class AiUsageStatus(BaseModel):
+    period_resets_at: str    # ISO-Zeitpunkt, an dem sich das Kontingent zurücksetzt
+    quotas: list[AiUsageQuota]
+
+
 class CheckoutRequest(BaseModel):
     product: ProductType
 
