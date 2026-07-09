@@ -196,9 +196,15 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
                   .filter((s): s is number => s != null)
                   .reverse()
                 return scores.length >= 2 ? (
-                  <p className="text-xs text-brand-muted mb-1">
-                    Verlauf: <span className="font-semibold text-accent">{scores.join(' → ')}</span>
-                  </p>
+                  <div className="mb-2 flex flex-wrap items-center gap-1.5">
+                    <span className="text-xs text-brand-muted">Verlauf:</span>
+                    {scores.map((s, i) => (
+                      <span key={i} className="flex items-center gap-1.5">
+                        {i > 0 && <span className="text-brand-muted/40">→</span>}
+                        <span className="rounded bg-accent/10 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-accent">Ø {s}</span>
+                      </span>
+                    ))}
+                  </div>
                 ) : null
               })()}
               {items.map(a => {

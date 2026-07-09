@@ -1,7 +1,7 @@
 /**
- * Fragebogen-Auswertung für die Fachperson: Ø-Score (Likert) als Pille + je Frage
- * die Antwort visuell aufbereitet (Segment-Skala + Bedeutungs-Label, gewählte
- * Optionen als Chips, Einfachauswahl als Pille, Freitext).
+ * Fragebogen-Auswertung für die Fachperson: Ø-Score-Pille + je Frage die Antwort
+ * visuell aufbereitet — Likert als nummerierte Skala mit markiertem Wert + Label,
+ * Auswahl als Chips, Freitext als Zitat.
  */
 import { type Answer, type Question } from '@/lib/questionnaire'
 
@@ -31,8 +31,8 @@ export default function QuestionnaireEvaluation({
       )}
       <div className="space-y-2">
         {questions.map(q => (
-          <div key={q.key} className="rounded-brand border border-brand-border bg-white px-3 py-2.5">
-            <p className="text-xs font-medium text-brand-muted mb-1.5">{q.label}</p>
+          <div key={q.key} className="rounded-brand border border-brand-border bg-white px-3.5 py-3">
+            <p className="text-xs font-medium text-brand-muted mb-2">{q.label}</p>
             <AnswerView q={q} a={answers[q.key]} />
           </div>
         ))}
@@ -50,16 +50,29 @@ function AnswerView({ q, a }: { q: Question; a: Answer | undefined }) {
     const max = q.max ?? 5
     const lbl = q.scaleLabels?.[v - 1]?.trim()
     return (
-      <div className="flex items-center gap-2.5 flex-wrap">
-        <span className="flex gap-1 shrink-0" aria-hidden>
-          {Array.from({ length: max }, (_, i) => (
-            <span key={i} className={`h-2 w-4 rounded-full ${i < v ? 'bg-accent' : 'bg-brand-border'}`} />
-          ))}
-        </span>
-        {lbl
-          ? <span className="text-sm font-semibold text-navy">{lbl}</span>
-          : <span className="text-sm font-semibold text-navy tabular-nums">{v} von {max}</span>}
-        {lbl && <span className="text-[11px] text-brand-muted tabular-nums">{v}/{max}</span>}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <div className="flex items-center gap-1" role="img" aria-label={`${v} von ${max}`}>
+          {Array.from({ length: max }, (_, i) => {
+            const n = i + 1
+            const active = n === v
+            const filled = n < v
+            return (
+              <span
+                key={i}
+                className={`flex h-7 w-7 items-center justify-center rounded-md text-xs font-semibold tabular-nums ${
+                  active
+                    ? 'bg-accent text-white shadow-sm'
+                    : filled
+                      ? 'bg-accent/15 text-accent'
+                      : 'bg-brand-bg text-brand-muted/50'
+                }`}
+              >
+                {n}
+              </span>
+            )
+          })}
+        </div>
+        {lbl && <span className="text-sm font-semibold text-navy">{lbl}</span>}
       </div>
     )
   }
@@ -67,17 +80,22 @@ function AnswerView({ q, a }: { q: Question; a: Answer | undefined }) {
     return (
       <div className="flex flex-wrap gap-1.5">
         {(a as string[]).map(o => (
-          <span key={o} className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{o}</span>
+          <span key={o} className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">{o}</span>
         ))}
       </div>
     )
   }
   if (q.type === 'single') {
     return (
-      <span className="inline-block text-sm font-medium text-navy px-2.5 py-0.5 rounded-full bg-brand-bg border border-brand-border">
+      <span className="inline-flex items-center gap-2 text-sm font-medium text-navy">
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
         {String(a)}
       </span>
     )
   }
-  return <p className="text-sm text-brand-text whitespace-pre-wrap">{String(a)}</p>
+  return (
+    <p className="whitespace-pre-wrap rounded-brand border-l-2 border-accent/40 bg-brand-bg px-3 py-2 text-sm text-brand-text">
+      {String(a)}
+    </p>
+  )
 }
