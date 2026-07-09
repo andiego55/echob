@@ -206,12 +206,22 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
                 const qs = (a.payload as { questions?: Question[] }).questions ?? []
                 const done = a.status === 'completed' && !!resp?.answers
                 return (
-                  <details key={a.id} className="rounded-brand border border-brand-border p-3">
-                    <summary className="flex items-center justify-between gap-3 cursor-pointer text-sm">
-                      <span className="font-medium text-navy">{a.title || 'Fragebogen'}</span>
-                      <span className="flex items-center gap-2 text-xs text-brand-muted">
-                        {resp?.score != null && <span className="font-semibold text-accent">Ø {resp.score}</span>}
-                        <span>{a.status}</span>
+                  <details key={a.id} className="group rounded-brand border border-brand-border p-3 open:border-accent/30">
+                    <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className="flex items-center gap-2 min-w-0">
+                        <svg className="h-4 w-4 shrink-0 text-brand-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="3" width="8" height="4" rx="1" /><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" /><path d="M9 12h6M9 16h4" /></svg>
+                        <span className="text-sm font-medium text-navy truncate">{a.title || 'Fragebogen'}</span>
+                      </span>
+                      <span className="flex items-center gap-2 shrink-0">
+                        {resp?.score != null && (
+                          <span className="text-xs font-semibold text-accent tabular-nums rounded bg-accent/10 px-1.5 py-0.5">Ø {resp.score}</span>
+                        )}
+                        <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${
+                          a.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {a.status === 'completed' ? 'Beantwortet' : 'Offen'}
+                        </span>
+                        <svg className="h-4 w-4 text-brand-muted transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" /></svg>
                       </span>
                     </summary>
                     <div className="mt-3">

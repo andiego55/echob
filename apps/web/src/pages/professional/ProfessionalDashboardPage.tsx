@@ -4,7 +4,7 @@
  * Aufmerksamkeit → Postfach · Offene Aufgaben → Filter), darunter die Fall-Liste
  * mit Suche + Freigabe-Chips, je Fall aufklappbar mit den konkreten Punkten.
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
@@ -33,6 +33,29 @@ const ITEM_ICON: Record<DashboardItem['kind'], string> = {
   questionnaire_answered: '📋', dialog_summary: '💬', message_reply: '✉️', open_task: '⏳',
 }
 const elLabel = (et: string) => (SHARE_ELEMENT_LABELS as Record<string, string>)[et] ?? et
+
+const svgProps = {
+  viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7,
+  strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, className: 'h-5 w-5',
+}
+const IconUsers = () => (
+  <svg {...svgProps}><circle cx="9" cy="8" r="3.2" /><path d="M2.5 19a6.5 6.5 0 0 1 13 0" /><path d="M16 5.5a2.9 2.9 0 0 1 0 5.4" /><path d="M17.5 13a5.5 5.5 0 0 1 4 5.3" /></svg>
+)
+const IconFolder = () => (
+  <svg {...svgProps}><path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+)
+const IconBell = () => (
+  <svg {...svgProps}><path d="M6 9a6 6 0 0 1 12 0c0 4.5 1.5 5.5 2 6H4c.5-.5 2-1.5 2-6" /><path d="M10.3 19a1.9 1.9 0 0 0 3.4 0" /></svg>
+)
+const IconClock = () => (
+  <svg {...svgProps}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 1.8" /></svg>
+)
+function initials(name: string): string {
+  const p = name.trim().split(/\s+/).filter(Boolean)
+  if (p.length === 0) return '·'
+  if (p.length === 1) return p[0].slice(0, 2).toUpperCase()
+  return (p[0][0] + p[p.length - 1][0]).toUpperCase()
+}
 
 export default function ProfessionalDashboardPage() {
   const { data, isLoading } = useQuery({ queryKey: ['prof-dashboard'], queryFn: professionalApi.dashboard })
@@ -76,16 +99,10 @@ export default function ProfessionalDashboardPage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <Tile label="Klient:innen" value={clientsCount} onClick={() => { setFilter('all'); setQ('') }} />
-          <Tile label="Fälle" value={cases.length} onClick={() => setFilter('all')} />
-          <Link to="/professional"
-            className={`block rounded-brand border px-4 py-3 no-underline transition-colors ${
-              totalUnread > 0 ? 'border-accent bg-accent/5' : 'border-brand-border bg-white hover:border-accent/40'
-            }`}>
-            <p className="text-xs text-brand-muted">Braucht Aufmerksamkeit</p>
-            <p className={`text-2xl font-bold ${totalUnread > 0 ? 'text-accent' : 'text-navy'}`}>{totalUnread}</p>
-          </Link>
-          <Tile label="Offene Aufgaben" value={totalOpen} active={filter === 'open'} onClick={() => setFilter('open')} />
+          <Tile label="Klient:innen" value={clientsCount} icon={<IconUsers />} onClick={() => { setFilter('all'); setQ('') }} />
+          <Tile label="Fälle" value={cases.length} icon={<IconFolder />} onClick={() => setFilter('all')} />
+          <Tile label="Braucht Aufmerksamkeit" value={totalUnread} icon={<IconBell />} to="/professional" accent={totalUnread > 0} />
+          <Tile label="Offene Aufgaben" value={totalOpen} icon={<IconClock />} active={filter === 'open'} onClick={() => setFilter('open')} />
         </div>
 
         {cases.length === 0 ? (
@@ -117,8 +134,12 @@ export default function ProfessionalDashboardPage() {
                 return (
                   <div key={c.case_id} className={`card ${c.unread_count > 0 ? 'border-accent/40' : ''}`}>
                     <div className="flex items-center justify-between gap-3">
-                      <Link to={`/professional/cases/${c.case_id}`} className="flex items-center gap-2 min-w-0 no-underline group">
-                        {c.unread_count > 0 && <span className="w-2 h-2 rounded-full bg-accent shrink-0" />}
+                      <Link to={`/professional/cases/${c.case_id}`} className="flex items-center gap-2.5 min-w-0 no-underline group">
+                        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                          c.unread_count > 0 ? 'bg-accent text-white' : 'bg-accent/10 text-accent'
+                        }`}>
+                          {initials(c.client_display_name)}
+                        </span>
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors">
                             {c.client_display_name} · {c.case_title}
@@ -204,18 +225,28 @@ export default function ProfessionalDashboardPage() {
   )
 }
 
-function Tile({ label, value, active, onClick }: {
-  label: string; value: number; active?: boolean; onClick: () => void
+function Tile({ label, value, icon, to, onClick, active, accent }: {
+  label: string; value: number; icon: ReactNode
+  to?: string; onClick?: () => void; active?: boolean; accent?: boolean
 }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`text-left rounded-brand border px-4 py-3 transition-colors ${
-        active ? 'border-accent bg-accent/5' : 'border-brand-border bg-white hover:border-accent/40'
-      }`}
-    >
-      <p className="text-xs text-brand-muted">{label}</p>
-      <p className={`text-2xl font-bold ${active ? 'text-accent' : 'text-navy'}`}>{value}</p>
-    </button>
+  const highlight = active || (accent && value > 0)
+  const cls = `flex items-center gap-3 text-left rounded-brand border px-3.5 py-3 transition-colors ${
+    highlight ? 'border-accent bg-accent/5' : 'border-brand-border bg-white hover:border-accent/40'
+  }`
+  const inner = (
+    <>
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+        highlight ? 'bg-accent text-white' : 'bg-accent/10 text-accent'
+      }`}>
+        {icon}
+      </span>
+      <span className="min-w-0">
+        <span className={`block text-2xl font-bold leading-none ${highlight ? 'text-accent' : 'text-navy'}`}>{value}</span>
+        <span className="mt-1 block truncate text-xs text-brand-muted">{label}</span>
+      </span>
+    </>
   )
+  return to
+    ? <Link to={to} className={`${cls} no-underline`}>{inner}</Link>
+    : <button onClick={onClick} className={cls}>{inner}</button>
 }
