@@ -23,6 +23,7 @@ const TYPE_CONFIG: Record<ReportType, {
   coaching_prep: { icon: '🎯', color: 'text-teal-700',   bgColor: 'bg-teal-50',   borderColor: 'border-teal-200',   printAccent: '#0f766e' },
   therapy_prep:  { icon: '🏥', color: 'text-indigo-700', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', printAccent: '#3730a3' },
   progress:      { icon: '📈', color: 'text-amber-700',  bgColor: 'bg-amber-50',  borderColor: 'border-amber-200',  printAccent: '#b45309' },
+  partner:       { icon: '✉️', color: 'text-rose-700',   bgColor: 'bg-rose-50',   borderColor: 'border-rose-200',   printAccent: '#be123c' },
 }
 const DEFAULT_CONFIG = TYPE_CONFIG.pattern
 

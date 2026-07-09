@@ -73,6 +73,16 @@ const REPORT_TYPES: {
     sections: 6,
     accentClass: 'border-amber-300 bg-amber-50',
   },
+  {
+    type: 'partner',
+    icon: '✉️',
+    label: 'Nachricht für das Gegenüber',
+    tagline: 'Ein behutsamer Brückenschlag für ein Gespräch',
+    desc: 'Eine sehr vorsichtige, in Ich-Sprache formulierte Nachricht, die du optional mit deinem Gegenüber teilen kannst — ohne Analyse, ohne Vorwürfe, ohne Details aus dem Fall. Du liest und entscheidest zuerst selbst.',
+    audience: 'Zum Teilen mit deinem Gegenüber',
+    sections: 2,
+    accentClass: 'border-rose-300 bg-rose-50',
+  },
 ]
 
 export default function ReportNewPage() {

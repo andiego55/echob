@@ -794,6 +794,22 @@ class EchoService:
 
         system_prompt = _load_prompt("report_generation_prompt.md")
 
+        # Partner-Nachricht: strikt datensparsam. Es fließen NUR die eigenen Gefühle/Wünsche
+        # der nutzenden Person ein (Selbstprofil, Onboarding, Fall-Basics) — KEINE Szenen,
+        # Skalen, Hypothesen, Themen-Analysen oder Personenprofil, weder in den Prompt noch
+        # in die Visualisierung. So kann nichts Analytisches in eine Nachricht sickern, die
+        # das Gegenüber lesen soll. Sicherheits-Flag aus dem eigenen safety_status.
+        partner_safety_concern = False
+        if report_type == "partner":
+            partner_safety_concern = (user_profile or {}).get(
+                "safety_status", "no_indication"
+            ) not in (None, "", "no_indication")
+            scenes = []
+            scale_scores = []
+            person_profile = None
+            topic_summaries = None
+            hypotheses = None
+
         # Kontext aufbauen
         context_parts: list[str] = []
 
@@ -844,6 +860,7 @@ class EchoService:
             "coaching_prep": {"max_tokens": 3000, "temperature": 0.38},
             "therapy_prep":  {"max_tokens": 5500, "temperature": 0.25},
             "progress":      {"max_tokens": 3000, "temperature": 0.38},
+            "partner":       {"max_tokens": 1400, "temperature": 0.55},
         }
         cfg = _TYPE_CONFIG.get(report_type, {"max_tokens": 3000, "temperature": 0.40})
 
@@ -880,6 +897,22 @@ class EchoService:
                 "Erstelle einen **Verlaufsbericht** (Typ: `progress`). "
                 "Alle 6 Abschnitte. Chronologisch, vergleichend. "
                 "Benenne Veränderungen konkret, beschönige nichts."
+            ),
+            "partner": (
+                "Erstelle eine **Nachricht für das Gegenüber** (Typ: `partner`) — eine sehr "
+                "behutsame, teilbare Ich-Botschaft, KEINE Analyse. Halte die 2-Abschnitt-Struktur "
+                "exakt ein. Die eigentliche Nachricht (Abschnitt 2) ist durchgängig Ich-Sprache "
+                "der nutzenden Person, an das Gegenüber gerichtet: eigene Gefühle, Wünsche und "
+                "eine Einladung zum Gespräch — keinerlei Diagnose, Charakterisierung, Vorwurf, "
+                "Szenen, Muster oder Forderung. Gesamtlänge unter 1.400 Zeichen."
+                + (
+                    " ACHTUNG Sicherheitshinweis: Im Material gibt es Anzeichen für Bedrohung, "
+                    "Kontrolle oder Unsicherheit. Führe Abschnitt 1 mit einer klaren, ernsten "
+                    "Warnung und dem dringenden Rat, vor jedem Teilen zuerst mit einer "
+                    "Beratungsstelle oder Fachperson zu sprechen (Notruf 110/112, "
+                    "Telefonseelsorge 0800 111 0 111). Halte die Nachricht besonders zurückhaltend."
+                    if partner_safety_concern else ""
+                )
             ),
         }
         user_message = (

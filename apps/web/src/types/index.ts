@@ -23,7 +23,7 @@ export type ThreadType =
   | 'blog_beziehungsmuster' | 'blog_beobachtung_gefuehl'
   | 'blog_professionelle_hilfe' | 'blog_krisentelefone'
   | 'hyp_dynamics' | 'hyp_clusterb' | 'hyp_attachment' | 'hyp_trauma' | 'hyp_own_role'
-export type ReportType = 'short' | 'pattern' | 'coaching_prep' | 'therapy_prep' | 'progress'
+export type ReportType = 'short' | 'pattern' | 'coaching_prep' | 'therapy_prep' | 'progress' | 'partner'
 export type ReportStatus = 'draft' | 'ready' | 'archived'
 export type Confidence = 'low' | 'medium' | 'high'
 
@@ -101,6 +101,7 @@ export const REPORT_TYPE_LABELS: Record<ReportType, string> = {
   coaching_prep: 'Coaching-Vorbereitung',
   therapy_prep:  'Therapie-/Beratungsvorbereitung',
   progress:      'Verlaufsbericht',
+  partner:       'Nachricht für das Gegenüber',
 }
 
 // ── Datenmodelle ──────────────────────────────────────────────────────────────
