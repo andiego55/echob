@@ -475,25 +475,25 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
       <div className="grid gap-4 lg:grid-cols-2">
         {has('case_info') && bundle.case && (
           <Section title="Fallinformationen">
-            <dl className="space-y-1.5 text-sm">
-              <Row k="Beziehungstyp" v={RELATIONSHIP_TYPE_LABELS[bundle.case.relationship_type]} />
-              <Row k="Status" v={RELATIONSHIP_STATUS_LABELS[bundle.case.relationship_status]} />
-              <Row k="Kontaktfrequenz" v={CONTACT_FREQUENCY_LABELS[bundle.case.contact_frequency]} />
-              {bundle.case.main_concern && <Row k="Hauptanliegen" v={bundle.case.main_concern} />}
+            <dl className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2">
+              <Field label="Beziehungstyp"><InfoChip>{RELATIONSHIP_TYPE_LABELS[bundle.case.relationship_type]}</InfoChip></Field>
+              <Field label="Status"><InfoChip>{RELATIONSHIP_STATUS_LABELS[bundle.case.relationship_status]}</InfoChip></Field>
+              <Field label="Kontaktfrequenz"><InfoChip>{CONTACT_FREQUENCY_LABELS[bundle.case.contact_frequency]}</InfoChip></Field>
+              {bundle.case.main_concern && <Field label="Hauptanliegen" wide>{bundle.case.main_concern}</Field>}
             </dl>
           </Section>
         )}
 
         {has('onboarding') && bundle.onboarding && (
           <Section title="Onboarding-Informationen">
-            <dl className="space-y-1.5 text-sm">
-              {bundle.onboarding.person_name && <Row k="Fallperson (Pseudonym)" v={bundle.onboarding.person_name} />}
-              {bundle.onboarding.relationship_description && <Row k="Beziehungsbeschreibung" v={bundle.onboarding.relationship_description} />}
-              {bundle.onboarding.typical_scenes && <Row k="Typische Szenen" v={bundle.onboarding.typical_scenes} />}
-              {bundle.onboarding.main_burden && <Row k="Hauptbelastung" v={bundle.onboarding.main_burden} />}
-              {bundle.onboarding.significant_event && <Row k="Prägendes Ereignis" v={bundle.onboarding.significant_event} />}
-              {bundle.onboarding.memorable_scenes && <Row k="Erinnerliche Szenen" v={bundle.onboarding.memorable_scenes} />}
-              {typeof bundle.onboarding.distress_score === 'number' && <Row k="Belastungswert" v={`${bundle.onboarding.distress_score}/10`} />}
+            <dl className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2">
+              {bundle.onboarding.person_name && <Field label="Fallperson (Pseudonym)">{bundle.onboarding.person_name}</Field>}
+              {typeof bundle.onboarding.distress_score === 'number' && <Field label="Belastungswert"><DistressBadge score={bundle.onboarding.distress_score} /></Field>}
+              {bundle.onboarding.relationship_description && <Field label="Beziehungsbeschreibung" wide>{bundle.onboarding.relationship_description}</Field>}
+              {bundle.onboarding.typical_scenes && <Field label="Typische Szenen" wide>{bundle.onboarding.typical_scenes}</Field>}
+              {bundle.onboarding.main_burden && <Field label="Hauptbelastung" wide>{bundle.onboarding.main_burden}</Field>}
+              {bundle.onboarding.significant_event && <Field label="Prägendes Ereignis" wide>{bundle.onboarding.significant_event}</Field>}
+              {bundle.onboarding.memorable_scenes && <Field label="Erinnerliche Szenen" wide>{bundle.onboarding.memorable_scenes}</Field>}
             </dl>
           </Section>
         )}
@@ -924,12 +924,32 @@ function SummaryItem({ s, onDelete, deleting, onUpdate, updating }: {
   )
 }
 
-function Row({ k, v }: { k: string; v: string }) {
+function Field({ label, wide, children }: { label: string; wide?: boolean; children: React.ReactNode }) {
   return (
-    <div className="flex gap-2">
-      <dt className="text-brand-muted shrink-0">{k}:</dt>
-      <dd className="text-brand-text font-medium">{v}</dd>
+    <div className={wide ? 'sm:col-span-2' : undefined}>
+      <dt className="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-muted">{label}</dt>
+      <dd className="whitespace-pre-wrap text-sm leading-relaxed text-navy">{children}</dd>
     </div>
+  )
+}
+
+function InfoChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-block rounded-full bg-accent/10 px-2.5 py-0.5 text-sm font-medium text-accent">{children}</span>
+  )
+}
+
+function DistressBadge({ score }: { score: number }) {
+  const pct = Math.min(100, Math.round((score / 10) * 100))
+  const bar = score >= 7 ? 'bg-red-500' : score >= 4 ? 'bg-amber-400' : 'bg-green-500'
+  const txt = score >= 7 ? 'text-red-600' : score >= 4 ? 'text-amber-600' : 'text-green-600'
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span className={`text-base font-bold tabular-nums ${txt}`}>{score}<span className="text-xs font-normal text-brand-muted">/10</span></span>
+      <span className="h-1.5 w-16 overflow-hidden rounded-full bg-brand-border">
+        <span className={`block h-full rounded-full ${bar}`} style={{ width: `${pct}%` }} />
+      </span>
+    </span>
   )
 }
 
