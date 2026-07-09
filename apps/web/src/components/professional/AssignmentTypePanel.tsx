@@ -28,6 +28,40 @@ function fmt(dt: string) {
   })
 }
 
+function TypeIcon({ type }: { type: AssignmentType }) {
+  const p = {
+    className: 'h-4 w-4 shrink-0 text-brand-muted', viewBox: '0 0 24 24', fill: 'none',
+    stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const,
+  }
+  if (type === 'message')
+    return <svg {...p}><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" /></svg>
+  if (type === 'dialog')
+    return <svg {...p}><path d="M4 5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" /><path d="M7.5 8.5h5M7.5 11h3" /></svg>
+  if (type === 'questionnaire')
+    return <svg {...p}><rect x="8" y="3" width="8" height="4" rx="1" /><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" /><path d="M9 12h6M9 16h4" /></svg>
+  return <svg {...p}><path d="M10 13.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-1 1" /><path d="M14 10.5a3.5 3.5 0 0 0-5 0L6.5 13a3.5 3.5 0 0 0 5 5l1-1" /></svg>
+}
+
+function StatusChip({ status, doneLabel = 'Erledigt' }: { status: string; doneLabel?: string }) {
+  const done = status === 'completed'
+  return (
+    <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[11px] font-medium ${
+      done ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+    }`}>
+      {done ? doneLabel : 'Offen'}
+    </span>
+  )
+}
+
+function Chevron() {
+  return (
+    <svg className="h-4 w-4 shrink-0 text-brand-muted transition-transform group-open:rotate-180"
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+    </svg>
+  )
+}
+
 const META: Record<AssignmentType, { title: string; intro: string; contentLabel: string; cta: string }> = {
   dialog: {
     title: 'Dialog-Vorschläge',
@@ -178,9 +212,12 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
             <div className="space-y-3">
               {items.map(a => (
                 <div key={a.id} className="rounded-brand border border-brand-border p-3">
-                  <div className="flex justify-between gap-2 mb-2">
-                    <span className="text-xs font-semibold text-navy">{a.title || 'Nachricht'}</span>
-                    <span className="text-[11px] text-brand-muted">{fmt(a.created_at)}</span>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="flex items-center gap-2 min-w-0">
+                      <TypeIcon type="message" />
+                      <span className="text-sm font-medium text-navy truncate">{a.title || 'Nachricht'}</span>
+                    </span>
+                    <span className="text-[11px] text-brand-muted shrink-0">{fmt(a.created_at)}</span>
                   </div>
                   <MessageThread messages={threadFromPayload(a.payload)} mySide="professional"
                     onSend={t => proReply.mutate({ id: a.id, text: t })} busy={proReply.isPending} />
@@ -215,25 +252,26 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
                   <details key={a.id} className="group rounded-brand border border-brand-border p-3 open:border-accent/30">
                     <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                       <span className="flex items-center gap-2 min-w-0">
-                        <svg className="h-4 w-4 shrink-0 text-brand-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="3" width="8" height="4" rx="1" /><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" /><path d="M9 12h6M9 16h4" /></svg>
+                        <TypeIcon type="questionnaire" />
                         <span className="text-sm font-medium text-navy truncate">{a.title || 'Fragebogen'}</span>
                       </span>
                       <span className="flex items-center gap-2 shrink-0">
                         {resp?.score != null && (
-                          <span className="text-xs font-semibold text-accent tabular-nums rounded bg-accent/10 px-1.5 py-0.5">Ø {resp.score}</span>
+                          <span className="rounded bg-accent/10 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-accent">Ø {resp.score}</span>
                         )}
-                        <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${
-                          a.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                        }`}>
-                          {a.status === 'completed' ? 'Beantwortet' : 'Offen'}
-                        </span>
-                        <svg className="h-4 w-4 text-brand-muted transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" /></svg>
+                        <StatusChip status={a.status} doneLabel="Beantwortet" />
+                        <Chevron />
                       </span>
                     </summary>
                     <div className="mt-3">
                       {done
                         ? <QuestionnaireEvaluation questions={qs} answers={resp!.answers!} score={resp?.score} />
-                        : <p className="text-xs text-brand-muted">Noch nicht beantwortet · {qs.length} Frage(n)</p>}
+                        : (
+                          <p className="flex items-center gap-1.5 text-xs text-brand-muted">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                            Noch nicht beantwortet · {qs.length} {qs.length === 1 ? 'Frage' : 'Fragen'}
+                          </p>
+                        )}
                     </div>
                   </details>
                 )
@@ -245,12 +283,15 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
                 const resp = a.response as { summary?: string; note?: string } | null
                 const intention = (a.payload as { intention?: string }).intention
                 return (
-                  <details key={a.id} className="rounded-brand border border-brand-border p-3">
-                    <summary className="flex items-center justify-between gap-3 cursor-pointer text-sm">
-                      <span className="font-medium text-navy">{a.title || 'Dialog'}</span>
-                      <span className="flex items-center gap-2 text-xs text-brand-muted">
-                        {resp?.summary && <span className="font-semibold text-accent">✓ Zusammenfassung</span>}
-                        <span>{a.status}</span>
+                  <details key={a.id} className="group rounded-brand border border-brand-border p-3 open:border-accent/30">
+                    <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className="flex items-center gap-2 min-w-0">
+                        <TypeIcon type="dialog" />
+                        <span className="text-sm font-medium text-navy truncate">{a.title || 'Dialog'}</span>
+                      </span>
+                      <span className="flex items-center gap-2 shrink-0">
+                        <StatusChip status={a.status} doneLabel="Abgeschlossen" />
+                        <Chevron />
                       </span>
                     </summary>
                     <div className="mt-3 text-sm">
@@ -278,12 +319,15 @@ export default function AssignmentTypePanel({ caseId, type }: { caseId: string; 
               })}
             </div>
           ) : (
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2">
               {items.map(a => (
-                <li key={a.id} className="flex items-center justify-between gap-3 border-b border-brand-border pb-2 last:border-0 last:pb-0">
-                  <span className="text-brand-text">{a.title || '–'}</span>
-                  <span className="flex items-center gap-2 text-xs text-brand-muted shrink-0">
-                    <span>{a.status}</span>
+                <li key={a.id} className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3 py-2">
+                  <span className="flex items-center gap-2 min-w-0">
+                    <TypeIcon type={type} />
+                    <span className="text-sm text-navy truncate">{a.title || '–'}</span>
+                  </span>
+                  <span className="flex items-center gap-2 shrink-0 text-[11px] text-brand-muted">
+                    <StatusChip status={a.status} />
                     <span>{fmt(a.created_at)}</span>
                   </span>
                 </li>
