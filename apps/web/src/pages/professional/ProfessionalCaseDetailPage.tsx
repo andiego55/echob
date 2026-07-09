@@ -231,7 +231,7 @@ function ProfileAnswers({ modules, config }: {
   const sections = config
     .map(mod => {
       const ans = modules?.[mod.id] ?? {}
-      const items: { label: string; value: string }[] = []
+      const items: { label: string; value: string; likert?: number }[] = []
       for (const sel of mod.selections ?? []) {
         const v = ans[sel.key]
         if (v == null || (Array.isArray(v) && v.length === 0)) continue
@@ -240,7 +240,7 @@ function ProfileAnswers({ modules, config }: {
       }
       for (const it of mod.likertItems ?? []) {
         const v = ans[it.key]
-        if (typeof v === 'number') items.push({ label: it.text, value: `${v}/5` })
+        if (typeof v === 'number') items.push({ label: it.text, value: `${v}/5`, likert: v })
       }
       for (const ft of mod.freeTexts ?? []) {
         const v = ans[ft.key]
@@ -252,7 +252,7 @@ function ProfileAnswers({ modules, config }: {
       }
       return items.length ? { id: mod.id, label: mod.label, items } : null
     })
-    .filter((x): x is { id: string; label: string; items: { label: string; value: string }[] } => x !== null)
+    .filter((x): x is { id: string; label: string; items: { label: string; value: string; likert?: number }[] } => x !== null)
 
   if (sections.length === 0) {
     return <p className="text-sm text-brand-muted">Keine ausgefüllten Angaben in diesem Profil.</p>
@@ -267,7 +267,22 @@ function ProfileAnswers({ modules, config }: {
             {sec.items.map((it, i) => (
               <div key={i}>
                 <dt className="text-xs text-brand-muted">{it.label}</dt>
-                <dd className="text-sm text-brand-text whitespace-pre-wrap">{it.value}</dd>
+                {it.likert != null ? (
+                  <dd className="mt-1 flex items-center gap-1">
+                    {Array.from({ length: 5 }, (_, k) => {
+                      const n = k + 1
+                      const active = n === it.likert
+                      const filled = n < (it.likert ?? 0)
+                      return (
+                        <span key={k} className={`flex h-6 w-6 items-center justify-center rounded text-[11px] font-semibold tabular-nums ${
+                          active ? 'bg-accent text-white' : filled ? 'bg-accent/15 text-accent' : 'border border-brand-border bg-white text-brand-muted/50'
+                        }`}>{n}</span>
+                      )
+                    })}
+                  </dd>
+                ) : (
+                  <dd className="text-sm text-brand-text whitespace-pre-wrap">{it.value}</dd>
+                )}
               </div>
             ))}
           </dl>
@@ -485,18 +500,19 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 
         {has('scales') && bundle.scales.length > 0 && (
           <Section title="Skalen">
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {bundle.scales.filter(s => (Number(s.score) || 0) > 0).map(s => {
                 const score = Number(s.score) || 0
+                const label = SCALE_LABELS[s.scale_key as ScaleKey] ?? s.scale_key
                 return (
-                  <div key={s.scale_key}>
-                    <div className="flex justify-between text-xs mb-0.5">
-                      <span className="text-brand-text">{SCALE_LABELS[s.scale_key as ScaleKey] ?? s.scale_key}</span>
-                      <span className="text-brand-muted">{score.toFixed(1)}/5</span>
+                  <div key={s.scale_key} className="flex items-center gap-3">
+                    <span className="w-36 shrink-0 truncate text-xs font-medium text-navy" title={label}>{label}</span>
+                    <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-brand-border/70">
+                      <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${Math.min(100, Math.round((score / 5) * 100))}%` }} />
                     </div>
-                    <div className="h-1.5 bg-brand-border rounded-full overflow-hidden">
-                      <div className="h-full bg-accent" style={{ width: `${Math.min(100, Math.round((score / 5) * 100))}%` }} />
-                    </div>
+                    <span className="w-12 shrink-0 text-right text-sm font-bold tabular-nums text-accent">
+                      {score.toFixed(1)}<span className="text-[10px] font-normal text-brand-muted">/5</span>
+                    </span>
                   </div>
                 )
               })}
