@@ -12,6 +12,7 @@ from app.schemas.professional import (
     ConnectionResponse,
     ProfessionalInviteCreate,
 )
+from app.services import seat_service
 from app.services.invite_service import send_invite_email
 
 router = APIRouter(prefix="/professionals", tags=["professionals"])
@@ -99,3 +100,46 @@ async def invite(
         professional_user_id=row["professional_user_id"],
         display_name=None, title=None, created_at=row["created_at"],
     )
+
+
+@router.delete("/connections")
+async def dissolve_connection(
+    email: str,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Löst eine Fachpersonen-Verbindung auf. Widerruft zuerst ALLE aktiven Freigaben
+    an diese Fachperson (Zugriff endet sofort, Belegung wird geschlossen) und entfernt
+    dann die Verbindung. Nur die verbundene Person kann ihre eigene Verbindung lösen.
+    Wirkt auch für noch ausstehende (pending) Einladungen. Idempotent nach außen.
+    """
+    uid = current_user["user_id"]
+    key = (email or "").strip().lower()
+    async with pool.acquire() as conn:
+        inv = await conn.fetchrow(
+            "SELECT professional_user_id FROM professional_invites "
+            "WHERE inviter_user_id = $1 AND lower(email) = $2",
+            uid, key,
+        )
+        if inv is None:
+            raise HTTPException(status_code=404, detail="Verbindung nicht gefunden.")
+        pro_id = inv["professional_user_id"]
+        async with conn.transaction():
+            if pro_id is not None:
+                revoked = await conn.fetch(
+                    "UPDATE case_shares SET status = 'revoked', revoked_at = NOW(), "
+                    "updated_at = NOW() "
+                    "WHERE owner_user_id = $1 AND professional_user_id = $2 "
+                    "  AND status = 'active' "
+                    "RETURNING case_id",
+                    uid, pro_id,
+                )
+                for r in revoked:
+                    await seat_service.release_case_by_id(
+                        r["case_id"], conn, reason="revoked")
+            await conn.execute(
+                "DELETE FROM professional_invites "
+                "WHERE inviter_user_id = $1 AND lower(email) = $2",
+                uid, key,
+            )
+    return {"dissolved": True}

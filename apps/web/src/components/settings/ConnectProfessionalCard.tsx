@@ -39,6 +39,14 @@ export default function ConnectProfessionalCard() {
     },
   })
 
+  const dissolve = useMutation({
+    mutationFn: (email: string) => professionalsApi.dissolve(email),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['connections'] })
+      qc.invalidateQueries({ queryKey: ['prof-connections'] })
+    },
+  })
+
   const accepted = (connections ?? []).filter((c) => c.status === 'accepted')
 
   return (
@@ -52,17 +60,41 @@ export default function ConnectProfessionalCard() {
 
       {accepted.length > 0 && (
         <ul className="mt-4 space-y-1.5">
-          {accepted.map((c) => (
-            <li key={c.professional_user_id ?? c.email}
-              className="flex items-center gap-2 rounded-brand border border-brand-border bg-brand-bg/40 px-3 py-2 text-sm">
-              <span className="text-accent" aria-hidden="true">✓</span>
-              <span className="text-navy">
-                Verbunden mit <strong>{c.display_name || 'deiner Fachperson'}</strong>
-                {c.title && <span className="text-brand-muted"> · {c.title}</span>}
-              </span>
-            </li>
-          ))}
+          {accepted.map((c) => {
+            const label = c.display_name || 'deiner Fachperson'
+            const busy = dissolve.isPending && dissolve.variables === c.email
+            return (
+              <li key={c.professional_user_id ?? c.email}
+                className="flex items-center gap-2 rounded-brand border border-brand-border bg-brand-bg/40 px-3 py-2 text-sm">
+                <span className="text-accent" aria-hidden="true">✓</span>
+                <span className="min-w-0 text-navy">
+                  Verbunden mit <strong>{label}</strong>
+                  {c.title && <span className="text-brand-muted"> · {c.title}</span>}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm(
+                      `Verbindung mit ${label} wirklich auflösen?\n\n` +
+                      'Alle aktiven Freigaben an diese Fachperson werden dabei widerrufen – ' +
+                      'sie verliert sofort den Zugriff auf geteilte Fälle. ' +
+                      'Diese Aktion lässt sich nicht rückgängig machen.'
+                    )) dissolve.mutate(c.email)
+                  }}
+                  disabled={busy}
+                  className="ml-auto shrink-0 text-xs font-medium text-red-500 transition-colors hover:text-red-700 disabled:opacity-40"
+                >
+                  {busy ? 'Löse…' : 'Auflösen'}
+                </button>
+              </li>
+            )
+          })}
         </ul>
+      )}
+      {dissolve.isError && (
+        <p className="mt-2 text-sm text-red-600">
+          Verbindung konnte nicht aufgelöst werden. Bitte versuche es erneut.
+        </p>
       )}
 
       <form

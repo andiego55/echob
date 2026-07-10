@@ -19,4 +19,7 @@ export const professionalsApi = {
     apiClient.get<Connection[]>('/professionals/connections').then(r => r.data),
   invite: (email: string) =>
     apiClient.post<Connection>('/professionals/invite', { email }).then(r => r.data),
+  /** Verbindung auflösen: widerruft aktive Freigaben an die Fachperson + entfernt die Verbindung. */
+  dissolve: (email: string) =>
+    apiClient.delete('/professionals/connections', { params: { email } }),
 }
