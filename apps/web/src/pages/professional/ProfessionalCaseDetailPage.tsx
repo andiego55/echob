@@ -425,7 +425,14 @@ function CouplePanel({ caseId }: { caseId: string }) {
         </div>
         <div className="flex items-center gap-3">
           <Link to={`/professional/couples/${status.couple_id}/echo`} className="btn-primary !py-1.5 !px-4 !text-xs">Paar-Analyse mit Echo</Link>
-          <button onClick={() => { if (window.confirm('Kopplung lösen?')) remove.mutate(status.couple_id!) }}
+          <button
+            onClick={() => {
+              if (!window.confirm(
+                'Kopplung wirklich lösen?\n\nAlle gespeicherten Paar-Dialoge und Paar-Analyse-Berichte dieser Kopplung gehen dabei UNWIDERRUFLICH verloren. Die Einzelfälle und ihre Freigaben bleiben unberührt.',
+              )) return
+              if (!window.confirm('Sicher? Dieser Schritt kann nicht rückgängig gemacht werden.')) return
+              remove.mutate(status.couple_id!)
+            }}
             className="text-xs text-brand-muted hover:text-red-600">Entkoppeln</button>
         </div>
       </div>

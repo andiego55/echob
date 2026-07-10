@@ -665,6 +665,26 @@ export interface CoupleEchoSession {
   created_at: string
   updated_at: string
 }
+export interface CoupleReportListItem {
+  id: string
+  couple_id: string
+  source: string
+  template_id: string | null
+  title: string | null
+  created_at: string
+  updated_at: string
+}
+export interface CoupleReport {
+  id: string
+  couple_id: string
+  source: string
+  template_id: string | null
+  title: string | null
+  content: ReportContent
+  disclaimer: string
+  created_at: string
+  updated_at: string
+}
 export interface CoupleMeta {
   suggested_questions: string[]
   glossary: GlossaryTerm[]

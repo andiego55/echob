@@ -7,6 +7,7 @@ Paar-Echo-Daten liegen in eigenen professional_couple_echo_*-Tabellen.
 """
 from __future__ import annotations
 
+import json
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -14,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_pool
 from app.schemas.professional import (
+    PRO_REPORT_DISCLAIMER,
     CaseCoupleStatus,
     CoupleCreateRequest,
     CoupleEchoChatRequest,
@@ -22,9 +24,13 @@ from app.schemas.professional import (
     CoupleEchoSessionResponse,
     CoupleGlossaryTerm,
     CoupleMeta,
+    CoupleReport,
+    CoupleReportCreate,
+    CoupleReportListItem,
     CoupleResponse,
 )
 from app.services import couple_service, echo_modes
+from app.services.pro_report_templates import get_standard
 from app.services.sharing_service import require_active_share
 from app.services.subscription_service import enforce_professional_echo_limit
 
@@ -280,4 +286,149 @@ async def delete_couple_session(
         )
     if result == "DELETE 0":
         raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return {"deleted": True}
+
+
+# ── Paar-Berichte (an die Kopplung gebunden; Cascade-Löschung beim Entkoppeln) ──
+
+_MAX_COUPLE_REPORTS = 30
+
+
+def _couple_report_response(row) -> CoupleReport:
+    content = row["content"]
+    if isinstance(content, str):
+        content = json.loads(content)
+    content = crypto.decrypt_json_strings(content) if content else {"sections": []}
+    return CoupleReport(
+        id=row["id"], couple_id=row["couple_id"], source=row["source"],
+        template_id=row["template_id"], title=row["title"], content=content,
+        disclaimer=content.get("disclaimer", PRO_REPORT_DISCLAIMER),
+        created_at=row["created_at"], updated_at=row["updated_at"],
+    )
+
+
+@router.post("/couples/{couple_id}/reports", response_model=CoupleReport, status_code=201)
+async def create_couple_report(
+    couple_id: UUID,
+    body: CoupleReportCreate,
+    request: Request,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> CoupleReport:
+    """Erstellt einen Paar-Bericht: umfassender Standard ODER eigene Berichtsvorlage.
+
+    Kontext = die freigegebenen Inhalte BEIDER Fälle (load_combined_context → je
+    load_shared_bundle; kein neuer Datenzugriff). Der Bericht hängt an der Kopplung.
+    """
+    pid = current["user_id"]
+    echo_svc = _get_echo_service(request)
+    is_template = body.source == "template"
+
+    async with pool.acquire() as conn:
+        couple = await couple_service.require_couple(pid, couple_id, conn)
+        await couple_service.assert_couple_workable(couple, current, conn)
+        count = await conn.fetchval(
+            "SELECT COUNT(*) FROM professional_couple_reports WHERE couple_id = $1", couple_id
+        )
+        if count >= _MAX_COUPLE_REPORTS:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Maximale Anzahl von {_MAX_COUPLE_REPORTS} Berichten erreicht. "
+                       "Bitte löschen Sie einen Bericht, bevor Sie einen neuen erstellen.",
+            )
+        if is_template:
+            if not body.template_id:
+                raise HTTPException(status_code=422, detail="Vorlage fehlt.")
+            tpl = await conn.fetchrow(
+                "SELECT name, instruction FROM professional_report_templates "
+                "WHERE id = $1 AND org_id = $2",
+                body.template_id, current["org_id"],
+            )
+            if not tpl:
+                raise HTTPException(status_code=404, detail="Vorlage nicht gefunden.")
+            instruction = crypto.decrypt(tpl["instruction"])
+            max_tokens, temperature = 3500, 0.38
+            source_str, template_id, default_title = "template", body.template_id, tpl["name"]
+        else:
+            std = get_standard("couple")
+            if not std:
+                raise HTTPException(status_code=422, detail="Standardbericht nicht verfügbar.")
+            instruction = std["instruction"]
+            max_tokens, temperature = std["max_tokens"], std["temperature"]
+            source_str, template_id, default_title = "standard:couple", None, std["label"]
+        context = await couple_service.load_combined_context(pid, couple, conn)
+
+    content = await echo_svc.professional_generate_report(
+        instruction=instruction, context=context,
+        max_tokens=max_tokens, temperature=temperature,
+        prompt_file="echo_couple_report_prompt.md",
+    )
+    title = body.title or default_title or "Paaranalyse-Bericht"
+    content_json = json.dumps(crypto.encrypt_json_strings(content))
+
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "INSERT INTO professional_couple_reports "
+            "(couple_id, professional_user_id, source, template_id, title, content) "
+            "VALUES ($1, $2, $3, $4, $5, $6::jsonb) RETURNING *",
+            couple_id, pid, source_str, template_id, title, content_json,
+        )
+    return _couple_report_response(row)
+
+
+@router.get("/couples/{couple_id}/reports", response_model=list[CoupleReportListItem])
+async def list_couple_reports(
+    couple_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> list[CoupleReportListItem]:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await couple_service.require_couple(pid, couple_id, conn)
+        rows = await conn.fetch(
+            "SELECT id, couple_id, source, template_id, title, created_at, updated_at "
+            "FROM professional_couple_reports "
+            "WHERE couple_id = $1 AND professional_user_id = $2 ORDER BY created_at DESC",
+            couple_id, pid,
+        )
+    return [CoupleReportListItem(**dict(r)) for r in rows]
+
+
+@router.get("/couples/{couple_id}/reports/{report_id}", response_model=CoupleReport)
+async def get_couple_report(
+    couple_id: UUID,
+    report_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> CoupleReport:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await couple_service.require_couple(pid, couple_id, conn)
+        row = await conn.fetchrow(
+            "SELECT * FROM professional_couple_reports "
+            "WHERE id = $1 AND couple_id = $2 AND professional_user_id = $3",
+            report_id, couple_id, pid,
+        )
+    if not row:
+        raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
+    return _couple_report_response(row)
+
+
+@router.delete("/couples/{couple_id}/reports/{report_id}")
+async def delete_couple_report(
+    couple_id: UUID,
+    report_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await couple_service.require_couple(pid, couple_id, conn)
+        result = await conn.execute(
+            "DELETE FROM professional_couple_reports "
+            "WHERE id = $1 AND couple_id = $2 AND professional_user_id = $3",
+            report_id, couple_id, pid,
+        )
+    if result == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
     return {"deleted": True}

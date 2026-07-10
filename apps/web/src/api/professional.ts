@@ -21,6 +21,8 @@ import type {
   CaseCoupleStatus,
   CoupleMeta,
   CoupleEchoSession,
+  CoupleReport,
+  CoupleReportListItem,
 } from '@/types'
 
 interface EchoChatResult {
@@ -305,4 +307,18 @@ export const professionalApi = {
   }) =>
     apiClient.post<EchoChatResult>(`/professional/couples/${coupleId}/echo/chat`, data, { timeout: 120_000 })
       .then(r => r.data),
+  deleteCoupleSession: (coupleId: string, sessionId: string) =>
+    apiClient.delete(`/professional/couples/${coupleId}/echo/sessions/${sessionId}`).then(r => r.data),
+  coupleReports: (coupleId: string) =>
+    apiClient.get<CoupleReportListItem[]>(`/professional/couples/${coupleId}/reports`).then(r => r.data),
+  createCoupleReport: (
+    coupleId: string,
+    data: { source?: 'standard' | 'template'; template_id?: string; title?: string },
+  ) =>
+    apiClient.post<CoupleReport>(`/professional/couples/${coupleId}/reports`, data, { timeout: 180_000 })
+      .then(r => r.data),
+  getCoupleReport: (coupleId: string, reportId: string) =>
+    apiClient.get<CoupleReport>(`/professional/couples/${coupleId}/reports/${reportId}`).then(r => r.data),
+  deleteCoupleReport: (coupleId: string, reportId: string) =>
+    apiClient.delete(`/professional/couples/${coupleId}/reports/${reportId}`).then(r => r.data),
 }

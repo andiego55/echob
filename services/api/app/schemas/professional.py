@@ -448,6 +448,38 @@ class CoupleMeta(BaseModel):
     glossary: list[CoupleGlossaryTerm]
 
 
+class CoupleReportCreate(BaseModel):
+    source: Literal["standard", "template"] = "standard"
+    template_id: UUID | None = None
+    title: str | None = Field(None, max_length=200)
+
+
+class CoupleReportListItem(BaseModel):
+    id: UUID
+    couple_id: UUID
+    source: str
+    template_id: UUID | None = None
+    title: str | None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class CoupleReport(BaseModel):
+    id: UUID
+    couple_id: UUID
+    source: str
+    template_id: UUID | None = None
+    title: str | None
+    content: dict[str, Any]
+    disclaimer: str = PRO_REPORT_DISCLAIMER
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 # ── Aktivierungs-Historie (Abrechnung) ────────────────────────────────────────
 
 class ActivationLogEntry(BaseModel):
