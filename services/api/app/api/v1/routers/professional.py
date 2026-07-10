@@ -349,8 +349,38 @@ async def dashboard(
             "GROUP BY s.case_id, s.is_demo, c.relationship_type, up.display_name",
             pid,
         )
+        # „Verbunden, wartet auf Freigabe": akzeptierte Verbindungen (Zwei-Schritt-Modell:
+        # verbinden ≠ teilen), zu denen es noch keinen aktiven Fall-Share gibt. Rein
+        # informativ – die Person muss selbst einen Fall freigeben. Anzeigename:
+        # Fachpersonen-Label (client_invites) vor selbst gewähltem Anzeigenamen.
+        pending_rows = await conn.fetch(
+            "SELECT pi.inviter_user_id, pi.accepted_at, "
+            "       up.display_name AS client_display_name, ci.label AS invite_label "
+            "FROM professional_invites pi "
+            "LEFT JOIN user_profiles up ON up.user_id = pi.inviter_user_id "
+            "LEFT JOIN LATERAL ("
+            "  SELECT label FROM client_invites "
+            "  WHERE professional_user_id = pi.professional_user_id "
+            "    AND accepted_user_id = pi.inviter_user_id AND status = 'accepted' "
+            "  ORDER BY accepted_at DESC NULLS LAST LIMIT 1"
+            ") ci ON TRUE "
+            "WHERE pi.professional_user_id = $1 AND pi.status = 'accepted' "
+            "  AND NOT EXISTS ("
+            "    SELECT 1 FROM case_shares s "
+            "    WHERE s.professional_user_id = $1 AND s.owner_user_id = pi.inviter_user_id "
+            "      AND s.status = 'active') "
+            "ORDER BY pi.accepted_at DESC NULLS LAST",
+            pid,
+        )
+        pending_connections = [
+            {
+                "display_name": r["invite_label"] or r["client_display_name"] or "Verbundene Person",
+                "connected_at": r["accepted_at"],
+            }
+            for r in pending_rows
+        ]
         if not share_rows:
-            return {"cases": [], "total_unread": 0}
+            return {"cases": [], "total_unread": 0, "pending_connections": pending_connections}
         case_info = {
             r["case_id"]: {
                 "client_display_name": r["client_display_name"] or "Klient:in",
@@ -436,7 +466,11 @@ async def dashboard(
     cases_out.sort(key=lambda c: c["last_activity"] or _floor, reverse=True)
     cases_out.sort(key=lambda c: (c["unread_count"], c["open_count"]), reverse=True)
 
-    return {"cases": cases_out, "total_unread": sum(c["unread_count"] for c in cases_out)}
+    return {
+        "cases": cases_out,
+        "total_unread": sum(c["unread_count"] for c in cases_out),
+        "pending_connections": pending_connections,
+    }
 
 
 @router.get("/postfach")

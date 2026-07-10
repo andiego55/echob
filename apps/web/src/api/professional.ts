@@ -60,9 +60,14 @@ export interface DashboardCase {
   last_activity: string | null
   items: DashboardItem[]
 }
+export interface PendingConnection {
+  display_name: string
+  connected_at: string | null
+}
 export interface ProfessionalDashboard {
   cases: DashboardCase[]
   total_unread: number
+  pending_connections?: PendingConnection[]
 }
 
 export interface PostfachAttention {

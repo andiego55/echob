@@ -78,6 +78,7 @@ export default function ProfessionalDashboardPage() {
 
   const cases = data?.cases ?? []
   const totalUnread = data?.total_unread ?? 0
+  const pending = data?.pending_connections ?? []
   const clientsCount = new Set(cases.map(c => c.client_display_name)).size
   const totalOpen = cases.reduce((n, c) => n + c.open_count, 0)
 
@@ -104,6 +105,42 @@ export default function ProfessionalDashboardPage() {
           <Tile label="Braucht Aufmerksamkeit" value={totalUnread} icon={<IconBell />} to="/professional" accent={totalUnread > 0} />
           <Tile label="Offene Aufgaben" value={totalOpen} icon={<IconClock />} active={filter === 'open'} onClick={() => setFilter('open')} />
         </div>
+
+        {pending.length > 0 && (
+          <div className="mb-6 rounded-brand border border-amber-200 bg-amber-50/50 p-4">
+            <div className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7}
+                  strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                  <circle cx="12" cy="12" r="8.5" /><path d="M12 8v4l2.5 1.5" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-sm font-semibold text-navy">Verbunden, wartet auf Freigabe</h2>
+                <p className="mt-0.5 text-xs leading-relaxed text-brand-muted">
+                  {pending.length === 1 ? 'Diese Person ist' : 'Diese Personen sind'} mit dir verbunden,
+                  {pending.length === 1 ? ' hat' : ' haben'} aber noch keinen Fall freigegeben. Sobald in der
+                  eigenen App ein Fall mit dir geteilt wird, erscheint er oben in der Fall-Liste – du kannst
+                  die Person gern daran erinnern.
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2 border-t border-amber-200/70 pt-3">
+              {pending.map((p, i) => (
+                <span key={i}
+                  className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white px-2.5 py-1">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700">
+                    {initials(p.display_name)}
+                  </span>
+                  <span className="text-xs font-medium text-navy">{p.display_name}</span>
+                  {p.connected_at && (
+                    <span className="text-[11px] text-brand-muted">· verbunden {fmtDay(p.connected_at)}</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {cases.length === 0 ? (
           <div className="card text-center py-12">
