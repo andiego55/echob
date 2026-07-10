@@ -43,7 +43,7 @@ export default function CoupleEchoPage() {
   const reports = useQuery({
     queryKey: ['couple-reports', coupleId], queryFn: () => professionalApi.coupleReports(coupleId!), enabled: !!coupleId,
   })
-  const reportTemplates = useQuery({ queryKey: ['report-templates'], queryFn: professionalApi.reportTemplates })
+  const reportTemplates = useQuery({ queryKey: ['prof-report-templates'], queryFn: professionalApi.reportTemplates })
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
