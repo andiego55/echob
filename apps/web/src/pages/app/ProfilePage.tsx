@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { profileApi } from '@/api/profile'
+import { renderBold } from '@/utils/renderBold'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import type { ProfileModuleConfig } from '@/utils/profileModules'
 import { computeModuleScores, computeResourcesIndex, scoreLevel, buildSummaryText } from '@/utils/profileScoring'
@@ -589,7 +590,7 @@ function SummaryView({
             <div className="card mb-6 space-y-3">
               <p className="text-sm font-semibold text-navy">Zusammenfassung</p>
               {summaryLines.map((line, i) => (
-                <p key={i} className="text-sm text-brand-text" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                <p key={i} className="text-sm text-brand-text">{renderBold(line)}</p>
               ))}
               <p className="text-xs text-brand-muted/70 pt-2 border-t border-brand-border">
                 Diese Einschätzung basiert auf deinen Selbstangaben und ist vorläufig. Sie ersetzt keine professionelle Beratung oder Diagnostik.

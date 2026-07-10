@@ -7,6 +7,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import { renderBold } from '@/utils/renderBold'
 import { personProfileApi } from '@/api/personProfile'
 import { casesApi } from '@/api/cases'
 import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
@@ -564,7 +565,7 @@ function PersonProfileSummaryView({
             <div className="card mb-6 space-y-3">
               <p className="text-sm font-semibold text-navy">Zusammenfassung deiner Einschätzung</p>
               {summaryLines.map((line, i) => (
-                <p key={i} className="text-sm text-brand-text" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                <p key={i} className="text-sm text-brand-text">{renderBold(line)}</p>
               ))}
               <p className="text-xs text-brand-muted/70 pt-2 border-t border-brand-border">
                 Diese Einschätzung basiert auf deinen Angaben zu der anderen Person und ist vorläufig.
