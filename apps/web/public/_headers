@@ -1,0 +1,18 @@
+# Security-Header für alle Routen. Cloudflare (Workers Static Assets / Pages) liefert
+# diese Datei aus dem dist-Root aus (Vite kopiert public/* -> dist/).
+#
+# Die CSP läuft absichtlich zuerst als *Report-Only*: sie blockt nichts, meldet
+# Verstöße nur in der Browser-Konsole. Nach dem Deploy die App einmal komplett
+# durchklicken (Login, Chat/Audio, Berichte, Freigaben) und die Konsole auf
+# "Content-Security-Policy" prüfen. Wenn sauber -> Header umbenennen in
+# "Content-Security-Policy" (ohne "-Report-Only"), damit die CSP wirklich greift.
+#
+# Verifikation: curl -sI https://echo-b.de/ | grep -iE "strict-transport|content-security|x-frame|permissions-policy"
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(self), geolocation=(), payment=()
+  Content-Security-Policy-Report-Only: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.echo-b.de https://*.supabase.co wss://*.supabase.co https://*.sentry.io; upgrade-insecure-requests
