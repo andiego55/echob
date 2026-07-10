@@ -5,6 +5,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { isAxiosError } from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
@@ -30,6 +31,7 @@ export default function ProfessionalEchoPage() {
   const [summary, setSummary] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
+  const [gateError, setGateError] = useState(false)
   const glossaryStarted = useRef(false)
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -39,6 +41,14 @@ export default function ProfessionalEchoPage() {
     enabled: !!caseId,
   })
   const { data: glossary = [] } = useQuery({ queryKey: ['prof-glossary'], queryFn: professionalApi.glossary })
+  const { data: caseInfo } = useQuery({
+    queryKey: ['prof-case', caseId],
+    queryFn: () => professionalApi.caseDetail(caseId!),
+    enabled: !!caseId,
+  })
+  // Nicht-aktivierter Nicht-Demo-Fall → Echo gesperrt (Sitz-Gate). gateError deckt
+  // den Fall ab, dass der Status noch lädt und der Server mit 402 antwortet.
+  const locked = gateError || (!!caseInfo && !caseInfo.is_demo && !caseInfo.activated)
   const { data: history } = useQuery({
     queryKey: ['prof-echo-history', caseId, activeSession],
     queryFn: () => professionalApi.echoHistory(caseId!, activeSession!),
@@ -52,9 +62,13 @@ export default function ProfessionalEchoPage() {
     mutationFn: (vars: { message: string; thread_type?: 'case' | 'glossary'; glossary_slug?: string }) =>
       professionalApi.echoChat(caseId!, { ...vars, session_id: activeSession ?? undefined }),
     onSuccess: (res) => {
+      setGateError(false)
       setActiveSession(res.session_id)
       setMessages(prev => [...prev, res.user_message, res.assistant_message])
       qc.invalidateQueries({ queryKey: ['prof-echo-sessions', caseId] })
+    },
+    onError: (err) => {
+      if (isAxiosError(err) && err.response?.status === 402) setGateError(true)
     },
   })
 
@@ -72,7 +86,7 @@ export default function ProfessionalEchoPage() {
 
   const send = () => {
     const msg = input.trim()
-    if (!msg || chat.isPending) return
+    if (!msg || chat.isPending || locked) return
     setInput('')
     chat.mutate({ message: msg })
   }
@@ -118,6 +132,20 @@ export default function ProfessionalEchoPage() {
           </div>
           <button onClick={newChat} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm">+ Neuer Chat</button>
         </div>
+
+        {locked && (
+          <div className="mb-4 rounded-brand border border-amber-200 bg-amber-50 px-4 py-3">
+            <p className="text-sm font-semibold text-navy">Dieser Fall ist noch nicht aktiviert</p>
+            <p className="mt-1 text-xs leading-relaxed text-brand-muted">
+              Um mit Echo über diesen Fall zu sprechen, aktiviere ihn zuerst in der Fallansicht
+              (belegt einen Sitz). Der Beispielfall ist frei nutzbar.
+            </p>
+            <Link to={`/professional/cases/${caseId}`}
+              className="mt-2 inline-block text-xs font-medium text-accent hover:underline">
+              → Zur Fallansicht · Fall aktivieren
+            </Link>
+          </div>
+        )}
 
         <div className="flex gap-6">
           {/* Sessions */}
@@ -185,8 +213,8 @@ export default function ProfessionalEchoPage() {
                     <p className="mb-3">Stelle Echo eine Frage zu diesem Fall. Zum Beispiel:</p>
                     <div className="flex flex-col gap-2">
                       {SUGGESTIONS.map(q => (
-                        <button key={q} onClick={() => chat.mutate({ message: q })}
-                          className="text-left text-xs px-3 py-2 rounded-brand border border-brand-border hover:border-accent hover:text-accent transition-colors">
+                        <button key={q} onClick={() => chat.mutate({ message: q })} disabled={locked}
+                          className="text-left text-xs px-3 py-2 rounded-brand border border-brand-border hover:border-accent hover:text-accent transition-colors disabled:opacity-40 disabled:hover:border-brand-border disabled:hover:text-brand-muted">
                           {q}
                         </button>
                       ))}
@@ -216,10 +244,11 @@ export default function ProfessionalEchoPage() {
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
                     rows={2}
-                    placeholder="Nachricht an Echo …"
-                    className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
+                    disabled={locked}
+                    placeholder={locked ? 'Fall nicht aktiviert – Echo ist gesperrt' : 'Nachricht an Echo …'}
+                    className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none disabled:opacity-60 disabled:cursor-not-allowed"
                   />
-                  <button onClick={send} disabled={chat.isPending || !input.trim()} className="btn-primary !px-5 !text-sm self-end">Senden</button>
+                  <button onClick={send} disabled={chat.isPending || !input.trim() || locked} className="btn-primary !px-5 !text-sm self-end">Senden</button>
                 </div>
                 {messages.length > 0 && (
                   <div className="mt-2 flex gap-3">
