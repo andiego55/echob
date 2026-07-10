@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { setPendingInvite } from '@/lib/pendingInvite'
 import SetPasswordForm from '@/components/auth/SetPasswordForm'
+import { validatePassword } from '@/utils/validatePassword'
 
 type Tab    = 'login' | 'signup'
 type Method = 'password' | 'magic'
@@ -61,8 +62,9 @@ export default function AuthPage() {
       }
 
       if (tab === 'signup') {
-        if (password.length < 8) {
-          setMessage({ type: 'error', text: 'Das Passwort muss mindestens 8 Zeichen haben.' })
+        const pwErr = validatePassword(password)
+        if (pwErr) {
+          setMessage({ type: 'error', text: pwErr })
           return
         }
         const { error } = await supabase.auth.signUp({

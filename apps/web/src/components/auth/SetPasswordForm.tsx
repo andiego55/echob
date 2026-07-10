@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { validatePassword, PASSWORD_HINT } from '@/utils/validatePassword'
 
 /**
  * Passwort-festlegen-Formular für eingeladene Nutzer (und Passwort-Reset).
@@ -22,7 +23,8 @@ export default function SetPasswordForm({ variant = 'invite' }: { variant?: 'inv
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    if (password.length < 8) { setError('Das Passwort muss mindestens 8 Zeichen haben.'); return }
+    const pwErr = validatePassword(password)
+    if (pwErr) { setError(pwErr); return }
     if (password !== confirm) { setError('Die Passwörter stimmen nicht überein.'); return }
     setSubmitting(true)
     try {
@@ -57,9 +59,10 @@ export default function SetPasswordForm({ variant = 'invite' }: { variant?: 'inv
           <input
             id="np-1" type="password" required autoComplete="new-password"
             value={password} onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mindestens 8 Zeichen"
+            placeholder="Passwort"
             className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
           />
+          <p className="mt-1 text-[11px] text-brand-muted">{PASSWORD_HINT}</p>
         </div>
         <div>
           <label htmlFor="np-2" className="mb-1.5 block text-sm font-medium text-brand-text">Passwort bestätigen</label>
