@@ -606,15 +606,24 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           <Section title={`Berichte (${bundle.reports.length})`}>
             <div className="space-y-4">
               {bundle.reports.map(r => (
-                <details key={r.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
-                  <summary className="text-sm font-semibold text-navy cursor-pointer">
-                    {r.title || r.type_label || r.report_type}
+                <details key={r.id} className="group rounded-brand border border-brand-border bg-white px-4 py-3 open:border-accent/30">
+                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-center gap-2 min-w-0">
+                      <DocIcon />
+                      <span className="text-sm font-medium text-navy truncate">{r.title || r.type_label || r.report_type}</span>
+                    </span>
+                    <span className="flex items-center gap-2 shrink-0">
+                      {r.type_label && r.title && (
+                        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">{r.type_label}</span>
+                      )}
+                      <Chevron />
+                    </span>
                   </summary>
-                  <div className="mt-2 space-y-2">
+                  <div className="mt-3 space-y-3 border-t border-brand-border pt-3">
                     {(r.content?.sections ?? []).map((sec, i) => (
                       <div key={i}>
-                        <p className="text-xs font-semibold text-navy">{sec.heading}</p>
-                        <p className="text-sm text-brand-muted whitespace-pre-wrap">{sec.text}</p>
+                        <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-muted">{sec.heading}</p>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-navy">{sec.text}</p>
                       </div>
                     ))}
                   </div>
@@ -817,12 +826,13 @@ function ReportsPanel({ caseId }: { caseId: string }) {
           <div className="space-y-2">
             {reports.map(r => (
               <div key={r.id}
-                className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
-                <Link to={`/professional/cases/${caseId}/reports/${r.id}`} className="min-w-0 no-underline">
-                  <div className="text-sm font-semibold text-navy truncate">{r.title || 'Bericht'}</div>
-                  <div className="text-[11px] text-brand-muted">
-                    {sourceLabel(r.source)} · {fmtSummaryDate(r.created_at)}
-                  </div>
+                className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-white px-4 py-2.5">
+                <Link to={`/professional/cases/${caseId}/reports/${r.id}`} className="flex items-center gap-2.5 min-w-0 no-underline group">
+                  <DocIcon />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors">{r.title || 'Bericht'}</span>
+                    <span className="block text-[11px] text-brand-muted">{sourceLabel(r.source)} · {fmtSummaryDate(r.created_at)}</span>
+                  </span>
                 </Link>
                 <button
                   onClick={() => { if (window.confirm('Diesen Bericht löschen?')) del.mutate(r.id) }}
@@ -936,6 +946,25 @@ function Field({ label, wide, children }: { label: string; wide?: boolean; child
 function InfoChip({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-block rounded-full bg-accent/10 px-2.5 py-0.5 text-sm font-medium text-accent">{children}</span>
+  )
+}
+
+function DocIcon() {
+  return (
+    <svg className="h-4 w-4 shrink-0 text-brand-muted" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 3v5h5M9 13h6M9 17h4" />
+    </svg>
+  )
+}
+
+function Chevron() {
+  return (
+    <svg className="h-4 w-4 shrink-0 text-brand-muted transition-transform group-open:rotate-180"
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+    </svg>
   )
 }
 
