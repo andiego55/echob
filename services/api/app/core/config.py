@@ -22,6 +22,12 @@ CommaSeparatedList = Annotated[list[str], BeforeValidator(_parse_comma_list)]
 
 _INSECURE_KEY = "insecure-dev-secret-change-in-production"
 
+# Fester Fernet-Schlüssel NUR für Development/Tests: sorgt dafür, dass auch lokal
+# IMMER verschlüsselt wird — sensible Freitexte liegen nie versehentlich im Klartext.
+# Kein Geheimnis (gilt nur für Wegwerf-Dev-Daten); in Production wird ein ECHTER
+# Key erzwungen (siehe validate_production_secrets). Nicht für echte Daten verwenden.
+_DEV_ENCRYPTION_KEY = "OfenbMY_hx9Ic8WK0Wn_TMPU_8zLZFHzkN2LZ-Z4z8o="
+
 
 class Settings(BaseSettings):
     # ── Meta ───────────────────────────────────────────────────────────
@@ -120,24 +126,51 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_production_secrets(self) -> "Settings":
-        """Bricht den Start ab wenn unsichere Defaults in Production laufen."""
-        if not self.is_production:
-            return self
+        """Erzwingt sichere Konfiguration. Development: setzt einen festen Dev-Key,
+        damit IMMER verschlüsselt wird. Production: bricht bei unsicheren Defaults ab
+        (fail-closed) – u.a. wenn KEIN ENCRYPTION_KEY gesetzt ist, sonst würden
+        sensible Freitexte im Klartext gespeichert."""
+        # Nur Development/Tests: nie versehentlich Klartext → fester Dev-Key, wenn
+        # keiner gesetzt ist. Staging/Production bekommen den öffentlichen Dev-Key
+        # NICHT (dort muss ein echter Key gesetzt sein).
+        if self.is_development and not self.encryption_key:
+            self.encryption_key = _DEV_ENCRYPTION_KEY
 
-        errors: list[str] = []
+        if self.is_production:
+            errors: list[str] = []
 
-        if self.secret_key in ("", _INSECURE_KEY):
-            errors.append("SECRET_KEY muss in Production gesetzt sein.")
+            if self.secret_key in ("", _INSECURE_KEY):
+                errors.append("SECRET_KEY muss in Production gesetzt sein.")
 
-        if not self.cors_origins or any(
-            "localhost" in o for o in self.cors_origins
-        ):
-            errors.append(
-                "CORS_ORIGINS enthält localhost – in Production nicht erlaubt."
-            )
+            if not self.encryption_key:
+                errors.append(
+                    "ENCRYPTION_KEY muss in Production gesetzt sein – ohne ihn "
+                    "würden sensible Daten im Klartext gespeichert (fail-closed)."
+                )
 
-        if errors:
-            raise ValueError("Unsichere Konfiguration für Production:\n" + "\n".join(f"  • {e}" for e in errors))
+            if not self.cors_origins or any(
+                "localhost" in o for o in self.cors_origins
+            ):
+                errors.append(
+                    "CORS_ORIGINS enthält localhost – in Production nicht erlaubt."
+                )
+
+            if errors:
+                raise ValueError(
+                    "Unsichere Konfiguration für Production:\n"
+                    + "\n".join(f"  • {e}" for e in errors)
+                )
+
+        # Key-Format früh prüfen (Dev + Prod): fängt einen kaputten/vertippten
+        # Schlüssel beim Start ab, statt erst zur Laufzeit stumm zu scheitern.
+        if self.encryption_key:
+            from cryptography.fernet import Fernet
+            try:
+                Fernet(self.encryption_key.encode("ascii"))
+            except Exception as e:  # noqa: BLE001 – jede Fehlform soll den Start stoppen
+                raise ValueError(
+                    f"ENCRYPTION_KEY ist kein gültiger Fernet-Schlüssel: {e}"
+                ) from e
 
         return self
 
