@@ -480,6 +480,11 @@ class CoupleReport(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class CoupleReportUpdate(BaseModel):
+    title: str | None = Field(None, max_length=200)
+    sections: list[dict[str, Any]] | None = None
+
+
 # ── Aktivierungs-Historie (Abrechnung) ────────────────────────────────────────
 
 class ActivationLogEntry(BaseModel):

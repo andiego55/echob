@@ -250,43 +250,23 @@ function CoupleReportItem({ coupleId, item }: {
   item: CoupleReportListItem
 }) {
   const qc = useQueryClient()
-  const [open, setOpen] = useState(false)
-  const { data } = useQuery({
-    queryKey: ['couple-report', coupleId, item.id],
-    queryFn: () => professionalApi.getCoupleReport(coupleId, item.id),
-    enabled: open,
-  })
   const del = useMutation({
     mutationFn: () => professionalApi.deleteCoupleReport(coupleId, item.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-reports', coupleId] }),
   })
   return (
-    <div className="rounded-brand border border-brand-border bg-white">
-      <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-        <button onClick={() => setOpen(o => !o)} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
-          <DocIcon />
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-medium text-navy">{item.title || 'Paar-Bericht'}</span>
-            <span className="block text-[11px] text-brand-muted">{sourceLabel(item.source)} · {fmtDay(item.created_at)}</span>
-          </span>
-          <svg className={`h-4 w-4 shrink-0 text-brand-muted transition-transform ${open ? 'rotate-180' : ''}`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" /></svg>
-        </button>
-        <button onClick={() => { if (window.confirm('Diesen Bericht löschen?')) del.mutate() }} disabled={del.isPending}
-          className="shrink-0 text-xs text-brand-muted transition-colors hover:text-red-600 disabled:opacity-40">Löschen</button>
-      </div>
-      {open && (
-        <div className="space-y-3 border-t border-brand-border px-4 py-3">
-          {!data ? <p className="text-xs text-brand-muted">Wird geladen …</p> : (
-            (data.content?.sections ?? []).map((sec, i) => (
-              <div key={i}>
-                <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-muted">{sec.heading}</p>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-navy">{sec.text}</p>
-              </div>
-            ))
-          )}
-        </div>
-      )}
+    <div className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-white px-4 py-2.5">
+      <Link to={`/professional/couples/${coupleId}/reports/${item.id}`}
+        className="group flex min-w-0 flex-1 items-center gap-2.5 no-underline">
+        <DocIcon />
+        <span className="min-w-0">
+          <span className="block truncate text-sm font-medium text-navy transition-colors group-hover:text-accent">{item.title || 'Paar-Bericht'}</span>
+          <span className="block text-[11px] text-brand-muted">{sourceLabel(item.source)} · {fmtDay(item.created_at)}</span>
+        </span>
+        <span className="ml-auto shrink-0 text-xs font-medium text-accent">Öffnen →</span>
+      </Link>
+      <button onClick={() => { if (window.confirm('Diesen Bericht löschen?')) del.mutate() }} disabled={del.isPending}
+        className="shrink-0 text-xs text-brand-muted transition-colors hover:text-red-600 disabled:opacity-40">Löschen</button>
     </div>
   )
 }

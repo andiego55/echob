@@ -27,6 +27,7 @@ from app.schemas.professional import (
     CoupleReport,
     CoupleReportCreate,
     CoupleReportListItem,
+    CoupleReportUpdate,
     CoupleResponse,
 )
 from app.services import couple_service, echo_modes
@@ -412,6 +413,42 @@ async def get_couple_report(
     if not row:
         raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
     return _couple_report_response(row)
+
+
+@router.patch("/couples/{couple_id}/reports/{report_id}", response_model=CoupleReport)
+async def update_couple_report(
+    couple_id: UUID,
+    report_id: UUID,
+    body: CoupleReportUpdate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> CoupleReport:
+    """Titel und/oder Abschnitte eines Paar-Berichts bearbeiten (verschlüsselt gespeichert)."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        await couple_service.require_couple(pid, couple_id, conn)
+        row = await conn.fetchrow(
+            "SELECT * FROM professional_couple_reports "
+            "WHERE id = $1 AND couple_id = $2 AND professional_user_id = $3",
+            report_id, couple_id, pid,
+        )
+        if not row:
+            raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
+        content = row["content"]
+        if isinstance(content, str):
+            content = json.loads(content)
+        content = crypto.decrypt_json_strings(content) if content else {"sections": []}
+        if body.sections is not None:
+            content["sections"] = body.sections
+        new_title = body.title if body.title is not None else row["title"]
+        updated = await conn.fetchrow(
+            "UPDATE professional_couple_reports "
+            "SET title = $4, content = $5::jsonb, updated_at = NOW() "
+            "WHERE id = $1 AND couple_id = $2 AND professional_user_id = $3 RETURNING *",
+            report_id, couple_id, pid, new_title,
+            json.dumps(crypto.encrypt_json_strings(content)),
+        )
+    return _couple_report_response(updated)
 
 
 @router.delete("/couples/{couple_id}/reports/{report_id}")

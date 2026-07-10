@@ -319,6 +319,11 @@ export const professionalApi = {
       .then(r => r.data),
   getCoupleReport: (coupleId: string, reportId: string) =>
     apiClient.get<CoupleReport>(`/professional/couples/${coupleId}/reports/${reportId}`).then(r => r.data),
+  updateCoupleReport: (
+    coupleId: string, reportId: string,
+    data: { title?: string | null; sections?: { heading: string; text: string }[] },
+  ) =>
+    apiClient.patch<CoupleReport>(`/professional/couples/${coupleId}/reports/${reportId}`, data).then(r => r.data),
   deleteCoupleReport: (coupleId: string, reportId: string) =>
     apiClient.delete(`/professional/couples/${coupleId}/reports/${reportId}`).then(r => r.data),
 }

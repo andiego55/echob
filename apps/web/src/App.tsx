@@ -98,6 +98,7 @@ import ProfessionalSettingsPage  from '@/pages/professional/ProfessionalSettings
 import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalReportTemplatesPage'
 import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
 import CoupleEchoPage from '@/pages/professional/CoupleEchoPage'
+import CoupleReportDetailPage from '@/pages/professional/CoupleReportDetailPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -198,6 +199,7 @@ export function AppRoutes() {
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/reports/:reportId" element={<ProfessionalRoute><ProfessionalReportDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/couples/:coupleId/echo" element={<ProfessionalRoute><CoupleEchoPage /></ProfessionalRoute>} />
+      <Route path="/professional/couples/:coupleId/reports/:reportId" element={<ProfessionalRoute><CoupleReportDetailPage /></ProfessionalRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />
