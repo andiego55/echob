@@ -7,7 +7,7 @@ eine Fachperson sieht nur freigegebene Inhalte.
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, time
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -595,6 +595,140 @@ async def case_detail(
         ),
         "echo_summaries": [crypto.decrypt_fields(dict(s), "summary_text") for s in summary_rows],
     }
+
+
+# ── Fall-Verlauf (Historie) ───────────────────────────────────────────────────
+
+_ASSIGN_DE = {"dialog": "Dialog", "questionnaire": "Fragebogen",
+              "message": "Nachricht", "resource": "Ressource"}
+_APPT_DE = {"proposed": "vorgeschlagen", "confirmed": "bestätigt",
+            "cancelled": "abgesagt", "completed": "stattgefunden"}
+
+
+def _hist_ev(kind: str, at, actor: str, title: str, detail=None) -> dict:
+    return {"kind": kind, "at": at, "actor": actor, "title": title, "detail": detail or None}
+
+
+def _client_content_events(bundle) -> list[dict]:
+    """Ereignisse aus freigegebenen Klient-Inhalten – AUSSCHLIESSLICH aus dem Bundle
+    (kein Direktzugriff auf Client-Tabellen → die Freigabe wird automatisch respektiert)."""
+    ev: list[dict] = []
+    for s in bundle.scenes:
+        if s.get("created_at"):
+            ev.append(_hist_ev("scene", s["created_at"], "client", "Szene ergänzt", s.get("title")))
+    for sc in bundle.scale_scores:
+        if sc.get("calculated_at"):
+            ev.append(_hist_ev("scale", sc["calculated_at"], "client",
+                               "Skala aktualisiert", sc.get("scale_key")))
+    for r in bundle.reports:
+        if r.get("created_at"):
+            ev.append(_hist_ev("client_report", r["created_at"], "client",
+                               "Bericht erstellt", r.get("title") or r.get("report_type")))
+    if bundle.onboarding:
+        at = bundle.onboarding.get("completed_at") or bundle.onboarding.get("updated_at")
+        if at:
+            ev.append(_hist_ev("onboarding", at, "client", "Onboarding ausgefüllt"))
+    if bundle.person_profile and bundle.person_profile.get("updated_at"):
+        ev.append(_hist_ev("profile", bundle.person_profile["updated_at"], "client",
+                           "Persönlichkeitsbild aktualisiert"))
+    if bundle.self_profile and bundle.self_profile.get("updated_at"):
+        ev.append(_hist_ev("profile", bundle.self_profile["updated_at"], "client",
+                           "Selbstbild aktualisiert"))
+    return ev
+
+
+async def _professional_case_events(conn, pid, case_id, share) -> list[dict]:
+    """Ereignisse aus den fachpersonen-eigenen Tabellen dieses Falls (nur eigene Daten)."""
+    ev: list[dict] = []
+    if share.get("created_at"):
+        ev.append(_hist_ev("share", share["created_at"], "client", "Fall für dich freigegeben"))
+    for a in await conn.fetch(
+        "SELECT type, title, sent_at, responded_at, completed_at "
+        "FROM professional_assignments WHERE professional_user_id = $1 AND case_id = $2",
+        pid, case_id,
+    ):
+        label = _ASSIGN_DE.get(a["type"], a["type"])
+        if a["sent_at"]:
+            ev.append(_hist_ev("assignment_sent", a["sent_at"], "pro",
+                               f"{label} zugewiesen", a["title"]))
+        done = a["completed_at"] or a["responded_at"]
+        if done:
+            ev.append(_hist_ev("assignment_done", done, "client",
+                               f"{label} beantwortet", a["title"]))
+    for ap in await conn.fetch(
+        "SELECT title, start_at, status, created_at FROM professional_appointments "
+        "WHERE professional_user_id = $1 AND case_id = $2",
+        pid, case_id,
+    ):
+        st = _APPT_DE.get(ap["status"], ap["status"])
+        # Stattgefundene Termine auf ihr Datum, geplante/offene auf die Aktion (kein
+        # Zukunfts-Eintrag oben im Verlauf).
+        at = ap["start_at"] if (ap["status"] == "completed" and ap["start_at"]) else ap["created_at"]
+        ev.append(_hist_ev("appointment", at, "pro", f"Termin · {st}", ap["title"]))
+    for n in await conn.fetch(
+        "SELECT title, created_at FROM professional_session_notes "
+        "WHERE professional_user_id = $1 AND case_id = $2",
+        pid, case_id,
+    ):
+        ev.append(_hist_ev("session_note", n["created_at"], "pro",
+                           "Sitzungsnotiz erstellt", n["title"]))
+    for r in await conn.fetch(
+        "SELECT title, created_at FROM professional_reports "
+        "WHERE professional_user_id = $1 AND case_id = $2",
+        pid, case_id,
+    ):
+        ev.append(_hist_ev("report", r["created_at"], "pro", "Bericht erstellt", r["title"]))
+    for s in await conn.fetch(
+        "SELECT title, created_at FROM professional_echo_summaries "
+        "WHERE professional_user_id = $1 AND case_id = $2",
+        pid, case_id,
+    ):
+        ev.append(_hist_ev("echo", s["created_at"], "pro", "Echo-Reflexion festgehalten", s["title"]))
+    nd = await conn.fetchrow(
+        "SELECT created_at, updated_at FROM professional_notes "
+        "WHERE professional_user_id = $1 AND case_id = $2",
+        pid, case_id,
+    )
+    if nd:
+        ev.append(_hist_ev("notes", nd["updated_at"] or nd["created_at"], "pro", "Notizen bearbeitet"))
+    return ev
+
+
+@router.get("/cases/{case_id}/history")
+async def case_history(
+    case_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fall-Verlauf: alle Ereignisse (Freigabe, Zuweisungen, Antworten, Termine,
+    Notizen, Berichte, Echo, neu geteilte Inhalte) chronologisch absteigend.
+    Read-only, gleiche 404-Absicherung wie die Fall-Detailseite (load_shared_bundle)."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        bundle = await load_shared_bundle(pid, case_id, conn)
+        events = _client_content_events(bundle)
+        events += await _professional_case_events(conn, pid, case_id, bundle.share)
+    events.sort(key=lambda e: e["at"], reverse=True)
+    return {"events": events}
+
+
+@router.get("/cases/{case_id}/history/new-shared")
+async def case_new_shared(
+    case_id: UUID,
+    since: date,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """„Neue Freigaben ermitteln": nur die seit ``since`` neu hinzugekommenen
+    Klient-Inhalte (Szenen, Skalen, Berichte, Profil/Onboarding) – ohne
+    fachpersonen-eigene Aktionen. Datum inklusiv ab 00:00 UTC."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        bundle = await load_shared_bundle(pid, case_id, conn)
+    since_dt = datetime.combine(since, time.min, tzinfo=UTC)
+    items = [e for e in _client_content_events(bundle) if e["at"] >= since_dt]
+    items.sort(key=lambda e: e["at"], reverse=True)
+    return {"since": since.isoformat(), "items": items}
 
 
 # ── Notizen der Fachperson ────────────────────────────────────────────────────

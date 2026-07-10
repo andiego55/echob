@@ -12,6 +12,7 @@ import { professionalApi } from '@/api/professional'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import AssignmentTypePanel from '@/components/professional/AssignmentTypePanel'
 import AppointmentsPanel from '@/components/professional/AppointmentsPanel'
+import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
@@ -45,6 +46,7 @@ const TABS = [
   { key: 'reports', label: 'Berichte' },
   { key: 'notes', label: 'Notizen' },
   { key: 'appointments', label: 'Termine' },
+  { key: 'history', label: 'Verlauf' },
 ] as const
 type TabKey = (typeof TABS)[number]['key']
 
@@ -378,6 +380,7 @@ export default function ProfessionalCaseDetailPage() {
         {tab === 'reports' && <ReportsPanel caseId={caseId!} />}
         {tab === 'notes' && <NotesPanel caseId={caseId!} overview={bundle.notes} />}
         {tab === 'appointments' && <AppointmentsPanel caseId={caseId!} />}
+        {tab === 'history' && <CaseHistoryPanel caseId={caseId!} />}
       </div>
     </ProfessionalShell>
   )

@@ -70,6 +70,14 @@ export interface ProfessionalDashboard {
   pending_connections?: PendingConnection[]
 }
 
+export interface CaseHistoryEvent {
+  kind: string
+  at: string
+  actor: 'pro' | 'client'
+  title: string
+  detail: string | null
+}
+
 export interface PostfachAttention {
   assignment_id: string
   case_id: string
@@ -133,6 +141,14 @@ export const professionalApi = {
     apiClient.get<ProfessionalClientGroup[]>('/professional/cases').then(r => r.data),
   caseDetail: (caseId: string) =>
     apiClient.get<SharedCaseBundle>(`/professional/cases/${caseId}`).then(r => r.data),
+
+  // Fall-Verlauf (Historie) + „Neue Freigaben ermitteln" (seit Datum)
+  caseHistory: (caseId: string) =>
+    apiClient.get<{ events: CaseHistoryEvent[] }>(`/professional/cases/${caseId}/history`).then(r => r.data),
+  caseNewShared: (caseId: string, since: string) =>
+    apiClient.get<{ since: string; items: CaseHistoryEvent[] }>(
+      `/professional/cases/${caseId}/history/new-shared`, { params: { since } },
+    ).then(r => r.data),
 
   // Notizen
   saveNotes: (caseId: string, data: ProfessionalNote) =>
