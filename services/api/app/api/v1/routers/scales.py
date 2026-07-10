@@ -130,6 +130,13 @@ async def calculate_scales(
     # Alle bisherigen Werte ersetzen, neu einfügen
     async with pool.acquire() as conn:
         await log_ai_usage(user_id, conn, "scale_calc")
+        # Alte Werte VOR dem Ersetzen lesen (für das Änderungs-Log alt→neu)
+        old_scores = {
+            r["scale_key"]: r["score"]
+            for r in await conn.fetch(
+                "SELECT scale_key, score FROM scale_scores WHERE case_id = $1", case_id
+            )
+        }
         await conn.execute(
             "DELETE FROM scale_scores WHERE case_id = $1 AND user_id = $2",
             case_id, user_id,
@@ -138,6 +145,7 @@ async def calculate_scales(
             scale_key = s.get("scale_key", "")
             if scale_key not in SCALE_DEFINITIONS:
                 continue
+            new_score = float(s.get("score", 2.5))
             await conn.execute(
                 """
                 INSERT INTO scale_scores
@@ -147,11 +155,20 @@ async def calculate_scales(
                 case_id,
                 user_id,
                 scale_key,
-                float(s.get("score", 2.5)),
+                new_score,
                 int(s.get("scene_count", 0)),
                 s.get("confidence", "low"),
                 s.get("notes"),
             )
+            # Änderungs-Log: nur bei Erstermittlung oder tatsächlicher Änderung
+            old = old_scores.get(scale_key)
+            if old is None or round(float(old), 2) != round(new_score, 2):
+                await conn.execute(
+                    "INSERT INTO scale_score_changes "
+                    "(case_id, scale_key, old_score, new_score) VALUES ($1, $2, $3, $4)",
+                    case_id, scale_key,
+                    (float(old) if old is not None else None), new_score,
+                )
 
     # Frisch geladene Werte zurückgeben
     async with pool.acquire() as conn:

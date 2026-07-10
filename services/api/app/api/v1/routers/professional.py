@@ -605,21 +605,26 @@ _APPT_DE = {"proposed": "vorgeschlagen", "confirmed": "bestätigt",
             "cancelled": "abgesagt", "completed": "stattgefunden"}
 
 
-def _hist_ev(kind: str, at, actor: str, title: str, detail=None) -> dict:
-    return {"kind": kind, "at": at, "actor": actor, "title": title, "detail": detail or None}
+def _hist_ev(kind: str, at, actor: str, title: str, detail=None,
+             *, body=None, before=None, after=None) -> dict:
+    return {"kind": kind, "at": at, "actor": actor, "title": title,
+            "detail": detail or None, "body": body or None,
+            "before": before, "after": after}
+
+
+def _num(x):
+    return float(x) if x is not None else None
 
 
 def _client_content_events(bundle) -> list[dict]:
     """Ereignisse aus freigegebenen Klient-Inhalten – AUSSCHLIESSLICH aus dem Bundle
-    (kein Direktzugriff auf Client-Tabellen → die Freigabe wird automatisch respektiert)."""
+    (kein Direktzugriff auf Client-Tabellen → die Freigabe wird automatisch respektiert).
+    Skalen laufen separat über das Änderungs-Log (_scale_events)."""
     ev: list[dict] = []
     for s in bundle.scenes:
         if s.get("created_at"):
-            ev.append(_hist_ev("scene", s["created_at"], "client", "Szene ergänzt", s.get("title")))
-    for sc in bundle.scale_scores:
-        if sc.get("calculated_at"):
-            ev.append(_hist_ev("scale", sc["calculated_at"], "client",
-                               "Skala aktualisiert", sc.get("scale_key")))
+            ev.append(_hist_ev("scene", s["created_at"], "client", "Szene ergänzt",
+                               s.get("title"), body=s.get("description")))
     for r in bundle.reports:
         if r.get("created_at"):
             ev.append(_hist_ev("client_report", r["created_at"], "client",
@@ -634,6 +639,33 @@ def _client_content_events(bundle) -> list[dict]:
     if bundle.self_profile and bundle.self_profile.get("updated_at"):
         ev.append(_hist_ev("profile", bundle.self_profile["updated_at"], "client",
                            "Selbstbild aktualisiert"))
+    return ev
+
+
+async def _scale_events(conn, case_id, current_scales, since=None) -> list[dict]:
+    """Skalen-Ereignisse mit Vorher/Nachher aus dem Änderungs-Log. Skalen, die vor
+    Einführung des Logs berechnet wurden (kein Log-Eintrag), bekommen einen
+    Basis-Eintrag mit ihrem aktuellen Wert (ohne Vorher/Nachher)."""
+    ev: list[dict] = []
+    logged: set[str] = set()
+    for r in await conn.fetch(
+        "SELECT scale_key, old_score, new_score, changed_at FROM scale_score_changes "
+        "WHERE case_id = $1 ORDER BY changed_at DESC",
+        case_id,
+    ):
+        logged.add(r["scale_key"])
+        if since and r["changed_at"] < since:
+            continue
+        title = "Skala aktualisiert" if r["old_score"] is not None else "Skala ermittelt"
+        ev.append(_hist_ev("scale", r["changed_at"], "client", title, r["scale_key"],
+                           before=_num(r["old_score"]), after=_num(r["new_score"])))
+    for sc in current_scales:
+        key = sc.get("scale_key")
+        at = sc.get("calculated_at")
+        if key in logged or not at or (since and at < since):
+            continue
+        ev.append(_hist_ev("scale", at, "client", "Skala ermittelt", key,
+                           after=_num(sc.get("score"))))
     return ev
 
 
@@ -707,6 +739,8 @@ async def case_history(
     async with pool.acquire() as conn:
         bundle = await load_shared_bundle(pid, case_id, conn)
         events = _client_content_events(bundle)
+        if "scales" in bundle.allowed:
+            events += await _scale_events(conn, case_id, bundle.scale_scores)
         events += await _professional_case_events(conn, pid, case_id, bundle.share)
     events.sort(key=lambda e: e["at"], reverse=True)
     return {"events": events}
@@ -723,10 +757,12 @@ async def case_new_shared(
     Klient-Inhalte (Szenen, Skalen, Berichte, Profil/Onboarding) – ohne
     fachpersonen-eigene Aktionen. Datum inklusiv ab 00:00 UTC."""
     pid = current["user_id"]
+    since_dt = datetime.combine(since, time.min, tzinfo=UTC)
     async with pool.acquire() as conn:
         bundle = await load_shared_bundle(pid, case_id, conn)
-    since_dt = datetime.combine(since, time.min, tzinfo=UTC)
-    items = [e for e in _client_content_events(bundle) if e["at"] >= since_dt]
+        items = [e for e in _client_content_events(bundle) if e["at"] >= since_dt]
+        if "scales" in bundle.allowed:
+            items += await _scale_events(conn, case_id, bundle.scale_scores, since=since_dt)
     items.sort(key=lambda e: e["at"], reverse=True)
     return {"since": since.isoformat(), "items": items}
 

@@ -27,26 +27,84 @@ function detailText(e: CaseHistoryEvent): string | null {
   return e.detail
 }
 
+const fmtScore = (n: number) => n.toFixed(1).replace('.', ',')
+
+/** Vorher/Nachher einer Skala. Höhere Werte = auffälliger → Anstieg rot, Rückgang grün. */
+function ScaleDelta({ before, after }: { before?: number | null; after?: number | null }) {
+  if (after == null) return null
+  if (before == null) {
+    return (
+      <p className="text-sm text-navy">
+        Erstmals ermittelt: <strong className="tabular-nums">{fmtScore(after)}</strong>
+        <span className="text-xs text-brand-muted"> / 5</span>
+      </p>
+    )
+  }
+  const up = after > before
+  const same = after === before
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="tabular-nums text-brand-muted">{fmtScore(before)}</span>
+      <span aria-hidden className="text-brand-muted">→</span>
+      <span className={`tabular-nums font-semibold ${
+        same ? 'text-brand-muted' : up ? 'text-red-600' : 'text-green-600'
+      }`}>{fmtScore(after)}</span>
+      <span className="text-xs text-brand-muted">/ 5</span>
+      {!same && (
+        <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+          up ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+        }`}>
+          {up ? `+${fmtScore(after - before)}` : `−${fmtScore(before - after)}`}
+        </span>
+      )}
+    </div>
+  )
+}
+
 function EventRow({ e }: { e: CaseHistoryEvent }) {
+  const [open, setOpen] = useState(false)
   const isClient = e.actor === 'client'
   const d = detailText(e)
+  const hasChange = e.before != null || e.after != null
+  const expandable = !!e.body || hasChange
   return (
-    <div className="flex items-start gap-3 py-2">
-      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-bg text-sm" aria-hidden>
-        {KIND_ICON[e.kind] ?? '•'}
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm font-medium text-navy">{e.title}</span>
-          <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-            isClient ? 'bg-accent/10 text-accent' : 'bg-brand-bg text-brand-muted'
-          }`}>
-            {isClient ? 'Klient:in' : 'Du'}
-          </span>
+    <div className="py-2">
+      <div
+        className={`flex items-start gap-3 ${expandable ? 'cursor-pointer' : ''}`}
+        onClick={expandable ? () => setOpen(o => !o) : undefined}
+      >
+        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-bg text-sm" aria-hidden>
+          {KIND_ICON[e.kind] ?? '•'}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-navy">{e.title}</span>
+            <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+              isClient ? 'bg-accent/10 text-accent' : 'bg-brand-bg text-brand-muted'
+            }`}>
+              {isClient ? 'Klient:in' : 'Du'}
+            </span>
+          </div>
+          {d && <p className="mt-0.5 text-xs text-brand-muted break-words">{d}</p>}
         </div>
-        {d && <p className="mt-0.5 text-xs text-brand-muted break-words">{d}</p>}
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="text-xs text-brand-muted tabular-nums">{fmtTime(e.at)}</span>
+          {expandable && (
+            <svg className={`h-4 w-4 text-brand-muted transition-transform ${open ? 'rotate-180' : ''}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          )}
+        </div>
       </div>
-      <span className="shrink-0 text-xs text-brand-muted tabular-nums">{fmtTime(e.at)}</span>
+      {expandable && open && (
+        <div className="ml-10 mt-2 space-y-1 rounded-brand border border-brand-border bg-brand-bg/40 px-3 py-2">
+          {hasChange && <ScaleDelta before={e.before} after={e.after} />}
+          {e.body && (
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-brand-text">{e.body}</p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

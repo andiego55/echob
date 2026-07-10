@@ -76,6 +76,9 @@ export interface CaseHistoryEvent {
   actor: 'pro' | 'client'
   title: string
   detail: string | null
+  body?: string | null
+  before?: number | null
+  after?: number | null
 }
 
 export interface PostfachAttention {
