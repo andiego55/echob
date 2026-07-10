@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { professionalApi } from '@/api/professional'
@@ -34,6 +35,7 @@ export default function CoupleEchoPage() {
   const [messages, setMessages] = useState<ProfessionalEchoMessage[]>([])
   const [input, setInput] = useState('')
   const [tplId, setTplId] = useState('')
+  const [gateError, setGateError] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
   const { data: meta } = useQuery({ queryKey: ['couple-meta'], queryFn: professionalApi.coupleMeta })
@@ -51,10 +53,14 @@ export default function CoupleEchoPage() {
     mutationFn: (vars: { message: string; thread_type?: 'couple' | 'glossary'; glossary_slug?: string }) =>
       professionalApi.coupleEchoChat(coupleId!, { ...vars, session_id: session ?? undefined }),
     onSuccess: (res) => {
+      setGateError(false)
       const isNew = !session
       setSession(res.session_id)
       setMessages(prev => [...prev, res.user_message, res.assistant_message])
       if (isNew) qc.invalidateQueries({ queryKey: ['couple-sessions', coupleId] })
+    },
+    onError: (err) => {
+      if (isAxiosError(err) && err.response?.status === 402) setGateError(true)
     },
   })
   const loadSession = useMutation({
@@ -71,7 +77,10 @@ export default function CoupleEchoPage() {
   const createReport = useMutation({
     mutationFn: (vars: { source: 'standard' | 'template'; template_id?: string }) =>
       professionalApi.createCoupleReport(coupleId!, vars),
-    onSuccess: () => { setTplId(''); qc.invalidateQueries({ queryKey: ['couple-reports', coupleId] }) },
+    onSuccess: () => { setGateError(false); setTplId(''); qc.invalidateQueries({ queryKey: ['couple-reports', coupleId] }) },
+    onError: (err) => {
+      if (isAxiosError(err) && err.response?.status === 402) setGateError(true)
+    },
   })
 
   const send = (text?: string) => {
@@ -94,6 +103,17 @@ export default function CoupleEchoPage() {
             fachlichen Verantwortung; bei Hinweisen auf Gewalt ist ein Paarsetting in der Regel kontraindiziert.
           </p>
         </div>
+
+        {gateError && (
+          <div className="mb-4 rounded-brand border border-amber-200 bg-amber-50 px-4 py-3">
+            <p className="text-sm font-semibold text-amber-900">Fall nicht aktiviert</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-amber-800">
+              Paar-Echo und Paar-Berichte sind erst nutzbar, wenn <strong>beide</strong> gekoppelten
+              Fälle aktiviert sind (Sitz). Aktiviere sie in der jeweiligen Fallansicht — der
+              Beispielfall ist frei nutzbar.
+            </p>
+          </div>
+        )}
 
         <div className="flex gap-6">
           {/* Vergangene Dialoge */}
