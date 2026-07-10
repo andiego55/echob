@@ -261,9 +261,12 @@ function ProfileAnswers({ modules, config }: {
   return (
     <div className="space-y-2">
       {sections.map(sec => (
-        <details key={sec.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
-          <summary className="text-sm font-semibold text-navy cursor-pointer">{sec.label}</summary>
-          <dl className="mt-2 space-y-2">
+        <details key={sec.id} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
+          <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <span className="text-sm font-medium text-navy">{sec.label}</span>
+            <Chevron />
+          </summary>
+          <dl className="mt-3 space-y-3 border-t border-brand-border pt-3">
             {sec.items.map((it, i) => (
               <div key={i}>
                 <dt className="text-xs text-brand-muted">{it.label}</dt>
@@ -524,11 +527,12 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           <Section title="Themendialog-Zusammenfassungen">
             <div className="space-y-2">
               {bundle.topic_summaries.map(t => (
-                <details key={t.topic} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
-                  <summary className="text-sm font-semibold text-navy cursor-pointer">
-                    {TOPIC_LABELS[t.topic] ?? t.topic}
+                <details key={t.topic} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
+                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <span className="text-sm font-medium text-navy truncate">{TOPIC_LABELS[t.topic] ?? t.topic}</span>
+                    <Chevron />
                   </summary>
-                  <div className="mt-2 text-sm text-brand-text leading-relaxed">
+                  <div className="mt-3 border-t border-brand-border pt-3 text-sm text-brand-text leading-relaxed">
                     <MarkdownMessage content={t.summary_text} />
                   </div>
                 </details>
@@ -541,11 +545,12 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           <Section title="Hypothesen (tastend, keine Diagnose)">
             <div className="space-y-2">
               {bundle.hypotheses.map(h => (
-                <details key={h.hypothesis_type} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5">
-                  <summary className="text-sm font-semibold text-navy cursor-pointer">
-                    {HYP_LABELS[h.hypothesis_type] ?? h.hypothesis_type}
+                <details key={h.hypothesis_type} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
+                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <span className="text-sm font-medium text-navy truncate">{HYP_LABELS[h.hypothesis_type] ?? h.hypothesis_type}</span>
+                    <Chevron />
                   </summary>
-                  <div className="mt-2 text-sm text-brand-text leading-relaxed">
+                  <div className="mt-3 border-t border-brand-border pt-3 text-sm text-brand-text leading-relaxed">
                     <MarkdownMessage content={h.summary_text} />
                   </div>
                 </details>
@@ -577,19 +582,19 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
             {bundle.scenes.length === 0
               ? <p className="text-sm text-brand-muted">Keine freigegebenen Szenen.</p>
               : (
-                <div className="space-y-4">
+                <div className="space-y-2.5">
                   {bundle.scenes.map(s => (
-                    <div key={s.id} className="border-b border-brand-border pb-3 last:border-0 last:pb-0">
+                    <div key={s.id} className="rounded-brand border border-brand-border bg-white px-4 py-3">
                       <div className="flex justify-between gap-2 flex-wrap">
                         <p className="text-sm font-semibold text-navy">{s.title}</p>
                         {s.scene_date && <span className="text-xs text-brand-muted">{s.scene_date}</span>}
                       </div>
-                      {s.description && <p className="mt-1 text-sm text-brand-muted whitespace-pre-wrap">{s.description}</p>}
-                      {s.user_reaction && <p className="mt-1 text-xs text-brand-muted italic">Reaktion: {s.user_reaction}</p>}
+                      {s.description && <p className="mt-1.5 text-sm text-brand-text whitespace-pre-wrap leading-relaxed">{s.description}</p>}
+                      {s.user_reaction && <p className="mt-1.5 text-xs text-brand-muted italic">Reaktion: {s.user_reaction}</p>}
                       {s.pattern_tags?.length > 0 && (
-                        <div className="mt-1.5 flex flex-wrap gap-1">
+                        <div className="mt-2 flex flex-wrap gap-1.5">
                           {s.pattern_tags.map((t, i) => (
-                            <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-brand-bg text-brand-muted">{t}</span>
+                            <span key={i} className="rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">{t}</span>
                           ))}
                         </div>
                       )}
