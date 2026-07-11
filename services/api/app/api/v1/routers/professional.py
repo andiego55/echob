@@ -374,6 +374,7 @@ async def dashboard(
         )
         pending_connections = [
             {
+                "user_id": str(r["inviter_user_id"]),
                 "display_name": r["invite_label"] or r["client_display_name"] or "Verbundene Person",
                 "connected_at": r["accepted_at"],
             }
@@ -471,6 +472,52 @@ async def dashboard(
         "total_unread": sum(c["unread_count"] for c in cases_out),
         "pending_connections": pending_connections,
     }
+
+
+@router.delete("/connections/{client_id}")
+async def dissolve_connection(
+    client_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Beendet die Verbindung der Fachperson zu dieser Person (jede Verbindung, nicht nur
+    wartende). Widerruft dabei alle aktiven Freigaben an mich (Zugriff endet sofort, Belegung
+    wird geschlossen) und entfernt die professional_invites-Verbindung. Die EIGENEN Profi-Daten
+    (Notizen/Berichte/Echo) bleiben erhalten – endgültige Löschung via Fall-/Account-Löschung
+    der Person (Cascade). Die Person erhält eine In-App-Benachrichtigung."""
+    pid = current["user_id"]
+    pro_name = (current.get("professional") or {}).get("display_name") or "deiner Fachperson"
+    async with pool.acquire() as conn:
+        inv = await conn.fetchrow(
+            "SELECT 1 FROM professional_invites "
+            "WHERE professional_user_id = $1 AND inviter_user_id = $2",
+            pid, client_id,
+        )
+        if inv is None:
+            raise HTTPException(status_code=404, detail="Verbindung nicht gefunden.")
+        async with conn.transaction():
+            revoked = await conn.fetch(
+                "UPDATE case_shares SET status = 'revoked', revoked_at = NOW(), "
+                "updated_at = NOW() "
+                "WHERE professional_user_id = $1 AND owner_user_id = $2 AND status = 'active' "
+                "RETURNING case_id",
+                pid, client_id,
+            )
+            for r in revoked:
+                await seat_service.release_case_by_id(r["case_id"], conn, reason="revoked")
+            await conn.execute(
+                "DELETE FROM professional_invites "
+                "WHERE professional_user_id = $1 AND inviter_user_id = $2",
+                pid, client_id,
+            )
+            await conn.execute(
+                "INSERT INTO client_notifications (user_id, kind, body) "
+                "VALUES ($1, 'connection_dissolved', $2)",
+                client_id,
+                f"Die Verbindung mit {pro_name} wurde von der Fachperson beendet. "
+                "Zuvor freigegebene Inhalte sind für diese Fachperson nicht mehr zugänglich.",
+            )
+    return {"dissolved": True}
 
 
 @router.get("/postfach")

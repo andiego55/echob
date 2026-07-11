@@ -10,6 +10,7 @@ import ConnectProfessionalCard from '@/components/settings/ConnectProfessionalCa
 import SubscriptionCard from '@/components/settings/SubscriptionCard'
 import UsageCard from '@/components/settings/UsageCard'
 import DataAccountCard from '@/components/settings/DataAccountCard'
+import NotificationsBanner from '@/components/settings/NotificationsBanner'
 import { profileApi } from '@/api/profile'
 
 const USER_MODES: EchoModeOption[] = [
@@ -58,6 +59,8 @@ export default function SettingsPage() {
         <p className="mt-1 text-sm text-brand-muted">
           Hier stimmst du Echo auf dich ab. Weitere Einstellungen folgen.
         </p>
+
+        <NotificationsBanner />
 
         <div className="mt-8 card">
           <h2 className="text-lg font-semibold text-navy">Wie Echo mit dir spricht</h2>

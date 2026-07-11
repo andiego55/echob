@@ -61,6 +61,7 @@ export interface DashboardCase {
   items: DashboardItem[]
 }
 export interface PendingConnection {
+  user_id: string
   display_name: string
   connected_at: string | null
 }
@@ -128,6 +129,9 @@ export const professionalApi = {
   // Dashboard (fallübergreifendes Cockpit)
   dashboard: () =>
     apiClient.get<ProfessionalDashboard>('/professional/dashboard').then(r => r.data),
+  /** Verbindung der Fachperson zu einer Person beenden (widerruft Freigaben + benachrichtigt). */
+  dissolveConnection: (clientId: string) =>
+    apiClient.delete(`/professional/connections/${clientId}`).then(r => r.data),
 
   // Postfach (alle Eingänge, gelesen/ungelesen)
   postfach: () =>

@@ -16,6 +16,7 @@ from app.api.v1.routers import (
     health,
     hypotheses,
     inbox,
+    notifications,
     onboarding,
     org_billing,
     organizations,
@@ -63,6 +64,7 @@ v1_router.include_router(hypotheses.router)
 v1_router.include_router(onboarding.router)
 v1_router.include_router(subscription.router)
 v1_router.include_router(inbox.router)
+v1_router.include_router(notifications.router)
 
 # ── Fachpersonenbereich ───────────────────────────────────────────────────────
 v1_router.include_router(professional.router)

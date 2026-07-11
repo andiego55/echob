@@ -6,7 +6,7 @@
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import ClientInviteButton from '@/components/professional/ClientInviteButton'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
@@ -59,6 +59,11 @@ function initials(name: string): string {
 
 export default function ProfessionalDashboardPage() {
   const { data, isLoading } = useQuery({ queryKey: ['prof-dashboard'], queryFn: professionalApi.dashboard })
+  const qc = useQueryClient()
+  const dissolve = useMutation({
+    mutationFn: (clientId: string) => professionalApi.dissolveConnection(clientId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-dashboard'] }),
+  })
 
   const [openCases, setOpenCases] = useState<Record<string, boolean>>({})
   const inited = useRef(false)
@@ -126,8 +131,8 @@ export default function ProfessionalDashboardPage() {
               </div>
             </div>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-amber-200/70 pt-3">
-              {pending.map((p, i) => (
-                <span key={i}
+              {pending.map((p) => (
+                <span key={p.user_id}
                   className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white px-2.5 py-1">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700">
                     {initials(p.display_name)}
@@ -136,6 +141,16 @@ export default function ProfessionalDashboardPage() {
                   {p.connected_at && (
                     <span className="text-[11px] text-brand-muted">· verbunden {fmtDay(p.connected_at)}</span>
                   )}
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Verbindung mit ${p.display_name} beenden?\n\nDie Person wird benachrichtigt; aktive Freigaben (falls vorhanden) werden widerrufen.`)) dissolve.mutate(p.user_id)
+                    }}
+                    disabled={dissolve.isPending && dissolve.variables === p.user_id}
+                    aria-label="Verbindung entfernen"
+                    className="ml-0.5 text-amber-700/50 transition-colors hover:text-red-600 disabled:opacity-40"
+                  >
+                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                  </button>
                 </span>
               ))}
             </div>
