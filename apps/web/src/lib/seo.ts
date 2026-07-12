@@ -5,6 +5,8 @@
 // In-App-Navigation. Für JS-lose Crawler greift zusätzlich der Prerender-
 // bzw. noscript-Fallback.
 
+import { CONTENT_ROUTE_META } from '@/content/manifest.generated'
+
 const SITE = 'https://echo-b.de'
 
 const DEFAULT_TITLE = 'EchoB – Beziehungsmuster erkennen | Erkenne, was sich wiederholt.'
@@ -140,6 +142,9 @@ export const ROUTE_META: Record<string, PageMeta> = {
   },
 }
 
+/** Alle öffentlichen Metadaten: statische Routen + generierte Content-Seiten. */
+const ALL_META: Record<string, PageMeta> = { ...ROUTE_META, ...CONTENT_ROUTE_META }
+
 /** Login-/App-Bereiche sollen nicht indexiert werden. */
 const NOINDEX_RE = /^\/(app|professional|auth|pseudonym|einladung)(\/|$)/
 
@@ -147,7 +152,7 @@ export type Head = { title: string; description: string; url: string; robots: st
 
 /** Reine Metadaten je Pfad – ohne DOM. Von Client (applyHead) und Prerender genutzt. */
 export function headFor(pathname: string): Head {
-  const meta = ROUTE_META[pathname]
+  const meta = ALL_META[pathname]
   return {
     title: meta?.title ?? DEFAULT_TITLE,
     description: meta?.description ?? DEFAULT_DESC,
@@ -157,7 +162,7 @@ export function headFor(pathname: string): Head {
 }
 
 /** Öffentliche, indexierbare Routen – Grundlage fürs Prerendering (ohne Login-Bereiche). */
-export const PUBLIC_ROUTES = Object.keys(ROUTE_META).filter((p) => !NOINDEX_RE.test(p))
+export const PUBLIC_ROUTES = Object.keys(ALL_META).filter((p) => !NOINDEX_RE.test(p))
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`)
