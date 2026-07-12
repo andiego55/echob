@@ -91,6 +91,15 @@ for (const file of walk(contentDir)) {
   pages.push({ fm, rel })
 }
 
+// Slugs müssen global eindeutig sein (bodies.ts mappt per Slug).
+const slugSeen = {}
+for (const { fm, rel } of pages) {
+  if (!fm.slug) continue
+  ;(slugSeen[fm.slug] ??= []).push(rel)
+}
+for (const [slug, files] of Object.entries(slugSeen))
+  if (files.length > 1) errors.push(`slug "${slug}" mehrfach vergeben: ${files.join(', ')}`)
+
 // Cross-Link-Validierung: interne Links müssen auf veröffentlichte Slugs zeigen.
 const published = pages.filter((p) => !p.fm.draft)
 const known = new Set(published.map((p) => p.fm.slug))

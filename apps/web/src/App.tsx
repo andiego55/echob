@@ -21,7 +21,7 @@ import BlogBeobachtungGefuehlPage  from '@/pages/BlogBeobachtungGefuehlPage'
 import BlogProfessionelleHilfePage from '@/pages/BlogProfessionelleHilfePage'
 import BlogKrisentelephonePage     from '@/pages/BlogKrisentelephonePage'
 import WissenPage                    from '@/pages/WissenPage'
-import WissenBeziehungsmusterPage    from '@/pages/wissen/WissenBeziehungsmusterPage'
+import ContentPage                   from '@/pages/content/ContentPage'
 import WissenBindungsstilelPage      from '@/pages/wissen/WissenBindungsstilelPage'
 import WissenKommunikationPage       from '@/pages/wissen/WissenKommunikationPage'
 import WissenPersoenlichkeitPage     from '@/pages/wissen/WissenPersoenlichkeitPage'
@@ -148,7 +148,7 @@ export function AppRoutes() {
       <Route path="/blog/professionelle-hilfe" element={<BlogProfessionelleHilfePage />} />
       <Route path="/blog/krisentelefone"     element={<BlogKrisentelephonePage />} />
       <Route path="/wissen"                          element={<WissenPage />} />
-      <Route path="/wissen/beziehungsmuster"         element={<WissenBeziehungsmusterPage />} />
+      <Route path="/wissen/:slug"                    element={<ContentPage />} />
       <Route path="/wissen/bindungsstile"            element={<WissenBindungsstilelPage />} />
       <Route path="/wissen/kommunikation-konflikte"  element={<WissenKommunikationPage />} />
       <Route path="/wissen/persoenlichkeit-verhalten" element={<WissenPersoenlichkeitPage />} />

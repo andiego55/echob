@@ -49,11 +49,6 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Verständliche Artikel zu Beziehungsmustern, Bindungsstilen, Kommunikation, Emotionsregulation und Grenzen – fundiert, alltagsnah und ohne Diagnose.',
   },
-  '/wissen/beziehungsmuster': {
-    title: 'Beziehungsmuster verstehen – EchoB Wissen',
-    description:
-      'Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose.',
-  },
   '/wissen/bindungsstile': {
     title: 'Bindungsstile verstehen – EchoB Wissen',
     description:
