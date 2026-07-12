@@ -124,6 +124,9 @@ async def dissolve_connection(
         if inv is None:
             raise HTTPException(status_code=404, detail="Verbindung nicht gefunden.")
         pro_id = inv["professional_user_id"]
+        client_name = await conn.fetchval(
+            "SELECT display_name FROM user_profiles WHERE user_id = $1", uid
+        ) or "Eine verbundene Person"
         async with conn.transaction():
             if pro_id is not None:
                 revoked = await conn.fetch(
@@ -142,4 +145,13 @@ async def dissolve_connection(
                 "WHERE inviter_user_id = $1 AND lower(email) = $2",
                 uid, key,
             )
+            # Fachperson benachrichtigen (gleiche notifications-Tabelle, user-agnostisch).
+            if pro_id is not None:
+                await conn.execute(
+                    "INSERT INTO client_notifications (user_id, kind, body) "
+                    "VALUES ($1, 'connection_dissolved', $2)",
+                    pro_id,
+                    f"{client_name} hat die Verbindung zu dir beendet. "
+                    "Zuvor freigegebene Inhalte sind nicht mehr zugänglich.",
+                )
     return {"dissolved": True}

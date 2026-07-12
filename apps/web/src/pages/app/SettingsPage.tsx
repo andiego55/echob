@@ -10,7 +10,7 @@ import ConnectProfessionalCard from '@/components/settings/ConnectProfessionalCa
 import SubscriptionCard from '@/components/settings/SubscriptionCard'
 import UsageCard from '@/components/settings/UsageCard'
 import DataAccountCard from '@/components/settings/DataAccountCard'
-import NotificationsBanner from '@/components/settings/NotificationsBanner'
+import NotificationsBanner from '@/components/NotificationsBanner'
 import { profileApi } from '@/api/profile'
 
 const USER_MODES: EchoModeOption[] = [
