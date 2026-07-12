@@ -141,7 +141,7 @@ export const ROUTE_META: Record<string, PageMeta> = {
 const ALL_META: Record<string, PageMeta> = { ...ROUTE_META, ...CONTENT_ROUTE_META }
 
 /** Login-/App-Bereiche sollen nicht indexiert werden. */
-const NOINDEX_RE = /^\/(app|professional|auth|pseudonym|einladung)(\/|$)/
+const NOINDEX_RE = /^\/(app|professional|auth|pseudonym|einladung|reflektieren)(\/|$)/
 
 export type Head = { title: string; description: string; url: string; robots: string }
 

@@ -14,6 +14,7 @@ import AssignmentDialogSummary from '@/components/app/AssignmentDialogSummary'
 import { echoApi } from '@/api/echo'
 import { apiErrorText } from '@/utils/apiError'
 import type { EchoChatSession, ThreadType } from '@/types'
+import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -47,6 +48,7 @@ export default function EchoPage() {
   const { caseId } = useParams<{ caseId: string }>()
   const [searchParams] = useSearchParams()
   const assignmentId = searchParams.get('assignment')
+  const contentSlug = searchParams.get('content')
   const qc = useQueryClient()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -69,7 +71,7 @@ export default function EchoPage() {
   // Beim ersten Laden: jüngste Session auswählen (oder neuen Chat anbieten).
   // Bei zugewiesenem Dialog NICHT – dort öffnet der Effekt unten eine eigene Session.
   useEffect(() => {
-    if (selectedSession === undefined && sessionsLoaded && !assignmentId) {
+    if (selectedSession === undefined && sessionsLoaded && !assignmentId && !contentSlug) {
       setSelectedSession(sessions[0]?.id ?? null)
     }
   }, [sessionsLoaded, sessions, selectedSession, assignmentId])
@@ -117,6 +119,20 @@ export default function EchoPage() {
       setPendingMessage(null)
     },
   })
+
+  // Content-Launch: aus einer Wissensseite kommend (?content=<slug>) einen Dialog
+  // seeden, der das gelesene Thema auf den Fall bezieht (mirror des Assignment-Musters).
+  const contentStarted = useRef(false)
+  useEffect(() => {
+    if (!contentSlug || !caseId || assignmentId || contentStarted.current || !sessionsLoaded) return
+    contentStarted.current = true
+    const title = CONTENT_MANIFEST.find((m) => m.slug === contentSlug)?.title ?? 'dieses Thema'
+    const seed = `Ich habe gerade über „${title}" gelesen und möchte das auf meine aktuelle Situation beziehen.`
+    setSelectedSession(null)
+    setPendingMessage(seed)
+    mutation.mutate({ message: seed })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contentSlug, caseId, assignmentId, sessionsLoaded])
 
   // Auto-scroll
   useEffect(() => {

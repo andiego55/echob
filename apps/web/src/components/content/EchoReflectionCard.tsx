@@ -22,7 +22,7 @@ export default function EchoReflectionCard({
   meta: ContentMeta
   position?: CtaPosition
 }) {
-  const reflectHref = `/app?thema=${meta.slug}` // PR3 → /reflektieren?topic=…&source=…
+  const reflectHref = `/reflektieren?topic=${meta.slug}&source=${meta.slug}`
 
   return (
     <aside className="not-prose my-8 rounded-brand border border-accent/25 bg-accent/[0.04] px-6 py-6">
