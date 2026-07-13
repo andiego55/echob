@@ -49,6 +49,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Verständliche Artikel zu Beziehungsmustern, Bindungsstilen, Kommunikation, Emotionsregulation und Grenzen – fundiert, alltagsnah und ohne Diagnose.',
   },
+  '/glossar': {
+    title: 'Glossar: Begriffe rund um Beziehungen – EchoB',
+    description:
+      'Wichtige Begriffe rund um Beziehungen, Dynamiken und Psychologie – kurz und klar erklärt, ohne Diagnose.',
+  },
   '/wissen/bindungsstile': {
     title: 'Bindungsstile verstehen – EchoB Wissen',
     description:

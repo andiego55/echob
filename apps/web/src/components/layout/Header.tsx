@@ -57,6 +57,7 @@ export default function Header() {
   const { session, signOut } = useAuth()
   const location = useLocation()
   const wissenActive = location.pathname.startsWith('/wissen')
+  const glossarActive = location.pathname.startsWith('/glossar')
   const ueberActive = location.pathname.startsWith('/ueber')
 
   return (
@@ -141,6 +142,11 @@ export default function Header() {
               </div>
             </div>
           </div>
+
+          {/* Glossar */}
+          <NavLink to="/glossar" className={() => LINK_CLS(glossarActive)}>
+            Glossar
+          </NavLink>
 
           {/* Blog + Fachpersonen */}
           {NAV_SIMPLE.slice(2, 4).map(({ to, label }) => (
