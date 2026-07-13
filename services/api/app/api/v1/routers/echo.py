@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json as _json
 import logging
+import re
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -138,7 +139,13 @@ async def chat(
     topic_summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in topic_summary_rows]
     hypotheses = [crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows]
 
-    session_meta = _json.dumps({"scene_session_id": body.scene_session_id}) if body.scene_session_id else "{}"
+    _meta: dict = {}
+    if body.scene_session_id:
+        _meta["scene_session_id"] = body.scene_session_id
+    # Herkunft aus einer Wissensseite (nur formatvalidierter Slug, reines Metadatum).
+    if body.source and re.fullmatch(r"[a-z0-9-]{1,80}", body.source):
+        _meta["source"] = body.source
+    session_meta = _json.dumps(_meta)
 
     # ── Sonderfall: Beziehungskontext hinzufügen ──────────────────────────────
     if body.message == "__add_context__" and body.thread_type == "scene" and body.scene_session_id:

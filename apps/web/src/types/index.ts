@@ -190,6 +190,7 @@ export interface EchoChatRequest {
   scene_session_id?: string
   chat_session_id?: string
   assignment_id?: string
+  source?: string
 }
 
 export interface EchoChatResponse {
