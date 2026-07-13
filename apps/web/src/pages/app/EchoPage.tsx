@@ -99,7 +99,7 @@ export default function EchoPage() {
   })
 
   const mutation = useMutation({
-    mutationFn: (data: { message: string; glossary_term?: string }) =>
+    mutationFn: (data: { message: string; glossary_term?: string; source?: string }) =>
       echoApi.chat(caseId!, {
         ...data,
         thread_type: threadType,
@@ -130,7 +130,7 @@ export default function EchoPage() {
     const seed = `Ich habe gerade über „${title}" gelesen und möchte das auf meine aktuelle Situation beziehen.`
     setSelectedSession(null)
     setPendingMessage(seed)
-    mutation.mutate({ message: seed })
+    mutation.mutate({ message: seed, source: contentSlug })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentSlug, caseId, assignmentId, sessionsLoaded])
 

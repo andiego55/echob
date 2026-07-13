@@ -46,6 +46,7 @@ class EchoChatRequest(BaseModel):
     related_scene_id: UUID | None = None
     glossary_term: str | None = Field(None, max_length=100)
     scene_session_id: str | None = Field(None, max_length=100)
+    source: str | None = Field(None, max_length=80)   # Herkunft: Content-Slug (Wissensseite)
     chat_session_id: UUID | None = None     # Session im freien Echo-Chat
     assignment_id: UUID | None = None       # zugewiesener Dialog → Profi-Steuerung in den Kontext
 
