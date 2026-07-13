@@ -19,8 +19,8 @@ scene_tags: [wiederkehrendes-muster]
 safety_tags: []
 links:
   children: []
-  related: []
-  glossary: []
+  related: [emotionale-manipulation]
+  glossary: [gaslighting]
 ---
 
 Viele Menschen in belastenden Beziehungen berichten von einem merkwürdigen Gefühl: Sie wissen, wie die nächste Auseinandersetzung verlaufen wird, bevor sie beginnt. Sie kennen das Drehbuch auswendig – und spielen trotzdem ihre Rolle. Dieses Phänomen nennt man **Beziehungsmuster**.

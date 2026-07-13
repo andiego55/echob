@@ -150,6 +150,11 @@ export function AppRoutes() {
       <Route path="/blog/krisentelefone"     element={<BlogKrisentelephonePage />} />
       <Route path="/wissen"                          element={<WissenPage />} />
       <Route path="/wissen/:slug"                    element={<ContentPage />} />
+      <Route path="/hilfe/:slug"                     element={<ContentPage />} />
+      <Route path="/glossar/:slug"                   element={<ContentPage />} />
+      <Route path="/ratgeber/:slug"                  element={<ContentPage />} />
+      <Route path="/fallbeispiele/:slug"             element={<ContentPage />} />
+      <Route path="/therapie-vorbereitung/:slug"     element={<ContentPage />} />
       <Route path="/wissen/bindungsstile"            element={<WissenBindungsstilelPage />} />
       <Route path="/wissen/kommunikation-konflikte"  element={<WissenKommunikationPage />} />
       <Route path="/wissen/persoenlichkeit-verhalten" element={<WissenPersoenlichkeitPage />} />
