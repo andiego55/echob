@@ -18,6 +18,7 @@ profile_modules: [wahrnehmung, selbstwert]
 scene_tags: [wahrnehmungszweifel]
 safety_tags: []
 links:
+  children: [an-eigener-wahrnehmung-zweifeln]
   glossary: [gaslighting]
   comparison: [gaslighting-oder-missverstaendnis]
   related: [beziehungsmuster]
