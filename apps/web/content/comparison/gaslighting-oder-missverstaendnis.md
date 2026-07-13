@@ -14,7 +14,7 @@ echo:
   mode: clarity
   opening_question: "Du bist dir nicht sicher, ob es Manipulation war oder ein Missverständnis. Möchtest du eine konkrete Situation gemeinsam ordnen?"
   cta_positions: [after-intro, end]
-safety_tags: [manipulation]
+safety_tags: []
 links:
   parent: emotionale-manipulation
   glossary: [gaslighting]

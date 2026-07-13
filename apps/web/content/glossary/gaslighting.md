@@ -14,7 +14,7 @@ echo:
   mode: clarity
   opening_question: "Du hast gerade nachgelesen, was Gaslighting bedeutet. Möchtest du eine Situation betrachten, in der jemand deine Wahrnehmung infrage gestellt hat?"
   cta_positions: [end]
-safety_tags: [manipulation]
+safety_tags: []
 links:
   parent: emotionale-manipulation
   comparison: [gaslighting-oder-missverstaendnis]

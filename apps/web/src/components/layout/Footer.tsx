@@ -47,7 +47,14 @@ export default function Footer() {
         <div className="flex flex-wrap justify-between gap-2.5 pt-6 text-[0.78rem]">
           <span>© {new Date().getFullYear()} EchoB. Alle Rechte vorbehalten.</span>
           <span className="text-white/30">
-            EchoB ersetzt keine Psychotherapie, keine Diagnostik und keine Notfallhilfe.
+            In einer Krise?{' '}
+            <Link
+              to="/blog/krisentelefone"
+              className="text-white/60 underline underline-offset-2 hover:text-white"
+            >
+              Notruf &amp; Krisennummern
+            </Link>
+            . EchoB ersetzt keine Psychotherapie, Diagnostik oder Notfallhilfe.
           </span>
         </div>
       </div>

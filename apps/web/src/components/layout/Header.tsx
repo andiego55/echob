@@ -6,9 +6,12 @@ const WISSEN_COLS = [
     {
       heading: 'Beziehungsdynamiken',
       links: [
-        { label: 'Beziehungsmuster erkennen', to: '/wissen/beziehungsmuster' },
-        { label: 'Bindungsstile',              to: '/wissen/bindungsstile' },
-        { label: 'Kommunikation & Konflikte',  to: '/wissen/kommunikation-konflikte' },
+        { label: 'Beziehungsmuster erkennen',       to: '/wissen/beziehungsmuster' },
+        { label: 'Emotionale Manipulation',         to: '/wissen/emotionale-manipulation' },
+        { label: 'Gaslighting oder Missverständnis?', to: '/wissen/gaslighting-oder-missverstaendnis' },
+        { label: 'Gaslighting: Begriff',            to: '/glossar/gaslighting' },
+        { label: 'Bindungsstile',                   to: '/wissen/bindungsstile' },
+        { label: 'Kommunikation & Konflikte',       to: '/wissen/kommunikation-konflikte' },
       ],
     },
     {

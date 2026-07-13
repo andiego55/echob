@@ -1,6 +1,12 @@
 import { type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
+import { CONTENT_MANIFEST } from '@/content/manifest.generated'
+import { CLUSTERS, CLUSTER_LABELS, CONTENT_TYPE_LABELS } from '@/content/types'
+
+// Datengetriebene Inhalte aus dem Content-Manifest. Die bereits oben kuratierte
+// Beziehungsmuster-Karte wird ausgenommen, um Dopplung zu vermeiden.
+const MANIFEST_ITEMS = CONTENT_MANIFEST.filter((m) => m.url !== '/wissen/beziehungsmuster')
 
 const iconCls = 'h-6 w-6'
 const svg = (children: ReactNode) => (
@@ -153,6 +159,48 @@ export default function WissenPage() {
           </p>
         </div>
       </section>
+
+      {/* Datengetriebene Themen & Begriffe (aus dem Content-Manifest) */}
+      {MANIFEST_ITEMS.length > 0 && (
+        <section className="border-t border-brand-border px-6 py-[72px]">
+          <div className="mx-auto max-w-[960px]">
+            <span className="label">Themen & Begriffe</span>
+            <h2 className="text-[clamp(1.4rem,2.5vw,1.9rem)] font-bold leading-[1.25] text-navy mb-3">
+              Nachschlagen und vertiefen
+            </h2>
+            <p className="text-brand-muted max-w-[600px] leading-[1.75] mb-10">
+              Themenseiten, Begriffe und Einordnungen – jede lässt sich direkt auf deine eigene
+              Situation beziehen. Diese Übersicht wächst mit jedem neuen Artikel.
+            </p>
+            {CLUSTERS.map((cl) => {
+              const items = MANIFEST_ITEMS.filter((m) => m.cluster === cl)
+              if (items.length === 0) return null
+              return (
+                <div key={cl} className="mb-10 last:mb-0">
+                  <h3 className="mb-4 text-[0.8rem] font-bold uppercase tracking-[0.08em] text-brand-muted">
+                    {CLUSTER_LABELS[cl]}
+                  </h3>
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    {items.map((m) => (
+                      <Link
+                        key={m.url}
+                        to={m.url}
+                        className="group card no-underline hover:border-accent/50"
+                      >
+                        <span className="mb-2 inline-block rounded bg-accent/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
+                          {CONTENT_TYPE_LABELS[m.type]}
+                        </span>
+                        <h4 className="mb-1.5 text-[0.97rem] font-bold text-navy">{m.title}</h4>
+                        <p className="text-sm leading-relaxed text-brand-muted">{m.description}</p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Kategorien */}
       {CATEGORIES.map(({ label, heading, lead, topics }, i) => (

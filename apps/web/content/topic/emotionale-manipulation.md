@@ -16,7 +16,7 @@ echo:
   cta_positions: [after-intro, end]
 profile_modules: [wahrnehmung, selbstwert]
 scene_tags: [wahrnehmungszweifel]
-safety_tags: [manipulation]
+safety_tags: []
 links:
   glossary: [gaslighting]
   comparison: [gaslighting-oder-missverstaendnis]

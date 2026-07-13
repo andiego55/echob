@@ -103,3 +103,23 @@ export const URL_PREFIX: Record<ContentType, string> = {
 export function contentUrl(type: ContentType, slug: string): string {
   return `${URL_PREFIX[type]}/${slug}`
 }
+
+/** Anzeige-Label je Cluster (für Hub/Übersichten). */
+export const CLUSTER_LABELS: Record<Cluster, string> = {
+  dynamiken: 'Belastende Dynamiken',
+  bindung: 'Bindung & Nähe',
+  trennung: 'Trennung',
+  selbstreflexion: 'Selbstreflexion',
+  therapie: 'Therapie & Coaching',
+}
+
+/** Kurzes Anzeige-Label je Content-Typ (Badge). */
+export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
+  topic: 'Thema',
+  problem: 'Hilfe',
+  glossary: 'Begriff',
+  guide: 'Ratgeber',
+  'case-example': 'Fallbeispiel',
+  comparison: 'Vergleich',
+  'therapy-prep': 'Therapie-Vorbereitung',
+}
