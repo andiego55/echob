@@ -22,6 +22,7 @@ import BlogProfessionelleHilfePage from '@/pages/BlogProfessionelleHilfePage'
 import BlogKrisentelephonePage     from '@/pages/BlogKrisentelephonePage'
 import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
+import GlossarPage                   from '@/pages/GlossarPage'
 import ReflectPage                   from '@/pages/content/ReflectPage'
 import WissenBindungsstilelPage      from '@/pages/wissen/WissenBindungsstilelPage'
 import WissenKommunikationPage       from '@/pages/wissen/WissenKommunikationPage'
@@ -151,6 +152,7 @@ export function AppRoutes() {
       <Route path="/wissen"                          element={<WissenPage />} />
       <Route path="/wissen/:slug"                    element={<ContentPage />} />
       <Route path="/hilfe/:slug"                     element={<ContentPage />} />
+      <Route path="/glossar"                         element={<GlossarPage />} />
       <Route path="/glossar/:slug"                   element={<ContentPage />} />
       <Route path="/ratgeber/:slug"                  element={<ContentPage />} />
       <Route path="/fallbeispiele/:slug"             element={<ContentPage />} />
