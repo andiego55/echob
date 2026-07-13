@@ -24,9 +24,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
         "end"
       ]
     },
-    "safety_tags": [
-      "manipulation"
-    ],
+    "safety_tags": [],
     "links": {
       "parent": "emotionale-manipulation",
       "comparison": [
@@ -108,9 +106,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "scene_tags": [
       "wahrnehmungszweifel"
     ],
-    "safety_tags": [
-      "manipulation"
-    ],
+    "safety_tags": [],
     "links": {
       "glossary": [
         "gaslighting"
@@ -146,9 +142,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
         "end"
       ]
     },
-    "safety_tags": [
-      "manipulation"
-    ],
+    "safety_tags": [],
     "links": {
       "parent": "emotionale-manipulation",
       "glossary": [
