@@ -5,6 +5,36 @@ import type { ContentMeta } from './types'
 export const CONTENT_MANIFEST: ContentMeta[] = [
   {
     "type": "glossary",
+    "slug": "bindungsangst",
+    "title": "Bindungsangst – Definition und Anzeichen",
+    "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt.",
+    "cluster": "bindung",
+    "search_intent": "Was ist Bindungsangst Definition",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Bindungsangst gelesen. Möchtest du eine konkrete Situation betrachten, in der Nähe schwierig oder eng wurde?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "links": {
+      "parent": "verlustangst",
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/glossar/bindungsangst"
+  },
+  {
+    "type": "glossary",
     "slug": "gaslighting",
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest.",
@@ -79,6 +109,47 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/hilfe/an-eigener-wahrnehmung-zweifeln"
+  },
+  {
+    "type": "problem",
+    "slug": "angst-verlassen-zu-werden",
+    "title": "Ständige Angst, verlassen zu werden – was dahinter steckt",
+    "description": "Wenn die Angst, verlassen zu werden, dein Denken und Handeln bestimmt: woran das liegen kann und was im Moment der Panik konkret hilft.",
+    "cluster": "bindung",
+    "search_intent": "Angst verlassen zu werden Beziehung",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Die Angst, verlassen zu werden, ist gerade groß. Möchtest du eine konkrete Situation anschauen, in der sie hochgekommen ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "bindung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "verlustangst"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "verlustangst",
+      "glossary": [
+        "bindungsangst"
+      ],
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/hilfe/angst-verlassen-zu-werden"
   },
   {
     "type": "topic",
@@ -200,10 +271,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/gaslighting-oder-missverstaendnis"
+  },
+  {
+    "type": "topic",
+    "slug": "verlustangst",
+    "title": "Verlustangst in Beziehungen verstehen",
+    "description": "Woher die Angst kommt, verlassen zu werden, wie sie sich in Beziehungen zeigt und was dir hilft, ihr weniger ausgeliefert zu sein – ohne Selbstverurteilung.",
+    "cluster": "bindung",
+    "search_intent": "Verlustangst in Beziehung verstehen",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Verlustangst gelesen. Möchtest du eine konkrete Situation anschauen, in der die Angst, verlassen zu werden, besonders stark war?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "bindung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "verlustangst"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "angst-verlassen-zu-werden"
+      ],
+      "glossary": [
+        "bindungsangst"
+      ],
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/verlustangst"
   }
 ]
 
 export const CONTENT_ROUTE_META: Record<string, { title: string; description: string }> = {
+  "/glossar/bindungsangst": {
+    "title": "Bindungsangst – Definition und Anzeichen",
+    "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt."
+  },
   "/glossar/gaslighting": {
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
@@ -211,6 +329,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/hilfe/an-eigener-wahrnehmung-zweifeln": {
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
     "description": "Immer öfter unsicher, was in deiner Beziehung wirklich passiert ist? Woran ständige Selbstzweifel liegen können und wie du wieder Boden unter die Füße bekommst – ohne vorschnelles Urteil."
+  },
+  "/hilfe/angst-verlassen-zu-werden": {
+    "title": "Ständige Angst, verlassen zu werden – was dahinter steckt",
+    "description": "Wenn die Angst, verlassen zu werden, dein Denken und Handeln bestimmt: woran das liegen kann und was im Moment der Panik konkret hilft."
   },
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
@@ -223,5 +345,9 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/gaslighting-oder-missverstaendnis": {
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
     "description": "Nicht jeder Streit ist Manipulation. Diese Merkmale helfen dir, ein echtes Missverständnis von systematischem Gaslighting zu unterscheiden – ohne vorschnelles Urteil."
+  },
+  "/wissen/verlustangst": {
+    "title": "Verlustangst in Beziehungen verstehen",
+    "description": "Woher die Angst kommt, verlassen zu werden, wie sie sich in Beziehungen zeigt und was dir hilft, ihr weniger ausgeliefert zu sein – ohne Selbstverurteilung."
   }
 }
