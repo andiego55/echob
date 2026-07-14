@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom'
 import type { Cluster, ContentMeta } from '@/content/types'
 import { getBody } from '@/content/bodies'
 import MarkdownArticle from './MarkdownArticle'
 import EchoReflectionCard from './EchoReflectionCard'
 import RelatedContentCluster from './RelatedContentCluster'
 import SafetyNotice from './SafetyNotice'
+import Breadcrumbs from './Breadcrumbs'
 
 const SITE = 'https://echo-b.de'
 
@@ -48,12 +48,7 @@ export default function ArticleTemplate({ meta }: { meta: ContentMeta }) {
     <>
       <section className="bg-navy px-6 pb-16 pt-[calc(60px+4rem)] text-white">
         <div className="mx-auto max-w-[720px]">
-          <Link
-            to="/wissen"
-            className="mb-6 inline-block text-[0.82rem] text-white/50 no-underline transition-colors hover:text-white"
-          >
-            ← Zurück zum Wissen
-          </Link>
+          <Breadcrumbs meta={meta} />
           <span className="label mb-3 block">{CLUSTER_LABEL[meta.cluster]}</span>
           <h1 className="text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.2] tracking-[-0.02em]">
             {meta.title}

@@ -37,6 +37,50 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/glossar/gaslighting"
   },
   {
+    "type": "problem",
+    "slug": "an-eigener-wahrnehmung-zweifeln",
+    "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
+    "description": "Immer öfter unsicher, was in deiner Beziehung wirklich passiert ist? Woran ständige Selbstzweifel liegen können und wie du wieder Boden unter die Füße bekommst – ohne vorschnelles Urteil.",
+    "cluster": "dynamiken",
+    "search_intent": "an der eigenen Wahrnehmung zweifeln Beziehung",
+    "updated": "2026-07-13",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du zweifelst gerade an deiner eigenen Wahrnehmung. Möchtest du eine konkrete Situation anschauen, bei der du unsicher geworden bist, was wirklich passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "emotionale-manipulation",
+      "glossary": [
+        "gaslighting"
+      ],
+      "comparison": [
+        "gaslighting-oder-missverstaendnis"
+      ],
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/hilfe/an-eigener-wahrnehmung-zweifeln"
+  },
+  {
     "type": "topic",
     "slug": "beziehungsmuster",
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
@@ -108,6 +152,9 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "links": {
+      "children": [
+        "an-eigener-wahrnehmung-zweifeln"
+      ],
       "glossary": [
         "gaslighting"
       ],
@@ -160,6 +207,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/gaslighting": {
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
+  },
+  "/hilfe/an-eigener-wahrnehmung-zweifeln": {
+    "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
+    "description": "Immer öfter unsicher, was in deiner Beziehung wirklich passiert ist? Woran ständige Selbstzweifel liegen können und wie du wieder Boden unter die Füße bekommst – ohne vorschnelles Urteil."
   },
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",

@@ -56,8 +56,7 @@ const LINK_CLS = (active: boolean) =>
 export default function Header() {
   const { session, signOut } = useAuth()
   const location = useLocation()
-  const wissenActive = location.pathname.startsWith('/wissen')
-  const glossarActive = location.pathname.startsWith('/glossar')
+  const wissenActive = location.pathname.startsWith('/wissen') || location.pathname.startsWith('/glossar')
   const ueberActive = location.pathname.startsWith('/ueber')
 
   return (
@@ -124,29 +123,20 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* Blog-Teaser */}
-                <div className="border-t border-brand-border bg-brand-bg px-5 py-3 flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-[0.82rem] font-semibold text-navy">EchoB Blog</p>
-                    <p className="text-[0.76rem] text-brand-muted leading-snug">
-                      Tiefergehende Artikel zu Beziehungsthemen
-                    </p>
-                  </div>
-                  <Link
-                    to="/blog"
-                    className="shrink-0 text-[0.8rem] font-semibold text-accent hover:text-accent-hover no-underline transition-colors"
-                  >
-                    Zum Blog →
+                {/* Glossar + Blog */}
+                <div className="grid grid-cols-2 divide-x divide-brand-border border-t border-brand-border bg-brand-bg">
+                  <Link to="/glossar" className="px-5 py-3 no-underline transition-colors hover:bg-white">
+                    <p className="text-[0.82rem] font-semibold text-navy">Glossar <span className="text-accent">→</span></p>
+                    <p className="text-[0.76rem] text-brand-muted leading-snug">Begriffe von A–Z</p>
+                  </Link>
+                  <Link to="/blog" className="px-5 py-3 no-underline transition-colors hover:bg-white">
+                    <p className="text-[0.82rem] font-semibold text-navy">EchoB Blog <span className="text-accent">→</span></p>
+                    <p className="text-[0.76rem] text-brand-muted leading-snug">Tiefergehende Artikel</p>
                   </Link>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Glossar */}
-          <NavLink to="/glossar" className={() => LINK_CLS(glossarActive)}>
-            Glossar
-          </NavLink>
 
           {/* Blog + Fachpersonen */}
           {NAV_SIMPLE.slice(2, 4).map(({ to, label }) => (
