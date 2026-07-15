@@ -54,26 +54,6 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Wichtige Begriffe rund um Beziehungen, Dynamiken und Psychologie – kurz und klar erklärt, ohne Diagnose.',
   },
-  '/wissen/beobachtung-gefuehl': {
-    title: 'Beobachtung & Gefühl trennen – EchoB Wissen',
-    description:
-      'Warum es hilft, Beobachtung von Bewertung und Gefühl zu trennen – und wie du das Schritt für Schritt übst.',
-  },
-  '/wissen/grenzen-setzen': {
-    title: 'Grenzen setzen – EchoB Wissen',
-    description:
-      'Wie du eigene Grenzen erkennst und wahrst – klar und respektvoll, ohne die Beziehung zu kappen.',
-  },
-  '/wissen/professionelle-hilfe': {
-    title: 'Wann professionelle Hilfe? – EchoB Wissen',
-    description:
-      'Woran du erkennst, dass professionelle Unterstützung sinnvoll ist – und wie du die passende findest.',
-  },
-  '/wissen/krisentelefone': {
-    title: 'Krisentelefone & Soforthilfe – EchoB Wissen',
-    description:
-      'Wichtige Anlaufstellen und Krisentelefone für akute Notlagen – schnelle Hilfe im Überblick.',
-  },
 
   '/impressum': {
     title: 'Impressum – EchoB',

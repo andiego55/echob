@@ -19,10 +19,6 @@ import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
 import GlossarPage                   from '@/pages/GlossarPage'
 import ReflectPage                   from '@/pages/content/ReflectPage'
-import WissenBeobachtungPage         from '@/pages/wissen/WissenBeobachtungPage'
-import WissenGrenzenPage             from '@/pages/wissen/WissenGrenzenPage'
-import WissenProfessionelleHilfePage from '@/pages/wissen/WissenProfessionelleHilfePage'
-import WissenKrisentelephonePage     from '@/pages/wissen/WissenKrisentelephonePage'
 
 // ── App-Bereich ───────────────────────────────────────────────────────────────
 import CasesOverviewPage from '@/pages/app/CasesOverviewPage'
@@ -143,10 +139,6 @@ export function AppRoutes() {
       <Route path="/ratgeber/:slug"                  element={<ContentPage />} />
       <Route path="/fallbeispiele/:slug"             element={<ContentPage />} />
       <Route path="/therapie-vorbereitung/:slug"     element={<ContentPage />} />
-      <Route path="/wissen/beobachtung-gefuehl"      element={<WissenBeobachtungPage />} />
-      <Route path="/wissen/grenzen-setzen"           element={<WissenGrenzenPage />} />
-      <Route path="/wissen/professionelle-hilfe"     element={<WissenProfessionelleHilfePage />} />
-      <Route path="/wissen/krisentelefone"           element={<WissenKrisentelephonePage />} />
 
       {/* ── App-Bereich (Login erforderlich) ───────────────────────────────── */}
       <Route path="/app" element={<ProtectedRoute><AppHome /></ProtectedRoute>} />

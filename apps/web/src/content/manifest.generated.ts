@@ -301,6 +301,43 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "beobachtung-gefuehl",
+    "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",
+    "description": "Wie du zwischen dem, was passiert ist, dem, was du fühlst, und dem, was du daraus schließt, unterscheidest – das Kernwerkzeug der Gewaltfreien Kommunikation.",
+    "cluster": "selbstreflexion",
+    "search_intent": "Beobachtung Gefühl Interpretation trennen GFK",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Beobachtung, Gefühl und Interpretation gelesen. Möchtest du eine konkrete Situation durchgehen und trennen, was passiert ist – von dem, was du daraus geschlossen hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "wahrnehmung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "related": [
+        "an-eigener-wahrnehmung-zweifeln",
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/beobachtung-gefuehl"
+  },
+  {
+    "type": "topic",
     "slug": "beziehungsmuster",
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
     "description": "Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose.",
@@ -589,6 +626,44 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "grenzen-setzen",
+    "title": "Grenzen setzen: was sie sind und warum sie so schwerfallen",
+    "description": "Was Grenzen wirklich sind, warum sie so schwer zu setzen sind und wie du sie klar kommunizierst – ohne Angriff und ohne Rechtfertigungsdruck.",
+    "cluster": "selbstreflexion",
+    "search_intent": "Grenzen setzen Beziehung lernen",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Grenzen gelesen. Möchtest du eine konkrete Situation anschauen, in der du gespürt hast, dass eine Grenze überschritten wurde?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "grenzen"
+    ],
+    "safety_tags": [],
+    "links": {
+      "related": [
+        "emotionale-manipulation",
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/grenzen-setzen"
+  },
+  {
+    "type": "topic",
     "slug": "kommunikation-konflikte",
     "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
     "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft.",
@@ -630,6 +705,30 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "krisentelefone",
+    "title": "Krisentelefone und Anlaufstellen (D/A/CH)",
+    "description": "Kostenlose, anonyme Hilfsangebote in Deutschland, Österreich und der Schweiz – rund um die Uhr erreichbar. Bei akuter Gefahr: Notruf 112.",
+    "cluster": "therapie",
+    "search_intent": "Krisentelefone Anlaufstellen kostenlos anonym",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn du gerade Abstand brauchst und trotzdem etwas sortieren möchtest, ist das möglich – wichtiger ist jetzt aber, dass du mit einem Menschen sprichst.",
+      "cta_positions": []
+    },
+    "safety_tags": [
+      "krise"
+    ],
+    "url": "/wissen/krisentelefone"
+  },
+  {
+    "type": "topic",
     "slug": "persoenlichkeit-verhalten",
     "title": "Persönlichkeit und Verhalten verstehen – ohne Ferndiagnose",
     "description": "Was Persönlichkeitsmerkmale sind und was nicht: Big Five, Narzissmus und das Dunkle Dreieck – verständlich erklärt, ohne andere zu etikettieren.",
@@ -668,6 +767,42 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/persoenlichkeit-verhalten"
+  },
+  {
+    "type": "topic",
+    "slug": "professionelle-hilfe",
+    "title": "Wann professionelle Hilfe sinnvoll ist",
+    "description": "Woran du erkennst, dass professionelle Unterstützung sinnvoll ist, was Therapie, Beratung und Coaching leisten – und wie du die Hürde zum ersten Gespräch überwindest.",
+    "cluster": "therapie",
+    "search_intent": "wann professionelle Hilfe Beziehung sinnvoll",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du überlegst, ob professionelle Hilfe der nächste Schritt ist. Möchtest du deine Situation strukturieren – als Vorbereitung für ein erstes Gespräch?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "hilfe-suchen"
+    ],
+    "safety_tags": [],
+    "links": {
+      "related": [
+        "an-eigener-wahrnehmung-zweifeln",
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/professionelle-hilfe"
   },
   {
     "type": "topic",
@@ -834,6 +969,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ständige Eifersucht – wenn Misstrauen euch beide erschöpft",
     "description": "Wenn Eifersucht dein Denken bestimmt und die Beziehung zermürbt: was dahinter stecken kann und was im Moment des Misstrauens konkret hilft."
   },
+  "/wissen/beobachtung-gefuehl": {
+    "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",
+    "description": "Wie du zwischen dem, was passiert ist, dem, was du fühlst, und dem, was du daraus schließt, unterscheidest – das Kernwerkzeug der Gewaltfreien Kommunikation."
+  },
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
     "description": "Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose."
@@ -862,13 +1001,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
     "description": "Nicht jeder Streit ist Manipulation. Diese Merkmale helfen dir, ein echtes Missverständnis von systematischem Gaslighting zu unterscheiden – ohne vorschnelles Urteil."
   },
+  "/wissen/grenzen-setzen": {
+    "title": "Grenzen setzen: was sie sind und warum sie so schwerfallen",
+    "description": "Was Grenzen wirklich sind, warum sie so schwer zu setzen sind und wie du sie klar kommunizierst – ohne Angriff und ohne Rechtfertigungsdruck."
+  },
   "/wissen/kommunikation-konflikte": {
     "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
     "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft."
   },
+  "/wissen/krisentelefone": {
+    "title": "Krisentelefone und Anlaufstellen (D/A/CH)",
+    "description": "Kostenlose, anonyme Hilfsangebote in Deutschland, Österreich und der Schweiz – rund um die Uhr erreichbar. Bei akuter Gefahr: Notruf 112."
+  },
   "/wissen/persoenlichkeit-verhalten": {
     "title": "Persönlichkeit und Verhalten verstehen – ohne Ferndiagnose",
     "description": "Was Persönlichkeitsmerkmale sind und was nicht: Big Five, Narzissmus und das Dunkle Dreieck – verständlich erklärt, ohne andere zu etikettieren."
+  },
+  "/wissen/professionelle-hilfe": {
+    "title": "Wann professionelle Hilfe sinnvoll ist",
+    "description": "Woran du erkennst, dass professionelle Unterstützung sinnvoll ist, was Therapie, Beratung und Coaching leisten – und wie du die Hürde zum ersten Gespräch überwindest."
   },
   "/wissen/sich-trennen": {
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",

@@ -18,16 +18,6 @@ interface OverviewItem {
   description?: string
 }
 
-// Handcodierte Legacy-Wissensseiten (noch nicht als Markdown migriert). Bis zur
-// Migration hier eingeordnet, damit die Übersicht vollständig bleibt und nichts
-// verwaist. Wandert eine Seite ins Content-Manifest, wird ihr Eintrag hier entfernt.
-const LEGACY_ITEMS: OverviewItem[] = [
-  { title: 'Beobachtung & Gefühl trennen', url: '/wissen/beobachtung-gefuehl', cluster: 'selbstreflexion', type: 'topic', description: 'Zwischen dem, was passiert, und dem, was du daraus schließt, unterscheiden.' },
-  { title: 'Grenzen setzen', url: '/wissen/grenzen-setzen', cluster: 'selbstreflexion', type: 'topic', description: 'Was Grenzen bedeuten und wie man sie klar kommuniziert.' },
-  { title: 'Wann professionelle Hilfe sinnvoll ist', url: '/wissen/professionelle-hilfe', cluster: 'therapie', type: 'guide', description: 'Orientierung, wann Beratung oder Therapie der nächste sinnvolle Schritt ist.' },
-  { title: 'Krisentelefone & Anlaufstellen', url: '/wissen/krisentelefone', cluster: 'therapie', type: 'guide', description: 'Kostenlose Hilfsangebote in Deutschland, Österreich und der Schweiz.' },
-]
-
 const MANIFEST_ITEMS: OverviewItem[] = CONTENT_MANIFEST.map((m) => ({
   title: m.title,
   url: m.url,
@@ -36,7 +26,7 @@ const MANIFEST_ITEMS: OverviewItem[] = CONTENT_MANIFEST.map((m) => ({
   description: m.description,
 }))
 
-const ALL_ITEMS = [...MANIFEST_ITEMS, ...LEGACY_ITEMS]
+const ALL_ITEMS = MANIFEST_ITEMS
 
 // Self-contained helle Typ-Badges (dunkler Text auf hellem Pill – auf jeder Karte lesbar).
 const TYPE_BADGE: Record<ContentType, { bg: string; fg: string }> = {
