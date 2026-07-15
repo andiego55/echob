@@ -154,7 +154,7 @@ export default function AusbildungPage() {
           </p>
 
           <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
-            {[['1', 'Fallmaterial für die ganze Kohorte'], ['Voll', 'Fachpersonen-Werkzeuge je Platz'], ['EU', 'sicher, pseudonym, ohne Diagnose']].map(([n, t], i) => (
+            {[['Sofort', 'Beispielfallmaterial für die Kohorte – beliebig erweiterbar'], ['Voll', 'Fachpersonen-Werkzeuge je Platz'], ['Praxisnah', 'begleitet & modern']].map(([n, t], i) => (
               <div key={t} className="rounded-brand border border-white/10 bg-white/[0.04] px-4 py-3"
                 style={{ animation: 'ab-up .6s ease-out both', animationDelay: `${0.15 + i * 0.12}s` }}>
                 <div className="text-xl font-extrabold text-white">{n}</div>
