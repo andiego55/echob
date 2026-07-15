@@ -36,6 +36,15 @@ class StudentReportUpdate(BaseModel):
     sections: list[dict] = Field(default_factory=list)
 
 
+class StudentHypSave(BaseModel):
+    hypothesis_type: str = Field(..., max_length=40)
+    summary_text: str = Field(..., min_length=1, max_length=20_000)
+
+
+class StudentHypGenerate(BaseModel):
+    hypothesis_type: str = Field(..., max_length=40)
+
+
 class StudentNotes(BaseModel):
     first_impressions: str | None = None
     key_scenes: str | None = None

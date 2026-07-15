@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import type { Hypothesis } from './hypotheses'
 import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
   Report, ReportCreate,
@@ -38,4 +39,20 @@ export const studentApi = {
     apiClient.get<StudentNotes>(`/student/cases/${copyId}/notes`).then(r => r.data),
   notesSave: (copyId: string, data: StudentNotes) =>
     apiClient.put<StudentNotes>(`/student/cases/${copyId}/notes`, data).then(r => r.data),
+
+  // Hypothesen (geführte Dialoge, student-scoped — thread_type hyp_*)
+  hypotheses: (copyId: string) =>
+    apiClient.get<Hypothesis[]>(`/student/cases/${copyId}/hypotheses`).then(r => r.data),
+  hypSave: (copyId: string, hypothesis_type: string, summary_text: string) =>
+    apiClient.put<Hypothesis>(`/student/cases/${copyId}/hypotheses`, { hypothesis_type, summary_text }).then(r => r.data),
+  hypGenerate: (copyId: string, hypothesis_type: string) =>
+    apiClient.post<{ summary: string }>(`/student/cases/${copyId}/hypotheses/generate`, { hypothesis_type }, { timeout: 120_000 }).then(r => r.data),
+  hypRemove: (copyId: string, hypothesis_type: string) =>
+    apiClient.delete(`/student/cases/${copyId}/hypotheses/${hypothesis_type}`).then(r => r.data),
+  hypHistory: (copyId: string, hypType: string) =>
+    apiClient.get<StudentEchoMessage[]>(`/student/cases/${copyId}/hypotheses/${hypType}/history`).then(r => r.data),
+  hypChat: (copyId: string, hypType: string, message: string) =>
+    apiClient.post<StudentEchoMessage>(`/student/cases/${copyId}/hypotheses/${hypType}/chat`, { message }, { timeout: 120_000 }).then(r => r.data),
+  hypReset: (copyId: string, hypType: string) =>
+    apiClient.delete(`/student/cases/${copyId}/hypotheses/${hypType}/history`).then(r => r.data),
 }

@@ -106,11 +106,12 @@ import StudentRegisterPage from '@/pages/student/StudentRegisterPage'
 import StudentDashboardPage from '@/pages/student/StudentDashboardPage'
 import StudentCaseDetailPage from '@/pages/student/StudentCaseDetailPage'
 import StudentEchoPage from '@/pages/student/StudentEchoPage'
-import StudentCaseToolPlaceholder from '@/pages/student/StudentCaseToolPlaceholder'
 import StudentReportsPage from '@/pages/student/StudentReportsPage'
 import StudentReportNewPage from '@/pages/student/StudentReportNewPage'
 import StudentReportDetailPage from '@/pages/student/StudentReportDetailPage'
 import StudentNotesPage from '@/pages/student/StudentNotesPage'
+import StudentHypothesesPage from '@/pages/student/StudentHypothesesPage'
+import StudentHypothesisDialogPage from '@/pages/student/StudentHypothesisDialogPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -220,7 +221,8 @@ export function AppRoutes() {
       <Route path="/student/dashboard" element={<StudentRoute><StudentDashboardPage /></StudentRoute>} />
       <Route path="/student/cases/:id" element={<StudentRoute><StudentCaseDetailPage /></StudentRoute>} />
       <Route path="/student/cases/:id/echo" element={<StudentRoute><StudentEchoPage /></StudentRoute>} />
-      <Route path="/student/cases/:id/hypotheses" element={<StudentRoute><StudentCaseToolPlaceholder title="Hypothesen" /></StudentRoute>} />
+      <Route path="/student/cases/:id/hypotheses" element={<StudentRoute><StudentHypothesesPage /></StudentRoute>} />
+      <Route path="/student/cases/:id/hypotheses/:hypId" element={<StudentRoute><StudentHypothesisDialogPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports" element={<StudentRoute><StudentReportsPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/new" element={<StudentRoute><StudentReportNewPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/:reportId" element={<StudentRoute><StudentReportDetailPage /></StudentRoute>} />
