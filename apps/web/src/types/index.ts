@@ -136,6 +136,72 @@ export interface InstituteProfile {
   updated_at: string
 }
 
+export interface GenerationInput {
+  title?: string | null
+  person_name: string
+  relationship_type: string
+  relationship_status: string
+  contact_frequency: string
+  distress_score: number
+  free_text?: string | null
+  focus_terms: string[]
+  scene_count: number
+  with_partner: boolean
+  partner_name?: string | null
+}
+
+export interface ExampleScene {
+  id: string
+  title: string | null
+  scene_date: string | null
+  description: string | null
+  user_reaction: string | null
+  distress_score: number | null
+  pattern_tags: string[]
+}
+
+export interface ExampleOnboarding {
+  person_name: string | null
+  relationship_description: string | null
+  main_burden: string | null
+  typical_scenes: string | null
+  significant_event: string | null
+  memorable_scenes: string | null
+  distress_score: number | null
+  safety_status: string | null
+  pattern_hypotheses: { label: string; confidence: string; source?: string }[]
+}
+
+export interface ExampleCasePart {
+  case_id: string
+  person_name: string | null
+  relationship_type: string
+  relationship_status: string
+  contact_frequency: string
+  main_concern: string | null
+  onboarding: ExampleOnboarding | null
+  scenes: ExampleScene[]
+}
+
+export interface ExampleDetail {
+  id: string
+  title: string
+  status: string
+  created_at: string | null
+  updated_at: string | null
+  primary: ExampleCasePart | null
+  partner: ExampleCasePart | null
+}
+
+export interface ExampleSummary {
+  id: string
+  title: string
+  status: string
+  has_partner: boolean
+  scene_count: number
+  created_at: string | null
+}
+
 export interface CaseCreate {
   relationship_type: RelationshipType
   relationship_status: RelationshipStatus

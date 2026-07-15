@@ -96,6 +96,7 @@ import InstituteRoute, { useInstitute } from '@/components/auth/InstituteRoute'
 import InstituteRegisterPage from '@/pages/institute/InstituteRegisterPage'
 import InstituteDashboardPage from '@/pages/institute/InstituteDashboardPage'
 import InstituteGeneratePage from '@/pages/institute/InstituteGeneratePage'
+import InstituteExampleEditorPage from '@/pages/institute/InstituteExampleEditorPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -197,6 +198,7 @@ export function AppRoutes() {
       <Route path="/institute/register" element={<ProtectedRoute><InstituteRegisterPage /></ProtectedRoute>} />
       <Route path="/institute/dashboard" element={<InstituteRoute><InstituteDashboardPage /></InstituteRoute>} />
       <Route path="/institute/examples/new" element={<InstituteRoute><InstituteGeneratePage /></InstituteRoute>} />
+      <Route path="/institute/examples/:id" element={<InstituteRoute><InstituteExampleEditorPage /></InstituteRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />
