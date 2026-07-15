@@ -138,6 +138,11 @@ export default function Header() {
             </NavLink>
           ))}
 
+          {/* Ausbildung */}
+          <NavLink to="/ausbildungsinstitute" end className={({ isActive }) => LINK_CLS(isActive)}>
+            Ausbildung
+          </NavLink>
+
           {/* Über mit Dropdown */}
           <div className="relative group">
             <NavLink

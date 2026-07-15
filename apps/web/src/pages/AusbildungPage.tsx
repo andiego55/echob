@@ -118,6 +118,35 @@ const ETHIK = [
   { title: 'Die Dozent:in bleibt die Instanz', text: 'Echo ist Übungspartner, nicht Prüfer. Die fachliche Bewertung liegt immer bei der Lehre.' },
 ]
 
+const TARIFS = [
+  {
+    name: 'Pilot', price: '299 €', unit: ' / 6 Monate', source: 'ausbildung_pilot', featured: false,
+    meta: 'bis 5 Studierende · 1 Kohorte',
+    features: [
+      'Fallbibliothek mit 3 Fällen', 'Eigene Fallerstellung: 1 Fall', '3 Lernmodule',
+      'Reflexionsaufgaben', 'Dozentenleitfaden', 'Berichterstellung', 'Skalenerstellung',
+      'KI-gestützte Lernbegleitung',
+    ],
+  },
+  {
+    name: 'Campus Standard', price: '1.299 €', unit: ' / 6 Monate', source: 'ausbildung_standard', featured: true,
+    meta: 'bis 20 Studierende · 1 Kohorte',
+    features: [
+      'Fallbibliothek mit 5 Fällen', 'Eigene Fallerstellung: 5 Fälle', '5 Lernmodule',
+      'Reflexionsaufgaben', 'Dozentenleitfaden', 'Berichterstellung', 'Skalenerstellung',
+      'KI-gestützte Lernbegleitung',
+    ],
+  },
+  {
+    name: 'Campus Pro', price: '3.499 €', unit: ' / Jahr', source: 'ausbildung_pro', featured: false,
+    meta: '50 Studierende · beliebig viele Kohorten',
+    features: [
+      'Fallbibliothek mit 10 Fällen', 'Eigene Fallerstellung: 10 Fälle', '10 Lernmodule',
+      'Reflexionsaufgaben', 'Dozentenleitfaden', 'KI-gestützte Lernbegleitung',
+    ],
+  },
+]
+
 export default function AusbildungPage() {
   return (
     <PageLayout>
@@ -279,53 +308,50 @@ export default function AusbildungPage() {
       <section id="preis" className="border-t border-brand-border px-6 py-[72px]">
         <div className="mx-auto max-w-[960px]">
           <Reveal>
-            <span className="label">Preis</span>
+            <span className="label">Preise</span>
             <h2 className="text-[clamp(1.4rem,2.5vw,1.9rem)] font-bold leading-[1.25] text-navy">
-              Sie zahlen je Studierenden-Platz, nicht pro Fall
+              Lizenzen für Ihre Ausbildung
             </h2>
             <p className="mt-3 max-w-[620px] leading-[1.75] text-brand-muted">
-              Ein planbares Modell für Kohorten: eine schlanke Grundgebühr fürs Institut, dazu ein
-              fairer Preis je aktivem Platz. Die Übungsfälle sind inklusive.
+              Von der Pilot-Kohorte bis zur Jahreslizenz fürs ganze Haus – transparente Pakete.
+              Fallbibliothek, eigene Fallerstellung, Reflexionsaufgaben und KI-Lernbegleitung inklusive.
             </p>
           </Reveal>
 
-          <Reveal delay={0.1}>
-            <div className="mt-8 overflow-hidden rounded-[1.25rem] border-2 border-accent/30 bg-accent/[0.04]">
-              <div className="grid items-center gap-6 p-6 sm:p-8 lg:grid-cols-[1.25fr_1fr]">
-                <div>
-                  <span className="label">Tarif Ausbildung</span>
-                  <ul className="mt-4 grid gap-2.5">
-                    {[
-                      'Übungsfälle inklusive – kein Pro-Fall-Preis',
-                      'Volle Fachpersonen-Werkzeuge je Studierenden-Platz',
-                      'Zentrale Verwaltung, Rollen und geteilte Vorlagen',
-                      'Pilot mit einer Kohorte möglich',
-                      'Ab ~30 Studierenden individuelle Konditionen',
-                    ].map((p) => (
-                      <li key={p} className="flex items-start gap-2.5 text-sm leading-relaxed text-brand-muted">
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {TARIFS.map((t, i) => (
+              <Reveal key={t.name} delay={(i % 3) * 0.08}>
+                <div className={`card flex h-full flex-col ${t.featured ? 'border-accent bg-accent/5' : ''}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="label">{t.name}</span>
+                    {t.featured && (
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Beliebt</span>
+                    )}
+                  </div>
+                  <div className="mt-3 text-3xl font-extrabold text-navy">
+                    {t.price}<span className="text-sm font-normal text-brand-muted">{t.unit}</span>
+                  </div>
+                  <p className="mt-1 text-xs font-medium text-accent">{t.meta}</p>
+                  <ul className="mt-4 flex-1 space-y-2">
+                    {t.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm leading-relaxed text-brand-muted">
                         <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
-                        {p}
+                        {f}
                       </li>
                     ))}
                   </ul>
-                </div>
-                <div className="rounded-[1rem] border border-brand-border bg-white p-6 text-center">
-                  <div className="text-3xl font-extrabold text-navy">99 €<span className="text-sm font-normal text-brand-muted">/Mo.</span></div>
-                  <p className="text-xs text-brand-muted">Grundgebühr je Institut</p>
-                  <div className="my-3 flex items-center gap-3 text-brand-border">
-                    <span className="h-px flex-1 bg-brand-border" /><span className="text-xs font-semibold">plus</span><span className="h-px flex-1 bg-brand-border" />
-                  </div>
-                  <div className="text-3xl font-extrabold text-navy">12,99 €<span className="text-sm font-normal text-brand-muted">/Mo.</span></div>
-                  <p className="text-xs text-brand-muted">je aktivem Studierenden-Platz</p>
                   <ErstgespraechCTA
-                    className="btn-primary mt-5 w-full justify-center"
+                    className={`mt-5 w-full justify-center ${t.featured ? 'btn-primary' : 'btn bg-white text-navy border-2 border-brand-border hover:border-navy/30'}`}
                     label="Demo anfragen" heading="Demo für Ausbildungsinstitute anfragen"
-                    kind="demo" source="ausbildung_preis" />
-                  <p className="mt-2 text-[11px] text-brand-muted">Unverbindlich · inkl. gesetzlicher USt.</p>
+                    kind="demo" source={t.source} />
                 </div>
-              </div>
-            </div>
-          </Reveal>
+              </Reveal>
+            ))}
+          </div>
+
+          <p className="mt-5 text-center text-xs text-brand-muted">
+            Alle Preise zzgl. gesetzlicher USt. · Pilot zum Kennenlernen · größere Häuser individuell.
+          </p>
         </div>
       </section>
 
