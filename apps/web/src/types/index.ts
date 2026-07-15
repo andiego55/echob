@@ -235,6 +235,14 @@ export interface StudentCaseDetail {
   partner: ExampleCasePart | null
 }
 
+export interface StudentEchoMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  safety_level: 'elevated' | 'acute' | null
+  created_at: string | null
+}
+
 export interface StudentInvite {
   id: string
   code: string

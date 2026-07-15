@@ -26,3 +26,7 @@ class StudentProfileResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class StudentEchoChat(BaseModel):
+    message: str = Field(..., min_length=1, max_length=4000)

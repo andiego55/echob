@@ -5,14 +5,19 @@ students-Zeile). Registrierung läuft über /student/accept (Einladungscode/-Tok
 """
 from __future__ import annotations
 
+import json
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.api.v1.routers.institute import _load_case_part   # generischer Fall-Loader (Engine-Reuse)
+from app.core import crypto
 from app.core.dependencies import get_current_student, get_current_user, get_pool
-from app.schemas.student import StudentInviteAccept, StudentProfileResponse
+from app.schemas.student import StudentEchoChat, StudentInviteAccept, StudentProfileResponse
 from app.services import student_invite_service
+from app.services.person_profile_service import build_person_context
+from app.services.profile_service import build_profile_context
+from app.services.safety_service import build_safety_message
 
 router = APIRouter(prefix="/student", tags=["student"])
 
@@ -97,3 +102,125 @@ async def case_detail(
         "primary": primary,
         "partner": partner,
     }
+
+
+# ── Echo-Dialog über die Arbeitskopie ─────────────────────────────────────────
+
+def _jsonb(v):
+    if isinstance(v, str):
+        try:
+            return json.loads(v)
+        except (ValueError, TypeError):
+            return {}
+    return v or {}
+
+
+def _safety_level(meta) -> str | None:
+    d = _jsonb(meta)
+    return (d.get("safety") or {}).get("level") if isinstance(d, dict) else None
+
+
+async def _copy_or_404(conn, copy_id, student_id):
+    copy = await conn.fetchrow(
+        "SELECT * FROM student_case_copies WHERE id = $1 AND student_id = $2", copy_id, student_id)
+    if not copy:
+        raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+    return copy
+
+
+@router.get("/cases/{copy_id}/echo/history")
+async def echo_history(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        rows = await conn.fetch(
+            "SELECT id, role, content, metadata, created_at FROM echo_messages "
+            "WHERE case_id = $1 AND thread_type = 'topic' ORDER BY created_at LIMIT 200",
+            copy["case_id"])
+    return [
+        {"id": str(r["id"]), "role": r["role"], "content": crypto.decrypt(r["content"]),
+         "safety_level": _safety_level(r["metadata"]),
+         "created_at": r["created_at"].isoformat() if r["created_at"] else None}
+        for r in rows
+    ]
+
+
+@router.post("/cases/{copy_id}/echo/chat")
+async def echo_chat(
+    copy_id: UUID,
+    body: StudentEchoChat,
+    request: Request,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Echo-Dialog über die zugewiesene Arbeitskopie — voller Fallkontext (Onboarding,
+    Szenen, Selbstbild, Fremdeinschätzung), mit Krisen-Erkennung wie im Nutzer-Echo."""
+    echo_svc = request.app.state.echo_service
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        case_id = copy["case_id"]
+        case_row = await conn.fetchrow("SELECT * FROM cases WHERE id = $1", case_id)
+        if not case_row:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+        onboarding_row = await conn.fetchrow("SELECT * FROM onboarding_answers WHERE case_id = $1", case_id)
+        scene_rows = await conn.fetch(
+            "SELECT * FROM scenes WHERE case_id = $1 ORDER BY scene_date DESC NULLS LAST, created_at DESC", case_id)
+        pp_row = await conn.fetchrow("SELECT * FROM person_profiles WHERE case_id = $1", case_id)
+        self_row = await conn.fetchrow("SELECT * FROM user_profiles WHERE user_id = $1", case_row["user_id"])
+        history_rows = await conn.fetch(
+            "SELECT role, content FROM echo_messages WHERE case_id = $1 AND thread_type = 'topic' "
+            "ORDER BY created_at DESC LIMIT 20", case_id)
+
+    onboarding = (crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+                  if onboarding_row else None)
+    scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in reversed(history_rows)]
+
+    parts: list[str] = []
+    if self_row and _jsonb(self_row["modules"]):
+        parts.append(build_profile_context({
+            "modules": _jsonb(self_row["modules"]),
+            "safety_status": self_row["safety_status"] or "no_indication",
+            "display_name": self_row["display_name"],
+        }))
+    if pp_row and _jsonb(pp_row["modules"]):
+        parts.append(build_person_context({
+            "modules": _jsonb(pp_row["modules"]), "summary": _jsonb(pp_row["summary"]),
+        }))
+    extra_context = "\n\n---\n\n".join(parts)
+
+    async def _answer() -> str:
+        return await echo_svc.chat(
+            user_message=body.message, case_context=dict(case_row), thread_type="topic",
+            history=history, onboarding=onboarding, scenes=scenes, scale_scores=[],
+            extra_context=extra_context)
+
+    safety_meta: dict = {}
+    risk = await echo_svc.classify_risk(text=body.message)
+    level = risk.get("level", "none")
+    if level == "acute":
+        answer = build_safety_message("acute", category=risk.get("category"))
+        safety_meta = {"safety": {"level": "acute", "category": risk.get("category"), "mode": "intervention"}}
+    else:
+        answer = await _answer()
+        if level == "elevated":
+            answer = answer.rstrip() + "\n\n" + build_safety_message("elevated", category=risk.get("category"))
+            safety_meta = {"safety": {"level": "elevated", "category": risk.get("category"), "mode": "appended"}}
+
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type) "
+            "VALUES ($1, $2, 'user', $3, 'topic')",
+            case_id, current["user_id"], crypto.encrypt(body.message))
+        arow = await conn.fetchrow(
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata) "
+            "VALUES ($1, $2, 'assistant', $3, 'topic', $4::jsonb) RETURNING id, created_at",
+            case_id, current["user_id"], crypto.encrypt(answer), json.dumps(safety_meta))
+    return {"id": str(arow["id"]), "role": "assistant", "content": answer,
+            "safety_level": (safety_meta.get("safety") or {}).get("level"),
+            "created_at": arow["created_at"].isoformat() if arow["created_at"] else None}

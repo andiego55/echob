@@ -5,6 +5,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import StudentShell from '@/components/student/StudentShell'
+import StudentCaseNav from '@/components/student/StudentCaseNav'
 import { Spinner } from '@/components/auth/StudentRoute'
 import { studentApi } from '@/api/student'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
@@ -56,6 +57,7 @@ export default function StudentCaseDetailPage() {
 
   return (
     <StudentShell>
+      <StudentCaseNav copyId={id!} />
       <div className="mx-auto max-w-[900px] px-6 py-8">
         <Link to="/student/dashboard" className="text-sm text-brand-muted no-underline hover:text-navy">
           ← Zurück zum Dashboard
