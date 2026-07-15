@@ -22,10 +22,6 @@ interface OverviewItem {
 // Migration hier eingeordnet, damit die Übersicht vollständig bleibt und nichts
 // verwaist. Wandert eine Seite ins Content-Manifest, wird ihr Eintrag hier entfernt.
 const LEGACY_ITEMS: OverviewItem[] = [
-  { title: 'Bindungsstile', url: '/wissen/bindungsstile', cluster: 'bindung', type: 'topic', description: 'Sicher, ängstlich, vermeidend – wie frühe Bindungserfahrungen Beziehungen prägen.' },
-  { title: 'Kommunikation & Konflikte', url: '/wissen/kommunikation-konflikte', cluster: 'dynamiken', type: 'topic', description: 'Warum Gespräche eskalieren und was konstruktive von destruktiver Kommunikation unterscheidet.' },
-  { title: 'Persönlichkeit & Verhalten', url: '/wissen/persoenlichkeit-verhalten', cluster: 'dynamiken', type: 'topic', description: 'Wie Persönlichkeitsmerkmale sich in Beziehungen zeigen.' },
-  { title: 'Emotionsregulation', url: '/wissen/emotionsregulation', cluster: 'selbstreflexion', type: 'topic', description: 'Warum manche Menschen Gefühle schwer regulieren – und was hilft.' },
   { title: 'Beobachtung & Gefühl trennen', url: '/wissen/beobachtung-gefuehl', cluster: 'selbstreflexion', type: 'topic', description: 'Zwischen dem, was passiert, und dem, was du daraus schließt, unterscheiden.' },
   { title: 'Grenzen setzen', url: '/wissen/grenzen-setzen', cluster: 'selbstreflexion', type: 'topic', description: 'Was Grenzen bedeuten und wie man sie klar kommuniziert.' },
   { title: 'Wann professionelle Hilfe sinnvoll ist', url: '/wissen/professionelle-hilfe', cluster: 'therapie', type: 'guide', description: 'Orientierung, wann Beratung oder Therapie der nächste sinnvolle Schritt ist.' },

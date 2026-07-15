@@ -54,26 +54,6 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Wichtige Begriffe rund um Beziehungen, Dynamiken und Psychologie – kurz und klar erklärt, ohne Diagnose.',
   },
-  '/wissen/bindungsstile': {
-    title: 'Bindungsstile verstehen – EchoB Wissen',
-    description:
-      'Sicher, ängstlich, vermeidend: Wie Bindungsstile Beziehungen prägen – und was das für deinen Alltag bedeutet.',
-  },
-  '/wissen/kommunikation-konflikte': {
-    title: 'Kommunikation & Konflikte – EchoB Wissen',
-    description:
-      'Wie Konflikte eskalieren und wie Kommunikation gelingt: Muster erkennen, statt sich im Streit zu verlieren.',
-  },
-  '/wissen/persoenlichkeit-verhalten': {
-    title: 'Persönlichkeit & Verhalten – EchoB Wissen',
-    description:
-      'Wie Persönlichkeit das Verhalten in Beziehungen prägt – verständlich erklärt, ohne Menschen zu etikettieren.',
-  },
-  '/wissen/emotionsregulation': {
-    title: 'Emotionsregulation – EchoB Wissen',
-    description:
-      'Wie du mit starken Gefühlen in Beziehungen umgehst und was Emotionsregulation im Alltag konkret bedeutet.',
-  },
   '/wissen/beobachtung-gefuehl': {
     title: 'Beobachtung & Gefühl trennen – EchoB Wissen',
     description:

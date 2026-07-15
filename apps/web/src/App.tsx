@@ -19,10 +19,6 @@ import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
 import GlossarPage                   from '@/pages/GlossarPage'
 import ReflectPage                   from '@/pages/content/ReflectPage'
-import WissenBindungsstilelPage      from '@/pages/wissen/WissenBindungsstilelPage'
-import WissenKommunikationPage       from '@/pages/wissen/WissenKommunikationPage'
-import WissenPersoenlichkeitPage     from '@/pages/wissen/WissenPersoenlichkeitPage'
-import WissenEmotionsregulationPage  from '@/pages/wissen/WissenEmotionsregulationPage'
 import WissenBeobachtungPage         from '@/pages/wissen/WissenBeobachtungPage'
 import WissenGrenzenPage             from '@/pages/wissen/WissenGrenzenPage'
 import WissenProfessionelleHilfePage from '@/pages/wissen/WissenProfessionelleHilfePage'
@@ -147,10 +143,6 @@ export function AppRoutes() {
       <Route path="/ratgeber/:slug"                  element={<ContentPage />} />
       <Route path="/fallbeispiele/:slug"             element={<ContentPage />} />
       <Route path="/therapie-vorbereitung/:slug"     element={<ContentPage />} />
-      <Route path="/wissen/bindungsstile"            element={<WissenBindungsstilelPage />} />
-      <Route path="/wissen/kommunikation-konflikte"  element={<WissenKommunikationPage />} />
-      <Route path="/wissen/persoenlichkeit-verhalten" element={<WissenPersoenlichkeitPage />} />
-      <Route path="/wissen/emotionsregulation"       element={<WissenEmotionsregulationPage />} />
       <Route path="/wissen/beobachtung-gefuehl"      element={<WissenBeobachtungPage />} />
       <Route path="/wissen/grenzen-setzen"           element={<WissenGrenzenPage />} />
       <Route path="/wissen/professionelle-hilfe"     element={<WissenProfessionelleHilfePage />} />

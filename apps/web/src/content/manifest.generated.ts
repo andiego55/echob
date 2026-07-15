@@ -342,6 +342,47 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "bindungsstile",
+    "title": "Bindungsstile: sicher, ängstlich, vermeidend, desorganisiert",
+    "description": "Wie frühe Bindungserfahrungen unser Beziehungsverhalten als Erwachsene prägen – die vier Bindungsstile verständlich erklärt, ohne Menschen zu etikettieren.",
+    "cluster": "bindung",
+    "search_intent": "Bindungsstile Beziehung verstehen",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über die Bindungsstile gelesen. Möchtest du eine konkrete Situation anschauen, in der dein Muster von Nähe und Distanz sichtbar wird?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "bindung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "naehe-distanz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "bindungsangst"
+      ],
+      "related": [
+        "verlustangst",
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/bindungsstile"
+  },
+  {
+    "type": "topic",
     "slug": "eifersucht",
     "title": "Eifersucht verstehen: woher sie kommt und was sie mit dir macht",
     "description": "Was hinter Eifersucht steckt, wann sie zur Belastung wird und wie du ihr weniger ausgeliefert bist – ohne dich dafür zu verurteilen.",
@@ -475,6 +516,44 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/emotionale-manipulation"
   },
   {
+    "type": "topic",
+    "slug": "emotionsregulation",
+    "title": "Emotionsregulation: das Toleranzfenster und was Gefühle steuert",
+    "description": "Warum manche Menschen Gefühle schwer regulieren können, was das Toleranzfenster ist und wie sich Dysregulation auf Beziehungen auswirkt – erklärend, nicht entschuldigend.",
+    "cluster": "selbstreflexion",
+    "search_intent": "Emotionsregulation Beziehung Toleranzfenster",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Emotionsregulation gelesen. Möchtest du eine konkrete Situation anschauen, in der Gefühle – deine oder die des anderen – aus dem Ruder liefen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "dysregulation"
+    ],
+    "safety_tags": [],
+    "links": {
+      "related": [
+        "verlustangst",
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/emotionsregulation"
+  },
+  {
     "type": "comparison",
     "slug": "gaslighting-oder-missverstaendnis",
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
@@ -507,6 +586,88 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/gaslighting-oder-missverstaendnis"
+  },
+  {
+    "type": "topic",
+    "slug": "kommunikation-konflikte",
+    "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
+    "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft.",
+    "cluster": "dynamiken",
+    "search_intent": "Kommunikation Konflikte Beziehung eskalieren",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Konfliktmuster gelesen. Möchtest du eine konkrete Gesprächssituation anschauen, die bei euch immer wieder ähnlich eskaliert?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "konfliktmuster"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "gaslighting"
+      ],
+      "related": [
+        "beziehungsmuster",
+        "emotionale-manipulation"
+      ]
+    },
+    "url": "/wissen/kommunikation-konflikte"
+  },
+  {
+    "type": "topic",
+    "slug": "persoenlichkeit-verhalten",
+    "title": "Persönlichkeit und Verhalten verstehen – ohne Ferndiagnose",
+    "description": "Was Persönlichkeitsmerkmale sind und was nicht: Big Five, Narzissmus und das Dunkle Dreieck – verständlich erklärt, ohne andere zu etikettieren.",
+    "cluster": "dynamiken",
+    "search_intent": "Persönlichkeit Verhalten Narzissmus Beziehung",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Persönlichkeit und Verhalten gelesen. Möchtest du ein konkretes Verhalten anschauen, das dich belastet – ohne jemanden zu diagnostizieren?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "belastendes-verhalten"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "gaslighting"
+      ],
+      "related": [
+        "emotionale-manipulation",
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/persoenlichkeit-verhalten"
   },
   {
     "type": "topic",
@@ -677,6 +838,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
     "description": "Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose."
   },
+  "/wissen/bindungsstile": {
+    "title": "Bindungsstile: sicher, ängstlich, vermeidend, desorganisiert",
+    "description": "Wie frühe Bindungserfahrungen unser Beziehungsverhalten als Erwachsene prägen – die vier Bindungsstile verständlich erklärt, ohne Menschen zu etikettieren."
+  },
   "/wissen/eifersucht": {
     "title": "Eifersucht verstehen: woher sie kommt und was sie mit dir macht",
     "description": "Was hinter Eifersucht steckt, wann sie zur Belastung wird und wie du ihr weniger ausgeliefert bist – ohne dich dafür zu verurteilen."
@@ -689,9 +854,21 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Emotionale Manipulation in Beziehungen erkennen",
     "description": "Wie emotionale Manipulation funktioniert, welche Muster typisch sind und wie du deine eigene Wahrnehmung wieder ernst nimmst – vorsichtig erklärt, ohne Ferndiagnose."
   },
+  "/wissen/emotionsregulation": {
+    "title": "Emotionsregulation: das Toleranzfenster und was Gefühle steuert",
+    "description": "Warum manche Menschen Gefühle schwer regulieren können, was das Toleranzfenster ist und wie sich Dysregulation auf Beziehungen auswirkt – erklärend, nicht entschuldigend."
+  },
   "/wissen/gaslighting-oder-missverstaendnis": {
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
     "description": "Nicht jeder Streit ist Manipulation. Diese Merkmale helfen dir, ein echtes Missverständnis von systematischem Gaslighting zu unterscheiden – ohne vorschnelles Urteil."
+  },
+  "/wissen/kommunikation-konflikte": {
+    "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
+    "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft."
+  },
+  "/wissen/persoenlichkeit-verhalten": {
+    "title": "Persönlichkeit und Verhalten verstehen – ohne Ferndiagnose",
+    "description": "Was Persönlichkeitsmerkmale sind und was nicht: Big Five, Narzissmus und das Dunkle Dreieck – verständlich erklärt, ohne andere zu etikettieren."
   },
   "/wissen/sich-trennen": {
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",
