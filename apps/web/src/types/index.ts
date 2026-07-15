@@ -228,6 +228,13 @@ export interface StudentCase {
   assigned_at: string | null
 }
 
+export interface StudentCaseDetail {
+  id: string
+  title: string
+  primary: ExampleCasePart | null
+  partner: ExampleCasePart | null
+}
+
 export interface StudentInvite {
   id: string
   code: string

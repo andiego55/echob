@@ -2,6 +2,7 @@
  * /student/dashboard — Übersicht der/des Studierenden.
  * Zeigt zugewiesene Fall-Arbeitskopien (P2b füllt sie; Fallansicht folgt in P2c).
  */
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import StudentShell from '@/components/student/StudentShell'
 import { useStudent } from '@/components/auth/StudentRoute'
@@ -46,7 +47,10 @@ export default function StudentDashboardPage() {
 
 function StudentCaseCard({ case_: c }: { case_: StudentCase }) {
   return (
-    <div className="card">
+    <Link
+      to={`/student/cases/${c.id}`}
+      className="card block no-underline transition-all hover:border-accent/40 hover:shadow-md"
+    >
       <div className="mb-3 flex items-start justify-between gap-2">
         <span className="label">Fallbeispiel</span>
         {c.has_partner && (
@@ -54,7 +58,10 @@ function StudentCaseCard({ case_: c }: { case_: StudentCase }) {
         )}
       </div>
       <p className="text-sm font-semibold text-navy leading-snug">{c.title}</p>
-      <p className="mt-4 text-[11px] text-brand-muted/80">{c.scene_count} Szenen</p>
-    </div>
+      <div className="mt-4 flex items-center justify-between gap-2">
+        <span className="text-[11px] text-brand-muted/80">{c.scene_count} Szenen</span>
+        <span className="text-xs font-medium text-accent shrink-0">Öffnen →</span>
+      </div>
+    </Link>
   )
 }

@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { StudentProfile, StudentCase } from '@/types'
+import type { StudentProfile, StudentCase, StudentCaseDetail } from '@/types'
 
 /** Student:in (eigene Ausbildungs-Domäne, /student/*). */
 export const studentApi = {
@@ -9,4 +9,6 @@ export const studentApi = {
     apiClient.post<StudentProfile>('/student/accept', data).then(r => r.data),
   cases: () =>
     apiClient.get<StudentCase[]>('/student/cases').then(r => r.data),
+  caseDetail: (copyId: string) =>
+    apiClient.get<StudentCaseDetail>(`/student/cases/${copyId}`).then(r => r.data),
 }

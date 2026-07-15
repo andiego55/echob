@@ -5,8 +5,11 @@ students-Zeile). Registrierung läuft über /student/accept (Einladungscode/-Tok
 """
 from __future__ import annotations
 
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.api.v1.routers.institute import _load_case_part   # generischer Fall-Loader (Engine-Reuse)
 from app.core.dependencies import get_current_student, get_current_user, get_pool
 from app.schemas.student import StudentInviteAccept, StudentProfileResponse
 from app.services import student_invite_service
@@ -70,3 +73,27 @@ async def cases(
         }
         for r in rows
     ]
+
+
+@router.get("/cases/{copy_id}")
+async def case_detail(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Detail einer zugewiesenen Fall-Arbeitskopie (Fall + Onboarding + Szenen + Profile)."""
+    async with pool.acquire() as conn:
+        copy = await conn.fetchrow(
+            "SELECT * FROM student_case_copies WHERE id = $1 AND student_id = $2",
+            copy_id, current["student"]["id"],
+        )
+        if not copy:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+        primary = await _load_case_part(conn, copy["case_id"])
+        partner = await _load_case_part(conn, copy["partner_case_id"]) if copy["partner_case_id"] else None
+    return {
+        "id": str(copy["id"]),
+        "title": copy["title"] or "Fallbeispiel",
+        "primary": primary,
+        "partner": partner,
+    }
