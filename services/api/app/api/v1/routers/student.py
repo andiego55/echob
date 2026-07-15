@@ -22,6 +22,7 @@ from app.schemas.student import (
     StudentNotes,
     StudentProfileResponse,
     StudentReportUpdate,
+    StudentSubmissionCreate,
 )
 from app.services import student_invite_service
 from app.services.hypothesis_service import HYPOTHESIS_LABELS, build_hypothesis_context
@@ -596,3 +597,83 @@ async def hyp_reset(
             "DELETE FROM echo_messages WHERE case_id = $1 AND thread_type = $2",
             copy["case_id"], hyp_type)
     return {"deleted": True}
+
+
+# ── Senden an Institut (Einreichung der Fallarbeit) ───────────────────────────
+
+def _submission_out(row, *, include_payload: bool = False) -> dict:
+    d = dict(row)
+    out = {
+        "id": str(d["id"]),
+        "copy_id": str(d["copy_id"]),
+        "title": d["title"],
+        "message": d["message"],
+        "status": d["status"],
+        "feedback": d["feedback"],
+        "created_at": d["created_at"].isoformat() if d["created_at"] else None,
+        "reviewed_at": d["reviewed_at"].isoformat() if d.get("reviewed_at") else None,
+    }
+    if include_payload:
+        out["payload"] = _jsonb(d.get("payload"))
+    return out
+
+
+async def _build_submission_snapshot(conn, student_id, case_id) -> dict:
+    """Klartext-Snapshot der Fallarbeit: Hypothesen + Notizen + Berichte."""
+    hyp_rows = await conn.fetch(
+        "SELECT hypothesis_type, summary_text, updated_at FROM case_hypotheses "
+        "WHERE case_id = $1 ORDER BY updated_at", case_id)
+    notes_row = await conn.fetchrow(
+        "SELECT * FROM student_notes WHERE student_id = $1 AND case_id = $2", student_id, case_id)
+    report_rows = await conn.fetch(
+        "SELECT * FROM reports WHERE case_id = $1 ORDER BY created_at", case_id)
+    hypotheses = [
+        {"label": HYPOTHESIS_LABELS.get(r["hypothesis_type"], r["hypothesis_type"]),
+         "summary_text": crypto.decrypt(r["summary_text"])}
+        for r in hyp_rows
+    ]
+    notes = {f: notes_row[f] for f in _NOTE_FIELDS} if notes_row else None
+    reports = []
+    for r in report_rows:
+        ro = _report_out(r)
+        reports.append({
+            "type_label": ro["type_label"], "title": ro["title"],
+            "sections": (ro["content"] or {}).get("sections", []),
+        })
+    return {"hypotheses": hypotheses, "notes": notes, "reports": reports}
+
+
+@router.post("/cases/{copy_id}/submit")
+async def submit_to_institute(
+    copy_id: UUID,
+    body: StudentSubmissionCreate,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Reicht die aktuelle Fallarbeit (Snapshot) beim Ausbildungsinstitut ein."""
+    sid = current["student"]["id"]
+    inst_id = current["student"]["institute_id"]
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, sid)
+        snapshot = await _build_submission_snapshot(conn, sid, copy["case_id"])
+        row = await conn.fetchrow(
+            "INSERT INTO student_submissions (student_id, institute_id, copy_id, title, message, payload) "
+            "VALUES ($1, $2, $3, $4, $5, $6::jsonb) RETURNING *",
+            sid, inst_id, copy_id, copy["title"], body.message, json.dumps(snapshot))
+    return _submission_out(row)
+
+
+@router.get("/cases/{copy_id}/submissions")
+async def list_submissions(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    """Bisherige Einreichungen zu dieser Arbeitskopie (Status + Rückmeldung des Ausbilders)."""
+    sid = current["student"]["id"]
+    async with pool.acquire() as conn:
+        await _copy_or_404(conn, copy_id, sid)
+        rows = await conn.fetch(
+            "SELECT * FROM student_submissions WHERE copy_id = $1 AND student_id = $2 "
+            "ORDER BY created_at DESC", copy_id, sid)
+    return [_submission_out(r) for r in rows]

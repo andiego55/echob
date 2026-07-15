@@ -45,6 +45,10 @@ class StudentHypGenerate(BaseModel):
     hypothesis_type: str = Field(..., max_length=40)
 
 
+class StudentSubmissionCreate(BaseModel):
+    message: str | None = Field(None, max_length=4000)
+
+
 class StudentNotes(BaseModel):
     first_impressions: str | None = None
     key_scenes: str | None = None

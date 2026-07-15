@@ -5,11 +5,12 @@
 import { NavLink } from 'react-router-dom'
 
 const tabs = [
-  { path: '',            label: 'Fall'       },
-  { path: '/echo',       label: 'Echo'       },
-  { path: '/hypotheses', label: 'Hypothesen' },
-  { path: '/reports',    label: 'Berichte'   },
-  { path: '/notes',      label: 'Notizen'    },
+  { path: '',            label: 'Fall'        },
+  { path: '/echo',       label: 'Echo'        },
+  { path: '/hypotheses', label: 'Hypothesen'  },
+  { path: '/reports',    label: 'Berichte'    },
+  { path: '/notes',      label: 'Notizen'     },
+  { path: '/submit',     label: 'An Institut' },
 ]
 
 export default function StudentCaseNav({ copyId }: { copyId: string }) {

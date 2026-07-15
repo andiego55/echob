@@ -22,6 +22,7 @@ from app.schemas.institute import (
     InstituteProfileResponse,
     InstituteRegister,
     InstituteUpdate,
+    SubmissionFeedback,
 )
 from app.schemas.student import StudentInviteCreate
 from app.services import case_generation_service, student_invite_service
@@ -502,3 +503,77 @@ async def revoke_student_invite(
     if not ok:
         raise HTTPException(status_code=404, detail="Einladung nicht gefunden.")
     return {"revoked": True}
+
+
+# ── Einreichungen der Studierenden (Inbox) ────────────────────────────────────
+
+def _submission_row(row, *, include_payload: bool = False) -> dict:
+    d = dict(row)
+    out = {
+        "id": str(d["id"]),
+        "student_name": d.get("display_name") or "Studierende:r",
+        "title": d["title"],
+        "message": d["message"],
+        "status": d["status"],
+        "feedback": d["feedback"],
+        "created_at": d["created_at"].isoformat() if d["created_at"] else None,
+        "reviewed_at": d["reviewed_at"].isoformat() if d.get("reviewed_at") else None,
+    }
+    if include_payload:
+        payload = d.get("payload")
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+        out["payload"] = payload or {}
+    return out
+
+
+@router.get("/submissions")
+async def list_submissions(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    """Alle Einreichungen der Studierenden, neueste zuerst (Inbox des Ausbilders)."""
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT sub.id, sub.title, sub.message, sub.status, sub.feedback, "
+            "sub.created_at, sub.reviewed_at, st.display_name "
+            "FROM student_submissions sub JOIN students st ON st.id = sub.student_id "
+            "WHERE sub.institute_id = $1 ORDER BY sub.created_at DESC",
+            current["institute"]["id"])
+    return [_submission_row(r) for r in rows]
+
+
+@router.get("/submissions/{submission_id}")
+async def get_submission(
+    submission_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Detail einer Einreichung inkl. Snapshot (Hypothesen, Notizen, Berichte)."""
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT sub.*, st.display_name "
+            "FROM student_submissions sub JOIN students st ON st.id = sub.student_id "
+            "WHERE sub.id = $1 AND sub.institute_id = $2",
+            submission_id, current["institute"]["id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Einreichung nicht gefunden.")
+    return _submission_row(row, include_payload=True)
+
+
+@router.post("/submissions/{submission_id}/feedback")
+async def review_submission(
+    submission_id: UUID,
+    body: SubmissionFeedback,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Rückmeldung geben und die Einreichung als gesichtet markieren."""
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE student_submissions SET feedback = $1, status = 'reviewed', reviewed_at = NOW() "
+            "WHERE id = $2 AND institute_id = $3 RETURNING id",
+            body.feedback, submission_id, current["institute"]["id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Einreichung nicht gefunden.")
+    return {"reviewed": True}

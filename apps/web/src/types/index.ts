@@ -252,6 +252,38 @@ export interface StudentNotes {
   free_text: string | null
 }
 
+export interface StudentSubmission {
+  id: string
+  copy_id: string
+  title: string | null
+  message: string | null
+  status: 'submitted' | 'reviewed'
+  feedback: string | null
+  created_at: string | null
+  reviewed_at: string | null
+}
+
+export interface SubmissionPayload {
+  hypotheses: { label: string; summary_text: string }[]
+  notes: StudentNotes | null
+  reports: { type_label: string; title: string | null; sections: { heading: string; text: string }[] }[]
+}
+
+export interface InstituteSubmission {
+  id: string
+  student_name: string
+  title: string | null
+  message: string | null
+  status: 'submitted' | 'reviewed'
+  feedback: string | null
+  created_at: string | null
+  reviewed_at: string | null
+}
+
+export interface InstituteSubmissionDetail extends InstituteSubmission {
+  payload: SubmissionPayload
+}
+
 export interface StudentInvite {
   id: string
   code: string

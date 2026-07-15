@@ -60,3 +60,7 @@ class ExamplePatch(BaseModel):
 
 class AssignStudents(BaseModel):
     student_ids: list[UUID] = Field(default_factory=list)
+
+
+class SubmissionFeedback(BaseModel):
+    feedback: str | None = Field(None, max_length=8000)

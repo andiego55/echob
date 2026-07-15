@@ -101,6 +101,8 @@ import InstituteDashboardPage from '@/pages/institute/InstituteDashboardPage'
 import InstituteGeneratePage from '@/pages/institute/InstituteGeneratePage'
 import InstituteExampleEditorPage from '@/pages/institute/InstituteExampleEditorPage'
 import InstituteStudentsPage from '@/pages/institute/InstituteStudentsPage'
+import InstituteSubmissionsPage from '@/pages/institute/InstituteSubmissionsPage'
+import InstituteSubmissionDetailPage from '@/pages/institute/InstituteSubmissionDetailPage'
 import StudentRoute, { useStudent } from '@/components/auth/StudentRoute'
 import StudentRegisterPage from '@/pages/student/StudentRegisterPage'
 import StudentDashboardPage from '@/pages/student/StudentDashboardPage'
@@ -112,6 +114,7 @@ import StudentReportDetailPage from '@/pages/student/StudentReportDetailPage'
 import StudentNotesPage from '@/pages/student/StudentNotesPage'
 import StudentHypothesesPage from '@/pages/student/StudentHypothesesPage'
 import StudentHypothesisDialogPage from '@/pages/student/StudentHypothesisDialogPage'
+import StudentSubmitPage from '@/pages/student/StudentSubmitPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -215,6 +218,8 @@ export function AppRoutes() {
       <Route path="/institute/examples/new" element={<InstituteRoute><InstituteGeneratePage /></InstituteRoute>} />
       <Route path="/institute/examples/:id" element={<InstituteRoute><InstituteExampleEditorPage /></InstituteRoute>} />
       <Route path="/institute/students" element={<InstituteRoute><InstituteStudentsPage /></InstituteRoute>} />
+      <Route path="/institute/submissions" element={<InstituteRoute><InstituteSubmissionsPage /></InstituteRoute>} />
+      <Route path="/institute/submissions/:id" element={<InstituteRoute><InstituteSubmissionDetailPage /></InstituteRoute>} />
 
       {/* ── Ausbildungsbereich · Student:in (Login + Rolle erforderlich) ──────── */}
       <Route path="/student/register" element={<ProtectedRoute><StudentRegisterPage /></ProtectedRoute>} />
@@ -227,6 +232,7 @@ export function AppRoutes() {
       <Route path="/student/cases/:id/reports/new" element={<StudentRoute><StudentReportNewPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/:reportId" element={<StudentRoute><StudentReportDetailPage /></StudentRoute>} />
       <Route path="/student/cases/:id/notes" element={<StudentRoute><StudentNotesPage /></StudentRoute>} />
+      <Route path="/student/cases/:id/submit" element={<StudentRoute><StudentSubmitPage /></StudentRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

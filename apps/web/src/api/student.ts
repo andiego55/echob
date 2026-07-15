@@ -2,7 +2,7 @@ import { apiClient } from './client'
 import type { Hypothesis } from './hypotheses'
 import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
-  Report, ReportCreate,
+  StudentSubmission, Report, ReportCreate,
 } from '@/types'
 
 /** Student:in (eigene Ausbildungs-Domäne, /student/*). */
@@ -55,4 +55,10 @@ export const studentApi = {
     apiClient.post<StudentEchoMessage>(`/student/cases/${copyId}/hypotheses/${hypType}/chat`, { message }, { timeout: 120_000 }).then(r => r.data),
   hypReset: (copyId: string, hypType: string) =>
     apiClient.delete(`/student/cases/${copyId}/hypotheses/${hypType}/history`).then(r => r.data),
+
+  // Senden an Institut (Einreichung der Fallarbeit)
+  submit: (copyId: string, message: string | null) =>
+    apiClient.post<StudentSubmission>(`/student/cases/${copyId}/submit`, { message }).then(r => r.data),
+  submissions: (copyId: string) =>
+    apiClient.get<StudentSubmission[]>(`/student/cases/${copyId}/submissions`).then(r => r.data),
 }

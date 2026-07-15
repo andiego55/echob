@@ -9,6 +9,7 @@ import EchoBLogo from '@/components/EchoBLogo'
 const NAV = [
   { to: '/institute/dashboard', label: 'Dashboard', end: false },
   { to: '/institute/students', label: 'Studierende', end: false },
+  { to: '/institute/submissions', label: 'Einreichungen', end: false },
 ]
 
 export default function InstituteShell({ children }: { children: React.ReactNode }) {

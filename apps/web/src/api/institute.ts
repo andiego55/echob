@@ -8,6 +8,8 @@ import type {
   ExampleSummary,
   InstituteStudent,
   StudentInvite,
+  InstituteSubmission,
+  InstituteSubmissionDetail,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -49,4 +51,12 @@ export const instituteApi = {
     apiClient.post<{ assigned: string[] }>(`/institute/examples/${id}/assign`, { student_ids: studentIds }).then(r => r.data),
   exampleAssignments: (id: string) =>
     apiClient.get<{ student_ids: string[] }>(`/institute/examples/${id}/assignments`).then(r => r.data),
+
+  // Einreichungen der Studierenden (Inbox)
+  submissions: () =>
+    apiClient.get<InstituteSubmission[]>('/institute/submissions').then(r => r.data),
+  submission: (id: string) =>
+    apiClient.get<InstituteSubmissionDetail>(`/institute/submissions/${id}`).then(r => r.data),
+  reviewSubmission: (id: string, feedback: string | null) =>
+    apiClient.post<{ reviewed: boolean }>(`/institute/submissions/${id}/feedback`, { feedback }).then(r => r.data),
 }
