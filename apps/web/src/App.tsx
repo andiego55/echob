@@ -15,11 +15,6 @@ import UeberPage            from '@/pages/UeberPage'
 import GruenderInterviewPage from '@/pages/GruenderInterviewPage'
 import TeamPage             from '@/pages/TeamPage'
 import FachpersonenPage     from '@/pages/FachpersonenPage'
-import BlogPage             from '@/pages/BlogPage'
-import BlogBeziehungsmusterPage    from '@/pages/BlogBeziehungsmusterPage'
-import BlogBeobachtungGefuehlPage  from '@/pages/BlogBeobachtungGefuehlPage'
-import BlogProfessionelleHilfePage from '@/pages/BlogProfessionelleHilfePage'
-import BlogKrisentelephonePage     from '@/pages/BlogKrisentelephonePage'
 import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
 import GlossarPage                   from '@/pages/GlossarPage'
@@ -144,11 +139,6 @@ export function AppRoutes() {
       <Route path="/ueber/gruender" element={<GruenderInterviewPage />} />
       <Route path="/ueber/team" element={<TeamPage />} />
       <Route path="/fachpersonen" element={<FachpersonenPage />} />
-      <Route path="/blog"        element={<BlogPage />} />
-      <Route path="/blog/beziehungsmuster"   element={<BlogBeziehungsmusterPage />} />
-      <Route path="/blog/beobachtung-gefuehl" element={<BlogBeobachtungGefuehlPage />} />
-      <Route path="/blog/professionelle-hilfe" element={<BlogProfessionelleHilfePage />} />
-      <Route path="/blog/krisentelefone"     element={<BlogKrisentelephonePage />} />
       <Route path="/wissen"                          element={<WissenPage />} />
       <Route path="/wissen/:slug"                    element={<ContentPage />} />
       <Route path="/hilfe/:slug"                     element={<ContentPage />} />

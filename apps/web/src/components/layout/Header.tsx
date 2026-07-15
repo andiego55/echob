@@ -43,7 +43,6 @@ const WISSEN_COLS = [
 const NAV_SIMPLE = [
   { to: '/',             label: 'Start' },
   { to: '/coaching',     label: 'Coaching' },
-  { to: '/blog',         label: 'Blog' },
   { to: '/fachpersonen', label: 'Fachpersonen' },
   { to: '/ueber',        label: 'Über' },
 ]
@@ -123,23 +122,17 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* Glossar + Blog */}
-                <div className="grid grid-cols-2 divide-x divide-brand-border border-t border-brand-border bg-brand-bg">
-                  <Link to="/glossar" className="px-5 py-3 no-underline transition-colors hover:bg-white">
-                    <p className="text-[0.82rem] font-semibold text-navy">Glossar <span className="text-accent">→</span></p>
-                    <p className="text-[0.76rem] text-brand-muted leading-snug">Begriffe von A–Z</p>
-                  </Link>
-                  <Link to="/blog" className="px-5 py-3 no-underline transition-colors hover:bg-white">
-                    <p className="text-[0.82rem] font-semibold text-navy">EchoB Blog <span className="text-accent">→</span></p>
-                    <p className="text-[0.76rem] text-brand-muted leading-snug">Tiefergehende Artikel</p>
-                  </Link>
-                </div>
+                {/* Glossar */}
+                <Link to="/glossar" className="block border-t border-brand-border bg-brand-bg px-5 py-3 no-underline transition-colors hover:bg-white">
+                  <p className="text-[0.82rem] font-semibold text-navy">Glossar <span className="text-accent">→</span></p>
+                  <p className="text-[0.76rem] text-brand-muted leading-snug">Begriffe von A–Z</p>
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* Blog + Fachpersonen */}
-          {NAV_SIMPLE.slice(2, 4).map(({ to, label }) => (
+          {/* Fachpersonen */}
+          {NAV_SIMPLE.slice(2, 3).map(({ to, label }) => (
             <NavLink key={to} to={to} end className={({ isActive }) => LINK_CLS(isActive)}>
               {label}
             </NavLink>

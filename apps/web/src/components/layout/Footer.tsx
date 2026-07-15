@@ -28,7 +28,7 @@ export default function Footer() {
                 Inhalt
               </h4>
               <Link to="/wissen" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Wissen</Link>
-              <Link to="/blog" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Blog</Link>
+              <Link to="/glossar" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Glossar</Link>
               <Link to="/ueber" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Über EchoB</Link>
             </div>
             <div>
@@ -49,7 +49,7 @@ export default function Footer() {
           <span className="text-white/30">
             In einer Krise?{' '}
             <Link
-              to="/blog/krisentelefone"
+              to="/wissen/krisentelefone"
               className="text-white/60 underline underline-offset-2 hover:text-white"
             >
               Notruf &amp; Krisennummern

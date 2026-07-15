@@ -16,7 +16,7 @@ interface Props {
 
 export default function BlogArticleLayout({
   tag, title, subtitle, echoLink, echoTitle, echoText, echoCta, echoSteps,
-  backLink = '/blog', backLabel = 'Zurück zum Blog',
+  backLink = '/wissen', backLabel = 'Zurück zum Wissen',
   children,
 }: Props) {
   return (

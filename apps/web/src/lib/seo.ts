@@ -95,30 +95,6 @@ export const ROUTE_META: Record<string, PageMeta> = {
       'Wichtige Anlaufstellen und Krisentelefone für akute Notlagen – schnelle Hilfe im Überblick.',
   },
 
-  '/blog': {
-    title: 'Blog – EchoB',
-    description:
-      'Beiträge rund um Beziehungsmuster, Reflexion und den bewussten Umgang mit schwierigen Situationen.',
-  },
-  '/blog/beziehungsmuster': {
-    title: 'Beziehungsmuster erkennen – EchoB Blog',
-    description:
-      'Wie sich wiederkehrende Muster in Beziehungen zeigen – und wie du beginnst, sie zu verstehen.',
-  },
-  '/blog/beobachtung-gefuehl': {
-    title: 'Beobachtung und Gefühl – EchoB Blog',
-    description:
-      'Warum die Trennung von Beobachtung und Gefühl der erste Schritt zu mehr Klarheit ist.',
-  },
-  '/blog/professionelle-hilfe': {
-    title: 'Professionelle Hilfe finden – EchoB Blog',
-    description: 'Wann und wie du dir professionelle Unterstützung suchst – ein Wegweiser.',
-  },
-  '/blog/krisentelefone': {
-    title: 'Krisentelefone – EchoB Blog',
-    description: 'Anlaufstellen für akute Krisen: die wichtigsten Nummern und wie sie helfen.',
-  },
-
   '/impressum': {
     title: 'Impressum – EchoB',
     description: 'Impressum und Anbieterkennzeichnung von EchoB.',

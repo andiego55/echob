@@ -142,21 +142,14 @@ export default function WissenPage() {
         </div>
       </section>
 
-      {/* Disclaimer + Blog */}
+      {/* Disclaimer */}
       <section className="border-t border-brand-border px-6 py-[56px]">
         <div className="mx-auto max-w-[960px]">
-          <div className="mb-10 max-w-xl rounded-brand border border-amber-200 bg-amber-50 px-5 py-4">
+          <div className="max-w-xl rounded-brand border border-amber-200 bg-amber-50 px-5 py-4">
             <p className="text-sm text-amber-800">
               <strong>Hinweis:</strong> Alle Inhalte dienen der Orientierung und ersetzen keine professionelle
               Beratung oder Therapie. Bei akuter Gefahr: Notruf <strong>110 / 112</strong>.
             </p>
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h2 className="mb-1 text-xl font-bold text-navy">EchoB Blog</h2>
-              <p className="text-sm text-brand-muted">Tiefergehende Artikel zu Beziehungsthemen – persönlicher, mit konkreten Beispielen.</p>
-            </div>
-            <Link to="/blog" className="btn-primary">Zum Blog →</Link>
           </div>
         </div>
       </section>
