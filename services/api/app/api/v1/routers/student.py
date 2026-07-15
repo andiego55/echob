@@ -10,7 +10,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from app.api.v1.routers.institute import _load_case_part   # generischer Fall-Loader (Engine-Reuse)
+from app.api.v1.routers.institute import _load_case_part  # generischer Fall-Loader (Engine-Reuse)
 from app.core import crypto
 from app.core.dependencies import get_current_student, get_current_user, get_pool
 from app.schemas.student import StudentEchoChat, StudentInviteAccept, StudentProfileResponse
