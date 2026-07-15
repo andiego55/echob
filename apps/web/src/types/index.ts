@@ -172,6 +172,11 @@ export interface ExampleOnboarding {
   pattern_hypotheses: { label: string; confidence: string; source?: string }[]
 }
 
+export interface ProfileModules {
+  modules: Record<string, Record<string, unknown>>
+  completed_modules: string[]
+}
+
 export interface ExampleCasePart {
   case_id: string
   person_name: string | null
@@ -181,6 +186,8 @@ export interface ExampleCasePart {
   main_concern: string | null
   onboarding: ExampleOnboarding | null
   scenes: ExampleScene[]
+  self_profile: ProfileModules | null
+  person_profile: ProfileModules | null
 }
 
 export interface ExampleDetail {

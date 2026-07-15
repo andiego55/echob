@@ -10,7 +10,7 @@ import InstituteShell from '@/components/institute/InstituteShell'
 import { Spinner } from '@/components/auth/InstituteRoute'
 import { instituteApi } from '@/api/institute'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
-import type { ExampleCasePart, ExampleScene } from '@/types'
+import type { ExampleCasePart, ExampleScene, ProfileModules } from '@/types'
 
 const relTypeLabel = (v: string) => (RELATIONSHIP_TYPE_LABELS as Record<string, string>)[v] ?? v
 const relStatusLabel = (v: string) => (RELATIONSHIP_STATUS_LABELS as Record<string, string>)[v] ?? v
@@ -162,6 +162,9 @@ function CasePartView({ part, heading }: { part: ExampleCasePart | null; heading
         )}
       </div>
 
+      {part.self_profile && <ProfileView title="Selbstauskunft (Selbstbild)" profile={part.self_profile} />}
+      {part.person_profile && <ProfileView title="Einschätzung der anderen Person" profile={part.person_profile} />}
+
       {/* Szenen */}
       <p className="mt-5 mb-3 text-sm font-semibold text-navy">{part.scenes.length} Szenen</p>
       <div className="space-y-3">
@@ -198,6 +201,81 @@ function SceneCard({ scene: s }: { scene: ExampleScene }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+const SCORE_LABELS: Record<string, string> = {
+  distress_index: 'Belastungsgrad',
+  attachment_anxiety_score: 'Verlustangst / Nähebedürfnis',
+  attachment_avoidance_score: 'Rückzug / Distanzschutz',
+  attachment_ambivalence_score: 'Ambivalenz',
+  emotional_overwhelm_score: 'Emotionale Überwältigung',
+  self_soothing_score: 'Selbstberuhigung',
+  impulse_pressure_score: 'Impulsdruck',
+  withdrawal_tendency_score: 'Rückzugstendenz',
+  guilt_tendency_score: 'Schuld-/Verantwortungsdruck',
+  shame_score: 'Scham / Selbstabwertung',
+  self_worth_dependency_score: 'Abhängigkeit von Bestätigung',
+  boundary_awareness_score: 'Grenzen wahrnehmen',
+  boundary_communication_score: 'Grenzen kommunizieren',
+  boundary_stability_score: 'Grenzen halten',
+  autonomy_score: 'Autonomieerleben',
+  perception_uncertainty_score: 'Wahrnehmungsverunsicherung',
+  reality_check_need_score: 'Bedarf an Realitätsabgleich',
+  observation_interpretation_clarity_score: 'Beobachtung vs. Interpretation',
+  social_support_score: 'Soziale Unterstützung',
+  self_stabilization_score: 'Selbststabilisierung',
+  professional_support_access_score: 'Zugang zu Hilfe',
+  emotional_volatility: 'Emotionale Volatilität',
+  empathy_deficit: 'Empathie-Defizit',
+  grandiosity: 'Grandiosität',
+  manipulation_score: 'Manipulation',
+  attachment_instability: 'Bindungsinstabilität',
+  impulsivity_score: 'Impulsivität',
+  relational_burden: 'Beziehungsbelastung',
+}
+
+function ProfileView({ title, profile }: { title: string; profile: ProfileModules }) {
+  const scores: { label: string; value: number }[] = []
+  const texts: string[] = []
+  let patterns: string[] = []
+  for (const mod of Object.values(profile.modules || {})) {
+    for (const [k, v] of Object.entries(mod || {})) {
+      if (SCORE_LABELS[k] && typeof v === 'number') scores.push({ label: SCORE_LABELS[k], value: v })
+      else if (k === 'free_text' && typeof v === 'string' && v.trim()) texts.push(v)
+      else if (k === 'perceived_patterns' && Array.isArray(v)) patterns = v.filter(p => typeof p === 'string')
+    }
+  }
+  if (scores.length === 0 && texts.length === 0 && patterns.length === 0) return null
+  return (
+    <div className="mt-5">
+      <p className="mb-2 text-sm font-semibold text-navy">{title}</p>
+      <div className="card space-y-3">
+        {scores.length > 0 && (
+          <div className="grid gap-x-5 gap-y-2 sm:grid-cols-2">
+            {scores.map((s, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="w-40 shrink-0 truncate text-xs text-brand-muted" title={s.label}>{s.label}</span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-brand-border/50">
+                  <div className="h-full rounded-full bg-accent" style={{ width: `${(s.value / 5) * 100}%` }} />
+                </div>
+                <span className="w-6 shrink-0 text-right text-xs font-semibold text-navy">{s.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {patterns.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {patterns.map((p, i) => (
+              <span key={i} className="rounded-full border border-brand-border bg-brand-bg px-2.5 py-0.5 text-xs text-brand-text">{p}</span>
+            ))}
+          </div>
+        )}
+        {texts.map((t, i) => (
+          <p key={i} className="text-sm italic leading-relaxed text-brand-muted">{t}</p>
+        ))}
+      </div>
     </div>
   )
 }

@@ -125,7 +125,7 @@ async def _load_case_part(conn, case_id) -> dict | None:
     if case_id is None:
         return None
     case = await conn.fetchrow(
-        "SELECT id, relationship_type, relationship_status, contact_frequency, main_concern "
+        "SELECT id, user_id, relationship_type, relationship_status, contact_frequency, main_concern "
         "FROM cases WHERE id = $1", case_id,
     )
     if not case:
@@ -139,6 +139,10 @@ async def _load_case_part(conn, case_id) -> dict | None:
         "SELECT id, title, scene_date, description, user_reaction, distress_score, pattern_tags "
         "FROM scenes WHERE case_id = $1 ORDER BY scene_date NULLS LAST, created_at", case_id,
     )
+    self_p = await conn.fetchrow(
+        "SELECT modules, completed_modules FROM user_profiles WHERE user_id = $1", case["user_id"])
+    person_p = await conn.fetchrow(
+        "SELECT modules, completed_modules FROM person_profiles WHERE case_id = $1", case_id)
     ob_out = None
     if ob:
         ob_out = {
@@ -172,6 +176,10 @@ async def _load_case_part(conn, case_id) -> dict | None:
             }
             for s in scenes
         ],
+        "self_profile": ({"modules": _jsonb(self_p["modules"]),
+                          "completed_modules": list(self_p["completed_modules"] or [])} if self_p else None),
+        "person_profile": ({"modules": _jsonb(person_p["modules"]),
+                            "completed_modules": list(person_p["completed_modules"] or [])} if person_p else None),
     }
 
 
