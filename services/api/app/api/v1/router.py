@@ -36,6 +36,7 @@ from app.api.v1.routers import (
     reviews,
     scales,
     scenes,
+    student,
     subscription,
     topic_summaries,
     waitlist,
@@ -84,3 +85,4 @@ v1_router.include_router(professional_templates.router)
 
 # ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
 v1_router.include_router(institute.router)
+v1_router.include_router(student.router)

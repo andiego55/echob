@@ -68,13 +68,16 @@ function AppHome() {
   const { session } = useAuth()
   const { data: pro, isLoading: proLoading } = useProfessional()
   const { data: institute, isLoading: instLoading } = useInstitute()
-  if (proLoading || instLoading) return <RoleSpinner />
+  const { data: student, isLoading: studLoading } = useStudent()
+  if (proLoading || instLoading || studLoading) return <RoleSpinner />
   if (institute) return <Navigate to="/institute/dashboard" replace />
+  if (student) return <Navigate to="/student/dashboard" replace />
   if (pro) return <Navigate to="/professional/dashboard" replace />
   // Selbst-registriert (Absicht aus dem Signup) → Profil-Anlage, statt fälschlich
   // im Klientenbereich zu landen.
   const pending = session?.user?.user_metadata?.pending_role
   if (pending === 'institute') return <Navigate to="/institute/register" replace />
+  if (pending === 'student') return <Navigate to="/student/register" replace />
   if (pending === 'professional') return <Navigate to="/professional/register" replace />
   return <CasesOverviewPage />
 }
@@ -97,6 +100,10 @@ import InstituteRegisterPage from '@/pages/institute/InstituteRegisterPage'
 import InstituteDashboardPage from '@/pages/institute/InstituteDashboardPage'
 import InstituteGeneratePage from '@/pages/institute/InstituteGeneratePage'
 import InstituteExampleEditorPage from '@/pages/institute/InstituteExampleEditorPage'
+import InstituteStudentsPage from '@/pages/institute/InstituteStudentsPage'
+import StudentRoute, { useStudent } from '@/components/auth/StudentRoute'
+import StudentRegisterPage from '@/pages/student/StudentRegisterPage'
+import StudentDashboardPage from '@/pages/student/StudentDashboardPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -199,6 +206,11 @@ export function AppRoutes() {
       <Route path="/institute/dashboard" element={<InstituteRoute><InstituteDashboardPage /></InstituteRoute>} />
       <Route path="/institute/examples/new" element={<InstituteRoute><InstituteGeneratePage /></InstituteRoute>} />
       <Route path="/institute/examples/:id" element={<InstituteRoute><InstituteExampleEditorPage /></InstituteRoute>} />
+      <Route path="/institute/students" element={<InstituteRoute><InstituteStudentsPage /></InstituteRoute>} />
+
+      {/* ── Ausbildungsbereich · Student:in (Login + Rolle erforderlich) ──────── */}
+      <Route path="/student/register" element={<ProtectedRoute><StudentRegisterPage /></ProtectedRoute>} />
+      <Route path="/student/dashboard" element={<StudentRoute><StudentDashboardPage /></StudentRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

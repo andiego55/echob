@@ -158,3 +158,27 @@ async def get_current_institute(
                 detail="Kein Ausbildungsinstitut-Zugang.",
             )
     return {**current_user, "institute": dict(row)}
+
+
+async def get_current_student(
+    current_user: dict = Depends(get_current_user),
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> dict:
+    """
+    Stellt sicher, dass der eingeloggte Account ein:e Student:in ist.
+
+    Lädt die zugehörige students-Zeile (status='active'). Gibt das User-Objekt
+    erweitert um {"student": <row>, "institute_id": ...} zurück; wirft 403, wenn
+    kein aktiver Studierenden-Zugang existiert. Auf ALLEN /student/*-Endpunkten.
+    """
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM students WHERE user_id = $1 AND status = 'active'",
+            current_user["user_id"],
+        )
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Kein Studierenden-Zugang.",
+            )
+    return {**current_user, "student": dict(row), "institute_id": row["institute_id"]}

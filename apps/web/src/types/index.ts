@@ -209,6 +209,39 @@ export interface ExampleSummary {
   created_at: string | null
 }
 
+// ── Ausbildungsbereich (Student:in) ───────────────────────────────────────────
+export interface StudentProfile {
+  id: string
+  user_id: string
+  institute_id: string
+  display_name: string | null
+  status: string
+  created_at: string
+}
+
+export interface StudentCase {
+  id: string
+  case_id: string
+  title: string
+  has_partner: boolean
+  scene_count: number
+  assigned_at: string | null
+}
+
+export interface StudentInvite {
+  id: string
+  code: string
+  token: string
+  label: string | null
+  created_at: string | null
+}
+
+export interface InstituteStudent {
+  id: string
+  display_name: string | null
+  created_at: string | null
+}
+
 export interface GenerationStart {
   generation_id: string
   status: string

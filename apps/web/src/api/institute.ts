@@ -6,6 +6,8 @@ import type {
   GenerationStatus,
   ExampleDetail,
   ExampleSummary,
+  InstituteStudent,
+  StudentInvite,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -31,4 +33,14 @@ export const instituteApi = {
     apiClient.patch<ExampleDetail>(`/institute/examples/${id}`, data).then(r => r.data),
   deleteExample: (id: string) =>
     apiClient.delete(`/institute/examples/${id}`).then(r => r.data),
+
+  // Studierende (Einladungen + Verwaltung)
+  listStudents: () =>
+    apiClient.get<{ quota: number; students: InstituteStudent[]; invites: StudentInvite[] }>('/institute/students').then(r => r.data),
+  inviteStudent: (label?: string | null) =>
+    apiClient.post<StudentInvite>('/institute/students/invite', { label }).then(r => r.data),
+  removeStudent: (id: string) =>
+    apiClient.delete(`/institute/students/${id}`).then(r => r.data),
+  revokeStudentInvite: (id: string) =>
+    apiClient.delete(`/institute/student-invites/${id}`).then(r => r.data),
 }

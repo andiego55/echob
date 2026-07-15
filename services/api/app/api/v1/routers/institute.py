@@ -22,7 +22,8 @@ from app.schemas.institute import (
     InstituteRegister,
     InstituteUpdate,
 )
-from app.services import case_generation_service
+from app.schemas.student import StudentInviteCreate
+from app.services import case_generation_service, student_invite_service
 
 router = APIRouter(prefix="/institute", tags=["institute"])
 
@@ -317,3 +318,81 @@ async def delete_example(
             for cid in (ex["primary_case_id"], ex["partner_case_id"]):
                 if cid:
                     await conn.execute("DELETE FROM cases WHERE id = $1", cid)
+
+
+# ── Studierende (Einladungen + Verwaltung) ────────────────────────────────────
+
+@router.get("/students")
+async def list_students(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Aktive Studierende + offene Einladungen + Kontingent."""
+    inst = current["institute"]
+    async with pool.acquire() as conn:
+        students = await conn.fetch(
+            "SELECT id, display_name, created_at FROM students "
+            "WHERE institute_id = $1 AND status = 'active' ORDER BY created_at",
+            inst["id"],
+        )
+        invites = await student_invite_service.list_invites(conn, inst["id"])
+    return {
+        "quota": inst.get("student_quota", 0),
+        "students": [
+            {"id": str(s["id"]), "display_name": s["display_name"],
+             "created_at": s["created_at"].isoformat() if s["created_at"] else None}
+            for s in students
+        ],
+        "invites": [
+            {"id": str(i["id"]), "code": i["code"], "token": i["token"], "label": i["label"],
+             "created_at": i["created_at"].isoformat() if i["created_at"] else None}
+            for i in invites
+        ],
+    }
+
+
+@router.post("/students/invite")
+async def invite_student(
+    body: StudentInviteCreate,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Erzeugt eine Studierenden-Einladung (Code + Token). 403 bei erschöpftem Kontingent."""
+    inst = current["institute"]
+    async with pool.acquire() as conn:
+        used = await student_invite_service.seat_count(conn, inst["id"])
+        if used >= (inst.get("student_quota") or 0):
+            raise HTTPException(status_code=403, detail="QUOTA_EXCEEDED")
+        inv = await student_invite_service.create_invite(conn, inst["id"], body.label)
+    return {"id": str(inv["id"]), "code": inv["code"], "token": inv["token"], "label": inv["label"]}
+
+
+@router.delete("/students/{student_id}")
+async def remove_student(
+    student_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Entfernt eine:n Studierende:n aus dem Institut (Zugang endet; Fall-Kopien bleiben)."""
+    async with pool.acquire() as conn:
+        r = await conn.execute(
+            "UPDATE students SET status = 'removed' WHERE id = $1 AND institute_id = $2",
+            student_id, current["institute"]["id"],
+        )
+    if r == "UPDATE 0":
+        raise HTTPException(status_code=404, detail="Studierende:r nicht gefunden.")
+    return {"removed": True}
+
+
+@router.delete("/student-invites/{invite_id}")
+async def revoke_student_invite(
+    invite_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Zieht eine offene Einladung zurück."""
+    async with pool.acquire() as conn:
+        ok = await student_invite_service.revoke_invite(conn, current["institute"]["id"], invite_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Einladung nicht gefunden.")
+    return {"revoked": True}

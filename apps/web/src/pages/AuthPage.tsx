@@ -16,9 +16,10 @@ export default function AuthPage() {
   const role        = searchParams.get('role')
   const isPro       = role === 'professional'
   const isInstitute = role === 'institute'
-  const pendingRole = isPro ? 'professional' : isInstitute ? 'institute' : null
+  const isStudent   = role === 'student'
+  const pendingRole = isPro ? 'professional' : isInstitute ? 'institute' : isStudent ? 'student' : null
   const fromLoc     = (location.state as { from?: Location })?.from
-  const defaultDest = isPro ? '/professional/register' : isInstitute ? '/institute/register' : '/app'
+  const defaultDest = isPro ? '/professional/register' : isInstitute ? '/institute/register' : isStudent ? '/student/register' : '/app'
   const from        = fromLoc ? `${fromLoc.pathname}${(fromLoc as Location & { search?: string }).search ?? ''}` : defaultDest
 
   const defaultTab = (location.state as { defaultTab?: Tab } | null)?.defaultTab ?? (pendingRole ? 'signup' : 'login')

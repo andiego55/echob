@@ -1,17 +1,15 @@
 /**
- * InstituteShell – Wrapper für alle /institute/* Seiten.
- * Eigener Header mit Ausbildungs-Navigation. Konsistent zum Fachpersonen-Shell.
+ * StudentShell – Wrapper für alle /student/* Seiten. Konsistent zum Fachpersonen-/Institut-Shell.
  */
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import EchoBLogo from '@/components/EchoBLogo'
 
 const NAV = [
-  { to: '/institute/dashboard', label: 'Dashboard', end: false },
-  { to: '/institute/students', label: 'Studierende', end: false },
+  { to: '/student/dashboard', label: 'Dashboard', end: false },
 ]
 
-export default function InstituteShell({ children }: { children: React.ReactNode }) {
+export default function StudentShell({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
 
@@ -24,7 +22,7 @@ export default function InstituteShell({ children }: { children: React.ReactNode
     <div className="min-h-screen bg-brand-bg flex flex-col">
       <header className="bg-navy border-b border-white/[0.07] sticky top-0 z-40">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 h-14">
-          <EchoBLogo to="/" badge="Institut" />
+          <EchoBLogo to="/" badge="Ausbildung" />
 
           <nav className="hidden md:flex items-center gap-1">
             {NAV.map(({ to, label, end }) => (
