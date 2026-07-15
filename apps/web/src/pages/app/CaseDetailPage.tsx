@@ -309,6 +309,14 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
   const qc = useQueryClient()
   const [editingTopic, setEditingTopic] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const toggleExpanded = (topic: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(topic)) next.delete(topic)
+      else next.add(topic)
+      return next
+    })
 
   const saveMutation = useMutation({
     mutationFn: ({ topic, text }: { topic: string; text: string }) =>
@@ -420,10 +428,22 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
               {contentSummaries.map((s) => {
                 const slug = s.topic.slice('content_'.length)
                 const meta = CONTENT_MANIFEST.find((m) => m.slug === slug)
+                const isOpen = expanded.has(s.topic)
                 return (
                   <div key={s.topic} className="rounded-brand border border-accent/20 bg-accent/5 px-4 py-3">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <p className="text-xs font-semibold text-navy">{meta?.title ?? slug}</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => toggleExpanded(s.topic)}
+                        className="flex items-center gap-1.5 min-w-0 text-left"
+                      >
+                        <svg
+                          className={`w-3.5 h-3.5 flex-shrink-0 text-accent transition-transform ${isOpen ? 'rotate-90' : ''}`}
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <span className="text-xs font-semibold text-navy truncate">{meta?.title ?? slug}</span>
+                      </button>
                       <button
                         onClick={() => navigate(`/app/cases/${caseId}/topics/${s.topic}`)}
                         className="text-xs text-accent hover:underline flex-shrink-0"
@@ -431,9 +451,11 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
                         Dialog erneut führen →
                       </button>
                     </div>
-                    <div className="mt-1 text-sm text-brand-muted leading-relaxed">
-                      <MarkdownMessage content={s.summary_text} />
-                    </div>
+                    {isOpen && (
+                      <div className="mt-2 text-sm text-brand-muted leading-relaxed">
+                        <MarkdownMessage content={s.summary_text} />
+                      </div>
+                    )}
                   </div>
                 )
               })}

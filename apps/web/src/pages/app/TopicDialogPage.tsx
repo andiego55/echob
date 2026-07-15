@@ -9,6 +9,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { echoApi } from '@/api/echo'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
@@ -274,7 +275,9 @@ export default function TopicDialogPage() {
                     ✕ Schließen
                   </button>
                 </div>
-                <p className="text-sm text-brand-text whitespace-pre-wrap mb-4">{summary}</p>
+                <div className="text-sm text-brand-text mb-4 leading-relaxed">
+                  <MarkdownMessage content={summary} />
+                </div>
                 <div className="flex items-center gap-3">
                   {savedSummary ? (
                     <span className="text-xs text-green-600 font-medium">✓ Gespeichert</span>
