@@ -83,13 +83,13 @@ export default function CaseDetailPage() {
                 to={`/app/cases/${caseId}/echo`}
                 className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm"
               >
-                💬 Mit Echo sprechen
+                Mit Echo sprechen
               </Link>
               <Link
                 to={`/app/cases/${caseId}/share`}
                 className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm"
               >
-                👥 Freigaben
+                Freigaben
               </Link>
               <Link
                 to={`/app/cases/${caseId}/scenes/new`}
@@ -109,10 +109,10 @@ export default function CaseDetailPage() {
 
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 border-t border-brand-border pt-3">
             <span className="text-xs text-brand-muted">
-              📝 {sceneCount} {sceneCount === 1 ? 'Szene' : 'Szenen'} dokumentiert
+              {sceneCount} {sceneCount === 1 ? 'Szene' : 'Szenen'} dokumentiert
             </span>
             <span className="text-xs text-brand-muted">
-              💬 {coreSummaryCount} von 4 Themendialogen gespeichert
+              {coreSummaryCount} von 4 Themendialogen gespeichert
             </span>
           </div>
         </div>
@@ -123,7 +123,6 @@ export default function CaseDetailPage() {
         {/* Schnell-Aktionen */}
         <div className="grid gap-4 sm:grid-cols-3 mt-6">
           <QuickCard
-            icon="📝"
             title="Szenen"
             value={
               sceneCount === 0
@@ -134,14 +133,12 @@ export default function CaseDetailPage() {
             cta={sceneCount === 0 ? 'Erste Szene festhalten' : 'Alle Szenen ansehen'}
           />
           <QuickCard
-            icon="💬"
             title="Echo"
             value="Dein KI-Begleiter"
             to={`/app/cases/${caseId}/echo`}
             cta="Gespräch starten"
           />
           <QuickCard
-            icon="📊"
             title="Berichte"
             value="Muster & Verlauf"
             to={`/app/cases/${caseId}/reports`}
@@ -473,6 +470,14 @@ function HypothesesOverviewCard({ caseId }: { caseId: string }) {
     queryFn: () => hypothesesApi.list(caseId),
     enabled: !!caseId,
   })
+  const [hypOpen, setHypOpen] = useState<Set<string>>(new Set())
+  const toggleHyp = (key: string) =>
+    setHypOpen((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
 
   return (
     <div className="card">
@@ -491,13 +496,23 @@ function HypothesesOverviewCard({ caseId }: { caseId: string }) {
       </div>
 
       {saved.length > 0 ? (
-        <div className="space-y-3">
-          {saved.map(h => (
-            <div key={h.hypothesis_type} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
-              <p className="text-xs font-semibold text-navy mb-1">{h.label}</p>
-              <div className="text-sm text-brand-muted leading-relaxed"><MarkdownMessage content={h.summary_text} /></div>
-            </div>
-          ))}
+        <div className="space-y-2">
+          {saved.map(h => {
+            const isOpen = hypOpen.has(h.hypothesis_type)
+            return (
+              <div key={h.hypothesis_type} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+                <button onClick={() => toggleHyp(h.hypothesis_type)} className="flex items-center gap-1.5 w-full text-left">
+                  <svg className={`w-3.5 h-3.5 flex-shrink-0 text-accent transition-transform ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span className="text-xs font-semibold text-navy">{h.label}</span>
+                </button>
+                {isOpen && (
+                  <div className="mt-2 text-sm text-brand-muted leading-relaxed"><MarkdownMessage content={h.summary_text} /></div>
+                )}
+              </div>
+            )
+          })}
         </div>
       ) : (
         <p className="text-xs text-brand-muted/70 leading-relaxed">
@@ -509,12 +524,11 @@ function HypothesesOverviewCard({ caseId }: { caseId: string }) {
   )
 }
 
-function QuickCard({ icon, title, value, to, cta }: {
-  icon: string; title: string; value: string; to: string; cta: string
+function QuickCard({ title, value, to, cta }: {
+  title: string; value: string; to: string; cta: string
 }) {
   return (
     <Link to={to} className="card block no-underline hover:border-accent/40 transition-all">
-      <div className="text-2xl mb-3">{icon}</div>
       <p className="text-xs font-semibold text-brand-muted mb-1">{title}</p>
       <p className="text-sm font-medium text-navy mb-3">{value}</p>
       <span className="text-xs text-accent font-medium">{cta} →</span>

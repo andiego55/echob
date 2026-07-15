@@ -98,6 +98,7 @@ export default function OnboardingPage() {
   const [answers, setAnswers] = useState<OnboardingAnswers>({})
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(false)
+  const [savedOk, setSavedOk] = useState(false)
 
   const { data: existing, isLoading } = useQuery({
     queryKey: ['onboarding', caseId],
@@ -164,6 +165,22 @@ export default function OnboardingPage() {
       navigate(`/app/cases/${caseId}/scenes`)
     } catch {
       setSaveError(true)
+      setSaving(false)
+    }
+  }
+
+  // Zwischenspeichern ohne Weiterspringen – in jedem Schritt möglich.
+  const handleSave = async () => {
+    setSaving(true)
+    setSaveError(false)
+    try {
+      const saved = await onboardingApi.save(caseId!, answers)
+      qc.setQueryData(['onboarding', caseId], saved)
+      setSavedOk(true)
+      setTimeout(() => setSavedOk(false), 2000)
+    } catch {
+      setSaveError(true)
+    } finally {
       setSaving(false)
     }
   }
@@ -271,8 +288,17 @@ export default function OnboardingPage() {
               disabled={!canProceed() || saving}
               className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50"
             >
-              {saving ? 'Wird gespeichert …' : isLast ? 'Abschließen' : 'Weiter'}
+              {isLast ? (saving ? 'Wird gespeichert …' : 'Abschließen') : 'Weiter'}
             </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="rounded-brand border border-brand-border bg-white px-4 py-2 text-sm font-medium text-navy hover:bg-brand-bg transition-colors disabled:opacity-50"
+            >
+              Speichern
+            </button>
+            {savedOk && <span className="text-xs font-medium text-green-600">✓ Gespeichert</span>}
             {step.type !== 'slider' && !step.optional && (
               <button
                 type="button"
