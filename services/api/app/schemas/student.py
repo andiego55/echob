@@ -30,3 +30,7 @@ class StudentProfileResponse(BaseModel):
 
 class StudentEchoChat(BaseModel):
     message: str = Field(..., min_length=1, max_length=4000)
+
+
+class StudentReportUpdate(BaseModel):
+    sections: list[dict] = Field(default_factory=list)

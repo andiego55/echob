@@ -13,7 +13,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from app.api.v1.routers.institute import _load_case_part  # generischer Fall-Loader (Engine-Reuse)
 from app.core import crypto
 from app.core.dependencies import get_current_student, get_current_user, get_pool
-from app.schemas.student import StudentEchoChat, StudentInviteAccept, StudentProfileResponse
+from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS, ReportCreate
+from app.schemas.student import (
+    StudentEchoChat,
+    StudentInviteAccept,
+    StudentProfileResponse,
+    StudentReportUpdate,
+)
 from app.services import student_invite_service
 from app.services.person_profile_service import build_person_context
 from app.services.profile_service import build_profile_context
@@ -224,3 +230,142 @@ async def echo_chat(
     return {"id": str(arow["id"]), "role": "assistant", "content": answer,
             "safety_level": (safety_meta.get("safety") or {}).get("level"),
             "created_at": arow["created_at"].isoformat() if arow["created_at"] else None}
+
+
+# ── Berichte (student-scoped, wie Nutzer-Berichte) ────────────────────────────
+
+def _report_out(row) -> dict:
+    d = dict(row)
+    content = d.get("content")
+    if isinstance(content, str):
+        content = json.loads(content)
+    content = crypto.decrypt_json_strings(content) if content else {"sections": []}
+    disclaimer = (content.get("disclaimer") if isinstance(content, dict) else None) or REPORT_DISCLAIMER
+    return {
+        "id": str(d["id"]), "case_id": str(d["case_id"]), "user_id": str(d["user_id"]),
+        "report_type": d["report_type"],
+        "type_label": REPORT_TYPE_LABELS.get(d["report_type"], d["report_type"]),
+        "title": d["title"], "content": content, "status": d.get("status", "ready"),
+        "disclaimer": disclaimer,
+        "created_at": d["created_at"].isoformat() if d["created_at"] else None,
+        "updated_at": d["updated_at"].isoformat() if d.get("updated_at") else None,
+    }
+
+
+@router.get("/cases/{copy_id}/reports")
+async def list_reports(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        rows = await conn.fetch(
+            "SELECT * FROM reports WHERE case_id = $1 ORDER BY created_at DESC", copy["case_id"])
+    return {"reports": [_report_out(r) for r in rows], "total": len(rows)}
+
+
+@router.post("/cases/{copy_id}/reports")
+async def create_report(
+    copy_id: UUID,
+    body: ReportCreate,
+    request: Request,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Bericht über die Arbeitskopie erzeugen (Echo). Max 20 je Fall."""
+    echo_svc = request.app.state.echo_service
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        case_id = copy["case_id"]
+        count = await conn.fetchval("SELECT count(*) FROM reports WHERE case_id = $1", case_id)
+        if count >= 20:
+            raise HTTPException(
+                status_code=422,
+                detail="Maximale Anzahl von 20 Berichten erreicht. Bitte lösche zuerst einen Bericht.")
+        case_row = await conn.fetchrow("SELECT * FROM cases WHERE id = $1", case_id)
+        if not case_row:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+        scene_rows = await conn.fetch(
+            "SELECT * FROM scenes WHERE case_id = $1 ORDER BY scene_date DESC NULLS LAST", case_id)
+        scale_rows = await conn.fetch("SELECT * FROM scale_scores WHERE case_id = $1", case_id)
+        onboarding_row = await conn.fetchrow("SELECT * FROM onboarding_answers WHERE case_id = $1", case_id)
+        self_row = await conn.fetchrow("SELECT * FROM user_profiles WHERE user_id = $1", case_row["user_id"])
+        pp_row = await conn.fetchrow("SELECT * FROM person_profiles WHERE case_id = $1", case_id)
+
+    scenes_data = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
+    onboarding_data = (crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+                       if onboarding_row else None)
+    content = await echo_svc.generate_report(
+        report_type=body.report_type, case_context=dict(case_row), scenes=scenes_data,
+        scale_scores=[dict(r) for r in scale_rows], onboarding=onboarding_data,
+        user_profile=dict(self_row) if self_row else None,
+        person_profile=dict(pp_row) if pp_row else None,
+        topic_summaries=[], hypotheses=[])
+    title = body.title or REPORT_TYPE_LABELS.get(body.report_type, "Bericht")
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "INSERT INTO reports (case_id, user_id, report_type, title, content, status) "
+            "VALUES ($1, $2, $3, $4, $5::jsonb, 'ready') RETURNING *",
+            case_id, current["user_id"], body.report_type, title,
+            json.dumps(crypto.encrypt_json_strings(content)))
+    return _report_out(row)
+
+
+@router.get("/cases/{copy_id}/reports/{report_id}")
+async def get_report(
+    copy_id: UUID,
+    report_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        row = await conn.fetchrow(
+            "SELECT * FROM reports WHERE id = $1 AND case_id = $2", report_id, copy["case_id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
+    return _report_out(row)
+
+
+@router.put("/cases/{copy_id}/reports/{report_id}")
+async def update_report(
+    copy_id: UUID,
+    report_id: UUID,
+    body: StudentReportUpdate,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        row = await conn.fetchrow(
+            "SELECT * FROM reports WHERE id = $1 AND case_id = $2", report_id, copy["case_id"])
+        if not row:
+            raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
+        content = dict(row).get("content") or {}
+        if isinstance(content, str):
+            content = json.loads(content)
+        content = crypto.decrypt_json_strings(content)
+        content["sections"] = body.sections
+        updated = await conn.fetchrow(
+            "UPDATE reports SET content = $1::jsonb, updated_at = NOW() "
+            "WHERE id = $2 AND case_id = $3 RETURNING *",
+            json.dumps(crypto.encrypt_json_strings(content)), report_id, copy["case_id"])
+    return _report_out(updated)
+
+
+@router.delete("/cases/{copy_id}/reports/{report_id}", status_code=204)
+async def delete_report(
+    copy_id: UUID,
+    report_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> None:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        row = await conn.fetchrow(
+            "DELETE FROM reports WHERE id = $1 AND case_id = $2 RETURNING id", report_id, copy["case_id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
