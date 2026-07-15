@@ -63,16 +63,19 @@ function HypothesisDialogPageWrapper() {
   return <HypothesisDialogPage key={hypothesisId} />
 }
 
-// Rollen-Weiche: Fachpersonen landen im Fachpersonenbereich, sonst in der Fallübersicht.
+// Rollen-Weiche: Institut/Fachperson landen im jeweiligen Bereich, sonst in der Fallübersicht.
 function AppHome() {
   const { session } = useAuth()
-  const { data, isLoading } = useProfessional()
-  if (isLoading) return <RoleSpinner />
-  if (data) return <Navigate to="/professional/dashboard" replace />
-  // Selbst-registrierte Fachperson (Absicht aus dem Signup) → Profil anlegen,
-  // statt fälschlich im Klientenbereich zu landen.
-  if (session?.user?.user_metadata?.pending_role === 'professional')
-    return <Navigate to="/professional/register" replace />
+  const { data: pro, isLoading: proLoading } = useProfessional()
+  const { data: institute, isLoading: instLoading } = useInstitute()
+  if (proLoading || instLoading) return <RoleSpinner />
+  if (institute) return <Navigate to="/institute/dashboard" replace />
+  if (pro) return <Navigate to="/professional/dashboard" replace />
+  // Selbst-registriert (Absicht aus dem Signup) → Profil-Anlage, statt fälschlich
+  // im Klientenbereich zu landen.
+  const pending = session?.user?.user_metadata?.pending_role
+  if (pending === 'institute') return <Navigate to="/institute/register" replace />
+  if (pending === 'professional') return <Navigate to="/professional/register" replace />
   return <CasesOverviewPage />
 }
 
@@ -89,6 +92,10 @@ import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalRe
 import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
 import CoupleEchoPage from '@/pages/professional/CoupleEchoPage'
 import CoupleReportDetailPage from '@/pages/professional/CoupleReportDetailPage'
+import InstituteRoute, { useInstitute } from '@/components/auth/InstituteRoute'
+import InstituteRegisterPage from '@/pages/institute/InstituteRegisterPage'
+import InstituteDashboardPage from '@/pages/institute/InstituteDashboardPage'
+import InstituteGeneratePage from '@/pages/institute/InstituteGeneratePage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -185,6 +192,11 @@ export function AppRoutes() {
       <Route path="/professional/cases/:caseId/reports/:reportId" element={<ProfessionalRoute><ProfessionalReportDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/couples/:coupleId/echo" element={<ProfessionalRoute><CoupleEchoPage /></ProfessionalRoute>} />
       <Route path="/professional/couples/:coupleId/reports/:reportId" element={<ProfessionalRoute><CoupleReportDetailPage /></ProfessionalRoute>} />
+
+      {/* ── Ausbildungsbereich · Institut (Login + Rolle erforderlich) ────────── */}
+      <Route path="/institute/register" element={<ProtectedRoute><InstituteRegisterPage /></ProtectedRoute>} />
+      <Route path="/institute/dashboard" element={<InstituteRoute><InstituteDashboardPage /></InstituteRoute>} />
+      <Route path="/institute/examples/new" element={<InstituteRoute><InstituteGeneratePage /></InstituteRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

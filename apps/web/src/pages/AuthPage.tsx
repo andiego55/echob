@@ -15,11 +15,13 @@ export default function AuthPage() {
   const [searchParams] = useSearchParams()
   const role        = searchParams.get('role')
   const isPro       = role === 'professional'
+  const isInstitute = role === 'institute'
+  const pendingRole = isPro ? 'professional' : isInstitute ? 'institute' : null
   const fromLoc     = (location.state as { from?: Location })?.from
-  const defaultDest = role === 'professional' ? '/professional/register' : '/app'
+  const defaultDest = isPro ? '/professional/register' : isInstitute ? '/institute/register' : '/app'
   const from        = fromLoc ? `${fromLoc.pathname}${(fromLoc as Location & { search?: string }).search ?? ''}` : defaultDest
 
-  const defaultTab = (location.state as { defaultTab?: Tab } | null)?.defaultTab ?? (role === 'professional' ? 'signup' : 'login')
+  const defaultTab = (location.state as { defaultTab?: Tab } | null)?.defaultTab ?? (pendingRole ? 'signup' : 'login')
   const [tab, setTab]         = useState<Tab>(defaultTab)
   const [method, setMethod]   = useState<Method>('password')
   const [email, setEmail]     = useState('')
@@ -74,7 +76,7 @@ export default function AuthPage() {
             // Nach der Bestätigung im App-Bereich landen; dort routet AppHome
             // eine Fachperson anhand von pending_role weiter zur Profil-Anlage.
             emailRedirectTo: `${window.location.origin}/app`,
-            ...(isPro ? { data: { pending_role: 'professional' } } : {}),
+            ...(pendingRole ? { data: { pending_role: pendingRole } } : {}),
           },
         })
         if (error) throw error

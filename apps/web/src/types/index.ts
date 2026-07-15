@@ -122,6 +122,20 @@ export interface Case {
   person_name?: string | null   // Pseudonym der Fallperson (angereichert in der Listen-API)
 }
 
+// ── Ausbildungsbereich (Institut) ─────────────────────────────────────────────
+export interface InstituteProfile {
+  id: string
+  user_id: string
+  name: string
+  contact_name: string | null
+  email: string | null
+  student_quota: number
+  example_quota: number
+  plan: string
+  created_at: string
+  updated_at: string
+}
+
 export interface CaseCreate {
   relationship_type: RelationshipType
   relationship_status: RelationshipStatus
