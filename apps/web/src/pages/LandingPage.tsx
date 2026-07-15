@@ -78,7 +78,7 @@ const FAQ = [
   },
   {
     q: 'Wer sieht meine Eingaben – sind meine Daten sicher?',
-    a: 'Nur du. Deine Einträge werden verschlüsselt und DSGVO-konform auf Servern in Europa gespeichert. Wir geben nichts weiter, trainieren keine KI mit deinen Inhalten und zeigen keine Werbung. Eine Fachperson sieht ausschließlich das, was du ausdrücklich freigibst.',
+    a: 'Deine Fallinhalte werden verschlüsselt auf Servern in Europa gespeichert und im Produkt nur dir angezeigt. Für die KI-Funktionen werden die dafür nötigen Inhalte an unseren KI-Dienstleister in den USA übermittelt und dort verarbeitet – nicht zum Training von KI-Modellen. Wir zeigen keine Werbung und verkaufen deine Daten nicht. Eine Fachperson sieht ausschließlich das, was du ausdrücklich freigibst. Alle Details findest du in der Datenschutzerklärung.',
   },
   {
     q: 'Muss ich gut schreiben können oder viel Zeit haben?',

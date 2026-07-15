@@ -17,13 +17,13 @@ const KI_MENSCH = [
   { icon: svg(<><rect x="6" y="6" width="12" height="12" rx="2" /><rect x="9.5" y="9.5" width="5" height="5" rx="1" /><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" /></>), title: 'Was die KI leistet', text: 'Echo analysiert deine dokumentierten Situationen, erkennt wiederkehrende Dynamiken, berechnet Skalenwerte zu Belastung, Bindungsmustern und Selbstwahrnehmung – und ist jederzeit verfügbar.' },
   { icon: svg(<><circle cx="12" cy="8" r="3.5" /><path d="M5.5 19a6.5 6.5 0 0 1 13 0" /></>), title: 'Was Menschen leisten', text: 'Dein Coach hört zu, stellt Rückfragen, hält Ambivalenz aus und begleitet dich in Momenten, in denen Struktur allein nicht hilft. Echte Verbindung kann keine KI ersetzen.' },
   { icon: svg(<><path d="M3 20h18" /><path d="M6 20v-6M12 20V8M18 20v-9" /></>), title: 'Daten als Gesprächsgrundlage', text: 'Mit deiner Erlaubnis kann dein Coach auf deine EchoB-Daten zugreifen: Szenen, Muster, Skalenwerte. Das macht Gespräche konkreter und spart wertvolle Zeit.' },
-  { icon: svg(<><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>), title: 'Deine Daten gehören dir', text: 'Was du in EchoB dokumentierst, teilst du nur dann, wenn du es möchtest. Kein Coaching-Zugriff ohne deine ausdrückliche Freigabe. DSGVO-konform, Server in Deutschland.' },
+  { icon: svg(<><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>), title: 'Deine Daten gehören dir', text: 'Was du in EchoB dokumentierst, teilst du nur dann, wenn du es möchtest. Kein Coaching-Zugriff ohne deine ausdrückliche Freigabe. Server in Deutschland, verschlüsselte Speicherung.' },
 ]
 
 const badgeIcon = 'h-3.5 w-3.5'
 const TRUST_BADGES = [
   { icon: svg(<><rect x="4" y="4" width="16" height="7" rx="1.5" /><rect x="4" y="13" width="16" height="7" rx="1.5" /><path d="M7.5 7.5h.01M7.5 16.5h.01" /></>, badgeIcon), label: 'Server in Deutschland' },
-  { icon: svg(<><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>, badgeIcon), label: 'DSGVO-konform' },
+  { icon: svg(<><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>, badgeIcon), label: 'Server in der EU' },
   { icon: svg(<><circle cx="12" cy="12" r="8.5" /><path d="M6 6l12 12" /></>, badgeIcon), label: 'Keine Datenweitergabe' },
   { icon: svg(<><path d="M5 7h14M10 7V5h4v2M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12" /></>, badgeIcon), label: 'Jederzeit löschbar' },
   { icon: svg(<><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="2.5" /></>, badgeIcon), label: 'Coaching-Zugriff nur mit Freigabe' },

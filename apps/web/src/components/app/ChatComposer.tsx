@@ -21,7 +21,8 @@ export default function ChatComposer({
   value, onChange, onSend,
   pending = false, disabled = false,
   placeholder = 'Schreib Echo eine Nachricht …',
-  hint, leftAccessory, autoFocus,
+  hint = 'Beschreibe andere Personen mit einer Rolle (z. B. „Partner", „Mutter") statt mit echtem Namen.',
+  leftAccessory, autoFocus,
 }: Props) {
   const ref = useRef<HTMLTextAreaElement>(null)
 

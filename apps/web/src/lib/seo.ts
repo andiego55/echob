@@ -11,7 +11,7 @@ const SITE = 'https://echo-b.de'
 
 const DEFAULT_TITLE = 'EchoB – Beziehungsmuster erkennen | Erkenne, was sich wiederholt.'
 const DEFAULT_DESC =
-  'EchoB hilft dir, belastende Beziehungssituationen zu sortieren und wiederkehrende Muster sichtbar zu machen – privat, DSGVO-konform, mit KI-Unterstützung. Kein Therapieersatz.'
+  'EchoB hilft dir, belastende Beziehungssituationen zu sortieren und wiederkehrende Muster sichtbar zu machen – privat, datensparsam, mit KI-Unterstützung. Kein Therapieersatz.'
 
 export type PageMeta = { title: string; description: string }
 
@@ -62,7 +62,7 @@ export const ROUTE_META: Record<string, PageMeta> = {
   '/datenschutz': {
     title: 'Datenschutz – EchoB',
     description:
-      'Wie EchoB deine Daten schützt: DSGVO-konform, Server in der EU, verschlüsselt. Alle Informationen zur Datenverarbeitung.',
+      'Wie EchoB deine Daten schützt: Server in der EU, verschlüsselte Speicherung, KI-Verarbeitung offen erklärt. Alle Informationen zur Datenverarbeitung.',
   },
   '/agb': {
     title: 'AGB – EchoB',
