@@ -5,6 +5,36 @@ import type { ContentMeta } from './types'
 export const CONTENT_MANIFEST: ContentMeta[] = [
   {
     "type": "glossary",
+    "slug": "ambivalenz",
+    "title": "Ambivalenz – wenn du hin- und hergerissen bist",
+    "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist.",
+    "cluster": "trennung",
+    "search_intent": "Ambivalenz Bedeutung Beziehung",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du steckst gerade in einer Ambivalenz fest. Möchtest du eine konkrete Situation anschauen, bei der du dich besonders hin- und hergerissen fühlst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "links": {
+      "parent": "sich-trennen",
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/glossar/ambivalenz"
+  },
+  {
+    "type": "glossary",
     "slug": "bindungsangst",
     "title": "Bindungsangst – Definition und Anzeichen",
     "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt.",
@@ -152,6 +182,50 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/hilfe/angst-verlassen-zu-werden"
   },
   {
+    "type": "problem",
+    "slug": "soll-ich-mich-trennen",
+    "title": "„Soll ich mich trennen?\" – Wenn du nicht mehr weiterweißt",
+    "description": "Wenn die Frage, ob du bleiben oder gehen sollst, dich nicht loslässt: was dahinter stecken kann und wie du der Entscheidung näherkommst – ohne Druck und ohne Rat von außen.",
+    "cluster": "trennung",
+    "search_intent": "soll ich mich trennen",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Die Frage, ob du bleiben oder gehen sollst, lässt dich nicht los. Möchtest du eine konkrete Situation anschauen, an der sich das für dich zuspitzt?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "trennungsentscheidung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sich-trennen",
+      "comparison": [
+        "trennen-oder-bleiben"
+      ],
+      "glossary": [
+        "ambivalenz"
+      ],
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/hilfe/soll-ich-mich-trennen"
+  },
+  {
     "type": "topic",
     "slug": "beziehungsmuster",
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
@@ -274,6 +348,93 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "sich-trennen",
+    "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",
+    "description": "Warum die Trennungsfrage so schwer ist, welche Zweifel dazugehören und wie du Schritt für Schritt zu mehr Klarheit findest – ohne dass dir jemand die Entscheidung abnimmt.",
+    "cluster": "trennung",
+    "search_intent": "sich trennen Zweifel Entscheidung",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über die Trennungsfrage gelesen. Möchtest du eine konkrete Situation anschauen, die deine Zweifel besonders auslöst?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "trennungsentscheidung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "soll-ich-mich-trennen"
+      ],
+      "comparison": [
+        "trennen-oder-bleiben"
+      ],
+      "glossary": [
+        "ambivalenz"
+      ],
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/sich-trennen"
+  },
+  {
+    "type": "comparison",
+    "slug": "trennen-oder-bleiben",
+    "title": "Trennen oder bleiben? Woran du Orientierung findest",
+    "description": "Kein Test entscheidet für dich – aber diese Fragen und Merkmale helfen dir, ehrlicher hinzuschauen, ob Bleiben oder Gehen deiner Wahrheit näherkommt.",
+    "cluster": "trennung",
+    "search_intent": "trennen oder bleiben Entscheidungshilfe",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du wägst ab, ob du bleiben oder gehen sollst. Möchtest du eine konkrete Situation gemeinsam ordnen, statt im Kreis zu denken?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "trennungsentscheidung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sich-trennen",
+      "glossary": [
+        "ambivalenz"
+      ],
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/trennen-oder-bleiben"
+  },
+  {
+    "type": "topic",
     "slug": "verlustangst",
     "title": "Verlustangst in Beziehungen verstehen",
     "description": "Woher die Angst kommt, verlassen zu werden, wie sie sich in Beziehungen zeigt und was dir hilft, ihr weniger ausgeliefert zu sein – ohne Selbstverurteilung.",
@@ -318,6 +479,10 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
 ]
 
 export const CONTENT_ROUTE_META: Record<string, { title: string; description: string }> = {
+  "/glossar/ambivalenz": {
+    "title": "Ambivalenz – wenn du hin- und hergerissen bist",
+    "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist."
+  },
   "/glossar/bindungsangst": {
     "title": "Bindungsangst – Definition und Anzeichen",
     "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt."
@@ -334,6 +499,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ständige Angst, verlassen zu werden – was dahinter steckt",
     "description": "Wenn die Angst, verlassen zu werden, dein Denken und Handeln bestimmt: woran das liegen kann und was im Moment der Panik konkret hilft."
   },
+  "/hilfe/soll-ich-mich-trennen": {
+    "title": "„Soll ich mich trennen?\" – Wenn du nicht mehr weiterweißt",
+    "description": "Wenn die Frage, ob du bleiben oder gehen sollst, dich nicht loslässt: was dahinter stecken kann und wie du der Entscheidung näherkommst – ohne Druck und ohne Rat von außen."
+  },
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
     "description": "Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose."
@@ -345,6 +514,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/gaslighting-oder-missverstaendnis": {
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
     "description": "Nicht jeder Streit ist Manipulation. Diese Merkmale helfen dir, ein echtes Missverständnis von systematischem Gaslighting zu unterscheiden – ohne vorschnelles Urteil."
+  },
+  "/wissen/sich-trennen": {
+    "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",
+    "description": "Warum die Trennungsfrage so schwer ist, welche Zweifel dazugehören und wie du Schritt für Schritt zu mehr Klarheit findest – ohne dass dir jemand die Entscheidung abnimmt."
+  },
+  "/wissen/trennen-oder-bleiben": {
+    "title": "Trennen oder bleiben? Woran du Orientierung findest",
+    "description": "Kein Test entscheidet für dich – aber diese Fragen und Merkmale helfen dir, ehrlicher hinzuschauen, ob Bleiben oder Gehen deiner Wahrheit näherkommt."
   },
   "/wissen/verlustangst": {
     "title": "Verlustangst in Beziehungen verstehen",
