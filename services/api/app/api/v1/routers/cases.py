@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.case import CaseCreate, CaseListResponse, CaseResponse, CaseUpdate
 from app.services import seat_service
@@ -27,6 +28,7 @@ async def list_cases(
             """
             SELECT c.*,
                    (SELECT COUNT(*) FROM scenes s WHERE s.case_id = c.id)::int AS scene_count,
+                   (SELECT o.person_name FROM onboarding_answers o WHERE o.case_id = c.id LIMIT 1) AS person_name,
                    GREATEST(
                        c.created_at,
                        COALESCE((SELECT MAX(s.created_at) FROM scenes s WHERE s.case_id = c.id), c.created_at),
@@ -41,7 +43,11 @@ async def list_cases(
         chat_session_count = await conn.fetchval(
             "SELECT COUNT(*) FROM echo_chat_sessions WHERE user_id = $1", user_id
         )
-    cases = [CaseResponse(**dict(r)) for r in rows]
+    cases = []
+    for r in rows:
+        d = dict(r)
+        d["person_name"] = crypto.decrypt(d.get("person_name"))  # Pseudonym der Fallperson entschlüsseln
+        cases.append(CaseResponse(**d))
     return CaseListResponse(cases=cases, total=len(cases), chat_session_count=chat_session_count or 0)
 
 

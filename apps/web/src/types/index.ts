@@ -119,6 +119,7 @@ export interface Case {
   updated_at: string
   scene_count: number
   last_activity_at: string | null
+  person_name?: string | null   // Pseudonym der Fallperson (angereichert in der Listen-API)
 }
 
 export interface CaseCreate {

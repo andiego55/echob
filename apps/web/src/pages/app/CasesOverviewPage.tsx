@@ -3,6 +3,7 @@
  * Persönliche Begrüßung, Weitermachen-Karte, Fortschritt,
  * Fallliste, Tagesimpuls.
  */
+import type { ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
@@ -162,9 +163,14 @@ export default function CasesOverviewPage() {
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <Link to={`/app/cases/${lastCase.id}`} className="no-underline">
                     <p className="text-base font-bold text-navy">
-                      {RELATIONSHIP_TYPE_LABELS[lastCase.relationship_type] ?? lastCase.relationship_type}
+                      {lastCase.person_name?.trim()
+                        || RELATIONSHIP_TYPE_LABELS[lastCase.relationship_type]
+                        || lastCase.relationship_type}
                     </p>
                     <p className="text-xs text-brand-muted mt-0.5">
+                      {lastCase.person_name?.trim() && (
+                        <>{RELATIONSHIP_TYPE_LABELS[lastCase.relationship_type] ?? lastCase.relationship_type} · </>
+                      )}
                       Zuletzt aktiv {relativeTime(lastCase.last_activity_at)} · {lastCase.scene_count} {lastCase.scene_count === 1 ? 'Szene' : 'Szenen'}
                     </p>
                   </Link>
@@ -173,33 +179,69 @@ export default function CasesOverviewPage() {
                       to={`/app/cases/${lastCase.id}/scenes/new`}
                       className="btn-primary !py-2 !px-4 !text-xs"
                     >
-                      Szene festhalten
+                      <span className="inline-flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M12 20h9" />
+                          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                        </svg>
+                        Szene festhalten
+                      </span>
                     </Link>
                     <Link
                       to={`/app/cases/${lastCase.id}/echo`}
                       className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-xs"
                     >
-                      Mit Echo sprechen
+                      <span className="inline-flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" />
+                        </svg>
+                        Mit Echo sprechen
+                      </span>
                     </Link>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Fortschritt – kompakte Statuszeile */}
-            <div className="mb-6 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-brand border border-brand-border bg-white px-5 py-3 text-sm">
-              <span className="text-brand-muted">
-                <strong className="font-bold text-navy">{totalScenes}</strong> {totalScenes === 1 ? 'Szene' : 'Szenen'}
-              </span>
-              <span className="text-brand-border">·</span>
-              <span className="text-brand-muted">
-                <strong className="font-bold text-navy">{chatCount}</strong> {chatCount === 1 ? 'Echo-Gespräch' : 'Echo-Gespräche'}
-              </span>
-              <span className="text-brand-border">·</span>
-              <Link to="/app/profile" className="group inline-flex items-center gap-1.5 text-brand-muted no-underline hover:text-accent transition-colors">
-                <span><strong className="font-bold text-navy">{profilePercent} %</strong> Beziehungsprofil</span>
-                {profilePercent < 100 && <span className="text-xs font-medium text-accent">vervollständigen →</span>}
-              </Link>
+            {/* Dein Überblick */}
+            <div className="mb-6 rounded-brand border border-brand-border bg-white px-5 py-4">
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-wider text-brand-muted/70">
+                Dein Überblick
+              </p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
+                <StatTile
+                  icon={<StatIcon><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2Z" /></StatIcon>}
+                  value={cases.length}
+                  label={cases.length === 1 ? 'Aktiver Fall' : 'Aktive Fälle'}
+                />
+                <StatTile
+                  icon={<StatIcon><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /><path d="M9 13h6M9 17h6" /></StatIcon>}
+                  value={totalScenes}
+                  label={totalScenes === 1 ? 'Erfasste Szene' : 'Erfasste Szenen'}
+                />
+                <StatTile
+                  icon={<StatIcon><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" /></StatIcon>}
+                  value={chatCount}
+                  label={chatCount === 1 ? 'Echo-Gespräch' : 'Echo-Gespräche'}
+                />
+                {/* Beziehungsprofil – verlinkt, mit Fortschrittsbalken */}
+                <Link to="/app/profile" className="group flex items-center gap-3 no-underline">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                    <StatIcon><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></StatIcon>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-lg font-bold text-navy leading-none">
+                      {profilePercent}<span className="text-sm font-semibold"> %</span>
+                    </p>
+                    <p className="mt-1 text-xs text-brand-muted truncate group-hover:text-accent transition-colors">
+                      Beziehungsprofil
+                    </p>
+                    <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-brand-border/50">
+                      <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${profilePercent}%` }} />
+                    </div>
+                  </div>
+                </Link>
+              </div>
             </div>
           </>
         )}
@@ -248,6 +290,7 @@ export default function CasesOverviewPage() {
 function CaseCard({ case_: c, blogTopic }: { case_: Case; blogTopic?: string }) {
   const typeLabel   = RELATIONSHIP_TYPE_LABELS[c.relationship_type]   ?? c.relationship_type
   const statusLabel = RELATIONSHIP_STATUS_LABELS[c.relationship_status] ?? c.relationship_status
+  const personName  = c.person_name?.trim()
   const to = blogTopic
     ? `/app/cases/${c.id}/topics/${blogTopic}`
     : `/app/cases/${c.id}`
@@ -260,7 +303,10 @@ function CaseCard({ case_: c, blogTopic }: { case_: Case; blogTopic?: string }) 
       <div className="flex items-start justify-between gap-2 mb-3">
         <span className="label">{typeLabel}</span>
       </div>
-      <p className="text-sm font-medium text-navy mb-1">{statusLabel}</p>
+      <p className="text-sm font-semibold text-navy mb-1">{personName || statusLabel}</p>
+      {personName && (
+        <p className="text-xs text-brand-muted mb-1">{statusLabel}</p>
+      )}
       {c.main_concern && (
         <p className="text-xs text-brand-muted line-clamp-2">{c.main_concern}</p>
       )}
@@ -273,6 +319,37 @@ function CaseCard({ case_: c, blogTopic }: { case_: Case; blogTopic?: string }) 
         </span>
       </div>
     </Link>
+  )
+}
+
+function StatIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg
+      className="h-[18px] w-[18px]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  )
+}
+
+function StatTile({ icon, value, label }: { icon: ReactNode; value: ReactNode; label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-lg font-bold text-navy leading-none">{value}</p>
+        <p className="mt-1 text-xs text-brand-muted truncate">{label}</p>
+      </div>
+    </div>
   )
 }
 
