@@ -6,6 +6,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.schemas.case import ContactFrequency, RelationshipStatus, RelationshipType
+
 
 class InstituteRegister(BaseModel):
     """Registrierung eines Ausbildungsinstituts (invite-gated)."""
@@ -32,3 +34,25 @@ class InstituteProfileResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# ── KI-Fallgenerierung ────────────────────────────────────────────────────────
+
+class GenerationInput(BaseModel):
+    """Rahmen-Eingaben des Ausbilders für einen prototypischen Beispielfall."""
+    title: str | None = Field(None, max_length=200)
+    person_name: str = Field(..., min_length=1, max_length=120)       # Pseudonym Fallperson
+    relationship_type: RelationshipType
+    relationship_status: RelationshipStatus
+    contact_frequency: ContactFrequency
+    distress_score: int = Field(3, ge=0, le=5)
+    free_text: str | None = Field(None, max_length=4000)              # sonstige Angaben zur Beziehung
+    focus_terms: list[str] = Field(default_factory=list)             # Schwerpunkte, die die Beziehung prägen
+    scene_count: int = Field(12, ge=3, le=30)
+    with_partner: bool = False
+    partner_name: str | None = Field(None, max_length=120)            # Pseudonym Partnerperson
+
+
+class ExamplePatch(BaseModel):
+    title: str | None = Field(None, max_length=200)
+    status: str | None = Field(None, pattern="^(draft|published|archived)$")

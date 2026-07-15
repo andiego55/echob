@@ -7,16 +7,22 @@ training_institutes-Zeile bestimmt. Registrierung ist invite-gated
 """
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
+from app.core import crypto
 from app.core.dependencies import get_current_institute, get_current_user, get_pool
 from app.schemas.institute import (
+    ExamplePatch,
+    GenerationInput,
     InstituteProfileResponse,
     InstituteRegister,
     InstituteUpdate,
 )
+from app.services import case_generation_service
 
 router = APIRouter(prefix="/institute", tags=["institute"])
 
@@ -96,3 +102,189 @@ async def update_me(
             current["user_id"], *updates.values(),
         )
     return InstituteProfileResponse(**dict(row))
+
+
+# ── Beispielfälle (KI-Generierung) ────────────────────────────────────────────
+
+def _jsonb(v):
+    """asyncpg liefert JSONB als String → parsen; Alt-Objekte durchreichen."""
+    if isinstance(v, str):
+        try:
+            return json.loads(v)
+        except (ValueError, TypeError):
+            return []
+    return v or []
+
+
+def _dec(v):
+    return crypto.decrypt(v) if isinstance(v, str) else v
+
+
+async def _load_case_part(conn, case_id) -> dict | None:
+    """Editierbare Falldaten (Fall + Onboarding + Szenen) für den Institut-Editor."""
+    if case_id is None:
+        return None
+    case = await conn.fetchrow(
+        "SELECT id, relationship_type, relationship_status, contact_frequency, main_concern "
+        "FROM cases WHERE id = $1", case_id,
+    )
+    if not case:
+        return None
+    ob = await conn.fetchrow(
+        "SELECT person_name, relationship_description, main_burden, typical_scenes, significant_event, "
+        "memorable_scenes, distress_score, safety_status, pattern_hypotheses "
+        "FROM onboarding_answers WHERE case_id = $1", case_id,
+    )
+    scenes = await conn.fetch(
+        "SELECT id, title, scene_date, description, user_reaction, distress_score, pattern_tags "
+        "FROM scenes WHERE case_id = $1 ORDER BY scene_date NULLS LAST, created_at", case_id,
+    )
+    ob_out = None
+    if ob:
+        ob_out = {
+            "person_name": _dec(ob["person_name"]),
+            "relationship_description": _dec(ob["relationship_description"]),
+            "main_burden": _dec(ob["main_burden"]),
+            "typical_scenes": _dec(ob["typical_scenes"]),
+            "significant_event": _dec(ob["significant_event"]),
+            "memorable_scenes": _dec(ob["memorable_scenes"]),
+            "distress_score": ob["distress_score"],
+            "safety_status": ob["safety_status"],
+            "pattern_hypotheses": _jsonb(ob["pattern_hypotheses"]),
+        }
+    return {
+        "case_id": str(case["id"]),
+        "person_name": ob_out["person_name"] if ob_out else None,
+        "relationship_type": case["relationship_type"],
+        "relationship_status": case["relationship_status"],
+        "contact_frequency": case["contact_frequency"],
+        "main_concern": case["main_concern"],
+        "onboarding": ob_out,
+        "scenes": [
+            {
+                "id": str(s["id"]),
+                "title": s["title"],
+                "scene_date": s["scene_date"].isoformat() if s["scene_date"] else None,
+                "description": _dec(s["description"]),
+                "user_reaction": _dec(s["user_reaction"]),
+                "distress_score": s["distress_score"],
+                "pattern_tags": _jsonb(s["pattern_tags"]),
+            }
+            for s in scenes
+        ],
+    }
+
+
+async def _load_example_detail(conn, institute_id, example_id) -> dict:
+    ex = await conn.fetchrow(
+        "SELECT id, title, status, primary_case_id, partner_case_id, created_at, updated_at "
+        "FROM institute_examples WHERE id = $1 AND institute_id = $2",
+        example_id, institute_id,
+    )
+    if not ex:
+        raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+    return {
+        "id": str(ex["id"]),
+        "title": ex["title"],
+        "status": ex["status"],
+        "created_at": ex["created_at"].isoformat() if ex["created_at"] else None,
+        "updated_at": ex["updated_at"].isoformat() if ex["updated_at"] else None,
+        "primary": await _load_case_part(conn, ex["primary_case_id"]),
+        "partner": await _load_case_part(conn, ex["partner_case_id"]),
+    }
+
+
+@router.post("/examples/generate")
+async def generate_example(
+    body: GenerationInput,
+    request: Request,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Generiert einen prototypischen Beispielfall (mehrstufig über die Echo-Engine).
+    Läuft synchron (mehrere LLM-Aufrufe → langer Client-Timeout einplanen)."""
+    echo_svc = request.app.state.echo_service
+    async with pool.acquire() as conn:
+        example_id = await case_generation_service.generate_example(
+            echo_svc, current["institute"], body, conn,
+        )
+        return await _load_example_detail(conn, current["institute"]["id"], example_id)
+
+
+@router.get("/examples")
+async def list_examples(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT e.id, e.title, e.status, e.created_at, "
+            "(e.partner_case_id IS NOT NULL) AS has_partner, "
+            "(SELECT count(*) FROM scenes s WHERE s.case_id = e.primary_case_id)::int AS scene_count "
+            "FROM institute_examples e WHERE e.institute_id = $1 AND e.status <> 'archived' "
+            "ORDER BY e.created_at DESC",
+            current["institute"]["id"],
+        )
+    return [
+        {
+            "id": str(r["id"]), "title": r["title"], "status": r["status"],
+            "has_partner": r["has_partner"], "scene_count": r["scene_count"],
+            "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+        }
+        for r in rows
+    ]
+
+
+@router.get("/examples/{example_id}")
+async def get_example(
+    example_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        return await _load_example_detail(conn, current["institute"]["id"], example_id)
+
+
+@router.patch("/examples/{example_id}")
+async def patch_example(
+    example_id: UUID,
+    body: ExamplePatch,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Titel/Status ändern (draft ↔ published ↔ archived)."""
+    updates = body.model_dump(exclude_none=True)
+    institute_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        if updates:
+            sets = ", ".join(f"{k} = ${i + 3}" for i, k in enumerate(updates))
+            row = await conn.fetchrow(
+                f"UPDATE institute_examples SET {sets}, updated_at = NOW() "
+                "WHERE id = $1 AND institute_id = $2 RETURNING id",
+                example_id, institute_id, *updates.values(),
+            )
+            if not row:
+                raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+        return await _load_example_detail(conn, institute_id, example_id)
+
+
+@router.delete("/examples/{example_id}", status_code=204)
+async def delete_example(
+    example_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> None:
+    """Beispiel + zugehörige Fälle löschen (Cascade räumt Onboarding/Szenen)."""
+    async with pool.acquire() as conn:
+        ex = await conn.fetchrow(
+            "SELECT primary_case_id, partner_case_id FROM institute_examples "
+            "WHERE id = $1 AND institute_id = $2",
+            example_id, current["institute"]["id"],
+        )
+        if not ex:
+            raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+        async with conn.transaction():
+            await conn.execute("DELETE FROM institute_examples WHERE id = $1", example_id)
+            for cid in (ex["primary_case_id"], ex["partner_case_id"]):
+                if cid:
+                    await conn.execute("DELETE FROM cases WHERE id = $1", cid)

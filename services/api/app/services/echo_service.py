@@ -226,6 +226,34 @@ class EchoService:
             kwargs["response_format"] = response_format
         return await self._client.chat.completions.create(**kwargs)  # type: ignore[union-attr]
 
+    async def generate_json(
+        self, *, system: str, user: str, max_tokens: int = 4000, mock: dict | None = None,
+    ) -> dict:
+        """Strukturierte JSON-Ausgabe (Smart-Modell, JSON-Modus).
+
+        Für die KI-Fallgenerierung der Ausbildungs-Domäne. Ohne OpenAI-Key wird
+        ``mock`` zurückgegeben, damit die Pipeline auch ohne Schlüssel testbar ist.
+        """
+        import json as _json
+        if not self._use_openai:
+            return mock or {}
+        response = await self._chat(
+            model=self._model_smart,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            max_tokens=max_tokens,
+            temperature=None if self._reasoning else 0.9,
+            response_format={"type": "json_object"},
+        )
+        content = (response.choices[0].message.content or "{}").strip()
+        try:
+            return _json.loads(content)
+        except (ValueError, TypeError):
+            logger.error("generate_json: ungültige JSON-Antwort vom Modell.")
+            return mock or {}
+
     # ── Öffentliche Methoden ──────────────────────────────────────────────────
 
     async def chat(
