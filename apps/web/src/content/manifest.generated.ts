@@ -97,6 +97,36 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/glossar/gaslighting"
   },
   {
+    "type": "glossary",
+    "slug": "projektion",
+    "title": "Projektion – eigene Gefühle im anderen sehen",
+    "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt.",
+    "cluster": "dynamiken",
+    "search_intent": "Projektion Psychologie Bedeutung",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Projektion gelesen. Möchtest du eine konkrete Situation betrachten, in der du dich fragst, wessen Gefühl da eigentlich im Raum war?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "links": {
+      "parent": "eifersucht",
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/glossar/projektion"
+  },
+  {
     "type": "problem",
     "slug": "an-eigener-wahrnehmung-zweifeln",
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
@@ -226,6 +256,50 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/hilfe/soll-ich-mich-trennen"
   },
   {
+    "type": "problem",
+    "slug": "staendige-eifersucht",
+    "title": "Ständige Eifersucht – wenn Misstrauen euch beide erschöpft",
+    "description": "Wenn Eifersucht dein Denken bestimmt und die Beziehung zermürbt: was dahinter stecken kann und was im Moment des Misstrauens konkret hilft.",
+    "cluster": "dynamiken",
+    "search_intent": "ständige Eifersucht was tun",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Die Eifersucht ist gerade übermächtig. Möchtest du eine konkrete Situation anschauen, in der das Misstrauen hochgekommen ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "bindung"
+    ],
+    "scene_tags": [
+      "eifersucht"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "eifersucht",
+      "comparison": [
+        "eifersucht-oder-bauchgefuehl"
+      ],
+      "glossary": [
+        "projektion"
+      ],
+      "related": [
+        "verlustangst"
+      ]
+    },
+    "url": "/hilfe/staendige-eifersucht"
+  },
+  {
     "type": "topic",
     "slug": "beziehungsmuster",
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
@@ -265,6 +339,94 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/beziehungsmuster"
+  },
+  {
+    "type": "topic",
+    "slug": "eifersucht",
+    "title": "Eifersucht verstehen: woher sie kommt und was sie mit dir macht",
+    "description": "Was hinter Eifersucht steckt, wann sie zur Belastung wird und wie du ihr weniger ausgeliefert bist – ohne dich dafür zu verurteilen.",
+    "cluster": "dynamiken",
+    "search_intent": "Eifersucht in Beziehung verstehen",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Eifersucht gelesen. Möchtest du eine konkrete Situation anschauen, in der die Eifersucht besonders stark war?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "bindung"
+    ],
+    "scene_tags": [
+      "eifersucht"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "staendige-eifersucht"
+      ],
+      "comparison": [
+        "eifersucht-oder-bauchgefuehl"
+      ],
+      "glossary": [
+        "projektion"
+      ],
+      "related": [
+        "verlustangst",
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/eifersucht"
+  },
+  {
+    "type": "comparison",
+    "slug": "eifersucht-oder-bauchgefuehl",
+    "title": "Eifersucht oder berechtigtes Bauchgefühl?",
+    "description": "Nicht jede Eifersucht ist unbegründet – und nicht jedes Misstrauen trifft zu. Diese Merkmale helfen dir, ehrlicher hinzuschauen, ohne dich oder den anderen vorzuverurteilen.",
+    "cluster": "dynamiken",
+    "search_intent": "Eifersucht oder Bauchgefühl Unterschied",
+    "updated": "2026-07-14",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du bist unsicher, ob deine Eifersucht ein Warnsignal ist oder aus alter Unsicherheit kommt. Möchtest du eine konkrete Situation gemeinsam ordnen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "bindung"
+    ],
+    "scene_tags": [
+      "eifersucht"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "eifersucht",
+      "glossary": [
+        "projektion"
+      ],
+      "related": [
+        "beziehungsmuster"
+      ]
+    },
+    "url": "/wissen/eifersucht-oder-bauchgefuehl"
   },
   {
     "type": "topic",
@@ -491,6 +653,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
   },
+  "/glossar/projektion": {
+    "title": "Projektion – eigene Gefühle im anderen sehen",
+    "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt."
+  },
   "/hilfe/an-eigener-wahrnehmung-zweifeln": {
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
     "description": "Immer öfter unsicher, was in deiner Beziehung wirklich passiert ist? Woran ständige Selbstzweifel liegen können und wie du wieder Boden unter die Füße bekommst – ohne vorschnelles Urteil."
@@ -503,9 +669,21 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "„Soll ich mich trennen?\" – Wenn du nicht mehr weiterweißt",
     "description": "Wenn die Frage, ob du bleiben oder gehen sollst, dich nicht loslässt: was dahinter stecken kann und wie du der Entscheidung näherkommst – ohne Druck und ohne Rat von außen."
   },
+  "/hilfe/staendige-eifersucht": {
+    "title": "Ständige Eifersucht – wenn Misstrauen euch beide erschöpft",
+    "description": "Wenn Eifersucht dein Denken bestimmt und die Beziehung zermürbt: was dahinter stecken kann und was im Moment des Misstrauens konkret hilft."
+  },
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
     "description": "Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose."
+  },
+  "/wissen/eifersucht": {
+    "title": "Eifersucht verstehen: woher sie kommt und was sie mit dir macht",
+    "description": "Was hinter Eifersucht steckt, wann sie zur Belastung wird und wie du ihr weniger ausgeliefert bist – ohne dich dafür zu verurteilen."
+  },
+  "/wissen/eifersucht-oder-bauchgefuehl": {
+    "title": "Eifersucht oder berechtigtes Bauchgefühl?",
+    "description": "Nicht jede Eifersucht ist unbegründet – und nicht jedes Misstrauen trifft zu. Diese Merkmale helfen dir, ehrlicher hinzuschauen, ohne dich oder den anderen vorzuverurteilen."
   },
   "/wissen/emotionale-manipulation": {
     "title": "Emotionale Manipulation in Beziehungen erkennen",
