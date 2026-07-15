@@ -161,7 +161,7 @@ export default function InstituteGeneratePage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelCls}>Belastungsgrad: <strong className="text-navy">{distress}</strong> / 5</label>
-                <input type="range" min={0} max={5} value={distress} onChange={e => setDistress(Number(e.target.value))}
+                <input type="range" min={1} max={5} value={distress} onChange={e => setDistress(Number(e.target.value))}
                   className="w-full accent-accent" />
               </div>
               <div>

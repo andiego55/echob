@@ -65,8 +65,9 @@ def _s(x) -> str | None:
 
 
 def _clip_score(x) -> int:
+    # Constraint scenes_distress_score_check: 1..5 (0 ist unzulässig)
     try:
-        return max(0, min(5, int(x)))
+        return max(1, min(5, int(x)))
     except (TypeError, ValueError):
         return 3
 
@@ -198,7 +199,8 @@ async def _write_case(conn, *, owner_id, inp, self_name: str, ob: dict, scenes: 
         "VALUES ($1, $2, $3, $4, $5) RETURNING id",
         owner_id, inp.relationship_type, inp.relationship_status, inp.contact_frequency, main_concern,
     )
-    safety = "elevated" if inp.distress_score >= 4 else "none"
+    distress = max(1, min(5, int(inp.distress_score)))
+    safety = "elevated" if distress >= 4 else "none"
     await conn.execute(
         "INSERT INTO onboarding_answers (case_id, user_id, person_name, relationship_description, "
         "main_burden, typical_scenes, significant_event, memorable_scenes, distress_score, safety_status, "
@@ -207,7 +209,7 @@ async def _write_case(conn, *, owner_id, inp, self_name: str, ob: dict, scenes: 
         case_id, owner_id, self_name,
         _s(ob.get("relationship_description")), _s(ob.get("main_burden")),
         _s(ob.get("typical_scenes")), _s(ob.get("significant_event")), _s(ob.get("memorable_scenes")),
-        inp.distress_score, safety, json.dumps(_clean_hyps(ob.get("pattern_hypotheses"))),
+        distress, safety, json.dumps(_clean_hyps(ob.get("pattern_hypotheses"))),
     )
     n = len(scenes)
     for idx, sc in enumerate(scenes[:30]):
