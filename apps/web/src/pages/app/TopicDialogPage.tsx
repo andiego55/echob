@@ -11,10 +11,18 @@ import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
 import { topicSummariesApi } from '@/api/topicSummaries'
+import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { apiErrorText } from '@/utils/apiError'
 import type { EchoMessage, ThreadType } from '@/types'
 
-const TOPICS: Record<string, { label: string; description: string; startTrigger: string; isBlog?: boolean }> = {
+interface TopicDef {
+  label: string
+  description: string
+  startTrigger: string
+  isContent?: boolean
+}
+
+const TOPICS: Record<string, TopicDef> = {
   topic_self: {
     label: 'Über mich',
     description: 'Erkunde deine eigenen Muster, Bedürfnisse und Reaktionen in dieser Beziehung.',
@@ -35,31 +43,24 @@ const TOPICS: Record<string, { label: string; description: string; startTrigger:
     description: 'Erforsche, woher dein Schuldgefühl kommt und ob es wirklich dir gehört.',
     startTrigger: '__topic_guilt_start__',
   },
-  // Blog-Themen
-  blog_beziehungsmuster: {
-    label: 'Beziehungsmuster erkennen',
-    description: 'Welche Muster erkennst du in deiner eigenen Beziehungssituation? Echo hilft dir, sie zu benennen und zu verstehen.',
-    startTrigger: '__blog_beziehungsmuster_start__',
-    isBlog: true,
-  },
-  blog_beobachtung_gefuehl: {
-    label: 'Beobachtung, Gefühl, Interpretation',
-    description: 'Übe das Trennen von Wahrnehmung, Emotion und Schlussfolgerung – anhand konkreter Situationen aus deinem Fall.',
-    startTrigger: '__blog_beobachtung_gefuehl_start__',
-    isBlog: true,
-  },
-  blog_professionelle_hilfe: {
-    label: 'Wann professionelle Hilfe sinnvoll ist',
-    description: 'Reflektiere gemeinsam mit Echo, was du gerade erlebst – und ob professionelle Unterstützung ein nächster Schritt sein könnte.',
-    startTrigger: '__blog_professionelle_hilfe_start__',
-    isBlog: true,
-  },
-  blog_krisentelefone: {
-    label: 'Krisentelefone & Anlaufstellen',
-    description: 'Besprich mit Echo, wie es dir gerade geht, und erhalte Orientierung zu verfügbaren Unterstützungsangeboten.',
-    startTrigger: '__blog_krisentelefone_start__',
-    isBlog: true,
-  },
+}
+
+// Wissens-Dialoge: content_<slug> wird dynamisch aus dem Content-Manifest aufgelöst.
+// Seed-Trigger transportiert Titel + Einstiegsfrage an den generischen Backend-Prompt.
+function resolveTopic(topicId: string): TopicDef | undefined {
+  if (TOPICS[topicId]) return TOPICS[topicId]
+  if (topicId.startsWith('content_')) {
+    const slug = topicId.slice('content_'.length)
+    const meta = CONTENT_MANIFEST.find((m) => m.slug === slug)
+    if (!meta) return undefined
+    return {
+      label: meta.title,
+      description: `Beziehe das Thema „${meta.title}" auf deine eigene Situation.`,
+      startTrigger: `__content_start__|${meta.title}|${meta.echo.opening_question}`,
+      isContent: true,
+    }
+  }
+  return undefined
 }
 
 export default function TopicDialogPage() {
@@ -74,7 +75,7 @@ export default function TopicDialogPage() {
   const [savedSummary, setSavedSummary] = useState(false)
   const sessionId = topicId ?? ''
 
-  const topic = TOPICS[topicId ?? '']
+  const topic = resolveTopic(topicId ?? '')
 
   const { data: history = [], isSuccess: historyLoaded } = useQuery({
     queryKey: ['topic-echo-history', caseId, topicId, sessionId],
@@ -211,21 +212,19 @@ export default function TopicDialogPage() {
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
             {/* Kontext-Hinweis */}
-            <div className={`rounded-brand border px-4 py-3 ${topic.isBlog ? 'border-accent/30 bg-accent/5' : 'border-brand-border bg-blue-50'}`}>
-              {topic.isBlog && (
-                <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-accent mb-1">Aus dem Blog</span>
+            <div className={`rounded-brand border px-4 py-3 ${topic.isContent ? 'border-accent/30 bg-accent/5' : 'border-brand-border bg-blue-50'}`}>
+              {topic.isContent && (
+                <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-accent mb-1">Aus dem Wissen</span>
               )}
               <p className="text-xs font-medium text-navy mb-0.5">{topic.label}</p>
               <p className="text-xs text-brand-muted">{topic.description}</p>
 
-              {!topic.isBlog && (
-                <p className="text-xs text-brand-muted mt-2 pt-2 border-t border-navy/10">
-                  <strong className="text-navy">Wozu dieser Dialog?</strong>{' '}
-                  Deine Antworten hier verbessern dein Nutzer- und Beziehungsprofil. Erstelle am Ende über{' '}
-                  <strong className="text-navy">„Zusammenfassung"</strong> die Essenz des Gesprächs und speichere sie –
-                  Echo berücksichtigt sie künftig in allen Gesprächen und Berichten.
-                </p>
-              )}
+              <p className="text-xs text-brand-muted mt-2 pt-2 border-t border-navy/10">
+                <strong className="text-navy">Wozu dieser Dialog?</strong>{' '}
+                Deine Antworten hier verbessern dein Nutzer- und Beziehungsprofil. Erstelle am Ende über{' '}
+                <strong className="text-navy">„Zusammenfassung"</strong> die Essenz des Gesprächs und speichere sie –
+                Echo berücksichtigt sie künftig in allen Gesprächen und Berichten.
+              </p>
               <p className="text-xs text-brand-muted mt-2">
                 Du möchtest frei mit Echo sprechen?{' '}
                 <Link to={`/app/cases/${caseId}/echo`} className="text-accent font-medium hover:underline">

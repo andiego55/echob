@@ -11,6 +11,7 @@ import { casesApi } from '@/api/cases'
 import { scenesApi } from '@/api/scenes'
 import { personProfileApi } from '@/api/personProfile'
 import { topicSummariesApi, type TopicSummary } from '@/api/topicSummaries'
+import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { hypothesesApi } from '@/api/hypotheses'
 import {
   RELATIONSHIP_TYPE_LABELS,
@@ -20,12 +21,6 @@ import {
 
 const TOPIC_ORDER = ['topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt'] as const
 
-const BLOG_TOPICS = [
-  { id: 'blog_beziehungsmuster',     label: 'Beziehungsmuster erkennen' },
-  { id: 'blog_beobachtung_gefuehl',  label: 'Beobachtung, Gefühl, Interpretation' },
-  { id: 'blog_professionelle_hilfe', label: 'Wann professionelle Hilfe sinnvoll ist' },
-  { id: 'blog_krisentelefone',       label: 'Krisentelefone & Anlaufstellen' },
-] as const
 
 export default function CaseDetailPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -64,6 +59,7 @@ export default function CaseDetailPage() {
 
   const c = caseData
   const sceneCount = scenesData?.total ?? 0
+  const coreSummaryCount = topicSummaries.filter((s) => !s.topic.startsWith('content_')).length
 
   return (
     <AppShell>
@@ -116,13 +112,13 @@ export default function CaseDetailPage() {
               📝 {sceneCount} {sceneCount === 1 ? 'Szene' : 'Szenen'} dokumentiert
             </span>
             <span className="text-xs text-brand-muted">
-              💬 {topicSummaries.length} von 4 Themendialogen gespeichert
+              💬 {coreSummaryCount} von 4 Themendialogen gespeichert
             </span>
           </div>
         </div>
 
         {/* Nächster Schritt */}
-        <NextStepCard caseId={caseId!} sceneCount={sceneCount} topicCount={topicSummaries.length} />
+        <NextStepCard caseId={caseId!} sceneCount={sceneCount} topicCount={coreSummaryCount} />
 
         {/* Schnell-Aktionen */}
         <div className="grid gap-4 sm:grid-cols-3 mt-6">
@@ -324,7 +320,9 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
   })
 
   const summaryMap = Object.fromEntries(summaries.map(s => [s.topic, s]))
-  const hasSummaries = summaries.length > 0
+  const coreSummaries = summaries.filter((s) => !s.topic.startsWith('content_'))
+  const contentSummaries = summaries.filter((s) => s.topic.startsWith('content_'))
+  const hasSummaries = coreSummaries.length > 0
 
   return (
     <div className="card">
@@ -332,7 +330,7 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
         <p className="text-xs font-semibold text-brand-muted mb-0.5">Themendialoge</p>
         <p className="text-sm font-medium text-navy">
           {hasSummaries
-            ? `${summaries.length} von 4 Zusammenfassungen gespeichert`
+            ? `${coreSummaries.length} von 4 Zusammenfassungen gespeichert`
             : 'Noch keine gespeicherten Zusammenfassungen'}
         </p>
         <p className="text-xs text-brand-muted mt-2 leading-relaxed">
@@ -406,22 +404,41 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
           )
         })}
 
-        {/* Aus dem Blog */}
+        {/* Wissens-Dialoge (aus Reflexionen zu Wissensseiten) */}
         <div className="mt-4 pt-4 border-t border-brand-border">
-          <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Aus dem Blog</p>
-          <div className="space-y-2">
-            {BLOG_TOPICS.map(({ id, label }) => (
-              <div key={id} className="rounded-brand border border-accent/20 bg-accent/5 px-4 py-3 flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold text-navy">{label}</p>
-                <button
-                  onClick={() => navigate(`/app/cases/${caseId}/topics/${id}`)}
-                  className="text-xs text-accent hover:underline flex-shrink-0"
-                >
-                  Dialog starten →
-                </button>
-              </div>
-            ))}
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-semibold text-accent uppercase tracking-wider">Wissens-Dialoge</p>
+            <Link to="/wissen" className="text-xs text-accent hover:underline flex-shrink-0">+ Wissensseite reflektieren →</Link>
           </div>
+          {contentSummaries.length === 0 ? (
+            <p className="text-xs text-brand-muted/60 italic">
+              Noch keine. Starte einen über „Auf meine Situation beziehen" auf einer{' '}
+              <Link to="/wissen" className="text-accent hover:underline">Wissensseite</Link>.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {contentSummaries.map((s) => {
+                const slug = s.topic.slice('content_'.length)
+                const meta = CONTENT_MANIFEST.find((m) => m.slug === slug)
+                return (
+                  <div key={s.topic} className="rounded-brand border border-accent/20 bg-accent/5 px-4 py-3">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="text-xs font-semibold text-navy">{meta?.title ?? slug}</p>
+                      <button
+                        onClick={() => navigate(`/app/cases/${caseId}/topics/${s.topic}`)}
+                        className="text-xs text-accent hover:underline flex-shrink-0"
+                      >
+                        Dialog erneut führen →
+                      </button>
+                    </div>
+                    <div className="mt-1 text-sm text-brand-muted leading-relaxed">
+                      <MarkdownMessage content={s.summary_text} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

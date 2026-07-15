@@ -22,6 +22,7 @@ export type ThreadType =
   | 'topic_self' | 'topic_person' | 'topic_responsibility' | 'topic_guilt'
   | 'blog_beziehungsmuster' | 'blog_beobachtung_gefuehl'
   | 'blog_professionelle_hilfe' | 'blog_krisentelefone'
+  | `content_${string}`
   | 'hyp_dynamics' | 'hyp_clusterb' | 'hyp_attachment' | 'hyp_trauma' | 'hyp_own_role'
 export type ReportType = 'short' | 'pattern' | 'coaching_prep' | 'therapy_prep' | 'progress' | 'partner'
 export type ReportStatus = 'draft' | 'ready' | 'archived'

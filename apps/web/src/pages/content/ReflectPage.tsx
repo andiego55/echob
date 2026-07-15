@@ -58,7 +58,7 @@ export default function ReflectPage() {
               {cases.map((c) => (
                 <li key={c.id}>
                   <Link
-                    to={`/app/cases/${c.id}/echo?content=${encodeURIComponent(slug)}`}
+                    to={`/app/cases/${c.id}/topics/content_${slug}`}
                     className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-white px-4 py-3 no-underline transition-colors hover:border-accent"
                   >
                     <span className="min-w-0">
