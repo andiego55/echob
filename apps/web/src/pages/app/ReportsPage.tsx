@@ -184,7 +184,6 @@ function ReportCard({ report: r, caseId, onDelete, isDeleting }: {
 function EmptyReports({ caseId }: { caseId: string }) {
   return (
     <div className="card text-center py-14 max-w-md mx-auto">
-      <div className="text-4xl mb-4">📄</div>
       <h2 className="text-lg font-semibold text-navy mb-2">Noch keine Berichte</h2>
       <p className="text-sm text-brand-muted mb-2 leading-relaxed max-w-xs mx-auto">
         Erstelle deinen ersten Bericht — als kompakte Übersicht, tiefe Musteranalyse oder Vorbereitung für professionelle Hilfe.

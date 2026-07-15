@@ -108,18 +108,17 @@ export default function SceneNewPage() {
           </p>
           <div className="grid gap-4">
             {[
-              { key: 'freetext', icon: '✍️', label: 'Freitext', desc: 'Beschreibe frei, was du festhalten willst – Situation, Beobachtung oder Gedanke.' },
-              { key: 'voice',    icon: '🎙️', label: 'Schnell erfassen (Sprache/Text)', desc: 'Sprich oder füge Text ein – Echo macht daraus einen strukturierten Entwurf, den du prüfst.' },
-              { key: 'guided',   icon: '❓', label: 'Geführte Fragen', desc: 'Strukturierte Fragen – ideal für eine konkrete Situation.' },
-              { key: 'chat',     icon: '💬', label: 'Mit Echo erarbeiten', desc: 'Echo hilft dir im Gespräch, deine Gedanken zu sortieren und festzuhalten.' },
-            ].map(({ key, icon, label, desc }) => (
+              { key: 'freetext', label: 'Freitext', desc: 'Beschreibe frei, was du festhalten willst – Situation, Beobachtung oder Gedanke.' },
+              { key: 'voice',    label: 'Schnell erfassen (Sprache/Text)', desc: 'Sprich oder füge Text ein – Echo macht daraus einen strukturierten Entwurf, den du prüfst.' },
+              { key: 'guided',   label: 'Geführte Fragen', desc: 'Strukturierte Fragen – ideal für eine konkrete Situation.' },
+              { key: 'chat',     label: 'Mit Echo erarbeiten', desc: 'Echo hilft dir im Gespräch, deine Gedanken zu sortieren und festzuhalten.' },
+            ].map(({ key, label, desc }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => handleEntry(key)}
-                className="card text-left flex items-start gap-4 hover:border-accent/40 transition-all"
+                className="card text-left hover:border-accent/40 transition-all"
               >
-                <span className="text-2xl">{icon}</span>
                 <div>
                   <p className="font-semibold text-navy">{label}</p>
                   <p className="text-sm text-brand-muted">{desc}</p>
@@ -147,7 +146,7 @@ export default function SceneNewPage() {
               onClick={() => setQuickOpen(true)}
               className="ml-auto text-xs text-accent hover:underline"
             >
-              🎙️ Schnell erfassen
+              Schnell erfassen
             </button>
           )}
         </div>

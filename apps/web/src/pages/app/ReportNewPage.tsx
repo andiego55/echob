@@ -125,7 +125,6 @@ export default function ReportNewPage() {
       <AppShell>
         <CaseNav caseId={caseId!} />
         <div className="mx-auto max-w-[640px] px-6 py-20 text-center">
-          <div className="text-4xl mb-5">✍️</div>
           <h2 className="text-lg font-bold text-navy mb-2">Bericht wird erstellt …</h2>
           <p className="text-sm text-brand-muted max-w-sm mx-auto leading-relaxed">
             Echo analysiert deine Szenen und Daten. Das kann 15–30 Sekunden dauern.

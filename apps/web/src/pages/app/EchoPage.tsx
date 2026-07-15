@@ -468,8 +468,10 @@ function ChatSidebar({
 function WelcomePrompt({ onTopic }: { onTopic: (t: string) => void }) {
   return (
     <div className="text-center py-6">
-      <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center text-xl mx-auto mb-4">
-        💬
+      <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
+        <svg className="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z" />
+        </svg>
       </div>
       <h2 className="text-lg font-bold text-navy mb-2">Echo ist bereit</h2>
       <p className="text-sm text-brand-muted mb-6 max-w-md mx-auto">

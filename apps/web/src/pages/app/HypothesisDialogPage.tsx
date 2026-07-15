@@ -211,7 +211,7 @@ export default function HypothesisDialogPage() {
           {showExamples && hyp.introQuestions.length > 0 && (
             <div className="mx-auto max-w-[780px] mb-2 rounded-2xl border border-brand-border bg-white shadow-[0_4px_24px_rgba(15,30,46,0.08)] px-5 py-4">
               <div className="flex items-center justify-between mb-1.5">
-                <p className="text-sm font-semibold text-navy">💡 Beispielfragen zum Einstieg</p>
+                <p className="text-sm font-semibold text-navy">Beispielfragen zum Einstieg</p>
                 <button onClick={() => setShowExamples(false)} className="text-xs text-brand-muted hover:text-navy">
                   ✕ Schließen
                 </button>
@@ -251,7 +251,7 @@ export default function HypothesisDialogPage() {
                     : 'border-brand-border text-brand-muted hover:border-accent/40 hover:text-accent'
                 }`}
               >
-                💡 Beispiele
+                Beispiele
               </button>
             }
           />

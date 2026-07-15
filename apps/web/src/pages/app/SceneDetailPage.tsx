@@ -333,7 +333,7 @@ export default function SceneDetailPage() {
             onClick={() => navigate(`/app/cases/${caseId}/echo`)}
             className="btn-outline !py-2 !px-4 !text-sm"
           >
-            💬 Mit Echo besprechen
+            Mit Echo besprechen
           </button>
           <button
             onClick={() => {

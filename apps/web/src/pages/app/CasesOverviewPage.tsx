@@ -173,13 +173,13 @@ export default function CasesOverviewPage() {
                       to={`/app/cases/${lastCase.id}/scenes/new`}
                       className="btn-primary !py-2 !px-4 !text-xs"
                     >
-                      ✍️ Szene festhalten
+                      Szene festhalten
                     </Link>
                     <Link
                       to={`/app/cases/${lastCase.id}/echo`}
                       className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-xs"
                     >
-                      💬 Mit Echo sprechen
+                      Mit Echo sprechen
                     </Link>
                   </div>
                 </div>
@@ -228,7 +228,7 @@ export default function CasesOverviewPage() {
           <div className="mt-8 rounded-brand border border-[#c0d8ed] bg-[#eef5fb] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#3b6a9a] mb-1">
-                💡 Impuls für heute
+                Impuls für heute
               </p>
               <p className="text-sm text-navy">{dayPrompt}</p>
             </div>
@@ -243,7 +243,7 @@ export default function CasesOverviewPage() {
 
         {/* Vertrauens-Zeile */}
         <p className="mt-10 text-center text-xs text-brand-muted/70">
-          🔒 Dein Raum. Deine Daten. Du bestimmst das Tempo.
+          Dein Raum. Deine Daten. Du bestimmst das Tempo.
         </p>
       </div>
     </AppShell>
@@ -284,7 +284,6 @@ function CaseCard({ case_: c, blogTopic }: { case_: Case; blogTopic?: string }) 
 function EmptyState() {
   return (
     <div className="card text-center py-12 max-w-md mx-auto">
-      <div className="text-4xl mb-4">📂</div>
       <h2 className="text-lg font-semibold text-navy mb-2">Schön, dass du hier bist</h2>
       <p className="text-sm text-brand-muted mb-6">
         Leg deinen ersten Fall an, um eine Beziehungssituation strukturiert zu reflektieren –
@@ -294,7 +293,7 @@ function EmptyState() {
         Ersten Fall anlegen
       </Link>
       <p className="mt-6 text-xs text-brand-muted/70">
-        🔒 Deine Daten gehören dir. Du bestimmst, was du teilst.
+        Deine Daten gehören dir. Du bestimmst, was du teilst.
       </p>
     </div>
   )

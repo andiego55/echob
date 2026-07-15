@@ -217,7 +217,7 @@ export default function ReportDetailPage() {
                   <button
                     onClick={() => { setEditValues(sections.map(s => ({ heading: s.heading, text: s.text }))); setIsEditing(true) }}
                     className="flex items-center gap-1.5 text-xs font-medium text-brand-muted hover:text-navy border border-brand-border rounded-brand px-3 py-1.5 bg-white hover:bg-brand-bg transition-colors">
-                    <span>✏️</span> Bearbeiten
+                    Bearbeiten
                   </button>
                 )}
                 <button onClick={() => navigate(`/app/cases/${caseId}/reports`)}
@@ -384,7 +384,6 @@ function ScaleBarsSection({ scales, title, subtitle, mode }: {
   return (
     <div className="visual-block rounded-brand border border-brand-border bg-white overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-3 border-b border-brand-border bg-brand-bg">
-        <span className="text-lg leading-none">{mode === 'personality' ? '🧠' : '📊'}</span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-navy">{title}</p>
           <p className="text-[10px] text-brand-muted mt-0.5">{subtitle}</p>
