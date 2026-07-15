@@ -16,6 +16,7 @@ from app.api.v1.routers import (
     health,
     hypotheses,
     inbox,
+    institute,
     notifications,
     onboarding,
     org_billing,
@@ -80,3 +81,6 @@ v1_router.include_router(professional_collab.router)
 v1_router.include_router(professional_notes.router)
 v1_router.include_router(professional_reports.router)
 v1_router.include_router(professional_templates.router)
+
+# ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
+v1_router.include_router(institute.router)

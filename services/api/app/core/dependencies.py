@@ -134,3 +134,27 @@ async def get_current_professional(
         **current_user, "professional": dict(row),
         "org_id": org["org_id"], "org_role": org["role"],
     }
+
+
+async def get_current_institute(
+    current_user: dict = Depends(get_current_user),
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> dict:
+    """
+    Stellt sicher, dass der eingeloggte Account ein Ausbildungsinstitut ist.
+
+    Lädt die zugehörige training_institutes-Zeile. Gibt das User-Objekt erweitert
+    um {"institute": <row>} zurück; wirft 403, wenn kein Institut-Konto existiert.
+    Auf ALLEN /institute/*-Endpunkten verwenden. Eigene, getrennte Domäne.
+    """
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM training_institutes WHERE user_id = $1",
+            current_user["user_id"],
+        )
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Kein Ausbildungsinstitut-Zugang.",
+            )
+    return {**current_user, "institute": dict(row)}
