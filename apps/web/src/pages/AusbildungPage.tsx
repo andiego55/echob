@@ -142,7 +142,8 @@ const TARIFS = [
     meta: '50 Studierende · beliebig viele Kohorten',
     features: [
       'Fallbibliothek mit 10 Fällen', 'Eigene Fallerstellung: 10 Fälle', '10 Lernmodule',
-      'Reflexionsaufgaben', 'Dozentenleitfaden', 'KI-gestützte Lernbegleitung',
+      'Reflexionsaufgaben', 'Dozentenleitfaden', 'Berichterstellung', 'Skalenerstellung',
+      'KI-gestützte Lernbegleitung',
     ],
   },
 ]
