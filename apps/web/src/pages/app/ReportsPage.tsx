@@ -10,13 +10,13 @@ import type { Report, ReportType } from '@/types'
 
 const MAX_REPORTS = 20
 
-const TYPE_META: Record<ReportType, { icon: string; color: string; bg: string; border: string }> = {
-  short:        { icon: '⚡', color: 'text-sky-700',    bg: 'bg-sky-50',    border: 'border-sky-200' },
-  pattern:      { icon: '🔍', color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
-  coaching_prep:{ icon: '🎯', color: 'text-teal-700',   bg: 'bg-teal-50',   border: 'border-teal-200' },
-  therapy_prep: { icon: '🏥', color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200' },
-  progress:     { icon: '📈', color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200' },
-  partner:      { icon: '✉️', color: 'text-rose-700',   bg: 'bg-rose-50',   border: 'border-rose-200' },
+const TYPE_META: Record<ReportType, { color: string; bg: string; border: string }> = {
+  short:        { color: 'text-sky-700',    bg: 'bg-sky-50',    border: 'border-sky-200' },
+  pattern:      { color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
+  coaching_prep:{ color: 'text-teal-700',   bg: 'bg-teal-50',   border: 'border-teal-200' },
+  therapy_prep: { color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200' },
+  progress:     { color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200' },
+  partner:      { color: 'text-rose-700',   bg: 'bg-rose-50',   border: 'border-rose-200' },
 }
 
 export default function ReportsPage() {
@@ -137,7 +137,7 @@ function ReportCard({ report: r, caseId, onDelete, isDeleting }: {
           {/* Typ-Badge + Datum */}
           <div className="flex items-center gap-2 mb-2">
             <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${meta.bg} ${meta.color} ${meta.border} border`}>
-              {meta.icon} {r.type_label}
+              {r.type_label}
             </span>
             <span className="text-[11px] text-brand-muted">
               {new Date(r.created_at).toLocaleDateString('de-DE', {

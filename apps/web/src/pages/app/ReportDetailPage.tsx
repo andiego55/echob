@@ -12,18 +12,17 @@ import type { ReportType } from '@/types'
 // ── Typ-Konfiguration ─────────────────────────────────────────────────────────
 
 const TYPE_CONFIG: Record<ReportType, {
-  icon: string
   color: string
   bgColor: string
   borderColor: string
   printAccent: string
 }> = {
-  short:         { icon: '⚡', color: 'text-sky-700',    bgColor: 'bg-sky-50',    borderColor: 'border-sky-200',    printAccent: '#0369a1' },
-  pattern:       { icon: '🔍', color: 'text-violet-700', bgColor: 'bg-violet-50', borderColor: 'border-violet-200', printAccent: '#5b21b6' },
-  coaching_prep: { icon: '🎯', color: 'text-teal-700',   bgColor: 'bg-teal-50',   borderColor: 'border-teal-200',   printAccent: '#0f766e' },
-  therapy_prep:  { icon: '🏥', color: 'text-indigo-700', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', printAccent: '#3730a3' },
-  progress:      { icon: '📈', color: 'text-amber-700',  bgColor: 'bg-amber-50',  borderColor: 'border-amber-200',  printAccent: '#b45309' },
-  partner:       { icon: '✉️', color: 'text-rose-700',   bgColor: 'bg-rose-50',   borderColor: 'border-rose-200',   printAccent: '#be123c' },
+  short:         { color: 'text-sky-700',    bgColor: 'bg-sky-50',    borderColor: 'border-sky-200',    printAccent: '#0369a1' },
+  pattern:       { color: 'text-violet-700', bgColor: 'bg-violet-50', borderColor: 'border-violet-200', printAccent: '#5b21b6' },
+  coaching_prep: { color: 'text-teal-700',   bgColor: 'bg-teal-50',   borderColor: 'border-teal-200',   printAccent: '#0f766e' },
+  therapy_prep:  { color: 'text-indigo-700', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', printAccent: '#3730a3' },
+  progress:      { color: 'text-amber-700',  bgColor: 'bg-amber-50',  borderColor: 'border-amber-200',  printAccent: '#b45309' },
+  partner:       { color: 'text-rose-700',   bgColor: 'bg-rose-50',   borderColor: 'border-rose-200',   printAccent: '#be123c' },
 }
 const DEFAULT_CONFIG = TYPE_CONFIG.pattern
 
@@ -198,7 +197,6 @@ export default function ReportDetailPage() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider mb-3 no-print ${cfg.bgColor} ${cfg.color} ${cfg.borderColor} border`}>
-                  <span>{cfg.icon}</span>
                   <span>{report.type_label}</span>
                 </div>
                 <h1 className="report-title text-[1.35rem] font-bold text-navy leading-snug">

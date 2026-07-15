@@ -15,7 +15,6 @@ const TRIAL_ALLOWED: ReportType[] = ['short', 'coaching_prep']
 
 const REPORT_TYPES: {
   type: ReportType
-  icon: string
   label: string
   tagline: string
   desc: string
@@ -25,7 +24,6 @@ const REPORT_TYPES: {
 }[] = [
   {
     type: 'short',
-    icon: '⚡',
     label: 'Kurzbericht',
     tagline: 'Kompakte Orientierung auf einen Blick',
     desc: 'Die wesentlichen Muster und genau ein nächster Schritt — verdichtet auf das Wichtigste. Ideal wenn du schnell eine Einordnung brauchst.',
@@ -35,7 +33,6 @@ const REPORT_TYPES: {
   },
   {
     type: 'pattern',
-    icon: '🔍',
     label: 'Musterbericht',
     tagline: 'Tiefe Analyse der Beziehungsdynamiken',
     desc: 'Umfassende Auswertung aller Szenen, Muster und Skalenwerte — mit grafischer Auswertung der Persönlichkeitsdimensionen und Belastungsdynamiken.',
@@ -45,7 +42,6 @@ const REPORT_TYPES: {
   },
   {
     type: 'coaching_prep',
-    icon: '🎯',
     label: 'Coaching-Vorbereitung',
     tagline: 'Optimal vorbereitet ins Coaching-Gespräch',
     desc: 'Strukturiert dein Anliegen, Ziele und Ressourcen so, dass ein Coach sofort produktiv mit dir arbeiten kann. Passend zur App-Einführung bei EchoB.',
@@ -55,7 +51,6 @@ const REPORT_TYPES: {
   },
   {
     type: 'therapy_prep',
-    icon: '🏥',
     label: 'Therapie- & Beratungsvorbereitung',
     tagline: 'Professionelle Dokumentation für Fachpersonen',
     desc: 'Vollständige klinische Erstdokumentation im Fachvokabular von Psychotherapeut:innen — mit Skalenwerten, Belastungsverlauf und Ressourceneinschätzung.',
@@ -65,7 +60,6 @@ const REPORT_TYPES: {
   },
   {
     type: 'progress',
-    icon: '📈',
     label: 'Verlaufsbericht',
     tagline: 'Veränderungen über Zeit sichtbar machen',
     desc: 'Vergleicht frühere und aktuelle Szenen und zeigt, was sich verändert hat — in der Situation und in dir. Setzt mehrere Szenen über einen längeren Zeitraum voraus.',
@@ -75,7 +69,6 @@ const REPORT_TYPES: {
   },
   {
     type: 'partner',
-    icon: '✉️',
     label: 'Nachricht für das Gegenüber',
     tagline: 'Ein behutsamer Brückenschlag für ein Gespräch',
     desc: 'Eine sehr vorsichtige, in Ich-Sprache formulierte Nachricht, die du optional mit deinem Gegenüber teilen kannst — ohne Analyse, ohne Vorwürfe, ohne Details aus dem Fall. Du liest und entscheidest zuerst selbst.',
@@ -158,7 +151,7 @@ export default function ReportNewPage() {
 
         {/* Typ-Auswahl */}
         <div className="grid gap-3 sm:grid-cols-2 mb-8">
-          {REPORT_TYPES.map(({ type, icon, label, tagline, desc, audience, sections, accentClass }) => {
+          {REPORT_TYPES.map(({ type, label, tagline, desc, audience, sections, accentClass }) => {
             const locked = isLocked(type)
             return (
               <button
@@ -174,7 +167,6 @@ export default function ReportNewPage() {
                 }`}
               >
                 <div className="flex items-start gap-3 mb-2">
-                  <span className="text-2xl leading-none mt-0.5">{icon}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-bold text-navy leading-snug">{label}</p>

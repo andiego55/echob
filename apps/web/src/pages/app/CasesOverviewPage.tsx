@@ -186,24 +186,19 @@ export default function CasesOverviewPage() {
               </div>
             )}
 
-            {/* Fortschritt */}
-            <div className="mb-6 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-brand border border-brand-border bg-white px-4 py-3">
-                <p className="text-xs text-brand-muted">Szenen festgehalten</p>
-                <p className="text-2xl font-extrabold text-navy mt-0.5">{totalScenes}</p>
-              </div>
-              <div className="rounded-brand border border-brand-border bg-white px-4 py-3">
-                <p className="text-xs text-brand-muted">Echo-Gespräche</p>
-                <p className="text-2xl font-extrabold text-navy mt-0.5">{chatCount}</p>
-              </div>
-              <Link to="/app/profile" className="rounded-brand border border-brand-border bg-white px-4 py-3 no-underline hover:border-accent/40 transition-colors">
-                <p className="text-xs text-brand-muted">Beziehungsprofil</p>
-                <p className="text-2xl font-extrabold text-navy mt-0.5">
-                  {profilePercent} %
-                  {profilePercent < 100 && (
-                    <span className="ml-2 text-xs font-medium text-accent">vervollständigen →</span>
-                  )}
-                </p>
+            {/* Fortschritt – kompakte Statuszeile */}
+            <div className="mb-6 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-brand border border-brand-border bg-white px-5 py-3 text-sm">
+              <span className="text-brand-muted">
+                <strong className="font-bold text-navy">{totalScenes}</strong> {totalScenes === 1 ? 'Szene' : 'Szenen'}
+              </span>
+              <span className="text-brand-border">·</span>
+              <span className="text-brand-muted">
+                <strong className="font-bold text-navy">{chatCount}</strong> {chatCount === 1 ? 'Echo-Gespräch' : 'Echo-Gespräche'}
+              </span>
+              <span className="text-brand-border">·</span>
+              <Link to="/app/profile" className="group inline-flex items-center gap-1.5 text-brand-muted no-underline hover:text-accent transition-colors">
+                <span><strong className="font-bold text-navy">{profilePercent} %</strong> Beziehungsprofil</span>
+                {profilePercent < 100 && <span className="text-xs font-medium text-accent">vervollständigen →</span>}
               </Link>
             </div>
           </>
