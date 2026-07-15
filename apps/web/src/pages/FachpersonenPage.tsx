@@ -193,6 +193,18 @@ const AUDIENCE = [
     title: 'Praxen & Teams',
     text: 'Mehrere Fachpersonen, gemeinsame Vorlagen, klare Rollen und Abrechnung pro Fall.',
   },
+  {
+    // Talar: Ausbildung
+    icon: (
+      <svg className={iconCls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 4 2 9l10 5 10-5-10-5Z" />
+        <path d="M6 11v5c0 1.3 2.7 2.5 6 2.5s6-1.2 6-2.5v-5" />
+        <path d="M21 9.5V15" />
+      </svg>
+    ),
+    title: 'Ausbildungsinstitute',
+    text: 'Viele Studierende lernen am selben, sicheren Fallmaterial – Fallkonzeption, Hypothesen und Berichte üben, ohne echte Patient:innen.',
+  },
 ]
 
 export default function FachpersonenPage() {
@@ -474,6 +486,47 @@ export default function FachpersonenPage() {
               </Reveal>
             ))}
           </div>
+          {/* Sondertarif: Ausbildungsinstitute */}
+          <Reveal delay={0.1}>
+            <div className="mt-6 overflow-hidden rounded-[1.25rem] border-2 border-accent/30 bg-accent/[0.04]">
+              <div className="grid items-center gap-6 p-6 sm:p-8 lg:grid-cols-[1.25fr_1fr]">
+                <div>
+                  <span className="label inline-flex items-center gap-2">
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Neu</span>
+                    Ausbildung
+                  </span>
+                  <h3 className="mt-2 text-xl font-bold text-navy">Für Ausbildungsinstitute</h3>
+                  <p className="mt-2 max-w-[520px] text-sm leading-relaxed text-brand-muted">
+                    Viele Studierende, wenige Übungsfälle: Ihre angehenden Paar- und Beziehungstherapeut:innen
+                    lernen am selben, sicheren Fallmaterial – von der Szene über Hypothesen bis zum Bericht.
+                    Sie zahlen je Studierenden-Platz, nicht pro Fall.
+                  </p>
+                  <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                    {['Übungsfälle inklusive', 'Volle Werkzeuge je Platz', 'Zentrale Verwaltung & Rollen', 'Pilot mit einer Kohorte'].map((p) => (
+                      <li key={p} className="flex items-start gap-2 text-sm leading-relaxed text-brand-muted">
+                        <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="rounded-[1rem] border border-brand-border bg-white p-6 text-center">
+                  <div className="text-3xl font-extrabold text-navy">99 €<span className="text-sm font-normal text-brand-muted">/Mo.</span></div>
+                  <p className="text-xs text-brand-muted">Grundgebühr je Institut</p>
+                  <div className="my-3 flex items-center gap-3 text-brand-border">
+                    <span className="h-px flex-1 bg-brand-border" /><span className="text-xs font-semibold">plus</span><span className="h-px flex-1 bg-brand-border" />
+                  </div>
+                  <div className="text-3xl font-extrabold text-navy">12,99 €<span className="text-sm font-normal text-brand-muted">/Mo.</span></div>
+                  <p className="text-xs text-brand-muted">je aktivem Studierenden-Platz</p>
+                  <Link to="/ausbildungsinstitute" className="btn-primary mt-5 flex w-full justify-center">
+                    So funktioniert's →
+                  </Link>
+                  <p className="mt-2 text-[11px] text-brand-muted">Ab ~30 Studierenden individuell</p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
           <p className="mt-5 text-xs text-brand-muted">
             Alle Preise inkl. gesetzlicher USt. Monatlich kündbar. Fälle jederzeit archivieren, um Sitze
             freizugeben. Es gelten die <Link to="/agb" className="underline hover:text-navy">AGB</Link>.

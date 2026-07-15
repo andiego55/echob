@@ -24,6 +24,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'EchoB für Therapie, Beratung und Coaching: ein Arbeitsplatz mit ausschließlich freigegebenem Fallkontext, KI-gestützten Berichten und Sitzungsnotizen – streng einwilligungsbasiert.',
   },
+  '/ausbildungsinstitute': {
+    title: 'EchoB für Ausbildungsinstitute – am Fall ausbilden',
+    description:
+      'Wie Ausbildungsinstitute EchoB in der Lehre nutzen: viele Studierende üben den vollen Fallweg – Szenen, Hypothesen, Berichte – am selben, sicheren Fallmaterial. Preis je Studierenden-Platz, ohne echte Patient:innen, ohne Diagnosen.',
+  },
   '/coaching': {
     title: 'Coaching mit EchoB – Erstgespräch anfragen',
     description:

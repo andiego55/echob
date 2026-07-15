@@ -22,6 +22,7 @@ export default function Footer() {
               <Link to="/auth" state={{ defaultTab: 'signup' }} className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">App</Link>
               <Link to="/coaching" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Coaching</Link>
               <Link to="/fachpersonen" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Fachpersonen</Link>
+              <Link to="/ausbildungsinstitute" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Ausbildungsinstitute</Link>
             </div>
             <div>
               <h4 className="text-[0.75rem] font-bold tracking-[0.08em] uppercase text-white/30 mb-3.5">

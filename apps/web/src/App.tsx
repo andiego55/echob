@@ -15,6 +15,7 @@ import UeberPage            from '@/pages/UeberPage'
 import GruenderInterviewPage from '@/pages/GruenderInterviewPage'
 import TeamPage             from '@/pages/TeamPage'
 import FachpersonenPage     from '@/pages/FachpersonenPage'
+import AusbildungPage       from '@/pages/AusbildungPage'
 import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
 import GlossarPage                   from '@/pages/GlossarPage'
@@ -131,6 +132,7 @@ export function AppRoutes() {
       <Route path="/ueber/gruender" element={<GruenderInterviewPage />} />
       <Route path="/ueber/team" element={<TeamPage />} />
       <Route path="/fachpersonen" element={<FachpersonenPage />} />
+      <Route path="/ausbildungsinstitute" element={<AusbildungPage />} />
       <Route path="/wissen"                          element={<WissenPage />} />
       <Route path="/wissen/:slug"                    element={<ContentPage />} />
       <Route path="/hilfe/:slug"                     element={<ContentPage />} />
