@@ -2,6 +2,8 @@ import { apiClient } from './client'
 import type {
   InstituteProfile,
   GenerationInput,
+  GenerationStart,
+  GenerationStatus,
   ExampleDetail,
   ExampleSummary,
 } from '@/types'
@@ -15,9 +17,12 @@ export const instituteApi = {
   updateMe: (data: { name?: string; contact_name?: string | null }) =>
     apiClient.patch<InstituteProfile>('/institute/me', data).then(r => r.data),
 
-  // Beispielfälle (KI-Generierung) — generate läuft lange (mehrere LLM-Aufrufe)
+  // Beispielfälle (KI-Generierung) — asynchron: start liefert eine generation_id,
+  // Status wird gepollt (die Generierung läuft im Hintergrund weiter).
   generateExample: (input: GenerationInput) =>
-    apiClient.post<ExampleDetail>('/institute/examples/generate', input, { timeout: 300_000 }).then(r => r.data),
+    apiClient.post<GenerationStart>('/institute/examples/generate', input).then(r => r.data),
+  getGeneration: (id: string) =>
+    apiClient.get<GenerationStatus>(`/institute/examples/generations/${id}`).then(r => r.data),
   listExamples: () =>
     apiClient.get<ExampleSummary[]>('/institute/examples').then(r => r.data),
   getExample: (id: string) =>

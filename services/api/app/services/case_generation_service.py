@@ -11,6 +11,7 @@ Instituts. Job-Status/Audit in ``case_generations``, Hülle in ``institute_examp
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from datetime import date, timedelta
@@ -224,24 +225,44 @@ async def _write_case(conn, *, owner_id, inp, self_name: str, ob: dict, scenes: 
     return str(case_id)
 
 
-async def generate_example(echo_svc, institute: dict, inp, conn) -> str:
-    """Vollständige Generierung: LLM (außerhalb der Transaktion) → DB-Schreiben (Transaktion).
-
-    Gibt die institute_examples-id zurück. 403 bei überschrittenem example_quota.
-    """
+async def create_generation(institute: dict, inp, conn) -> str:
+    """Quota-Check + Job-Row (pending). Schnell → der Endpoint kann sofort antworten."""
     used = await conn.fetchval(
         "SELECT count(*) FROM institute_examples WHERE institute_id = $1 AND status <> 'archived'",
         institute["id"],
     )
     if used >= (institute.get("example_quota") or 0):
         raise HTTPException(status_code=403, detail="QUOTA_EXCEEDED")
-
-    n = max(3, min(30, inp.scene_count))
     gen_id = await conn.fetchval(
-        "INSERT INTO case_generations (institute_id, input, status) VALUES ($1, $2::jsonb, 'running') "
+        "INSERT INTO case_generations (institute_id, input, status) VALUES ($1, $2::jsonb, 'pending') "
         "RETURNING id",
         institute["id"], json.dumps(inp.model_dump(), default=str),
     )
+    return str(gen_id)
+
+
+_bg_tasks: set = set()
+
+
+def spawn_generation(app, institute: dict, inp, gen_id: str) -> None:
+    """Startet die Generierung als entkoppelten Hintergrund-Task — überlebt das Request-/
+    Proxy-Timeout (die Generierung dauert länger, als ein HTTP-Request offen bleibt)."""
+    task = asyncio.create_task(run_generation(app, institute, inp, gen_id))
+    _bg_tasks.add(task)                       # Referenz halten (sonst GC)
+    task.add_done_callback(_bg_tasks.discard)
+
+
+async def run_generation(app, institute: dict, inp, gen_id: str) -> None:
+    """Hintergrund-Runner: eigene DB-Connection + Echo aus app.state; hält Ergebnis bzw.
+    Fehler im case_generations-Ledger fest. Fängt bewusst BaseException (auch Cancel),
+    damit kein Job auf 'running' hängen bleibt."""
+    pool = app.state.pool
+    echo_svc = app.state.echo_service
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE case_generations SET status = 'running', updated_at = NOW() WHERE id = $1", gen_id)
+
+    n = max(3, min(30, inp.scene_count))
     try:
         primary_ob, primary_scenes = await _generate_person(
             echo_svc, self_name=inp.person_name,
@@ -253,36 +274,36 @@ async def generate_example(echo_svc, institute: dict, inp, conn) -> str:
                 echo_svc, self_name=inp.partner_name, other_name=inp.person_name, inp=inp, n=n,
             )
             partner_pack = (inp.partner_name, partner_ob, partner_scenes)
-    except HTTPException:
-        raise
-    except Exception as e:   # noqa: BLE001 — Generierungsfehler robust festhalten
-        logger.exception("Fallgenerierung fehlgeschlagen (institute=%s)", institute["id"])
-        await conn.execute(
-            "UPDATE case_generations SET status = 'failed', error = $2, updated_at = NOW() WHERE id = $1",
-            gen_id, str(e)[:500],
-        )
-        raise HTTPException(status_code=502, detail="GENERATION_FAILED")
 
-    async with conn.transaction():
-        await _ensure_owner_profile(conn, institute["user_id"], institute["name"])
-        primary_case = await _write_case(
-            conn, owner_id=institute["user_id"], inp=inp,
-            self_name=inp.person_name, ob=primary_ob, scenes=primary_scenes,
-        )
-        partner_case = None
-        if partner_pack:
-            pname, pob, pscenes = partner_pack
-            partner_case = await _write_case(
+        async with pool.acquire() as conn, conn.transaction():
+            await _ensure_owner_profile(conn, institute["user_id"], institute["name"])
+            primary_case = await _write_case(
                 conn, owner_id=institute["user_id"], inp=inp,
-                self_name=pname, ob=pob, scenes=pscenes,
+                self_name=inp.person_name, ob=primary_ob, scenes=primary_scenes,
             )
-        example_id = await conn.fetchval(
-            "INSERT INTO institute_examples (institute_id, title, primary_case_id, partner_case_id, status) "
-            "VALUES ($1, $2, $3, $4, 'draft') RETURNING id",
-            institute["id"], inp.title or f"Beispiel: {inp.person_name}", primary_case, partner_case,
-        )
-        await conn.execute(
-            "UPDATE case_generations SET status = 'done', example_id = $2, updated_at = NOW() WHERE id = $1",
-            gen_id, example_id,
-        )
-    return str(example_id)
+            partner_case = None
+            if partner_pack:
+                pname, pob, pscenes = partner_pack
+                partner_case = await _write_case(
+                    conn, owner_id=institute["user_id"], inp=inp,
+                    self_name=pname, ob=pob, scenes=pscenes,
+                )
+            example_id = await conn.fetchval(
+                "INSERT INTO institute_examples (institute_id, title, primary_case_id, partner_case_id, status) "
+                "VALUES ($1, $2, $3, $4, 'draft') RETURNING id",
+                institute["id"], inp.title or f"Beispiel: {inp.person_name}", primary_case, partner_case,
+            )
+            await conn.execute(
+                "UPDATE case_generations SET status = 'done', example_id = $2, updated_at = NOW() WHERE id = $1",
+                gen_id, example_id,
+            )
+    except BaseException as e:   # noqa: BLE001 — auch Cancel/Timeout im Ledger festhalten
+        logger.exception("Fallgenerierung fehlgeschlagen (gen_id=%s)", gen_id)
+        try:
+            async with pool.acquire() as conn:
+                await conn.execute(
+                    "UPDATE case_generations SET status = 'failed', error = $2, updated_at = NOW() WHERE id = $1",
+                    gen_id, f"{type(e).__name__}: {e}"[:500],
+                )
+        except Exception:
+            logger.exception("Fehlerstatus konnte nicht gespeichert werden (gen_id=%s)", gen_id)

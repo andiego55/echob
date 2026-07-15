@@ -194,21 +194,42 @@ async def _load_example_detail(conn, institute_id, example_id) -> dict:
     }
 
 
-@router.post("/examples/generate")
+@router.post("/examples/generate", status_code=202)
 async def generate_example(
     body: GenerationInput,
     request: Request,
     current: dict = Depends(get_current_institute),
     pool=Depends(get_pool),
 ) -> dict:
-    """Generiert einen prototypischen Beispielfall (mehrstufig über die Echo-Engine).
-    Läuft synchron (mehrere LLM-Aufrufe → langer Client-Timeout einplanen)."""
-    echo_svc = request.app.state.echo_service
+    """Startet die KI-Generierung als Hintergrund-Job (entkoppelt vom Request-/Proxy-Timeout —
+    die Generierung dauert länger, als ein HTTP-Request offen bleibt). Antwortet sofort; das
+    Frontend pollt den Status über /examples/generations/{id}."""
     async with pool.acquire() as conn:
-        example_id = await case_generation_service.generate_example(
-            echo_svc, current["institute"], body, conn,
+        gen_id = await case_generation_service.create_generation(current["institute"], body, conn)
+    case_generation_service.spawn_generation(request.app, current["institute"], body, gen_id)
+    return {"generation_id": gen_id, "status": "pending"}
+
+
+@router.get("/examples/generations/{gen_id}")
+async def generation_status(
+    gen_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Status eines Generierungs-Jobs (pending/running/done/failed) + example_id/Fehler."""
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT status, example_id, left(error, 300) AS error FROM case_generations "
+            "WHERE id = $1 AND institute_id = $2",
+            gen_id, current["institute"]["id"],
         )
-        return await _load_example_detail(conn, current["institute"]["id"], example_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Generierung nicht gefunden.")
+    return {
+        "status": row["status"],
+        "example_id": str(row["example_id"]) if row["example_id"] else None,
+        "error": row["error"],
+    }
 
 
 @router.get("/examples")

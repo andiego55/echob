@@ -202,6 +202,17 @@ export interface ExampleSummary {
   created_at: string | null
 }
 
+export interface GenerationStart {
+  generation_id: string
+  status: string
+}
+
+export interface GenerationStatus {
+  status: string          // pending | running | done | failed
+  example_id: string | null
+  error: string | null
+}
+
 export interface CaseCreate {
   relationship_type: RelationshipType
   relationship_status: RelationshipStatus

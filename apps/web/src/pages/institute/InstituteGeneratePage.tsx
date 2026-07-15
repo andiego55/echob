@@ -1,14 +1,14 @@
 /**
  * /institute/examples/new — KI-Fallgenerierung (Wizard).
- * Rahmen-Eingaben → Echo generiert Onboarding + Szenen (optional Partnerperson).
- * Läuft synchron (kann 1–2 Minuten dauern) → danach in den Editor.
+ * Startet einen Hintergrund-Job (überlebt Request-Timeouts) und pollt den Status,
+ * bis der Fall fertig ist → dann in den Editor.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi } from '@/api/institute'
-import type { GenerationInput } from '@/types'
+import type { GenerationInput, GenerationStatus } from '@/types'
 
 const REL_TYPES: [string, string][] = [
   ['partner', 'Partnerschaft'], ['ex_partner', 'Ex-Partnerschaft'], ['family', 'Familie'],
@@ -45,7 +45,10 @@ export default function InstituteGeneratePage() {
   const [partnerName, setPartnerName] = useState('')
   const [freeText, setFreeText] = useState('')
 
-  const mutation = useMutation({
+  const [genId, setGenId] = useState<string | null>(null)
+  const [failed, setFailed] = useState(false)
+
+  const start = useMutation({
     mutationFn: () => {
       const input: GenerationInput = {
         title: title.trim() || null,
@@ -62,12 +65,41 @@ export default function InstituteGeneratePage() {
       }
       return instituteApi.generateExample(input)
     },
-    onSuccess: (data) => navigate(`/institute/examples/${data.id}`),
+    onSuccess: (d) => setGenId(d.generation_id),
+    onError: () => setFailed(true),
   })
 
-  const canSubmit = !!personName.trim() && (!withPartner || !!partnerName.trim())
+  const gen = useQuery({
+    queryKey: ['generation', genId],
+    queryFn: () => instituteApi.getGeneration(genId!),
+    enabled: !!genId && !failed,
+    refetchInterval: (q) => {
+      const s = (q.state.data as GenerationStatus | undefined)?.status
+      return s === 'done' || s === 'failed' ? false : 3000
+    },
+  })
 
-  if (mutation.isPending) {
+  useEffect(() => {
+    const d = gen.data
+    if (!d) return
+    if (d.status === 'done' && d.example_id) {
+      navigate(`/institute/examples/${d.example_id}`, { replace: true })
+    } else if (d.status === 'failed') {
+      setFailed(true)
+    }
+  }, [gen.data, navigate])
+
+  const canSubmit = !!personName.trim() && (!withPartner || !!partnerName.trim())
+  const busy = start.isPending || (!!genId && !failed)
+
+  const submit = () => {
+    if (!canSubmit) return
+    setFailed(false)
+    setGenId(null)
+    start.mutate()
+  }
+
+  if (busy) {
     return (
       <InstituteShell>
         <div className="mx-auto flex max-w-[600px] flex-col items-center px-6 py-24 text-center">
@@ -75,7 +107,7 @@ export default function InstituteGeneratePage() {
           <h1 className="mt-6 text-lg font-bold text-navy">Echo generiert den Beispielfall …</h1>
           <p className="mt-2 text-sm leading-relaxed text-brand-muted">
             Erst das Onboarding-Narrativ, dann {sceneCount} Szenen{withPartner ? ' – und dieselbe Beziehung aus Sicht der Partnerperson' : ''}.
-            Das dauert einen Moment (bis ~2 Minuten). Bitte das Fenster offen lassen.
+            Das läuft im Hintergrund weiter (bis ~2 Minuten); die Seite aktualisiert sich von selbst.
           </p>
         </div>
       </InstituteShell>
@@ -94,10 +126,7 @@ export default function InstituteGeneratePage() {
           anschließend prüfen, bearbeiten und ablegen.
         </p>
 
-        <form
-          onSubmit={(e) => { e.preventDefault(); if (canSubmit) mutation.mutate() }}
-          className="mt-8 space-y-5"
-        >
+        <form onSubmit={(e) => { e.preventDefault(); submit() }} className="mt-8 space-y-5">
           <div className="card space-y-4">
             <div>
               <label className={labelCls}>Titel des Beispiels (optional)</label>
@@ -172,17 +201,18 @@ export default function InstituteGeneratePage() {
             )}
           </div>
 
-          {mutation.isError && (
-            <p className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          {failed && (
+            <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
               Generierung fehlgeschlagen. Prüfe dein Kontingent oder versuche es erneut.
-            </p>
+              {gen.data?.error && <span className="mt-1 block text-xs text-red-500/80">{gen.data.error}</span>}
+            </div>
           )}
 
           <div className="flex items-center gap-3">
             <button type="submit" disabled={!canSubmit} className="btn-primary">
               Fall generieren
             </button>
-            <span className="text-xs text-brand-muted">Kann bis zu ~2 Minuten dauern.</span>
+            <span className="text-xs text-brand-muted">Läuft im Hintergrund, ~1–2 Minuten.</span>
           </div>
         </form>
       </div>
