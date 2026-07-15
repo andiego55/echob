@@ -43,4 +43,10 @@ export const instituteApi = {
     apiClient.delete(`/institute/students/${id}`).then(r => r.data),
   revokeStudentInvite: (id: string) =>
     apiClient.delete(`/institute/student-invites/${id}`).then(r => r.data),
+
+  // Freigabe eines Beispiels an Studierende (Klon je Student)
+  assignExample: (id: string, studentIds: string[]) =>
+    apiClient.post<{ assigned: string[] }>(`/institute/examples/${id}/assign`, { student_ids: studentIds }).then(r => r.data),
+  exampleAssignments: (id: string) =>
+    apiClient.get<{ student_ids: string[] }>(`/institute/examples/${id}/assignments`).then(r => r.data),
 }

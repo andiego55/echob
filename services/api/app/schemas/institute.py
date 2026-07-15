@@ -56,3 +56,7 @@ class GenerationInput(BaseModel):
 class ExamplePatch(BaseModel):
     title: str | None = Field(None, max_length=200)
     status: str | None = Field(None, pattern="^(draft|published|archived)$")
+
+
+class AssignStudents(BaseModel):
+    student_ids: list[UUID] = Field(default_factory=list)

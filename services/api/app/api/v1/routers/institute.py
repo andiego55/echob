@@ -9,13 +9,14 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core import crypto
 from app.core.dependencies import get_current_institute, get_current_user, get_pool
 from app.schemas.institute import (
+    AssignStudents,
     ExamplePatch,
     GenerationInput,
     InstituteProfileResponse,
@@ -203,6 +204,55 @@ async def _load_example_detail(conn, institute_id, example_id) -> dict:
     }
 
 
+async def _clone_case(conn, source_case_id) -> str:
+    """Klont einen Fall (Fall + Onboarding + Szenen + Selbstbild + Fremdeinschätzung)
+    unter einer NEUEN synthetischen user_id — die eigene Arbeitskopie einer/eines
+    Studierenden. Klartext bleibt Klartext."""
+    src = await conn.fetchrow("SELECT * FROM cases WHERE id = $1", source_case_id)
+    if not src:
+        raise HTTPException(status_code=404, detail="Quellfall nicht gefunden.")
+    new_uid = uuid4()
+    sp = await conn.fetchrow(
+        "SELECT display_name, modules, completed_modules, safety_status "
+        "FROM user_profiles WHERE user_id = $1", src["user_id"])
+    await conn.execute(
+        "INSERT INTO user_profiles (user_id, display_name, modules, completed_modules, safety_status) "
+        "VALUES ($1, $2, COALESCE($3::jsonb, '{}'::jsonb), $4, $5) ON CONFLICT (user_id) DO NOTHING",
+        new_uid, sp["display_name"] if sp else None, sp["modules"] if sp else None,
+        (list(sp["completed_modules"]) if sp and sp["completed_modules"] else []),
+        sp["safety_status"] if sp else None,
+    )
+    new_case = await conn.fetchval(
+        "INSERT INTO cases (user_id, relationship_type, relationship_status, contact_frequency, main_concern) "
+        "VALUES ($1, $2, $3, $4, $5) RETURNING id",
+        new_uid, src["relationship_type"], src["relationship_status"], src["contact_frequency"], src["main_concern"])
+    ob = await conn.fetchrow("SELECT * FROM onboarding_answers WHERE case_id = $1", source_case_id)
+    if ob:
+        await conn.execute(
+            "INSERT INTO onboarding_answers (case_id, user_id, person_name, relationship_description, "
+            "main_burden, typical_scenes, significant_event, memorable_scenes, distress_score, safety_status, "
+            "pattern_hypotheses, completed_at) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, COALESCE($11::jsonb, '[]'::jsonb), NOW())",
+            new_case, new_uid, ob["person_name"], ob["relationship_description"], ob["main_burden"],
+            ob["typical_scenes"], ob["significant_event"], ob["memorable_scenes"], ob["distress_score"],
+            ob["safety_status"], ob["pattern_hypotheses"])
+    await conn.execute(
+        "INSERT INTO scenes (case_id, user_id, title, scene_date, description, user_reaction, "
+        "distress_score, pattern_tags, confirmed_by_user, input_mode) "
+        "SELECT $1, $2, title, scene_date, description, user_reaction, distress_score, pattern_tags, "
+        "confirmed_by_user, input_mode FROM scenes WHERE case_id = $3",
+        new_case, new_uid, source_case_id)
+    pp = await conn.fetchrow(
+        "SELECT modules, completed_modules FROM person_profiles WHERE case_id = $1", source_case_id)
+    if pp:
+        await conn.execute(
+            "INSERT INTO person_profiles (case_id, user_id, modules, completed_modules) "
+            "VALUES ($1, $2, COALESCE($3::jsonb, '{}'::jsonb), $4) ON CONFLICT (case_id) DO NOTHING",
+            new_case, new_uid, pp["modules"],
+            (list(pp["completed_modules"]) if pp["completed_modules"] else []))
+    return str(new_case)
+
+
 @router.post("/examples/generate", status_code=202)
 async def generate_example(
     body: GenerationInput,
@@ -318,6 +368,62 @@ async def delete_example(
             for cid in (ex["primary_case_id"], ex["partner_case_id"]):
                 if cid:
                     await conn.execute("DELETE FROM cases WHERE id = $1", cid)
+
+
+@router.get("/examples/{example_id}/assignments")
+async def example_assignments(
+    example_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """student_ids, die diese Beispiel-Arbeitskopie bereits erhalten haben."""
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT scc.student_id FROM student_case_copies scc "
+            "JOIN institute_examples e ON e.id = scc.example_id "
+            "WHERE scc.example_id = $1 AND e.institute_id = $2",
+            example_id, current["institute"]["id"])
+    return {"student_ids": [str(r["student_id"]) for r in rows]}
+
+
+@router.post("/examples/{example_id}/assign")
+async def assign_example(
+    example_id: UUID,
+    body: AssignStudents,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Gibt ein veröffentlichtes Beispiel an Studierende frei → je Student eine
+    eigene Arbeitskopie (Klon inkl. beider Profile). Bereits Zugewiesene werden übersprungen."""
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        ex = await conn.fetchrow(
+            "SELECT * FROM institute_examples WHERE id = $1 AND institute_id = $2", example_id, inst_id)
+        if not ex:
+            raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+        if ex["status"] != "published":
+            raise HTTPException(status_code=400, detail="NOT_PUBLISHED")
+        assigned: list[str] = []
+        for sid in body.student_ids:
+            student = await conn.fetchrow(
+                "SELECT id FROM students WHERE id = $1 AND institute_id = $2 AND status = 'active'",
+                sid, inst_id)
+            if not student:
+                continue
+            already = await conn.fetchval(
+                "SELECT 1 FROM student_case_copies WHERE student_id = $1 AND example_id = $2", sid, example_id)
+            if already:
+                continue
+            async with conn.transaction():
+                primary_clone = await _clone_case(conn, ex["primary_case_id"])
+                partner_clone = (await _clone_case(conn, ex["partner_case_id"])
+                                 if ex["partner_case_id"] else None)
+                await conn.execute(
+                    "INSERT INTO student_case_copies (student_id, example_id, case_id, partner_case_id, title) "
+                    "VALUES ($1, $2, $3, $4, $5)",
+                    sid, example_id, primary_clone, partner_clone, ex["title"])
+            assigned.append(str(sid))
+    return {"assigned": assigned}
 
 
 # ── Studierende (Einladungen + Verwaltung) ────────────────────────────────────

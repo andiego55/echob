@@ -120,10 +120,64 @@ export default function InstituteExampleEditorPage() {
           für die Freigabe an Studierende vorbereitet. Das Bearbeiten einzelner Szenen folgt in Kürze.
         </p>
 
+        {published && <AssignPanel exampleId={data.id} />}
+
         <CasePartView part={data.primary} heading="Fallperson" />
         {data.partner && <CasePartView part={data.partner} heading="Partnerperson (Paar-Analyse)" />}
       </div>
     </InstituteShell>
+  )
+}
+
+function AssignPanel({ exampleId }: { exampleId: string }) {
+  const qc = useQueryClient()
+  const { data: studentsData } = useQuery({ queryKey: ['institute-students'], queryFn: instituteApi.listStudents })
+  const { data: assignData } = useQuery({
+    queryKey: ['example-assignments', exampleId],
+    queryFn: () => instituteApi.exampleAssignments(exampleId),
+  })
+  const assign = useMutation({
+    mutationFn: (studentId: string) => instituteApi.assignExample(exampleId, [studentId]),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['example-assignments', exampleId] }),
+  })
+
+  const students = studentsData?.students ?? []
+  const assigned = new Set(assignData?.student_ids ?? [])
+
+  return (
+    <div className="card mt-6">
+      <p className="text-sm font-semibold text-navy">An Studierende freigeben</p>
+      <p className="mt-1 text-xs text-brand-muted">
+        Jede Freigabe erzeugt für die/den Studierende:n eine eigene Arbeitskopie (Klon inkl. Profile).
+      </p>
+      {students.length === 0 ? (
+        <p className="mt-3 text-sm text-brand-muted">
+          Noch keine Studierenden. <Link to="/institute/students" className="text-accent hover:underline">Einladen →</Link>
+        </p>
+      ) : (
+        <div className="mt-3 space-y-2">
+          {students.map(s => {
+            const has = assigned.has(s.id)
+            return (
+              <div key={s.id} className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-white px-4 py-2">
+                <span className="text-sm text-navy">{s.display_name || 'Studierende:r'}</span>
+                {has ? (
+                  <span className="text-xs font-semibold text-green-600">✓ Freigegeben</span>
+                ) : (
+                  <button
+                    onClick={() => assign.mutate(s.id)}
+                    disabled={assign.isPending}
+                    className="text-xs font-semibold text-accent hover:text-navy transition-colors disabled:opacity-40"
+                  >
+                    Freigeben
+                  </button>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 
