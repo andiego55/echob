@@ -251,7 +251,7 @@ class EchoService:
                 history=history or [],
                 extra_context=extra_context,
             )
-        if thread_type.startswith("topic_") or thread_type.startswith("blog_") or thread_type.startswith("hyp_"):
+        if thread_type.startswith(("topic_", "blog_", "hyp_", "content_")):
             if self._use_openai:
                 return await self._openai_topic_chat(
                     topic=thread_type,
@@ -412,6 +412,7 @@ class EchoService:
             if m["role"] in ("user", "assistant")
             and not m["content"].startswith("__topic_")
             and not m["content"].startswith("__blog_")
+            and not m["content"].startswith("__content_")
         )
         user_message = (
             f"Thema: {_TOPIC_LABELS.get(topic, topic)}\n\n"
@@ -743,7 +744,10 @@ class EchoService:
             "hyp_trauma":               "hypothesis_trauma_prompt.md",
             "hyp_own_role":             "hypothesis_own_role_prompt.md",
         }
-        prompt_file = _TOPIC_PROMPTS.get(topic, "blog_topic_prompt.md")
+        if topic.startswith("content_"):
+            prompt_file = "content_topic_prompt.md"
+        else:
+            prompt_file = _TOPIC_PROMPTS.get(topic, "blog_topic_prompt.md")
         system_prompt = _load_prompt(prompt_file)
 
         case_ctx = build_case_context(

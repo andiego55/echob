@@ -8,13 +8,10 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 MessageRole = Literal["user", "assistant", "system"]
-ThreadType = Literal[
-    "onboarding", "scene", "topic", "glossary", "report",
-    "topic_self", "topic_person", "topic_responsibility", "topic_guilt",
-    "blog_beziehungsmuster", "blog_beobachtung_gefuehl",
-    "blog_professionelle_hilfe", "blog_krisentelefone",
-    "hyp_dynamics", "hyp_clusterb", "hyp_attachment", "hyp_trauma", "hyp_own_role",
-]
+# Früher ein Literal; jetzt str, weil Wissens-Dialoge dynamische thread_types
+# 'content_<slug>' verwenden (24+ Seiten). Validierung erfolgt über die DB-CHECK-
+# Constraint (echo_messages_thread_type_check: Enum ODER 'content_%').
+ThreadType = str
 
 # ── Einzel-Nachricht ──────────────────────────────────────────────────────────
 

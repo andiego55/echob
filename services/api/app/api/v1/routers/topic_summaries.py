@@ -61,7 +61,7 @@ async def upsert_summary(
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> TopicSummaryResponse:
-    if body.topic not in TOPIC_LABELS:
+    if body.topic not in TOPIC_LABELS and not body.topic.startswith("content_"):
         raise HTTPException(status_code=400, detail="Ungültiges Thema.")
     async with pool.acquire() as conn:
         await _assert_owner(case_id, current_user["user_id"], conn)

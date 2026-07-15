@@ -33,4 +33,10 @@ def build_topic_context(topic_summaries: list[dict[str, Any]]) -> str:
             label = _TOPIC_LABELS.get(topic, topic)
             lines.append(f"### {label}\n{text}\n")
 
+    # Wissens-Dialoge (content_<slug>): dynamische Themen, nach den Kern-Themen.
+    for topic, text in by_topic.items():
+        if topic.startswith("content_") and text:
+            label = topic.removeprefix("content_").replace("-", " ").capitalize()
+            lines.append(f"### Wissens-Dialog: {label}\n{text}\n")
+
     return "\n".join(lines)
