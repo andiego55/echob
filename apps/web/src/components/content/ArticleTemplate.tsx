@@ -69,13 +69,6 @@ export default function ArticleTemplate({ meta }: { meta: ContentMeta }) {
 
           {positions.includes('end') && <EchoReflectionCard meta={meta} position="end" />}
 
-          <div className="mt-14 rounded-brand border border-amber-200 bg-amber-50 px-5 py-4">
-            <p className="text-sm text-amber-800">
-              <strong>Hinweis:</strong> Dieser Artikel dient der allgemeinen Orientierung und ersetzt keine
-              professionelle Beratung, Psychotherapie oder medizinische Diagnostik.
-            </p>
-          </div>
-
           <RelatedContentCluster meta={meta} />
 
           <p className="mt-8 border-t border-brand-border pt-6 text-xs text-brand-muted">
