@@ -110,6 +110,7 @@ import StudentCaseToolPlaceholder from '@/pages/student/StudentCaseToolPlacehold
 import StudentReportsPage from '@/pages/student/StudentReportsPage'
 import StudentReportNewPage from '@/pages/student/StudentReportNewPage'
 import StudentReportDetailPage from '@/pages/student/StudentReportDetailPage'
+import StudentNotesPage from '@/pages/student/StudentNotesPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -223,7 +224,7 @@ export function AppRoutes() {
       <Route path="/student/cases/:id/reports" element={<StudentRoute><StudentReportsPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/new" element={<StudentRoute><StudentReportNewPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/:reportId" element={<StudentRoute><StudentReportDetailPage /></StudentRoute>} />
-      <Route path="/student/cases/:id/notes" element={<StudentRoute><StudentCaseToolPlaceholder title="Notizen" /></StudentRoute>} />
+      <Route path="/student/cases/:id/notes" element={<StudentRoute><StudentNotesPage /></StudentRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />

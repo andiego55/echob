@@ -17,6 +17,7 @@ from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS, ReportCrea
 from app.schemas.student import (
     StudentEchoChat,
     StudentInviteAccept,
+    StudentNotes,
     StudentProfileResponse,
     StudentReportUpdate,
 )
@@ -369,3 +370,47 @@ async def delete_report(
             "DELETE FROM reports WHERE id = $1 AND case_id = $2 RETURNING id", report_id, copy["case_id"])
     if not row:
         raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
+
+
+# ── Notizen (student-scoped, wie Fachpersonen-Notizen) ────────────────────────
+
+_NOTE_FIELDS = ("first_impressions", "key_scenes", "open_questions",
+                "conversation_prompts", "next_steps", "free_text")
+
+
+@router.get("/cases/{copy_id}/notes", response_model=StudentNotes)
+async def get_notes(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> StudentNotes:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        row = await conn.fetchrow(
+            "SELECT * FROM student_notes WHERE student_id = $1 AND case_id = $2",
+            current["student"]["id"], copy["case_id"])
+    return StudentNotes(**{f: (row[f] if row else None) for f in _NOTE_FIELDS})
+
+
+@router.put("/cases/{copy_id}/notes", response_model=StudentNotes)
+async def save_notes(
+    copy_id: UUID,
+    body: StudentNotes,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> StudentNotes:
+    sid = current["student"]["id"]
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, sid)
+        row = await conn.fetchrow(
+            "INSERT INTO student_notes (student_id, case_id, first_impressions, key_scenes, "
+            "open_questions, conversation_prompts, next_steps, free_text) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) "
+            "ON CONFLICT (student_id, case_id) DO UPDATE SET "
+            "first_impressions = EXCLUDED.first_impressions, key_scenes = EXCLUDED.key_scenes, "
+            "open_questions = EXCLUDED.open_questions, conversation_prompts = EXCLUDED.conversation_prompts, "
+            "next_steps = EXCLUDED.next_steps, free_text = EXCLUDED.free_text, updated_at = NOW() "
+            "RETURNING *",
+            sid, copy["case_id"], body.first_impressions, body.key_scenes, body.open_questions,
+            body.conversation_prompts, body.next_steps, body.free_text)
+    return StudentNotes(**{f: row[f] for f in _NOTE_FIELDS})

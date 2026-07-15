@@ -1,6 +1,6 @@
 import { apiClient } from './client'
 import type {
-  StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage,
+  StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
   Report, ReportCreate,
 } from '@/types'
 
@@ -32,4 +32,10 @@ export const studentApi = {
     apiClient.put<Report>(`/student/cases/${copyId}/reports/${reportId}`, { sections }).then(r => r.data),
   reportDelete: (copyId: string, reportId: string) =>
     apiClient.delete(`/student/cases/${copyId}/reports/${reportId}`).then(r => r.data),
+
+  // Notizen (student-scoped, wie Fachpersonen-Notizen)
+  notes: (copyId: string) =>
+    apiClient.get<StudentNotes>(`/student/cases/${copyId}/notes`).then(r => r.data),
+  notesSave: (copyId: string, data: StudentNotes) =>
+    apiClient.put<StudentNotes>(`/student/cases/${copyId}/notes`, data).then(r => r.data),
 }

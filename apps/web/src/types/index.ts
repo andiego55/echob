@@ -243,6 +243,15 @@ export interface StudentEchoMessage {
   created_at: string | null
 }
 
+export interface StudentNotes {
+  first_impressions: string | null
+  key_scenes: string | null
+  open_questions: string | null
+  conversation_prompts: string | null
+  next_steps: string | null
+  free_text: string | null
+}
+
 export interface StudentInvite {
   id: string
   code: string

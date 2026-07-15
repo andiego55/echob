@@ -34,3 +34,12 @@ class StudentEchoChat(BaseModel):
 
 class StudentReportUpdate(BaseModel):
     sections: list[dict] = Field(default_factory=list)
+
+
+class StudentNotes(BaseModel):
+    first_impressions: str | None = None
+    key_scenes: str | None = None
+    open_questions: str | None = None
+    conversation_prompts: str | None = None
+    next_steps: str | None = None
+    free_text: str | None = None
