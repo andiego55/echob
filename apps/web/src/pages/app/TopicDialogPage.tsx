@@ -12,6 +12,7 @@ import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } f
 import { echoApi } from '@/api/echo'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
+import { getBody } from '@/content/bodies'
 import { apiErrorText } from '@/utils/apiError'
 import type { EchoMessage, ThreadType } from '@/types'
 
@@ -53,10 +54,18 @@ function resolveTopic(topicId: string): TopicDef | undefined {
     const slug = topicId.slice('content_'.length)
     const meta = CONTENT_MANIFEST.find((m) => m.slug === slug)
     if (!meta) return undefined
+    // Auszug (Intro bis zur ersten H2) als inhaltlicher Anker für Echo.
+    const body = getBody(meta.slug)
+    const splitAt = body.indexOf('\n## ')
+    const excerpt = (splitAt === -1 ? body : body.slice(0, splitAt))
+      .replace(/\s+/g, ' ')
+      .replace(/\|/g, '/')
+      .trim()
+      .slice(0, 700)
     return {
       label: meta.title,
       description: `Beziehe das Thema „${meta.title}" auf deine eigene Situation.`,
-      startTrigger: `__content_start__|${meta.title}|${meta.echo.opening_question}`,
+      startTrigger: `__content_start__|${meta.title}|${meta.echo.opening_question}|${excerpt}`,
       isContent: true,
     }
   }
