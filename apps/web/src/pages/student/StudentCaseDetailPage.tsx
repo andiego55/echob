@@ -1,18 +1,20 @@
 /**
  * /student/cases/:id — Fallansicht der/des Studierenden (eigene Arbeitskopie).
- * Onboarding + Szenen + Selbstbild + Fremdeinschätzung. Echo-Dialog folgt (P2c-2).
+ * Layout wie die Fachpersonen-Fallübersicht; bei Partnerfall ein Toggle A/B.
  */
-import { useParams, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import StudentShell from '@/components/student/StudentShell'
 import StudentCaseNav from '@/components/student/StudentCaseNav'
 import { Spinner } from '@/components/auth/StudentRoute'
 import { studentApi } from '@/api/student'
-import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
+import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS } from '@/types'
 import type { ExampleCasePart, ExampleScene, ProfileModules } from '@/types'
 
 const relTypeLabel = (v: string) => (RELATIONSHIP_TYPE_LABELS as Record<string, string>)[v] ?? v
 const relStatusLabel = (v: string) => (RELATIONSHIP_STATUS_LABELS as Record<string, string>)[v] ?? v
+const contactLabel = (v: string) => (CONTACT_FREQUENCY_LABELS as Record<string, string>)[v] ?? v
 
 const SCORE_LABELS: Record<string, string> = {
   distress_index: 'Belastungsgrad',
@@ -47,6 +49,7 @@ const SCORE_LABELS: Record<string, string> = {
 
 export default function StudentCaseDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const [side, setSide] = useState<'primary' | 'partner'>('primary')
   const { data, isLoading, isError } = useQuery({
     queryKey: ['student-case', id],
     queryFn: () => studentApi.caseDetail(id!),
@@ -55,29 +58,44 @@ export default function StudentCaseDetailPage() {
 
   if (isLoading) return <Spinner />
 
+  const hasPartner = !!data?.partner
+  const part = side === 'partner' && data?.partner ? data.partner : data?.primary
+
   return (
     <StudentShell>
       <StudentCaseNav copyId={id!} />
-      <div className="mx-auto max-w-[900px] px-6 py-8">
-        <Link to="/student/dashboard" className="text-sm text-brand-muted no-underline hover:text-navy">
-          ← Zurück zum Dashboard
-        </Link>
+      <div className="mx-auto max-w-[1000px] px-6 py-8">
         {isError || !data ? (
-          <p className="mt-6 text-sm text-red-600">Fall nicht gefunden.</p>
+          <p className="text-sm text-red-600">Fall nicht gefunden.</p>
         ) : (
           <>
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="mb-6">
               <h1 className="text-2xl font-bold text-navy">{data.title}</h1>
-              <button
-                disabled
-                title="Der Echo-Dialog wird gerade gebaut"
-                className="btn bg-white text-navy border-2 border-brand-border !py-2 !px-4 !text-sm opacity-50 cursor-not-allowed"
-              >
-                Mit Echo besprechen (bald)
-              </button>
+              <p className="mt-1 text-xs text-brand-muted">
+                Fiktiver Übungsfall – deine Arbeitskopie. Keine echten Patient:innen.
+              </p>
             </div>
-            <CasePart part={data.primary} heading="Fallperson" />
-            {data.partner && <CasePart part={data.partner} heading="Partnerperson (Paar-Analyse)" />}
+
+            {hasPartner && (
+              <div className="mb-6 inline-flex rounded-brand border border-brand-border bg-white p-0.5">
+                {([
+                  ['primary', data.primary?.person_name ?? 'Fallperson'],
+                  ['partner', data.partner?.person_name ?? 'Partnerperson'],
+                ] as const).map(([k, label]) => (
+                  <button
+                    key={k}
+                    onClick={() => setSide(k)}
+                    className={`rounded-[6px] px-4 py-1.5 text-sm font-medium transition-colors ${
+                      side === k ? 'bg-accent text-white' : 'text-brand-muted hover:text-navy'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {part && <CaseOverview part={part} />}
           </>
         )}
       </div>
@@ -85,38 +103,54 @@ export default function StudentCaseDetailPage() {
   )
 }
 
-function CasePart({ part, heading }: { part: ExampleCasePart | null; heading: string }) {
-  if (!part) return null
+function CaseOverview({ part }: { part: ExampleCasePart }) {
   const ob = part.onboarding
   return (
-    <section className="mt-8">
-      <div className="mb-3 flex items-center gap-2">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-accent">{heading}</h2>
-        <span className="text-sm text-brand-muted">
-          · {part.person_name ?? '—'} · {relTypeLabel(part.relationship_type)} · {relStatusLabel(part.relationship_status)}
-        </span>
+    <div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Section title="Fallinformationen">
+          <dl className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2">
+            {part.person_name && <Field label="Person (Pseudonym)"><InfoChip>{part.person_name}</InfoChip></Field>}
+            <Field label="Beziehungstyp"><InfoChip>{relTypeLabel(part.relationship_type)}</InfoChip></Field>
+            <Field label="Status"><InfoChip>{relStatusLabel(part.relationship_status)}</InfoChip></Field>
+            <Field label="Kontaktfrequenz"><InfoChip>{contactLabel(part.contact_frequency)}</InfoChip></Field>
+            {part.main_concern && <Field label="Hauptanliegen" wide>{part.main_concern}</Field>}
+          </dl>
+        </Section>
+
+        {ob && (ob.relationship_description || ob.typical_scenes || ob.main_burden || ob.significant_event || ob.memorable_scenes) && (
+          <Section title="Onboarding-Informationen">
+            <dl className="grid grid-cols-1 gap-x-5 gap-y-3">
+              {ob.relationship_description && <Field label="Beziehungsbeschreibung">{ob.relationship_description}</Field>}
+              {ob.typical_scenes && <Field label="Typische Szenen">{ob.typical_scenes}</Field>}
+              {ob.main_burden && <Field label="Hauptbelastung">{ob.main_burden}</Field>}
+              {ob.significant_event && <Field label="Prägendes Ereignis">{ob.significant_event}</Field>}
+              {ob.memorable_scenes && <Field label="Erinnerliche Szenen">{ob.memorable_scenes}</Field>}
+            </dl>
+          </Section>
+        )}
+
+        <ProfileSection title="Selbstauskunft (Selbstbild)" profile={part.self_profile} />
+        <ProfileSection title="Einschätzung der anderen Person" profile={part.person_profile} />
       </div>
 
-      <div className="card space-y-3">
-        {part.main_concern && <Field label="Anliegen" value={part.main_concern} />}
-        {ob?.relationship_description && <Field label="Verlauf" value={ob.relationship_description} />}
-        {ob?.main_burden && <Field label="Zentrale Belastung" value={ob.main_burden} />}
-        {ob?.typical_scenes && <Field label="Wiederkehrendes Muster" value={ob.typical_scenes} />}
-        {ob?.significant_event && <Field label="Prägendes Ereignis" value={ob.significant_event} />}
+      <div className="mt-4">
+        <Section title={`Szenen (${part.scenes.length})`}>
+          {part.scenes.length === 0 ? (
+            <p className="text-sm text-brand-muted">Keine Szenen erfasst.</p>
+          ) : (
+            <div className="space-y-2.5">
+              {part.scenes.map(s => <SceneCard key={s.id} scene={s} />)}
+            </div>
+          )}
+        </Section>
       </div>
-
-      {part.self_profile && <ProfileView title="Selbstauskunft (Selbstbild)" profile={part.self_profile} />}
-      {part.person_profile && <ProfileView title="Einschätzung der anderen Person" profile={part.person_profile} />}
-
-      <p className="mt-5 mb-3 text-sm font-semibold text-navy">{part.scenes.length} Szenen</p>
-      <div className="space-y-3">
-        {part.scenes.map(s => <SceneCard key={s.id} scene={s} />)}
-      </div>
-    </section>
+    </div>
   )
 }
 
-function ProfileView({ title, profile }: { title: string; profile: ProfileModules }) {
+function ProfileSection({ title, profile }: { title: string; profile: ProfileModules | null }) {
+  if (!profile) return null
   const scores: { label: string; value: number }[] = []
   const texts: string[] = []
   let patterns: string[] = []
@@ -129,9 +163,8 @@ function ProfileView({ title, profile }: { title: string; profile: ProfileModule
   }
   if (scores.length === 0 && texts.length === 0 && patterns.length === 0) return null
   return (
-    <div className="mt-5">
-      <p className="mb-2 text-sm font-semibold text-navy">{title}</p>
-      <div className="card space-y-3">
+    <Section title={title}>
+      <div className="space-y-3">
         {scores.length > 0 && (
           <div className="grid gap-x-5 gap-y-2 sm:grid-cols-2">
             {scores.map((s, i) => (
@@ -154,13 +187,13 @@ function ProfileView({ title, profile }: { title: string; profile: ProfileModule
         )}
         {texts.map((t, i) => <p key={i} className="text-sm italic leading-relaxed text-brand-muted">{t}</p>)}
       </div>
-    </div>
+    </Section>
   )
 }
 
 function SceneCard({ scene: s }: { scene: ExampleScene }) {
   return (
-    <div className="rounded-brand border border-brand-border bg-white px-5 py-4">
+    <div className="rounded-brand border border-brand-border bg-white px-4 py-3">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-semibold text-navy">{s.title ?? 'Szene'}</p>
         <div className="flex shrink-0 items-center gap-2">
@@ -174,12 +207,12 @@ function SceneCard({ scene: s }: { scene: ExampleScene }) {
           )}
         </div>
       </div>
-      {s.description && <p className="mt-2 text-sm leading-relaxed text-brand-text">{s.description}</p>}
-      {s.user_reaction && <p className="mt-1.5 text-sm italic leading-relaxed text-brand-muted">{s.user_reaction}</p>}
+      {s.description && <p className="mt-1.5 text-sm leading-relaxed text-brand-text whitespace-pre-wrap">{s.description}</p>}
+      {s.user_reaction && <p className="mt-1.5 text-xs italic text-brand-muted">Reaktion: {s.user_reaction}</p>}
       {s.pattern_tags.length > 0 && (
-        <div className="mt-2.5 flex flex-wrap gap-1.5">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {s.pattern_tags.map((t, i) => (
-            <span key={i} className="rounded-full bg-brand-bg px-2 py-0.5 text-[10px] text-brand-muted">{t}</span>
+            <span key={i} className="rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">{t}</span>
           ))}
         </div>
       )}
@@ -187,11 +220,26 @@ function SceneCard({ scene: s }: { scene: ExampleScene }) {
   )
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div>
-      <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-brand-muted">{label}</p>
-      <p className="text-sm leading-relaxed text-brand-text">{value}</p>
+    <div className="card">
+      <h2 className="mb-3 text-sm font-bold text-navy">{title}</h2>
+      {children}
     </div>
+  )
+}
+
+function Field({ label, wide, children }: { label: string; wide?: boolean; children: React.ReactNode }) {
+  return (
+    <div className={wide ? 'sm:col-span-2' : undefined}>
+      <dt className="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-muted">{label}</dt>
+      <dd className="whitespace-pre-wrap text-sm leading-relaxed text-navy">{children}</dd>
+    </div>
+  )
+}
+
+function InfoChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-block rounded-full bg-accent/10 px-2.5 py-0.5 text-sm font-medium text-accent">{children}</span>
   )
 }
