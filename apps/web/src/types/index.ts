@@ -307,6 +307,28 @@ export interface InstituteSubmissionDetail extends InstituteSubmission {
   payload: SubmissionPayload
 }
 
+export interface RubricCriterion {
+  key: string
+  name: string
+  description: string | null
+  max_points: number
+}
+
+export interface Rubric {
+  id: string
+  name: string
+  description: string | null
+  criteria: RubricCriterion[]
+  created_at: string | null
+  updated_at: string | null
+}
+
+export type RubricInput = {
+  name: string
+  description?: string | null
+  criteria: { key: string; name: string; description?: string | null; max_points: number }[]
+}
+
 export interface StudentInvite {
   id: string
   code: string

@@ -10,6 +10,8 @@ import type {
   StudentInvite,
   InstituteSubmission,
   InstituteSubmissionDetail,
+  Rubric,
+  RubricInput,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -59,4 +61,16 @@ export const instituteApi = {
     apiClient.get<InstituteSubmissionDetail>(`/institute/submissions/${id}`).then(r => r.data),
   reviewSubmission: (id: string, feedback: string | null) =>
     apiClient.post<{ reviewed: boolean }>(`/institute/submissions/${id}/feedback`, { feedback }).then(r => r.data),
+
+  // Bewertungsraster (Rubrics)
+  rubrics: () =>
+    apiClient.get<Rubric[]>('/institute/rubrics').then(r => r.data),
+  rubric: (id: string) =>
+    apiClient.get<Rubric>(`/institute/rubrics/${id}`).then(r => r.data),
+  rubricCreate: (data: RubricInput) =>
+    apiClient.post<Rubric>('/institute/rubrics', data).then(r => r.data),
+  rubricUpdate: (id: string, data: RubricInput) =>
+    apiClient.patch<Rubric>(`/institute/rubrics/${id}`, data).then(r => r.data),
+  rubricDelete: (id: string) =>
+    apiClient.delete(`/institute/rubrics/${id}`).then(r => r.data),
 }

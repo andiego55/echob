@@ -64,3 +64,19 @@ class AssignStudents(BaseModel):
 
 class SubmissionFeedback(BaseModel):
     feedback: str | None = Field(None, max_length=8000)
+    rubric_id: UUID | None = None
+    scores: list[dict] = Field(default_factory=list)
+    total_points: float | None = None
+
+
+class RubricCriterion(BaseModel):
+    key: str = Field(..., min_length=1, max_length=60)
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str | None = Field(None, max_length=1000)
+    max_points: int = Field(..., ge=1, le=100)
+
+
+class RubricUpsert(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str | None = Field(None, max_length=2000)
+    criteria: list[RubricCriterion] = Field(default_factory=list)

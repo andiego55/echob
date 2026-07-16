@@ -22,6 +22,7 @@ from app.schemas.institute import (
     InstituteProfileResponse,
     InstituteRegister,
     InstituteUpdate,
+    RubricUpsert,
     SubmissionFeedback,
 )
 from app.schemas.student import StudentInviteCreate
@@ -577,3 +578,92 @@ async def review_submission(
     if not row:
         raise HTTPException(status_code=404, detail="Einreichung nicht gefunden.")
     return {"reviewed": True}
+
+
+# ── Bewertungsraster (Rubrics) ────────────────────────────────────────────────
+
+def _rubric_out(row) -> dict:
+    criteria = row["criteria"]
+    if isinstance(criteria, str):
+        criteria = json.loads(criteria)
+    return {
+        "id": str(row["id"]), "name": row["name"], "description": row["description"],
+        "criteria": criteria or [],
+        "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+        "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+    }
+
+
+@router.get("/rubrics")
+async def list_rubrics(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT * FROM institute_rubrics WHERE institute_id = $1 ORDER BY created_at DESC",
+            current["institute"]["id"])
+    return [_rubric_out(r) for r in rows]
+
+
+@router.post("/rubrics")
+async def create_rubric(
+    body: RubricUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    criteria = json.dumps([c.model_dump() for c in body.criteria])
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "INSERT INTO institute_rubrics (institute_id, name, description, criteria) "
+            "VALUES ($1, $2, $3, $4::jsonb) RETURNING *",
+            current["institute"]["id"], body.name, body.description, criteria)
+    return _rubric_out(row)
+
+
+@router.get("/rubrics/{rubric_id}")
+async def get_rubric(
+    rubric_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM institute_rubrics WHERE id = $1 AND institute_id = $2",
+            rubric_id, current["institute"]["id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Raster nicht gefunden.")
+    return _rubric_out(row)
+
+
+@router.patch("/rubrics/{rubric_id}")
+async def update_rubric(
+    rubric_id: UUID,
+    body: RubricUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    criteria = json.dumps([c.model_dump() for c in body.criteria])
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE institute_rubrics SET name = $1, description = $2, criteria = $3::jsonb, "
+            "updated_at = NOW() WHERE id = $4 AND institute_id = $5 RETURNING *",
+            body.name, body.description, criteria, rubric_id, current["institute"]["id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Raster nicht gefunden.")
+    return _rubric_out(row)
+
+
+@router.delete("/rubrics/{rubric_id}")
+async def delete_rubric(
+    rubric_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        res = await conn.execute(
+            "DELETE FROM institute_rubrics WHERE id = $1 AND institute_id = $2",
+            rubric_id, current["institute"]["id"])
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Raster nicht gefunden.")
+    return {"deleted": True}

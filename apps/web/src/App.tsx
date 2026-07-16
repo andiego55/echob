@@ -103,6 +103,7 @@ import InstituteExampleEditorPage from '@/pages/institute/InstituteExampleEditor
 import InstituteStudentsPage from '@/pages/institute/InstituteStudentsPage'
 import InstituteSubmissionsPage from '@/pages/institute/InstituteSubmissionsPage'
 import InstituteSubmissionDetailPage from '@/pages/institute/InstituteSubmissionDetailPage'
+import InstituteRubricsPage from '@/pages/institute/InstituteRubricsPage'
 import StudentRoute, { useStudent } from '@/components/auth/StudentRoute'
 import StudentRegisterPage from '@/pages/student/StudentRegisterPage'
 import StudentDashboardPage from '@/pages/student/StudentDashboardPage'
@@ -223,6 +224,7 @@ export function AppRoutes() {
       <Route path="/institute/students" element={<InstituteRoute><InstituteStudentsPage /></InstituteRoute>} />
       <Route path="/institute/submissions" element={<InstituteRoute><InstituteSubmissionsPage /></InstituteRoute>} />
       <Route path="/institute/submissions/:id" element={<InstituteRoute><InstituteSubmissionDetailPage /></InstituteRoute>} />
+      <Route path="/institute/rubrics" element={<InstituteRoute><InstituteRubricsPage /></InstituteRoute>} />
 
       {/* ── Ausbildungsbereich · Student:in (Login + Rolle erforderlich) ──────── */}
       <Route path="/student/register" element={<ProtectedRoute><StudentRegisterPage /></ProtectedRoute>} />
