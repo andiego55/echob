@@ -2,7 +2,7 @@ import { apiClient } from './client'
 import type { Hypothesis } from './hypotheses'
 import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
-  StudentSubmission, Report, ReportCreate,
+  StudentSubmission, StudentEchoSession, StudentEchoChatResult, GlossaryTerm, Report, ReportCreate,
 } from '@/types'
 
 /** Student:in (eigene Ausbildungs-Domäne, /student/*). */
@@ -16,11 +16,21 @@ export const studentApi = {
   caseDetail: (copyId: string) =>
     apiClient.get<StudentCaseDetail>(`/student/cases/${copyId}`).then(r => r.data),
 
-  // Echo-Dialog über die Arbeitskopie
-  echoHistory: (copyId: string) =>
-    apiClient.get<StudentEchoMessage[]>(`/student/cases/${copyId}/echo/history`).then(r => r.data),
-  echoChat: (copyId: string, message: string) =>
-    apiClient.post<StudentEchoMessage>(`/student/cases/${copyId}/echo/chat`, { message }, { timeout: 120_000 }).then(r => r.data),
+  // Glossar (Echo-Dialog)
+  glossary: () =>
+    apiClient.get<GlossaryTerm[]>('/student/glossary').then(r => r.data),
+
+  // Echo-Dialog (session-basiert, mit Glossar) über die Arbeitskopie
+  echoSessions: (copyId: string) =>
+    apiClient.get<StudentEchoSession[]>(`/student/cases/${copyId}/echo/sessions`).then(r => r.data),
+  echoHistory: (copyId: string, sessionId: string) =>
+    apiClient.get<StudentEchoMessage[]>(`/student/cases/${copyId}/echo/history`, { params: { session_id: sessionId } }).then(r => r.data),
+  echoChat: (copyId: string, data: { message: string; session_id?: string; thread_type?: 'topic' | 'glossary'; glossary_slug?: string }) =>
+    apiClient.post<StudentEchoChatResult>(`/student/cases/${copyId}/echo/chat`, data, { timeout: 120_000 }).then(r => r.data),
+  echoSessionRename: (copyId: string, sessionId: string, title: string) =>
+    apiClient.patch<StudentEchoSession>(`/student/cases/${copyId}/echo/sessions/${sessionId}`, { title }).then(r => r.data),
+  echoSessionDelete: (copyId: string, sessionId: string) =>
+    apiClient.delete(`/student/cases/${copyId}/echo/sessions/${sessionId}`).then(r => r.data),
 
   // Berichte (student-scoped, wie Nutzer-Berichte)
   reports: (copyId: string) =>

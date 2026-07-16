@@ -16,12 +16,14 @@ from app.core.dependencies import get_current_student, get_current_user, get_poo
 from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS, ReportCreate
 from app.schemas.student import (
     StudentEchoChat,
+    StudentEchoChatRequest,
     StudentHypGenerate,
     StudentHypSave,
     StudentInviteAccept,
     StudentNotes,
     StudentProfileResponse,
     StudentReportUpdate,
+    StudentSessionRename,
     StudentSubmissionCreate,
 )
 from app.services import student_invite_service
@@ -225,8 +227,41 @@ async def _echo_turn(pool, echo_svc, *, case_id, user_id, message, thread_type):
             "created_at": arow["created_at"].isoformat() if arow["created_at"] else None}
 
 
-@router.get("/cases/{copy_id}/echo/history")
-async def echo_history(
+@router.get("/glossary")
+async def glossary(
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    """Glossarbegriffe für den Echo-Dialog (ohne Paar-spezifische paar_*-Begriffe)."""
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT slug, term, definition FROM glossary_terms ORDER BY sort_order, term")
+    return [{"slug": r["slug"], "term": r["term"], "definition": r["definition"]}
+            for r in rows if not r["slug"].startswith("paar_")]
+
+
+def _echo_msg_out(row) -> dict:
+    return {
+        "id": str(row["id"]),
+        "session_id": str(row["session_id"]) if row["session_id"] else None,
+        "role": row["role"],
+        "content": crypto.decrypt(row["content"]),
+        "safety_level": _safety_level(row["metadata"]),
+        "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+    }
+
+
+def _session_out(row) -> dict:
+    return {
+        "id": str(row["id"]),
+        "title": row["title"],
+        "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+        "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+    }
+
+
+@router.get("/cases/{copy_id}/echo/sessions")
+async def echo_sessions(
     copy_id: UUID,
     current: dict = Depends(get_current_student),
     pool=Depends(get_pool),
@@ -234,35 +269,142 @@ async def echo_history(
     async with pool.acquire() as conn:
         copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
         rows = await conn.fetch(
-            "SELECT id, role, content, metadata, created_at FROM echo_messages "
-            "WHERE case_id = $1 AND thread_type = 'topic' ORDER BY created_at LIMIT 200",
-            copy["case_id"])
-    return [
-        {"id": str(r["id"]), "role": r["role"], "content": crypto.decrypt(r["content"]),
-         "safety_level": _safety_level(r["metadata"]),
-         "created_at": r["created_at"].isoformat() if r["created_at"] else None}
-        for r in rows
-    ]
+            "SELECT * FROM echo_chat_sessions WHERE case_id = $1 AND user_id = $2 "
+            "ORDER BY updated_at DESC", copy["case_id"], current["user_id"])
+    return [_session_out(r) for r in rows]
+
+
+@router.get("/cases/{copy_id}/echo/history")
+async def echo_history(
+    copy_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        owns = await conn.fetchrow(
+            "SELECT id FROM echo_chat_sessions WHERE id = $1 AND case_id = $2 AND user_id = $3",
+            session_id, copy["case_id"], current["user_id"])
+        if not owns:
+            raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT id, session_id, role, content, metadata, created_at FROM echo_messages "
+            "WHERE session_id = $1 ORDER BY created_at LIMIT 200", session_id)
+    return [_echo_msg_out(r) for r in rows]
 
 
 @router.post("/cases/{copy_id}/echo/chat")
 async def echo_chat(
     copy_id: UUID,
-    body: StudentEchoChat,
+    body: StudentEchoChatRequest,
     request: Request,
     current: dict = Depends(get_current_student),
     pool=Depends(get_pool),
 ) -> dict:
-    """Echo-Dialog über die zugewiesene Arbeitskopie — voller Fallkontext (Onboarding,
-    Szenen, Selbstbild, Fremdeinschätzung), mit Krisen-Erkennung wie im Nutzer-Echo."""
+    """Freier Echo-Dialog (session-basiert) über die Arbeitskopie — voller Fallkontext,
+    optional Glossar-Dialog, mit Krisen-Erkennung wie im Nutzer-Echo."""
     echo_svc = request.app.state.echo_service
     if echo_svc is None:
         raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    uid = current["user_id"]
     async with pool.acquire() as conn:
         copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
-    return await _echo_turn(
-        pool, echo_svc, case_id=copy["case_id"], user_id=current["user_id"],
-        message=body.message, thread_type="topic")
+        case_id = copy["case_id"]
+        if body.session_id:
+            sess = await conn.fetchrow(
+                "SELECT id FROM echo_chat_sessions WHERE id = $1 AND case_id = $2 AND user_id = $3",
+                body.session_id, case_id, uid)
+            if not sess:
+                raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+            session_id = sess["id"]
+        else:
+            sess = await conn.fetchrow(
+                "INSERT INTO echo_chat_sessions (case_id, user_id) VALUES ($1, $2) RETURNING id",
+                case_id, uid)
+            session_id = sess["id"]
+        glossary_term = None
+        if body.thread_type == "glossary" and body.glossary_slug:
+            g = await conn.fetchrow("SELECT term FROM glossary_terms WHERE slug = $1", body.glossary_slug)
+            if g:
+                glossary_term = g["term"]
+        case_row, onboarding, scenes, extra_context = await _load_case_echo_context(conn, case_id)
+        history_rows = await conn.fetch(
+            "SELECT role, content FROM echo_messages WHERE session_id = $1 "
+            "ORDER BY created_at DESC LIMIT 20", session_id)
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in reversed(history_rows)]
+    thread_type = "glossary" if body.thread_type == "glossary" else "topic"
+
+    async def _answer() -> str:
+        return await echo_svc.chat(
+            user_message=body.message, case_context=dict(case_row), thread_type=thread_type,
+            history=history, glossary_term=glossary_term, onboarding=onboarding,
+            scenes=scenes, scale_scores=[], extra_context=extra_context)
+
+    safety_meta: dict = {}
+    risk = await echo_svc.classify_risk(text=body.message)
+    level = risk.get("level", "none")
+    if level == "acute":
+        answer = build_safety_message("acute", category=risk.get("category"))
+        safety_meta = {"safety": {"level": "acute", "category": risk.get("category"), "mode": "intervention"}}
+    else:
+        answer = await _answer()
+        if level == "elevated":
+            answer = answer.rstrip() + "\n\n" + build_safety_message("elevated", category=risk.get("category"))
+            safety_meta = {"safety": {"level": "elevated", "category": risk.get("category"), "mode": "appended"}}
+
+    async with pool.acquire() as conn:
+        urow = await conn.fetchrow(
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, session_id) "
+            "VALUES ($1, $2, 'user', $3, $4, $5) "
+            "RETURNING id, session_id, role, content, metadata, created_at",
+            case_id, uid, crypto.encrypt(body.message), thread_type, session_id)
+        arow = await conn.fetchrow(
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, session_id, metadata) "
+            "VALUES ($1, $2, 'assistant', $3, $4, $5, $6::jsonb) "
+            "RETURNING id, session_id, role, content, metadata, created_at",
+            case_id, uid, crypto.encrypt(answer), thread_type, session_id, json.dumps(safety_meta))
+        await conn.execute(
+            "UPDATE echo_chat_sessions SET updated_at = NOW(), title = COALESCE(title, LEFT($2, 60)) "
+            "WHERE id = $1", session_id, body.message.strip())
+    return {"user_message": _echo_msg_out(urow), "assistant_message": _echo_msg_out(arow),
+            "session_id": str(session_id)}
+
+
+@router.patch("/cases/{copy_id}/echo/sessions/{session_id}")
+async def echo_session_rename(
+    copy_id: UUID,
+    session_id: UUID,
+    body: StudentSessionRename,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        row = await conn.fetchrow(
+            "UPDATE echo_chat_sessions SET title = $1 "
+            "WHERE id = $2 AND case_id = $3 AND user_id = $4 RETURNING *",
+            body.title.strip(), session_id, copy["case_id"], current["user_id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return _session_out(row)
+
+
+@router.delete("/cases/{copy_id}/echo/sessions/{session_id}")
+async def echo_session_delete(
+    copy_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        res = await conn.execute(
+            "DELETE FROM echo_chat_sessions WHERE id = $1 AND case_id = $2 AND user_id = $3",
+            session_id, copy["case_id"], current["user_id"])
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return {"deleted": True}
 
 
 # ── Berichte (student-scoped, wie Nutzer-Berichte) ────────────────────────────

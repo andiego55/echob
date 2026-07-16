@@ -237,10 +237,24 @@ export interface StudentCaseDetail {
 
 export interface StudentEchoMessage {
   id: string
+  session_id?: string | null
   role: 'user' | 'assistant'
   content: string
   safety_level: 'elevated' | 'acute' | null
   created_at: string | null
+}
+
+export interface StudentEchoSession {
+  id: string
+  title: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface StudentEchoChatResult {
+  user_message: StudentEchoMessage
+  assistant_message: StudentEchoMessage
+  session_id: string
 }
 
 export interface StudentNotes {

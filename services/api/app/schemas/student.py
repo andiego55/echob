@@ -32,6 +32,18 @@ class StudentEchoChat(BaseModel):
     message: str = Field(..., min_length=1, max_length=4000)
 
 
+class StudentEchoChatRequest(BaseModel):
+    """Freier Echo-Chat (session-basiert, optional Glossar-Dialog)."""
+    message: str = Field(..., min_length=1, max_length=4000)
+    session_id: UUID | None = None
+    thread_type: str = "topic"          # 'topic' | 'glossary'
+    glossary_slug: str | None = Field(None, max_length=120)
+
+
+class StudentSessionRename(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+
+
 class StudentReportUpdate(BaseModel):
     sections: list[dict] = Field(default_factory=list)
 
