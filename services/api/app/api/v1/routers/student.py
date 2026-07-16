@@ -269,7 +269,7 @@ async def echo_sessions(
     async with pool.acquire() as conn:
         copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
         rows = await conn.fetch(
-            "SELECT * FROM echo_chat_sessions WHERE case_id = $1 AND user_id = $2 "
+            "SELECT * FROM echo_chat_sessions WHERE case_id = $1 AND user_id = $2 AND kind = 'echo' "
             "ORDER BY updated_at DESC", copy["case_id"], current["user_id"])
     return [_session_out(r) for r in rows]
 
@@ -865,46 +865,49 @@ async def _build_couple_context(conn, primary_case_id, partner_case_id) -> str:
     )
 
 
-async def _couple_turn(pool, echo_svc, *, primary_case_id, partner_case_id, user_id, message):
+async def _couple_turn(pool, echo_svc, *, primary_case_id, partner_case_id, user_id, session_id,
+                       message, glossary_term=None, glossary_definition=None):
     async with pool.acquire() as conn:
         combined = await _build_couple_context(conn, primary_case_id, partner_case_id)
         history_rows = await conn.fetch(
-            "SELECT role, content FROM echo_messages WHERE case_id = $1 AND thread_type = 'couple' "
-            "ORDER BY created_at DESC LIMIT 20", primary_case_id)
+            "SELECT role, content FROM echo_messages WHERE session_id = $1 "
+            "ORDER BY created_at DESC LIMIT 20", session_id)
     history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in reversed(history_rows)]
 
     async def _answer() -> str:
         return await echo_svc.professional_chat(
             user_message=message, shared_context=combined, history=history,
+            glossary_term=glossary_term, glossary_definition=glossary_definition,
             prompt_file="echo_couple_prompt.md")
 
     safety_meta: dict = {}
-    if message.startswith("__"):
-        answer = await _answer()
+    risk = await echo_svc.classify_risk(text=message)
+    level = risk.get("level", "none")
+    if level == "acute":
+        answer = build_safety_message("acute", category=risk.get("category"))
+        safety_meta = {"safety": {"level": "acute", "category": risk.get("category"), "mode": "intervention"}}
     else:
-        risk = await echo_svc.classify_risk(text=message)
-        level = risk.get("level", "none")
-        if level == "acute":
-            answer = build_safety_message("acute", category=risk.get("category"))
-            safety_meta = {"safety": {"level": "acute", "category": risk.get("category"), "mode": "intervention"}}
-        else:
-            answer = await _answer()
-            if level == "elevated":
-                answer = answer.rstrip() + "\n\n" + build_safety_message("elevated", category=risk.get("category"))
-                safety_meta = {"safety": {"level": "elevated", "category": risk.get("category"), "mode": "appended"}}
+        answer = await _answer()
+        if level == "elevated":
+            answer = answer.rstrip() + "\n\n" + build_safety_message("elevated", category=risk.get("category"))
+            safety_meta = {"safety": {"level": "elevated", "category": risk.get("category"), "mode": "appended"}}
 
     async with pool.acquire() as conn:
-        await conn.execute(
-            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type) "
-            "VALUES ($1, $2, 'user', $3, 'couple')",
-            primary_case_id, user_id, crypto.encrypt(message))
+        urow = await conn.fetchrow(
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, session_id) "
+            "VALUES ($1, $2, 'user', $3, 'couple', $4) "
+            "RETURNING id, session_id, role, content, metadata, created_at",
+            primary_case_id, user_id, crypto.encrypt(message), session_id)
         arow = await conn.fetchrow(
-            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata) "
-            "VALUES ($1, $2, 'assistant', $3, 'couple', $4::jsonb) RETURNING id, created_at",
-            primary_case_id, user_id, crypto.encrypt(answer), json.dumps(safety_meta))
-    return {"id": str(arow["id"]), "role": "assistant", "content": answer,
-            "safety_level": (safety_meta.get("safety") or {}).get("level"),
-            "created_at": arow["created_at"].isoformat() if arow["created_at"] else None}
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, session_id, metadata) "
+            "VALUES ($1, $2, 'assistant', $3, 'couple', $4, $5::jsonb) "
+            "RETURNING id, session_id, role, content, metadata, created_at",
+            primary_case_id, user_id, crypto.encrypt(answer), session_id, json.dumps(safety_meta))
+        await conn.execute(
+            "UPDATE echo_chat_sessions SET updated_at = NOW(), title = COALESCE(title, LEFT($2, 60)) "
+            "WHERE id = $1", session_id, message.strip())
+    return {"user_message": _echo_msg_out(urow), "assistant_message": _echo_msg_out(arow),
+            "session_id": str(session_id)}
 
 
 def _require_partner(copy) -> None:
@@ -912,8 +915,8 @@ def _require_partner(copy) -> None:
         raise HTTPException(status_code=400, detail="Dieser Fall hat keine Partnerperson.")
 
 
-@router.get("/cases/{copy_id}/couple/history")
-async def couple_history(
+@router.get("/cases/{copy_id}/couple/sessions")
+async def couple_sessions(
     copy_id: UUID,
     current: dict = Depends(get_current_student),
     pool=Depends(get_pool),
@@ -922,45 +925,107 @@ async def couple_history(
         copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
         _require_partner(copy)
         rows = await conn.fetch(
-            "SELECT id, role, content, metadata, created_at FROM echo_messages "
-            "WHERE case_id = $1 AND thread_type = 'couple' ORDER BY created_at LIMIT 200",
-            copy["case_id"])
-    return [
-        {"id": str(r["id"]), "role": r["role"], "content": crypto.decrypt(r["content"]),
-         "safety_level": _safety_level(r["metadata"]),
-         "created_at": r["created_at"].isoformat() if r["created_at"] else None}
-        for r in rows
-    ]
+            "SELECT * FROM echo_chat_sessions WHERE case_id = $1 AND user_id = $2 AND kind = 'couple' "
+            "ORDER BY updated_at DESC", copy["case_id"], current["user_id"])
+    return [_session_out(r) for r in rows]
+
+
+@router.get("/cases/{copy_id}/couple/history")
+async def couple_history(
+    copy_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        _require_partner(copy)
+        owns = await conn.fetchrow(
+            "SELECT id FROM echo_chat_sessions "
+            "WHERE id = $1 AND case_id = $2 AND user_id = $3 AND kind = 'couple'",
+            session_id, copy["case_id"], current["user_id"])
+        if not owns:
+            raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT id, session_id, role, content, metadata, created_at FROM echo_messages "
+            "WHERE session_id = $1 ORDER BY created_at LIMIT 200", session_id)
+    return [_echo_msg_out(r) for r in rows]
 
 
 @router.post("/cases/{copy_id}/couple/chat")
 async def couple_chat(
     copy_id: UUID,
-    body: StudentEchoChat,
+    body: StudentEchoChatRequest,
     request: Request,
     current: dict = Depends(get_current_student),
     pool=Depends(get_pool),
 ) -> dict:
-    """Paar-Echo-Zug über primary + partner der Arbeitskopie (allparteilich)."""
+    """Paar-Echo (session-basiert) über primary + partner (allparteilich), optional Glossar."""
     echo_svc = request.app.state.echo_service
     if echo_svc is None:
         raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    uid = current["user_id"]
     async with pool.acquire() as conn:
         copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
         _require_partner(copy)
+        case_id = copy["case_id"]
+        if body.session_id:
+            sess = await conn.fetchrow(
+                "SELECT id FROM echo_chat_sessions "
+                "WHERE id = $1 AND case_id = $2 AND user_id = $3 AND kind = 'couple'",
+                body.session_id, case_id, uid)
+            if not sess:
+                raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+            session_id = sess["id"]
+        else:
+            sess = await conn.fetchrow(
+                "INSERT INTO echo_chat_sessions (case_id, user_id, kind) "
+                "VALUES ($1, $2, 'couple') RETURNING id", case_id, uid)
+            session_id = sess["id"]
+        glossary_term = glossary_definition = None
+        if body.thread_type == "glossary" and body.glossary_slug:
+            g = await conn.fetchrow(
+                "SELECT term, definition FROM glossary_terms WHERE slug = $1", body.glossary_slug)
+            if g:
+                glossary_term, glossary_definition = g["term"], g["definition"]
     return await _couple_turn(
-        pool, echo_svc, primary_case_id=copy["case_id"], partner_case_id=copy["partner_case_id"],
-        user_id=current["user_id"], message=body.message)
+        pool, echo_svc, primary_case_id=case_id, partner_case_id=copy["partner_case_id"],
+        user_id=uid, session_id=session_id, message=body.message,
+        glossary_term=glossary_term, glossary_definition=glossary_definition)
 
 
-@router.delete("/cases/{copy_id}/couple/history")
-async def couple_reset(
+@router.patch("/cases/{copy_id}/couple/sessions/{session_id}")
+async def couple_session_rename(
     copy_id: UUID,
+    session_id: UUID,
+    body: StudentSessionRename,
     current: dict = Depends(get_current_student),
     pool=Depends(get_pool),
 ) -> dict:
     async with pool.acquire() as conn:
         copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
-        await conn.execute(
-            "DELETE FROM echo_messages WHERE case_id = $1 AND thread_type = 'couple'", copy["case_id"])
+        row = await conn.fetchrow(
+            "UPDATE echo_chat_sessions SET title = $1 "
+            "WHERE id = $2 AND case_id = $3 AND user_id = $4 AND kind = 'couple' RETURNING *",
+            body.title.strip(), session_id, copy["case_id"], current["user_id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return _session_out(row)
+
+
+@router.delete("/cases/{copy_id}/couple/sessions/{session_id}")
+async def couple_session_delete(
+    copy_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        res = await conn.execute(
+            "DELETE FROM echo_chat_sessions "
+            "WHERE id = $1 AND case_id = $2 AND user_id = $3 AND kind = 'couple'",
+            session_id, copy["case_id"], current["user_id"])
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
     return {"deleted": True}

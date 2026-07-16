@@ -72,11 +72,15 @@ export const studentApi = {
   submissions: (copyId: string) =>
     apiClient.get<StudentSubmission[]>(`/student/cases/${copyId}/submissions`).then(r => r.data),
 
-  // Paar-Analyse (nur bei Arbeitskopien mit Partnerperson) — thread_type 'couple'
-  coupleHistory: (copyId: string) =>
-    apiClient.get<StudentEchoMessage[]>(`/student/cases/${copyId}/couple/history`).then(r => r.data),
-  coupleChat: (copyId: string, message: string) =>
-    apiClient.post<StudentEchoMessage>(`/student/cases/${copyId}/couple/chat`, { message }, { timeout: 120_000 }).then(r => r.data),
-  coupleReset: (copyId: string) =>
-    apiClient.delete(`/student/cases/${copyId}/couple/history`).then(r => r.data),
+  // Paar-Analyse (session-basiert, mit Glossar) — nur bei Arbeitskopien mit Partnerperson
+  coupleSessions: (copyId: string) =>
+    apiClient.get<StudentEchoSession[]>(`/student/cases/${copyId}/couple/sessions`).then(r => r.data),
+  coupleHistory: (copyId: string, sessionId: string) =>
+    apiClient.get<StudentEchoMessage[]>(`/student/cases/${copyId}/couple/history`, { params: { session_id: sessionId } }).then(r => r.data),
+  coupleChat: (copyId: string, data: { message: string; session_id?: string; thread_type?: 'topic' | 'glossary'; glossary_slug?: string }) =>
+    apiClient.post<StudentEchoChatResult>(`/student/cases/${copyId}/couple/chat`, data, { timeout: 120_000 }).then(r => r.data),
+  coupleSessionRename: (copyId: string, sessionId: string, title: string) =>
+    apiClient.patch<StudentEchoSession>(`/student/cases/${copyId}/couple/sessions/${sessionId}`, { title }).then(r => r.data),
+  coupleSessionDelete: (copyId: string, sessionId: string) =>
+    apiClient.delete(`/student/cases/${copyId}/couple/sessions/${sessionId}`).then(r => r.data),
 }
