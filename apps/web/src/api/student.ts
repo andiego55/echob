@@ -2,8 +2,11 @@ import { apiClient } from './client'
 import type { Hypothesis } from './hypotheses'
 import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
-  StudentSubmission, StudentEchoSession, StudentEchoChatResult, GlossaryTerm, Report, ReportCreate,
+  StudentSubmission, StudentSessionNote, StudentEchoSession, StudentEchoChatResult,
+  GlossaryTerm, Report, ReportCreate,
 } from '@/types'
+
+type SessionNoteInput = { session_date?: string | null; title?: string | null; sections: { heading: string; text: string }[] }
 
 /** Student:in (eigene Ausbildungs-Domäne, /student/*). */
 export const studentApi = {
@@ -44,11 +47,21 @@ export const studentApi = {
   reportDelete: (copyId: string, reportId: string) =>
     apiClient.delete(`/student/cases/${copyId}/reports/${reportId}`).then(r => r.data),
 
-  // Notizen (student-scoped, wie Fachpersonen-Notizen)
+  // Notizen: stehender Fallüberblick (6 Felder)
   notes: (copyId: string) =>
     apiClient.get<StudentNotes>(`/student/cases/${copyId}/notes`).then(r => r.data),
   notesSave: (copyId: string, data: StudentNotes) =>
     apiClient.put<StudentNotes>(`/student/cases/${copyId}/notes`, data).then(r => r.data),
+
+  // Notizen: Sitzungsverlauf (titelbare Notizen aus Vorlagen)
+  sessionNotes: (copyId: string) =>
+    apiClient.get<StudentSessionNote[]>(`/student/cases/${copyId}/session-notes`).then(r => r.data),
+  sessionNoteCreate: (copyId: string, data: SessionNoteInput) =>
+    apiClient.post<StudentSessionNote>(`/student/cases/${copyId}/session-notes`, data).then(r => r.data),
+  sessionNoteUpdate: (copyId: string, noteId: string, data: SessionNoteInput) =>
+    apiClient.put<StudentSessionNote>(`/student/cases/${copyId}/session-notes/${noteId}`, data).then(r => r.data),
+  sessionNoteDelete: (copyId: string, noteId: string) =>
+    apiClient.delete(`/student/cases/${copyId}/session-notes/${noteId}`).then(r => r.data),
 
   // Hypothesen (geführte Dialoge, student-scoped — thread_type hyp_*)
   hypotheses: (copyId: string) =>

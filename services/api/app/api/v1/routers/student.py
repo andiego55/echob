@@ -23,6 +23,7 @@ from app.schemas.student import (
     StudentNotes,
     StudentProfileResponse,
     StudentReportUpdate,
+    StudentSessionNoteCreate,
     StudentSessionRename,
     StudentSubmissionCreate,
 )
@@ -588,6 +589,94 @@ async def save_notes(
             sid, copy["case_id"], body.first_impressions, body.key_scenes, body.open_questions,
             body.conversation_prompts, body.next_steps, body.free_text)
     return StudentNotes(**{f: row[f] for f in _NOTE_FIELDS})
+
+
+# ── Sitzungsnotizen (titelbar, aus Vorlagen — wie Fachpersonen-Sitzungsnotizen) ─
+
+def _snote_out(row) -> dict:
+    content = row["content"]
+    if isinstance(content, str):
+        content = json.loads(content)
+    return {
+        "id": str(row["id"]),
+        "session_date": row["session_date"].isoformat() if row["session_date"] else None,
+        "title": row["title"],
+        "content": content or {"sections": []},
+        "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+        "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+    }
+
+
+@router.get("/cases/{copy_id}/session-notes")
+async def list_session_notes(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        rows = await conn.fetch(
+            "SELECT * FROM student_session_notes WHERE student_id = $1 AND case_id = $2 "
+            "ORDER BY session_date DESC NULLS LAST, created_at DESC",
+            current["student"]["id"], copy["case_id"])
+    return [_snote_out(r) for r in rows]
+
+
+@router.post("/cases/{copy_id}/session-notes")
+async def create_session_note(
+    copy_id: UUID,
+    body: StudentSessionNoteCreate,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    sid = current["student"]["id"]
+    content = json.dumps({"sections": body.sections})
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, sid)
+        row = await conn.fetchrow(
+            "INSERT INTO student_session_notes (student_id, case_id, session_date, title, content) "
+            "VALUES ($1, $2, $3, $4, $5::jsonb) RETURNING *",
+            sid, copy["case_id"], body.session_date, body.title, content)
+    return _snote_out(row)
+
+
+@router.put("/cases/{copy_id}/session-notes/{note_id}")
+async def update_session_note(
+    copy_id: UUID,
+    note_id: UUID,
+    body: StudentSessionNoteCreate,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    sid = current["student"]["id"]
+    content = json.dumps({"sections": body.sections})
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, sid)
+        row = await conn.fetchrow(
+            "UPDATE student_session_notes SET session_date = $1, title = $2, content = $3::jsonb, "
+            "updated_at = NOW() WHERE id = $4 AND student_id = $5 AND case_id = $6 RETURNING *",
+            body.session_date, body.title, content, note_id, sid, copy["case_id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Notiz nicht gefunden.")
+    return _snote_out(row)
+
+
+@router.delete("/cases/{copy_id}/session-notes/{note_id}")
+async def delete_session_note(
+    copy_id: UUID,
+    note_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    sid = current["student"]["id"]
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, sid)
+        res = await conn.execute(
+            "DELETE FROM student_session_notes WHERE id = $1 AND student_id = $2 AND case_id = $3",
+            note_id, sid, copy["case_id"])
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Notiz nicht gefunden.")
+    return {"deleted": True}
 
 
 # ── Hypothesen (student-scoped, geführte Dialoge wie im Nutzer-Bereich) ────────

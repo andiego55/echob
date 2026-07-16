@@ -277,6 +277,15 @@ export interface StudentSubmission {
   reviewed_at: string | null
 }
 
+export interface StudentSessionNote {
+  id: string
+  session_date: string | null
+  title: string | null
+  content: { sections: { heading: string; text: string }[] }
+  created_at: string | null
+  updated_at: string | null
+}
+
 export interface SubmissionPayload {
   hypotheses: { label: string; summary_text: string }[]
   notes: StudentNotes | null

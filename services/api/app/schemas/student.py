@@ -1,7 +1,7 @@
 """Schemas: Student:in (Ausbildungs-Domäne, /student/*)."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -59,6 +59,12 @@ class StudentHypGenerate(BaseModel):
 
 class StudentSubmissionCreate(BaseModel):
     message: str | None = Field(None, max_length=4000)
+
+
+class StudentSessionNoteCreate(BaseModel):
+    session_date: date | None = None
+    title: str | None = Field(None, max_length=200)
+    sections: list[dict] = Field(default_factory=list)
 
 
 class StudentNotes(BaseModel):
