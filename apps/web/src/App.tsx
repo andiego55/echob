@@ -115,6 +115,7 @@ import StudentNotesPage from '@/pages/student/StudentNotesPage'
 import StudentHypothesesPage from '@/pages/student/StudentHypothesesPage'
 import StudentHypothesisDialogPage from '@/pages/student/StudentHypothesisDialogPage'
 import StudentSubmitPage from '@/pages/student/StudentSubmitPage'
+import StudentCouplePage from '@/pages/student/StudentCouplePage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -232,6 +233,7 @@ export function AppRoutes() {
       <Route path="/student/cases/:id/reports/new" element={<StudentRoute><StudentReportNewPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/:reportId" element={<StudentRoute><StudentReportDetailPage /></StudentRoute>} />
       <Route path="/student/cases/:id/notes" element={<StudentRoute><StudentNotesPage /></StudentRoute>} />
+      <Route path="/student/cases/:id/couple" element={<StudentRoute><StudentCouplePage /></StudentRoute>} />
       <Route path="/student/cases/:id/submit" element={<StudentRoute><StudentSubmitPage /></StudentRoute>} />
 
       {/* ── Fallback ───────────────────────────────────────────────────────── */}

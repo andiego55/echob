@@ -61,4 +61,12 @@ export const studentApi = {
     apiClient.post<StudentSubmission>(`/student/cases/${copyId}/submit`, { message }).then(r => r.data),
   submissions: (copyId: string) =>
     apiClient.get<StudentSubmission[]>(`/student/cases/${copyId}/submissions`).then(r => r.data),
+
+  // Paar-Analyse (nur bei Arbeitskopien mit Partnerperson) — thread_type 'couple'
+  coupleHistory: (copyId: string) =>
+    apiClient.get<StudentEchoMessage[]>(`/student/cases/${copyId}/couple/history`).then(r => r.data),
+  coupleChat: (copyId: string, message: string) =>
+    apiClient.post<StudentEchoMessage>(`/student/cases/${copyId}/couple/chat`, { message }, { timeout: 120_000 }).then(r => r.data),
+  coupleReset: (copyId: string) =>
+    apiClient.delete(`/student/cases/${copyId}/couple/history`).then(r => r.data),
 }

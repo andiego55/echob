@@ -3,18 +3,34 @@
  * Wird auf allen /student/cases/:id/* Seiten angezeigt.
  */
 import { NavLink } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { studentApi } from '@/api/student'
 
-const tabs = [
+const baseTabs = [
   { path: '',            label: 'Fall'        },
   { path: '/echo',       label: 'Echo'        },
   { path: '/hypotheses', label: 'Hypothesen'  },
   { path: '/reports',    label: 'Berichte'    },
   { path: '/notes',      label: 'Notizen'     },
-  { path: '/submit',     label: 'An Institut' },
 ]
 
 export default function StudentCaseNav({ copyId }: { copyId: string }) {
   const base = `/student/cases/${copyId}`
+
+  // Paar-Analyse-Tab nur, wenn die Arbeitskopie eine Partnerperson hat.
+  // Gleicher Query-Key wie die Fallansicht → geteilter Cache, kein Extra-Load.
+  const { data: detail } = useQuery({
+    queryKey: ['student-case', copyId],
+    queryFn: () => studentApi.caseDetail(copyId),
+    enabled: !!copyId,
+    staleTime: 60_000,
+  })
+
+  const tabs = [
+    ...baseTabs,
+    ...(detail?.partner ? [{ path: '/couple', label: 'Paar-Analyse' }] : []),
+    { path: '/submit', label: 'An Institut' },
+  ]
   return (
     <div className="border-b border-brand-border bg-white sticky top-14 z-30">
       <div className="mx-auto max-w-[1100px] px-6 flex items-stretch">
