@@ -6,6 +6,7 @@ students-Zeile). Registrierung läuft über /student/accept (Einladungscode/-Tok
 from __future__ import annotations
 
 import json
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -14,6 +15,7 @@ from app.api.v1.routers.institute import _load_case_part  # generischer Fall-Loa
 from app.core import crypto
 from app.core.dependencies import get_current_student, get_current_user, get_pool
 from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS, ReportCreate
+from app.schemas.scale import SCALE_DEFINITIONS, SCALE_LABELS
 from app.schemas.student import (
     StudentEchoChat,
     StudentEchoChatRequest,
@@ -32,6 +34,7 @@ from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import HYPOTHESIS_LABELS, build_hypothesis_context
 from app.services.person_profile_service import build_person_context
 from app.services.profile_service import build_profile_context
+from app.services.review_service import compute_trends, format_trends_for_prompt
 from app.services.safety_service import build_safety_message
 
 router = APIRouter(prefix="/student", tags=["student"])
@@ -1117,4 +1120,200 @@ async def couple_session_delete(
             session_id, copy["case_id"], current["user_id"])
     if res == "DELETE 0":
         raise HTTPException(status_code=404, detail="Chat nicht gefunden.")
+    return {"deleted": True}
+
+
+# ── Muster & Skalen (KI-Einschätzung der Fallperson, wie Nutzer /scales) ───────
+
+def _quality(n: int) -> str:
+    return "insufficient" if n == 0 else "limited" if n < 3 else "moderate" if n < 7 else "good"
+
+
+def _scale_out(row) -> dict:
+    d = dict(row)
+    src = d.get("source_scene_ids")
+    if isinstance(src, str):
+        src = json.loads(src)
+    return {
+        "id": str(d["id"]), "scale_key": d["scale_key"],
+        "label": SCALE_LABELS.get(d["scale_key"], d["scale_key"]),
+        "score": float(d["score"]), "scene_count": d.get("scene_count", 0),
+        "confidence": d.get("confidence", "low"),
+        "source_scene_ids": src or [], "notes": d.get("notes"),
+    }
+
+
+async def _scales_overview(conn, case_id) -> dict:
+    rows = await conn.fetch(
+        "SELECT * FROM scale_scores WHERE case_id = $1 ORDER BY calculated_at DESC", case_id)
+    n = await conn.fetchval(
+        "SELECT COUNT(*) FROM scenes WHERE case_id = $1 AND confirmed_by_user = true", case_id)
+    return {"case_id": str(case_id), "scores": [_scale_out(r) for r in rows],
+            "total_scenes": n or 0, "data_quality": _quality(n or 0),
+            "disclaimer": "EchoB stellt keine Diagnosen. Die Skalen sind KI-gestützte, vorläufige "
+                          "Einschätzungen auf Basis der dokumentierten Szenen – kein Ersatz für fachliche Abklärung."}
+
+
+@router.get("/cases/{copy_id}/scales")
+async def get_scales(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        return await _scales_overview(conn, copy["case_id"])
+
+
+@router.post("/cases/{copy_id}/scales/calculate")
+async def calculate_scales(
+    copy_id: UUID,
+    request: Request,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Berechnet die Skalen der Fallperson per KI und speichert sie."""
+    echo_svc = request.app.state.echo_service
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    uid = current["user_id"]
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        cid = copy["case_id"]
+        case_row = await conn.fetchrow("SELECT * FROM cases WHERE id = $1", cid)
+        scene_rows = await conn.fetch(
+            "SELECT * FROM scenes WHERE case_id = $1 AND confirmed_by_user = true "
+            "ORDER BY scene_date DESC NULLS LAST", cid)
+        onboarding_row = await conn.fetchrow("SELECT * FROM onboarding_answers WHERE case_id = $1", cid)
+        pp_row = await conn.fetchrow("SELECT * FROM person_profiles WHERE case_id = $1", cid)
+        hyp_rows = await conn.fetch(
+            "SELECT hypothesis_type, summary_text FROM case_hypotheses WHERE case_id = $1", cid)
+    scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
+    onboarding = (crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+                  if onboarding_row else None)
+    scales = await echo_svc.calculate_scales(
+        case_context=dict(case_row), scenes=scenes, onboarding=onboarding,
+        person_profile=dict(pp_row) if pp_row else None, topic_summaries=[],
+        hypotheses=[crypto.decrypt_fields(dict(r), "summary_text") for r in hyp_rows])
+
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM scale_scores WHERE case_id = $1 AND user_id = $2", cid, uid)
+        for s in scales:
+            sk = s.get("scale_key", "")
+            if sk not in SCALE_DEFINITIONS:
+                continue
+            await conn.execute(
+                "INSERT INTO scale_scores "
+                "(case_id, user_id, scale_key, score, scene_count, confidence, source_scene_ids, notes) "
+                "VALUES ($1, $2, $3, $4, $5, $6, '[]'::jsonb, $7)",
+                cid, uid, sk, float(s.get("score", 2.5)), int(s.get("scene_count", 0)),
+                s.get("confidence", "low"), s.get("notes"))
+        return await _scales_overview(conn, cid)
+
+
+# ── Verlauf & Rückblick (deterministische Trends + LLM-Narrativ, wie /reviews) ─
+
+_MAX_REVIEWS = 24
+
+
+def _review_out(row) -> dict:
+    d = dict(row)
+    stats = d.get("stats")
+    if isinstance(stats, str):
+        stats = json.loads(stats)
+    return {
+        "id": str(d["id"]), "case_id": str(d["case_id"]),
+        "period_start": d["period_start"].isoformat() if d["period_start"] else None,
+        "period_end": d["period_end"].isoformat() if d["period_end"] else None,
+        "narrative": d["narrative"], "stats": stats or {}, "scene_count": d["scene_count"],
+        "created_at": d["created_at"].isoformat() if d["created_at"] else None,
+    }
+
+
+@router.get("/cases/{copy_id}/reviews/trends")
+async def review_trends(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        cid = copy["case_id"]
+        scene_rows = await conn.fetch(
+            "SELECT * FROM scenes WHERE case_id = $1 ORDER BY scene_date ASC NULLS LAST, created_at ASC", cid)
+        scale_rows = await conn.fetch("SELECT * FROM scale_scores WHERE case_id = $1", cid)
+    scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
+    return compute_trends(scenes, [dict(r) for r in scale_rows])
+
+
+@router.get("/cases/{copy_id}/reviews")
+async def list_reviews(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        rows = await conn.fetch(
+            "SELECT * FROM case_reviews WHERE case_id = $1 ORDER BY created_at DESC", copy["case_id"])
+    return {"reviews": [_review_out(r) for r in rows], "total": len(rows)}
+
+
+@router.post("/cases/{copy_id}/reviews")
+async def create_review(
+    copy_id: UUID,
+    request: Request,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Rückblick: Trends-Snapshot + LLM-Narrativ über den Verlauf. Max 24 je Fall."""
+    echo_svc = request.app.state.echo_service
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    uid = current["user_id"]
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        cid = copy["case_id"]
+        count = await conn.fetchval("SELECT COUNT(*) FROM case_reviews WHERE case_id = $1", cid)
+        if count >= _MAX_REVIEWS:
+            raise HTTPException(status_code=422, detail=f"Maximal {_MAX_REVIEWS} Rückblicke je Fall.")
+        case_row = await conn.fetchrow("SELECT * FROM cases WHERE id = $1", cid)
+        scene_rows = await conn.fetch(
+            "SELECT * FROM scenes WHERE case_id = $1 ORDER BY scene_date ASC NULLS LAST, created_at ASC", cid)
+        scale_rows = await conn.fetch("SELECT * FROM scale_scores WHERE case_id = $1", cid)
+        onboarding_row = await conn.fetchrow("SELECT * FROM onboarding_answers WHERE case_id = $1", cid)
+    scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
+    confirmed = [s for s in scenes if s.get("confirmed_by_user")]
+    if not confirmed:
+        raise HTTPException(status_code=422, detail="Noch keine Szenen — ein Rückblick braucht Material.")
+    scales = [dict(r) for r in scale_rows]
+    trends = compute_trends(scenes, scales)
+    narrative = await echo_svc.generate_review(
+        case_context=dict(case_row), scenes=confirmed, scale_scores=scales,
+        onboarding=(crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+                    if onboarding_row else None),
+        trend_summary=format_trends_for_prompt(trends))
+    period_start = date.fromisoformat(trends["period_start"]) if trends.get("period_start") else None
+    period_end = date.fromisoformat(trends["period_end"]) if trends.get("period_end") else None
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "INSERT INTO case_reviews (case_id, user_id, period_start, period_end, narrative, stats, scene_count) "
+            "VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7) RETURNING *",
+            cid, uid, period_start, period_end, narrative, json.dumps(trends), len(confirmed))
+    return _review_out(row)
+
+
+@router.delete("/cases/{copy_id}/reviews/{review_id}")
+async def delete_review(
+    copy_id: UUID,
+    review_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        row = await conn.fetchrow(
+            "DELETE FROM case_reviews WHERE id = $1 AND case_id = $2 RETURNING id", review_id, copy["case_id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Rückblick nicht gefunden.")
     return {"deleted": True}

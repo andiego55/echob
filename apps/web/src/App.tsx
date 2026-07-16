@@ -116,6 +116,8 @@ import StudentHypothesesPage from '@/pages/student/StudentHypothesesPage'
 import StudentHypothesisDialogPage from '@/pages/student/StudentHypothesisDialogPage'
 import StudentSubmitPage from '@/pages/student/StudentSubmitPage'
 import StudentCouplePage from '@/pages/student/StudentCouplePage'
+import StudentScalesPage from '@/pages/student/StudentScalesPage'
+import StudentReviewPage from '@/pages/student/StudentReviewPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -229,6 +231,8 @@ export function AppRoutes() {
       <Route path="/student/cases/:id/echo" element={<StudentRoute><StudentEchoPage /></StudentRoute>} />
       <Route path="/student/cases/:id/hypotheses" element={<StudentRoute><StudentHypothesesPage /></StudentRoute>} />
       <Route path="/student/cases/:id/hypotheses/:hypId" element={<StudentRoute><StudentHypothesisDialogPage /></StudentRoute>} />
+      <Route path="/student/cases/:id/scales" element={<StudentRoute><StudentScalesPage /></StudentRoute>} />
+      <Route path="/student/cases/:id/review" element={<StudentRoute><StudentReviewPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports" element={<StudentRoute><StudentReportsPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/new" element={<StudentRoute><StudentReportNewPage /></StudentRoute>} />
       <Route path="/student/cases/:id/reports/:reportId" element={<StudentRoute><StudentReportDetailPage /></StudentRoute>} />

@@ -10,6 +10,8 @@ const baseTabs = [
   { path: '',            label: 'Fall'        },
   { path: '/echo',       label: 'Echo'        },
   { path: '/hypotheses', label: 'Hypothesen'  },
+  { path: '/scales',     label: 'Muster'      },
+  { path: '/review',     label: 'Verlauf'     },
   { path: '/reports',    label: 'Berichte'    },
   { path: '/notes',      label: 'Notizen'     },
 ]

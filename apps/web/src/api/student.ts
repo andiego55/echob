@@ -3,7 +3,7 @@ import type { Hypothesis } from './hypotheses'
 import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
   StudentSubmission, StudentSessionNote, StudentEchoSession, StudentEchoChatResult,
-  GlossaryTerm, Report, ReportCreate,
+  GlossaryTerm, Report, ReportCreate, ScalesOverview, CaseTrends, CaseReview,
 } from '@/types'
 
 type SessionNoteInput = { session_date?: string | null; title?: string | null; sections: { heading: string; text: string }[] }
@@ -96,4 +96,20 @@ export const studentApi = {
     apiClient.patch<StudentEchoSession>(`/student/cases/${copyId}/couple/sessions/${sessionId}`, { title }).then(r => r.data),
   coupleSessionDelete: (copyId: string, sessionId: string) =>
     apiClient.delete(`/student/cases/${copyId}/couple/sessions/${sessionId}`).then(r => r.data),
+
+  // Muster & Skalen (KI-Einschätzung der Fallperson)
+  scales: (copyId: string) =>
+    apiClient.get<ScalesOverview>(`/student/cases/${copyId}/scales`).then(r => r.data),
+  scalesCalculate: (copyId: string) =>
+    apiClient.post<ScalesOverview>(`/student/cases/${copyId}/scales/calculate`, undefined, { timeout: 120_000 }).then(r => r.data),
+
+  // Verlauf & Rückblick
+  reviewTrends: (copyId: string) =>
+    apiClient.get<CaseTrends>(`/student/cases/${copyId}/reviews/trends`).then(r => r.data),
+  reviews: (copyId: string) =>
+    apiClient.get<{ reviews: CaseReview[]; total: number }>(`/student/cases/${copyId}/reviews`).then(r => r.data),
+  reviewCreate: (copyId: string) =>
+    apiClient.post<CaseReview>(`/student/cases/${copyId}/reviews`, undefined, { timeout: 120_000 }).then(r => r.data),
+  reviewDelete: (copyId: string, reviewId: string) =>
+    apiClient.delete(`/student/cases/${copyId}/reviews/${reviewId}`).then(r => r.data),
 }
