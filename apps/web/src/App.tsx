@@ -104,6 +104,8 @@ import InstituteStudentsPage from '@/pages/institute/InstituteStudentsPage'
 import InstituteSubmissionsPage from '@/pages/institute/InstituteSubmissionsPage'
 import InstituteSubmissionDetailPage from '@/pages/institute/InstituteSubmissionDetailPage'
 import InstituteRubricsPage from '@/pages/institute/InstituteRubricsPage'
+import InstituteAssignmentsPage from '@/pages/institute/InstituteAssignmentsPage'
+import InstituteAssignmentDetailPage from '@/pages/institute/InstituteAssignmentDetailPage'
 import StudentRoute, { useStudent } from '@/components/auth/StudentRoute'
 import StudentRegisterPage from '@/pages/student/StudentRegisterPage'
 import StudentDashboardPage from '@/pages/student/StudentDashboardPage'
@@ -117,6 +119,7 @@ import StudentHypothesesPage from '@/pages/student/StudentHypothesesPage'
 import StudentHypothesisDialogPage from '@/pages/student/StudentHypothesisDialogPage'
 import StudentSubmitPage from '@/pages/student/StudentSubmitPage'
 import StudentCouplePage from '@/pages/student/StudentCouplePage'
+import StudentAssignmentsPage from '@/pages/student/StudentAssignmentsPage'
 import StudentScalesPage from '@/pages/student/StudentScalesPage'
 import StudentReviewPage from '@/pages/student/StudentReviewPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
@@ -225,10 +228,13 @@ export function AppRoutes() {
       <Route path="/institute/submissions" element={<InstituteRoute><InstituteSubmissionsPage /></InstituteRoute>} />
       <Route path="/institute/submissions/:id" element={<InstituteRoute><InstituteSubmissionDetailPage /></InstituteRoute>} />
       <Route path="/institute/rubrics" element={<InstituteRoute><InstituteRubricsPage /></InstituteRoute>} />
+      <Route path="/institute/assignments" element={<InstituteRoute><InstituteAssignmentsPage /></InstituteRoute>} />
+      <Route path="/institute/assignments/:id" element={<InstituteRoute><InstituteAssignmentDetailPage /></InstituteRoute>} />
 
       {/* ── Ausbildungsbereich · Student:in (Login + Rolle erforderlich) ──────── */}
       <Route path="/student/register" element={<ProtectedRoute><StudentRegisterPage /></ProtectedRoute>} />
       <Route path="/student/dashboard" element={<StudentRoute><StudentDashboardPage /></StudentRoute>} />
+      <Route path="/student/assignments" element={<StudentRoute><StudentAssignmentsPage /></StudentRoute>} />
       <Route path="/student/cases/:id" element={<StudentRoute><StudentCaseDetailPage /></StudentRoute>} />
       <Route path="/student/cases/:id/echo" element={<StudentRoute><StudentEchoPage /></StudentRoute>} />
       <Route path="/student/cases/:id/hypotheses" element={<StudentRoute><StudentHypothesesPage /></StudentRoute>} />

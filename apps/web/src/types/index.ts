@@ -349,6 +349,64 @@ export type RubricInput = {
   criteria: { key: string; name: string; description?: string | null; max_points: number }[]
 }
 
+export type AssignmentKind = 'task' | 'reflection' | 'resource'
+export type AssignmentStatus = 'assigned' | 'in_progress' | 'submitted' | 'reviewed'
+
+export interface Assignment {
+  id: string
+  kind: AssignmentKind
+  title: string
+  instructions: string | null
+  payload: { link?: string }
+  rubric_id: string | null
+  status: 'draft' | 'published' | 'archived'
+  created_at: string | null
+  assigned_count?: number
+  submitted_count?: number
+}
+
+export interface StudentAssignmentRow {
+  id: string
+  student_id: string
+  student_name: string
+  status: AssignmentStatus
+  response: { text?: string } | null
+  feedback: string | null
+  scores?: SubmissionScore[] | null
+  total_points?: number | null
+  submitted_at: string | null
+  reviewed_at: string | null
+}
+
+export interface AssignmentDetail extends Assignment {
+  students: StudentAssignmentRow[]
+}
+
+export interface StudentAssignment {
+  id: string
+  assignment_id: string
+  kind: AssignmentKind
+  title: string
+  instructions: string | null
+  payload: { link?: string }
+  status: AssignmentStatus
+  response: { text?: string } | null
+  feedback: string | null
+  scores?: SubmissionScore[] | null
+  total_points?: number | null
+  assigned_at: string | null
+  submitted_at: string | null
+}
+
+export type AssignmentInput = {
+  kind: AssignmentKind
+  title: string
+  instructions?: string | null
+  link?: string | null
+  rubric_id?: string | null
+  status?: 'draft' | 'published' | 'archived'
+}
+
 export interface StudentInvite {
   id: string
   code: string

@@ -3,7 +3,7 @@ import type { Hypothesis } from './hypotheses'
 import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
   StudentSubmission, StudentSessionNote, StudentEchoSession, StudentEchoChatResult,
-  GlossaryTerm, Report, ReportCreate, ScalesOverview, CaseTrends, CaseReview,
+  GlossaryTerm, Report, ReportCreate, ScalesOverview, CaseTrends, CaseReview, StudentAssignment,
 } from '@/types'
 
 type SessionNoteInput = { session_date?: string | null; title?: string | null; sections: { heading: string; text: string }[] }
@@ -112,4 +112,10 @@ export const studentApi = {
     apiClient.post<CaseReview>(`/student/cases/${copyId}/reviews`, undefined, { timeout: 120_000 }).then(r => r.data),
   reviewDelete: (copyId: string, reviewId: string) =>
     apiClient.delete(`/student/cases/${copyId}/reviews/${reviewId}`).then(r => r.data),
+
+  // Aufgaben (student-weit, nicht fall-gebunden)
+  assignments: () =>
+    apiClient.get<StudentAssignment[]>('/student/assignments').then(r => r.data),
+  assignmentRespond: (saId: string, text: string, submit: boolean) =>
+    apiClient.post<StudentAssignment>(`/student/assignments/${saId}/respond`, { text, submit }).then(r => r.data),
 }

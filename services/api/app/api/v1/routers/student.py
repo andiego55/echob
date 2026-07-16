@@ -17,6 +17,7 @@ from app.core.dependencies import get_current_student, get_current_user, get_poo
 from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS, ReportCreate
 from app.schemas.scale import SCALE_DEFINITIONS, SCALE_LABELS
 from app.schemas.student import (
+    StudentAssignmentRespond,
     StudentEchoChat,
     StudentEchoChatRequest,
     StudentHypGenerate,
@@ -1322,3 +1323,71 @@ async def delete_review(
     if not row:
         raise HTTPException(status_code=404, detail="Rückblick nicht gefunden.")
     return {"deleted": True}
+
+
+# ── Aufgaben (zugewiesene Aufgaben/Reflexionen/Ressourcen) ─────────────────────
+
+def _student_assignment_out(row) -> dict:
+    d = dict(row)
+    payload = d.get("payload")
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+    response = d.get("response")
+    if isinstance(response, str):
+        response = json.loads(response)
+    scores = d.get("scores")
+    if isinstance(scores, str):
+        scores = json.loads(scores)
+    return {
+        "id": str(d["id"]),
+        "assignment_id": str(d["assignment_id"]),
+        "kind": d["kind"], "title": d["title"], "instructions": d["instructions"],
+        "payload": payload or {},
+        "status": d["status"],
+        "response": response or None,
+        "feedback": d.get("feedback"),
+        "scores": scores or None,
+        "total_points": float(d["total_points"]) if d.get("total_points") is not None else None,
+        "assigned_at": d["assigned_at"].isoformat() if d.get("assigned_at") else None,
+        "submitted_at": d["submitted_at"].isoformat() if d.get("submitted_at") else None,
+    }
+
+
+@router.get("/assignments")
+async def list_assignments(
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    """Zugewiesene Aufgaben — offene zuerst (Studenten-Inbox)."""
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT sa.*, a.kind, a.title, a.instructions, a.payload FROM student_assignments sa "
+            "JOIN institute_assignments a ON a.id = sa.assignment_id "
+            "WHERE sa.student_id = $1 "
+            "ORDER BY (sa.status IN ('assigned', 'in_progress')) DESC, sa.assigned_at DESC",
+            current["student"]["id"])
+    return [_student_assignment_out(r) for r in rows]
+
+
+@router.post("/assignments/{sa_id}/respond")
+async def respond_assignment(
+    sa_id: UUID,
+    body: StudentAssignmentRespond,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Antwort speichern (Zwischenstand) oder einreichen."""
+    new_status = "submitted" if body.submit else "in_progress"
+    response = json.dumps({"text": body.text})
+    async with pool.acquire() as conn:
+        upd = await conn.fetchrow(
+            "UPDATE student_assignments SET response = $1::jsonb, status = $2, "
+            "submitted_at = CASE WHEN $3::boolean THEN NOW() ELSE submitted_at END, updated_at = NOW() "
+            "WHERE id = $4 AND student_id = $5 RETURNING id",
+            response, new_status, body.submit, sa_id, current["student"]["id"])
+        if not upd:
+            raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
+        full = await conn.fetchrow(
+            "SELECT sa.*, a.kind, a.title, a.instructions, a.payload FROM student_assignments sa "
+            "JOIN institute_assignments a ON a.id = sa.assignment_id WHERE sa.id = $1", sa_id)
+    return _student_assignment_out(full)

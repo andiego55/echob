@@ -6,7 +6,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import EchoBLogo from '@/components/EchoBLogo'
 
 const NAV = [
-  { to: '/student/dashboard', label: 'Dashboard', end: false },
+  { to: '/student/dashboard', label: 'Meine Fälle', end: false },
+  { to: '/student/assignments', label: 'Aufgaben', end: false },
 ]
 
 export default function StudentShell({ children }: { children: React.ReactNode }) {

@@ -14,6 +14,9 @@ import type {
   RubricInput,
   SubmissionScore,
   AiEvaluation,
+  Assignment,
+  AssignmentDetail,
+  AssignmentInput,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -77,4 +80,20 @@ export const instituteApi = {
     apiClient.patch<Rubric>(`/institute/rubrics/${id}`, data).then(r => r.data),
   rubricDelete: (id: string) =>
     apiClient.delete(`/institute/rubrics/${id}`).then(r => r.data),
+
+  // Aufgaben / Zuweisungen
+  assignments: () =>
+    apiClient.get<Assignment[]>('/institute/assignments').then(r => r.data),
+  assignment: (id: string) =>
+    apiClient.get<AssignmentDetail>(`/institute/assignments/${id}`).then(r => r.data),
+  assignmentCreate: (data: AssignmentInput) =>
+    apiClient.post<Assignment>('/institute/assignments', data).then(r => r.data),
+  assignmentUpdate: (id: string, data: AssignmentInput) =>
+    apiClient.patch<Assignment>(`/institute/assignments/${id}`, data).then(r => r.data),
+  assignmentDelete: (id: string) =>
+    apiClient.delete(`/institute/assignments/${id}`).then(r => r.data),
+  assignmentAssign: (id: string, data: { student_ids?: string[]; to_all?: boolean }) =>
+    apiClient.post<{ assigned: number }>(`/institute/assignments/${id}/assign`, data).then(r => r.data),
+  reviewStudentAssignment: (saId: string, feedback: string | null) =>
+    apiClient.post<{ reviewed: boolean }>(`/institute/student-assignments/${saId}/feedback`, { feedback }).then(r => r.data),
 }

@@ -16,6 +16,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from app.core import crypto
 from app.core.dependencies import get_current_institute, get_current_user, get_pool
 from app.schemas.institute import (
+    AssignmentAssign,
+    AssignmentUpsert,
     AssignStudents,
     ExamplePatch,
     GenerationInput,
@@ -23,6 +25,7 @@ from app.schemas.institute import (
     InstituteRegister,
     InstituteUpdate,
     RubricUpsert,
+    StudentAssignmentReview,
     SubmissionEvaluate,
     SubmissionFeedback,
 )
@@ -711,3 +714,182 @@ async def delete_rubric(
     if res == "DELETE 0":
         raise HTTPException(status_code=404, detail="Raster nicht gefunden.")
     return {"deleted": True}
+
+
+# ── Aufgaben / Zuweisungen ────────────────────────────────────────────────────
+
+def _assignment_out(row, *, assigned: int | None = None, submitted: int | None = None) -> dict:
+    payload = row["payload"]
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+    out = {
+        "id": str(row["id"]), "kind": row["kind"], "title": row["title"],
+        "instructions": row["instructions"], "payload": payload or {},
+        "rubric_id": str(row["rubric_id"]) if row["rubric_id"] else None,
+        "status": row["status"],
+        "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+    }
+    if assigned is not None:
+        out["assigned_count"] = assigned
+        out["submitted_count"] = submitted or 0
+    return out
+
+
+def _student_assignment_out(row) -> dict:
+    d = dict(row)
+    response = d.get("response")
+    if isinstance(response, str):
+        response = json.loads(response)
+    scores = d.get("scores")
+    if isinstance(scores, str):
+        scores = json.loads(scores)
+    return {
+        "id": str(d["id"]),
+        "student_id": str(d["student_id"]),
+        "student_name": d.get("display_name") or "Studierende:r",
+        "status": d["status"],
+        "response": response or None,
+        "feedback": d.get("feedback"),
+        "scores": scores or None,
+        "total_points": float(d["total_points"]) if d.get("total_points") is not None else None,
+        "submitted_at": d["submitted_at"].isoformat() if d.get("submitted_at") else None,
+        "reviewed_at": d["reviewed_at"].isoformat() if d.get("reviewed_at") else None,
+    }
+
+
+@router.get("/assignments")
+async def list_assignments(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT a.*, "
+            "(SELECT count(*) FROM student_assignments sa WHERE sa.assignment_id = a.id)::int AS assigned, "
+            "(SELECT count(*) FROM student_assignments sa WHERE sa.assignment_id = a.id "
+            " AND sa.status IN ('submitted','reviewed'))::int AS submitted "
+            "FROM institute_assignments a WHERE a.institute_id = $1 ORDER BY a.created_at DESC",
+            current["institute"]["id"])
+    return [_assignment_out(r, assigned=r["assigned"], submitted=r["submitted"]) for r in rows]
+
+
+@router.post("/assignments")
+async def create_assignment(
+    body: AssignmentUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    payload = json.dumps({"link": body.link} if body.kind == "resource" and body.link else {})
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "INSERT INTO institute_assignments (institute_id, kind, title, instructions, payload, rubric_id, status) "
+            "VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7) RETURNING *",
+            current["institute"]["id"], body.kind, body.title, body.instructions, payload,
+            body.rubric_id, body.status)
+    return _assignment_out(row)
+
+
+@router.get("/assignments/{assignment_id}")
+async def get_assignment(
+    assignment_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        a = await conn.fetchrow(
+            "SELECT * FROM institute_assignments WHERE id = $1 AND institute_id = $2",
+            assignment_id, current["institute"]["id"])
+        if not a:
+            raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT sa.*, st.display_name FROM student_assignments sa "
+            "JOIN students st ON st.id = sa.student_id WHERE sa.assignment_id = $1 ORDER BY sa.assigned_at",
+            assignment_id)
+    out = _assignment_out(a)
+    out["students"] = [_student_assignment_out(r) for r in rows]
+    return out
+
+
+@router.patch("/assignments/{assignment_id}")
+async def update_assignment(
+    assignment_id: UUID,
+    body: AssignmentUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    payload = json.dumps({"link": body.link} if body.kind == "resource" and body.link else {})
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE institute_assignments SET kind = $1, title = $2, instructions = $3, "
+            "payload = $4::jsonb, rubric_id = $5, status = $6, updated_at = NOW() "
+            "WHERE id = $7 AND institute_id = $8 RETURNING *",
+            body.kind, body.title, body.instructions, payload, body.rubric_id, body.status,
+            assignment_id, current["institute"]["id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
+    return _assignment_out(row)
+
+
+@router.delete("/assignments/{assignment_id}")
+async def delete_assignment(
+    assignment_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        res = await conn.execute(
+            "DELETE FROM institute_assignments WHERE id = $1 AND institute_id = $2",
+            assignment_id, current["institute"]["id"])
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
+    return {"deleted": True}
+
+
+@router.post("/assignments/{assignment_id}/assign")
+async def assign_assignment(
+    assignment_id: UUID,
+    body: AssignmentAssign,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Weist eine Aufgabe Studierenden zu (einzeln oder allen). Idempotent."""
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        a = await conn.fetchrow(
+            "SELECT id FROM institute_assignments WHERE id = $1 AND institute_id = $2",
+            assignment_id, inst_id)
+        if not a:
+            raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
+        if body.to_all:
+            id_rows = await conn.fetch(
+                "SELECT id FROM students WHERE institute_id = $1 AND status = 'active'", inst_id)
+        else:
+            id_rows = await conn.fetch(
+                "SELECT id FROM students WHERE institute_id = $1 AND status = 'active' "
+                "AND id = ANY($2::uuid[])", inst_id, body.student_ids)
+        n = 0
+        for r in id_rows:
+            res = await conn.execute(
+                "INSERT INTO student_assignments (assignment_id, student_id) VALUES ($1, $2) "
+                "ON CONFLICT (assignment_id, student_id) DO NOTHING", assignment_id, r["id"])
+            if res.endswith("1"):
+                n += 1
+    return {"assigned": n}
+
+
+@router.post("/student-assignments/{sa_id}/feedback")
+async def review_student_assignment(
+    sa_id: UUID,
+    body: StudentAssignmentReview,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE student_assignments sa SET feedback = $1, status = 'reviewed', "
+            "reviewed_at = NOW(), updated_at = NOW() FROM institute_assignments a "
+            "WHERE sa.id = $2 AND sa.assignment_id = a.id AND a.institute_id = $3 RETURNING sa.id",
+            body.feedback, sa_id, current["institute"]["id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Zuweisung nicht gefunden.")
+    return {"reviewed": True}

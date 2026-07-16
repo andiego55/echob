@@ -84,3 +84,21 @@ class RubricUpsert(BaseModel):
 
 class SubmissionEvaluate(BaseModel):
     rubric_id: UUID
+
+
+class AssignmentUpsert(BaseModel):
+    kind: str = Field(..., pattern="^(task|reflection|resource)$")
+    title: str = Field(..., min_length=1, max_length=200)
+    instructions: str | None = Field(None, max_length=8000)
+    link: str | None = Field(None, max_length=1000)          # resource
+    rubric_id: UUID | None = None
+    status: str = Field("published", pattern="^(draft|published|archived)$")
+
+
+class AssignmentAssign(BaseModel):
+    student_ids: list[UUID] = Field(default_factory=list)
+    to_all: bool = False
+
+
+class StudentAssignmentReview(BaseModel):
+    feedback: str | None = Field(None, max_length=8000)

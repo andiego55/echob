@@ -67,6 +67,11 @@ class StudentSessionNoteCreate(BaseModel):
     sections: list[dict] = Field(default_factory=list)
 
 
+class StudentAssignmentRespond(BaseModel):
+    text: str = Field("", max_length=20_000)
+    submit: bool = False
+
+
 class StudentNotes(BaseModel):
     first_impressions: str | None = None
     key_scenes: str | None = None
