@@ -848,6 +848,11 @@ def _submission_out(row, *, include_payload: bool = False) -> dict:
         "created_at": d["created_at"].isoformat() if d["created_at"] else None,
         "reviewed_at": d["reviewed_at"].isoformat() if d.get("reviewed_at") else None,
     }
+    scores = d.get("scores")
+    if isinstance(scores, str):
+        scores = json.loads(scores)
+    out["scores"] = scores or None
+    out["total_points"] = float(d["total_points"]) if d.get("total_points") is not None else None
     if include_payload:
         out["payload"] = _jsonb(d.get("payload"))
     return out

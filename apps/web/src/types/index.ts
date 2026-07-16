@@ -273,6 +273,8 @@ export interface StudentSubmission {
   message: string | null
   status: 'submitted' | 'reviewed'
   feedback: string | null
+  scores?: SubmissionScore[] | null
+  total_points?: number | null
   created_at: string | null
   reviewed_at: string | null
 }
@@ -292,6 +294,21 @@ export interface SubmissionPayload {
   reports: { type_label: string; title: string | null; sections: { heading: string; text: string }[] }[]
 }
 
+export interface SubmissionScore {
+  key: string
+  name: string
+  max_points: number
+  points: number
+  note: string
+}
+
+export interface AiEvaluation {
+  scores: SubmissionScore[]
+  total: number
+  max_total: number
+  feedback: string
+}
+
 export interface InstituteSubmission {
   id: string
   student_name: string
@@ -299,6 +316,9 @@ export interface InstituteSubmission {
   message: string | null
   status: 'submitted' | 'reviewed'
   feedback: string | null
+  scores?: SubmissionScore[] | null
+  total_points?: number | null
+  rubric_id?: string | null
   created_at: string | null
   reviewed_at: string | null
 }

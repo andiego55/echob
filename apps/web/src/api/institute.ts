@@ -12,6 +12,8 @@ import type {
   InstituteSubmissionDetail,
   Rubric,
   RubricInput,
+  SubmissionScore,
+  AiEvaluation,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -59,8 +61,10 @@ export const instituteApi = {
     apiClient.get<InstituteSubmission[]>('/institute/submissions').then(r => r.data),
   submission: (id: string) =>
     apiClient.get<InstituteSubmissionDetail>(`/institute/submissions/${id}`).then(r => r.data),
-  reviewSubmission: (id: string, feedback: string | null) =>
-    apiClient.post<{ reviewed: boolean }>(`/institute/submissions/${id}/feedback`, { feedback }).then(r => r.data),
+  reviewSubmission: (id: string, data: { feedback: string | null; rubric_id?: string | null; scores?: SubmissionScore[]; total_points?: number | null }) =>
+    apiClient.post<{ reviewed: boolean }>(`/institute/submissions/${id}/feedback`, data).then(r => r.data),
+  aiEvaluate: (id: string, rubricId: string) =>
+    apiClient.post<AiEvaluation>(`/institute/submissions/${id}/ai-evaluate`, { rubric_id: rubricId }, { timeout: 120_000 }).then(r => r.data),
 
   // Bewertungsraster (Rubrics)
   rubrics: () =>

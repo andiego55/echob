@@ -254,6 +254,77 @@ class EchoService:
             logger.error("generate_json: ungültige JSON-Antwort vom Modell.")
             return mock or {}
 
+    async def evaluate_submission(self, *, rubric: dict, submission: dict) -> dict:
+        """Bewertet eine eingereichte Fallarbeit anhand eines Rasters (KI-Vorschlag).
+
+        rubric: {name, description, criteria:[{key, name, description, max_points}]}
+        submission: {message, hypotheses:[{label, summary_text}], notes:{…}|None,
+                     reports:[{type_label, title, sections:[{heading, text}]}]}
+        → {scores:[{key, name, max_points, points, note}], total, max_total, feedback}
+        Der Snapshot in ``scores`` ist self-contained (Name + Max), damit beide Seiten
+        ohne das Raster rendern können. Konstruktiv, keine Diagnosen.
+        """
+        crits = [c for c in (rubric.get("criteria") or []) if c.get("key")]
+
+        parts: list[str] = []
+        if submission.get("message"):
+            parts.append(f"## Begleitnachricht\n{submission['message']}")
+        for h in submission.get("hypotheses") or []:
+            parts.append(f"## Hypothese: {h.get('label', '')}\n{h.get('summary_text', '')}")
+        notes = submission.get("notes")
+        if isinstance(notes, dict):
+            nt = "\n".join(f"- {k}: {v}" for k, v in notes.items() if v)
+            if nt:
+                parts.append("## Notizen\n" + nt)
+        for r in submission.get("reports") or []:
+            secs = "\n".join(f"### {s.get('heading', '')}\n{s.get('text', '')}" for s in (r.get("sections") or []))
+            parts.append(f"## Bericht: {r.get('title') or r.get('type_label', '')}\n{secs}")
+        work = "\n\n".join(parts).strip() or "(keine ausgearbeiteten Inhalte eingereicht)"
+
+        crit_lines = "\n".join(
+            f"- key={c['key']} · {c['name']} (0–{c['max_points']} Punkte)"
+            + (f" — {c['description']}" if c.get("description") else "")
+            for c in crits)
+
+        system = (
+            "Du bist eine erfahrene Ausbilderin in psychosozialer Beratung. Du bewertest die eingereichte "
+            "Fallarbeit einer studierenden Person anhand eines vorgegebenen Bewertungsrasters — konstruktiv, "
+            "wertschätzend und konkret. Du stellst KEINE Diagnosen; du bewertest die Arbeit der studierenden "
+            "Person, nicht die Fallperson. Antworte ausschließlich als JSON."
+        )
+        user = (
+            f"# Bewertungsraster: {rubric.get('name', '')}\n{rubric.get('description') or ''}\n\n"
+            f"Kriterien:\n{crit_lines}\n\n"
+            f"# Eingereichte Fallarbeit\n{work}\n\n"
+            "Gib für JEDES Kriterium eine ganzzahlige Punktzahl (0 bis max) und eine kurze, konkrete "
+            "Begründung mit Bezug auf die Einreichung (1–2 Sätze). Formuliere zusätzlich ein "
+            "zusammenfassendes, konstruktives Gesamtfeedback (3–6 Sätze: Stärken zuerst, dann 1–2 "
+            'Entwicklungshinweise). JSON-Form: {"scores":[{"key":"…","points":0,"note":"…"}],"feedback":"…"}'
+        )
+        mock = {
+            "scores": [{"key": c["key"], "points": round(int(c["max_points"]) * 0.6),
+                        "note": "Demo-Bewertung (keine KI-Anbindung)."} for c in crits],
+            "feedback": ("Demo-Feedback ohne KI-Anbindung: solide Grundlage; im nächsten Schritt lohnt es, "
+                         "Beobachtung und Deutung klarer zu trennen."),
+        }
+        raw = await self.generate_json(system=system, user=user, max_tokens=1500, mock=mock)
+
+        by_key = {s.get("key"): s for s in (raw.get("scores") or []) if isinstance(s, dict)}
+        scores, total, max_total = [], 0, 0
+        for c in crits:
+            mp = int(c["max_points"])
+            s = by_key.get(c["key"]) or {}
+            try:
+                pts = max(0, min(mp, int(round(float(s.get("points"))))))
+            except (TypeError, ValueError):
+                pts = 0
+            scores.append({"key": c["key"], "name": c["name"], "max_points": mp,
+                           "points": pts, "note": str(s.get("note") or "")})
+            total += pts
+            max_total += mp
+        return {"scores": scores, "total": total, "max_total": max_total,
+                "feedback": str(raw.get("feedback") or "")}
+
     # ── Öffentliche Methoden ──────────────────────────────────────────────────
 
     async def chat(

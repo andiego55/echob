@@ -80,3 +80,7 @@ class RubricUpsert(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: str | None = Field(None, max_length=2000)
     criteria: list[RubricCriterion] = Field(default_factory=list)
+
+
+class SubmissionEvaluate(BaseModel):
+    rubric_id: UUID

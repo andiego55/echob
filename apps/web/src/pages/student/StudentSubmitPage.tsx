@@ -87,6 +87,30 @@ export default function StudentSubmitPage() {
                     </span>
                   </div>
                   {s.message && <p className="mt-2 text-sm text-brand-text whitespace-pre-wrap">{s.message}</p>}
+                  {s.scores && s.scores.length > 0 && (
+                    <div className="mt-3 rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="text-[11px] font-semibold text-brand-muted uppercase tracking-wide">Bewertung</p>
+                        <p className="text-sm font-semibold text-navy tabular-nums">
+                          {s.total_points ?? s.scores.reduce((a, sc) => a + sc.points, 0)} / {s.scores.reduce((a, sc) => a + sc.max_points, 0)} Punkte
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        {s.scores.map((sc, i) => (
+                          <div key={i}>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-sm text-navy">{sc.name}</span>
+                              <span className="shrink-0 text-xs font-semibold text-accent tabular-nums">{sc.points}/{sc.max_points}</span>
+                            </div>
+                            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-brand-border/60">
+                              <div className="h-full rounded-full bg-accent" style={{ width: `${sc.max_points > 0 ? (sc.points / sc.max_points) * 100 : 0}%` }} />
+                            </div>
+                            {sc.note && <p className="mt-1 text-xs text-brand-muted">{sc.note}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {s.feedback && (
                     <div className="mt-3 rounded-brand border border-accent/30 bg-accent/5 px-4 py-3">
                       <p className="text-[11px] font-semibold text-accent uppercase tracking-wide mb-1">Rückmeldung des Ausbilders</p>

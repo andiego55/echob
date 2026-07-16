@@ -23,6 +23,7 @@ from app.schemas.institute import (
     InstituteRegister,
     InstituteUpdate,
     RubricUpsert,
+    SubmissionEvaluate,
     SubmissionFeedback,
 )
 from app.schemas.student import StudentInviteCreate
@@ -520,6 +521,12 @@ def _submission_row(row, *, include_payload: bool = False) -> dict:
         "created_at": d["created_at"].isoformat() if d["created_at"] else None,
         "reviewed_at": d["reviewed_at"].isoformat() if d.get("reviewed_at") else None,
     }
+    scores = d.get("scores")
+    if isinstance(scores, str):
+        scores = json.loads(scores)
+    out["scores"] = scores or None
+    out["total_points"] = float(d["total_points"]) if d.get("total_points") is not None else None
+    out["rubric_id"] = str(d["rubric_id"]) if d.get("rubric_id") else None
     if include_payload:
         payload = d.get("payload")
         if isinstance(payload, str):
@@ -569,15 +576,52 @@ async def review_submission(
     current: dict = Depends(get_current_institute),
     pool=Depends(get_pool),
 ) -> dict:
-    """Rückmeldung geben und die Einreichung als gesichtet markieren."""
+    """Rückmeldung geben (optional mit Raster-Punkten) und als gesichtet markieren."""
+    scores_json = json.dumps(body.scores) if body.scores else None
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "UPDATE student_submissions SET feedback = $1, status = 'reviewed', reviewed_at = NOW() "
-            "WHERE id = $2 AND institute_id = $3 RETURNING id",
-            body.feedback, submission_id, current["institute"]["id"])
+            "UPDATE student_submissions SET feedback = $1, rubric_id = $2, scores = $3::jsonb, "
+            "total_points = $4, status = 'reviewed', reviewed_at = NOW() "
+            "WHERE id = $5 AND institute_id = $6 RETURNING id",
+            body.feedback, body.rubric_id, scores_json, body.total_points,
+            submission_id, current["institute"]["id"])
     if not row:
         raise HTTPException(status_code=404, detail="Einreichung nicht gefunden.")
     return {"reviewed": True}
+
+
+@router.post("/submissions/{submission_id}/ai-evaluate")
+async def ai_evaluate_submission(
+    submission_id: UUID,
+    body: SubmissionEvaluate,
+    request: Request,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """KI-Bewertungsvorschlag für eine Einreichung anhand eines Rasters (nicht gespeichert)."""
+    echo_svc = getattr(request.app.state, "echo_service", None)
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        sub = await conn.fetchrow(
+            "SELECT payload FROM student_submissions WHERE id = $1 AND institute_id = $2",
+            submission_id, inst_id)
+        if not sub:
+            raise HTTPException(status_code=404, detail="Einreichung nicht gefunden.")
+        rub = await conn.fetchrow(
+            "SELECT name, description, criteria FROM institute_rubrics WHERE id = $1 AND institute_id = $2",
+            body.rubric_id, inst_id)
+        if not rub:
+            raise HTTPException(status_code=404, detail="Raster nicht gefunden.")
+    payload = sub["payload"]
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+    criteria = rub["criteria"]
+    if isinstance(criteria, str):
+        criteria = json.loads(criteria)
+    rubric = {"name": rub["name"], "description": rub["description"], "criteria": criteria or []}
+    return await echo_svc.evaluate_submission(rubric=rubric, submission=payload or {})
 
 
 # ── Bewertungsraster (Rubrics) ────────────────────────────────────────────────
