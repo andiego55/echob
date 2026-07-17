@@ -416,12 +416,17 @@ export type AssignmentInput = {
 
 // ── Lernmodule ────────────────────────────────────────────────────────────────
 
+export type ModuleStepKind = 'lesson' | 'case' | 'assignment'
+
 export interface ModuleStep {
   id: string
   position: number
-  kind: string
+  kind: ModuleStepKind
   title: string
   content: string | null
+  ref_id?: string | null
+  ref_copy_id?: string | null
+  ref_assignment_id?: string | null
 }
 
 export interface ModuleStudentProgress {
@@ -457,7 +462,7 @@ export type ModuleInput = {
   sellable?: boolean
 }
 
-export type ModuleStepInput = { title: string; content?: string | null; kind?: string }
+export type ModuleStepInput = { title: string; content?: string | null; kind?: ModuleStepKind; ref_id?: string | null }
 
 export interface StudentModuleRow {
   id: string

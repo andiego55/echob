@@ -122,7 +122,8 @@ class ModuleUpsert(BaseModel):
 class ModuleStepUpsert(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     content: str | None = Field(None, max_length=40_000)
-    kind: str = Field("lesson", pattern="^(lesson)$")
+    kind: str = Field("lesson", pattern="^(lesson|case|assignment)$")
+    ref_id: UUID | None = None
 
 
 class ModuleStepReorder(BaseModel):

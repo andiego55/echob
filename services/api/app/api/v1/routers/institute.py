@@ -939,7 +939,27 @@ async def update_echo_settings(
 
 def _step_out(row) -> dict:
     return {"id": str(row["id"]), "position": row["position"], "kind": row["kind"],
-            "title": row["title"], "content": row["content"]}
+            "title": row["title"], "content": row["content"],
+            "ref_id": str(row["ref_id"]) if row["ref_id"] else None}
+
+
+async def _validate_step_ref(conn, kind, ref_id, inst_id) -> None:
+    if kind == "case":
+        if not ref_id:
+            raise HTTPException(status_code=422, detail="Bitte einen Fall wählen.")
+        ex = await conn.fetchrow(
+            "SELECT status FROM institute_examples WHERE id = $1 AND institute_id = $2", ref_id, inst_id)
+        if not ex:
+            raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+        if ex["status"] != "published":
+            raise HTTPException(status_code=400, detail="Der Fall muss veröffentlicht sein.")
+    elif kind == "assignment":
+        if not ref_id:
+            raise HTTPException(status_code=422, detail="Bitte eine Aufgabe wählen.")
+        a = await conn.fetchrow(
+            "SELECT id FROM institute_assignments WHERE id = $1 AND institute_id = $2", ref_id, inst_id)
+        if not a:
+            raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
 
 
 def _jsonb_list(v):
@@ -1066,14 +1086,17 @@ async def add_module_step(
     current: dict = Depends(get_current_institute),
     pool=Depends(get_pool),
 ) -> dict:
+    inst_id = current["institute"]["id"]
+    ref_id = body.ref_id if body.kind != "lesson" else None
     async with pool.acquire() as conn:
-        await _own_module(conn, module_id, current["institute"]["id"])
+        await _own_module(conn, module_id, inst_id)
+        await _validate_step_ref(conn, body.kind, ref_id, inst_id)
         pos = await conn.fetchval(
             "SELECT COALESCE(MAX(position), -1) + 1 FROM learning_module_steps WHERE module_id = $1", module_id)
         row = await conn.fetchrow(
-            "INSERT INTO learning_module_steps (module_id, position, kind, title, content) "
-            "VALUES ($1, $2, $3, $4, $5) RETURNING *",
-            module_id, pos, body.kind, body.title, body.content)
+            "INSERT INTO learning_module_steps (module_id, position, kind, title, content, ref_id) "
+            "VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            module_id, pos, body.kind, body.title, body.content, ref_id)
     return _step_out(row)
 
 
@@ -1085,11 +1108,15 @@ async def update_module_step(
     current: dict = Depends(get_current_institute),
     pool=Depends(get_pool),
 ) -> dict:
+    inst_id = current["institute"]["id"]
+    ref_id = body.ref_id if body.kind != "lesson" else None
     async with pool.acquire() as conn:
-        await _own_module(conn, module_id, current["institute"]["id"])
+        await _own_module(conn, module_id, inst_id)
+        await _validate_step_ref(conn, body.kind, ref_id, inst_id)
         row = await conn.fetchrow(
-            "UPDATE learning_module_steps SET title = $1, content = $2 "
-            "WHERE id = $3 AND module_id = $4 RETURNING *", body.title, body.content, step_id, module_id)
+            "UPDATE learning_module_steps SET kind = $1, title = $2, content = $3, ref_id = $4 "
+            "WHERE id = $5 AND module_id = $6 RETURNING *",
+            body.kind, body.title, body.content, ref_id, step_id, module_id)
     if not row:
         raise HTTPException(status_code=404, detail="Schritt nicht gefunden.")
     return _step_out(row)

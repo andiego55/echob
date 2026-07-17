@@ -1,11 +1,16 @@
 /**
  * /student/modules/:id — ein Lernmodul durcharbeiten (Lektionen lesen, als erledigt markieren).
  */
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import StudentShell from '@/components/student/StudentShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { studentApi } from '@/api/student'
+
+const STEP_KIND_LABEL: Record<string, string> = { lesson: 'Lektion', case: 'Fall', assignment: 'Aufgabe' }
+const STEP_KIND_CLS: Record<string, string> = {
+  lesson: 'bg-slate-100 text-slate-600', case: 'bg-accent/10 text-accent', assignment: 'bg-violet-100 text-violet-700',
+}
 
 export default function StudentModuleDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -56,8 +61,9 @@ export default function StudentModuleDetailPage() {
               return (
                 <div key={s.id} className={`card ${isDone ? 'border-accent/30' : ''}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-baseline gap-2 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span className="text-xs font-semibold text-brand-muted tabular-nums">{i + 1}.</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${STEP_KIND_CLS[s.kind]}`}>{STEP_KIND_LABEL[s.kind] ?? s.kind}</span>
                       <h2 className="text-sm font-bold text-navy">{s.title}</h2>
                     </div>
                     <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-brand-muted">
@@ -66,9 +72,21 @@ export default function StudentModuleDetailPage() {
                       erledigt
                     </label>
                   </div>
-                  {s.content && (
+                  {s.kind === 'lesson' && s.content && (
                     <div className="mt-3 border-t border-brand-border pt-3 text-sm leading-relaxed text-brand-text">
                       <MarkdownMessage content={s.content} />
+                    </div>
+                  )}
+                  {s.kind === 'case' && (
+                    <div className="mt-3 border-t border-brand-border pt-3">
+                      {s.ref_copy_id
+                        ? <Link to={`/student/cases/${s.ref_copy_id}`} className="text-sm font-medium text-accent hover:underline">Fall öffnen & bearbeiten →</Link>
+                        : <p className="text-sm text-brand-muted">Dieser Fall ist derzeit nicht verfügbar.</p>}
+                    </div>
+                  )}
+                  {s.kind === 'assignment' && (
+                    <div className="mt-3 border-t border-brand-border pt-3">
+                      <Link to="/student/assignments" className="text-sm font-medium text-accent hover:underline">Zur Aufgabe →</Link>
                     </div>
                   )}
                 </div>

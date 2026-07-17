@@ -11,7 +11,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from app.api.v1.routers.institute import _load_case_part  # generischer Fall-Loader (Engine-Reuse)
+from app.api.v1.routers.institute import (  # Engine-Reuse (Loader + Klon)
+    _clone_case,
+    _load_case_part,
+)
 from app.core import crypto
 from app.core.dependencies import get_current_student, get_current_user, get_pool
 from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS, ReportCreate
@@ -1622,6 +1625,42 @@ def _completed_list(v):
     return v if isinstance(v, list) else []
 
 
+async def _ensure_example_copy(conn, example_id, student_id) -> str | None:
+    """Find-or-create: eigene Arbeitskopie eines Beispiels für eine:n Studierende:n (idempotent)."""
+    existing = await conn.fetchrow(
+        "SELECT id FROM student_case_copies WHERE student_id = $1 AND example_id = $2", student_id, example_id)
+    if existing:
+        return str(existing["id"])
+    ex = await conn.fetchrow("SELECT * FROM institute_examples WHERE id = $1", example_id)
+    if not ex or ex["status"] != "published":
+        return None
+    async with conn.transaction():
+        primary_clone = await _clone_case(conn, ex["primary_case_id"])
+        partner_clone = (await _clone_case(conn, ex["partner_case_id"]) if ex["partner_case_id"] else None)
+        row = await conn.fetchrow(
+            "INSERT INTO student_case_copies (student_id, example_id, case_id, partner_case_id, title) "
+            "VALUES ($1, $2, $3, $4, $5) RETURNING id",
+            student_id, example_id, primary_clone, partner_clone, ex["title"])
+    return str(row["id"])
+
+
+async def _ensure_assignment(conn, assignment_id, student_id) -> str | None:
+    """Find-or-create: Zuweisungs-Instanz einer Aufgabe (idempotent)."""
+    existing = await conn.fetchrow(
+        "SELECT id FROM student_assignments WHERE student_id = $1 AND assignment_id = $2", student_id, assignment_id)
+    if existing:
+        return str(existing["id"])
+    a = await conn.fetchrow("SELECT id FROM institute_assignments WHERE id = $1", assignment_id)
+    if not a:
+        return None
+    await conn.execute(
+        "INSERT INTO student_assignments (assignment_id, student_id) VALUES ($1, $2) "
+        "ON CONFLICT (assignment_id, student_id) DO NOTHING", assignment_id, student_id)
+    row = await conn.fetchrow(
+        "SELECT id FROM student_assignments WHERE student_id = $1 AND assignment_id = $2", student_id, assignment_id)
+    return str(row["id"]) if row else None
+
+
 @router.get("/modules")
 async def list_student_modules(
     current: dict = Depends(get_current_student),
@@ -1649,22 +1688,33 @@ async def get_student_module(
     current: dict = Depends(get_current_student),
     pool=Depends(get_pool),
 ) -> dict:
+    sid = current["student"]["id"]
     async with pool.acquire() as conn:
         sm = await conn.fetchrow(
             "SELECT sm.*, m.title, m.description FROM student_modules sm "
             "JOIN learning_modules m ON m.id = sm.module_id WHERE sm.id = $1 AND sm.student_id = $2",
-            sm_id, current["student"]["id"])
+            sm_id, sid)
         if not sm:
             raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
         steps = await conn.fetch(
-            "SELECT id, position, kind, title, content FROM learning_module_steps "
+            "SELECT id, position, kind, title, content, ref_id FROM learning_module_steps "
             "WHERE module_id = $1 ORDER BY position, created_at", sm["module_id"])
+        steps_out = []
+        for s in steps:
+            step = {"id": str(s["id"]), "position": s["position"], "kind": s["kind"],
+                    "title": s["title"], "content": s["content"],
+                    "ref_copy_id": None, "ref_assignment_id": None}
+            # Fall-/Aufgaben-Schritte: eigene Arbeitskopie/Zuweisung find-or-create.
+            if s["kind"] == "case" and s["ref_id"]:
+                step["ref_copy_id"] = await _ensure_example_copy(conn, s["ref_id"], sid)
+            elif s["kind"] == "assignment" and s["ref_id"]:
+                step["ref_assignment_id"] = await _ensure_assignment(conn, s["ref_id"], sid)
+            steps_out.append(step)
     return {
         "id": str(sm["id"]), "module_id": str(sm["module_id"]),
         "title": sm["title"], "description": sm["description"], "status": sm["status"],
         "completed_steps": [str(x) for x in _completed_list(sm["completed_steps"])],
-        "steps": [{"id": str(s["id"]), "position": s["position"], "kind": s["kind"],
-                   "title": s["title"], "content": s["content"]} for s in steps],
+        "steps": steps_out,
     }
 
 
