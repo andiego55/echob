@@ -414,6 +414,71 @@ export type AssignmentInput = {
   status?: 'draft' | 'published' | 'archived'
 }
 
+// ── Lernmodule ────────────────────────────────────────────────────────────────
+
+export interface ModuleStep {
+  id: string
+  position: number
+  kind: string
+  title: string
+  content: string | null
+}
+
+export interface ModuleStudentProgress {
+  student_id: string
+  student_name: string
+  status: 'active' | 'completed'
+  completed: number
+  total: number
+}
+
+export interface LearningModule {
+  id: string
+  title: string
+  description: string | null
+  didactic_guide: string | null
+  status: 'draft' | 'published' | 'archived'
+  sellable: boolean
+  step_count?: number | null
+  enrolled_count?: number | null
+  created_at: string | null
+}
+
+export interface LearningModuleDetail extends LearningModule {
+  steps: ModuleStep[]
+  students: ModuleStudentProgress[]
+}
+
+export type ModuleInput = {
+  title: string
+  description?: string | null
+  didactic_guide?: string | null
+  status?: 'draft' | 'published' | 'archived'
+  sellable?: boolean
+}
+
+export type ModuleStepInput = { title: string; content?: string | null; kind?: string }
+
+export interface StudentModuleRow {
+  id: string
+  module_id: string
+  title: string
+  description: string | null
+  status: 'active' | 'completed'
+  step_count: number
+  completed_count: number
+}
+
+export interface StudentModuleDetail {
+  id: string
+  module_id: string
+  title: string
+  description: string | null
+  status: 'active' | 'completed'
+  completed_steps: string[]
+  steps: ModuleStep[]
+}
+
 export interface StudentInvite {
   id: string
   code: string

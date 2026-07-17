@@ -25,6 +25,9 @@ from app.schemas.institute import (
     InstituteProfileResponse,
     InstituteRegister,
     InstituteUpdate,
+    ModuleStepReorder,
+    ModuleStepUpsert,
+    ModuleUpsert,
     RubricUpsert,
     StudentAssignmentReview,
     SubmissionEvaluate,
@@ -930,3 +933,222 @@ async def update_echo_settings(
             approach, tone, depth, custom, current["institute"]["id"])
     return {"echo_approach": row["echo_approach"], "echo_tone": row["echo_tone"],
             "echo_depth": row["echo_depth"], "echo_custom_steering": row["echo_custom_steering"]}
+
+
+# ── Lernmodule ────────────────────────────────────────────────────────────────
+
+def _step_out(row) -> dict:
+    return {"id": str(row["id"]), "position": row["position"], "kind": row["kind"],
+            "title": row["title"], "content": row["content"]}
+
+
+def _jsonb_list(v):
+    if isinstance(v, str):
+        try:
+            return json.loads(v)
+        except (ValueError, TypeError):
+            return []
+    return v or []
+
+
+def _module_out(row) -> dict:
+    d = dict(row)
+    return {
+        "id": str(d["id"]), "title": d["title"], "description": d["description"],
+        "didactic_guide": d["didactic_guide"], "status": d["status"], "sellable": d["sellable"],
+        "step_count": d.get("step_count"), "enrolled_count": d.get("enrolled_count"),
+        "created_at": d["created_at"].isoformat() if d.get("created_at") else None,
+    }
+
+
+async def _own_module(conn, module_id, inst_id) -> None:
+    m = await conn.fetchrow(
+        "SELECT id FROM learning_modules WHERE id = $1 AND institute_id = $2", module_id, inst_id)
+    if not m:
+        raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
+
+
+@router.get("/modules")
+async def list_modules(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT m.*, "
+            "(SELECT count(*) FROM learning_module_steps s WHERE s.module_id = m.id)::int AS step_count, "
+            "(SELECT count(*) FROM student_modules sm WHERE sm.module_id = m.id)::int AS enrolled_count "
+            "FROM learning_modules m WHERE m.institute_id = $1 ORDER BY m.created_at DESC",
+            current["institute"]["id"])
+    return [_module_out(r) for r in rows]
+
+
+@router.post("/modules")
+async def create_module(
+    body: ModuleUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "INSERT INTO learning_modules (institute_id, title, description, didactic_guide, status, sellable) "
+            "VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            current["institute"]["id"], body.title, body.description, body.didactic_guide,
+            body.status, body.sellable)
+    return _module_out(row)
+
+
+@router.get("/modules/{module_id}")
+async def get_module(
+    module_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        m = await conn.fetchrow(
+            "SELECT * FROM learning_modules WHERE id = $1 AND institute_id = $2",
+            module_id, current["institute"]["id"])
+        if not m:
+            raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
+        steps = await conn.fetch(
+            "SELECT * FROM learning_module_steps WHERE module_id = $1 ORDER BY position, created_at", module_id)
+        enrolled = await conn.fetch(
+            "SELECT sm.completed_steps, sm.status, st.id AS student_id, st.display_name "
+            "FROM student_modules sm JOIN students st ON st.id = sm.student_id "
+            "WHERE sm.module_id = $1 ORDER BY sm.enrolled_at", module_id)
+    total = len(steps)
+    out = _module_out(m)
+    out["steps"] = [_step_out(s) for s in steps]
+    out["students"] = [
+        {"student_id": str(e["student_id"]), "student_name": e["display_name"] or "Studierende:r",
+         "status": e["status"], "completed": len(_jsonb_list(e["completed_steps"])), "total": total}
+        for e in enrolled]
+    return out
+
+
+@router.patch("/modules/{module_id}")
+async def update_module(
+    module_id: UUID,
+    body: ModuleUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE learning_modules SET title = $1, description = $2, didactic_guide = $3, "
+            "status = $4, sellable = $5, updated_at = NOW() WHERE id = $6 AND institute_id = $7 RETURNING *",
+            body.title, body.description, body.didactic_guide, body.status, body.sellable,
+            module_id, current["institute"]["id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
+    return _module_out(row)
+
+
+@router.delete("/modules/{module_id}")
+async def delete_module(
+    module_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        res = await conn.execute(
+            "DELETE FROM learning_modules WHERE id = $1 AND institute_id = $2",
+            module_id, current["institute"]["id"])
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
+    return {"deleted": True}
+
+
+@router.post("/modules/{module_id}/steps")
+async def add_module_step(
+    module_id: UUID,
+    body: ModuleStepUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        await _own_module(conn, module_id, current["institute"]["id"])
+        pos = await conn.fetchval(
+            "SELECT COALESCE(MAX(position), -1) + 1 FROM learning_module_steps WHERE module_id = $1", module_id)
+        row = await conn.fetchrow(
+            "INSERT INTO learning_module_steps (module_id, position, kind, title, content) "
+            "VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            module_id, pos, body.kind, body.title, body.content)
+    return _step_out(row)
+
+
+@router.patch("/modules/{module_id}/steps/{step_id}")
+async def update_module_step(
+    module_id: UUID,
+    step_id: UUID,
+    body: ModuleStepUpsert,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        await _own_module(conn, module_id, current["institute"]["id"])
+        row = await conn.fetchrow(
+            "UPDATE learning_module_steps SET title = $1, content = $2 "
+            "WHERE id = $3 AND module_id = $4 RETURNING *", body.title, body.content, step_id, module_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Schritt nicht gefunden.")
+    return _step_out(row)
+
+
+@router.delete("/modules/{module_id}/steps/{step_id}")
+async def delete_module_step(
+    module_id: UUID,
+    step_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        await _own_module(conn, module_id, current["institute"]["id"])
+        res = await conn.execute(
+            "DELETE FROM learning_module_steps WHERE id = $1 AND module_id = $2", step_id, module_id)
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Schritt nicht gefunden.")
+    return {"deleted": True}
+
+
+@router.post("/modules/{module_id}/steps/reorder")
+async def reorder_module_steps(
+    module_id: UUID,
+    body: ModuleStepReorder,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        await _own_module(conn, module_id, current["institute"]["id"])
+        for i, sid in enumerate(body.step_ids):
+            await conn.execute(
+                "UPDATE learning_module_steps SET position = $1 WHERE id = $2 AND module_id = $3",
+                i, sid, module_id)
+    return {"ok": True}
+
+
+@router.post("/modules/{module_id}/enroll")
+async def enroll_module(
+    module_id: UUID,
+    body: AssignmentAssign,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        await _own_module(conn, module_id, inst_id)
+        if body.to_all:
+            id_rows = await conn.fetch(
+                "SELECT id FROM students WHERE institute_id = $1 AND status = 'active'", inst_id)
+        else:
+            id_rows = await conn.fetch(
+                "SELECT id FROM students WHERE institute_id = $1 AND status = 'active' "
+                "AND id = ANY($2::uuid[])", inst_id, body.student_ids)
+        n = 0
+        for r in id_rows:
+            res = await conn.execute(
+                "INSERT INTO student_modules (module_id, student_id) VALUES ($1, $2) "
+                "ON CONFLICT (module_id, student_id) DO NOTHING", module_id, r["id"])
+            if res.endswith("1"):
+                n += 1
+    return {"enrolled": n}

@@ -10,6 +10,7 @@ import GearIcon from '@/components/icons/GearIcon'
 const NAV = [
   { to: '/institute/dashboard', label: 'Dashboard', end: false },
   { to: '/institute/students', label: 'Studierende', end: false },
+  { to: '/institute/modules', label: 'Lernmodule', end: false },
   { to: '/institute/assignments', label: 'Aufgaben', end: false },
   { to: '/institute/submissions', label: 'Einreichungen', end: false },
   { to: '/institute/rubrics', label: 'Bewertungsraster', end: false },

@@ -4,6 +4,7 @@ import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
   StudentSubmission, StudentSessionNote, StudentEchoSession, StudentEchoChatResult,
   GlossaryTerm, Report, ReportCreate, ScalesOverview, CaseTrends, CaseReview, StudentAssignment,
+  StudentModuleRow, StudentModuleDetail,
 } from '@/types'
 
 type SessionNoteInput = { session_date?: string | null; title?: string | null; sections: { heading: string; text: string }[] }
@@ -132,4 +133,12 @@ export const studentApi = {
     apiClient.get<StudentAssignment[]>('/student/assignments').then(r => r.data),
   assignmentRespond: (saId: string, text: string, submit: boolean) =>
     apiClient.post<StudentAssignment>(`/student/assignments/${saId}/respond`, { text, submit }).then(r => r.data),
+
+  // Lernmodule
+  modules: () =>
+    apiClient.get<StudentModuleRow[]>('/student/modules').then(r => r.data),
+  module: (smId: string) =>
+    apiClient.get<StudentModuleDetail>(`/student/modules/${smId}`).then(r => r.data),
+  moduleStepComplete: (smId: string, stepId: string, done: boolean) =>
+    apiClient.post<{ completed_steps: string[]; status: 'active' | 'completed' }>(`/student/modules/${smId}/steps/${stepId}/complete`, { done }).then(r => r.data),
 }

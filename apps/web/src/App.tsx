@@ -107,6 +107,8 @@ import InstituteRubricsPage from '@/pages/institute/InstituteRubricsPage'
 import InstituteAssignmentsPage from '@/pages/institute/InstituteAssignmentsPage'
 import InstituteAssignmentDetailPage from '@/pages/institute/InstituteAssignmentDetailPage'
 import InstituteSettingsPage from '@/pages/institute/InstituteSettingsPage'
+import InstituteModulesPage from '@/pages/institute/InstituteModulesPage'
+import InstituteModuleDetailPage from '@/pages/institute/InstituteModuleDetailPage'
 import StudentRoute, { useStudent } from '@/components/auth/StudentRoute'
 import StudentRegisterPage from '@/pages/student/StudentRegisterPage'
 import StudentDashboardPage from '@/pages/student/StudentDashboardPage'
@@ -122,6 +124,8 @@ import StudentSubmitPage from '@/pages/student/StudentSubmitPage'
 import StudentCouplePage from '@/pages/student/StudentCouplePage'
 import StudentRoleplayPage from '@/pages/student/StudentRoleplayPage'
 import StudentAssignmentsPage from '@/pages/student/StudentAssignmentsPage'
+import StudentModulesPage from '@/pages/student/StudentModulesPage'
+import StudentModuleDetailPage from '@/pages/student/StudentModuleDetailPage'
 import StudentScalesPage from '@/pages/student/StudentScalesPage'
 import StudentReviewPage from '@/pages/student/StudentReviewPage'
 import DevNoticeModal from '@/components/DevNoticeModal'
@@ -233,11 +237,15 @@ export function AppRoutes() {
       <Route path="/institute/assignments" element={<InstituteRoute><InstituteAssignmentsPage /></InstituteRoute>} />
       <Route path="/institute/assignments/:id" element={<InstituteRoute><InstituteAssignmentDetailPage /></InstituteRoute>} />
       <Route path="/institute/settings" element={<InstituteRoute><InstituteSettingsPage /></InstituteRoute>} />
+      <Route path="/institute/modules" element={<InstituteRoute><InstituteModulesPage /></InstituteRoute>} />
+      <Route path="/institute/modules/:id" element={<InstituteRoute><InstituteModuleDetailPage /></InstituteRoute>} />
 
       {/* ── Ausbildungsbereich · Student:in (Login + Rolle erforderlich) ──────── */}
       <Route path="/student/register" element={<ProtectedRoute><StudentRegisterPage /></ProtectedRoute>} />
       <Route path="/student/dashboard" element={<StudentRoute><StudentDashboardPage /></StudentRoute>} />
       <Route path="/student/assignments" element={<StudentRoute><StudentAssignmentsPage /></StudentRoute>} />
+      <Route path="/student/modules" element={<StudentRoute><StudentModulesPage /></StudentRoute>} />
+      <Route path="/student/modules/:id" element={<StudentRoute><StudentModuleDetailPage /></StudentRoute>} />
       <Route path="/student/cases/:id" element={<StudentRoute><StudentCaseDetailPage /></StudentRoute>} />
       <Route path="/student/cases/:id/echo" element={<StudentRoute><StudentEchoPage /></StudentRoute>} />
       <Route path="/student/cases/:id/roleplay" element={<StudentRoute><StudentRoleplayPage /></StudentRoute>} />

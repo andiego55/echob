@@ -28,6 +28,7 @@ from app.schemas.student import (
     StudentReportUpdate,
     StudentSessionNoteCreate,
     StudentSessionRename,
+    StudentStepComplete,
     StudentSubmissionCreate,
 )
 from app.services import echo_modes, student_invite_service
@@ -1608,3 +1609,94 @@ async def roleplay_analyze(
         for r in rows)
     analysis = await echo_svc.analyze_roleplay(transcript=transcript)
     return {"analysis": analysis}
+
+
+# ── Lernmodule (eingeschriebene Module + Fortschritt) ─────────────────────────
+
+def _completed_list(v):
+    if isinstance(v, str):
+        try:
+            return json.loads(v)
+        except (ValueError, TypeError):
+            return []
+    return v if isinstance(v, list) else []
+
+
+@router.get("/modules")
+async def list_student_modules(
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT sm.id, sm.completed_steps, sm.status, m.id AS module_id, m.title, m.description, "
+            "(SELECT count(*) FROM learning_module_steps s WHERE s.module_id = m.id)::int AS step_count "
+            "FROM student_modules sm JOIN learning_modules m ON m.id = sm.module_id "
+            "WHERE sm.student_id = $1 AND m.status <> 'archived' "
+            "ORDER BY (sm.status = 'active') DESC, sm.enrolled_at DESC",
+            current["student"]["id"])
+    return [
+        {"id": str(r["id"]), "module_id": str(r["module_id"]), "title": r["title"],
+         "description": r["description"], "status": r["status"], "step_count": r["step_count"],
+         "completed_count": len(_completed_list(r["completed_steps"]))}
+        for r in rows
+    ]
+
+
+@router.get("/modules/{sm_id}")
+async def get_student_module(
+    sm_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        sm = await conn.fetchrow(
+            "SELECT sm.*, m.title, m.description FROM student_modules sm "
+            "JOIN learning_modules m ON m.id = sm.module_id WHERE sm.id = $1 AND sm.student_id = $2",
+            sm_id, current["student"]["id"])
+        if not sm:
+            raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
+        steps = await conn.fetch(
+            "SELECT id, position, kind, title, content FROM learning_module_steps "
+            "WHERE module_id = $1 ORDER BY position, created_at", sm["module_id"])
+    return {
+        "id": str(sm["id"]), "module_id": str(sm["module_id"]),
+        "title": sm["title"], "description": sm["description"], "status": sm["status"],
+        "completed_steps": [str(x) for x in _completed_list(sm["completed_steps"])],
+        "steps": [{"id": str(s["id"]), "position": s["position"], "kind": s["kind"],
+                   "title": s["title"], "content": s["content"]} for s in steps],
+    }
+
+
+@router.post("/modules/{sm_id}/steps/{step_id}/complete")
+async def complete_module_step(
+    sm_id: UUID,
+    step_id: UUID,
+    body: StudentStepComplete,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    sid = current["student"]["id"]
+    async with pool.acquire() as conn:
+        sm = await conn.fetchrow(
+            "SELECT * FROM student_modules WHERE id = $1 AND student_id = $2", sm_id, sid)
+        if not sm:
+            raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
+        step = await conn.fetchrow(
+            "SELECT id FROM learning_module_steps WHERE id = $1 AND module_id = $2", step_id, sm["module_id"])
+        if not step:
+            raise HTTPException(status_code=404, detail="Schritt nicht gefunden.")
+        completed = {str(x) for x in _completed_list(sm["completed_steps"])}
+        if body.done:
+            completed.add(str(step_id))
+        else:
+            completed.discard(str(step_id))
+        total = await conn.fetchval(
+            "SELECT count(*) FROM learning_module_steps WHERE module_id = $1", sm["module_id"])
+        new_status = "completed" if total and len(completed) >= total else "active"
+        row = await conn.fetchrow(
+            "UPDATE student_modules SET completed_steps = $1::jsonb, status = $2, updated_at = NOW() "
+            "WHERE id = $3 AND student_id = $4 RETURNING completed_steps, status",
+            json.dumps(sorted(completed)), new_status, sm_id, sid)
+    return {"completed_steps": [str(x) for x in _completed_list(row["completed_steps"])],
+            "status": row["status"]}

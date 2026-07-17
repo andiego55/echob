@@ -7,6 +7,7 @@ import EchoBLogo from '@/components/EchoBLogo'
 
 const NAV = [
   { to: '/student/dashboard', label: 'Meine Fälle', end: false },
+  { to: '/student/modules', label: 'Lernmodule', end: false },
   { to: '/student/assignments', label: 'Aufgaben', end: false },
 ]
 

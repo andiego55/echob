@@ -72,6 +72,10 @@ class StudentAssignmentRespond(BaseModel):
     submit: bool = False
 
 
+class StudentStepComplete(BaseModel):
+    done: bool = True
+
+
 class StudentNotes(BaseModel):
     first_impressions: str | None = None
     key_scenes: str | None = None

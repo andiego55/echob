@@ -18,6 +18,11 @@ import type {
   AssignmentDetail,
   AssignmentInput,
   InstituteEchoSettings,
+  LearningModule,
+  LearningModuleDetail,
+  ModuleInput,
+  ModuleStep,
+  ModuleStepInput,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -103,4 +108,26 @@ export const instituteApi = {
     apiClient.get<InstituteEchoSettings>('/institute/echo-settings').then(r => r.data),
   echoSettingsUpdate: (data: InstituteEchoSettings) =>
     apiClient.patch<InstituteEchoSettings>('/institute/echo-settings', data).then(r => r.data),
+
+  // Lernmodule
+  modules: () =>
+    apiClient.get<LearningModule[]>('/institute/modules').then(r => r.data),
+  module: (id: string) =>
+    apiClient.get<LearningModuleDetail>(`/institute/modules/${id}`).then(r => r.data),
+  moduleCreate: (data: ModuleInput) =>
+    apiClient.post<LearningModule>('/institute/modules', data).then(r => r.data),
+  moduleUpdate: (id: string, data: ModuleInput) =>
+    apiClient.patch<LearningModule>(`/institute/modules/${id}`, data).then(r => r.data),
+  moduleDelete: (id: string) =>
+    apiClient.delete(`/institute/modules/${id}`).then(r => r.data),
+  moduleStepAdd: (id: string, data: ModuleStepInput) =>
+    apiClient.post<ModuleStep>(`/institute/modules/${id}/steps`, data).then(r => r.data),
+  moduleStepUpdate: (id: string, stepId: string, data: ModuleStepInput) =>
+    apiClient.patch<ModuleStep>(`/institute/modules/${id}/steps/${stepId}`, data).then(r => r.data),
+  moduleStepDelete: (id: string, stepId: string) =>
+    apiClient.delete(`/institute/modules/${id}/steps/${stepId}`).then(r => r.data),
+  moduleStepsReorder: (id: string, stepIds: string[]) =>
+    apiClient.post(`/institute/modules/${id}/steps/reorder`, { step_ids: stepIds }).then(r => r.data),
+  moduleEnroll: (id: string, data: { student_ids?: string[]; to_all?: boolean }) =>
+    apiClient.post<{ enrolled: number }>(`/institute/modules/${id}/enroll`, data).then(r => r.data),
 }

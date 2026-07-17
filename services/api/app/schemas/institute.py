@@ -109,3 +109,21 @@ class InstituteEchoSettings(BaseModel):
     echo_tone: int | None = None
     echo_depth: int | None = None
     echo_custom_steering: str | None = Field(None, max_length=600)
+
+
+class ModuleUpsert(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str | None = Field(None, max_length=4000)
+    didactic_guide: str | None = Field(None, max_length=20_000)
+    status: str = Field("draft", pattern="^(draft|published|archived)$")
+    sellable: bool = False
+
+
+class ModuleStepUpsert(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str | None = Field(None, max_length=40_000)
+    kind: str = Field("lesson", pattern="^(lesson)$")
+
+
+class ModuleStepReorder(BaseModel):
+    step_ids: list[UUID] = Field(default_factory=list)
