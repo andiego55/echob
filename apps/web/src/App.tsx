@@ -119,6 +119,7 @@ import StudentHypothesesPage from '@/pages/student/StudentHypothesesPage'
 import StudentHypothesisDialogPage from '@/pages/student/StudentHypothesisDialogPage'
 import StudentSubmitPage from '@/pages/student/StudentSubmitPage'
 import StudentCouplePage from '@/pages/student/StudentCouplePage'
+import StudentRoleplayPage from '@/pages/student/StudentRoleplayPage'
 import StudentAssignmentsPage from '@/pages/student/StudentAssignmentsPage'
 import StudentScalesPage from '@/pages/student/StudentScalesPage'
 import StudentReviewPage from '@/pages/student/StudentReviewPage'
@@ -237,6 +238,7 @@ export function AppRoutes() {
       <Route path="/student/assignments" element={<StudentRoute><StudentAssignmentsPage /></StudentRoute>} />
       <Route path="/student/cases/:id" element={<StudentRoute><StudentCaseDetailPage /></StudentRoute>} />
       <Route path="/student/cases/:id/echo" element={<StudentRoute><StudentEchoPage /></StudentRoute>} />
+      <Route path="/student/cases/:id/roleplay" element={<StudentRoute><StudentRoleplayPage /></StudentRoute>} />
       <Route path="/student/cases/:id/hypotheses" element={<StudentRoute><StudentHypothesesPage /></StudentRoute>} />
       <Route path="/student/cases/:id/hypotheses/:hypId" element={<StudentRoute><StudentHypothesisDialogPage /></StudentRoute>} />
       <Route path="/student/cases/:id/scales" element={<StudentRoute><StudentScalesPage /></StudentRoute>} />

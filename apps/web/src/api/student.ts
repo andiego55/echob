@@ -97,6 +97,18 @@ export const studentApi = {
   coupleSessionDelete: (copyId: string, sessionId: string) =>
     apiClient.delete(`/student/cases/${copyId}/couple/sessions/${sessionId}`).then(r => r.data),
 
+  // Rollenspiel (Echo spielt die Klient:in) — session-basiert
+  roleplaySessions: (copyId: string) =>
+    apiClient.get<StudentEchoSession[]>(`/student/cases/${copyId}/roleplay/sessions`).then(r => r.data),
+  roleplayHistory: (copyId: string, sessionId: string) =>
+    apiClient.get<StudentEchoMessage[]>(`/student/cases/${copyId}/roleplay/history`, { params: { session_id: sessionId } }).then(r => r.data),
+  roleplayChat: (copyId: string, data: { message: string; session_id?: string }) =>
+    apiClient.post<StudentEchoChatResult>(`/student/cases/${copyId}/roleplay/chat`, data, { timeout: 120_000 }).then(r => r.data),
+  roleplaySessionRename: (copyId: string, sessionId: string, title: string) =>
+    apiClient.patch<StudentEchoSession>(`/student/cases/${copyId}/roleplay/sessions/${sessionId}`, { title }).then(r => r.data),
+  roleplaySessionDelete: (copyId: string, sessionId: string) =>
+    apiClient.delete(`/student/cases/${copyId}/roleplay/sessions/${sessionId}`).then(r => r.data),
+
   // Muster & Skalen (KI-Einschätzung der Fallperson)
   scales: (copyId: string) =>
     apiClient.get<ScalesOverview>(`/student/cases/${copyId}/scales`).then(r => r.data),

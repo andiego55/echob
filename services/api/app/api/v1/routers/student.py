@@ -1391,3 +1391,181 @@ async def respond_assignment(
             "SELECT sa.*, a.kind, a.title, a.instructions, a.payload FROM student_assignments sa "
             "JOIN institute_assignments a ON a.id = sa.assignment_id WHERE sa.id = $1", sa_id)
     return _student_assignment_out(full)
+
+
+# ── Rollenspiel (Echo spielt die ratsuchende Person / Klient:in) ──────────────
+# Gesprächsübung: Echo verkörpert die Klient:in des Falls (Persona aus Onboarding,
+# Selbstbild, Szenen) via professional_chat + echo_roleplay_prompt.md. Session-
+# basiert (echo_chat_sessions kind='roleplay', thread_type='roleplay'). Keine
+# Krisen-Triage — fiktives Übungsmaterial; der Prompt hält den Rahmen.
+
+async def _build_roleplay_context(conn, case_id) -> str:
+    case_row = await conn.fetchrow("SELECT * FROM cases WHERE id = $1", case_id)
+    onboarding_row = await conn.fetchrow("SELECT * FROM onboarding_answers WHERE case_id = $1", case_id)
+    scene_rows = await conn.fetch(
+        "SELECT * FROM scenes WHERE case_id = $1 ORDER BY scene_date DESC NULLS LAST, created_at DESC LIMIT 8", case_id)
+    self_row = await conn.fetchrow("SELECT * FROM user_profiles WHERE user_id = $1", case_row["user_id"])
+    onboarding = (crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+                  if onboarding_row else {})
+    scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
+    partner = onboarding.get("person_name") or "die andere Person"
+
+    parts = [
+        "# Deine Rolle: ratsuchende Person (Klient:in)\n"
+        f"Du kommst in ein Gespräch und sprichst über deine Beziehung zu {partner}. "
+        "Du bist belastet, unsicher und suchst Orientierung."
+    ]
+    if onboarding.get("relationship_description"):
+        parts.append("## Deine Beziehung\n" + onboarding["relationship_description"])
+    if onboarding.get("main_burden"):
+        parts.append("## Was dich am meisten belastet\n" + onboarding["main_burden"])
+    if onboarding.get("typical_scenes"):
+        parts.append("## Ein wiederkehrendes Muster\n" + onboarding["typical_scenes"])
+    if onboarding.get("significant_event"):
+        parts.append("## Ein prägendes Ereignis\n" + onboarding["significant_event"])
+    if self_row and _jsonb(self_row["modules"]):
+        parts.append("## Dein inneres Erleben\n" + build_profile_context({
+            "modules": _jsonb(self_row["modules"]),
+            "safety_status": self_row["safety_status"] or "no_indication",
+            "display_name": self_row["display_name"],
+        }))
+    if scenes:
+        sc = "\n".join(
+            f"- {s.get('title') or 'Szene'}: {s.get('description') or ''}"
+            + (f" (deine Reaktion damals: {s.get('user_reaction')})" if s.get("user_reaction") else "")
+            for s in scenes[:6])
+        parts.append("## Szenen, die du erlebt hast\n" + sc)
+    return "\n\n".join(parts)
+
+
+async def _roleplay_turn(pool, echo_svc, *, case_id, user_id, session_id, message):
+    async with pool.acquire() as conn:
+        persona = await _build_roleplay_context(conn, case_id)
+        history_rows = await conn.fetch(
+            "SELECT role, content FROM echo_messages WHERE session_id = $1 "
+            "ORDER BY created_at DESC LIMIT 24", session_id)
+    history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in reversed(history_rows)]
+    answer = await echo_svc.professional_chat(
+        user_message=message, shared_context=persona, history=history,
+        prompt_file="echo_roleplay_prompt.md")
+    async with pool.acquire() as conn:
+        urow = await conn.fetchrow(
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, session_id) "
+            "VALUES ($1, $2, 'user', $3, 'roleplay', $4) "
+            "RETURNING id, session_id, role, content, metadata, created_at",
+            case_id, user_id, crypto.encrypt(message), session_id)
+        arow = await conn.fetchrow(
+            "INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, session_id, metadata) "
+            "VALUES ($1, $2, 'assistant', $3, 'roleplay', $4, '{}'::jsonb) "
+            "RETURNING id, session_id, role, content, metadata, created_at",
+            case_id, user_id, crypto.encrypt(answer), session_id)
+        await conn.execute(
+            "UPDATE echo_chat_sessions SET updated_at = NOW(), title = COALESCE(title, LEFT($2, 60)) "
+            "WHERE id = $1", session_id, message.strip())
+    return {"user_message": _echo_msg_out(urow), "assistant_message": _echo_msg_out(arow),
+            "session_id": str(session_id)}
+
+
+@router.get("/cases/{copy_id}/roleplay/sessions")
+async def roleplay_sessions(
+    copy_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        rows = await conn.fetch(
+            "SELECT * FROM echo_chat_sessions WHERE case_id = $1 AND user_id = $2 AND kind = 'roleplay' "
+            "ORDER BY updated_at DESC", copy["case_id"], current["user_id"])
+    return [_session_out(r) for r in rows]
+
+
+@router.get("/cases/{copy_id}/roleplay/history")
+async def roleplay_history(
+    copy_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        owns = await conn.fetchrow(
+            "SELECT id FROM echo_chat_sessions "
+            "WHERE id = $1 AND case_id = $2 AND user_id = $3 AND kind = 'roleplay'",
+            session_id, copy["case_id"], current["user_id"])
+        if not owns:
+            raise HTTPException(status_code=404, detail="Gespräch nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT id, session_id, role, content, metadata, created_at FROM echo_messages "
+            "WHERE session_id = $1 ORDER BY created_at LIMIT 200", session_id)
+    return [_echo_msg_out(r) for r in rows]
+
+
+@router.post("/cases/{copy_id}/roleplay/chat")
+async def roleplay_chat(
+    copy_id: UUID,
+    body: StudentEchoChatRequest,
+    request: Request,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Ein Zug im Rollenspiel — Echo antwortet in der Rolle der Klient:in."""
+    echo_svc = request.app.state.echo_service
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    uid = current["user_id"]
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        case_id = copy["case_id"]
+        if body.session_id:
+            sess = await conn.fetchrow(
+                "SELECT id FROM echo_chat_sessions "
+                "WHERE id = $1 AND case_id = $2 AND user_id = $3 AND kind = 'roleplay'",
+                body.session_id, case_id, uid)
+            if not sess:
+                raise HTTPException(status_code=404, detail="Gespräch nicht gefunden.")
+            session_id = sess["id"]
+        else:
+            sess = await conn.fetchrow(
+                "INSERT INTO echo_chat_sessions (case_id, user_id, kind) "
+                "VALUES ($1, $2, 'roleplay') RETURNING id", case_id, uid)
+            session_id = sess["id"]
+    return await _roleplay_turn(
+        pool, echo_svc, case_id=case_id, user_id=uid, session_id=session_id, message=body.message)
+
+
+@router.patch("/cases/{copy_id}/roleplay/sessions/{session_id}")
+async def roleplay_session_rename(
+    copy_id: UUID,
+    session_id: UUID,
+    body: StudentSessionRename,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        row = await conn.fetchrow(
+            "UPDATE echo_chat_sessions SET title = $1 "
+            "WHERE id = $2 AND case_id = $3 AND user_id = $4 AND kind = 'roleplay' RETURNING *",
+            body.title.strip(), session_id, copy["case_id"], current["user_id"])
+    if not row:
+        raise HTTPException(status_code=404, detail="Gespräch nicht gefunden.")
+    return _session_out(row)
+
+
+@router.delete("/cases/{copy_id}/roleplay/sessions/{session_id}")
+async def roleplay_session_delete(
+    copy_id: UUID,
+    session_id: UUID,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        res = await conn.execute(
+            "DELETE FROM echo_chat_sessions "
+            "WHERE id = $1 AND case_id = $2 AND user_id = $3 AND kind = 'roleplay'",
+            session_id, copy["case_id"], current["user_id"])
+    if res == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Gespräch nicht gefunden.")
+    return {"deleted": True}

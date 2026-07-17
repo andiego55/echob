@@ -7,13 +7,14 @@ import { useQuery } from '@tanstack/react-query'
 import { studentApi } from '@/api/student'
 
 const baseTabs = [
-  { path: '',            label: 'Fall'        },
-  { path: '/echo',       label: 'Echo'        },
-  { path: '/hypotheses', label: 'Hypothesen'  },
-  { path: '/scales',     label: 'Muster'      },
-  { path: '/review',     label: 'Verlauf'     },
-  { path: '/reports',    label: 'Berichte'    },
-  { path: '/notes',      label: 'Notizen'     },
+  { path: '',            label: 'Fall'         },
+  { path: '/echo',       label: 'Echo'         },
+  { path: '/roleplay',   label: 'Rollenspiel'  },
+  { path: '/hypotheses', label: 'Hypothesen'   },
+  { path: '/scales',     label: 'Muster'       },
+  { path: '/review',     label: 'Verlauf'      },
+  { path: '/reports',    label: 'Berichte'     },
+  { path: '/notes',      label: 'Notizen'      },
 ]
 
 export default function StudentCaseNav({ copyId }: { copyId: string }) {
