@@ -2,7 +2,9 @@
  * StudentShell – Wrapper für alle /student/* Seiten. Konsistent zum Fachpersonen-/Institut-Shell.
  */
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
+import { studentApi } from '@/api/student'
 import EchoBLogo from '@/components/EchoBLogo'
 
 const NAV = [
@@ -14,6 +16,8 @@ const NAV = [
 export default function StudentShell({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const { data: inbox } = useQuery({ queryKey: ['student-inbox-count'], queryFn: () => studentApi.inboxCount() })
+  const openCount = inbox?.assignments ?? 0
 
   const handleSignOut = async () => {
     await signOut()
@@ -41,6 +45,11 @@ export default function StudentShell({ children }: { children: React.ReactNode }
                 }
               >
                 {label}
+                {to === '/student/assignments' && openCount > 0 && (
+                  <span className="ml-1.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 align-middle text-[10px] font-bold text-white">
+                    {openCount}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>

@@ -1750,3 +1750,17 @@ async def complete_module_step(
             json.dumps(sorted(completed)), new_status, sm_id, sid)
     return {"completed_steps": [str(x) for x in _completed_list(row["completed_steps"])],
             "status": row["status"]}
+
+
+@router.get("/inbox-count")
+async def inbox_count(
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Offene Aufgaben (Braucht Aufmerksamkeit) für den Nav-Zähler."""
+    async with pool.acquire() as conn:
+        n = await conn.fetchval(
+            "SELECT count(*) FROM student_assignments "
+            "WHERE student_id = $1 AND status IN ('assigned', 'in_progress')",
+            current["student"]["id"])
+    return {"assignments": n or 0}

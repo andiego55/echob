@@ -141,4 +141,7 @@ export const studentApi = {
     apiClient.get<StudentModuleDetail>(`/student/modules/${smId}`).then(r => r.data),
   moduleStepComplete: (smId: string, stepId: string, done: boolean) =>
     apiClient.post<{ completed_steps: string[]; status: 'active' | 'completed' }>(`/student/modules/${smId}/steps/${stepId}/complete`, { done }).then(r => r.data),
+
+  inboxCount: () =>
+    apiClient.get<{ assignments: number }>('/student/inbox-count').then(r => r.data),
 }
