@@ -325,6 +325,38 @@ class EchoService:
         return {"scores": scores, "total": total, "max_total": max_total,
                 "feedback": str(raw.get("feedback") or "")}
 
+    async def analyze_roleplay(self, *, transcript: str) -> str:
+        """Wertet die Gesprächsführung der beratenden (studierenden) Person im Rollenspiel aus.
+
+        Konstruktive Supervisions-Rückmeldung (Markdown) — für die Ausbildung, keine
+        Diagnosen über die gespielte Klient:in.
+        """
+        system = (
+            "Du bist eine erfahrene Supervisorin in der Beratungsausbildung. Analysiere die "
+            "Gesprächsführung der BERATENDEN (studierenden) Person in einem Übungs-Rollenspiel; die "
+            "andere Rolle ist die gespielte Klient:in. Sei konkret, konstruktiv und wertschätzend. "
+            "Keine Diagnosen über die Klient:in."
+        )
+        user = (
+            "Gesprächsprotokoll (BERATEND = studierende Person, KLIENT:IN = gespielte Person):\n\n"
+            f"{transcript}\n\n"
+            "Gib eine kurze, strukturierte Rückmeldung in Markdown mit genau diesen Abschnitten:\n"
+            "**Stärken** (2–4 Punkte mit konkretem Bezug aufs Gespräch), "
+            "**Entwicklungsfelder** (2–4 Punkte, je mit einem konkreten Formulierungsvorschlag), "
+            "**Ein Satz zum Mitnehmen**. Achte auf: offene Fragen, aktives Zuhören/Spiegeln, "
+            "Beziehungsaufbau, Struktur, Umgang mit Abwehr, Raum geben."
+        )
+        if not self._use_openai:
+            return ("**Stärken**\n- Freundlicher Einstieg _(Demo ohne KI-Anbindung)_.\n\n"
+                    "**Entwicklungsfelder**\n- Mehr offene Fragen nach dem Erleben stellen.\n\n"
+                    "**Ein Satz zum Mitnehmen**\nBleib neugierig und gib Raum.")
+        response = await self._chat(  # type: ignore[union-attr]
+            model=self._model_fast,
+            messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+            max_tokens=900, temperature=0.4,
+        )
+        return response.choices[0].message.content or ""
+
     # ── Öffentliche Methoden ──────────────────────────────────────────────────
 
     async def chat(

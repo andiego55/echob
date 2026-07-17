@@ -9,6 +9,7 @@ import StudentShell from '@/components/student/StudentShell'
 import StudentCaseNav from '@/components/student/StudentCaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { studentApi } from '@/api/student'
 import { apiErrorText } from '@/utils/apiError'
 import type { StudentEchoMessage } from '@/types'
@@ -21,6 +22,7 @@ export default function StudentRoleplayPage() {
   const [messages, setMessages] = useState<StudentEchoMessage[]>([])
   const [input, setInput] = useState('')
   const [pending, setPending] = useState<string | null>(null)
+  const [analysis, setAnalysis] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
 
@@ -67,6 +69,10 @@ export default function StudentRoleplayPage() {
       if (sid === activeSession) { setActiveSession(null); setMessages([]) }
     },
   })
+  const analyze = useMutation({
+    mutationFn: () => studentApi.roleplayAnalyze(id!, activeSession!),
+    onSuccess: (res) => setAnalysis(res.analysis),
+  })
 
   const send = (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -76,7 +82,7 @@ export default function StudentRoleplayPage() {
     setPending(msg)
     chat.mutate({ message: msg, session_id: activeSession ?? undefined })
   }
-  const newChat = () => { setActiveSession(null); setMessages([]) }
+  const newChat = () => { setActiveSession(null); setMessages([]); setAnalysis(null) }
   const submitRename = (sid: string) => {
     const t = editingTitle.trim()
     if (t) rename.mutate({ sid, title: t })
@@ -94,7 +100,13 @@ export default function StudentRoleplayPage() {
               Echo antwortet in der Rolle der ratsuchenden Person{clientName ? '' : ' dieses Falls'}. Übe Gesprächsführung – du bist die beratende Seite.
             </p>
           </div>
-          <button onClick={newChat} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm">+ Neues Gespräch</button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => analyze.mutate()} disabled={!activeSession || messages.length === 0 || analyze.isPending}
+              className="btn border-2 border-accent bg-accent/5 text-accent hover:bg-accent/10 !py-2 !px-4 !text-sm disabled:opacity-40">
+              {analyze.isPending ? 'Wertet aus …' : 'Gespräch auswerten'}
+            </button>
+            <button onClick={newChat} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm">+ Neues Gespräch</button>
+          </div>
         </div>
 
         <div className="flex gap-6">
@@ -117,7 +129,7 @@ export default function StudentRoleplayPage() {
                       />
                     ) : (
                       <>
-                        <button onClick={() => setActiveSession(s.id)}
+                        <button onClick={() => { setActiveSession(s.id); setAnalysis(null) }}
                           className={`w-full truncate rounded-brand px-3 py-2 pr-12 text-left text-sm ${isActive ? 'font-medium text-accent' : 'text-brand-muted hover:text-navy'}`}>
                           {s.title || 'Neues Gespräch'}
                         </button>
@@ -159,6 +171,20 @@ export default function StudentRoleplayPage() {
                 <ChatComposer value={input} onChange={setInput} onSend={send} pending={chat.isPending} placeholder="Was sagst du als beratende Person?" />
               </div>
             </div>
+
+            {analyze.isError && (
+              <p className="mt-3 text-xs text-red-600">{apiErrorText(analyze.error, 'Auswertung fehlgeschlagen.')}</p>
+            )}
+            {analysis && (
+              <div className="mt-4 card border-accent/30 bg-accent/5">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-sm font-bold text-navy">Auswertung deiner Gesprächsführung</p>
+                  <button onClick={() => setAnalysis(null)} className="text-xs text-brand-muted hover:text-navy transition-colors">✕ Schließen</button>
+                </div>
+                <div className="text-sm leading-relaxed text-brand-text"><MarkdownMessage content={analysis} /></div>
+                <p className="mt-3 border-t border-brand-border pt-2 text-[11px] text-brand-muted">Übungs-Rückmeldung, keine Bewertung. Fiktives Material.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -108,6 +108,8 @@ export const studentApi = {
     apiClient.patch<StudentEchoSession>(`/student/cases/${copyId}/roleplay/sessions/${sessionId}`, { title }).then(r => r.data),
   roleplaySessionDelete: (copyId: string, sessionId: string) =>
     apiClient.delete(`/student/cases/${copyId}/roleplay/sessions/${sessionId}`).then(r => r.data),
+  roleplayAnalyze: (copyId: string, sessionId: string) =>
+    apiClient.post<{ analysis: string }>(`/student/cases/${copyId}/roleplay/sessions/${sessionId}/analyze`, undefined, { timeout: 120_000 }).then(r => r.data),
 
   // Muster & Skalen (KI-Einschätzung der Fallperson)
   scales: (copyId: string) =>

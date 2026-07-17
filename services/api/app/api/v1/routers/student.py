@@ -1569,3 +1569,35 @@ async def roleplay_session_delete(
     if res == "DELETE 0":
         raise HTTPException(status_code=404, detail="Gespräch nicht gefunden.")
     return {"deleted": True}
+
+
+@router.post("/cases/{copy_id}/roleplay/sessions/{session_id}/analyze")
+async def roleplay_analyze(
+    copy_id: UUID,
+    session_id: UUID,
+    request: Request,
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """KI-Auswertung der eigenen Gesprächsführung im Rollenspiel (nicht gespeichert)."""
+    echo_svc = request.app.state.echo_service
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    async with pool.acquire() as conn:
+        copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
+        owns = await conn.fetchrow(
+            "SELECT id FROM echo_chat_sessions "
+            "WHERE id = $1 AND case_id = $2 AND user_id = $3 AND kind = 'roleplay'",
+            session_id, copy["case_id"], current["user_id"])
+        if not owns:
+            raise HTTPException(status_code=404, detail="Gespräch nicht gefunden.")
+        rows = await conn.fetch(
+            "SELECT role, content FROM echo_messages WHERE session_id = $1 "
+            "ORDER BY created_at ASC LIMIT 100", session_id)
+    if not rows:
+        raise HTTPException(status_code=400, detail="Noch kein Gespräch zum Auswerten.")
+    transcript = "\n\n".join(
+        ("BERATEND" if r["role"] == "user" else "KLIENT:IN") + ": " + crypto.decrypt(r["content"])
+        for r in rows)
+    analysis = await echo_svc.analyze_roleplay(transcript=transcript)
+    return {"analysis": analysis}
