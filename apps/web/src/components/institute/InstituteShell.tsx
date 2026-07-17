@@ -5,6 +5,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import EchoBLogo from '@/components/EchoBLogo'
+import GearIcon from '@/components/icons/GearIcon'
 
 const NAV = [
   { to: '/institute/dashboard', label: 'Dashboard', end: false },
@@ -49,6 +50,14 @@ export default function InstituteShell({ children }: { children: React.ReactNode
           </nav>
 
           <div className="flex items-center gap-3">
+            <NavLink
+              to="/institute/settings"
+              title="KI-Aussteuerung"
+              aria-label="KI-Aussteuerung"
+              className={({ isActive }) => `transition-colors ${isActive ? 'text-white' : 'text-white/55 hover:text-white'}`}
+            >
+              <GearIcon />
+            </NavLink>
             <span className="hidden sm:block text-xs text-white/40">{user?.email}</span>
             <button
               onClick={handleSignOut}

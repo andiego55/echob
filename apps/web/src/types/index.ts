@@ -349,6 +349,13 @@ export type RubricInput = {
   criteria: { key: string; name: string; description?: string | null; max_points: number }[]
 }
 
+export interface InstituteEchoSettings {
+  echo_approach: string | null
+  echo_tone: number | null
+  echo_depth: number | null
+  echo_custom_steering: string | null
+}
+
 export type AssignmentKind = 'task' | 'reflection' | 'resource'
 export type AssignmentStatus = 'assigned' | 'in_progress' | 'submitted' | 'reviewed'
 

@@ -102,3 +102,10 @@ class AssignmentAssign(BaseModel):
 
 class StudentAssignmentReview(BaseModel):
     feedback: str | None = Field(None, max_length=8000)
+
+
+class InstituteEchoSettings(BaseModel):
+    echo_approach: str | None = None
+    echo_tone: int | None = None
+    echo_depth: int | None = None
+    echo_custom_steering: str | None = Field(None, max_length=600)

@@ -17,6 +17,7 @@ import type {
   Assignment,
   AssignmentDetail,
   AssignmentInput,
+  InstituteEchoSettings,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -96,4 +97,10 @@ export const instituteApi = {
     apiClient.post<{ assigned: number }>(`/institute/assignments/${id}/assign`, data).then(r => r.data),
   reviewStudentAssignment: (saId: string, feedback: string | null) =>
     apiClient.post<{ reviewed: boolean }>(`/institute/student-assignments/${saId}/feedback`, { feedback }).then(r => r.data),
+
+  // KI-Aussteuerung (Haus-Stil)
+  echoSettings: () =>
+    apiClient.get<InstituteEchoSettings>('/institute/echo-settings').then(r => r.data),
+  echoSettingsUpdate: (data: InstituteEchoSettings) =>
+    apiClient.patch<InstituteEchoSettings>('/institute/echo-settings', data).then(r => r.data),
 }

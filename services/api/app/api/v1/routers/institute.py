@@ -21,6 +21,7 @@ from app.schemas.institute import (
     AssignStudents,
     ExamplePatch,
     GenerationInput,
+    InstituteEchoSettings,
     InstituteProfileResponse,
     InstituteRegister,
     InstituteUpdate,
@@ -30,7 +31,7 @@ from app.schemas.institute import (
     SubmissionFeedback,
 )
 from app.schemas.student import StudentInviteCreate
-from app.services import case_generation_service, student_invite_service
+from app.services import case_generation_service, echo_modes, student_invite_service
 
 router = APIRouter(prefix="/institute", tags=["institute"])
 
@@ -893,3 +894,39 @@ async def review_student_assignment(
     if not row:
         raise HTTPException(status_code=404, detail="Zuweisung nicht gefunden.")
     return {"reviewed": True}
+
+
+# ── KI-Aussteuerung (Haus-Stil des Instituts) ─────────────────────────────────
+
+@router.get("/echo-settings")
+async def get_echo_settings(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT echo_approach, echo_tone, echo_depth, echo_custom_steering "
+            "FROM training_institutes WHERE id = $1", current["institute"]["id"])
+    return {"echo_approach": row["echo_approach"], "echo_tone": row["echo_tone"],
+            "echo_depth": row["echo_depth"], "echo_custom_steering": row["echo_custom_steering"]}
+
+
+@router.patch("/echo-settings")
+async def update_echo_settings(
+    body: InstituteEchoSettings,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Setzt den KI-Haus-Stil (Ansatz/Ton/Tiefe/Freitext). Validiert über echo_modes."""
+    approach = echo_modes.valid_pro_approach(body.echo_approach) if body.echo_approach else None
+    tone = echo_modes.clean_slider(body.echo_tone)
+    depth = echo_modes.clean_slider(body.echo_depth)
+    custom = echo_modes.clean_custom(body.echo_custom_steering)
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE training_institutes SET echo_approach = $1, echo_tone = $2, echo_depth = $3, "
+            "echo_custom_steering = $4 WHERE id = $5 "
+            "RETURNING echo_approach, echo_tone, echo_depth, echo_custom_steering",
+            approach, tone, depth, custom, current["institute"]["id"])
+    return {"echo_approach": row["echo_approach"], "echo_tone": row["echo_tone"],
+            "echo_depth": row["echo_depth"], "echo_custom_steering": row["echo_custom_steering"]}

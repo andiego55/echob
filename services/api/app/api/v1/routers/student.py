@@ -30,7 +30,7 @@ from app.schemas.student import (
     StudentSessionRename,
     StudentSubmissionCreate,
 )
-from app.services import student_invite_service
+from app.services import echo_modes, student_invite_service
 from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import HYPOTHESIS_LABELS, build_hypothesis_context
 from app.services.person_profile_service import build_person_context
@@ -337,14 +337,21 @@ async def echo_chat(
         history_rows = await conn.fetch(
             "SELECT role, content FROM echo_messages WHERE session_id = $1 "
             "ORDER BY created_at DESC LIMIT 20", session_id)
+        inst = await conn.fetchrow(
+            "SELECT echo_approach, echo_tone, echo_depth, echo_custom_steering "
+            "FROM training_institutes WHERE id = $1", current["student"]["institute_id"])
     history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in reversed(history_rows)]
     thread_type = "glossary" if body.thread_type == "glossary" else "topic"
+    # KI-Aussteuerung des Instituts (Haus-Stil), nachrangig zum Basis-Prompt + Krisenlogik.
+    mode_steering = echo_modes.build_pro_steering(
+        inst["echo_approach"], inst["echo_tone"], inst["echo_depth"], inst["echo_custom_steering"]
+    ) if inst else ""
 
     async def _answer() -> str:
         return await echo_svc.chat(
             user_message=body.message, case_context=dict(case_row), thread_type=thread_type,
             history=history, glossary_term=glossary_term, onboarding=onboarding,
-            scenes=scenes, scale_scores=[], extra_context=extra_context)
+            scenes=scenes, scale_scores=[], extra_context=extra_context, mode_steering=mode_steering)
 
     safety_meta: dict = {}
     risk = await echo_svc.classify_risk(text=body.message)
