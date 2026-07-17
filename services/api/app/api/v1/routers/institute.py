@@ -976,9 +976,14 @@ async def update_echo_settings(
 # ── Lernmodule ────────────────────────────────────────────────────────────────
 
 def _step_out(row) -> dict:
-    return {"id": str(row["id"]), "position": row["position"], "kind": row["kind"],
-            "title": row["title"], "content": row["content"],
-            "ref_id": str(row["ref_id"]) if row["ref_id"] else None}
+    d = dict(row)
+    payload = d.get("payload")
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+    return {"id": str(d["id"]), "position": d["position"], "kind": d["kind"],
+            "title": d["title"], "content": d["content"],
+            "ref_id": str(d["ref_id"]) if d["ref_id"] else None,
+            "payload": payload or {}}
 
 
 async def _validate_step_ref(conn, kind, ref_id, inst_id) -> None:
@@ -1132,9 +1137,9 @@ async def add_module_step(
         pos = await conn.fetchval(
             "SELECT COALESCE(MAX(position), -1) + 1 FROM learning_module_steps WHERE module_id = $1", module_id)
         row = await conn.fetchrow(
-            "INSERT INTO learning_module_steps (module_id, position, kind, title, content, ref_id) "
-            "VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-            module_id, pos, body.kind, body.title, body.content, ref_id)
+            "INSERT INTO learning_module_steps (module_id, position, kind, title, content, ref_id, payload) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb) RETURNING *",
+            module_id, pos, body.kind, body.title, body.content, ref_id, json.dumps(body.payload or {}))
     return _step_out(row)
 
 
@@ -1152,9 +1157,9 @@ async def update_module_step(
         await _own_module(conn, module_id, inst_id)
         await _validate_step_ref(conn, body.kind, ref_id, inst_id)
         row = await conn.fetchrow(
-            "UPDATE learning_module_steps SET kind = $1, title = $2, content = $3, ref_id = $4 "
-            "WHERE id = $5 AND module_id = $6 RETURNING *",
-            body.kind, body.title, body.content, ref_id, step_id, module_id)
+            "UPDATE learning_module_steps SET kind = $1, title = $2, content = $3, ref_id = $4, payload = $5::jsonb "
+            "WHERE id = $6 AND module_id = $7 RETURNING *",
+            body.kind, body.title, body.content, ref_id, json.dumps(body.payload or {}), step_id, module_id)
     if not row:
         raise HTTPException(status_code=404, detail="Schritt nicht gefunden.")
     return _step_out(row)

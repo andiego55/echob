@@ -6,11 +6,61 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi } from '@/api/institute'
-import type { LearningModuleDetail, ModuleStep, ModuleStepKind, ModuleStepInput, ExampleSummary, Assignment } from '@/types'
+import type { LearningModuleDetail, ModuleStep, ModuleStepKind, ModuleStepInput, ExampleSummary, Assignment, QuizQuestion } from '@/types'
 
-const STEP_KIND_LABEL: Record<ModuleStepKind, string> = { lesson: 'Lektion', case: 'Fall', assignment: 'Aufgabe' }
+const STEP_KIND_LABEL: Record<ModuleStepKind, string> = { lesson: 'Lektion', case: 'Fall', assignment: 'Aufgabe', quiz: 'Wissenscheck' }
 const STEP_KIND_CLS: Record<ModuleStepKind, string> = {
-  lesson: 'bg-slate-100 text-slate-600', case: 'bg-accent/10 text-accent', assignment: 'bg-violet-100 text-violet-700',
+  lesson: 'bg-slate-100 text-slate-600', case: 'bg-accent/10 text-accent',
+  assignment: 'bg-violet-100 text-violet-700', quiz: 'bg-emerald-100 text-emerald-700',
+}
+
+const emptyQuestion = (): QuizQuestion => ({ q: '', options: ['', ''], correct: 0, explanation: '' })
+
+function cleanQuestions(qs: QuizQuestion[]): QuizQuestion[] {
+  return qs
+    .map(q => {
+      const correctText = q.options[q.correct]
+      const options = q.options.map(o => o.trim()).filter(Boolean)
+      let correct = options.indexOf((correctText ?? '').trim())
+      if (correct < 0) correct = 0
+      const explanation = (q.explanation ?? '').trim()
+      return { q: q.q.trim(), options, correct, ...(explanation ? { explanation } : {}) }
+    })
+    .filter(q => q.q && q.options.length >= 2)
+}
+
+function QuizBuilder({ questions, setQuestions }: { questions: QuizQuestion[]; setQuestions: (q: QuizQuestion[]) => void }) {
+  const setQ = (i: number, patch: Partial<QuizQuestion>) => setQuestions(questions.map((q, j) => (j === i ? { ...q, ...patch } : q)))
+  const inputCls = 'w-full rounded-brand border border-brand-border bg-white px-2.5 py-1.5 text-sm outline-none focus:border-accent'
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-brand-muted">Multiple-Choice mit einer richtigen Antwort (Punkt markieren). Studierende bekommen sofort Feedback.</p>
+      {questions.map((q, i) => (
+        <div key={i} className="space-y-2 rounded-brand border border-brand-border p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-brand-muted">Frage {i + 1}</span>
+            {questions.length > 1 && <button onClick={() => setQuestions(questions.filter((_, j) => j !== i))} className="text-xs text-brand-muted hover:text-red-600">Entfernen</button>}
+          </div>
+          <input value={q.q} onChange={e => setQ(i, { q: e.target.value })} placeholder="Frage …" className={`${inputCls} font-medium text-navy`} />
+          <div className="space-y-1.5">
+            {q.options.map((o, oi) => (
+              <div key={oi} className="flex items-center gap-2">
+                <input type="radio" name={`correct-${i}`} checked={q.correct === oi} onChange={() => setQ(i, { correct: oi })} className="accent-accent" title="Als richtig markieren" />
+                <input value={o} onChange={e => setQ(i, { options: q.options.map((x, k) => (k === oi ? e.target.value : x)) })} placeholder={`Option ${oi + 1}`} className={`flex-1 ${inputCls}`} />
+                {q.options.length > 2 && (
+                  <button onClick={() => setQ(i, { options: q.options.filter((_, k) => k !== oi), correct: q.correct > oi ? q.correct - 1 : q.correct })}
+                    className="text-xs text-brand-muted hover:text-red-600">×</button>
+                )}
+              </div>
+            ))}
+            <button onClick={() => setQ(i, { options: [...q.options, ''] })} className="text-xs text-accent hover:underline">+ Option</button>
+          </div>
+          <input value={q.explanation ?? ''} onChange={e => setQ(i, { explanation: e.target.value })} placeholder="Erklärung (optional, nach dem Antworten sichtbar)" className={`${inputCls} text-xs`} />
+        </div>
+      ))}
+      <button onClick={() => setQuestions([...questions, emptyQuestion()])} className="text-xs font-semibold text-accent hover:underline">+ Frage hinzufügen</button>
+    </div>
+  )
 }
 
 export default function InstituteModuleDetailPage() {
@@ -213,20 +263,23 @@ function StepForm({ examples, assignments, initial, onSubmit, onCancel, pending 
   const [title, setTitle] = useState(initial?.title ?? '')
   const [content, setContent] = useState(initial?.content ?? '')
   const [refId, setRefId] = useState(initial?.ref_id ?? '')
+  const [questions, setQuestions] = useState<QuizQuestion[]>(initial?.payload?.questions?.length ? initial.payload.questions : [emptyQuestion()])
   const publishedExamples = examples.filter(e => e.status === 'published')
 
   const pickRef = (id: string, label: string) => { setRefId(id); if (!title.trim()) setTitle(label) }
-  const canSubmit = !!title.trim() && (kind === 'lesson' || !!refId)
+  const validQuiz = questions.some(q => q.q.trim() && q.options.filter(o => o.trim()).length >= 2)
+  const canSubmit = !!title.trim() && (kind === 'lesson' ? true : kind === 'quiz' ? validQuiz : !!refId)
   const submit = () => onSubmit({
     kind, title: title.trim(),
     content: kind === 'lesson' ? content : null,
-    ref_id: kind === 'lesson' ? null : (refId || null),
+    ref_id: (kind === 'case' || kind === 'assignment') ? (refId || null) : null,
+    payload: kind === 'quiz' ? { questions: cleanQuestions(questions) } : undefined,
   })
 
   return (
     <div className="space-y-2 rounded-brand border border-brand-border p-3">
       <div className="flex flex-wrap gap-2">
-        {(['lesson', 'case', 'assignment'] as ModuleStepKind[]).map(k => (
+        {(['lesson', 'case', 'assignment', 'quiz'] as ModuleStepKind[]).map(k => (
           <button key={k} onClick={() => { setKind(k); setRefId('') }}
             className={`rounded-full border px-3 py-1 text-xs transition-colors ${kind === k ? 'border-accent bg-accent/10 text-accent' : 'border-brand-border text-brand-muted hover:border-accent/50'}`}>
             {STEP_KIND_LABEL[k]}
@@ -262,6 +315,7 @@ function StepForm({ examples, assignments, initial, onSubmit, onCancel, pending 
           {assignments.length === 0 && <p className="mt-1 text-xs text-brand-muted">Noch keine Aufgabe vorhanden.</p>}
         </div>
       )}
+      {kind === 'quiz' && <QuizBuilder questions={questions} setQuestions={setQuestions} />}
 
       <div className="flex items-center gap-3">
         <button onClick={submit} disabled={!canSubmit || pending} className="btn-primary !py-1.5 !px-4 !text-sm">

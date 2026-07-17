@@ -1,11 +1,13 @@
 /**
  * /student/modules/:id — ein Lernmodul durcharbeiten (Lektionen lesen, als erledigt markieren).
  */
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import StudentShell from '@/components/student/StudentShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { studentApi } from '@/api/student'
+import type { QuizQuestion } from '@/types'
 
 const STEP_KIND_LABEL: Record<string, string> = { lesson: 'Lektion', case: 'Fall', assignment: 'Aufgabe' }
 const STEP_KIND_CLS: Record<string, string> = {
@@ -89,6 +91,11 @@ export default function StudentModuleDetailPage() {
                       <Link to="/student/assignments" className="text-sm font-medium text-accent hover:underline">Zur Aufgabe →</Link>
                     </div>
                   )}
+                  {s.kind === 'quiz' && (
+                    <div className="mt-3 border-t border-brand-border pt-3">
+                      <QuizPlayer questions={s.payload?.questions ?? []} />
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -96,5 +103,50 @@ export default function StudentModuleDetailPage() {
         )}
       </div>
     </StudentShell>
+  )
+}
+
+function QuizPlayer({ questions }: { questions: QuizQuestion[] }) {
+  const [answers, setAnswers] = useState<Record<number, number>>({})
+  if (questions.length === 0) return <p className="text-sm text-brand-muted">Dieser Wissenscheck hat noch keine Fragen.</p>
+  const correctCount = questions.filter((q, i) => answers[i] === q.correct).length
+  const answeredCount = Object.keys(answers).length
+
+  return (
+    <div className="space-y-4">
+      {questions.map((q, i) => {
+        const chosen = answers[i]
+        const answered = chosen !== undefined
+        return (
+          <div key={i}>
+            <p className="mb-2 text-sm font-medium text-navy">{i + 1}. {q.q}</p>
+            <div className="space-y-1.5">
+              {q.options.map((o, oi) => {
+                const isCorrect = oi === q.correct
+                const isChosen = chosen === oi
+                let cls = 'border-brand-border text-brand-text hover:border-accent/50'
+                if (answered) {
+                  if (isCorrect) cls = 'border-green-400 bg-green-50 text-green-800'
+                  else if (isChosen) cls = 'border-red-300 bg-red-50 text-red-700'
+                  else cls = 'border-brand-border text-brand-muted'
+                }
+                return (
+                  <button key={oi} disabled={answered} onClick={() => setAnswers(a => ({ ...a, [i]: oi }))}
+                    className={`flex w-full items-center justify-between gap-2 rounded-brand border px-3 py-2 text-left text-sm transition-colors disabled:cursor-default ${cls}`}>
+                    <span>{o}</span>
+                    {answered && isCorrect && <span aria-hidden>✓</span>}
+                    {answered && isChosen && !isCorrect && <span aria-hidden>✕</span>}
+                  </button>
+                )
+              })}
+            </div>
+            {answered && q.explanation && <p className="mt-2 text-xs text-brand-muted">{q.explanation}</p>}
+          </div>
+        )
+      })}
+      {answeredCount === questions.length && (
+        <p className="pt-1 text-sm font-semibold text-navy">Ergebnis: {correctCount} / {questions.length} richtig</p>
+      )}
+    </div>
   )
 }

@@ -1697,12 +1697,12 @@ async def get_student_module(
         if not sm:
             raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
         steps = await conn.fetch(
-            "SELECT id, position, kind, title, content, ref_id FROM learning_module_steps "
+            "SELECT id, position, kind, title, content, ref_id, payload FROM learning_module_steps "
             "WHERE module_id = $1 ORDER BY position, created_at", sm["module_id"])
         steps_out = []
         for s in steps:
             step = {"id": str(s["id"]), "position": s["position"], "kind": s["kind"],
-                    "title": s["title"], "content": s["content"],
+                    "title": s["title"], "content": s["content"], "payload": _jsonb(s["payload"]),
                     "ref_copy_id": None, "ref_assignment_id": None}
             # Fall-/Aufgaben-Schritte: eigene Arbeitskopie/Zuweisung find-or-create.
             if s["kind"] == "case" and s["ref_id"]:
