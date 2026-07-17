@@ -100,8 +100,10 @@ export const instituteApi = {
     apiClient.delete(`/institute/assignments/${id}`).then(r => r.data),
   assignmentAssign: (id: string, data: { student_ids?: string[]; to_all?: boolean }) =>
     apiClient.post<{ assigned: number }>(`/institute/assignments/${id}/assign`, data).then(r => r.data),
-  reviewStudentAssignment: (saId: string, feedback: string | null) =>
-    apiClient.post<{ reviewed: boolean }>(`/institute/student-assignments/${saId}/feedback`, { feedback }).then(r => r.data),
+  reviewStudentAssignment: (saId: string, data: { feedback: string | null; scores?: SubmissionScore[]; total_points?: number | null }) =>
+    apiClient.post<{ reviewed: boolean }>(`/institute/student-assignments/${saId}/feedback`, data).then(r => r.data),
+  aiEvaluateAssignment: (saId: string, rubricId: string) =>
+    apiClient.post<AiEvaluation>(`/institute/student-assignments/${saId}/ai-evaluate`, { rubric_id: rubricId }, { timeout: 120_000 }).then(r => r.data),
 
   // KI-Aussteuerung (Haus-Stil)
   echoSettings: () =>

@@ -102,6 +102,8 @@ class AssignmentAssign(BaseModel):
 
 class StudentAssignmentReview(BaseModel):
     feedback: str | None = Field(None, max_length=8000)
+    scores: list[dict] = Field(default_factory=list)
+    total_points: float | None = None
 
 
 class InstituteEchoSettings(BaseModel):

@@ -888,15 +888,53 @@ async def review_student_assignment(
     current: dict = Depends(get_current_institute),
     pool=Depends(get_pool),
 ) -> dict:
+    scores_json = json.dumps(body.scores) if body.scores else None
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "UPDATE student_assignments sa SET feedback = $1, status = 'reviewed', "
-            "reviewed_at = NOW(), updated_at = NOW() FROM institute_assignments a "
-            "WHERE sa.id = $2 AND sa.assignment_id = a.id AND a.institute_id = $3 RETURNING sa.id",
-            body.feedback, sa_id, current["institute"]["id"])
+            "UPDATE student_assignments sa SET feedback = $1, scores = $2::jsonb, total_points = $3, "
+            "status = 'reviewed', reviewed_at = NOW(), updated_at = NOW() FROM institute_assignments a "
+            "WHERE sa.id = $4 AND sa.assignment_id = a.id AND a.institute_id = $5 RETURNING sa.id",
+            body.feedback, scores_json, body.total_points, sa_id, current["institute"]["id"])
     if not row:
         raise HTTPException(status_code=404, detail="Zuweisung nicht gefunden.")
     return {"reviewed": True}
+
+
+@router.post("/student-assignments/{sa_id}/ai-evaluate")
+async def ai_evaluate_student_assignment(
+    sa_id: UUID,
+    body: SubmissionEvaluate,
+    request: Request,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """KI-Bewertungsvorschlag für eine Aufgaben-Antwort anhand eines Rasters (nicht gespeichert)."""
+    echo_svc = getattr(request.app.state, "echo_service", None)
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        sa = await conn.fetchrow(
+            "SELECT sa.response, a.instructions FROM student_assignments sa "
+            "JOIN institute_assignments a ON a.id = sa.assignment_id "
+            "WHERE sa.id = $1 AND a.institute_id = $2", sa_id, inst_id)
+        if not sa:
+            raise HTTPException(status_code=404, detail="Zuweisung nicht gefunden.")
+        rub = await conn.fetchrow(
+            "SELECT name, description, criteria FROM institute_rubrics WHERE id = $1 AND institute_id = $2",
+            body.rubric_id, inst_id)
+        if not rub:
+            raise HTTPException(status_code=404, detail="Raster nicht gefunden.")
+    response = sa["response"]
+    if isinstance(response, str):
+        response = json.loads(response)
+    text = (response or {}).get("text", "") if isinstance(response, dict) else ""
+    work = f"Aufgabenstellung: {sa['instructions']}\n\nAntwort: {text}" if sa["instructions"] else text
+    criteria = rub["criteria"]
+    if isinstance(criteria, str):
+        criteria = json.loads(criteria)
+    rubric = {"name": rub["name"], "description": rub["description"], "criteria": criteria or []}
+    return await echo_svc.evaluate_submission(rubric=rubric, submission={"response_text": work})
 
 
 # ── KI-Aussteuerung (Haus-Stil des Instituts) ─────────────────────────────────

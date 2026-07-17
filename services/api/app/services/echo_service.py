@@ -267,6 +267,8 @@ class EchoService:
         crits = [c for c in (rubric.get("criteria") or []) if c.get("key")]
 
         parts: list[str] = []
+        if submission.get("response_text"):
+            parts.append(f"## Antwort der studierenden Person\n{submission['response_text']}")
         if submission.get("message"):
             parts.append(f"## Begleitnachricht\n{submission['message']}")
         for h in submission.get("hypotheses") or []:

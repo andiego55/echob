@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi } from '@/api/institute'
 import { KindBadge } from './InstituteAssignmentsPage'
-import type { StudentAssignmentRow, AssignmentStatus } from '@/types'
+import type { StudentAssignmentRow, AssignmentStatus, Rubric, SubmissionScore } from '@/types'
 
 const STATUS_LABEL: Record<AssignmentStatus, string> = {
   assigned: 'Zugewiesen', in_progress: 'In Arbeit', submitted: 'Eingereicht', reviewed: 'Gesichtet',
@@ -25,6 +25,7 @@ export default function InstituteAssignmentDetailPage() {
 
   const { data, isLoading } = useQuery({ queryKey: ['institute-assignment', id], queryFn: () => instituteApi.assignment(id!), enabled: !!id })
   const { data: studentsData } = useQuery({ queryKey: ['institute-students'], queryFn: () => instituteApi.listStudents() })
+  const { data: rubrics = [] } = useQuery({ queryKey: ['institute-rubrics'], queryFn: () => instituteApi.rubrics() })
 
   const del = useMutation({
     mutationFn: () => instituteApi.assignmentDelete(id!),
@@ -95,7 +96,7 @@ export default function InstituteAssignmentDetailPage() {
           {data.students.length === 0 ? (
             <div className="card text-sm text-brand-muted">Noch niemandem zugewiesen.</div>
           ) : (
-            data.students.map(s => <ResponseCard key={s.id} row={s} assignmentId={id!} />)
+            data.students.map(s => <ResponseCard key={s.id} row={s} assignmentId={id!} rubrics={rubrics} defaultRubricId={data.rubric_id ?? null} />)
           )}
         </section>
       </div>
@@ -103,15 +104,41 @@ export default function InstituteAssignmentDetailPage() {
   )
 }
 
-function ResponseCard({ row, assignmentId }: { row: StudentAssignmentRow; assignmentId: string }) {
+const emptyScores = (r: Rubric): SubmissionScore[] =>
+  r.criteria.map(c => ({ key: c.key, name: c.name, max_points: c.max_points, points: 0, note: '' }))
+
+function ResponseCard({ row, assignmentId, rubrics, defaultRubricId }: {
+  row: StudentAssignmentRow; assignmentId: string; rubrics: Rubric[]; defaultRubricId: string | null
+}) {
   const qc = useQueryClient()
-  const [feedback, setFeedback] = useState(row.feedback ?? '')
   const [open, setOpen] = useState(false)
+  const [feedback, setFeedback] = useState(row.feedback ?? '')
+  const [rubricId, setRubricId] = useState(defaultRubricId ?? '')
+  const [scores, setScores] = useState<SubmissionScore[]>(row.scores ?? [])
+
+  const aiEval = useMutation({
+    mutationFn: () => instituteApi.aiEvaluateAssignment(row.id, rubricId),
+    onSuccess: (res) => { setScores(res.scores); if (!feedback.trim()) setFeedback(res.feedback) },
+  })
   const review = useMutation({
-    mutationFn: () => instituteApi.reviewStudentAssignment(row.id, feedback.trim() || null),
+    mutationFn: () => instituteApi.reviewStudentAssignment(row.id, {
+      feedback: feedback.trim() || null,
+      scores: scores.length ? scores : undefined,
+      total_points: scores.length ? scores.reduce((a, s) => a + s.points, 0) : null,
+    }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['institute-assignment', assignmentId] }),
   })
+
+  const pickRubric = (rid: string) => {
+    setRubricId(rid)
+    const r = rubrics.find(x => x.id === rid)
+    setScores(r ? emptyScores(r) : [])
+  }
+  const setScore = (i: number, patch: Partial<SubmissionScore>) => setScores(prev => prev.map((s, j) => (j === i ? { ...s, ...patch } : s)))
+
   const hasResponse = !!row.response?.text
+  const total = scores.reduce((a, s) => a + s.points, 0)
+  const maxTotal = scores.reduce((a, s) => a + s.max_points, 0)
 
   return (
     <div className="card">
@@ -126,7 +153,7 @@ function ResponseCard({ row, assignmentId }: { row: StudentAssignmentRow; assign
       </div>
 
       {open && (
-        <div className="mt-3 space-y-3 border-t border-brand-border pt-3">
+        <div className="mt-3 space-y-4 border-t border-brand-border pt-3">
           {hasResponse ? (
             <div>
               <p className="text-[11px] font-semibold text-brand-muted uppercase tracking-wide mb-1">Antwort</p>
@@ -135,13 +162,52 @@ function ResponseCard({ row, assignmentId }: { row: StudentAssignmentRow; assign
           ) : (
             <p className="text-sm text-brand-muted">Noch keine Antwort eingereicht.</p>
           )}
+
+          {rubrics.length > 0 && (
+            <div>
+              <p className="text-[11px] font-semibold text-brand-muted uppercase tracking-wide mb-1.5">Bewertung</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <select value={rubricId} onChange={e => pickRubric(e.target.value)}
+                  className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent">
+                  <option value="">Raster wählen …</option>
+                  {rubrics.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </select>
+                <button onClick={() => aiEval.mutate()} disabled={!rubricId || !hasResponse || aiEval.isPending}
+                  className="rounded-brand border border-accent bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent/20 disabled:opacity-40">
+                  {aiEval.isPending ? 'KI wertet aus …' : '✨ KI-Auswertung vorschlagen'}
+                </button>
+                {aiEval.isError && <span className="text-xs text-red-600">Auswertung fehlgeschlagen.</span>}
+              </div>
+              {scores.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {scores.map((s, i) => (
+                    <div key={s.key} className="rounded-brand border border-brand-border p-2.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-semibold text-navy">{s.name}</p>
+                        <div className="flex shrink-0 items-center gap-1.5 text-sm">
+                          <input type="number" min={0} max={s.max_points} value={s.points}
+                            onChange={e => setScore(i, { points: Math.max(0, Math.min(s.max_points, Number(e.target.value) || 0)) })}
+                            className="w-14 rounded-brand border border-brand-border bg-white px-2 py-1 text-right tabular-nums outline-none focus:border-accent" />
+                          <span className="text-brand-muted tabular-nums">/ {s.max_points}</span>
+                        </div>
+                      </div>
+                      <textarea value={s.note} onChange={e => setScore(i, { note: e.target.value })} rows={2} placeholder="Begründung …"
+                        className="mt-2 w-full resize-y rounded-brand border border-brand-border bg-white px-2.5 py-1.5 text-xs text-brand-text outline-none focus:border-accent" />
+                    </div>
+                  ))}
+                  <div className="flex justify-end text-sm font-semibold text-navy tabular-nums">Gesamt: {total} / {maxTotal} Punkte</div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div>
             <p className="text-[11px] font-semibold text-brand-muted uppercase tracking-wide mb-1">Rückmeldung</p>
-            <textarea value={feedback} onChange={e => setFeedback(e.target.value)} rows={3} placeholder="Deine Rückmeldung …"
+            <textarea value={feedback} onChange={e => setFeedback(e.target.value)} rows={3} placeholder="Deine Rückmeldung … (die KI-Auswertung kann diesen Text vorbefüllen)"
               className="w-full resize-y rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
             <div className="mt-2 flex items-center gap-3">
               <button onClick={() => review.mutate()} disabled={review.isPending} className="btn-primary !py-1.5 !px-4 !text-sm">
-                {review.isPending ? 'Senden …' : row.status === 'reviewed' ? 'Rückmeldung aktualisieren' : 'Rückmeldung senden'}
+                {review.isPending ? 'Senden …' : row.status === 'reviewed' ? 'Bewertung aktualisieren' : 'Rückmeldung senden'}
               </button>
               {review.isSuccess && <span className="text-xs font-medium text-green-600">✓ Gesendet</span>}
             </div>
