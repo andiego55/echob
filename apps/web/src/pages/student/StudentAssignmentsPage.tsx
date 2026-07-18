@@ -53,6 +53,9 @@ export default function StudentAssignmentsPage() {
   )
 }
 
+function dueLabel(d: string): string { return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' }) }
+function dueOverdue(d: string): boolean { const t = new Date(d); t.setHours(23, 59, 59, 999); return t.getTime() < Date.now() }
+
 function AssignmentCard({ a }: { a: StudentAssignment }) {
   const qc = useQueryClient()
   const [text, setText] = useState(a.response?.text ?? '')
@@ -71,7 +74,14 @@ function AssignmentCard({ a }: { a: StudentAssignment }) {
           <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${KIND_CLS[a.kind]}`}>{KIND_LABEL[a.kind]}</span>
           <p className="truncate text-sm font-semibold text-navy">{a.title}</p>
         </div>
-        <span className="shrink-0 text-[11px] text-brand-muted">{STATUS_LABEL[a.status]}</span>
+        <div className="flex shrink-0 flex-col items-end gap-0.5">
+          <span className="text-[11px] text-brand-muted">{STATUS_LABEL[a.status]}</span>
+          {a.due_on && (a.status === 'assigned' || a.status === 'in_progress') && (
+            <span className={`text-[11px] ${dueOverdue(a.due_on) ? 'font-semibold text-red-600' : 'text-brand-muted'}`}>
+              fällig {dueLabel(a.due_on)}{dueOverdue(a.due_on) ? ' · überfällig' : ''}
+            </span>
+          )}
+        </div>
       </div>
 
       {a.instructions && <p className="mt-2 text-sm text-brand-text whitespace-pre-wrap">{a.instructions}</p>}

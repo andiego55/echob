@@ -1359,6 +1359,7 @@ def _student_assignment_out(row) -> dict:
         "feedback": d.get("feedback"),
         "scores": scores or None,
         "total_points": float(d["total_points"]) if d.get("total_points") is not None else None,
+        "due_on": d["due_on"].isoformat() if d.get("due_on") else None,
         "assigned_at": d["assigned_at"].isoformat() if d.get("assigned_at") else None,
         "submitted_at": d["submitted_at"].isoformat() if d.get("submitted_at") else None,
     }
@@ -1372,7 +1373,7 @@ async def list_assignments(
     """Zugewiesene Aufgaben — offene zuerst (Studenten-Inbox)."""
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT sa.*, a.kind, a.title, a.instructions, a.payload FROM student_assignments sa "
+            "SELECT sa.*, a.kind, a.title, a.instructions, a.payload, a.due_on FROM student_assignments sa "
             "JOIN institute_assignments a ON a.id = sa.assignment_id "
             "WHERE sa.student_id = $1 "
             "ORDER BY (sa.status IN ('assigned', 'in_progress')) DESC, sa.assigned_at DESC",
@@ -1399,7 +1400,7 @@ async def respond_assignment(
         if not upd:
             raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
         full = await conn.fetchrow(
-            "SELECT sa.*, a.kind, a.title, a.instructions, a.payload FROM student_assignments sa "
+            "SELECT sa.*, a.kind, a.title, a.instructions, a.payload, a.due_on FROM student_assignments sa "
             "JOIN institute_assignments a ON a.id = sa.assignment_id WHERE sa.id = $1", sa_id)
     return _student_assignment_out(full)
 

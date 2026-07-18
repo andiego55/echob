@@ -731,6 +731,7 @@ def _assignment_out(row, *, assigned: int | None = None, submitted: int | None =
         "instructions": row["instructions"], "payload": payload or {},
         "rubric_id": str(row["rubric_id"]) if row["rubric_id"] else None,
         "status": row["status"],
+        "due_on": row["due_on"].isoformat() if row["due_on"] else None,
         "created_at": row["created_at"].isoformat() if row["created_at"] else None,
     }
     if assigned is not None:
@@ -786,10 +787,10 @@ async def create_assignment(
     payload = json.dumps({"link": body.link} if body.kind == "resource" and body.link else {})
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "INSERT INTO institute_assignments (institute_id, kind, title, instructions, payload, rubric_id, status) "
-            "VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7) RETURNING *",
+            "INSERT INTO institute_assignments (institute_id, kind, title, instructions, payload, rubric_id, status, due_on) "
+            "VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) RETURNING *",
             current["institute"]["id"], body.kind, body.title, body.instructions, payload,
-            body.rubric_id, body.status)
+            body.rubric_id, body.status, body.due_on)
     return _assignment_out(row)
 
 
@@ -825,10 +826,10 @@ async def update_assignment(
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "UPDATE institute_assignments SET kind = $1, title = $2, instructions = $3, "
-            "payload = $4::jsonb, rubric_id = $5, status = $6, updated_at = NOW() "
-            "WHERE id = $7 AND institute_id = $8 RETURNING *",
+            "payload = $4::jsonb, rubric_id = $5, status = $6, due_on = $7, updated_at = NOW() "
+            "WHERE id = $8 AND institute_id = $9 RETURNING *",
             body.kind, body.title, body.instructions, payload, body.rubric_id, body.status,
-            assignment_id, current["institute"]["id"])
+            body.due_on, assignment_id, current["institute"]["id"])
     if not row:
         raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
     return _assignment_out(row)

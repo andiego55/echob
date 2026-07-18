@@ -91,10 +91,14 @@ function CreateForm({ onDone }: { onDone: (id?: string) => void }) {
   const [title, setTitle] = useState('')
   const [instructions, setInstructions] = useState('')
   const [link, setLink] = useState('')
+  const [due, setDue] = useState('')
 
   const create = useMutation({
     mutationFn: () => {
-      const data: AssignmentInput = { kind, title: title.trim(), instructions: instructions.trim() || null, link: kind === 'resource' ? (link.trim() || null) : null }
+      const data: AssignmentInput = {
+        kind, title: title.trim(), instructions: instructions.trim() || null,
+        link: kind === 'resource' ? (link.trim() || null) : null, due_on: due || null,
+      }
       return instituteApi.assignmentCreate(data)
     },
     onSuccess: (a) => { qc.invalidateQueries({ queryKey: ['institute-assignments'] }); onDone(a.id) },
@@ -132,6 +136,11 @@ function CreateForm({ onDone }: { onDone: (id?: string) => void }) {
             className="w-full rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
         </div>
       )}
+      <div>
+        <label className="mb-1 block text-xs font-medium text-brand-text">Frist (optional)</label>
+        <input type="date" value={due} onChange={e => setDue(e.target.value)}
+          className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+      </div>
       <div className="flex items-center gap-3 border-t border-brand-border pt-3">
         <button onClick={() => create.mutate()} disabled={!title.trim() || create.isPending} className="btn-primary !py-2 !px-4 !text-sm">
           {create.isPending ? 'Anlegen …' : 'Anlegen & zuweisen'}

@@ -1,7 +1,7 @@
 """Schemas: Ausbildungsinstitut (eigene Domäne, /institute/*)."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -93,6 +93,7 @@ class AssignmentUpsert(BaseModel):
     link: str | None = Field(None, max_length=1000)          # resource
     rubric_id: UUID | None = None
     status: str = Field("published", pattern="^(draft|published|archived)$")
+    due_on: date | None = None
 
 
 class AssignmentAssign(BaseModel):

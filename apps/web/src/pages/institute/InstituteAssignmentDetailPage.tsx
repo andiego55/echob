@@ -83,8 +83,10 @@ export default function InstituteAssignmentDetailPage() {
                   className="btn-primary !py-1.5 !px-4 !text-sm disabled:opacity-40">
                   {assign.isPending ? 'Zuweisen …' : `Ausgewählte zuweisen (${picked.length})`}
                 </button>
-                <button onClick={() => assign.mutate({ to_all: true })} disabled={assign.isPending}
-                  className="text-sm text-brand-muted hover:text-accent">Allen zuweisen</button>
+                <button onClick={() => { if (window.confirm('Diese Aufgabe allen aktiven Studierenden zuweisen?')) assign.mutate({ to_all: true }) }} disabled={assign.isPending}
+                  className="rounded-brand border border-brand-border px-4 py-1.5 text-sm font-medium text-navy transition-colors hover:border-accent hover:text-accent disabled:opacity-40">
+                  Der ganzen Kohorte zuweisen
+                </button>
               </div>
             </>
           )}

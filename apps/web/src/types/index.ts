@@ -367,6 +367,7 @@ export interface Assignment {
   payload: { link?: string }
   rubric_id: string | null
   status: 'draft' | 'published' | 'archived'
+  due_on: string | null
   created_at: string | null
   assigned_count?: number
   submitted_count?: number
@@ -401,6 +402,7 @@ export interface StudentAssignment {
   feedback: string | null
   scores?: SubmissionScore[] | null
   total_points?: number | null
+  due_on: string | null
   assigned_at: string | null
   submitted_at: string | null
 }
@@ -412,6 +414,7 @@ export type AssignmentInput = {
   link?: string | null
   rubric_id?: string | null
   status?: 'draft' | 'published' | 'archived'
+  due_on?: string | null
 }
 
 // ── Lernmodule ────────────────────────────────────────────────────────────────
