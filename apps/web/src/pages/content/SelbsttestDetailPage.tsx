@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
 import { getSelfTest } from '@/selftests'
 import {
-  DEFAULT_SCALE, TEST_CATEGORY_LABELS,
+  DEFAULT_SCALE, TEST_CATEGORY_LABELS, CRITICAL_FLAGS,
   type SelfTest, type TestQuestion, type TestAnswers, type TestBand,
 } from '@/selftests/types'
 import { scoreTest, isAnswered, requiredQuestions, type TestResult, type DimensionResult } from '@/selftests/scoring'
@@ -268,7 +268,12 @@ function ResultView({ test, result, onRetake }: { test: SelfTest; result: TestRe
   useEffect(() => { const t = setTimeout(() => setFill(true), 80); return () => clearTimeout(t) }, [])
 
   const reflectHref = `/reflektieren?test=${test.slug}`
-  const showSafety = test.safety && (result.overall?.band?.tone === 'alert' || result.dimensions.some((d) => d.band?.tone === 'alert'))
+  const severe = result.flags.some((f) => (CRITICAL_FLAGS as readonly string[]).includes(f))
+  const showSafety = test.safety && (severe || result.overall?.band?.tone === 'alert' || result.dimensions.some((d) => d.band?.tone === 'alert'))
+  // Kritische Angaben (Kindesentzug, Gewalt …) sind unabhängig vom Durchschnitt ernst.
+  const overallBand: TestBand | undefined = severe
+    ? { min: 0, label: 'Ernst zu nehmen', tone: 'alert', text: 'Unabhängig vom Gesamtwert: Du hast Dinge angegeben, die schwer wiegen (siehe Hinweis unten). Bitte nimm das ernst.' }
+    : result.overall?.band
 
   return (
     <section className="border-t border-brand-border bg-white px-6 py-12">
@@ -276,7 +281,7 @@ function ResultView({ test, result, onRetake }: { test: SelfTest; result: TestRe
         <span className="label">Dein Ergebnis</span>
 
         {result.mode === 'dimensional' && result.overall && (
-          <OverallCard score={result.overall.score} band={result.overall.band} fill={fill} />
+          <OverallCard score={result.overall.score} band={overallBand} fill={fill} />
         )}
         {result.mode === 'typology' && result.primary && (
           <TypologyHero primary={result.primary} dims={result.dimensions} />
@@ -298,7 +303,7 @@ function ResultView({ test, result, onRetake }: { test: SelfTest; result: TestRe
             )}
         </div>
 
-        {showSafety && <SafetyBox />}
+        {showSafety && <SafetyBox variant={test.safetyVariant ?? 'victim'} flags={result.flags} />}
 
         {/* Freitext-Rückschau */}
         {result.freeText.length > 0 && (
@@ -421,16 +426,40 @@ function TypologyBar({ d, primary, fill }: { d: DimensionResult; primary: boolea
   )
 }
 
-function SafetyBox() {
+const FLAG_LABELS: Record<string, string> = {
+  gewalt: 'körperliche Gewalt oder Einschüchterung',
+  kindesentzug: 'Drohung mit Kindesentzug / Sorgerechtsdruck',
+  'kindesentzug-ohne-reparatur': 'Kindesentzug-Drohung – ohne aufrichtige Klärung danach',
+  'trennungsdrohung-ohne-reparatur': 'Trennungsdrohung als Druckmittel – ohne Klärung danach',
+  'trennungsdrohung-haeufig': 'wiederholte Trennungsdrohungen',
+}
+
+function SafetyBox({ variant, flags }: { variant: 'victim' | 'self'; flags: string[] }) {
+  const shown = flags.filter((f) => FLAG_LABELS[f])
   return (
     <div className="mt-8 rounded-brand border border-red-200 bg-red-50 px-5 py-4">
       <p className="text-sm font-semibold text-red-800">Bitte ernst nehmen</p>
-      <p className="mt-1 text-[0.9rem] leading-relaxed text-red-700">
-        Dein Ergebnis zeigt in mindestens einem Bereich deutliche Anzeichen. Das bedeutet nicht automatisch, dass
-        etwas „diagnostizierbar" ist – aber dein Erleben zählt. Du musst das nicht allein tragen. Sprich mit einer
-        Vertrauensperson oder einer Fachstelle. Bei Gefahr: <strong>110</strong>. Hilfetelefon Gewalt gegen Frauen:
-        <strong> 116 016</strong> (kostenlos, rund um die Uhr). Telefonseelsorge: <strong>0800 111 0 111</strong>.
-      </p>
+      {shown.length > 0 && (
+        <ul className="mt-2 list-disc space-y-0.5 pl-5 text-[0.9rem] text-red-800">
+          {shown.map((f) => <li key={f}>{FLAG_LABELS[f]}</li>)}
+        </ul>
+      )}
+      {variant === 'self' ? (
+        <p className="mt-2 text-[0.9rem] leading-relaxed text-red-700">
+          Das ehrlich zuzugeben, ist ein wichtiger, mutiger Schritt. Manche dieser Muster – vor allem Drohungen mit den
+          Kindern und körperliche Gewalt – schaden anderen ernsthaft und können strafbar sein. Du musst das nicht allein
+          verändern: Es gibt Beratungsstellen für Menschen, die ihr Verhalten ändern wollen (Stichwort „Gewaltberatung"
+          bzw. „Täterberatung"), dazu hilft Paar- oder Einzeltherapie. Bei akuter Gefahr für andere: <strong>110</strong>.
+          Zum Reden rund um die Uhr: Telefonseelsorge <strong>0800 111 0 111</strong>.
+        </p>
+      ) : (
+        <p className="mt-2 text-[0.9rem] leading-relaxed text-red-700">
+          Das bedeutet nicht automatisch, dass etwas „diagnostizierbar" ist – aber dein Erleben zählt. Du musst das nicht
+          allein tragen. Sprich mit einer Vertrauensperson oder einer Fachstelle. Bei Gefahr: <strong>110</strong>.
+          Hilfetelefon Gewalt gegen Frauen: <strong>116 016</strong> (kostenlos, rund um die Uhr). Telefonseelsorge:
+          <strong> 0800 111 0 111</strong>.
+        </p>
+      )}
     </div>
   )
 }

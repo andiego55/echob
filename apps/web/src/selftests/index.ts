@@ -3,8 +3,9 @@ import type { SelfTest } from './types'
 import { beziehungsgesundheit } from './tests/beziehungsgesundheit'
 import { belastendeMuster } from './tests/belastende-muster'
 import { bindungsstil } from './tests/bindungsstil'
+import { eigenerAnteil } from './tests/eigener-anteil'
 
-export const SELF_TESTS: SelfTest[] = [beziehungsgesundheit, belastendeMuster, bindungsstil]
+export const SELF_TESTS: SelfTest[] = [beziehungsgesundheit, belastendeMuster, bindungsstil, eigenerAnteil]
 
 const BY_SLUG = new Map(SELF_TESTS.map((t) => [t.slug, t]))
 export function getSelfTest(slug: string): SelfTest | undefined {

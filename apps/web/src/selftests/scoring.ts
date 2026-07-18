@@ -24,6 +24,8 @@ export interface TestResult {
   overall?: { score: number; band?: TestBand }
   /** typology: dominanter Typ. */
   primary?: DimensionResult
+  /** Kritische Angaben (z. B. 'gewalt', 'kindesentzug'), unabhängig vom Score. */
+  flags: string[]
   freeText: { question: string; answer: string }[]
   answeredAt: string
 }
@@ -106,6 +108,25 @@ function scoreTypology(test: SelfTest, answers: TestAnswers): { dims: DimensionR
   return { dims, primary }
 }
 
+function collectFlags(test: SelfTest, answers: TestAnswers): string[] {
+  const flags = new Set<string>()
+  for (const q of test.questions) {
+    const a = answers[q.id]
+    if (q.type === 'scale' && q.flag && typeof a === 'number' && a >= (q.flagMin ?? Infinity)) {
+      flags.add(q.flag)
+    } else if (q.type === 'single' && q.options && typeof a === 'number') {
+      const f = q.options[a]?.flag
+      if (f) flags.add(f)
+    } else if (q.type === 'multi' && q.options && Array.isArray(a)) {
+      for (const i of a) {
+        const f = q.options[i]?.flag
+        if (f) flags.add(f)
+      }
+    }
+  }
+  return [...flags]
+}
+
 function collectFreeText(test: SelfTest, answers: TestAnswers): { question: string; answer: string }[] {
   const out: { question: string; answer: string }[] = []
   for (const q of test.questions) {
@@ -118,13 +139,14 @@ function collectFreeText(test: SelfTest, answers: TestAnswers): { question: stri
 
 export function scoreTest(test: SelfTest, answers: TestAnswers): TestResult {
   const freeText = collectFreeText(test, answers)
+  const flags = collectFlags(test, answers)
   const answeredAt = new Date().toISOString()
   if (test.resultMode === 'typology') {
     const { dims, primary } = scoreTypology(test, answers)
-    return { slug: test.slug, title: test.title, mode: 'typology', dimensions: dims, primary, freeText, answeredAt }
+    return { slug: test.slug, title: test.title, mode: 'typology', dimensions: dims, primary, flags, freeText, answeredAt }
   }
   const { dims, overall } = scoreDimensional(test, answers)
-  return { slug: test.slug, title: test.title, mode: 'dimensional', dimensions: dims, overall, freeText, answeredAt }
+  return { slug: test.slug, title: test.title, mode: 'dimensional', dimensions: dims, overall, flags, freeText, answeredAt }
 }
 
 /** Kompakte Ergebnis-Zusammenfassung als Text – Grundlage fürs Echo-Gespräch (__test_start__). */
@@ -140,6 +162,7 @@ export function resultToSeed(result: TestResult): string {
         result.dimensions.map((d) => `${d.name} ${d.score}/100${d.band ? ` – ${d.band.label}` : ''}`).join('; '),
     )
   }
+  if (result.flags.length) parts.push(`Kritische Angaben: ${result.flags.join(', ')}`)
   for (const ft of result.freeText) parts.push(`Freitext zu „${ft.question}": ${ft.answer}`)
   return parts.join(' | ').replace(/\|/g, '/').slice(0, 1400)
 }

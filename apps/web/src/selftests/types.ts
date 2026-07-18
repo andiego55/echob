@@ -22,6 +22,8 @@ export interface TestOption {
   value?: number
   /** Typologie-Modus: Punkte je Typ-Dimension (z. B. { sicher: 2, aengstlich: 0 }). */
   scores?: Record<string, number>
+  /** Wird diese Option gewählt, setzt sie ein kritisches Flag (z. B. 'gewalt'). */
+  flag?: string
 }
 
 export interface TestQuestion {
@@ -41,6 +43,9 @@ export interface TestQuestion {
   scale?: { min: number; max: number; labels: [string, string] }
   /** text-Fragen sind Reflexion (nicht gescort) und optional. */
   optional?: boolean
+  /** scale-Frage: ab diesem Wert wird ``flag`` gesetzt (kritische Angabe). */
+  flag?: string
+  flagMin?: number
 }
 
 /** Ergebnis-Band (min = inklusive Untergrenze in %, 0..100). Aufsteigend sortiert. */
@@ -84,8 +89,18 @@ export interface SelfTest {
   echo: { opening_question: string }
   /** zeigt einen Krisen-/Sicherheitshinweis (z. B. Coercive Control). */
   safety?: boolean
+  /** 'victim' = Betroffenen-Hilfe (Default), 'self' = Selbstreflexion über eigenes Verhalten. */
+  safetyVariant?: 'victim' | 'self'
   disclaimer?: string
 }
+
+/** Kritische Flags, die im Ergebnis unabhängig vom Durchschnitt ernst zu nehmen sind. */
+export const CRITICAL_FLAGS = [
+  'gewalt',
+  'kindesentzug',
+  'kindesentzug-ohne-reparatur',
+  'trennungsdrohung-ohne-reparatur',
+] as const
 
 /** Antwort je Frage: scale/single → number; multi → number[]; text → string. */
 export type TestAnswer = number | number[] | string
