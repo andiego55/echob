@@ -4,7 +4,7 @@ import type {
   StudentProfile, StudentCase, StudentCaseDetail, StudentEchoMessage, StudentNotes,
   StudentSubmission, StudentSessionNote, StudentEchoSession, StudentEchoChatResult,
   GlossaryTerm, Report, ReportCreate, ScalesOverview, CaseTrends, CaseReview, StudentAssignment,
-  StudentModuleRow, StudentModuleDetail,
+  StudentModuleRow, StudentModuleDetail, StudentStats,
 } from '@/types'
 
 type SessionNoteInput = { session_date?: string | null; title?: string | null; sections: { heading: string; text: string }[] }
@@ -144,4 +144,6 @@ export const studentApi = {
 
   inboxCount: () =>
     apiClient.get<{ assignments: number }>('/student/inbox-count').then(r => r.data),
+  stats: () =>
+    apiClient.get<StudentStats>('/student/stats').then(r => r.data),
 }

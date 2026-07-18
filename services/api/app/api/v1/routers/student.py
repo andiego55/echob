@@ -1765,3 +1765,30 @@ async def inbox_count(
             "WHERE student_id = $1 AND status IN ('assigned', 'in_progress')",
             current["student"]["id"])
     return {"assignments": n or 0}
+
+
+@router.get("/stats")
+async def student_stats(
+    current: dict = Depends(get_current_student),
+    pool=Depends(get_pool),
+) -> dict:
+    """Aggregierte Aktivität für den Fortschritts-/Meilenstein-Bereich."""
+    sid = current["student"]["id"]
+    uid = current["user_id"]
+    async with pool.acquire() as conn:
+        cases = await conn.fetchval("SELECT count(*) FROM student_case_copies WHERE student_id = $1", sid)
+        modules_completed = await conn.fetchval(
+            "SELECT count(*) FROM student_modules WHERE student_id = $1 AND status = 'completed'", sid)
+        modules_active = await conn.fetchval(
+            "SELECT count(*) FROM student_modules WHERE student_id = $1 AND status = 'active'", sid)
+        assignments_done = await conn.fetchval(
+            "SELECT count(*) FROM student_assignments WHERE student_id = $1 "
+            "AND status IN ('submitted', 'reviewed')", sid)
+        reports = await conn.fetchval("SELECT count(*) FROM reports WHERE user_id = $1", uid)
+        roleplays = await conn.fetchval(
+            "SELECT count(*) FROM echo_chat_sessions WHERE user_id = $1 AND kind = 'roleplay'", uid)
+    return {
+        "cases": cases or 0, "modules_completed": modules_completed or 0,
+        "modules_active": modules_active or 0, "assignments_done": assignments_done or 0,
+        "reports": reports or 0, "roleplays": roleplays or 0,
+    }

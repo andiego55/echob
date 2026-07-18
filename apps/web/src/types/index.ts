@@ -482,6 +482,15 @@ export interface DidacticsResult {
   rubric: { name: string; criteria: { name: string; description: string; max_points: number }[] }
 }
 
+export interface StudentStats {
+  cases: number
+  modules_completed: number
+  modules_active: number
+  assignments_done: number
+  reports: number
+  roleplays: number
+}
+
 export interface StudentModuleRow {
   id: string
   module_id: string

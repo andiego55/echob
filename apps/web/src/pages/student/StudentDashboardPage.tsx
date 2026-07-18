@@ -35,6 +35,8 @@ export default function StudentDashboardPage() {
 
         <OnboardingHint />
 
+        <ProgressSection />
+
         {openAssignments.length > 0 && (
           <Section title="Braucht Aufmerksamkeit" moreTo="/student/assignments" moreLabel="Alle Aufgaben">
             <div className="space-y-2">
@@ -64,6 +66,55 @@ export default function StudentDashboardPage() {
         </Section>
       </div>
     </StudentShell>
+  )
+}
+
+function ProgressSection() {
+  const { data: s } = useQuery({ queryKey: ['student-stats'], queryFn: () => studentApi.stats() })
+  if (!s) return null
+  const stats = [
+    { label: 'Fälle', value: s.cases },
+    { label: 'Module abgeschlossen', value: s.modules_completed },
+    { label: 'Aufgaben erledigt', value: s.assignments_done },
+    { label: 'Rollenspiele', value: s.roleplays },
+  ]
+  const badges = [
+    { label: 'Angekommen', earned: s.cases >= 1, hint: 'Ersten Fall erhalten' },
+    { label: 'Ins Gespräch', earned: s.roleplays >= 1, hint: 'Erstes Rollenspiel geführt' },
+    { label: 'Erster Bericht', earned: s.reports >= 1, hint: 'Ersten Bericht erstellt' },
+    { label: 'Modul-Abschluss', earned: s.modules_completed >= 1, hint: 'Erstes Lernmodul abgeschlossen' },
+    { label: 'Fleißig', earned: s.assignments_done >= 5, hint: '5 Aufgaben eingereicht' },
+    { label: 'Durchstarter', earned: s.modules_completed >= 3, hint: '3 Module abgeschlossen' },
+  ]
+  const earned = badges.filter(b => b.earned).length
+  return (
+    <section className="card">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {stats.map(st => (
+          <div key={st.label}>
+            <p className="text-2xl font-bold tabular-nums text-navy">{st.value}</p>
+            <p className="text-[11px] text-brand-muted">{st.label}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 border-t border-brand-border pt-3">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold text-navy">Meilensteine</p>
+          <p className="text-[11px] text-brand-muted tabular-nums">{earned}/{badges.length}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {badges.map(b => (
+            <span key={b.label} title={b.hint}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs ${
+                b.earned ? 'border-accent/40 bg-accent/10 font-medium text-accent' : 'border-brand-border text-brand-muted/60'
+              }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${b.earned ? 'bg-accent' : 'bg-brand-border'}`} />
+              {b.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
 
