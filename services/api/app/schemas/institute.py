@@ -56,6 +56,7 @@ class GenerationInput(BaseModel):
 class ExamplePatch(BaseModel):
     title: str | None = Field(None, max_length=200)
     status: str | None = Field(None, pattern="^(draft|published|archived)$")
+    master_solution: str | None = Field(None, max_length=40_000)
 
 
 class AssignStudents(BaseModel):

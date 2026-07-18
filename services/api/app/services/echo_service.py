@@ -254,7 +254,7 @@ class EchoService:
             logger.error("generate_json: ungültige JSON-Antwort vom Modell.")
             return mock or {}
 
-    async def evaluate_submission(self, *, rubric: dict, submission: dict) -> dict:
+    async def evaluate_submission(self, *, rubric: dict, submission: dict, reference: str = "") -> dict:
         """Bewertet eine eingereichte Fallarbeit anhand eines Rasters (KI-Vorschlag).
 
         rubric: {name, description, criteria:[{key, name, description, max_points}]}
@@ -294,10 +294,12 @@ class EchoService:
             "wertschätzend und konkret. Du stellst KEINE Diagnosen; du bewertest die Arbeit der studierenden "
             "Person, nicht die Fallperson. Antworte ausschließlich als JSON."
         )
+        ref_block = (f"\n\n## Experten-Referenzlösung (Vergleichsmaßstab, NICHT die Antwort der studierenden "
+                     f"Person)\n{reference}" if reference else "")
         user = (
             f"# Bewertungsraster: {rubric.get('name', '')}\n{rubric.get('description') or ''}\n\n"
             f"Kriterien:\n{crit_lines}\n\n"
-            f"# Eingereichte Fallarbeit\n{work}\n\n"
+            f"# Eingereichte Fallarbeit\n{work}{ref_block}\n\n"
             "Gib für JEDES Kriterium eine ganzzahlige Punktzahl (0 bis max) und eine kurze, konkrete "
             "Begründung mit Bezug auf die Einreichung (1–2 Sätze). Formuliere zusätzlich ein "
             "zusammenfassendes, konstruktives Gesamtfeedback (3–6 Sätze: Stärken zuerst, dann 1–2 "
@@ -410,6 +412,30 @@ class EchoService:
                              "description": str(c.get("description") or "").strip()[:1000], "max_points": mp})
         rubric = {"name": str(rub.get("name") or "Fall-Analyse").strip()[:200], "criteria": criteria}
         return {"guide": str(raw.get("guide") or ""), "tasks": tasks, "rubric": rubric}
+
+    async def generate_master_solution(self, *, case_summary: str) -> str:
+        """Experten-Referenzeinschätzung (Musterlösung) zu einem Übungsfall — Markdown, keine Diagnosen."""
+        system = (
+            "Du bist eine erfahrene Fachperson und Supervisorin. Zu einem fiktiven Übungsfall verfasst du "
+            "eine Experten-Referenzeinschätzung (Musterlösung) als Orientierung für Ausbilder:innen — "
+            "tastende Arbeitshypothesen, ausdrücklich keine Diagnosen. Antworte in Markdown."
+        )
+        user = (
+            f"# Übungsfall\n{case_summary}\n\n"
+            "Verfasse eine kompakte Experten-Musterlösung in Markdown mit den Abschnitten: "
+            "**Fallverständnis** (zentrale Dynamik und Muster), **Arbeitshypothesen** (tastend, mit "
+            "Unsicherheit und Gegenhinweisen), **Mögliche blinde Flecken**, **Vorgehen im Erstgespräch** "
+            "(3–5 Punkte). Alles als überprüfbare Annahme, keine Diagnosen."
+        )
+        if not self._use_openai:
+            return ("## Fallverständnis\n_(Demo ohne KI-Anbindung.)_\n\n## Arbeitshypothesen\n"
+                    "- Tastende Annahme …\n\n## Vorgehen im Erstgespräch\n- Sicherheit und Rapport zuerst.")
+        response = await self._chat(  # type: ignore[union-attr]
+            model=self._model_fast,
+            messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+            max_tokens=1200, temperature=0.4,
+        )
+        return response.choices[0].message.content or ""
 
     # ── Öffentliche Methoden ──────────────────────────────────────────────────
 

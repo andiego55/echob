@@ -45,8 +45,10 @@ export const instituteApi = {
     apiClient.get<ExampleSummary[]>('/institute/examples').then(r => r.data),
   getExample: (id: string) =>
     apiClient.get<ExampleDetail>(`/institute/examples/${id}`).then(r => r.data),
-  patchExample: (id: string, data: { title?: string; status?: string }) =>
+  patchExample: (id: string, data: { title?: string; status?: string; master_solution?: string | null }) =>
     apiClient.patch<ExampleDetail>(`/institute/examples/${id}`, data).then(r => r.data),
+  exampleMasterSolutionDraft: (id: string) =>
+    apiClient.post<{ master_solution: string }>(`/institute/examples/${id}/master-solution/draft`, undefined, { timeout: 120_000 }).then(r => r.data),
   deleteExample: (id: string) =>
     apiClient.delete(`/institute/examples/${id}`).then(r => r.data),
 

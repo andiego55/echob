@@ -125,6 +125,8 @@ export default function InstituteExampleEditorPage() {
 
         <DidacticsPanel exampleId={data.id} />
 
+        <MasterSolutionPanel exampleId={data.id} initial={data.master_solution} />
+
         <CasePartView part={data.primary} heading="Fallperson" />
         {data.partner && <CasePartView part={data.partner} heading="Partnerperson (Paar-Analyse)" />}
       </div>
@@ -268,6 +270,46 @@ function DidacticsPanel({ exampleId }: { exampleId: string }) {
           )}
         </div>
       )}
+    </section>
+  )
+}
+
+function MasterSolutionPanel({ exampleId, initial }: { exampleId: string; initial: string | null }) {
+  const qc = useQueryClient()
+  const [text, setText] = useState(initial ?? '')
+  const [savedOk, setSavedOk] = useState(false)
+  useEffect(() => { setText(initial ?? '') }, [initial])
+
+  const save = useMutation({
+    mutationFn: () => instituteApi.patchExample(exampleId, { master_solution: text }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['institute-example', exampleId] }); setSavedOk(true); setTimeout(() => setSavedOk(false), 2000) },
+  })
+  const draft = useMutation({
+    mutationFn: () => instituteApi.exampleMasterSolutionDraft(exampleId),
+    onSuccess: (r) => { setText(r.master_solution); setSavedOk(false) },
+  })
+
+  return (
+    <section className="card mt-6">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-bold text-navy">Musterlösung · Experten-Blick</h2>
+          <p className="mt-0.5 text-xs text-brand-muted">Nur für dich sichtbar. Dient der KI-Auswertung von Einreichungen als Vergleichsmaßstab.</p>
+        </div>
+        <button onClick={() => draft.mutate()} disabled={draft.isPending}
+          className="btn shrink-0 border-2 border-brand-border bg-white text-navy hover:border-navy/30 !py-1.5 !px-3 !text-xs">
+          {draft.isPending ? 'Entwurf …' : '✨ KI-Entwurf'}
+        </button>
+      </div>
+      {draft.isError && <p className="mt-2 text-xs text-red-600">Entwurf fehlgeschlagen.</p>}
+      <textarea value={text} onChange={e => { setText(e.target.value); setSavedOk(false) }} rows={8}
+        placeholder="Experten-Einschätzung: Fallverständnis, Arbeitshypothesen, blinde Flecken, Vorgehen im Erstgespräch …"
+        className="mt-3 w-full resize-y rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
+      <div className="mt-2 flex items-center gap-3">
+        <button onClick={() => save.mutate()} disabled={save.isPending} className="btn-primary !py-1.5 !px-4 !text-sm">
+          {save.isPending ? 'Speichern …' : savedOk ? '✓ Gespeichert' : 'Musterlösung speichern'}
+        </button>
+      </div>
     </section>
   )
 }

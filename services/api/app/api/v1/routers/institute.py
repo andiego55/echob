@@ -197,7 +197,7 @@ async def _load_case_part(conn, case_id) -> dict | None:
 
 async def _load_example_detail(conn, institute_id, example_id) -> dict:
     ex = await conn.fetchrow(
-        "SELECT id, title, status, primary_case_id, partner_case_id, created_at, updated_at "
+        "SELECT id, title, status, master_solution, primary_case_id, partner_case_id, created_at, updated_at "
         "FROM institute_examples WHERE id = $1 AND institute_id = $2",
         example_id, institute_id,
     )
@@ -207,6 +207,7 @@ async def _load_example_detail(conn, institute_id, example_id) -> dict:
         "id": str(ex["id"]),
         "title": ex["title"],
         "status": ex["status"],
+        "master_solution": ex["master_solution"],
         "created_at": ex["created_at"].isoformat() if ex["created_at"] else None,
         "updated_at": ex["updated_at"].isoformat() if ex["updated_at"] else None,
         "primary": await _load_case_part(conn, ex["primary_case_id"]),
@@ -612,7 +613,10 @@ async def ai_evaluate_submission(
     inst_id = current["institute"]["id"]
     async with pool.acquire() as conn:
         sub = await conn.fetchrow(
-            "SELECT payload FROM student_submissions WHERE id = $1 AND institute_id = $2",
+            "SELECT sub.payload, e.master_solution FROM student_submissions sub "
+            "LEFT JOIN student_case_copies scc ON scc.id = sub.copy_id "
+            "LEFT JOIN institute_examples e ON e.id = scc.example_id "
+            "WHERE sub.id = $1 AND sub.institute_id = $2",
             submission_id, inst_id)
         if not sub:
             raise HTTPException(status_code=404, detail="Einreichung nicht gefunden.")
@@ -628,7 +632,8 @@ async def ai_evaluate_submission(
     if isinstance(criteria, str):
         criteria = json.loads(criteria)
     rubric = {"name": rub["name"], "description": rub["description"], "criteria": criteria or []}
-    return await echo_svc.evaluate_submission(rubric=rubric, submission=payload or {})
+    return await echo_svc.evaluate_submission(
+        rubric=rubric, submission=payload or {}, reference=sub["master_solution"] or "")
 
 
 # ── Bewertungsraster (Rubrics) ────────────────────────────────────────────────
@@ -1269,3 +1274,25 @@ async def generate_example_didactics(
         part = await _load_case_part(conn, ex["primary_case_id"])
     summary = _example_summary_text(part, ex["title"])
     return await echo_svc.generate_didactics(case_summary=summary)
+
+
+@router.post("/examples/{example_id}/master-solution/draft")
+async def draft_master_solution(
+    example_id: UUID,
+    request: Request,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """KI-Entwurf einer Musterlösung/Experten-Einschätzung (nicht gespeichert)."""
+    echo_svc = getattr(request.app.state, "echo_service", None)
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    async with pool.acquire() as conn:
+        ex = await conn.fetchrow(
+            "SELECT * FROM institute_examples WHERE id = $1 AND institute_id = $2",
+            example_id, current["institute"]["id"])
+        if not ex:
+            raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+        part = await _load_case_part(conn, ex["primary_case_id"])
+    summary = _example_summary_text(part, ex["title"])
+    return {"master_solution": await echo_svc.generate_master_solution(case_summary=summary)}

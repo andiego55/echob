@@ -194,6 +194,7 @@ export interface ExampleDetail {
   id: string
   title: string
   status: string
+  master_solution: string | null
   created_at: string | null
   updated_at: string | null
   primary: ExampleCasePart | null
