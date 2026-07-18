@@ -23,6 +23,7 @@ import type {
   ModuleInput,
   ModuleStep,
   ModuleStepInput,
+  DidacticsResult,
 } from '@/types'
 
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
@@ -132,4 +133,8 @@ export const instituteApi = {
     apiClient.post(`/institute/modules/${id}/steps/reorder`, { step_ids: stepIds }).then(r => r.data),
   moduleEnroll: (id: string, data: { student_ids?: string[]; to_all?: boolean }) =>
     apiClient.post<{ enrolled: number }>(`/institute/modules/${id}/enroll`, data).then(r => r.data),
+
+  // Didaktik-Assistent (Vorschläge aus einem Fall)
+  exampleDidactics: (exampleId: string) =>
+    apiClient.post<DidacticsResult>(`/institute/examples/${exampleId}/didactics`, undefined, { timeout: 120_000 }).then(r => r.data),
 }

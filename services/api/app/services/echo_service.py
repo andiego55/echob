@@ -359,6 +359,58 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
+    async def generate_didactics(self, *, case_summary: str) -> dict:
+        """Erzeugt didaktisches Begleitmaterial zu einem Übungsfall (Leitfaden, Aufgaben, Raster).
+
+        → {guide: str(markdown), tasks: [{kind, title, instructions}], rubric: {name, criteria:[…]}}.
+        Für den Didaktik-Assistenten der Ausbildungs-Domäne. Keine Diagnosen.
+        """
+        system = (
+            "Du bist eine erfahrene Ausbilderin und Didaktikerin in psychosozialer Beratung. Aus einem "
+            "fiktiven Übungsfall entwirfst du didaktisches Begleitmaterial für Studierende — praxisnah, "
+            "konstruktiv, ohne Diagnosen. Antworte ausschließlich als JSON."
+        )
+        user = (
+            f"# Übungsfall\n{case_summary}\n\n"
+            "Erzeuge didaktisches Begleitmaterial als JSON mit genau diesen Feldern:\n"
+            '- "guide": didaktischer Leitfaden in Markdown (Lernziele, Hinweise zur Durchführung, '
+            "typische Fehler/Stolpersteine, 3–5 Diskussionsfragen, grobes Timing).\n"
+            '- "tasks": 2–4 Aufgabenvorschläge, je {"kind":"task"|"reflection","title":"…","instructions":"…"}.\n'
+            '- "rubric": ein Bewertungsraster {"name":"…","criteria":[{"name":"…","description":"…",'
+            '"max_points":<ganze Zahl 1–6>}]} mit 3–5 zum Fall passenden Kriterien.\n'
+            "Halte die JSON-Form exakt ein."
+        )
+        mock = {
+            "guide": ("## Lernziele\n- Beobachtung von Deutung trennen\n\n## Hinweise\n_(Demo ohne KI-Anbindung.)_\n\n"
+                      "## Diskussionsfragen\n- Welche Muster fallen auf?"),
+            "tasks": [{"kind": "reflection", "title": "Erste Eindrücke",
+                       "instructions": "Was fällt dir bei diesem Fall zuerst auf? Trenne Beobachtung und Deutung."}],
+            "rubric": {"name": "Fall-Analyse", "criteria": [
+                {"name": "Beobachtung vs. Interpretation", "description": "Sauber getrennt.", "max_points": 4}]},
+        }
+        raw = await self.generate_json(system=system, user=user, max_tokens=2500, mock=mock)
+
+        tasks = []
+        for t in (raw.get("tasks") or [])[:6]:
+            if not isinstance(t, dict) or not str(t.get("title") or "").strip():
+                continue
+            kind = t.get("kind") if t.get("kind") in ("task", "reflection") else "task"
+            tasks.append({"kind": kind, "title": str(t["title"]).strip()[:200],
+                          "instructions": str(t.get("instructions") or "").strip()})
+        rub = raw.get("rubric") if isinstance(raw.get("rubric"), dict) else {}
+        criteria = []
+        for c in (rub.get("criteria") or [])[:8]:
+            if not isinstance(c, dict) or not str(c.get("name") or "").strip():
+                continue
+            try:
+                mp = max(1, min(100, int(c.get("max_points") or 4)))
+            except (TypeError, ValueError):
+                mp = 4
+            criteria.append({"name": str(c["name"]).strip()[:200],
+                             "description": str(c.get("description") or "").strip()[:1000], "max_points": mp})
+        rubric = {"name": str(rub.get("name") or "Fall-Analyse").strip()[:200], "criteria": criteria}
+        return {"guide": str(raw.get("guide") or ""), "tasks": tasks, "rubric": rubric}
+
     # ── Öffentliche Methoden ──────────────────────────────────────────────────
 
     async def chat(

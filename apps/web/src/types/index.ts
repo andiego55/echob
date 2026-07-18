@@ -475,6 +475,12 @@ export type ModuleInput = {
 
 export type ModuleStepInput = { title: string; content?: string | null; kind?: ModuleStepKind; ref_id?: string | null; payload?: { questions: QuizQuestion[] } }
 
+export interface DidacticsResult {
+  guide: string
+  tasks: { kind: 'task' | 'reflection'; title: string; instructions: string }[]
+  rubric: { name: string; criteria: { name: string; description: string; max_points: number }[] }
+}
+
 export interface StudentModuleRow {
   id: string
   module_id: string

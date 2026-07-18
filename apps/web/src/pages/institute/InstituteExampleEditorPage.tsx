@@ -8,9 +8,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { Spinner } from '@/components/auth/InstituteRoute'
+import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { instituteApi } from '@/api/institute'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
-import type { ExampleCasePart, ExampleScene, ProfileModules } from '@/types'
+import type { ExampleCasePart, ExampleScene, ProfileModules, DidacticsResult } from '@/types'
 
 const relTypeLabel = (v: string) => (RELATIONSHIP_TYPE_LABELS as Record<string, string>)[v] ?? v
 const relStatusLabel = (v: string) => (RELATIONSHIP_STATUS_LABELS as Record<string, string>)[v] ?? v
@@ -122,6 +123,8 @@ export default function InstituteExampleEditorPage() {
 
         {published && <AssignPanel exampleId={data.id} />}
 
+        <DidacticsPanel exampleId={data.id} />
+
         <CasePartView part={data.primary} heading="Fallperson" />
         {data.partner && <CasePartView part={data.partner} heading="Partnerperson (Paar-Analyse)" />}
       </div>
@@ -178,6 +181,94 @@ function AssignPanel({ exampleId }: { exampleId: string }) {
         </div>
       )}
     </div>
+  )
+}
+
+function DidacticsPanel({ exampleId }: { exampleId: string }) {
+  const qc = useQueryClient()
+  const [result, setResult] = useState<DidacticsResult | null>(null)
+  const gen = useMutation({
+    mutationFn: () => instituteApi.exampleDidactics(exampleId),
+    onSuccess: (r) => setResult(r),
+  })
+  const createTask = useMutation({
+    mutationFn: (t: DidacticsResult['tasks'][number]) => instituteApi.assignmentCreate({ kind: t.kind, title: t.title, instructions: t.instructions }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['institute-assignments'] }),
+  })
+  const createRubric = useMutation({
+    mutationFn: (r: DidacticsResult['rubric']) => instituteApi.rubricCreate({ name: r.name, criteria: r.criteria.map((c, i) => ({ key: `k${i}`, name: c.name, description: c.description, max_points: c.max_points })) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['institute-rubrics'] }),
+  })
+
+  return (
+    <section className="card mt-6">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-bold text-navy">Didaktik-Assistent</h2>
+          <p className="mt-0.5 text-xs text-brand-muted">Leitfaden, Aufgaben und ein Bewertungsraster aus diesem Fall – als KI-Vorschlag, den du übernehmen kannst.</p>
+        </div>
+        <button onClick={() => gen.mutate()} disabled={gen.isPending} className="btn-primary !py-1.5 !px-4 !text-sm shrink-0">
+          {gen.isPending ? 'Erstellt …' : result ? 'Neu vorschlagen' : '✨ Vorschläge erstellen'}
+        </button>
+      </div>
+      {gen.isError && <p className="mt-2 text-xs text-red-600">Konnte nicht erstellen. Bitte erneut versuchen.</p>}
+
+      {result && (
+        <div className="mt-4 space-y-5">
+          {result.guide && (
+            <div>
+              <p className="label mb-1">Didaktischer Leitfaden</p>
+              <div className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3 text-sm leading-relaxed text-brand-text">
+                <MarkdownMessage content={result.guide} />
+              </div>
+            </div>
+          )}
+          {result.tasks.length > 0 && (
+            <div>
+              <p className="label mb-1">Aufgabenvorschläge</p>
+              <div className="space-y-2">
+                {result.tasks.map((t, i) => (
+                  <div key={i} className="rounded-brand border border-brand-border px-3 py-2.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-navy">{t.title}</p>
+                        <p className="mt-0.5 whitespace-pre-wrap text-xs text-brand-muted">{t.instructions}</p>
+                      </div>
+                      <button onClick={() => createTask.mutate(t)} disabled={createTask.isPending}
+                        className="shrink-0 rounded-brand border border-accent bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent hover:bg-accent/20 disabled:opacity-40">
+                        Als Aufgabe anlegen
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {result.rubric.criteria.length > 0 && (
+            <div>
+              <p className="label mb-1">Bewertungsraster · {result.rubric.name}</p>
+              <div className="rounded-brand border border-brand-border px-3 py-2.5">
+                <div className="space-y-1">
+                  {result.rubric.criteria.map((c, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 text-sm">
+                      <span className="text-navy">{c.name}</span>
+                      <span className="shrink-0 text-xs text-brand-muted tabular-nums">max. {c.max_points}</span>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => createRubric.mutate(result.rubric)} disabled={createRubric.isPending}
+                  className="mt-2 rounded-brand border border-accent bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent hover:bg-accent/20 disabled:opacity-40">
+                  Als Raster anlegen
+                </button>
+              </div>
+            </div>
+          )}
+          {(createTask.isSuccess || createRubric.isSuccess) && (
+            <p className="text-xs font-medium text-green-600">✓ Angelegt – zu finden unter „Aufgaben" bzw. „Bewertungsraster".</p>
+          )}
+        </div>
+      )}
+    </section>
   )
 }
 

@@ -1223,3 +1223,49 @@ async def enroll_module(
             if res.endswith("1"):
                 n += 1
     return {"enrolled": n}
+
+
+# ── Didaktik-Assistent (Vorschläge aus einem Fall) ────────────────────────────
+
+def _example_summary_text(part, title) -> str:
+    if not part:
+        return title
+    ob = part.get("onboarding") or {}
+    lines = [f"Titel: {title}", f"Fallperson: {part.get('person_name') or '—'}"]
+    if part.get("main_concern"):
+        lines.append("Anliegen: " + part["main_concern"])
+    if ob.get("relationship_description"):
+        lines.append("Beziehung: " + ob["relationship_description"])
+    if ob.get("main_burden"):
+        lines.append("Belastung: " + ob["main_burden"])
+    if ob.get("typical_scenes"):
+        lines.append("Muster: " + ob["typical_scenes"])
+    if ob.get("significant_event"):
+        lines.append("Prägendes Ereignis: " + ob["significant_event"])
+    scenes = part.get("scenes") or []
+    if scenes:
+        sc = "; ".join(f"{s.get('title') or 'Szene'}: {(s.get('description') or '')[:140]}" for s in scenes[:6])
+        lines.append("Szenen: " + sc)
+    return "\n".join(lines)
+
+
+@router.post("/examples/{example_id}/didactics")
+async def generate_example_didactics(
+    example_id: UUID,
+    request: Request,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Didaktik-Assistent: Leitfaden + Aufgaben + Raster aus einem Beispiel-Fall (nicht gespeichert)."""
+    echo_svc = getattr(request.app.state, "echo_service", None)
+    if echo_svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    async with pool.acquire() as conn:
+        ex = await conn.fetchrow(
+            "SELECT * FROM institute_examples WHERE id = $1 AND institute_id = $2",
+            example_id, current["institute"]["id"])
+        if not ex:
+            raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+        part = await _load_case_part(conn, ex["primary_case_id"])
+    summary = _example_summary_text(part, ex["title"])
+    return await echo_svc.generate_didactics(case_summary=summary)
