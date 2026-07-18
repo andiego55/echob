@@ -14,6 +14,8 @@ import { echoApi } from '@/api/echo'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { getBody } from '@/content/bodies'
+import { getSelfTest, resultToSeed } from '@/selftests'
+import { loadTestResult } from '@/selftests/resultStore'
 import { apiErrorText } from '@/utils/apiError'
 import type { EchoMessage, ThreadType } from '@/types'
 
@@ -23,6 +25,7 @@ interface TopicDef {
   startTrigger: string
   isContent?: boolean
   isScene?: boolean
+  isTest?: boolean
 }
 
 const TOPICS: Record<string, TopicDef> = {
@@ -55,7 +58,22 @@ function resolveTopic(topicId: string): TopicDef | undefined {
   if (topicId.startsWith('content_')) {
     const slug = topicId.slice('content_'.length)
     const meta = CONTENT_MANIFEST.find((m) => m.slug === slug)
-    if (!meta) return undefined
+    if (!meta) {
+      // Kein Content-Slug → Selbsttest? Ergebnis-Seed aus dem lokalen Speicher.
+      const test = getSelfTest(slug)
+      if (test) {
+        const result = loadTestResult(slug)
+        const seed = result ? resultToSeed(result) : ''
+        return {
+          label: test.title,
+          description: `Sprich mit Echo über dein Ergebnis im Selbsttest „${test.title}".`,
+          startTrigger: `__test_start__|${test.title}|${test.echo.opening_question}|${seed}`,
+          isContent: true,
+          isTest: true,
+        }
+      }
+      return undefined
+    }
     const isScene = meta.type === 'scene'
     // Anker für Echo: bei Szenen der (kurze) Szenentext, sonst das Intro bis zur ersten H2.
     const body = getBody(meta.slug)
@@ -202,7 +220,7 @@ export default function TopicDialogPage() {
         {/* Sub-Header */}
         <div className="border-b border-brand-border bg-white px-6 py-3 flex items-center justify-between gap-4 flex-shrink-0">
           <div>
-            <span className="label text-xs">{topic.isScene ? 'Szenendialog' : 'Themendialog'}</span>
+            <span className="label text-xs">{topic.isTest ? 'Ergebnis-Dialog' : topic.isScene ? 'Szenendialog' : 'Themendialog'}</span>
             <p className="text-sm font-semibold text-navy">{topic.label}</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -236,7 +254,7 @@ export default function TopicDialogPage() {
             <div className={`rounded-brand border px-4 py-3 ${topic.isContent ? 'border-accent/30 bg-accent/5' : 'border-brand-border bg-blue-50'}`}>
               {topic.isContent && (
                 <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-accent mb-1">
-                  {topic.isScene ? 'Aus den Szenen' : 'Aus dem Wissen'}
+                  {topic.isTest ? 'Aus den Selbsttests' : topic.isScene ? 'Aus den Szenen' : 'Aus dem Wissen'}
                 </span>
               )}
               <p className="text-xs font-medium text-navy mb-0.5">{topic.label}</p>

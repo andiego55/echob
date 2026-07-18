@@ -6,6 +6,7 @@
 // bzw. noscript-Fallback.
 
 import { CONTENT_ROUTE_META } from '@/content/manifest.generated'
+import { SELFTEST_ROUTE_META } from '@/selftests'
 
 const SITE = 'https://echo-b.de'
 
@@ -64,6 +65,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Kurze, gefühlvolle Szenen aus schwierigen Beziehungen – aus der Ich-Perspektive, fiktiv. Nach Themen wie Narzissmus, Gaslighting oder Nähe-Distanz filtern und mit Echo auf die eigene Situation beziehen.',
   },
+  '/selbsttests': {
+    title: 'Selbsttests: Beziehung, Bindung & belastende Muster – EchoB',
+    description:
+      'Fundierte, kostenlose Selbsttests zu Beziehungsgesundheit, Bindungsstil und belastenden Mustern wie Gaslighting oder Kontrolle. Klares Ergebnis mit Einordnung – anschließend mit Echo besprechbar. Ohne Diagnose.',
+  },
 
   '/impressum': {
     title: 'Impressum – EchoB',
@@ -88,8 +94,8 @@ export const ROUTE_META: Record<string, PageMeta> = {
   },
 }
 
-/** Alle öffentlichen Metadaten: statische Routen + generierte Content-Seiten. */
-const ALL_META: Record<string, PageMeta> = { ...ROUTE_META, ...CONTENT_ROUTE_META }
+/** Alle öffentlichen Metadaten: statische Routen + generierte Content-Seiten + Selbsttests. */
+const ALL_META: Record<string, PageMeta> = { ...ROUTE_META, ...CONTENT_ROUTE_META, ...SELFTEST_ROUTE_META }
 
 /** Login-/App-Bereiche sollen nicht indexiert werden. */
 const NOINDEX_RE = /^\/(app|professional|auth|pseudonym|einladung|reflektieren)(\/|$)/

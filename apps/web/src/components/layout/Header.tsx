@@ -58,7 +58,8 @@ export default function Header() {
   const wissenActive =
     location.pathname.startsWith('/wissen') ||
     location.pathname.startsWith('/glossar') ||
-    location.pathname.startsWith('/szenen')
+    location.pathname.startsWith('/szenen') ||
+    location.pathname.startsWith('/selbsttests')
   const ueberActive = location.pathname.startsWith('/ueber')
 
   return (
@@ -125,15 +126,19 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* Glossar + Szenen */}
-                <div className="grid grid-cols-2 border-t border-brand-border">
-                  <Link to="/glossar" className="block bg-brand-bg px-5 py-3 no-underline transition-colors hover:bg-white">
+                {/* Glossar + Szenen + Selbsttests */}
+                <div className="grid grid-cols-3 border-t border-brand-border">
+                  <Link to="/glossar" className="block bg-brand-bg px-4 py-3 no-underline transition-colors hover:bg-white">
                     <p className="text-[0.82rem] font-semibold text-navy">Glossar <span className="text-accent">→</span></p>
-                    <p className="text-[0.76rem] text-brand-muted leading-snug">Begriffe von A–Z</p>
+                    <p className="text-[0.75rem] text-brand-muted leading-snug">Begriffe A–Z</p>
                   </Link>
-                  <Link to="/szenen" className="block border-l border-brand-border bg-brand-bg px-5 py-3 no-underline transition-colors hover:bg-white">
+                  <Link to="/szenen" className="block border-l border-brand-border bg-brand-bg px-4 py-3 no-underline transition-colors hover:bg-white">
                     <p className="text-[0.82rem] font-semibold text-navy">Szenen <span className="text-accent">→</span></p>
-                    <p className="text-[0.76rem] text-brand-muted leading-snug">Erkenne dich wieder</p>
+                    <p className="text-[0.75rem] text-brand-muted leading-snug">Erkenne dich wieder</p>
+                  </Link>
+                  <Link to="/selbsttests" className="block border-l border-brand-border bg-brand-bg px-4 py-3 no-underline transition-colors hover:bg-white">
+                    <p className="text-[0.82rem] font-semibold text-navy">Selbsttests <span className="text-accent">→</span></p>
+                    <p className="text-[0.75rem] text-brand-muted leading-snug">Wo stehst du?</p>
                   </Link>
                 </div>
               </div>

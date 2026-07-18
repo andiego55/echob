@@ -82,25 +82,31 @@ export default function WissenPage() {
         </div>
       </section>
 
-      {/* Einladung zu den Beziehungsszenen */}
+      {/* Einladung: Szenen + Selbsttests */}
       <section className="border-t border-brand-border px-6 pt-10">
-        <div className="mx-auto max-w-[960px]">
+        <div className="mx-auto grid max-w-[960px] gap-4 sm:grid-cols-2">
           <Link
             to="/szenen"
-            className="group relative flex flex-col gap-4 overflow-hidden rounded-brand-lg border border-accent/25 bg-accent/[0.05] px-7 py-7 no-underline transition-colors hover:border-accent/50 sm:flex-row sm:items-center sm:justify-between"
+            className="group relative flex flex-col overflow-hidden rounded-brand-lg border border-accent/25 bg-accent/[0.05] px-6 py-6 no-underline transition-colors hover:border-accent/50"
           >
-            <span aria-hidden="true" className="pointer-events-none absolute -right-2 top-0 font-serif text-[6rem] leading-none text-accent/10 transition-colors group-hover:text-accent/20">
-              „
-            </span>
-            <div className="relative max-w-[620px]">
-              <span className="text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent">Neu · Beziehungsszenen</span>
-              <h2 className="mt-1.5 text-[1.3rem] font-bold text-navy">„Das kenne ich" – Szenen, in denen du dich wiedererkennst</h2>
-              <p className="mt-2 text-[0.95rem] leading-relaxed text-brand-muted">
-                Kurze, gefühlvolle Momente aus schwierigen Beziehungen – aus der Ich-Perspektive, fiktiv.
-                Nach Themen filtern und direkt mit Echo darüber sprechen.
-              </p>
-            </div>
-            <span className="relative shrink-0 text-sm font-semibold text-accent">Zu den Szenen →</span>
+            <span aria-hidden="true" className="pointer-events-none absolute -right-1 top-0 font-serif text-[5rem] leading-none text-accent/10 transition-colors group-hover:text-accent/20">„</span>
+            <span className="relative text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent">Beziehungsszenen</span>
+            <h2 className="relative mt-1.5 text-[1.2rem] font-bold text-navy">„Das kenne ich"</h2>
+            <p className="relative mt-2 flex-1 text-[0.92rem] leading-relaxed text-brand-muted">
+              Gefühlvolle, fiktive Szenen aus schwierigen Beziehungen. Erkenne dich wieder – und sprich mit Echo darüber.
+            </p>
+            <span className="relative mt-4 text-sm font-semibold text-accent">Zu den Szenen →</span>
+          </Link>
+          <Link
+            to="/selbsttests"
+            className="group relative flex flex-col overflow-hidden rounded-brand-lg border border-accent/25 bg-accent/[0.05] px-6 py-6 no-underline transition-colors hover:border-accent/50"
+          >
+            <span className="relative text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent">Selbsttests</span>
+            <h2 className="relative mt-1.5 text-[1.2rem] font-bold text-navy">Wo stehst du gerade?</h2>
+            <p className="relative mt-2 flex-1 text-[0.92rem] leading-relaxed text-brand-muted">
+              Fundierte Tests zu Beziehung, Bindung und belastenden Mustern – mit klarem Ergebnis, das du mit Echo besprechen kannst.
+            </p>
+            <span className="relative mt-4 text-sm font-semibold text-accent">Zu den Tests →</span>
           </Link>
         </div>
       </section>
