@@ -40,6 +40,8 @@ export default function SzenenPage() {
     return SCENES.filter((s) => (s.scene_tags ?? []).some((t) => active.has(t)))
   }, [active])
 
+  const [filterOpen, setFilterOpen] = useState(!!initialTag)
+
   return (
     <PageLayout>
       {/* Hero */}
@@ -70,36 +72,69 @@ export default function SzenenPage() {
         </div>
       </section>
 
-      {/* Filter */}
-      <section className="sticky top-[60px] z-30 border-b border-brand-border bg-brand-bg/95 px-6 py-4 backdrop-blur">
+      {/* Filter (einklappbar) */}
+      <section className="sticky top-[60px] z-30 border-b border-brand-border bg-brand-bg/95 px-6 py-3 backdrop-blur">
         <div className="mx-auto max-w-[1040px]">
-          <div className="mb-2.5 flex items-center justify-between">
-            <p className="text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brand-muted">Worum es geht</p>
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setFilterOpen((o) => !o)}
+              aria-expanded={filterOpen}
+              className="flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brand-muted transition-colors hover:text-navy"
+            >
+              <svg className={`h-3 w-3 transition-transform ${filterOpen ? 'rotate-90' : ''}`} viewBox="0 0 12 12" fill="none">
+                <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Worum es geht
+              <span className="font-medium normal-case tracking-normal text-brand-muted/60">
+                {active.size > 0 ? `· ${active.size} aktiv` : `· ${TAG_COUNTS.length} Themen`}
+              </span>
+            </button>
             {active.size > 0 && (
-              <button onClick={() => setActive(new Set())} className="text-xs font-medium text-accent hover:underline">
-                Filter zurücksetzen ({visible.length})
+              <button onClick={() => setActive(new Set())} className="shrink-0 text-xs font-medium text-accent hover:underline">
+                Zurücksetzen ({visible.length})
               </button>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            {TAG_COUNTS.map(({ tag, count }) => {
-              const on = active.has(tag)
-              return (
+
+          {/* Aktive Schlagworte bleiben sichtbar, auch wenn eingeklappt */}
+          {!filterOpen && active.size > 0 && (
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {orderSceneTags(active).map((tag) => (
                 <button
                   key={tag}
                   onClick={() => toggle(tag)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[0.82rem] transition-colors ${
-                    on
-                      ? 'border-accent bg-accent text-white'
-                      : 'border-brand-border bg-white text-brand-muted hover:border-accent/50 hover:text-navy'
-                  }`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-accent bg-accent px-3 py-1 text-[0.82rem] text-white"
                 >
                   {sceneTagLabel(tag)}
-                  <span className={`text-[0.7rem] tabular-nums ${on ? 'text-white/70' : 'text-brand-muted/50'}`}>{count}</span>
+                  <span className="text-white/70">✕</span>
                 </button>
-              )
-            })}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {/* Volle Schlagwortliste */}
+          {filterOpen && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {TAG_COUNTS.map(({ tag, count }) => {
+                const on = active.has(tag)
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => toggle(tag)}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[0.82rem] transition-colors ${
+                      on
+                        ? 'border-accent bg-accent text-white'
+                        : 'border-brand-border bg-white text-brand-muted hover:border-accent/50 hover:text-navy'
+                    }`}
+                  >
+                    {sceneTagLabel(tag)}
+                    <span className={`text-[0.7rem] tabular-nums ${on ? 'text-white/70' : 'text-brand-muted/50'}`}>{count}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 

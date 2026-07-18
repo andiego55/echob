@@ -163,7 +163,7 @@ export const bindungsstil: SelfTest = {
         { label: 'ist mein sicherer Hafen.', scores: { vermeidend: 2 } },
       ],
     },
-    { id: 'bs_t1', type: 'text', optional: true, section: 'Zum Schluss', text: 'Woran erinnert dich dein Ergebnis – aus früheren Beziehungen oder aus deiner Kindheit?' },
+    { id: 'bs_t1', type: 'text', optional: true, section: 'Zum Schluss', text: 'Kennst du deine typischen Reaktionen auf Nähe und Abstand aus früheren Beziehungen oder aus deiner Kindheit? Was fällt dir dazu ein?' },
     { id: 'bs_t2', type: 'text', optional: true, section: 'Zum Schluss', text: 'In welcher Situation wünschst du dir, anders reagieren zu können?' },
   ],
   disclaimer:

@@ -410,6 +410,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-augenrollen",
+    "title": "Das Augenrollen",
+    "description": "Eine Szene über Verachtung – kein lauter Streit, sondern ein steter Nieselregen aus Augenrollen, Seufzern und Spott, der einen kleiner macht. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Timos Sicht",
+    "pull_quote": "Sie sagt nichts. Sie verdreht nur die Augen. Und ich werde ein Stück kleiner.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du diese leise Verachtung, die ohne lauten Streit auskommt? Was macht sie mit dir?"
+    },
+    "scene_tags": [
+      "verachtung",
+      "abwertung",
+      "sich-klein-fuehlen"
+    ],
+    "url": "/szenen/das-augenrollen"
+  },
+  {
+    "type": "scene",
     "slug": "das-habe-ich-nie-gesagt",
     "title": "Das habe ich nie gesagt",
     "description": "Eine Szene über Gaslighting – wenn deine Erinnerung Stück für Stück in Frage gestellt wird, bis du an dir selbst zweifelst. Aus der Ich-Perspektive, fiktiv.",
@@ -435,6 +461,113 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/das-habe-ich-nie-gesagt"
+  },
+  {
+    "type": "scene",
+    "slug": "das-haus-das-nie-kommt",
+    "title": "Das Haus, das nie kommt",
+    "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Janas Sicht",
+    "pull_quote": "Er malt uns ein Haus mit Garten und einem Hund. Ich müsste nur noch aufhören zu fragen, wann wir einziehen.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – auf Versprechen zu warten, die immer schön klingen und nie kommen? Woran erinnert dich das?"
+    },
+    "scene_tags": [
+      "future-faking",
+      "zukunftsversprechen",
+      "hinhalten",
+      "idealisierung-abwertung"
+    ],
+    "url": "/szenen/das-haus-das-nie-kommt"
+  },
+  {
+    "type": "scene",
+    "slug": "der-vorwurf",
+    "title": "Der Vorwurf",
+    "description": "Eine Szene über Eifersuchtsvorwürfe – wenn man sich ständig für Dinge rechtfertigt, die man nie getan hat, und beginnt, wie schuldig zu leben. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Yasmins Sicht",
+    "pull_quote": "„Wer war das?\" Ein Kollege. Wegen der Schicht. Warum klinge ich, während ich es sage, schon schuldig?",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dich ständig für Dinge rechtfertigen zu müssen, die du nicht getan hast? Was löst das aus?"
+    },
+    "scene_tags": [
+      "eifersuchtsvorwuerfe",
+      "misstrauen",
+      "kontrolle",
+      "auf-eierschalen-gehen"
+    ],
+    "url": "/szenen/der-vorwurf"
+  },
+  {
+    "type": "scene",
+    "slug": "die-eine-nachricht",
+    "title": "Die eine Nachricht",
+    "description": "Eine Szene über Breadcrumbing – genau so viel Aufmerksamkeit, dass die Hoffnung nicht stirbt, aber nie genug, dass etwas Echtes wird. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "bindung",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Nils' Sicht",
+    "pull_quote": "Genau wenn ich loslassen will, kommt die eine Nachricht: „Hab an dich gedacht.\" Kein Treffen. Nur Hoffnung.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Warten auf Krümel, die du behandelst wie eine ganze Mahlzeit? Woran erinnert dich das?"
+    },
+    "scene_tags": [
+      "breadcrumbing",
+      "hinhalten",
+      "naehe-distanz",
+      "verlustangst"
+    ],
+    "url": "/szenen/die-eine-nachricht"
+  },
+  {
+    "type": "scene",
+    "slug": "die-wand",
+    "title": "Die Wand",
+    "description": "Eine Szene über Stonewalling – wenn das Gegenüber mitten im Gespräch dichtmacht und eine Wand steht, wo eben noch ein Mensch war. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ellens Sicht",
+    "pull_quote": "Mitten im Satz macht er zu. Kein Streit, kein Wort – nur eine Wand, wo eben noch ein Mensch war.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du dieses Reden gegen eine Wand? Woran erinnert dich das?"
+    },
+    "scene_tags": [
+      "stonewalling",
+      "mauern",
+      "rueckzug"
+    ],
+    "url": "/szenen/die-wand"
   },
   {
     "type": "scene",
@@ -467,6 +600,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "du-machst-das-eh-besser",
+    "title": "Du machst das eh besser",
+    "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Carlas Sicht",
+    "pull_quote": "„Du machst das eh besser\", sagt er und lächelt. Also mache ich es. Alles. Wieder.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kommt dir diese ungleiche Last bekannt vor? Woran erinnert dich die Szene?"
+    },
+    "scene_tags": [
+      "vorgetaeuschte-unfaehigkeit",
+      "ungleichgewicht",
+      "erschoepfung"
+    ],
+    "url": "/szenen/du-machst-das-eh-besser"
+  },
+  {
+    "type": "scene",
     "slug": "erst-der-rausch-dann-die-kaelte",
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv.",
@@ -492,6 +651,60 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/erst-der-rausch-dann-die-kaelte"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-muss-fragen",
+    "title": "Ich muss fragen",
+    "description": "Eine Szene über finanzielle Kontrolle – wenn man für das eigene Geld um Erlaubnis bitten und jede Ausgabe rechtfertigen muss. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sonjas Sicht",
+    "pull_quote": "Für einen Kaffee mit Lisa muss ich fragen. Und begründen. Es ist mein eigenes Gehalt.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, für dein eigenes Geld um Erlaubnis zu bitten? Was geht dir dabei durch den Kopf?"
+    },
+    "scene_tags": [
+      "finanzielle-kontrolle",
+      "kontrolle",
+      "abhaengigkeit",
+      "isolation"
+    ],
+    "url": "/szenen/ich-muss-fragen"
+  },
+  {
+    "type": "scene",
+    "slug": "immer-die-andere",
+    "title": "Immer die andere",
+    "description": "Eine Szene über Triangulierung – ständig mit einem Ex, einer Kollegin, einem Ideal verglichen zu werden, gegen das man nicht gewinnen kann. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Davids Sicht",
+    "pull_quote": "Ihr Ex hätte das ohne Worte gewusst, sagt sie. Ich kämpfe gegen Männer, die gar nicht im Raum sind.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, ständig mit jemandem verglichen zu werden? Was löst das in dir aus?"
+    },
+    "scene_tags": [
+      "triangulierung",
+      "vergleich",
+      "abwertung",
+      "sich-klein-fuehlen"
+    ],
+    "url": "/szenen/immer-die-andere"
   },
   {
     "type": "scene",
@@ -522,6 +735,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "kaum-bin-ich-raus-bist-du-zurueck",
+    "title": "Kaum bin ich raus, bist du zurück",
+    "description": "Eine Szene über Hoovering – kaum hast du Abstand gewonnen, taucht die andere Person von ihrer schönsten Seite wieder auf und zieht dich zurück. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Meikes Sicht",
+    "pull_quote": "Drei Wochen war Ruhe. Ich hatte wieder durchgeatmet. Dann kam die Nachricht: „Ich habe uns nie aufgegeben.\"",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du diesen Sog zurück, kaum dass du Abstand gewonnen hast? Was macht das mit dir?"
+    },
+    "scene_tags": [
+      "hoovering",
+      "love-bombing",
+      "push-pull",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/kaum-bin-ich-raus-bist-du-zurueck"
+  },
+  {
+    "type": "scene",
     "slug": "mach-doch-was-du-willst",
     "title": "Mach doch, was du willst",
     "description": "Eine Szene über passiv-aggressives Verhalten – wenn ‚ist schon okay' das Gegenteil bedeutet und du die Stimmung errätst statt sie zu erfahren. Ich-Perspektive, fiktiv.",
@@ -546,6 +786,61 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "schuldgefuehle"
     ],
     "url": "/szenen/mach-doch-was-du-willst"
+  },
+  {
+    "type": "scene",
+    "slug": "nach-dem-anruf-bei-mama",
+    "title": "Nach dem Anruf bei Mama",
+    "description": "Eine Szene über einen narzisstischen Elternteil – wenn jedes Gespräch bei ihrem Leid endet und man kleiner auflegt, als man angerufen hat. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Christophs Sicht",
+    "pull_quote": "Ich rufe an, um von meiner Beförderung zu erzählen. Ich lege auf und tröste sie, dass ich zu selten anrufe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du solche Gespräche – vielleicht aus deiner eigenen Familie? Woran erinnert dich das?"
+    },
+    "scene_tags": [
+      "narzisstischer-elternteil",
+      "verdeckter-narzissmus",
+      "schuldumkehr",
+      "sich-klein-fuehlen"
+    ],
+    "url": "/szenen/nach-dem-anruf-bei-mama"
+  },
+  {
+    "type": "scene",
+    "slug": "warum-ich-bleibe",
+    "title": "Warum ich bleibe",
+    "description": "Eine Szene über Trauma-Bindung – wenn der Wechsel aus Verletzung und großer Versöhnung eine Nähe schafft, aus der man kaum herausfindet. Ich-Perspektive, fiktiv.",
+    "cluster": "bindung",
+    "updated": "2026-07-19",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Leas Sicht",
+    "pull_quote": "Nach der schlimmsten Nacht bringt er mir Kaffee ans Bett. Und die Erleichterung fühlt sich an wie Liebe.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du dieses Auf und Ab, das bindet statt zu lösen? Was davon kommt dir nah?"
+    },
+    "scene_tags": [
+      "trauma-bindung",
+      "love-bombing",
+      "abwertung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/warum-ich-bleibe"
   },
   {
     "type": "scene",
@@ -1289,25 +1584,69 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Auf ihrer Bühne",
     "description": "Eine Szene über grandiosen Narzissmus – wenn du zum Publikum im Leben eines anderen wirst und dein eigenes leiser und leiser wird. Ich-Perspektive, fiktiv."
   },
+  "/szenen/das-augenrollen": {
+    "title": "Das Augenrollen",
+    "description": "Eine Szene über Verachtung – kein lauter Streit, sondern ein steter Nieselregen aus Augenrollen, Seufzern und Spott, der einen kleiner macht. Ich-Perspektive, fiktiv."
+  },
   "/szenen/das-habe-ich-nie-gesagt": {
     "title": "Das habe ich nie gesagt",
     "description": "Eine Szene über Gaslighting – wenn deine Erinnerung Stück für Stück in Frage gestellt wird, bis du an dir selbst zweifelst. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/das-haus-das-nie-kommt": {
+    "title": "Das Haus, das nie kommt",
+    "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/der-vorwurf": {
+    "title": "Der Vorwurf",
+    "description": "Eine Szene über Eifersuchtsvorwürfe – wenn man sich ständig für Dinge rechtfertigt, die man nie getan hat, und beginnt, wie schuldig zu leben. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-eine-nachricht": {
+    "title": "Die eine Nachricht",
+    "description": "Eine Szene über Breadcrumbing – genau so viel Aufmerksamkeit, dass die Hoffnung nicht stirbt, aber nie genug, dass etwas Echtes wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-wand": {
+    "title": "Die Wand",
+    "description": "Eine Szene über Stonewalling – wenn das Gegenüber mitten im Gespräch dichtmacht und eine Wand steht, wo eben noch ein Mensch war. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/drei-tage-schweigen": {
     "title": "Drei Tage Schweigen",
     "description": "Eine Szene über das Schweigen nach dem Streit – wenn Nähe zur Belohnung wird und Stille sich anfühlt wie Strafe. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/du-machst-das-eh-besser": {
+    "title": "Du machst das eh besser",
+    "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/erst-der-rausch-dann-die-kaelte": {
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-muss-fragen": {
+    "title": "Ich muss fragen",
+    "description": "Eine Szene über finanzielle Kontrolle – wenn man für das eigene Geld um Erlaubnis bitten und jede Ausgabe rechtfertigen muss. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/immer-die-andere": {
+    "title": "Immer die andere",
+    "description": "Eine Szene über Triangulierung – ständig mit einem Ex, einer Kollegin, einem Ideal verglichen zu werden, gegen das man nicht gewinnen kann. Ich-Perspektive, fiktiv."
   },
   "/szenen/kaum-bin-ich-nah": {
     "title": "Kaum bin ich nah, wirst du kalt",
     "description": "Eine Szene über Nähe-Distanz und Push-Pull – sobald einer bleibt, zieht der andere sich zurück. Ein Tanz, den keiner gewinnt. Ich-Perspektive, fiktiv."
   },
+  "/szenen/kaum-bin-ich-raus-bist-du-zurueck": {
+    "title": "Kaum bin ich raus, bist du zurück",
+    "description": "Eine Szene über Hoovering – kaum hast du Abstand gewonnen, taucht die andere Person von ihrer schönsten Seite wieder auf und zieht dich zurück. Ich-Perspektive, fiktiv."
+  },
   "/szenen/mach-doch-was-du-willst": {
     "title": "Mach doch, was du willst",
     "description": "Eine Szene über passiv-aggressives Verhalten – wenn ‚ist schon okay' das Gegenteil bedeutet und du die Stimmung errätst statt sie zu erfahren. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/nach-dem-anruf-bei-mama": {
+    "title": "Nach dem Anruf bei Mama",
+    "description": "Eine Szene über einen narzisstischen Elternteil – wenn jedes Gespräch bei ihrem Leid endet und man kleiner auflegt, als man angerufen hat. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/warum-ich-bleibe": {
+    "title": "Warum ich bleibe",
+    "description": "Eine Szene über Trauma-Bindung – wenn der Wechsel aus Verletzung und großer Versöhnung eine Nähe schafft, aus der man kaum herausfindet. Ich-Perspektive, fiktiv."
   },
   "/szenen/wo-bist-du-gerade": {
     "title": "Wo bist du gerade?",
