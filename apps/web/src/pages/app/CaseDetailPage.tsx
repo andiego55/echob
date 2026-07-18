@@ -324,6 +324,18 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
     },
   })
 
+  const removeMutation = useMutation({
+    mutationFn: (topic: string) => topicSummariesApi.remove(caseId, topic),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['topic-summaries', caseId] }),
+  })
+
+  const confirmRemove = (topic: string, label: string) => {
+    if (window.confirm(
+      `Dialog „${label}" wirklich löschen?\n\nDie gespeicherte Zusammenfassung und der Gesprächsverlauf werden entfernt ` +
+      `und fließen nicht mehr in Echos Fallkontext ein. Das lässt sich nicht rückgängig machen.`,
+    )) removeMutation.mutate(topic)
+  }
+
   const summaryMap = Object.fromEntries(summaries.map(s => [s.topic, s]))
   const coreSummaries = summaries.filter((s) => !s.topic.startsWith('content_'))
   const contentSummaries = summaries.filter((s) => s.topic.startsWith('content_'))
@@ -358,12 +370,21 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
                 <p className="text-xs font-semibold text-navy">{TOPIC_LABELS[topic]}</p>
                 <div className="flex gap-2">
                   {saved && !isEditing && (
-                    <button
-                      onClick={() => { setEditingTopic(topic); setEditValue(saved.summary_text) }}
-                      className="text-xs text-brand-muted hover:text-navy transition-colors"
-                    >
-                      Bearbeiten
-                    </button>
+                    <>
+                      <button
+                        onClick={() => { setEditingTopic(topic); setEditValue(saved.summary_text) }}
+                        className="text-xs text-brand-muted hover:text-navy transition-colors"
+                      >
+                        Bearbeiten
+                      </button>
+                      <button
+                        onClick={() => confirmRemove(topic, TOPIC_LABELS[topic])}
+                        disabled={removeMutation.isPending}
+                        className="text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
+                      >
+                        Löschen
+                      </button>
+                    </>
                   )}
                   <button
                     onClick={() => navigate(`/app/cases/${caseId}/topics/${topic}`)}
@@ -441,12 +462,21 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
                         </svg>
                         <span className="text-xs font-semibold text-navy truncate">{meta?.title ?? slug}</span>
                       </button>
-                      <button
-                        onClick={() => navigate(`/app/cases/${caseId}/topics/${s.topic}`)}
-                        className="text-xs text-accent hover:underline flex-shrink-0"
-                      >
-                        Dialog erneut führen →
-                      </button>
+                      <div className="flex flex-shrink-0 gap-2.5">
+                        <button
+                          onClick={() => confirmRemove(s.topic, meta?.title ?? slug)}
+                          disabled={removeMutation.isPending}
+                          className="text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
+                        >
+                          Löschen
+                        </button>
+                        <button
+                          onClick={() => navigate(`/app/cases/${caseId}/topics/${s.topic}`)}
+                          className="text-xs text-accent hover:underline"
+                        >
+                          Dialog erneut führen →
+                        </button>
+                      </div>
                     </div>
                     {isOpen && (
                       <div className="mt-2 text-sm text-brand-muted leading-relaxed">

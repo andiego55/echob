@@ -78,6 +78,32 @@ async def upsert_summary(
     return _to_response(row)
 
 
+@router.delete("/{topic}")
+async def delete_summary(
+    case_id: UUID,
+    topic: str,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Löscht einen gespeicherten Themen-/Wissens-Dialog vollständig: die Zusammenfassung
+    und den zugehörigen Gesprächsverlauf. Der Echo-Fallkontext (build_topic_context liest
+    topic_summaries live) passt sich dadurch automatisch an."""
+    if topic not in TOPIC_LABELS and not topic.startswith("content_"):
+        raise HTTPException(status_code=400, detail="Ungültiges Thema.")
+    async with pool.acquire() as conn:
+        await _assert_owner(case_id, current_user["user_id"], conn)
+        async with conn.transaction():
+            await conn.execute(
+                "DELETE FROM topic_summaries WHERE case_id = $1 AND topic = $2",
+                case_id, topic,
+            )
+            await conn.execute(
+                "DELETE FROM echo_messages WHERE case_id = $1 AND user_id = $2 AND thread_type = $3",
+                case_id, current_user["user_id"], topic,
+            )
+    return {"deleted": True, "topic": topic}
+
+
 async def _assert_owner(case_id, user_id, conn):
     row = await conn.fetchrow(
         "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
