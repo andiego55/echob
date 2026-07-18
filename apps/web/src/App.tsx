@@ -19,6 +19,8 @@ import AusbildungPage       from '@/pages/AusbildungPage'
 import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
 import GlossarPage                   from '@/pages/GlossarPage'
+import SzenenPage                    from '@/pages/content/SzenenPage'
+import SzeneDetailPage               from '@/pages/content/SzeneDetailPage'
 import ReflectPage                   from '@/pages/content/ReflectPage'
 
 // ── App-Bereich ───────────────────────────────────────────────────────────────
@@ -177,6 +179,8 @@ export function AppRoutes() {
       <Route path="/hilfe/:slug"                     element={<ContentPage />} />
       <Route path="/glossar"                         element={<GlossarPage />} />
       <Route path="/glossar/:slug"                   element={<ContentPage />} />
+      <Route path="/szenen"                          element={<SzenenPage />} />
+      <Route path="/szenen/:slug"                    element={<SzeneDetailPage />} />
       <Route path="/ratgeber/:slug"                  element={<ContentPage />} />
       <Route path="/fallbeispiele/:slug"             element={<ContentPage />} />
       <Route path="/therapie-vorbereitung/:slug"     element={<ContentPage />} />

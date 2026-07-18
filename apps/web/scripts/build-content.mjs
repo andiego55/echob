@@ -13,13 +13,14 @@ const webRoot = path.resolve(here, '..')
 const contentDir = path.join(webRoot, 'content')
 const outFile = path.join(webRoot, 'src', 'content', 'manifest.generated.ts')
 
-const CONTENT_TYPES = ['topic', 'problem', 'glossary', 'guide', 'case-example', 'comparison', 'therapy-prep']
+const CONTENT_TYPES = ['topic', 'problem', 'glossary', 'guide', 'case-example', 'comparison', 'therapy-prep', 'scene']
 const CLUSTERS = ['dynamiken', 'bindung', 'trennung', 'selbstreflexion', 'therapie']
 const ECHO_MODES = ['base', 'stabilize', 'clarity', 'radical', 'analysis']
 const CTA_POSITIONS = ['after-intro', 'after-reflection', 'end']
 const URL_PREFIX = {
   topic: '/wissen', problem: '/hilfe', glossary: '/glossar', guide: '/ratgeber',
   'case-example': '/fallbeispiele', comparison: '/wissen', 'therapy-prep': '/therapie-vorbereitung',
+  scene: '/szenen',
 }
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/

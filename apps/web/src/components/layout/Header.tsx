@@ -55,7 +55,10 @@ const LINK_CLS = (active: boolean) =>
 export default function Header() {
   const { session, signOut } = useAuth()
   const location = useLocation()
-  const wissenActive = location.pathname.startsWith('/wissen') || location.pathname.startsWith('/glossar')
+  const wissenActive =
+    location.pathname.startsWith('/wissen') ||
+    location.pathname.startsWith('/glossar') ||
+    location.pathname.startsWith('/szenen')
   const ueberActive = location.pathname.startsWith('/ueber')
 
   return (
@@ -122,11 +125,17 @@ export default function Header() {
                   ))}
                 </div>
 
-                {/* Glossar */}
-                <Link to="/glossar" className="block border-t border-brand-border bg-brand-bg px-5 py-3 no-underline transition-colors hover:bg-white">
-                  <p className="text-[0.82rem] font-semibold text-navy">Glossar <span className="text-accent">→</span></p>
-                  <p className="text-[0.76rem] text-brand-muted leading-snug">Begriffe von A–Z</p>
-                </Link>
+                {/* Glossar + Szenen */}
+                <div className="grid grid-cols-2 border-t border-brand-border">
+                  <Link to="/glossar" className="block bg-brand-bg px-5 py-3 no-underline transition-colors hover:bg-white">
+                    <p className="text-[0.82rem] font-semibold text-navy">Glossar <span className="text-accent">→</span></p>
+                    <p className="text-[0.76rem] text-brand-muted leading-snug">Begriffe von A–Z</p>
+                  </Link>
+                  <Link to="/szenen" className="block border-l border-brand-border bg-brand-bg px-5 py-3 no-underline transition-colors hover:bg-white">
+                    <p className="text-[0.82rem] font-semibold text-navy">Szenen <span className="text-accent">→</span></p>
+                    <p className="text-[0.76rem] text-brand-muted leading-snug">Erkenne dich wieder</p>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

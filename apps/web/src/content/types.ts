@@ -14,6 +14,7 @@ export const CONTENT_TYPES = [
   'case-example', // Fallbeispiel
   'comparison', // Vergleich/Einordnung
   'therapy-prep', // Therapie-/Coachingvorbereitung
+  'scene', // Beziehungsszene (Ich-Perspektive, fiktiv) – eigene Seite /szenen
 ] as const
 export type ContentType = (typeof CONTENT_TYPES)[number]
 
@@ -81,6 +82,10 @@ export interface ContentFrontmatter {
   scene_tags?: string[]
   safety_tags?: string[]
   links?: ContentLinks
+  /** Nur bei type=scene: Erzähl-Perspektive („Aus Lenas Sicht"). */
+  perspective?: string
+  /** Nur bei type=scene: kuratiertes Zitat für die Übersichtskarte. */
+  pull_quote?: string
 }
 
 /** Generierte, cross-page verfügbare Metadaten je Seite (ohne Markdown-Body). */
@@ -97,6 +102,7 @@ export const URL_PREFIX: Record<ContentType, string> = {
   'case-example': '/fallbeispiele',
   comparison: '/wissen',
   'therapy-prep': '/therapie-vorbereitung',
+  scene: '/szenen',
 }
 
 /** Öffentliche URL einer Content-Seite. */
@@ -122,4 +128,5 @@ export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   'case-example': 'Fallbeispiel',
   comparison: 'Vergleich',
   'therapy-prep': 'Therapie-Vorbereitung',
+  scene: 'Szene',
 }

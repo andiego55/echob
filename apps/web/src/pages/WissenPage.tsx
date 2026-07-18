@@ -26,7 +26,8 @@ const MANIFEST_ITEMS: OverviewItem[] = CONTENT_MANIFEST.map((m) => ({
   description: m.description,
 }))
 
-const ALL_ITEMS = MANIFEST_ITEMS
+// Szenen haben ihre eigene Seite (/szenen) – hier nicht im Artikel-Index listen.
+const ALL_ITEMS = MANIFEST_ITEMS.filter((i) => i.type !== 'scene')
 
 // Self-contained helle Typ-Badges (dunkler Text auf hellem Pill – auf jeder Karte lesbar).
 const TYPE_BADGE: Record<ContentType, { bg: string; fg: string }> = {
@@ -37,6 +38,7 @@ const TYPE_BADGE: Record<ContentType, { bg: string; fg: string }> = {
   guide:          { bg: '#E1F5EE', fg: '#085041' },
   'case-example': { bg: '#FBEAF0', fg: '#72243E' },
   'therapy-prep': { bg: '#EAF3DE', fg: '#27500A' },
+  scene:          { bg: '#FBEFE9', fg: '#7A3B1E' },
 }
 
 // „Nach Format"-Filter – Plural-Labels, nur Typen, die tatsächlich vorkommen.
@@ -48,6 +50,7 @@ const FORMAT_LABEL: Record<ContentType, string> = {
   guide: 'Ratgeber',
   'case-example': 'Fallbeispiele',
   'therapy-prep': 'Vorbereitung',
+  scene: 'Szenen',
 }
 const PRESENT_TYPES = Array.from(new Set(ALL_ITEMS.map((i) => i.type)))
 const FORMAT_ORDER: ContentType[] = ['topic', 'glossary', 'comparison', 'case-example', 'guide', 'problem', 'therapy-prep']
@@ -76,6 +79,29 @@ export default function WissenPage() {
             Nach Thema geordnet, mit direktem Link zu jeder Seite – Themen, Begriffe, Vergleiche und mehr.
             Jede Seite lässt sich unmittelbar auf deine eigene Situation beziehen.
           </p>
+        </div>
+      </section>
+
+      {/* Einladung zu den Beziehungsszenen */}
+      <section className="border-t border-brand-border px-6 pt-10">
+        <div className="mx-auto max-w-[960px]">
+          <Link
+            to="/szenen"
+            className="group relative flex flex-col gap-4 overflow-hidden rounded-brand-lg border border-accent/25 bg-accent/[0.05] px-7 py-7 no-underline transition-colors hover:border-accent/50 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span aria-hidden="true" className="pointer-events-none absolute -right-2 top-0 font-serif text-[6rem] leading-none text-accent/10 transition-colors group-hover:text-accent/20">
+              „
+            </span>
+            <div className="relative max-w-[620px]">
+              <span className="text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent">Neu · Beziehungsszenen</span>
+              <h2 className="mt-1.5 text-[1.3rem] font-bold text-navy">„Das kenne ich" – Szenen, in denen du dich wiedererkennst</h2>
+              <p className="mt-2 text-[0.95rem] leading-relaxed text-brand-muted">
+                Kurze, gefühlvolle Momente aus schwierigen Beziehungen – aus der Ich-Perspektive, fiktiv.
+                Nach Themen filtern und direkt mit Echo darüber sprechen.
+              </p>
+            </div>
+            <span className="relative shrink-0 text-sm font-semibold text-accent">Zu den Szenen →</span>
+          </Link>
         </div>
       </section>
 

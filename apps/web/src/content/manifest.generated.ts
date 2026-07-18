@@ -300,6 +300,310 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/hilfe/staendige-eifersucht"
   },
   {
+    "type": "scene",
+    "slug": "allein-zu-zweit",
+    "title": "Allein zu zweit",
+    "description": "Eine Szene über emotionale Vernachlässigung – dieselbe Wohnung, dasselbe Sofa, und trotzdem eine Einsamkeit, die man niemandem erklären kann. Ich-Perspektive, fiktiv.",
+    "cluster": "bindung",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Hannahs Sicht",
+    "pull_quote": "Wir sitzen auf demselben Sofa, keine Handbreit zwischen uns. Und ich vermisse dich, als wärst du verreist.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diese Einsamkeit, die es nur zu zweit gibt? Was macht diese Szene mit dir?"
+    },
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "einsamkeit-zu-zweit",
+      "rueckzug"
+    ],
+    "url": "/szenen/allein-zu-zweit"
+  },
+  {
+    "type": "scene",
+    "slug": "am-ende-entschuldige-ich-mich",
+    "title": "Am Ende entschuldige ich mich",
+    "description": "Eine Szene über Schuldumkehr – du bringst ein Anliegen vor und verlässt das Gespräch als die, die sich entschuldigt. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Neles Sicht",
+    "pull_quote": "Ich kam, um zu sagen, dass mich etwas verletzt hat. Ich gehe und sage: Entschuldige, dass ich das Thema überhaupt angesprochen habe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Passiert es dir auch, dass du dich am Ende entschuldigst, obwohl du verletzt wurdest? Was geht dir bei dieser Szene durch den Kopf?"
+    },
+    "scene_tags": [
+      "schuldumkehr",
+      "gaslighting",
+      "schuldgefuehle",
+      "erschoepfung",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/am-ende-entschuldige-ich-mich"
+  },
+  {
+    "type": "scene",
+    "slug": "am-ende-troeste-ich-ihn",
+    "title": "Am Ende tröste ich ihn",
+    "description": "Eine Szene über verdeckten Narzissmus: Du kommst mit deinem Schmerz – und gehst mit seinem. Wie aus deinem Anliegen sein Leid wird. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sarahs Sicht",
+    "pull_quote": "Ich wollte über meinen Schmerz reden. Zehn Minuten später halte ich seinen und habe meinen vergessen.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es das bei dir – dass am Ende eines Gesprächs deine Not verschwunden ist und die des anderen im Raum steht? Woran erinnert dich das?"
+    },
+    "scene_tags": [
+      "verdeckter-narzissmus",
+      "schuldumkehr",
+      "selbstzweifel",
+      "schuldgefuehle",
+      "erschoepfung"
+    ],
+    "url": "/szenen/am-ende-troeste-ich-ihn"
+  },
+  {
+    "type": "scene",
+    "slug": "auf-ihrer-buehne",
+    "title": "Auf ihrer Bühne",
+    "description": "Eine Szene über grandiosen Narzissmus – wenn du zum Publikum im Leben eines anderen wirst und dein eigenes leiser und leiser wird. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Pauls Sicht",
+    "pull_quote": "Beim Essen erzählt sie von ihrem Tag, ihren Erfolgen, ihren Feinden. Ich bin das Publikum, das an den richtigen Stellen klatscht.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, im Leben eines anderen nur Nebenrolle zu sein? Was berührt dich an dieser Szene?"
+    },
+    "scene_tags": [
+      "grandioser-narzissmus",
+      "entwertung",
+      "sich-klein-fuehlen",
+      "einsamkeit-zu-zweit"
+    ],
+    "url": "/szenen/auf-ihrer-buehne"
+  },
+  {
+    "type": "scene",
+    "slug": "das-habe-ich-nie-gesagt",
+    "title": "Das habe ich nie gesagt",
+    "description": "Eine Szene über Gaslighting – wenn deine Erinnerung Stück für Stück in Frage gestellt wird, bis du an dir selbst zweifelst. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Lenas Sicht",
+    "pull_quote": "Vielleicht erinnere ich mich wirklich falsch. Vielleicht bin ich zu empfindlich. Vielleicht. Vielleicht. Vielleicht.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Hast du das schon erlebt – dass du dir bei deiner eigenen Erinnerung plötzlich nicht mehr sicher warst? Was löst diese Szene in dir aus?"
+    },
+    "scene_tags": [
+      "gaslighting",
+      "realitaetsverdrehung",
+      "selbstzweifel",
+      "sich-klein-fuehlen",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/das-habe-ich-nie-gesagt"
+  },
+  {
+    "type": "scene",
+    "slug": "drei-tage-schweigen",
+    "title": "Drei Tage Schweigen",
+    "description": "Eine Szene über das Schweigen nach dem Streit – wenn Nähe zur Belohnung wird und Stille sich anfühlt wie Strafe. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Miras Sicht",
+    "pull_quote": "Er sagt nichts. Und dieses Nichts füllt die ganze Wohnung, bis kein Platz mehr für mich ist.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass jemand durch Schweigen mehr sagt als durch Worte? Wann hast du dich zuletzt so gefühlt?"
+    },
+    "scene_tags": [
+      "silent-treatment",
+      "schweigen-als-strafe",
+      "passiv-aggressiv",
+      "rueckzug",
+      "auf-eierschalen-gehen",
+      "naehe-distanz"
+    ],
+    "url": "/szenen/drei-tage-schweigen"
+  },
+  {
+    "type": "scene",
+    "slug": "erst-der-rausch-dann-die-kaelte",
+    "title": "Erst der Rausch, dann die Kälte",
+    "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Alinas Sicht",
+    "pull_quote": "Vor zwei Wochen war ich seine ganze Welt. Heute bin ich Luft. Und ich frage mich, was ich falsch gemacht habe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du dieses Wechselbad – erst überschüttet, dann fallen gelassen? Woran erinnert dich diese Szene?"
+    },
+    "scene_tags": [
+      "love-bombing",
+      "idealisierung-abwertung",
+      "entwertung",
+      "push-pull",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/erst-der-rausch-dann-die-kaelte"
+  },
+  {
+    "type": "scene",
+    "slug": "kaum-bin-ich-nah",
+    "title": "Kaum bin ich nah, wirst du kalt",
+    "description": "Eine Szene über Nähe-Distanz und Push-Pull – sobald einer bleibt, zieht der andere sich zurück. Ein Tanz, den keiner gewinnt. Ich-Perspektive, fiktiv.",
+    "cluster": "bindung",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jans Sicht",
+    "pull_quote": "Sobald ich bleibe, gehst du. Sobald ich gehe, willst du, dass ich bleibe. Ich weiß nie, wo ich stehe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kommt dir dieser Tanz aus Annähern und Zurückziehen bekannt vor? In welcher Rolle findest du dich – oder in beiden?"
+    },
+    "scene_tags": [
+      "naehe-distanz",
+      "push-pull",
+      "bindungsangst",
+      "rueckzug"
+    ],
+    "url": "/szenen/kaum-bin-ich-nah"
+  },
+  {
+    "type": "scene",
+    "slug": "mach-doch-was-du-willst",
+    "title": "Mach doch, was du willst",
+    "description": "Eine Szene über passiv-aggressives Verhalten – wenn ‚ist schon okay' das Gegenteil bedeutet und du die Stimmung errätst statt sie zu erfahren. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Katjas Sicht",
+    "pull_quote": "‚Ist schon okay', sagst du. Und ich weiß: Nichts ist okay. Jetzt beginnt das Raten.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – dass die Worte ‚alles gut' sagen und alles andere das Gegenteil? Wie geht es dir, wenn du diese Szene liest?"
+    },
+    "scene_tags": [
+      "passiv-aggressiv",
+      "silent-treatment",
+      "auf-eierschalen-gehen",
+      "schuldgefuehle"
+    ],
+    "url": "/szenen/mach-doch-was-du-willst"
+  },
+  {
+    "type": "scene",
+    "slug": "wo-bist-du-gerade",
+    "title": "Wo bist du gerade?",
+    "description": "Eine Szene über Kontrolle und Eifersucht – wenn Fürsorge zur Überwachung wird und dein Radius Woche für Woche kleiner. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Elifs Sicht",
+    "pull_quote": "Mein Handy leuchtet auf. Schon wieder. ‚Wo bist du?' Ich bin bei der Arbeit. Wie gestern. Wie immer.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, wenn Fürsorge sich langsam wie Kontrolle anfühlt? Woran erinnert dich diese Szene?"
+    },
+    "scene_tags": [
+      "kontrolle",
+      "eifersucht",
+      "misstrauen",
+      "isolation",
+      "auf-eierschalen-gehen"
+    ],
+    "url": "/szenen/wo-bist-du-gerade"
+  },
+  {
+    "type": "scene",
+    "slug": "zwischen-himmel-und-abgrund",
+    "title": "Zwischen Himmel und Abgrund",
+    "description": "Eine Szene über intensive Beziehungsdynamik – Idealisierung, Angst vorm Verlassenwerden und plötzliche Kälte, an einem einzigen Tag. Ich-Perspektive, fiktiv, keine Diagnose.",
+    "cluster": "bindung",
+    "updated": "2026-07-18",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tims Sicht",
+    "pull_quote": "Morgens bin ich der beste Mensch, den sie je getroffen hat. Abends der, der sie verlassen wird. Dazwischen liegt kein Grund, nur ein Riss.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diese Achterbahn aus großer Nähe und plötzlicher Angst? Was von dieser Szene fühlt sich vertraut an?"
+    },
+    "scene_tags": [
+      "borderline",
+      "idealisierung-abwertung",
+      "verlustangst",
+      "push-pull",
+      "naehe-distanz"
+    ],
+    "url": "/szenen/zwischen-himmel-und-abgrund"
+  },
+  {
     "type": "topic",
     "slug": "beobachtung-gefuehl",
     "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",
@@ -968,6 +1272,50 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/hilfe/staendige-eifersucht": {
     "title": "Ständige Eifersucht – wenn Misstrauen euch beide erschöpft",
     "description": "Wenn Eifersucht dein Denken bestimmt und die Beziehung zermürbt: was dahinter stecken kann und was im Moment des Misstrauens konkret hilft."
+  },
+  "/szenen/allein-zu-zweit": {
+    "title": "Allein zu zweit",
+    "description": "Eine Szene über emotionale Vernachlässigung – dieselbe Wohnung, dasselbe Sofa, und trotzdem eine Einsamkeit, die man niemandem erklären kann. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/am-ende-entschuldige-ich-mich": {
+    "title": "Am Ende entschuldige ich mich",
+    "description": "Eine Szene über Schuldumkehr – du bringst ein Anliegen vor und verlässt das Gespräch als die, die sich entschuldigt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/am-ende-troeste-ich-ihn": {
+    "title": "Am Ende tröste ich ihn",
+    "description": "Eine Szene über verdeckten Narzissmus: Du kommst mit deinem Schmerz – und gehst mit seinem. Wie aus deinem Anliegen sein Leid wird. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/auf-ihrer-buehne": {
+    "title": "Auf ihrer Bühne",
+    "description": "Eine Szene über grandiosen Narzissmus – wenn du zum Publikum im Leben eines anderen wirst und dein eigenes leiser und leiser wird. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/das-habe-ich-nie-gesagt": {
+    "title": "Das habe ich nie gesagt",
+    "description": "Eine Szene über Gaslighting – wenn deine Erinnerung Stück für Stück in Frage gestellt wird, bis du an dir selbst zweifelst. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/drei-tage-schweigen": {
+    "title": "Drei Tage Schweigen",
+    "description": "Eine Szene über das Schweigen nach dem Streit – wenn Nähe zur Belohnung wird und Stille sich anfühlt wie Strafe. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/erst-der-rausch-dann-die-kaelte": {
+    "title": "Erst der Rausch, dann die Kälte",
+    "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/kaum-bin-ich-nah": {
+    "title": "Kaum bin ich nah, wirst du kalt",
+    "description": "Eine Szene über Nähe-Distanz und Push-Pull – sobald einer bleibt, zieht der andere sich zurück. Ein Tanz, den keiner gewinnt. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/mach-doch-was-du-willst": {
+    "title": "Mach doch, was du willst",
+    "description": "Eine Szene über passiv-aggressives Verhalten – wenn ‚ist schon okay' das Gegenteil bedeutet und du die Stimmung errätst statt sie zu erfahren. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/wo-bist-du-gerade": {
+    "title": "Wo bist du gerade?",
+    "description": "Eine Szene über Kontrolle und Eifersucht – wenn Fürsorge zur Überwachung wird und dein Radius Woche für Woche kleiner. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/zwischen-himmel-und-abgrund": {
+    "title": "Zwischen Himmel und Abgrund",
+    "description": "Eine Szene über intensive Beziehungsdynamik – Idealisierung, Angst vorm Verlassenwerden und plötzliche Kälte, an einem einzigen Tag. Ich-Perspektive, fiktiv, keine Diagnose."
   },
   "/wissen/beobachtung-gefuehl": {
     "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",

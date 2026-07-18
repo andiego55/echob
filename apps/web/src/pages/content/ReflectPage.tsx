@@ -31,8 +31,17 @@ export default function ReflectPage() {
         {meta && (
           <>
             <p className="mt-2 text-sm text-brand-muted">
-              Du hast über <strong className="text-navy">{meta.title}</strong> gelesen. Wähle einen Fall,
-              um genau das mit Echo auf deine Situation zu beziehen.
+              {meta.type === 'scene' ? (
+                <>
+                  Du hast die Szene <strong className="text-navy">„{meta.title}"</strong> gelesen. Wähle einen Fall,
+                  um mit Echo darüber zu sprechen – über das, was sie in dir auslöst.
+                </>
+              ) : (
+                <>
+                  Du hast über <strong className="text-navy">{meta.title}</strong> gelesen. Wähle einen Fall,
+                  um genau das mit Echo auf deine Situation zu beziehen.
+                </>
+              )}
             </p>
             <div className="mt-4 rounded-brand border border-accent/25 bg-accent/[0.04] px-4 py-3">
               <p className="text-sm leading-relaxed text-brand-text">{meta.echo.opening_question}</p>

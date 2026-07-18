@@ -80,4 +80,23 @@
   }
   .prose-article strong { @apply font-bold text-navy; }
   .prose-article em { @apply italic; }
+
+  /* ── Szenen-Typografie (literarisch, seriös-erzählend) ────────── */
+  .prose-scene {
+    @apply font-serif text-[1.15rem] leading-[1.9] text-brand-text;
+  }
+  .prose-scene p { @apply mb-6; }
+  .prose-scene p:last-child { @apply mb-0; }
+  .prose-scene em { @apply italic text-navy; }
+  .prose-scene strong { @apply font-semibold text-navy; }
+  .prose-scene blockquote {
+    @apply my-8 border-l-2 border-accent/50 pl-5 not-italic text-brand-muted;
+  }
+  /* Initial (Drop-Cap) für den ersten Absatz – ruhiger literarischer Akzent */
+  .prose-scene > p:first-of-type::first-letter {
+    @apply float-left mr-2 font-serif font-bold text-accent;
+    font-size: 3.4rem;
+    line-height: 0.82;
+    padding-top: 0.28rem;
+  }
 }

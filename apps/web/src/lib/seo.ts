@@ -59,6 +59,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Wichtige Begriffe rund um Beziehungen, Dynamiken und Psychologie – kurz und klar erklärt, ohne Diagnose.',
   },
+  '/szenen': {
+    title: 'Beziehungsszenen: Momente, in denen du dich wiedererkennst – EchoB',
+    description:
+      'Kurze, gefühlvolle Szenen aus schwierigen Beziehungen – aus der Ich-Perspektive, fiktiv. Nach Themen wie Narzissmus, Gaslighting oder Nähe-Distanz filtern und mit Echo auf die eigene Situation beziehen.',
+  },
 
   '/impressum': {
     title: 'Impressum – EchoB',
