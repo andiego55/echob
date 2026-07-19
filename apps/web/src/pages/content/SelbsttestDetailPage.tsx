@@ -432,6 +432,7 @@ const FLAG_LABELS: Record<string, string> = {
   'kindesentzug-ohne-reparatur': 'Kindesentzug-Drohung – ohne aufrichtige Klärung danach',
   'trennungsdrohung-ohne-reparatur': 'Trennungsdrohung als Druckmittel – ohne Klärung danach',
   'trennungsdrohung-haeufig': 'wiederholte Trennungsdrohungen',
+  'coercive-control': 'systematische Isolation oder Kontrolle (Coercive Control)',
 }
 
 function SafetyBox({ variant, flags }: { variant: 'victim' | 'self'; flags: string[] }) {

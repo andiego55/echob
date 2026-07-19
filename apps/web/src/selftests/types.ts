@@ -100,6 +100,7 @@ export const CRITICAL_FLAGS = [
   'kindesentzug',
   'kindesentzug-ohne-reparatur',
   'trennungsdrohung-ohne-reparatur',
+  'coercive-control',
 ] as const
 
 /** Antwort je Frage: scale/single → number; multi → number[]; text → string. */

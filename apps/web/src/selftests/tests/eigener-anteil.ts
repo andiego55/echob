@@ -15,7 +15,7 @@ export const eigenerAnteil: SelfTest = {
   teaser: 'Ein mutiger, ehrlicher Selbstcheck über dein eigenes Konfliktverhalten – Druck, emotionale Dominanz, Kälte, Gaslighting – und wie sehr du reparierst.',
   description:
     'Dieser selbstgerichtete Test hilft dir, ehrlich hinzuschauen: Setze ich in meiner Partnerschaft selbst manipulative oder kontrollierende Muster ein – von Trennungsdrohung über emotionale Dominanz bis Gaslighting? Und wie sehr bemühe ich mich um echte Reparatur? Ohne Diagnose, ohne Beschämung. Das Ergebnis kannst du mit Echo besprechen.',
-  duration: '8–11 Min',
+  duration: '10–14 Min',
   resultMode: 'dimensional',
   polarity: 'concern',
   safety: true,
@@ -29,8 +29,8 @@ export const eigenerAnteil: SelfTest = {
   dimensions: [
     {
       key: 'drohungen',
-      name: 'Drohungen & Druckmittel',
-      description: 'Trennungs-/Extremdrohungen, Erpressung, Einschüchterung.',
+      name: 'Drohungen, Druck & Gewalt',
+      description: 'Trennungs-/Extremdrohungen, Erpressung, Einschüchterung, körperliche Gewalt.',
       bands: [
         { min: 0, label: 'Kaum Druckmittel', tone: 'good', text: 'Du setzt in Konflikten kaum auf Drohungen oder Druck. Das ist eine gute Basis für fairen Streit.' },
         { min: 30, label: 'Vereinzelt Druck', tone: 'watch', text: 'Manchmal greifst du zu Drohungen oder Druck, um dich durchzusetzen. Achte darauf, was das bei deinem Gegenüber an Angst auslöst.' },
@@ -48,6 +48,16 @@ export const eigenerAnteil: SelfTest = {
       ],
     },
     {
+      key: 'einengung',
+      name: 'Kontrolle & Einengung',
+      description: 'Kontakte, Geld, Handy, Bewegungsfreiheit deines Gegenübers.',
+      bands: [
+        { min: 0, label: 'Freiraum', tone: 'good', text: 'Du lässt deinem Gegenüber seinen eigenen Freiraum, seine Kontakte und Mittel. Das ist gesund.' },
+        { min: 30, label: 'Teils einengend', tone: 'watch', text: 'Manchmal kontrollierst du Kontakte, Geld oder Wege deines Gegenübers. Achte darauf, ob daraus Abhängigkeit oder Angst entsteht.' },
+        { min: 55, label: 'Stark einengend', tone: 'alert', text: 'Du schränkst Kontakte, Ressourcen oder Bewegungsfreiheit deines Gegenübers deutlich ein. Solche Kontrolle (Coercive Control) macht abhängig und gilt als ernste Form von Gewalt – auch ohne Schläge.' },
+      ],
+    },
+    {
       key: 'passiv_aggressiv',
       name: 'Kälte & indirekter Ärger',
       description: 'Strafen mit Rückzug, kaltem Ton, weggelassener Wärme.',
@@ -59,8 +69,8 @@ export const eigenerAnteil: SelfTest = {
     },
     {
       key: 'gaslighting',
-      name: 'Wahrnehmung infrage stellen',
-      description: 'Realität verdrehen, abwerten, Schuld umkehren.',
+      name: 'Abwertung & Gaslighting',
+      description: 'Realität verdrehen, abwerten, beleidigen, vergleichen, Schuld umkehren.',
       bands: [
         { min: 0, label: 'Anerkennend', tone: 'good', text: 'Du stellst die Wahrnehmung deines Gegenübers kaum infrage. Das schützt sein/ihr Vertrauen in sich selbst.' },
         { min: 30, label: 'Teils abwertend', tone: 'watch', text: 'Manchmal drehst du Wahrnehmung um oder wertest ab (auch als „Witz"). Das kann Selbstzweifel säen.' },
@@ -126,6 +136,13 @@ export const eigenerAnteil: SelfTest = {
         { label: 'Ja, wiederholt', value: 4, flag: 'gewalt' },
       ],
     },
+    { id: 'ea27', type: 'scale', section: 'Drohungen & Druck', dimension: 'drohungen', scale: freq, flag: 'gewalt', flagMin: 1, text: 'Ich habe im Streit Dinge geworfen, gegen Wände oder Türen geschlagen oder Gegenstände zerstört.' },
+    { id: 'ea28', type: 'scale', section: 'Drohungen & Druck', dimension: 'drohungen', scale: freq, flag: 'gewalt', flagMin: 1, text: 'Ich habe meinen Partner festgehalten, ihm den Weg versperrt oder ihn körperlich eingeschüchtert (z. B. bedrohlich nah, aufgebaut).' },
+    // Kontrolle & Einengung
+    { id: 'ea29', type: 'scale', section: 'Kontrolle & Einengung', dimension: 'einengung', scale: freq, flag: 'coercive-control', flagMin: 3, text: 'Ich rede meinem Partner Kontakte zu Freund:innen oder Familie aus – oder unterbinde sie.' },
+    { id: 'ea30', type: 'scale', section: 'Kontrolle & Einengung', dimension: 'einengung', scale: freq, text: 'Ich kontrolliere, wo mein Partner ist und mit wem – oder verlange Nachrichten, Fotos oder Standort zur Kontrolle.' },
+    { id: 'ea31', type: 'scale', section: 'Kontrolle & Einengung', dimension: 'einengung', scale: freq, flag: 'coercive-control', flagMin: 3, text: 'Ich kontrolliere das Geld, das Handy oder die Bewegungsfreiheit meines Partners.' },
+    { id: 'ea32', type: 'scale', section: 'Kontrolle & Einengung', dimension: 'einengung', scale: freq, text: 'Ich mache Vorwürfe oder Szenen, wenn mein Partner etwas ohne mich unternimmt.' },
     // Wie ich streite (emotionale Dominanz)
     { id: 'ea7', type: 'scale', section: 'Wie ich streite', dimension: 'dominanz', text: 'In Konflikten bin ich die emotional lautere oder intensivere Person.' },
     { id: 'ea8', type: 'scale', section: 'Wie ich streite', dimension: 'dominanz', text: 'Ich merke, dass mein Gegenüber von meiner Heftigkeit überfordert ist – und nachgibt oder verstummt.' },
@@ -141,10 +158,14 @@ export const eigenerAnteil: SelfTest = {
     { id: 'ea17', type: 'scale', section: 'Kälte & indirekter Ärger', dimension: 'passiv_aggressiv', scale: freq, text: 'Ich strafe mit Schweigen oder Rückzug, bis mein Gegenüber sich entschuldigt.' },
     { id: 'ea18', type: 'scale', section: 'Kälte & indirekter Ärger', dimension: 'passiv_aggressiv', scale: freq, text: 'Ich mache spitze Bemerkungen oder erledige etwas absichtlich schlampig, statt klar zu sagen, was mich stört.' },
     // Wahrnehmung & Schuld (Gaslighting/DARVO)
-    { id: 'ea19', type: 'scale', section: 'Wahrnehmung & Schuld', dimension: 'gaslighting', scale: freq, text: 'Ich habe schon „Dir ist alles egal" (oder Ähnliches) gesagt, um mein Gegenüber zu treffen.' },
-    { id: 'ea20', type: 'scale', section: 'Wahrnehmung & Schuld', dimension: 'gaslighting', scale: freq, text: 'Ich stelle die Wahrnehmung meines Partners infrage („das bildest du dir ein", „das habe ich nie gesagt").' },
-    { id: 'ea21', type: 'scale', section: 'Wahrnehmung & Schuld', dimension: 'gaslighting', scale: freq, text: 'Wenn ich kritisiert werde, drehe ich es um, bis am Ende der/die andere sich entschuldigt.' },
-    { id: 'ea22', type: 'scale', section: 'Wahrnehmung & Schuld', dimension: 'gaslighting', scale: freq, text: 'Ich verpacke Kritik als „Witz" oder „nur ehrlich" und werte damit ab.' },
+    { id: 'ea19', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich habe schon „Dir ist alles egal" (oder Ähnliches) gesagt, um mein Gegenüber zu treffen.' },
+    { id: 'ea20', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich stelle die Wahrnehmung meines Partners infrage („das bildest du dir ein", „das habe ich nie gesagt").' },
+    { id: 'ea21', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Wenn ich kritisiert werde, drehe ich es um, bis am Ende der/die andere sich entschuldigt.' },
+    { id: 'ea22', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich verpacke Kritik als „Witz" oder „nur ehrlich" und werte damit ab.' },
+    { id: 'ea33', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Im Streit gehen Beleidigungen von mir aus (herabsetzende Worte gegen die Person – z. B. „Idiot", „nichts wert", „peinlich").' },
+    { id: 'ea34', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich vergleiche meinen Partner abwertend mit anderen („Ein Freund von mir würde das nie machen", „meine Ex war da ganz anders").' },
+    { id: 'ea35', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich sage Dinge wie „Du verdrehst immer alles" oder „so war das überhaupt nicht", um mein Gegenüber zu verunsichern.' },
+    { id: 'ea36', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich stelle die psychische Verfassung meines Gegenübers infrage („Du bist zu empfindlich", „mit dir stimmt was nicht", „du bist doch krank").' },
     // Reparatur & Verantwortung (reverse: hoch = gute Reparatur = wenig Belastung)
     { id: 'ea23', type: 'scale', section: 'Reparatur & Verantwortung', dimension: 'reparatur', reverse: true, text: 'Nach einem Streit gehe ich von mir aus auf mein Gegenüber zu und suche Versöhnung.' },
     { id: 'ea24', type: 'scale', section: 'Reparatur & Verantwortung', dimension: 'reparatur', reverse: true, text: 'Wenn ich jemanden verletzt habe, entschuldige ich mich aufrichtig – so, dass ich die Verletzung wirklich anerkenne (nicht „Tut mir leid, ABER …").' },
