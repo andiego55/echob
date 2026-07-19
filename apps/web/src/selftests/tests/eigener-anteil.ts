@@ -158,7 +158,7 @@ export const eigenerAnteil: SelfTest = {
     { id: 'ea17', type: 'scale', section: 'Kälte & indirekter Ärger', dimension: 'passiv_aggressiv', scale: freq, text: 'Ich strafe mit Schweigen oder Rückzug, bis mein Gegenüber sich entschuldigt.' },
     { id: 'ea18', type: 'scale', section: 'Kälte & indirekter Ärger', dimension: 'passiv_aggressiv', scale: freq, text: 'Ich mache spitze Bemerkungen oder erledige etwas absichtlich schlampig, statt klar zu sagen, was mich stört.' },
     // Wahrnehmung & Schuld (Gaslighting/DARVO)
-    { id: 'ea19', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich habe schon „Dir ist alles egal" (oder Ähnliches) gesagt, um mein Gegenüber zu treffen.' },
+    { id: 'ea19', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich habe schon Sätze gesagt, die gezielt treffen sollen – z. B. „Dir ist alles egal", „Kein Wunder, dass dich keiner aushält" oder „Du hast mich nie wirklich geliebt".' },
     { id: 'ea20', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich stelle die Wahrnehmung meines Partners infrage („das bildest du dir ein", „das habe ich nie gesagt").' },
     { id: 'ea21', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Wenn ich kritisiert werde, drehe ich es um, bis am Ende der/die andere sich entschuldigt.' },
     { id: 'ea22', type: 'scale', section: 'Abwertung & Wahrnehmung', dimension: 'gaslighting', scale: freq, text: 'Ich verpacke Kritik als „Witz" oder „nur ehrlich" und werte damit ab.' },
