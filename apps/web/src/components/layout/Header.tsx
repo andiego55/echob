@@ -1,5 +1,7 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { CONTENT_MANIFEST } from '@/content/manifest.generated'
+import { SELF_TESTS } from '@/selftests'
 
 const WISSEN_COLS = [
   [
@@ -38,6 +40,50 @@ const WISSEN_COLS = [
       ],
     },
   ],
+]
+
+const SCENE_COUNT = CONTENT_MANIFEST.filter((m) => m.type === 'scene').length
+const TEST_COUNT = SELF_TESTS.length
+
+// Highlight-Elemente im Wissen-Dropdown (mit Icon, Teaser, Live-Zähler).
+const WISSEN_FEATURES = [
+  {
+    to: '/szenen',
+    title: 'Beziehungsszenen',
+    teaser: 'Kurze Geschichten aus schwierigen Beziehungen. Erkenne dich wieder.',
+    badge: `${SCENE_COUNT} Szenen`,
+    cta: 'Entdecken',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+        <path d="M12 6.5C9.8 5.1 6.4 5.1 4 6v12c2.4-.9 5.8-.9 8 .5 2.2-1.4 5.6-1.4 8-.5V6c-2.4-.9-5.8-.9-8 .5Z" />
+        <path d="M12 6.5V19" />
+      </svg>
+    ),
+  },
+  {
+    to: '/selbsttests',
+    title: 'Selbsttests',
+    teaser: 'Wo stehst du gerade? Klare Auswertung, mit Echo besprechbar.',
+    badge: `${TEST_COUNT} Tests`,
+    cta: 'Test starten',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+        <path d="M6 20V12M12 20V6M18 20v-5" />
+      </svg>
+    ),
+  },
+  {
+    to: '/glossar',
+    title: 'Glossar',
+    teaser: 'Die wichtigsten Begriffe – klar erklärt, von A bis Z.',
+    badge: 'A–Z',
+    cta: 'Nachschlagen',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+        <path d="M5 6h14M5 10.5h14M5 15h9M5 19h6" />
+      </svg>
+    ),
+  },
 ]
 
 const NAV_SIMPLE = [
@@ -101,45 +147,55 @@ export default function Header() {
                             opacity-0 pointer-events-none
                             group-hover:opacity-100 group-hover:pointer-events-auto
                             transition-opacity duration-150 z-50">
-              <div className="w-[520px] rounded-brand border border-brand-border bg-white shadow-2xl overflow-hidden">
-                {/* Topic grid */}
-                <div className="grid grid-cols-2 gap-0 p-5">
-                  {WISSEN_COLS.map((col, ci) => (
-                    <div key={ci} className={`flex flex-col gap-5 ${ci === 0 ? 'pr-5 border-r border-brand-border' : 'pl-5'}`}>
-                      {col.map(({ heading, links }) => (
-                        <div key={heading}>
-                          <p className="text-[0.68rem] font-bold uppercase tracking-[0.1em] text-accent mb-2">
-                            {heading}
-                          </p>
-                          {links.map(({ label, to }) => (
-                            <Link
-                              key={to}
-                              to={to}
-                              className="block py-1.5 text-[0.83rem] text-brand-text hover:text-accent no-underline transition-colors leading-tight"
-                            >
-                              {label}
-                            </Link>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
+              <div className="w-[600px] rounded-brand-lg border border-brand-border bg-white shadow-2xl overflow-hidden">
+                {/* Highlights – die interaktiven Elemente prominent anteasern */}
+                <div className="grid grid-cols-3 gap-2.5 bg-gradient-to-b from-brand-bg/70 to-white p-4">
+                  {WISSEN_FEATURES.map((f) => (
+                    <Link
+                      key={f.to}
+                      to={f.to}
+                      className="group/f flex flex-col rounded-brand-sm border border-brand-border bg-white p-3.5 no-underline shadow-brand-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-brand"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent/10 text-accent transition-colors group-hover/f:bg-accent group-hover/f:text-white">
+                          {f.icon}
+                        </span>
+                        {f.badge && (
+                          <span className="rounded-full bg-brand-bg px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand-muted">{f.badge}</span>
+                        )}
+                      </div>
+                      <p className="mt-2.5 text-[0.9rem] font-bold text-navy">{f.title}</p>
+                      <p className="mt-1 text-[0.74rem] leading-snug text-brand-muted">{f.teaser}</p>
+                      <span className="mt-2.5 inline-flex items-center gap-1 text-[0.72rem] font-semibold text-accent">
+                        {f.cta}<span className="transition-transform group-hover/f:translate-x-0.5">→</span>
+                      </span>
+                    </Link>
                   ))}
                 </div>
 
-                {/* Glossar + Szenen + Selbsttests */}
-                <div className="grid grid-cols-3 border-t border-brand-border">
-                  <Link to="/glossar" className="block bg-brand-bg px-4 py-3 no-underline transition-colors hover:bg-white">
-                    <p className="text-[0.82rem] font-semibold text-navy">Glossar <span className="text-accent">→</span></p>
-                    <p className="text-[0.75rem] text-brand-muted leading-snug">Begriffe A–Z</p>
-                  </Link>
-                  <Link to="/szenen" className="block border-l border-brand-border bg-brand-bg px-4 py-3 no-underline transition-colors hover:bg-white">
-                    <p className="text-[0.82rem] font-semibold text-navy">Szenen <span className="text-accent">→</span></p>
-                    <p className="text-[0.75rem] text-brand-muted leading-snug">Erkenne dich wieder</p>
-                  </Link>
-                  <Link to="/selbsttests" className="block border-l border-brand-border bg-brand-bg px-4 py-3 no-underline transition-colors hover:bg-white">
-                    <p className="text-[0.82rem] font-semibold text-navy">Selbsttests <span className="text-accent">→</span></p>
-                    <p className="text-[0.75rem] text-brand-muted leading-snug">Wo stehst du?</p>
-                  </Link>
+                {/* Themen zum Nachlesen */}
+                <div className="border-t border-brand-border p-4 pt-3.5">
+                  <p className="mb-2.5 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-brand-muted/70">Themen zum Nachlesen</p>
+                  <div className="grid grid-cols-2 gap-x-6">
+                    {WISSEN_COLS.map((col, ci) => (
+                      <div key={ci} className="flex flex-col gap-3.5">
+                        {col.map(({ heading, links }) => (
+                          <div key={heading}>
+                            <p className="mb-1 text-[0.63rem] font-bold uppercase tracking-[0.1em] text-accent/90">{heading}</p>
+                            {links.map(({ label, to }) => (
+                              <Link
+                                key={to}
+                                to={to}
+                                className="block py-1 text-[0.82rem] leading-tight text-brand-text hover:text-accent no-underline transition-colors"
+                              >
+                                {label}
+                              </Link>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
