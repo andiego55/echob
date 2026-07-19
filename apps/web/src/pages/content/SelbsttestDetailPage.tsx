@@ -269,7 +269,10 @@ function ResultView({ test, result, onRetake }: { test: SelfTest; result: TestRe
 
   const reflectHref = `/reflektieren?test=${test.slug}`
   const severe = result.flags.some((f) => (CRITICAL_FLAGS as readonly string[]).includes(f))
-  const showSafety = test.safety && (severe || result.overall?.band?.tone === 'alert' || result.dimensions.some((d) => d.band?.tone === 'alert'))
+  // Selbst-Test: die harte Hilfe-Box nur bei echten kritischen Angaben (Flags),
+  // nicht schon bei einer „alarm"-Dimension wie Mikrokontrolle. Betroffenen-Test: wie gehabt.
+  const isSelf = test.safetyVariant === 'self'
+  const showSafety = test.safety && (severe || (!isSelf && (result.overall?.band?.tone === 'alert' || result.dimensions.some((d) => d.band?.tone === 'alert'))))
   // Kritische Angaben (Kindesentzug, Gewalt …) sind unabhängig vom Durchschnitt ernst.
   const overallBand: TestBand | undefined = severe
     ? { min: 0, label: 'Ernst zu nehmen', tone: 'alert', text: 'Unabhängig vom Gesamtwert: Du hast Dinge angegeben, die schwer wiegen (siehe Hinweis unten). Bitte nimm das ernst.' }

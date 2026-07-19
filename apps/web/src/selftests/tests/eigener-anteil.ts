@@ -15,7 +15,7 @@ export const eigenerAnteil: SelfTest = {
   teaser: 'Ein mutiger, ehrlicher Selbstcheck über dein eigenes Konfliktverhalten – Druck, emotionale Dominanz, Kälte, Gaslighting – und wie sehr du reparierst.',
   description:
     'Dieser selbstgerichtete Test hilft dir, ehrlich hinzuschauen: Setze ich in meiner Partnerschaft selbst manipulative oder kontrollierende Muster ein – von Trennungsdrohung über emotionale Dominanz bis Gaslighting? Und wie sehr bemühe ich mich um echte Reparatur? Ohne Diagnose, ohne Beschämung. Das Ergebnis kannst du mit Echo besprechen.',
-  duration: '10–14 Min',
+  duration: '12–16 Min',
   resultMode: 'dimensional',
   polarity: 'concern',
   safety: true,
@@ -27,6 +27,16 @@ export const eigenerAnteil: SelfTest = {
       'Beim ehrlichen Ausfüllen ist dir wahrscheinlich eine konkrete Situation eingefallen. Welche war das – und wie ging es der anderen Person darin?',
   },
   dimensions: [
+    {
+      key: 'empathie',
+      name: 'Empathie & Interesse',
+      description: 'Interesse am Tun und am inneren Erleben deines Partners.',
+      bands: [
+        { min: 0, label: 'Zugewandt', tone: 'good', text: 'Du interessierst dich echt für deinen Partner – für sein Tun und sein Erleben. Diese Zugewandtheit ist ein starker Schutzfaktor.' },
+        { min: 30, label: 'Teils zugewandt', tone: 'watch', text: 'Dein Interesse am Erleben deines Partners ist da, aber nicht durchgängig. Regelmäßig nachfragen und wirklich zuhören stärkt die Verbindung.' },
+        { min: 55, label: 'Wenig zugewandt', tone: 'alert', text: 'Das innere Erleben deines Partners gerät oft aus dem Blick. Wenig Interesse und Mitgefühl lassen dein Gegenüber leicht allein und ungesehen zurück – auch das verletzt.' },
+      ],
+    },
     {
       key: 'drohungen',
       name: 'Drohungen, Druck & Gewalt',
@@ -55,6 +65,16 @@ export const eigenerAnteil: SelfTest = {
         { min: 0, label: 'Freiraum', tone: 'good', text: 'Du lässt deinem Gegenüber seinen eigenen Freiraum, seine Kontakte und Mittel. Das ist gesund.' },
         { min: 30, label: 'Teils einengend', tone: 'watch', text: 'Manchmal kontrollierst du Kontakte, Geld oder Wege deines Gegenübers. Achte darauf, ob daraus Abhängigkeit oder Angst entsteht.' },
         { min: 55, label: 'Stark einengend', tone: 'alert', text: 'Du schränkst Kontakte, Ressourcen oder Bewegungsfreiheit deines Gegenübers deutlich ein. Solche Kontrolle (Coercive Control) macht abhängig und gilt als ernste Form von Gewalt – auch ohne Schläge.' },
+      ],
+    },
+    {
+      key: 'beherrschung',
+      name: 'Beherrschung im Alltag',
+      description: 'Wie sehr du bestimmst, wie dein Partner Dinge zu tun hat.',
+      bands: [
+        { min: 0, label: 'Lässt Raum', tone: 'good', text: 'Du lässt deinem Partner seinen eigenen Weg und seine eigene Art, Dinge zu tun. Das ist gesund.' },
+        { min: 30, label: 'Bestimmt öfter', tone: 'watch', text: 'In einigen Bereichen bestimmst du, wie Dinge laufen sollen. Achte darauf, ob dein Partner noch seine eigene Art leben darf – oder sich vor allem nach dir richtet.' },
+        { min: 55, label: 'Stark bestimmend', tone: 'alert', text: 'In vielen Aspekten des Zusammenlebens gibst du vor, wie dein Partner Dinge zu tun hat. Das mag sich für dich nach „richtig" oder nach Fürsorge anfühlen – aber es kann sein, dass dein Bedürfnis nach Kontrolle inzwischen zu weit reicht und deinem Gegenüber kaum eigenen Raum lässt. Ein behutsamer, ehrlicher Blick darauf lohnt sich.' },
       ],
     },
     {
@@ -94,6 +114,12 @@ export const eigenerAnteil: SelfTest = {
     { min: 55, label: 'Deutliche Muster', tone: 'alert', text: 'Mehrere Antworten deuten auf kontrollierende oder verletzende Muster hin. Das ehrlich zu sehen, ist ein mutiger erster Schritt. Sprich mit Echo darüber – und zieh, wenn möglich, Unterstützung hinzu, um etwas zu verändern.' },
   ],
   questions: [
+    // Empathie & Interesse (reverse: hohe Zugewandtheit = wenig Belastung)
+    { id: 'ee1', type: 'scale', section: 'Empathie & Interesse', dimension: 'empathie', reverse: true, text: 'Ich interessiere mich für die Dinge, die mein Partner tut (Hobbys, Beruf, Alltag), und frage nach, was es Neues gibt.' },
+    { id: 'ee2', type: 'scale', section: 'Empathie & Interesse', dimension: 'empathie', reverse: true, text: 'Ich frage regelmäßig, wie es meinem Partner innerlich geht – und höre dann wirklich zu.' },
+    { id: 'ee3', type: 'scale', section: 'Empathie & Interesse', dimension: 'empathie', reverse: true, text: 'Wenn mein Partner mir etwas erzählt, bin ich präsent (nicht nebenbei am Handy oder in Gedanken).' },
+    { id: 'ee4', type: 'scale', section: 'Empathie & Interesse', dimension: 'empathie', reverse: true, text: 'Ich merke meist, wenn es meinem Partner schlecht geht – auch ohne dass er/sie es ausspricht.' },
+    { id: 'ee5', type: 'scale', section: 'Empathie & Interesse', dimension: 'empathie', reverse: true, text: 'Ich kann die Sicht meines Partners nachvollziehen, auch wenn ich anderer Meinung bin.' },
     // Drohungen & Druck (+ Reparatur-Follow-ups)
     { id: 'ea1', type: 'scale', section: 'Drohungen & Druck', dimension: 'drohungen', scale: freq, flag: 'trennungsdrohung-haeufig', flagMin: 3, text: 'Ich habe meinem Partner mit Trennung gedroht, um Druck aufzubauen oder etwas zu erreichen.' },
     {
@@ -143,6 +169,13 @@ export const eigenerAnteil: SelfTest = {
     { id: 'ea30', type: 'scale', section: 'Kontrolle & Einengung', dimension: 'einengung', scale: freq, text: 'Ich kontrolliere, wo mein Partner ist und mit wem – oder verlange Nachrichten, Fotos oder Standort zur Kontrolle.' },
     { id: 'ea31', type: 'scale', section: 'Kontrolle & Einengung', dimension: 'einengung', scale: freq, flag: 'coercive-control', flagMin: 3, text: 'Ich kontrolliere das Geld, das Handy oder die Bewegungsfreiheit meines Partners.' },
     { id: 'ea32', type: 'scale', section: 'Kontrolle & Einengung', dimension: 'einengung', scale: freq, text: 'Ich mache Vorwürfe oder Szenen, wenn mein Partner etwas ohne mich unternimmt.' },
+    // Beherrschung im Alltag (Mikrokontrolle)
+    { id: 'eb1', type: 'scale', section: 'Beherrschung im Alltag', dimension: 'beherrschung', scale: freq, text: 'Mein Partner setzt Dinge im Haushalt oft nicht so um, wie ich es für richtig halte – und ich korrigiere es oder mache es nach meiner Art.' },
+    { id: 'eb2', type: 'scale', section: 'Beherrschung im Alltag', dimension: 'beherrschung', scale: freq, text: 'In Diskussionen stört mich, wenn mein Partner nicht die Wortwahl trifft, die ich mir wünsche – und ich weise darauf hin.' },
+    { id: 'eb3', type: 'scale', section: 'Beherrschung im Alltag', dimension: 'beherrschung', scale: freq, text: 'Ich habe genaue Vorstellungen, wie mein Partner Dinge tun soll, und bestehe darauf.' },
+    { id: 'eb4', type: 'scale', section: 'Beherrschung im Alltag', dimension: 'beherrschung', scale: freq, text: 'In vielen Bereichen unseres Zusammenlebens (Ordnung, Essen, Tagesablauf, Erziehung) bestimme ich, wie es läuft.' },
+    { id: 'eb5', type: 'scale', section: 'Beherrschung im Alltag', dimension: 'beherrschung', scale: freq, text: 'Es fällt mir schwer, meinen Partner Dinge auf seine/ihre eigene Art machen zu lassen.' },
+    { id: 'eb6', type: 'scale', section: 'Beherrschung im Alltag', dimension: 'beherrschung', scale: freq, text: 'Mein Partner richtet sich in vielem nach meinen Vorstellungen, um Kritik oder Ärger zu vermeiden.' },
     // Wie ich streite (emotionale Dominanz)
     { id: 'ea7', type: 'scale', section: 'Wie ich streite', dimension: 'dominanz', text: 'In Konflikten bin ich die emotional lautere oder intensivere Person.' },
     { id: 'ea8', type: 'scale', section: 'Wie ich streite', dimension: 'dominanz', text: 'Ich merke, dass mein Gegenüber von meiner Heftigkeit überfordert ist – und nachgibt oder verstummt.' },
