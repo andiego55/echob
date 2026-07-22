@@ -26,6 +26,8 @@ import type {
   DidacticsResult,
 } from '@/types'
 
+export const DIFFICULTY_LABELS: Record<number, string> = { 0: 'Ohne Angabe', 1: 'Leicht', 2: 'Mittel', 3: 'Schwer' }
+
 export interface CohortStudent {
   id: string
   display_name: string
@@ -74,7 +76,7 @@ export const instituteApi = {
     apiClient.get<ExampleSummary[]>('/institute/examples').then(r => r.data),
   getExample: (id: string) =>
     apiClient.get<ExampleDetail>(`/institute/examples/${id}`).then(r => r.data),
-  patchExample: (id: string, data: { title?: string; status?: string; master_solution?: string | null }) =>
+  patchExample: (id: string, data: { title?: string; status?: string; master_solution?: string | null; difficulty?: number; tags?: string[] }) =>
     apiClient.patch<ExampleDetail>(`/institute/examples/${id}`, data).then(r => r.data),
   exampleMasterSolutionDraft: (id: string) =>
     apiClient.post<{ master_solution: string }>(`/institute/examples/${id}/master-solution/draft`, undefined, { timeout: 120_000 }).then(r => r.data),

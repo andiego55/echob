@@ -197,7 +197,7 @@ async def _load_case_part(conn, case_id) -> dict | None:
 
 async def _load_example_detail(conn, institute_id, example_id) -> dict:
     ex = await conn.fetchrow(
-        "SELECT id, title, status, master_solution, primary_case_id, partner_case_id, created_at, updated_at "
+        "SELECT id, title, status, difficulty, tags, master_solution, primary_case_id, partner_case_id, created_at, updated_at "
         "FROM institute_examples WHERE id = $1 AND institute_id = $2",
         example_id, institute_id,
     )
@@ -207,6 +207,8 @@ async def _load_example_detail(conn, institute_id, example_id) -> dict:
         "id": str(ex["id"]),
         "title": ex["title"],
         "status": ex["status"],
+        "difficulty": ex["difficulty"],
+        "tags": list(ex["tags"] or []),
         "master_solution": ex["master_solution"],
         "created_at": ex["created_at"].isoformat() if ex["created_at"] else None,
         "updated_at": ex["updated_at"].isoformat() if ex["updated_at"] else None,
@@ -309,7 +311,7 @@ async def list_examples(
 ) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT e.id, e.title, e.status, e.created_at, "
+            "SELECT e.id, e.title, e.status, e.difficulty, e.tags, e.created_at, "
             "(e.partner_case_id IS NOT NULL) AS has_partner, "
             "(SELECT count(*) FROM scenes s WHERE s.case_id = e.primary_case_id)::int AS scene_count "
             "FROM institute_examples e WHERE e.institute_id = $1 AND e.status <> 'archived' "
@@ -319,6 +321,7 @@ async def list_examples(
     return [
         {
             "id": str(r["id"]), "title": r["title"], "status": r["status"],
+            "difficulty": r["difficulty"], "tags": list(r["tags"] or []),
             "has_partner": r["has_partner"], "scene_count": r["scene_count"],
             "created_at": r["created_at"].isoformat() if r["created_at"] else None,
         }

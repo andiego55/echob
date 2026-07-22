@@ -57,6 +57,8 @@ class ExamplePatch(BaseModel):
     title: str | None = Field(None, max_length=200)
     status: str | None = Field(None, pattern="^(draft|published|archived)$")
     master_solution: str | None = Field(None, max_length=40_000)
+    difficulty: int | None = Field(None, ge=0, le=3)
+    tags: list[str] | None = None
 
 
 class AssignStudents(BaseModel):

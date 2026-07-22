@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { Spinner } from '@/components/auth/InstituteRoute'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
-import { instituteApi } from '@/api/institute'
+import { instituteApi, DIFFICULTY_LABELS } from '@/api/institute'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { ExampleCasePart, ExampleScene, ProfileModules, DidacticsResult } from '@/types'
 
@@ -121,6 +121,8 @@ export default function InstituteExampleEditorPage() {
           für die Freigabe an Studierende vorbereitet. Das Bearbeiten einzelner Szenen folgt in Kürze.
         </p>
 
+        <ClassificationPanel exampleId={data.id} initialDifficulty={data.difficulty} initialTags={data.tags} />
+
         {published && <AssignPanel exampleId={data.id} />}
 
         <DidacticsPanel exampleId={data.id} />
@@ -182,6 +184,79 @@ function AssignPanel({ exampleId }: { exampleId: string }) {
           })}
         </div>
       )}
+    </div>
+  )
+}
+
+function ClassificationPanel({ exampleId, initialDifficulty, initialTags }: { exampleId: string; initialDifficulty: number; initialTags: string[] }) {
+  const qc = useQueryClient()
+  const [difficulty, setDifficulty] = useState(initialDifficulty)
+  const [tags, setTags] = useState<string[]>(initialTags)
+  const [input, setInput] = useState('')
+  const [savedOk, setSavedOk] = useState(false)
+
+  const dirty = difficulty !== initialDifficulty || tags.join('|') !== initialTags.join('|')
+
+  const save = useMutation({
+    mutationFn: () => instituteApi.patchExample(exampleId, { difficulty, tags }),
+    onSuccess: (d) => {
+      qc.setQueryData(['institute-example', exampleId], d)
+      qc.invalidateQueries({ queryKey: ['institute-examples'] })
+      setSavedOk(true)
+    },
+  })
+
+  const addTag = () => {
+    const t = input.trim().replace(/,+$/, '').trim()
+    if (t && !tags.includes(t) && tags.length < 12) { setTags([...tags, t]); setSavedOk(false) }
+    setInput('')
+  }
+  const removeTag = (t: string) => { setTags(tags.filter(x => x !== t)); setSavedOk(false) }
+
+  return (
+    <div className="card mt-6">
+      <h2 className="text-sm font-bold text-navy">Einordnung</h2>
+      <p className="mt-1 text-xs text-brand-muted">Schwierigkeitsgrad und Themen-Schlagworte – für Filter und Suche in der Fallbibliothek.</p>
+
+      <div className="mt-4">
+        <label className="mb-1.5 block text-xs font-medium text-brand-muted">Schwierigkeitsgrad</label>
+        <div className="flex flex-wrap gap-2">
+          {[0, 1, 2, 3].map(d => (
+            <button key={d} onClick={() => { setDifficulty(d); setSavedOk(false) }}
+              className={`rounded-brand border px-3 py-1.5 text-sm transition-colors ${difficulty === d ? 'border-accent bg-accent/[0.06] font-medium text-navy' : 'border-brand-border text-brand-muted hover:border-accent/40'}`}>
+              {DIFFICULTY_LABELS[d]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="mb-1.5 block text-xs font-medium text-brand-muted">Themen-Schlagworte</label>
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {tags.length === 0
+            ? <span className="text-xs italic text-brand-muted/60">Noch keine Schlagworte.</span>
+            : tags.map(t => (
+                <span key={t} className="inline-flex items-center gap-1 rounded-full bg-brand-bg px-2.5 py-1 text-xs text-brand-text">
+                  {t}
+                  <button onClick={() => removeTag(t)} className="text-brand-muted hover:text-red-600">✕</button>
+                </span>
+              ))}
+        </div>
+        <div className="flex gap-2">
+          <input value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag() } }}
+            placeholder="z. B. Narzissmus, Trennung – Enter zum Hinzufügen"
+            className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent" />
+          <button onClick={addTag} disabled={!input.trim()} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm disabled:opacity-40">Hinzufügen</button>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center gap-3 border-t border-brand-border pt-4">
+        <button onClick={() => save.mutate()} disabled={!dirty || save.isPending} className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50">
+          {save.isPending ? 'Speichern …' : 'Einordnung speichern'}
+        </button>
+        {savedOk && !dirty && <span className="text-sm text-green-700">Gespeichert ✓</span>}
+      </div>
     </div>
   )
 }

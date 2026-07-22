@@ -194,6 +194,8 @@ export interface ExampleDetail {
   id: string
   title: string
   status: string
+  difficulty: number
+  tags: string[]
   master_solution: string | null
   created_at: string | null
   updated_at: string | null
@@ -205,6 +207,8 @@ export interface ExampleSummary {
   id: string
   title: string
   status: string
+  difficulty: number
+  tags: string[]
   has_partner: boolean
   scene_count: number
   created_at: string | null
