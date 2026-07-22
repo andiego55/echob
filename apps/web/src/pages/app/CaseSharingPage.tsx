@@ -109,51 +109,72 @@ function RevokeButton({ caseId, share }: { caseId: string; share: CaseShare }) {
 
 // ── Verbindungen ──────────────────────────────────────────────────────────────
 
+const STANDARD_INVITE =
+  'Hallo,\n\nich nutze EchoB, um belastende Beziehungssituationen zu sortieren, und würde gern fachlich mit dir zusammenarbeiten. Über EchoB kann ich dir einzelne Inhalte gezielt und vertraulich freigeben.\n\nIch würde mich freuen, wenn du dabei bist.'
+
+const INVITE_INPUT = 'w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent'
+
 function ConnectionsCard() {
   const qc = useQueryClient()
   const { data: connections = [] } = useQuery({ queryKey: ['prof-connections'], queryFn: professionalsApi.connections })
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [message, setMessage] = useState(STANDARD_INVITE)
   const [notice, setNotice] = useState<string | null>(null)
 
   const invite = useMutation({
-    mutationFn: () => professionalsApi.invite(email.trim()),
+    mutationFn: () => professionalsApi.invite(email.trim(), { inviter_name: name.trim() || null, message: message.trim() || null }),
     onSuccess: (conn) => {
       qc.invalidateQueries({ queryKey: ['prof-connections'] })
       setEmail('')
       setNotice(conn.status === 'accepted'
-        ? `${conn.display_name || conn.email} ist verbunden – du kannst jetzt teilen.`
-        : 'Einladung gespeichert. Sobald die Fachperson einen Account erstellt, kannst du teilen.')
+        ? `${conn.display_name || conn.email} ist bereits registriert und jetzt verbunden – du kannst teilen.`
+        : 'Einladung verschickt. Sobald die Fachperson sich registriert, erscheint sie hier.')
     },
     onError: () => setNotice('Einladung fehlgeschlagen. Bitte E-Mail prüfen.'),
   })
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy mb-1">Meine Fachpersonen</h2>
+      <h2 className="text-sm font-bold text-navy mb-1">Fachperson einladen</h2>
       <p className="text-xs text-brand-muted mb-3">
-        Du kannst nur an Fachpersonen freigeben, die einen EchoB-Account haben. Lade jemanden per
-        E-Mail ein – sobald die Person registriert ist, erscheint sie hier.
+        Lade eine Fachperson per E-Mail ein. Sie erhält deine Nachricht plus eine kurze Anleitung
+        (Registrieren, Anmelden, Verbinden). Freigeben kannst du, sobald sie registriert ist.
       </p>
-      <div className="flex gap-2">
-        <input
-          type="email"
-          value={email}
-          onChange={e => { setEmail(e.target.value); setNotice(null) }}
-          placeholder="fachperson@beispiel.de"
-          className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
-        />
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-brand-text">Dein Name (optional)</span>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="damit sie weiß, wer einlädt" className={INVITE_INPUT} />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-brand-text">E-Mail der Fachperson *</span>
+          <input type="email" value={email} onChange={e => { setEmail(e.target.value); setNotice(null) }} placeholder="fachperson@beispiel.de" className={INVITE_INPUT} />
+        </label>
+      </div>
+
+      <div className="mt-3">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-xs font-medium text-brand-text">Nachricht</span>
+          <button type="button" onClick={() => setMessage(STANDARD_INVITE)} className="text-[11px] text-accent hover:underline">Standardtext einsetzen</button>
+        </div>
+        <textarea value={message} onChange={e => setMessage(e.target.value)} rows={5} className={`${INVITE_INPUT} resize-y`} placeholder="Deine persönliche Nachricht (optional) …" />
+        <span className="mt-1 block text-[11px] text-brand-muted/70">Die Kurzanleitung wird automatisch an die E-Mail angehängt.</span>
+      </div>
+
+      <div className="mt-3 flex items-center gap-3 flex-wrap">
         <button
           onClick={() => invite.mutate()}
           disabled={invite.isPending || !email.trim()}
-          className="btn-primary !py-2 !px-4 !text-sm shrink-0"
+          className="btn-primary !py-2 !px-5 !text-sm shrink-0"
         >
-          {invite.isPending ? '…' : 'Einladen'}
+          {invite.isPending ? 'Wird gesendet …' : 'Einladung senden'}
         </button>
+        {notice && <span className="text-xs text-brand-muted">{notice}</span>}
       </div>
-      {notice && <p className="mt-2 text-xs text-brand-muted">{notice}</p>}
 
       {connections.length > 0 && (
-        <ul className="mt-4 space-y-1.5">
+        <ul className="mt-4 space-y-1.5 border-t border-brand-border pt-3">
           {connections.map(c => (
             <li key={c.email} className="flex items-center justify-between text-sm">
               <span className="text-brand-text">{c.display_name || c.email}</span>

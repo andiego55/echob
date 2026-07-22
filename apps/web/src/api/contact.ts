@@ -5,7 +5,7 @@ import { apiClient } from './client'
  * E-Mail ODER Telefon genügt. Wird gespeichert + an kontakt@echo-b.de gemeldet.
  */
 export interface ContactRequest {
-  kind?: 'coaching' | 'demo' | 'general'
+  kind?: 'coaching' | 'demo' | 'general' | 'scene'
   name?: string | null
   email?: string | null
   phone?: string | null

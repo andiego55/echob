@@ -8,7 +8,7 @@ class ContactRequest(BaseModel):
 
     E-Mail ODER Telefon genügt – mindestens eines muss angegeben sein.
     """
-    kind: Literal["coaching", "demo", "general"] = "coaching"
+    kind: Literal["coaching", "demo", "general", "scene"] = "coaching"
     name: str | None = Field(None, max_length=160)
     email: EmailStr | None = None
     phone: str | None = Field(None, max_length=60)

@@ -15,6 +15,7 @@ _KIND_LABEL = {
     "coaching": "Coaching-Anfrage (Erstgespräch)",
     "demo": "Demo-Anfrage (Fachperson)",
     "general": "Kontaktanfrage",
+    "scene": "Szenen-Einreichung",
 }
 
 

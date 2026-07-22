@@ -23,6 +23,7 @@ import SzenenPage                    from '@/pages/content/SzenenPage'
 import SzeneDetailPage               from '@/pages/content/SzeneDetailPage'
 import SelbsttestsPage               from '@/pages/content/SelbsttestsPage'
 import SelbsttestDetailPage          from '@/pages/content/SelbsttestDetailPage'
+import KompatibilitaetPage           from '@/pages/content/KompatibilitaetPage'
 import ReflectPage                   from '@/pages/content/ReflectPage'
 
 // ── App-Bereich ───────────────────────────────────────────────────────────────
@@ -185,6 +186,7 @@ export function AppRoutes() {
       <Route path="/szenen/:slug"                    element={<SzeneDetailPage />} />
       <Route path="/selbsttests"                     element={<SelbsttestsPage />} />
       <Route path="/selbsttests/:slug"               element={<SelbsttestDetailPage />} />
+      <Route path="/kompatibilitaet"                 element={<KompatibilitaetPage />} />
       <Route path="/ratgeber/:slug"                  element={<ContentPage />} />
       <Route path="/fallbeispiele/:slug"             element={<ContentPage />} />
       <Route path="/therapie-vorbereitung/:slug"     element={<ContentPage />} />

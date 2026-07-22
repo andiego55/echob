@@ -105,7 +105,8 @@ export default function Header() {
     location.pathname.startsWith('/wissen') ||
     location.pathname.startsWith('/glossar') ||
     location.pathname.startsWith('/szenen') ||
-    location.pathname.startsWith('/selbsttests')
+    location.pathname.startsWith('/selbsttests') ||
+    location.pathname.startsWith('/kompatibilitaet')
   const ueberActive = location.pathname.startsWith('/ueber')
 
   return (
@@ -197,6 +198,16 @@ export default function Header() {
                     ))}
                   </div>
                 </div>
+
+                {/* Kompatibilitäts-Matrix – interaktives Highlight, ganz unten */}
+                <Link to="/kompatibilitaet" className="flex items-center justify-between gap-3 border-t border-brand-border bg-accent/[0.05] px-4 py-3 no-underline transition-colors hover:bg-accent/[0.1]">
+                  <span>
+                    <span className="text-[0.58rem] font-bold uppercase tracking-[0.12em] text-accent">Neu · interaktiv</span>
+                    <p className="text-[0.85rem] font-semibold text-navy">Kompatibilitäts-Matrix</p>
+                    <p className="text-[0.74rem] leading-snug text-brand-muted">Welche Bindungstypen passen zusammen?</p>
+                  </span>
+                  <span className="shrink-0 text-sm font-semibold text-accent">Ausprobieren →</span>
+                </Link>
               </div>
             </div>
           </div>

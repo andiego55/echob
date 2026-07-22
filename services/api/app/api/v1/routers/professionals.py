@@ -13,7 +13,7 @@ from app.schemas.professional import (
     ProfessionalInviteCreate,
 )
 from app.services import seat_service
-from app.services.invite_service import send_invite_email
+from app.services.invite_service import send_professional_invite_email
 
 router = APIRouter(prefix="/professionals", tags=["professionals"])
 
@@ -58,7 +58,6 @@ async def invite(
     sonst Einladung (pending) + Best-effort-Mail."""
     uid = current_user["user_id"]
     email = _norm_email(body.email)
-    supabase = getattr(request.app.state, "supabase", None)
 
     async with pool.acquire() as conn:
         existing_pro = await conn.fetchrow(
@@ -94,7 +93,7 @@ async def invite(
             uid, email,
         )
 
-    send_invite_email(supabase, email)
+    await send_professional_invite_email(email, body.inviter_name, body.message)
     return ConnectionResponse(
         email=row["email"], status=row["status"],
         professional_user_id=row["professional_user_id"],

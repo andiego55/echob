@@ -70,6 +70,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Fundierte, kostenlose Selbsttests zu Beziehungsgesundheit, Bindungsstil und belastenden Mustern wie Gaslighting oder Kontrolle. Klares Ergebnis mit Einordnung – anschließend mit Echo besprechbar. Ohne Diagnose.',
   },
+  '/kompatibilitaet': {
+    title: 'Kompatibilitäts-Matrix: Welche Bindungstypen passen zusammen? – EchoB',
+    description:
+      'Interaktive Kompatibilitäts-Matrix der vier Bindungstypen (sicher, ängstlich, vermeidend, ängstlich-vermeidend). Wähle deinen Typ und den deines Gegenübers und entdecke Passung, typische Dynamiken und Wachstumswege. Ohne Diagnose.',
+  },
 
   '/impressum': {
     title: 'Impressum – EchoB',

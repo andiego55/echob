@@ -39,6 +39,8 @@ class ProfessionalRegister(BaseModel):
 
 class ProfessionalInviteCreate(BaseModel):
     email: str = Field(..., min_length=3, max_length=254)
+    inviter_name: str | None = Field(None, max_length=120)
+    message: str | None = Field(None, max_length=3000)
 
 
 class ConnectionResponse(BaseModel):
