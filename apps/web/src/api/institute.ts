@@ -26,10 +26,39 @@ import type {
   DidacticsResult,
 } from '@/types'
 
+export interface CohortStudent {
+  id: string
+  display_name: string
+  assignments_open: number
+  assignments_pending: number
+  assignments_overdue: number
+  assignments_reviewed: number
+  assignments_total: number
+  submissions_pending: number
+  submissions_total: number
+  modules_active: number
+  modules_completed: number
+  cases: number
+}
+
+export interface CohortOverview {
+  totals: {
+    students: number
+    submissions_pending: number
+    assignments_pending: number
+    assignments_overdue: number
+    modules_active: number
+    modules_completed: number
+  }
+  students: CohortStudent[]
+}
+
 /** Ausbildungsinstitut (eigene Domäne, /institute/*). */
 export const instituteApi = {
   me: () =>
     apiClient.get<InstituteProfile>('/institute/me').then(r => r.data),
+  cohort: () =>
+    apiClient.get<CohortOverview>('/institute/cohort').then(r => r.data),
   register: (data: { name: string; contact_name?: string | null; access_code: string }) =>
     apiClient.post<InstituteProfile>('/institute/register', data).then(r => r.data),
   updateMe: (data: { name?: string; contact_name?: string | null }) =>

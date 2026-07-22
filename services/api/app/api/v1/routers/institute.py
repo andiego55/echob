@@ -8,7 +8,7 @@ training_institutes-Zeile bestimmt. Registrierung ist invite-gated
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -541,6 +541,91 @@ def _submission_row(row, *, include_payload: bool = False) -> dict:
             payload = json.loads(payload)
         out["payload"] = payload or {}
     return out
+
+
+@router.get("/cohort")
+async def cohort_overview(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Kohorten-Statusboard: pro Studierende:r offene/eingereichte/überfällige Aufgaben,
+    ausstehende Fall-Einreichungen und Modulfortschritt + Gesamtkennzahlen. Rein
+    aggregierend über bestehende Daten (kein Einfluss auf Nutzer/Fachperson)."""
+    inst_id = current["institute"]["id"]
+    today = date.today()
+    async with pool.acquire() as conn:
+        students = await conn.fetch(
+            "SELECT id, display_name FROM students "
+            "WHERE institute_id = $1 AND status = 'active' ORDER BY lower(display_name)",
+            inst_id)
+        ids = [s["id"] for s in students]
+        assignments = await conn.fetch(
+            "SELECT sa.student_id, sa.status, a.due_on "
+            "FROM student_assignments sa JOIN institute_assignments a ON a.id = sa.assignment_id "
+            "WHERE a.institute_id = $1", inst_id)
+        submissions = await conn.fetch(
+            "SELECT student_id, status FROM student_submissions WHERE institute_id = $1", inst_id)
+        modules = await conn.fetch(
+            "SELECT sm.student_id, sm.status FROM student_modules sm "
+            "JOIN learning_modules m ON m.id = sm.module_id WHERE m.institute_id = $1", inst_id)
+        cases = await conn.fetch(
+            "SELECT student_id, count(*)::int AS n FROM student_case_copies "
+            "WHERE student_id = ANY($1::uuid[]) GROUP BY student_id", ids) if ids else []
+
+    per: dict = {sid: {
+        "assignments_open": 0, "assignments_pending": 0, "assignments_overdue": 0,
+        "assignments_reviewed": 0, "assignments_total": 0,
+        "submissions_pending": 0, "submissions_total": 0,
+        "modules_active": 0, "modules_completed": 0, "cases": 0,
+    } for sid in ids}
+
+    for a in assignments:
+        b = per.get(a["student_id"])
+        if not b:
+            continue
+        b["assignments_total"] += 1
+        st = a["status"]
+        if st in ("assigned", "in_progress"):
+            b["assignments_open"] += 1
+            if a["due_on"] and a["due_on"] < today:
+                b["assignments_overdue"] += 1
+        elif st == "submitted":
+            b["assignments_pending"] += 1
+        elif st in ("reviewed", "returned"):
+            b["assignments_reviewed"] += 1
+
+    for s in submissions:
+        b = per.get(s["student_id"])
+        if not b:
+            continue
+        b["submissions_total"] += 1
+        if s["status"] != "reviewed":
+            b["submissions_pending"] += 1
+
+    for m in modules:
+        b = per.get(m["student_id"])
+        if not b:
+            continue
+        if m["status"] == "completed":
+            b["modules_completed"] += 1
+        else:
+            b["modules_active"] += 1
+
+    for c in cases:
+        b = per.get(c["student_id"])
+        if b:
+            b["cases"] = c["n"]
+
+    student_rows = [{"id": str(s["id"]), "display_name": s["display_name"], **per[s["id"]]} for s in students]
+    totals = {
+        "students": len(students),
+        "submissions_pending": sum(b["submissions_pending"] for b in per.values()),
+        "assignments_pending": sum(b["assignments_pending"] for b in per.values()),
+        "assignments_overdue": sum(b["assignments_overdue"] for b in per.values()),
+        "modules_active": sum(b["modules_active"] for b in per.values()),
+        "modules_completed": sum(b["modules_completed"] for b in per.values()),
+    }
+    return {"totals": totals, "students": student_rows}
 
 
 @router.get("/submissions")

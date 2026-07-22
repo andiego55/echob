@@ -103,6 +103,7 @@ import CoupleReportDetailPage from '@/pages/professional/CoupleReportDetailPage'
 import InstituteRoute, { useInstitute } from '@/components/auth/InstituteRoute'
 import InstituteRegisterPage from '@/pages/institute/InstituteRegisterPage'
 import InstituteDashboardPage from '@/pages/institute/InstituteDashboardPage'
+import InstituteCohortPage from '@/pages/institute/InstituteCohortPage'
 import InstituteGeneratePage from '@/pages/institute/InstituteGeneratePage'
 import InstituteExampleEditorPage from '@/pages/institute/InstituteExampleEditorPage'
 import InstituteStudentsPage from '@/pages/institute/InstituteStudentsPage'
@@ -238,6 +239,7 @@ export function AppRoutes() {
       {/* ── Ausbildungsbereich · Institut (Login + Rolle erforderlich) ────────── */}
       <Route path="/institute/register" element={<ProtectedRoute><InstituteRegisterPage /></ProtectedRoute>} />
       <Route path="/institute/dashboard" element={<InstituteRoute><InstituteDashboardPage /></InstituteRoute>} />
+      <Route path="/institute/cohort" element={<InstituteRoute><InstituteCohortPage /></InstituteRoute>} />
       <Route path="/institute/examples/new" element={<InstituteRoute><InstituteGeneratePage /></InstituteRoute>} />
       <Route path="/institute/examples/:id" element={<InstituteRoute><InstituteExampleEditorPage /></InstituteRoute>} />
       <Route path="/institute/students" element={<InstituteRoute><InstituteStudentsPage /></InstituteRoute>} />
