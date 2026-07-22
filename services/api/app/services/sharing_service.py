@@ -35,6 +35,7 @@ class SharedBundle:
     hypotheses: list[dict[str, Any]] = field(default_factory=list)
     person_profile: dict[str, Any] | None = None
     self_profile: dict[str, Any] | None = None
+    test_results: list[dict[str, Any]] = field(default_factory=list)
 
 
 async def require_active_share(professional_user_id, case_id, conn) -> dict[str, Any]:
@@ -131,6 +132,22 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
             "SELECT * FROM user_profiles WHERE user_id = $1", share["owner_user_id"]
         )
         bundle.self_profile = dict(row) if row else None
+
+    # Nutzer-eigene Selbsttest-Ergebnisse (Anzeige-only; fließen NICHT in den Echo-Kontext).
+    if "test_results" in allowed:
+        rows = await conn.fetch(
+            "SELECT slug, title, category, result, updated_at FROM test_results "
+            "WHERE user_id = $1 ORDER BY updated_at DESC",
+            share["owner_user_id"],
+        )
+        bundle.test_results = [
+            {
+                "slug": r["slug"], "title": r["title"], "category": r["category"],
+                "updated_at": r["updated_at"],
+                "result": json.loads(crypto.decrypt(r["result"]) or "{}"),
+            }
+            for r in rows
+        ]
 
     return bundle
 

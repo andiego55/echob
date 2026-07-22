@@ -15,6 +15,15 @@ export interface DimensionResult {
   resultTagline?: string
 }
 
+/** Serverseitig gespeichertes Ergebnis (nutzer-eigen), z. B. für Übersicht/Freigabe. */
+export interface SavedTestResult {
+  slug: string
+  title: string
+  category: string | null
+  result: TestResult
+  updated_at: string
+}
+
 export interface TestResult {
   slug: string
   title: string

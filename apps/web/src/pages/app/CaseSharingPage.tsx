@@ -14,7 +14,7 @@ import type { ShareElementType, CaseShare } from '@/types'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
-  'reports', 'topic_summaries', 'person_profile', 'self_profile', 'hypotheses',
+  'reports', 'topic_summaries', 'person_profile', 'self_profile', 'hypotheses', 'test_results',
 ]
 
 export default function CaseSharingPage() {

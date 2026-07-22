@@ -8,6 +8,8 @@ import {
 } from '@/selftests/types'
 import { scoreTest, isAnswered, requiredQuestions, type TestResult, type DimensionResult } from '@/selftests/scoring'
 import { saveTestResult } from '@/selftests/resultStore'
+import { useAuth } from '@/contexts/AuthContext'
+import { testResultsApi } from '@/api/testResults'
 
 /**
  * /selbsttests/:slug — Test durchführen + Ergebnis (numerisch + Text + Visualisierung).
@@ -40,9 +42,11 @@ const TONE: Record<TestBand['tone'], { bar: string; chip: string; stroke: string
 }
 
 function TestRunner({ test }: { test: SelfTest }) {
+  const { session } = useAuth()
   const [answers, setAnswers] = useState<TestAnswers>({})
   const [result, setResult] = useState<TestResult | null>(null)
   const [showMissing, setShowMissing] = useState(false)
+  const [savedState, setSavedState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const resultRef = useRef<HTMLDivElement>(null)
 
   const sections = useMemo(() => {
@@ -79,12 +83,20 @@ function TestRunner({ test }: { test: SelfTest }) {
     const res = scoreTest(test, answers)
     saveTestResult(res)
     setResult(res)
+    // Angemeldet → Ergebnis ins Profil speichern (nutzer-eigen). Fire-and-forget.
+    if (session) {
+      setSavedState('saving')
+      testResultsApi.save(test.slug, { title: test.title, category: test.category, result: res })
+        .then(() => setSavedState('saved'))
+        .catch(() => setSavedState('error'))
+    }
   }
 
   const retake = () => {
     setAnswers({})
     setResult(null)
     setShowMissing(false)
+    setSavedState('idle')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -162,7 +174,7 @@ function TestRunner({ test }: { test: SelfTest }) {
 
       {result && (
         <div ref={resultRef}>
-          <ResultView test={test} result={result} onRetake={retake} />
+          <ResultView test={test} result={result} onRetake={retake} loggedIn={!!session} savedState={savedState} />
         </div>
       )}
     </>
@@ -263,7 +275,10 @@ function ScaleInput({ scale, value, onChange }: { scale: { min: number; max: num
   )
 }
 
-function ResultView({ test, result, onRetake }: { test: SelfTest; result: TestResult; onRetake: () => void }) {
+function ResultView({ test, result, onRetake, loggedIn, savedState }: {
+  test: SelfTest; result: TestResult; onRetake: () => void
+  loggedIn: boolean; savedState: 'idle' | 'saving' | 'saved' | 'error'
+}) {
   const [fill, setFill] = useState(false)
   useEffect(() => { const t = setTimeout(() => setFill(true), 80); return () => clearTimeout(t) }, [])
 
@@ -282,6 +297,21 @@ function ResultView({ test, result, onRetake }: { test: SelfTest; result: TestRe
     <section className="border-t border-brand-border bg-white px-6 py-12">
       <div className="mx-auto max-w-[720px]">
         <span className="label">Dein Ergebnis</span>
+
+        {loggedIn ? (
+          <p className="mb-4 text-xs text-brand-muted">
+            {savedState === 'saved'
+              ? '✓ In deinem Profil gespeichert – sichtbar in der Fall-Übersicht, optional für deine Fachperson freigebbar.'
+              : savedState === 'error'
+                ? 'Konnte nicht im Profil gespeichert werden.'
+                : 'Wird in deinem Profil gespeichert …'}
+          </p>
+        ) : (
+          <p className="mb-4 text-xs text-brand-muted">
+            <Link to="/auth" state={{ defaultTab: 'signup' }} className="font-medium text-accent hover:underline">Melde dich an</Link>,
+            um dein Ergebnis zu speichern und mit deiner Fachperson zu teilen.
+          </p>
+        )}
 
         {result.mode === 'dimensional' && result.overall && (
           <OverallCard score={result.overall.score} band={overallBand} fill={fill} />

@@ -38,6 +38,7 @@ from app.api.v1.routers import (
     scenes,
     student,
     subscription,
+    test_results,
     topic_summaries,
     waitlist,
 )
@@ -62,6 +63,7 @@ v1_router.include_router(profile.router)
 v1_router.include_router(account.router)
 v1_router.include_router(person_profile.router)
 v1_router.include_router(topic_summaries.router)
+v1_router.include_router(test_results.router)
 v1_router.include_router(hypotheses.router)
 v1_router.include_router(onboarding.router)
 v1_router.include_router(subscription.router)

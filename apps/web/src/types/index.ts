@@ -826,7 +826,7 @@ export interface PersonProfile {
 export type ShareElementType =
   | 'case_info' | 'onboarding' | 'all_scenes' | 'scene'
   | 'scales' | 'reports' | 'topic_summaries' | 'person_profile' | 'self_profile'
-  | 'hypotheses'
+  | 'hypotheses' | 'test_results'
 
 export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   case_info:       'Fallinformationen',
@@ -839,6 +839,7 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   person_profile:  'Fragebogen zur Fallperson',
   self_profile:    'Nutzerprofil / Selbstprofil',
   hypotheses:      'Hypothesen (tastend)',
+  test_results:    'Selbsttest-Ergebnisse',
 }
 
 export interface ProfessionalProfile {
@@ -1065,6 +1066,7 @@ export interface SharedCaseBundle {
   hypotheses: { hypothesis_type: string; summary_text: string }[]
   person_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null } | null
   self_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null; display_name?: string | null } | null
+  test_results: import('@/selftests/scoring').SavedTestResult[]
   notes: ProfessionalNote | null
   echo_summaries: ProfessionalEchoSummary[]
 }

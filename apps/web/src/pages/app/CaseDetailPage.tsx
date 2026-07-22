@@ -11,6 +11,9 @@ import { casesApi } from '@/api/cases'
 import { scenesApi } from '@/api/scenes'
 import { personProfileApi } from '@/api/personProfile'
 import { topicSummariesApi, type TopicSummary } from '@/api/topicSummaries'
+import { testResultsApi } from '@/api/testResults'
+import SavedTestResultView from '@/components/selftests/SavedTestResultView'
+import { TEST_CATEGORY_LABELS, type TestCategory } from '@/selftests'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { hypothesesApi } from '@/api/hypotheses'
 import {
@@ -163,6 +166,11 @@ export default function CaseDetailPage() {
         {/* Hypothesen */}
         <div className="mt-6">
           <HypothesesOverviewCard caseId={caseId!} />
+        </div>
+
+        {/* Selbsttest-Ergebnisse (nutzer-eigen, aufklappbar) */}
+        <div className="mt-6">
+          <TestResultsCard caseId={caseId!} />
         </div>
 
         {/* Disclaimer */}
@@ -490,6 +498,76 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+function TestResultsCard({ caseId }: { caseId: string }) {
+  const qc = useQueryClient()
+  const { data: results = [], isLoading } = useQuery({ queryKey: ['test-results'], queryFn: () => testResultsApi.list() })
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const toggle = (slug: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(slug)) next.delete(slug)
+      else next.add(slug)
+      return next
+    })
+
+  const remove = useMutation({
+    mutationFn: (slug: string) => testResultsApi.remove(slug),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['test-results'] }),
+  })
+
+  return (
+    <div className="card">
+      <div className="mb-3">
+        <p className="text-xs font-semibold text-brand-muted mb-0.5">Selbsttests</p>
+        <p className="text-sm font-medium text-navy">
+          {results.length > 0
+            ? `${results.length} gespeichertes Ergebnis${results.length === 1 ? '' : 'se'}`
+            : 'Noch keine gespeicherten Ergebnisse'}
+        </p>
+        <p className="text-xs text-brand-muted mt-2 leading-relaxed">
+          Ergebnisse aus den <Link to="/selbsttests" className="text-accent font-medium hover:underline">Selbsttests</Link> –
+          angemeldet werden sie automatisch hier abgelegt. Über{' '}
+          <Link to={`/app/cases/${caseId}/share`} className="text-accent font-medium hover:underline">Freigaben</Link> kannst du sie
+          deiner Fachperson zugänglich machen. Sie fließen nicht in Echos Kontext ein.
+        </p>
+      </div>
+
+      {isLoading ? (
+        <p className="text-sm text-brand-muted">Lädt …</p>
+      ) : results.length === 0 ? (
+        <p className="text-xs text-brand-muted/60 italic">Mach einen Test – dein Ergebnis erscheint dann hier.</p>
+      ) : (
+        <div className="space-y-2">
+          {results.map((r) => {
+            const isOpen = expanded.has(r.slug)
+            return (
+              <div key={r.slug} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+                <div className="flex items-center justify-between gap-2">
+                  <button onClick={() => toggle(r.slug)} className="flex items-center gap-1.5 min-w-0 text-left">
+                    <svg className={`w-3.5 h-3.5 flex-shrink-0 text-accent transition-transform ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="text-xs font-semibold text-navy truncate">{r.title}</span>
+                    {r.category && <span className="text-[10px] text-brand-muted/70 shrink-0">· {TEST_CATEGORY_LABELS[r.category as TestCategory] ?? r.category}</span>}
+                  </button>
+                  <button
+                    onClick={() => { if (window.confirm('Testergebnis wirklich löschen?')) remove.mutate(r.slug) }}
+                    disabled={remove.isPending}
+                    className="text-xs text-brand-muted hover:text-red-600 transition-colors flex-shrink-0 disabled:opacity-40"
+                  >
+                    Löschen
+                  </button>
+                </div>
+                {isOpen && <div className="mt-3"><SavedTestResultView result={r.result} /></div>}
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

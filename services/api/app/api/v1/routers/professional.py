@@ -636,6 +636,7 @@ async def case_detail(
         "hypotheses": bundle.hypotheses,
         "person_profile": _public_profile(bundle.person_profile),
         "self_profile": _public_profile(bundle.self_profile),
+        "test_results": bundle.test_results,
         "notes": (
             crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
             if note_row else None

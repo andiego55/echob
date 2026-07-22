@@ -10,6 +10,7 @@ import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi } from '@/api/professional'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import SavedTestResultView from '@/components/selftests/SavedTestResultView'
 import AssignmentTypePanel from '@/components/professional/AssignmentTypePanel'
 import AppointmentsPanel from '@/components/professional/AppointmentsPanel'
 import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
@@ -562,6 +563,24 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                   </summary>
                   <div className="mt-3 border-t border-brand-border pt-3 text-sm text-brand-text leading-relaxed">
                     <MarkdownMessage content={h.summary_text} />
+                  </div>
+                </details>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {has('test_results') && bundle.test_results.length > 0 && (
+          <Section title="Selbsttest-Ergebnisse">
+            <div className="space-y-2">
+              {bundle.test_results.map(t => (
+                <details key={t.slug} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
+                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <span className="text-sm font-medium text-navy truncate">{t.title}</span>
+                    <Chevron />
+                  </summary>
+                  <div className="mt-3 border-t border-brand-border pt-3">
+                    <SavedTestResultView result={t.result} />
                   </div>
                 </details>
               ))}
