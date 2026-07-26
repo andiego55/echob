@@ -157,6 +157,20 @@ def _parse_date(s, idx: int, n: int) -> date:
         return date.today() - timedelta(days=(n - 1 - idx) * 30)
 
 
+_DIFFICULTY_HINT = {
+    1: ("Didaktische Schwierigkeit: LEICHT — die Dynamik ist klar und gut erkennbar, die Muster liegen "
+        "relativ offen. Ein Fall zum Einüben für Einsteiger:innen."),
+    2: ("Didaktische Schwierigkeit: MITTEL — mit Ambivalenz und Grautönen; nicht alles liegt offen, "
+        "einige Signale sind widersprüchlich und wollen sortiert werden."),
+    3: ("Didaktische Schwierigkeit: SCHWER — anspruchsvoll und subtil: widersprüchliche Signale, blinde "
+        "Flecken, mehrdeutige Dynamik. Die Analyse erfordert genaues Hinsehen; nichts liegt offen zutage."),
+}
+
+
+def _difficulty_hint(inp) -> str:
+    return _DIFFICULTY_HINT.get(int(getattr(inp, "difficulty", 0) or 0), "")
+
+
 def _onboarding_user(self_name: str, other_name: str | None, inp) -> str:
     parts = [
         f"Beziehungsart: {_REL_TYPE_DE.get(inp.relationship_type, inp.relationship_type)}",
@@ -169,6 +183,8 @@ def _onboarding_user(self_name: str, other_name: str | None, inp) -> str:
         parts.append(f"Pseudonym der anderen Person: {other_name}")
     if inp.focus_terms:
         parts.append("Schwerpunkte, die die Beziehung prägen sollen: " + ", ".join(inp.focus_terms))
+    if hint := _difficulty_hint(inp):
+        parts.append(hint)
     if inp.free_text:
         parts.append("Weitere Angaben zur Beziehung: " + inp.free_text)
     return "\n".join(parts)
@@ -185,6 +201,7 @@ def _scenes_user(ob: dict, self_name: str, other_name: str | None, inp, n: int) 
         f"- Wiederkehrendes Muster: {ob.get('typical_scenes', '')}\n"
         f"- Prägendes Ereignis: {ob.get('significant_event', '')}\n\n"
         f"Erzeuge GENAU {n} Szenen. Lass die Schwerpunkte ({focus}) über den Verlauf sichtbar werden."
+        + (f" {_difficulty_hint(inp)}" if _difficulty_hint(inp) else "")
     )
 
 
@@ -433,10 +450,13 @@ async def run_generation(app, institute: dict, inp, gen_id: str) -> None:
             partner_case = None
             if partner is not None:
                 partner_case = await _write_case(conn, inp=inp, self_name=inp.partner_name, data=partner)
+            gen_tags = [t.strip() for t in (inp.focus_terms or []) if t.strip()][:12]
             example_id = await conn.fetchval(
-                "INSERT INTO institute_examples (institute_id, title, primary_case_id, partner_case_id, status) "
-                "VALUES ($1, $2, $3, $4, 'draft') RETURNING id",
+                "INSERT INTO institute_examples "
+                "(institute_id, title, primary_case_id, partner_case_id, status, difficulty, tags) "
+                "VALUES ($1, $2, $3, $4, 'draft', $5, $6) RETURNING id",
                 institute["id"], inp.title or f"Beispiel: {inp.person_name}", primary_case, partner_case,
+                int(getattr(inp, "difficulty", 0) or 0), gen_tags,
             )
             await conn.execute(
                 "UPDATE case_generations SET status = 'done', example_id = $2, updated_at = NOW() WHERE id = $1",

@@ -26,6 +26,8 @@ const CONTACT: [string, string][] = [
   ['irregular', 'Unregelmäßig'],
 ]
 
+const DIFFS: [number, string][] = [[0, 'Ohne'], [1, 'Leicht'], [2, 'Mittel'], [3, 'Schwer']]
+
 const inputCls =
   'w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent'
 const labelCls = 'mb-1.5 block text-sm font-medium text-brand-text'
@@ -41,6 +43,7 @@ export default function InstituteGeneratePage() {
   const [distress, setDistress] = useState(3)
   const [focusText, setFocusText] = useState('')
   const [sceneCount, setSceneCount] = useState(12)
+  const [difficulty, setDifficulty] = useState(0)
   const [withPartner, setWithPartner] = useState(false)
   const [partnerName, setPartnerName] = useState('')
   const [freeText, setFreeText] = useState('')
@@ -59,6 +62,7 @@ export default function InstituteGeneratePage() {
         distress_score: distress,
         focus_terms: focusText.split(',').map(s => s.trim()).filter(Boolean),
         scene_count: sceneCount,
+        difficulty,
         with_partner: withPartner,
         partner_name: withPartner ? (partnerName.trim() || null) : null,
         free_text: freeText.trim() || null,
@@ -169,6 +173,18 @@ export default function InstituteGeneratePage() {
                 <input type="range" min={3} max={30} value={sceneCount} onChange={e => setSceneCount(Number(e.target.value))}
                   className="w-full accent-accent" />
               </div>
+            </div>
+            <div>
+              <label className={labelCls}>Schwierigkeitsgrad (didaktisch)</label>
+              <div className="flex flex-wrap gap-2">
+                {DIFFS.map(([d, l]) => (
+                  <button key={d} type="button" onClick={() => setDifficulty(d)}
+                    className={`rounded-brand border px-3 py-1.5 text-sm transition-colors ${difficulty === d ? 'border-accent bg-accent/[0.06] font-medium text-navy' : 'border-brand-border text-brand-muted hover:border-accent/40'}`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1 text-xs text-brand-muted">Leicht = klare, gut erkennbare Muster · Schwer = subtil, ambivalent, anspruchsvoll zu analysieren.</p>
             </div>
             <div>
               <label className={labelCls}>Schwerpunkte (kommagetrennt)</label>

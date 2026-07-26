@@ -146,6 +146,7 @@ export interface GenerationInput {
   free_text?: string | null
   focus_terms: string[]
   scene_count: number
+  difficulty: number
   with_partner: boolean
   partner_name?: string | null
 }

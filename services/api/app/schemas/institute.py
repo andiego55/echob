@@ -49,6 +49,7 @@ class GenerationInput(BaseModel):
     free_text: str | None = Field(None, max_length=4000)              # sonstige Angaben zur Beziehung
     focus_terms: list[str] = Field(default_factory=list)             # Schwerpunkte, die die Beziehung prägen
     scene_count: int = Field(12, ge=3, le=30)
+    difficulty: int = Field(0, ge=0, le=3)                            # didaktische Schwierigkeit (0 = offen)
     with_partner: bool = False
     partner_name: str | None = Field(None, max_length=120)            # Pseudonym Partnerperson
 
