@@ -266,6 +266,39 @@ async def _clone_case(conn, source_case_id) -> str:
     return str(new_case)
 
 
+def _jsonb_str(v):
+    """jsonb-Wert (dict oder str aus asyncpg) → str fürs erneute Einfügen mit ::jsonb."""
+    if v is None:
+        return None
+    return v if isinstance(v, str) else json.dumps(v)
+
+
+async def _clone_example(conn, src_example_id, target_inst_id) -> str:
+    """Klont ein institute_example (inkl. Fälle) in ein Ziel-Institut. Gibt die neue example_id zurück."""
+    src = await conn.fetchrow("SELECT * FROM institute_examples WHERE id = $1", src_example_id)
+    if not src:
+        raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+    new_primary = await _clone_case(conn, src["primary_case_id"]) if src["primary_case_id"] else None
+    new_partner = await _clone_case(conn, src["partner_case_id"]) if src["partner_case_id"] else None
+    return await conn.fetchval(
+        "INSERT INTO institute_examples "
+        "(institute_id, title, description, status, primary_case_id, partner_case_id, difficulty, tags, master_solution) "
+        "VALUES ($1, $2, $3, 'published', $4, $5, $6, $7, $8) RETURNING id",
+        target_inst_id, src["title"], src["description"], new_primary, new_partner,
+        src["difficulty"], list(src["tags"] or []), src["master_solution"])
+
+
+async def _clone_assignment(conn, src_assignment_id, target_inst_id) -> str:
+    """Klont ein institute_assignment in ein Ziel-Institut (ohne Raster/Frist). Gibt neue id zurück."""
+    src = await conn.fetchrow("SELECT * FROM institute_assignments WHERE id = $1", src_assignment_id)
+    if not src:
+        raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
+    return await conn.fetchval(
+        "INSERT INTO institute_assignments (institute_id, kind, title, instructions, payload, rubric_id, status, due_on) "
+        "VALUES ($1, $2, $3, $4, $5::jsonb, NULL, 'published', NULL) RETURNING id",
+        target_inst_id, src["kind"], src["title"], src["instructions"], _jsonb_str(src["payload"]))
+
+
 @router.post("/examples/generate", status_code=202)
 async def generate_example(
     body: GenerationInput,
@@ -1254,6 +1287,46 @@ async def marketplace_detail(
         "provider": m["provider"], "is_own": m["institute_id"] == inst_id,
         "steps": [{"kind": s["kind"], "title": s["title"]} for s in steps],
     }
+
+
+@router.post("/marketplace/{module_id}/acquire")
+async def marketplace_acquire(
+    module_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Übernimmt ein kostenloses Marktplatz-Modul ins eigene Institut: klont Modul + Schritte;
+    Fall- und Aufgaben-Schritte werden mitgeklont (eigene Kopien). Der neue Modul-Entwurf gehört
+    dem übernehmenden Institut. Kostenpflichtige Module: 402 (Kauf folgt in P-F3)."""
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        src = await conn.fetchrow(
+            "SELECT * FROM learning_modules WHERE id = $1 AND sellable = true AND status = 'published'", module_id)
+        if not src:
+            raise HTTPException(status_code=404, detail="Angebot nicht gefunden.")
+        if src["institute_id"] == inst_id:
+            raise HTTPException(status_code=400, detail="Das ist bereits dein eigenes Modul.")
+        if src["price_cents"] > 0:
+            raise HTTPException(status_code=402, detail="Kostenpflichtige Module können noch nicht übernommen werden.")
+        steps = await conn.fetch(
+            "SELECT * FROM learning_module_steps WHERE module_id = $1 ORDER BY position, created_at", module_id)
+        async with conn.transaction():
+            new_mod = await conn.fetchval(
+                "INSERT INTO learning_modules "
+                "(institute_id, title, description, didactic_guide, status, sellable, price_cents) "
+                "VALUES ($1, $2, $3, $4, 'draft', false, 0) RETURNING id",
+                inst_id, src["title"], src["description"], src["didactic_guide"])
+            for st in steps:
+                ref = st["ref_id"]
+                if st["kind"] == "case" and ref:
+                    ref = await _clone_example(conn, ref, inst_id)
+                elif st["kind"] == "assignment" and ref:
+                    ref = await _clone_assignment(conn, ref, inst_id)
+                await conn.execute(
+                    "INSERT INTO learning_module_steps (module_id, position, kind, title, content, ref_id, payload) "
+                    "VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)",
+                    new_mod, st["position"], st["kind"], st["title"], st["content"], ref, _jsonb_str(st["payload"]))
+    return {"module_id": str(new_mod)}
 
 
 @router.delete("/modules/{module_id}")

@@ -2,8 +2,8 @@
  * /institute/marketplace/:id — Vorschau eines Marktplatz-Angebots (Inhaltsverzeichnis,
  * ohne die eigentlichen Inhalte). Erwerb/Übernahme folgt (P-F2).
  */
-import { useQuery } from '@tanstack/react-query'
-import { Link, useParams } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi } from '@/api/institute'
 import { euro } from './InstituteMarketplacePage'
@@ -12,10 +12,20 @@ const KIND_LABEL: Record<string, string> = { lesson: 'Lektion', case: 'Fallbeisp
 
 export default function InstituteMarketplaceDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const qc = useQueryClient()
   const { data, isLoading } = useQuery({
     queryKey: ['institute-marketplace', id],
     queryFn: () => instituteApi.marketplaceDetail(id!),
     enabled: !!id,
+  })
+
+  const acquire = useMutation({
+    mutationFn: () => instituteApi.marketplaceAcquire(id!),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ['institute-modules'] })
+      navigate(`/institute/modules/${res.module_id}`)
+    },
   })
 
   return (
@@ -49,17 +59,26 @@ export default function InstituteMarketplaceDetailPage() {
             </ol>
 
             <div className="mt-8 rounded-brand-lg border border-accent/25 bg-accent/[0.05] px-6 py-6">
-              <h3 className="text-sm font-bold text-navy">{data.is_own ? 'Das ist dein eigenes Angebot' : 'Modul erwerben'}</h3>
+              <h3 className="text-sm font-bold text-navy">{data.is_own ? 'Das ist dein eigenes Angebot' : 'Modul übernehmen'}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-brand-muted">
                 {data.is_own
                   ? 'So sehen andere Institute dein Modul im Marktplatz.'
-                  : 'Der Erwerb (Kauf und Übernahme ins eigene Institut) folgt in Kürze. Aktuell ist dies eine Vorschau des Angebots.'}
+                  : data.price_cents === 0
+                    ? 'Übernimm das Modul als Entwurf in dein Institut – inklusive eigener Kopien der enthaltenen Fälle und Aufgaben. Danach kannst du es anpassen und deinen Studierenden freigeben.'
+                    : 'Kostenpflichtige Module lassen sich in Kürze direkt kaufen. Kostenlose Module kannst du schon jetzt übernehmen.'}
               </p>
               {!data.is_own && (
-                <button disabled className="btn-primary mt-4 !py-2 !px-5 !text-sm opacity-50" title="In Vorbereitung">
-                  {data.price_cents === 0 ? 'Kostenlos übernehmen' : `Kaufen · ${euro(data.price_cents)}`} (bald)
-                </button>
+                data.price_cents === 0 ? (
+                  <button onClick={() => acquire.mutate()} disabled={acquire.isPending} className="btn-primary mt-4 !py-2 !px-5 !text-sm disabled:opacity-50">
+                    {acquire.isPending ? 'Wird übernommen …' : 'Kostenlos übernehmen'}
+                  </button>
+                ) : (
+                  <button disabled className="btn-primary mt-4 !py-2 !px-5 !text-sm opacity-50" title="In Vorbereitung">
+                    Kaufen · {euro(data.price_cents)} (bald)
+                  </button>
+                )
               )}
+              {acquire.isError && <p className="mt-2 text-sm text-red-600">Übernahme fehlgeschlagen. Bitte erneut versuchen.</p>}
             </div>
           </>
         )}
