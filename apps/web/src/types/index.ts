@@ -461,9 +461,33 @@ export interface LearningModule {
   didactic_guide: string | null
   status: 'draft' | 'published' | 'archived'
   sellable: boolean
+  price_cents: number
+  teaser: string | null
   step_count?: number | null
   enrolled_count?: number | null
   created_at: string | null
+}
+
+export interface MarketplaceModule {
+  id: string
+  title: string
+  teaser: string | null
+  description: string | null
+  price_cents: number
+  provider: string
+  step_count: number
+  is_own: boolean
+}
+
+export interface MarketplaceModuleDetail {
+  id: string
+  title: string
+  teaser: string | null
+  description: string | null
+  price_cents: number
+  provider: string
+  is_own: boolean
+  steps: { kind: ModuleStepKind; title: string }[]
 }
 
 export interface LearningModuleDetail extends LearningModule {
@@ -477,6 +501,8 @@ export type ModuleInput = {
   didactic_guide?: string | null
   status?: 'draft' | 'published' | 'archived'
   sellable?: boolean
+  price_cents?: number
+  teaser?: string | null
 }
 
 export type ModuleStepInput = { title: string; content?: string | null; kind?: ModuleStepKind; ref_id?: string | null; payload?: { questions: QuizQuestion[] } }

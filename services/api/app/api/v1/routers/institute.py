@@ -1113,6 +1113,7 @@ def _module_out(row) -> dict:
     return {
         "id": str(d["id"]), "title": d["title"], "description": d["description"],
         "didactic_guide": d["didactic_guide"], "status": d["status"], "sellable": d["sellable"],
+        "price_cents": d.get("price_cents", 0), "teaser": d.get("teaser"),
         "step_count": d.get("step_count"), "enrolled_count": d.get("enrolled_count"),
         "created_at": d["created_at"].isoformat() if d.get("created_at") else None,
     }
@@ -1148,10 +1149,11 @@ async def create_module(
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "INSERT INTO learning_modules (institute_id, title, description, didactic_guide, status, sellable) "
-            "VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            "INSERT INTO learning_modules "
+            "(institute_id, title, description, didactic_guide, status, sellable, price_cents, teaser) "
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
             current["institute"]["id"], body.title, body.description, body.didactic_guide,
-            body.status, body.sellable)
+            body.status, body.sellable, body.price_cents, body.teaser)
     return _module_out(row)
 
 
@@ -1193,12 +1195,65 @@ async def update_module(
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "UPDATE learning_modules SET title = $1, description = $2, didactic_guide = $3, "
-            "status = $4, sellable = $5, updated_at = NOW() WHERE id = $6 AND institute_id = $7 RETURNING *",
+            "status = $4, sellable = $5, price_cents = $6, teaser = $7, updated_at = NOW() "
+            "WHERE id = $8 AND institute_id = $9 RETURNING *",
             body.title, body.description, body.didactic_guide, body.status, body.sellable,
-            module_id, current["institute"]["id"])
+            body.price_cents, body.teaser, module_id, current["institute"]["id"])
     if not row:
         raise HTTPException(status_code=404, detail="Modul nicht gefunden.")
     return _module_out(row)
+
+
+@router.get("/marketplace")
+async def marketplace_list(
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> list[dict]:
+    """Marktplatz-Katalog: alle angebotenen Module (sellable + veröffentlicht) über alle
+    Institute hinweg — mit Anbieter, Schrittzahl, Preis, Teaser."""
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT m.id, m.title, m.teaser, m.description, m.price_cents, m.institute_id, "
+            "ti.name AS provider, "
+            "(SELECT count(*) FROM learning_module_steps s WHERE s.module_id = m.id)::int AS step_count "
+            "FROM learning_modules m JOIN training_institutes ti ON ti.id = m.institute_id "
+            "WHERE m.sellable = true AND m.status = 'published' ORDER BY m.updated_at DESC")
+    return [
+        {
+            "id": str(r["id"]), "title": r["title"], "teaser": r["teaser"],
+            "description": r["description"], "price_cents": r["price_cents"],
+            "provider": r["provider"], "step_count": r["step_count"],
+            "is_own": r["institute_id"] == inst_id,
+        }
+        for r in rows
+    ]
+
+
+@router.get("/marketplace/{module_id}")
+async def marketplace_detail(
+    module_id: UUID,
+    current: dict = Depends(get_current_institute),
+    pool=Depends(get_pool),
+) -> dict:
+    """Vorschau eines angebotenen Moduls: Kopf + Schritt-Überblick (Inhaltsverzeichnis, ohne Inhalte)."""
+    inst_id = current["institute"]["id"]
+    async with pool.acquire() as conn:
+        m = await conn.fetchrow(
+            "SELECT m.*, ti.name AS provider FROM learning_modules m "
+            "JOIN training_institutes ti ON ti.id = m.institute_id "
+            "WHERE m.id = $1 AND m.sellable = true AND m.status = 'published'", module_id)
+        if not m:
+            raise HTTPException(status_code=404, detail="Angebot nicht gefunden.")
+        steps = await conn.fetch(
+            "SELECT kind, title FROM learning_module_steps WHERE module_id = $1 "
+            "ORDER BY position, created_at", module_id)
+    return {
+        "id": str(m["id"]), "title": m["title"], "teaser": m["teaser"],
+        "description": m["description"], "price_cents": m["price_cents"],
+        "provider": m["provider"], "is_own": m["institute_id"] == inst_id,
+        "steps": [{"kind": s["kind"], "title": s["title"]} for s in steps],
+    }
 
 
 @router.delete("/modules/{module_id}")

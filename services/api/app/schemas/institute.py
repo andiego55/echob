@@ -124,6 +124,8 @@ class ModuleUpsert(BaseModel):
     didactic_guide: str | None = Field(None, max_length=20_000)
     status: str = Field("draft", pattern="^(draft|published|archived)$")
     sellable: bool = False
+    price_cents: int = Field(0, ge=0, le=1_000_000)
+    teaser: str | None = Field(None, max_length=600)
 
 
 class ModuleStepUpsert(BaseModel):

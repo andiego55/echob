@@ -104,6 +104,8 @@ import InstituteRoute, { useInstitute } from '@/components/auth/InstituteRoute'
 import InstituteRegisterPage from '@/pages/institute/InstituteRegisterPage'
 import InstituteDashboardPage from '@/pages/institute/InstituteDashboardPage'
 import InstituteCohortPage from '@/pages/institute/InstituteCohortPage'
+import InstituteMarketplacePage from '@/pages/institute/InstituteMarketplacePage'
+import InstituteMarketplaceDetailPage from '@/pages/institute/InstituteMarketplaceDetailPage'
 import InstituteGeneratePage from '@/pages/institute/InstituteGeneratePage'
 import InstituteExampleEditorPage from '@/pages/institute/InstituteExampleEditorPage'
 import InstituteStudentsPage from '@/pages/institute/InstituteStudentsPage'
@@ -249,6 +251,8 @@ export function AppRoutes() {
       <Route path="/institute/assignments" element={<InstituteRoute><InstituteAssignmentsPage /></InstituteRoute>} />
       <Route path="/institute/assignments/:id" element={<InstituteRoute><InstituteAssignmentDetailPage /></InstituteRoute>} />
       <Route path="/institute/settings" element={<InstituteRoute><InstituteSettingsPage /></InstituteRoute>} />
+      <Route path="/institute/marketplace" element={<InstituteRoute><InstituteMarketplacePage /></InstituteRoute>} />
+      <Route path="/institute/marketplace/:id" element={<InstituteRoute><InstituteMarketplaceDetailPage /></InstituteRoute>} />
       <Route path="/institute/modules" element={<InstituteRoute><InstituteModulesPage /></InstituteRoute>} />
       <Route path="/institute/modules/:id" element={<InstituteRoute><InstituteModuleDetailPage /></InstituteRoute>} />
 

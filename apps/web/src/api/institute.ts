@@ -20,6 +20,8 @@ import type {
   InstituteEchoSettings,
   LearningModule,
   LearningModuleDetail,
+  MarketplaceModule,
+  MarketplaceModuleDetail,
   ModuleInput,
   ModuleStep,
   ModuleStepInput,
@@ -154,6 +156,10 @@ export const instituteApi = {
     apiClient.post<LearningModule>('/institute/modules', data).then(r => r.data),
   moduleUpdate: (id: string, data: ModuleInput) =>
     apiClient.patch<LearningModule>(`/institute/modules/${id}`, data).then(r => r.data),
+  marketplace: () =>
+    apiClient.get<MarketplaceModule[]>('/institute/marketplace').then(r => r.data),
+  marketplaceDetail: (id: string) =>
+    apiClient.get<MarketplaceModuleDetail>(`/institute/marketplace/${id}`).then(r => r.data),
   moduleDelete: (id: string) =>
     apiClient.delete(`/institute/modules/${id}`).then(r => r.data),
   moduleStepAdd: (id: string, data: ModuleStepInput) =>

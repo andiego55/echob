@@ -12,6 +12,7 @@ const NAV = [
   { to: '/institute/cohort', label: 'Kohorte', end: false },
   { to: '/institute/students', label: 'Studierende', end: false },
   { to: '/institute/modules', label: 'Lernmodule', end: false },
+  { to: '/institute/marketplace', label: 'Marktplatz', end: false },
   { to: '/institute/assignments', label: 'Aufgaben', end: false },
   { to: '/institute/submissions', label: 'Einreichungen', end: false },
   { to: '/institute/rubrics', label: 'Bewertungsraster', end: false },

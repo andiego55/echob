@@ -104,12 +104,16 @@ function MetaCard({ module }: { module: LearningModuleDetail }) {
   const [guide, setGuide] = useState(module.didactic_guide ?? '')
   const [status, setStatus] = useState(module.status)
   const [sellable, setSellable] = useState(module.sellable)
+  const [teaser, setTeaser] = useState(module.teaser ?? '')
+  const [priceEuro, setPriceEuro] = useState(module.price_cents ? (module.price_cents / 100).toFixed(2) : '0')
   const [savedOk, setSavedOk] = useState(false)
 
   const save = useMutation({
     mutationFn: () => instituteApi.moduleUpdate(module.id, {
       title: title.trim(), description: description.trim() || null,
       didactic_guide: guide.trim() || null, status, sellable,
+      price_cents: Math.max(0, Math.round((parseFloat(priceEuro.replace(',', '.')) || 0) * 100)),
+      teaser: teaser.trim() || null,
     }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['institute-module', module.id] }); qc.invalidateQueries({ queryKey: ['institute-modules'] }); setSavedOk(true); setTimeout(() => setSavedOk(false), 2000) },
   })
@@ -145,9 +149,32 @@ function MetaCard({ module }: { module: LearningModuleDetail }) {
         </div>
         <label className="flex items-center gap-2 text-sm text-brand-text">
           <input type="checkbox" checked={sellable} onChange={e => { setSellable(e.target.checked); dirty() }} className="accent-accent" />
-          Als verkaufbares Paket markieren
+          Im Marktplatz anbieten
         </label>
       </div>
+
+      {sellable && (
+        <div className="space-y-3 rounded-brand border border-accent/25 bg-accent/[0.04] p-3">
+          <p className="text-xs font-semibold text-accent">Marktplatz-Angebot</p>
+          <p className="text-[11px] leading-relaxed text-brand-muted">
+            Als Paket markierte, <strong>veröffentlichte</strong> Module erscheinen im Marktplatz für andere Institute.
+            {status !== 'published' && <span className="text-amber-700"> Zum Listen bitte oben auf „Veröffentlicht“ stellen.</span>}
+          </p>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-brand-text">Angebots-Teaser</label>
+            <textarea value={teaser} onChange={e => { setTeaser(e.target.value); dirty() }} rows={2} maxLength={600}
+              placeholder="Worum geht es, für wen ist das Modul, was ist enthalten? …"
+              className="w-full resize-y rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-brand-text">Preis</label>
+            <input value={priceEuro} onChange={e => { setPriceEuro(e.target.value); dirty() }} inputMode="decimal"
+              className="w-24 rounded-brand border border-brand-border bg-white px-2.5 py-1.5 text-sm outline-none focus:border-accent" />
+            <span className="text-sm text-brand-muted">€ <span className="text-[11px]">(0 = kostenlos)</span></span>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-3 border-t border-brand-border pt-3">
         <button onClick={() => save.mutate()} disabled={!title.trim() || save.isPending} className="btn-primary !py-2 !px-4 !text-sm">
           {save.isPending ? 'Speichern …' : savedOk ? '✓ Gespeichert' : 'Modul speichern'}
