@@ -1,70 +1,61 @@
 /**
- * /institute/cohort — Kohorten-Statusboard: Was braucht die Aufmerksamkeit der Dozent:in?
+ * Kohorten-Statusboard: Was braucht die Aufmerksamkeit der Dozent:in?
  * Rein aggregierende Übersicht (GET /institute/cohort) über Aufgaben, Einreichungen, Module.
+ * Wird als Tab „Status“ in die Studierenden-Seite eingebettet (InstituteStudentsPage).
  */
 import type { ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi, type CohortStudent } from '@/api/institute'
 
-export default function InstituteCohortPage() {
+export function CohortView() {
   const { data, isLoading } = useQuery({ queryKey: ['institute-cohort'], queryFn: instituteApi.cohort })
 
-  return (
-    <InstituteShell>
-      <div className="mx-auto max-w-[1100px] px-6 py-8">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold text-navy">Kohorte</h1>
-          <p className="mt-1 text-sm text-brand-muted">
-            Der Status deiner Studierenden auf einen Blick – was braucht gerade deine Aufmerksamkeit?
-          </p>
-        </header>
+  if (isLoading || !data) return <p className="text-sm text-brand-muted">Lädt …</p>
 
-        {isLoading || !data ? (
-          <p className="text-sm text-brand-muted">Lädt …</p>
-        ) : data.students.length === 0 ? (
-          <div className="card py-10 text-center">
-            <p className="text-sm text-brand-muted">
-              Noch keine Studierenden. <Link to="/institute/students" className="text-accent hover:underline">Lade welche ein →</Link>
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              <Tile label="Studierende" value={data.totals.students} />
-              <Tile label="Einreichungen offen" value={data.totals.submissions_pending} to="/institute/submissions" accent />
-              <Tile label="Aufgaben eingereicht" value={data.totals.assignments_pending} to="/institute/assignments" accent />
-              <Tile label="Überfällig" value={data.totals.assignments_overdue} danger />
-              <Tile label="Module aktiv" value={data.totals.modules_active} />
-              <Tile label="Module fertig" value={data.totals.modules_completed} />
-            </div>
-
-            <div className="card mt-6 overflow-x-auto !p-0">
-              <table className="w-full min-w-[720px] text-sm">
-                <thead>
-                  <tr className="border-b border-brand-border text-left text-[11px] uppercase tracking-wide text-brand-muted">
-                    <Th>Studierende:r</Th>
-                    <Th center>Aufgaben offen</Th>
-                    <Th center>Eingereicht</Th>
-                    <Th center>Überfällig</Th>
-                    <Th center>Fall-Einreich.</Th>
-                    <Th center>Fälle</Th>
-                    <Th center>Module</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.students.map((s) => <Row key={s.id} s={s} />)}
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-3 text-xs text-brand-muted/70">
-              „Eingereicht“ und „Fall-Einreich.“ warten auf deine Bewertung. Überfällige Aufgaben sind rot markiert.
-            </p>
-          </>
-        )}
+  if (data.students.length === 0) {
+    return (
+      <div className="card py-10 text-center">
+        <p className="text-sm text-brand-muted">
+          Noch keine Studierenden. <Link to="/institute/students?view=manage" className="text-accent hover:underline">Lade welche ein →</Link>
+        </p>
       </div>
-    </InstituteShell>
+    )
+  }
+
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <Tile label="Studierende" value={data.totals.students} />
+        <Tile label="Einreichungen offen" value={data.totals.submissions_pending} to="/institute/submissions" accent />
+        <Tile label="Aufgaben eingereicht" value={data.totals.assignments_pending} to="/institute/assignments" accent />
+        <Tile label="Überfällig" value={data.totals.assignments_overdue} danger />
+        <Tile label="Module aktiv" value={data.totals.modules_active} />
+        <Tile label="Module fertig" value={data.totals.modules_completed} />
+      </div>
+
+      <div className="card mt-6 overflow-x-auto !p-0">
+        <table className="w-full min-w-[720px] text-sm">
+          <thead>
+            <tr className="border-b border-brand-border text-left text-[11px] uppercase tracking-wide text-brand-muted">
+              <Th>Studierende:r</Th>
+              <Th center>Aufgaben offen</Th>
+              <Th center>Eingereicht</Th>
+              <Th center>Überfällig</Th>
+              <Th center>Fall-Einreich.</Th>
+              <Th center>Fälle</Th>
+              <Th center>Module</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.students.map((s) => <Row key={s.id} s={s} />)}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-xs text-brand-muted/70">
+        „Eingereicht“ und „Fall-Einreich.“ warten auf deine Bewertung. Überfällige Aufgaben sind rot markiert.
+      </p>
+    </>
   )
 }
 

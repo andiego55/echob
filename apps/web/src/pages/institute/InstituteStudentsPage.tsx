@@ -1,14 +1,45 @@
 /**
- * /institute/students — Studierende einladen und verwalten.
- * Einladung erzeugt einen Code (+ Link-Token); Kontingent wird serverseitig geprüft.
+ * /institute/students — Studierende der Kohorte: Status-Board + Einladen/Verwalten.
+ * Tabs via ?view=status|manage (Standard: status). Vereint das frühere „Kohorte“-Board
+ * (CohortView) mit der Platzverwaltung.
  */
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
+import InstituteTabs from '@/components/institute/InstituteTabs'
 import { instituteApi } from '@/api/institute'
 import type { StudentInvite } from '@/types'
+import { CohortView } from './InstituteCohortPage'
 
 export default function InstituteStudentsPage() {
+  const [params, setParams] = useSearchParams()
+  const view = params.get('view') === 'manage' ? 'manage' : 'status'
+  const setView = (v: 'status' | 'manage') => setParams(v === 'status' ? {} : { view: v }, { replace: true })
+
+  return (
+    <InstituteShell>
+      <div className="mx-auto max-w-[1100px] px-6 py-8">
+        <header className="mb-5">
+          <h1 className="text-2xl font-bold text-navy">Studierende</h1>
+          <p className="mt-1 text-sm text-brand-muted">
+            Der Status deiner Kohorte auf einen Blick – und die Verwaltung der Plätze.
+          </p>
+        </header>
+
+        <InstituteTabs
+          tabs={[{ key: 'status', label: 'Status' }, { key: 'manage', label: 'Einladen & verwalten' }]}
+          active={view}
+          onChange={(k) => setView(k as 'status' | 'manage')}
+        />
+
+        <div className="mt-6">{view === 'status' ? <CohortView /> : <RosterView />}</div>
+      </div>
+    </InstituteShell>
+  )
+}
+
+function RosterView() {
   const qc = useQueryClient()
   const { data } = useQuery({ queryKey: ['institute-students'], queryFn: instituteApi.listStudents })
   const [label, setLabel] = useState('')
@@ -31,73 +62,70 @@ export default function InstituteStudentsPage() {
   const full = used >= quota
 
   return (
-    <InstituteShell>
-      <div className="mx-auto max-w-[860px] px-6 py-10">
-        <h1 className="text-2xl font-bold text-navy">Studierende</h1>
-        <p className="mt-1 text-sm text-brand-muted">
-          Laden Sie Studierende per Code ein. Belegt: <strong className="text-navy">{used}</strong> / {quota} Plätze.
-        </p>
+    <div className="max-w-[820px]">
+      <p className="text-sm text-brand-muted">
+        Laden Sie Studierende per Code ein. Belegt: <strong className="text-navy">{used}</strong> / {quota} Plätze.
+      </p>
 
-        {/* Einladen */}
-        <div className="card mt-6">
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex-1 min-w-[200px]">
-              <label className="mb-1.5 block text-sm font-medium text-brand-text">Interner Merker (optional)</label>
-              <input
-                value={label}
-                onChange={e => setLabel(e.target.value)}
-                placeholder="z. B. Kohorte 2026"
-                maxLength={160}
-                className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
-              />
-            </div>
-            <button
-              onClick={() => invite.mutate()}
-              disabled={invite.isPending || full}
-              title={full ? 'Kontingent erreicht' : undefined}
-              className="btn-primary !py-2.5 !px-5 !text-sm"
-            >
-              + Einladen
-            </button>
+      {/* Einladen */}
+      <div className="card mt-5">
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <label className="mb-1.5 block text-sm font-medium text-brand-text">Interner Merker (optional)</label>
+            <input
+              value={label}
+              onChange={e => setLabel(e.target.value)}
+              placeholder="z. B. Kohorte 2026"
+              maxLength={160}
+              className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
+            />
           </div>
-          {full && (
-            <p className="mt-2 text-xs text-brand-muted">Kontingent erreicht – bestehende Einladungen zurückziehen oder Plätze aufstocken.</p>
-          )}
+          <button
+            onClick={() => invite.mutate()}
+            disabled={invite.isPending || full}
+            title={full ? 'Kontingent erreicht' : undefined}
+            className="btn-primary !py-2.5 !px-5 !text-sm"
+          >
+            + Einladen
+          </button>
         </div>
+        {full && (
+          <p className="mt-2 text-xs text-brand-muted">Kontingent erreicht – bestehende Einladungen zurückziehen oder Plätze aufstocken.</p>
+        )}
+      </div>
 
-        {/* Offene Einladungen */}
-        {data && data.invites.length > 0 && (
-          <div className="mt-8">
-            <p className="mb-3 text-sm font-semibold text-navy">Offene Einladungen</p>
-            <div className="space-y-2">
-              {data.invites.map(inv => <InviteRow key={inv.id} invite={inv} onRevoke={() => revoke.mutate(inv.id)} />)}
-            </div>
+      {/* Offene Einladungen */}
+      {data && data.invites.length > 0 && (
+        <div className="mt-8">
+          <p className="mb-3 text-sm font-semibold text-navy">Offene Einladungen</p>
+          <div className="space-y-2">
+            {data.invites.map(inv => <InviteRow key={inv.id} invite={inv} onRevoke={() => revoke.mutate(inv.id)} />)}
+          </div>
+        </div>
+      )}
+
+      {/* Aktive Studierende */}
+      <div className="mt-8">
+        <p className="mb-3 text-sm font-semibold text-navy">Aktive Studierende</p>
+        {!data || data.students.length === 0 ? (
+          <p className="text-sm text-brand-muted">Noch niemand beigetreten.</p>
+        ) : (
+          <div className="space-y-2">
+            {data.students.map(s => (
+              <div key={s.id} className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-white px-4 py-2.5">
+                <span className="text-sm font-medium text-navy">{s.display_name || 'Studierende:r'}</span>
+                <button
+                  onClick={() => { if (window.confirm('Studierende:n entfernen?')) remove.mutate(s.id) }}
+                  className="text-xs text-brand-muted/70 hover:text-red-500 transition-colors"
+                >
+                  Entfernen
+                </button>
+              </div>
+            ))}
           </div>
         )}
-
-        {/* Aktive Studierende */}
-        <div className="mt-8">
-          <p className="mb-3 text-sm font-semibold text-navy">Aktive Studierende</p>
-          {!data || data.students.length === 0 ? (
-            <p className="text-sm text-brand-muted">Noch niemand beigetreten.</p>
-          ) : (
-            <div className="space-y-2">
-              {data.students.map(s => (
-                <div key={s.id} className="flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-white px-4 py-2.5">
-                  <span className="text-sm font-medium text-navy">{s.display_name || 'Studierende:r'}</span>
-                  <button
-                    onClick={() => { if (window.confirm('Studierende:n entfernen?')) remove.mutate(s.id) }}
-                    className="text-xs text-brand-muted/70 hover:text-red-500 transition-colors"
-                  >
-                    Entfernen
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
-    </InstituteShell>
+    </div>
   )
 }
 

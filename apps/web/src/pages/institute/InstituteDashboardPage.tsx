@@ -1,8 +1,8 @@
 /**
  * /institute/dashboard — Cockpit des Ausbildungsinstituts.
- * Kontingent-Überblick + Fallbibliothek (Karten) mit Filter/Suche + Einstieg in die Generierung.
+ * Kennzahlen/Status oben (Kontingente + offene Bewertungen aus der Kohorte), Fallbibliothek darunter.
  */
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
@@ -19,10 +19,12 @@ const DIFF_STYLE: Record<number, string> = {
 export default function InstituteDashboardPage() {
   const { data: institute } = useInstitute()
   const { data: examples } = useQuery({ queryKey: ['institute-examples'], queryFn: instituteApi.listExamples })
+  const { data: cohort } = useQuery({ queryKey: ['institute-cohort'], queryFn: instituteApi.cohort })
 
   const list = examples ?? []
   const used = list.length
   const quota = institute?.example_quota ?? 0
+  const t = cohort?.totals
 
   const [search, setSearch] = useState('')
   const [diff, setDiff] = useState<'all' | '1' | '2' | '3'>('all')
@@ -54,11 +56,11 @@ export default function InstituteDashboardPage() {
   return (
     <InstituteShell>
       <div className="mx-auto max-w-[1100px] px-6 py-10">
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-navy">{institute?.name ?? 'Ausbildungsinstitut'}</h1>
             <p className="mt-1 text-sm text-brand-muted">
-              Generieren Sie Beispielfälle, ordnen Sie sie ein und geben Sie sie an Ihre Studierenden frei.
+              Überblick über dein Institut – Kennzahlen, offene Bewertungen und deine Fallbibliothek.
             </p>
           </div>
           <Link
@@ -70,16 +72,23 @@ export default function InstituteDashboardPage() {
           </Link>
         </div>
 
-        {/* Kontingent */}
-        <div className="mb-6 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-brand border border-brand-border bg-white px-5 py-3 text-sm">
-          <span className="text-brand-muted"><strong className="font-bold text-navy">{used}</strong> / {quota} Beispielfälle</span>
-          <span className="text-brand-border">·</span>
-          <span className="text-brand-muted"><strong className="font-bold text-navy">{institute?.student_quota ?? 0}</strong> Studierenden-Plätze</span>
+        {/* Kennzahlen / Status */}
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Kpi label="Beispielfälle" value={`${used} / ${quota}`} />
+          <Kpi label="Studierende aktiv" value={t?.students ?? 0} sub={`von ${institute?.student_quota ?? 0} Plätzen`} to="/institute/students" />
+          <Kpi label="Zu bewerten" value={(t?.submissions_pending ?? 0) + (t?.assignments_pending ?? 0)} to="/institute/students?view=status" accent />
+          <Kpi label="Überfällig" value={t?.assignments_overdue ?? 0} to="/institute/students?view=status" danger />
+        </div>
+
+        {/* Fallbibliothek */}
+        <div className="mb-4 flex items-baseline justify-between gap-3">
+          <h2 className="text-lg font-bold text-navy">Fallbibliothek</h2>
+          {list.length > 0 && <span className="text-xs text-brand-muted">{used} {used === 1 ? 'Fall' : 'Fälle'}</span>}
         </div>
 
         {list.length === 0 ? (
           <div className="card mx-auto max-w-md py-14 text-center">
-            <h2 className="mb-2 text-lg font-semibold text-navy">Noch keine Beispielfälle</h2>
+            <h3 className="mb-2 text-lg font-semibold text-navy">Noch keine Beispielfälle</h3>
             <p className="mx-auto mb-6 max-w-xs text-sm leading-relaxed text-brand-muted">
               Erzeugen Sie Ihren ersten prototypischen Fall – EchoB generiert Szenen und Onboarding,
               die Sie danach prüfen und ablegen.
@@ -137,6 +146,20 @@ export default function InstituteDashboardPage() {
       </div>
     </InstituteShell>
   )
+}
+
+function Kpi({ label, value, sub, to, accent, danger }: { label: string; value: ReactNode; sub?: string; to?: string; accent?: boolean; danger?: boolean }) {
+  const alert = !!danger && typeof value === 'number' && value > 0
+  const warn = !!accent && typeof value === 'number' && value > 0
+  const border = alert ? 'border-red-200' : warn ? 'border-amber-200' : ''
+  const inner = (
+    <div className={`card !p-4 h-full ${border} ${to ? 'transition-colors hover:border-accent/50' : ''}`}>
+      <p className={`text-2xl font-bold tabular-nums ${alert ? 'text-red-600' : 'text-navy'}`}>{value}</p>
+      <p className="mt-0.5 text-[11px] text-brand-muted">{label}</p>
+      {sub && <p className="text-[10px] text-brand-muted/70">{sub}</p>}
+    </div>
+  )
+  return to ? <Link to={to} className="block no-underline">{inner}</Link> : inner
 }
 
 function ExampleCard({ example: ex }: { example: ExampleSummary }) {

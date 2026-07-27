@@ -31,7 +31,7 @@ export default function InstituteMarketplaceDetailPage() {
   return (
     <InstituteShell>
       <div className="mx-auto max-w-[760px] px-6 py-10">
-        <Link to="/institute/marketplace" className="text-sm text-brand-muted no-underline hover:text-navy">← Zurück zum Marktplatz</Link>
+        <Link to="/institute/modules?view=market" className="text-sm text-brand-muted no-underline hover:text-navy">← Zurück zum Marktplatz</Link>
 
         {isLoading || !data ? (
           <p className="mt-6 text-sm text-brand-muted">Lädt …</p>
