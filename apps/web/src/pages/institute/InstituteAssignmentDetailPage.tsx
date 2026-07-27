@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi } from '@/api/institute'
+import { apiErrorDetail } from '@/utils/apiError'
 import { KindBadge, KIND_LABEL } from './InstituteAssignmentsPage'
 import type { StudentAssignmentRow, AssignmentStatus, AssignmentDetail, AssignmentKind, Rubric, SubmissionScore } from '@/types'
 
@@ -31,6 +32,7 @@ export default function InstituteAssignmentDetailPage() {
   const del = useMutation({
     mutationFn: () => instituteApi.assignmentDelete(id!),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['institute-assignments'] }); navigate('/institute/assignments') },
+    onError: (e) => window.alert(apiErrorDetail(e, 'Löschen fehlgeschlagen.')),
   })
   const assign = useMutation({
     mutationFn: (v: { student_ids?: string[]; to_all?: boolean }) => instituteApi.assignmentAssign(id!, v),

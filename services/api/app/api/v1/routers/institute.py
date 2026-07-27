@@ -994,6 +994,16 @@ async def delete_assignment(
     pool=Depends(get_pool),
 ) -> dict:
     async with pool.acquire() as conn:
+        used = await conn.fetchval(
+            "SELECT count(*) FROM learning_module_steps s "
+            "JOIN learning_modules m ON m.id = s.module_id "
+            "WHERE s.kind = 'assignment' AND s.ref_id = $1 AND m.institute_id = $2",
+            assignment_id, current["institute"]["id"])
+        if used:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Diese Aufgabe wird in {used} Lernmodul(en) verwendet und kann nicht gelöscht werden. "
+                       "Entferne sie zuerst dort aus den Schritten.")
         res = await conn.execute(
             "DELETE FROM institute_assignments WHERE id = $1 AND institute_id = $2",
             assignment_id, current["institute"]["id"])
