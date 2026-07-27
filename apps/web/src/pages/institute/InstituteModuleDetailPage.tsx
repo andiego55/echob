@@ -2,7 +2,7 @@
  * /institute/modules/:id — Modul bearbeiten: Metadaten, Leitfaden, Lektionen, Einschreibung.
  */
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi } from '@/api/institute'
@@ -262,6 +262,7 @@ function StepRow({ moduleId, step, index, total, onMove, examples, assignments }
   }
 
   const ref = refTitle(step, examples, assignments)
+  const refAssignment = step.kind === 'assignment' ? assignments.find(a => a.id === step.ref_id) : undefined
   return (
     <div className="rounded-brand border border-brand-border bg-white px-3 py-2.5">
       <div className="flex items-center justify-between gap-3">
@@ -274,10 +275,24 @@ function StepRow({ moduleId, step, index, total, onMove, examples, assignments }
         <div className="flex shrink-0 items-center gap-1">
           <button onClick={() => onMove(index, -1)} disabled={index === 0} title="Nach oben" className="rounded p-1 text-brand-muted hover:text-navy disabled:opacity-30">↑</button>
           <button onClick={() => onMove(index, 1)} disabled={index === total - 1} title="Nach unten" className="rounded p-1 text-brand-muted hover:text-navy disabled:opacity-30">↓</button>
-          <button onClick={() => setEditing(true)} className="ml-1 text-xs text-brand-muted hover:text-accent">Bearbeiten</button>
+          <button onClick={() => setEditing(true)} title="Schritt (Titel/Referenz) ändern" className="ml-1 text-xs text-brand-muted hover:text-accent">Schritt</button>
           <button onClick={() => { if (window.confirm('Schritt löschen?')) del.mutate() }} className="ml-1 text-xs text-brand-muted hover:text-red-600">Löschen</button>
         </div>
       </div>
+
+      {step.kind === 'assignment' && step.ref_id && (
+        <div className="mt-2 border-t border-brand-border/60 pt-2">
+          {refAssignment?.instructions
+            ? <p className="mb-1.5 line-clamp-3 whitespace-pre-wrap text-xs leading-relaxed text-brand-muted">{refAssignment.instructions}</p>
+            : <p className="mb-1.5 text-xs italic text-brand-muted">Für diese Aufgabe ist noch keine Aufgabenstellung hinterlegt.</p>}
+          <Link to={`/institute/assignments/${step.ref_id}`} className="text-xs font-medium text-accent hover:underline">Aufgabenstellung öffnen &amp; bearbeiten →</Link>
+        </div>
+      )}
+      {step.kind === 'case' && step.ref_id && (
+        <div className="mt-2 border-t border-brand-border/60 pt-2">
+          <Link to={`/institute/examples/${step.ref_id}`} className="text-xs font-medium text-accent hover:underline">Fall öffnen &amp; bearbeiten →</Link>
+        </div>
+      )}
     </div>
   )
 }
