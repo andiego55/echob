@@ -44,6 +44,12 @@ export default function SzeneDetailPage() {
     .slice(0, 3)
     .map((x) => x.s)
 
+  // Erklärendes Wissen aus demselben Cluster (keine Szenen) — verbindet die
+  // Erzählung mit Hintergrund (Themencluster: Szene → Wissen/Glossar).
+  const clusterReads = CONTENT_MANIFEST
+    .filter((m) => m.cluster === scene.cluster && m.type !== 'scene')
+    .slice(0, 4)
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
@@ -146,6 +152,22 @@ export default function SzeneDetailPage() {
                   </Link>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Verstehen: erklärendes Wissen desselben Clusters */}
+          {clusterReads.length > 0 && (
+            <div className="mt-12 border-t border-brand-border pt-8">
+              <p className="mb-4 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brand-muted">
+                Verstehen, was dahintersteckt
+              </p>
+              <ul className="space-y-2">
+                {clusterReads.map((m) => (
+                  <li key={m.url}>
+                    <Link to={m.url} className="text-sm font-medium text-accent hover:underline">{m.title}</Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
