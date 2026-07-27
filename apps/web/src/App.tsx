@@ -12,6 +12,7 @@ import PseudonymAuthPage    from '@/pages/PseudonymAuthPage'
 import NotFoundPage         from '@/pages/NotFoundPage'
 import CoachingPage         from '@/pages/CoachingPage'
 import UeberPage            from '@/pages/UeberPage'
+import UeberMissionPage     from '@/pages/UeberMissionPage'
 import GruenderInterviewPage from '@/pages/GruenderInterviewPage'
 import TeamPage             from '@/pages/TeamPage'
 import FachpersonenPage     from '@/pages/FachpersonenPage'
@@ -174,6 +175,7 @@ export function AppRoutes() {
       <Route path="/einladung/:token" element={<ClientInvitePage />} />
       <Route path="/coaching"    element={<CoachingPage />} />
       <Route path="/ueber"       element={<UeberPage />} />
+      <Route path="/ueber/mission" element={<UeberMissionPage />} />
       <Route path="/ueber/gruender" element={<GruenderInterviewPage />} />
       <Route path="/ueber/team" element={<TeamPage />} />
       <Route path="/fachpersonen" element={<FachpersonenPage />} />

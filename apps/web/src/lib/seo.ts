@@ -40,6 +40,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Wer hinter EchoB steht und warum es EchoB gibt: ein Werkzeug, um wiederkehrende Beziehungsmuster zu verstehen. Kein Ersatz für Therapie oder Beratung.',
   },
+  '/ueber/mission': {
+    title: 'Warum es EchoB gibt – Mission & Haltung – EchoB',
+    description:
+      'Warum EchoB existiert: niedrigschwellige, sofort erreichbare Reflexion, wenn Therapie nicht verfügbar, bezahlbar oder bewilligt ist. Von wahrgenommenem „Schicksal" zu echter Erkenntnis – ein Werkzeug, das Menschen und Fachpersonen zusammenbringt.',
+  },
   '/ueber/gruender': {
     title: 'Gründer-Interview – EchoB',
     description:

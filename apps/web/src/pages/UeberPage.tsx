@@ -27,6 +27,9 @@ export default function UeberPage() {
             Rahmen, der ehrlich ist: KI-gestützt, auf Reflexion ausgelegt – und mit einem klaren Weg
             zu menschlicher Unterstützung, wenn es darauf ankommt.
           </p>
+          <Link to="/ueber/mission" className="mt-6 inline-block text-brand-blue font-medium hover:text-white no-underline">
+            Warum es EchoB gibt – unsere Mission →
+          </Link>
         </div>
       </section>
 

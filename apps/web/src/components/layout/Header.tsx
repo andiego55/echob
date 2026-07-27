@@ -249,6 +249,9 @@ export default function Header() {
                 <Link to="/ueber" className="block px-4 py-2 text-[0.83rem] text-brand-text hover:text-accent hover:bg-brand-bg no-underline transition-colors">
                   Über EchoB
                 </Link>
+                <Link to="/ueber/mission" className="block px-4 py-2 text-[0.83rem] text-brand-text hover:text-accent hover:bg-brand-bg no-underline transition-colors">
+                  Mission &amp; Haltung
+                </Link>
                 <Link to="/ueber/gruender" className="block px-4 py-2 text-[0.83rem] text-brand-text hover:text-accent hover:bg-brand-bg no-underline transition-colors">
                   Interview
                 </Link>
