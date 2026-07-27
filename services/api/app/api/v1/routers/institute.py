@@ -1249,15 +1249,18 @@ async def marketplace_list(
         rows = await conn.fetch(
             "SELECT m.id, m.title, m.teaser, m.description, m.price_cents, m.institute_id, "
             "ti.name AS provider, "
-            "(SELECT count(*) FROM learning_module_steps s WHERE s.module_id = m.id)::int AS step_count "
+            "(SELECT count(*) FROM learning_module_steps s WHERE s.module_id = m.id)::int AS step_count, "
+            "EXISTS (SELECT 1 FROM learning_modules mine WHERE mine.institute_id = $1 "
+            "AND mine.source_module_id = m.id) AS acquired "
             "FROM learning_modules m JOIN training_institutes ti ON ti.id = m.institute_id "
-            "WHERE m.sellable = true AND m.status = 'published' ORDER BY m.updated_at DESC")
+            "WHERE m.sellable = true AND m.status = 'published' ORDER BY m.updated_at DESC",
+            inst_id)
     return [
         {
             "id": str(r["id"]), "title": r["title"], "teaser": r["teaser"],
             "description": r["description"], "price_cents": r["price_cents"],
             "provider": r["provider"], "step_count": r["step_count"],
-            "is_own": r["institute_id"] == inst_id,
+            "is_own": r["institute_id"] == inst_id, "acquired": r["acquired"],
         }
         for r in rows
     ]
@@ -1281,10 +1284,14 @@ async def marketplace_detail(
         steps = await conn.fetch(
             "SELECT kind, title FROM learning_module_steps WHERE module_id = $1 "
             "ORDER BY position, created_at", module_id)
+        acquired = await conn.fetchval(
+            "SELECT id FROM learning_modules WHERE institute_id = $1 AND source_module_id = $2 LIMIT 1",
+            inst_id, module_id)
     return {
         "id": str(m["id"]), "title": m["title"], "teaser": m["teaser"],
         "description": m["description"], "price_cents": m["price_cents"],
         "provider": m["provider"], "is_own": m["institute_id"] == inst_id,
+        "acquired_module_id": str(acquired) if acquired else None,
         "steps": [{"kind": s["kind"], "title": s["title"]} for s in steps],
     }
 
@@ -1308,14 +1315,19 @@ async def marketplace_acquire(
             raise HTTPException(status_code=400, detail="Das ist bereits dein eigenes Modul.")
         if src["price_cents"] > 0:
             raise HTTPException(status_code=402, detail="Kostenpflichtige Module können noch nicht übernommen werden.")
+        existing = await conn.fetchval(
+            "SELECT id FROM learning_modules WHERE institute_id = $1 AND source_module_id = $2 LIMIT 1",
+            inst_id, module_id)
+        if existing:
+            return {"module_id": str(existing), "already": True}
         steps = await conn.fetch(
             "SELECT * FROM learning_module_steps WHERE module_id = $1 ORDER BY position, created_at", module_id)
         async with conn.transaction():
             new_mod = await conn.fetchval(
                 "INSERT INTO learning_modules "
-                "(institute_id, title, description, didactic_guide, status, sellable, price_cents) "
-                "VALUES ($1, $2, $3, $4, 'draft', false, 0) RETURNING id",
-                inst_id, src["title"], src["description"], src["didactic_guide"])
+                "(institute_id, title, description, didactic_guide, status, sellable, price_cents, source_module_id) "
+                "VALUES ($1, $2, $3, $4, 'draft', false, 0, $5) RETURNING id",
+                inst_id, src["title"], src["description"], src["didactic_guide"], module_id)
             for st in steps:
                 ref = st["ref_id"]
                 if st["kind"] == "case" and ref:

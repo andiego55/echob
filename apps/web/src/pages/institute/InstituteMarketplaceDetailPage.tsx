@@ -59,16 +59,22 @@ export default function InstituteMarketplaceDetailPage() {
             </ol>
 
             <div className="mt-8 rounded-brand-lg border border-accent/25 bg-accent/[0.05] px-6 py-6">
-              <h3 className="text-sm font-bold text-navy">{data.is_own ? 'Das ist dein eigenes Angebot' : 'Modul übernehmen'}</h3>
+              <h3 className="text-sm font-bold text-navy">
+                {data.is_own ? 'Das ist dein eigenes Angebot' : data.acquired_module_id ? 'Bereits übernommen' : 'Modul übernehmen'}
+              </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-brand-muted">
                 {data.is_own
                   ? 'So sehen andere Institute dein Modul im Marktplatz.'
-                  : data.price_cents === 0
-                    ? 'Übernimm das Modul als Entwurf in dein Institut – inklusive eigener Kopien der enthaltenen Fälle und Aufgaben. Danach kannst du es anpassen und deinen Studierenden freigeben.'
-                    : 'Kostenpflichtige Module lassen sich in Kürze direkt kaufen. Kostenlose Module kannst du schon jetzt übernehmen.'}
+                  : data.acquired_module_id
+                    ? 'Du hast dieses Modul bereits in dein Institut übernommen.'
+                    : data.price_cents === 0
+                      ? 'Übernimm das Modul als Entwurf in dein Institut – inklusive eigener Kopien der enthaltenen Fälle und Aufgaben. Danach kannst du es anpassen und deinen Studierenden freigeben.'
+                      : 'Kostenpflichtige Module lassen sich in Kürze direkt kaufen. Kostenlose Module kannst du schon jetzt übernehmen.'}
               </p>
               {!data.is_own && (
-                data.price_cents === 0 ? (
+                data.acquired_module_id ? (
+                  <Link to={`/institute/modules/${data.acquired_module_id}`} className="mt-3 inline-block text-sm font-medium text-accent hover:underline">Zu deinem Modul →</Link>
+                ) : data.price_cents === 0 ? (
                   <button onClick={() => acquire.mutate()} disabled={acquire.isPending} className="btn-primary mt-4 !py-2 !px-5 !text-sm disabled:opacity-50">
                     {acquire.isPending ? 'Wird übernommen …' : 'Kostenlos übernehmen'}
                   </button>

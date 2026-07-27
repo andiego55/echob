@@ -477,6 +477,7 @@ export interface MarketplaceModule {
   provider: string
   step_count: number
   is_own: boolean
+  acquired: boolean
 }
 
 export interface MarketplaceModuleDetail {
@@ -487,6 +488,7 @@ export interface MarketplaceModuleDetail {
   price_cents: number
   provider: string
   is_own: boolean
+  acquired_module_id: string | null
   steps: { kind: ModuleStepKind; title: string }[]
 }
 

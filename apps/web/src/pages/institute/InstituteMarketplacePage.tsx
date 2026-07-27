@@ -51,7 +51,9 @@ function Card({ m }: { m: MarketplaceModule }) {
     <Link to={`/institute/marketplace/${m.id}`} className="card block no-underline transition-all hover:border-accent/40 hover:shadow-md">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${m.price_cents === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-accent/10 text-accent'}`}>{euro(m.price_cents)}</span>
-        {m.is_own && <span className="rounded-full bg-brand-bg px-2 py-0.5 text-[10px] text-brand-muted">Dein Angebot</span>}
+        {m.is_own
+          ? <span className="rounded-full bg-brand-bg px-2 py-0.5 text-[10px] text-brand-muted">Dein Angebot</span>
+          : m.acquired && <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">✓ Übernommen</span>}
       </div>
       <p className="text-sm font-semibold leading-snug text-navy">{m.title}</p>
       {m.teaser && <p className="mt-1.5 text-xs leading-relaxed text-brand-muted line-clamp-3">{m.teaser}</p>}
