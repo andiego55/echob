@@ -426,6 +426,16 @@ async def delete_example(
         )
         if not ex:
             raise HTTPException(status_code=404, detail="Beispiel nicht gefunden.")
+        used = await conn.fetchval(
+            "SELECT count(*) FROM learning_module_steps s "
+            "JOIN learning_modules m ON m.id = s.module_id "
+            "WHERE s.kind = 'case' AND s.ref_id = $1 AND m.institute_id = $2",
+            example_id, current["institute"]["id"])
+        if used:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Dieser Fall wird in {used} Lernmodul(en) verwendet und kann nicht gelöscht werden. "
+                       "Entferne ihn zuerst dort aus den Schritten.")
         async with conn.transaction():
             await conn.execute("DELETE FROM institute_examples WHERE id = $1", example_id)
             for cid in (ex["primary_case_id"], ex["partner_case_id"]):

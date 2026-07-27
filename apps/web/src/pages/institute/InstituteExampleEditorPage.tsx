@@ -10,6 +10,7 @@ import InstituteShell from '@/components/institute/InstituteShell'
 import { Spinner } from '@/components/auth/InstituteRoute'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { instituteApi, DIFFICULTY_LABELS } from '@/api/institute'
+import { apiErrorDetail } from '@/utils/apiError'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { ExampleCasePart, ExampleScene, ProfileModules, DidacticsResult } from '@/types'
 
@@ -107,7 +108,7 @@ export default function InstituteExampleEditorPage() {
               {published ? 'Zurückziehen' : 'Veröffentlichen'}
             </button>
             <button
-              onClick={() => { if (window.confirm('Beispiel und zugehörige Fälle löschen?')) remove.mutate() }}
+              onClick={() => { if (window.confirm('Beispiel und zugehörige Fälle unwiderruflich löschen? Fälle, die in einem Lernmodul verwendet werden, lassen sich nicht löschen.')) remove.mutate() }}
               disabled={remove.isPending}
               className="text-xs text-brand-muted/70 hover:text-red-500 transition-colors"
             >
@@ -115,6 +116,12 @@ export default function InstituteExampleEditorPage() {
             </button>
           </div>
         </div>
+
+        {remove.isError && (
+          <p className="mt-3 rounded-brand border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            {apiErrorDetail(remove.error, 'Löschen fehlgeschlagen.')}
+          </p>
+        )}
 
         <p className="mt-3 text-xs text-brand-muted">
           Prüfen Sie den generierten Fall. Über <strong className="text-navy">Veröffentlichen</strong> wird er

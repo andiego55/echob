@@ -20,3 +20,11 @@ export function apiErrorText(error: unknown, fallback: string): string {
   if (typeof detail === 'string' && ERROR_TEXTS[detail]) return ERROR_TEXTS[detail]
   return fallback
 }
+
+// Wie apiErrorText, gibt aber auch unbekannte Detail-Texte (Klartext-Meldungen der API)
+// direkt zurück — für Fälle wie 409-Guards mit ausformulierter Begründung.
+export function apiErrorDetail(error: unknown, fallback: string): string {
+  const detail = (error as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
+  if (typeof detail === 'string' && detail.trim()) return ERROR_TEXTS[detail] ?? detail
+  return fallback
+}
