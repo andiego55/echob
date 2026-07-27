@@ -288,15 +288,31 @@ async def _clone_example(conn, src_example_id, target_inst_id) -> str:
         src["difficulty"], list(src["tags"] or []), src["master_solution"])
 
 
+async def _clone_rubric(conn, src_rubric_id, target_inst_id) -> str | None:
+    """Klont ein Bewertungsraster in ein Ziel-Institut (Raster sind institutseigen).
+    Gibt die neue rubric_id zurück oder None, wenn keine Quelle existiert."""
+    if not src_rubric_id:
+        return None
+    src = await conn.fetchrow("SELECT * FROM institute_rubrics WHERE id = $1", src_rubric_id)
+    if not src:
+        return None
+    return await conn.fetchval(
+        "INSERT INTO institute_rubrics (institute_id, name, description, criteria) "
+        "VALUES ($1, $2, $3, $4::jsonb) RETURNING id",
+        target_inst_id, src["name"], src["description"], _jsonb_str(src["criteria"]))
+
+
 async def _clone_assignment(conn, src_assignment_id, target_inst_id) -> str:
-    """Klont ein institute_assignment in ein Ziel-Institut (ohne Raster/Frist). Gibt neue id zurück."""
+    """Klont ein institute_assignment in ein Ziel-Institut (inkl. eigener Raster-Kopie, ohne Frist).
+    Gibt neue id zurück."""
     src = await conn.fetchrow("SELECT * FROM institute_assignments WHERE id = $1", src_assignment_id)
     if not src:
         raise HTTPException(status_code=404, detail="Aufgabe nicht gefunden.")
+    new_rubric_id = await _clone_rubric(conn, src["rubric_id"], target_inst_id)
     return await conn.fetchval(
         "INSERT INTO institute_assignments (institute_id, kind, title, instructions, payload, rubric_id, status, due_on) "
-        "VALUES ($1, $2, $3, $4, $5::jsonb, NULL, 'published', NULL) RETURNING id",
-        target_inst_id, src["kind"], src["title"], src["instructions"], _jsonb_str(src["payload"]))
+        "VALUES ($1, $2, $3, $4, $5::jsonb, $6, 'published', NULL) RETURNING id",
+        target_inst_id, src["kind"], src["title"], src["instructions"], _jsonb_str(src["payload"]), new_rubric_id)
 
 
 @router.post("/examples/generate", status_code=202)
