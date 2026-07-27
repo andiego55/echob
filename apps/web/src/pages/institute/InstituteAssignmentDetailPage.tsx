@@ -6,8 +6,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import InstituteShell from '@/components/institute/InstituteShell'
 import { instituteApi } from '@/api/institute'
-import { KindBadge } from './InstituteAssignmentsPage'
-import type { StudentAssignmentRow, AssignmentStatus, Rubric, SubmissionScore } from '@/types'
+import { KindBadge, KIND_LABEL } from './InstituteAssignmentsPage'
+import type { StudentAssignmentRow, AssignmentStatus, AssignmentDetail, AssignmentKind, Rubric, SubmissionScore } from '@/types'
 
 const STATUS_LABEL: Record<AssignmentStatus, string> = {
   assigned: 'Zugewiesen', in_progress: 'In Arbeit', submitted: 'Eingereicht', reviewed: 'Gesichtet',
@@ -22,6 +22,7 @@ export default function InstituteAssignmentDetailPage() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [picked, setPicked] = useState<string[]>([])
+  const [editing, setEditing] = useState(false)
 
   const { data, isLoading } = useQuery({ queryKey: ['institute-assignment', id], queryFn: () => instituteApi.assignment(id!), enabled: !!id })
   const { data: studentsData } = useQuery({ queryKey: ['institute-students'], queryFn: () => instituteApi.listStudents() })
@@ -50,17 +51,32 @@ export default function InstituteAssignmentDetailPage() {
         <button onClick={() => navigate('/institute/assignments')} className="text-xs text-brand-muted hover:text-navy transition-colors">← Alle Aufgaben</button>
 
         <header className="card">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2"><KindBadge kind={data.kind} /><h1 className="text-lg font-bold text-navy">{data.title}</h1></div>
-              {data.instructions && <p className="mt-2 text-sm text-brand-text whitespace-pre-wrap">{data.instructions}</p>}
-              {data.payload.link && (
-                <a href={data.payload.link} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm text-accent hover:underline">{data.payload.link} ↗</a>
-              )}
+          {editing ? (
+            <AssignmentEditForm
+              data={data}
+              onCancel={() => setEditing(false)}
+              onSaved={() => {
+                setEditing(false)
+                qc.invalidateQueries({ queryKey: ['institute-assignment', id] })
+                qc.invalidateQueries({ queryKey: ['institute-assignments'] })
+              }}
+            />
+          ) : (
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2"><KindBadge kind={data.kind} /><h1 className="text-lg font-bold text-navy">{data.title}</h1></div>
+                {data.instructions && <p className="mt-2 text-sm text-brand-text whitespace-pre-wrap">{data.instructions}</p>}
+                {data.payload.link && (
+                  <a href={data.payload.link} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm text-accent hover:underline">{data.payload.link} ↗</a>
+                )}
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                <button onClick={() => setEditing(true)} className="text-xs font-medium text-accent hover:text-navy transition-colors">Bearbeiten</button>
+                <button onClick={() => { if (window.confirm('Diese Aufgabe löschen? Alle Zuweisungen gehen verloren.')) del.mutate() }}
+                  className="text-xs text-brand-muted hover:text-red-600 transition-colors">Löschen</button>
+              </div>
             </div>
-            <button onClick={() => { if (window.confirm('Diese Aufgabe löschen? Alle Zuweisungen gehen verloren.')) del.mutate() }}
-              className="shrink-0 text-xs text-brand-muted hover:text-red-600">Löschen</button>
-          </div>
+          )}
         </header>
 
         {/* Zuweisen */}
@@ -103,6 +119,72 @@ export default function InstituteAssignmentDetailPage() {
         </section>
       </div>
     </InstituteShell>
+  )
+}
+
+const EDIT_KINDS: AssignmentKind[] = ['task', 'reflection', 'resource']
+
+function AssignmentEditForm({ data, onCancel, onSaved }: { data: AssignmentDetail; onCancel: () => void; onSaved: () => void }) {
+  const [kind, setKind] = useState<AssignmentKind>(data.kind)
+  const [title, setTitle] = useState(data.title)
+  const [instructions, setInstructions] = useState(data.instructions ?? '')
+  const [link, setLink] = useState(data.payload?.link ?? '')
+  const [due, setDue] = useState(data.due_on ?? '')
+
+  const save = useMutation({
+    // rubric_id + status werden bewusst mitgeschickt, damit das PATCH sie nicht nullt.
+    mutationFn: () => instituteApi.assignmentUpdate(data.id, {
+      kind, title: title.trim(), instructions: instructions.trim() || null,
+      link: kind === 'resource' ? (link.trim() || null) : null,
+      due_on: due || null, rubric_id: data.rubric_id, status: data.status,
+    }),
+    onSuccess: onSaved,
+  })
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-sm font-bold text-navy">Aufgabe bearbeiten</h2>
+      <div>
+        <label className="mb-1.5 block text-xs font-medium text-brand-text">Typ</label>
+        <div className="flex flex-wrap gap-2">
+          {EDIT_KINDS.map(k => (
+            <button key={k} onClick={() => setKind(k)}
+              className={`rounded-brand border px-3 py-1.5 text-sm font-medium transition-colors ${kind === k ? 'border-accent bg-accent/5 text-navy' : 'border-brand-border text-brand-muted hover:border-accent/50'}`}>
+              {KIND_LABEL[k]}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="mb-1 block text-xs font-medium text-brand-text">Titel</label>
+        <input value={title} onChange={e => setTitle(e.target.value)} maxLength={200}
+          className="w-full rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+      </div>
+      <div>
+        <label className="mb-1 block text-xs font-medium text-brand-text">{kind === 'resource' ? 'Beschreibung' : 'Aufgabenstellung'}</label>
+        <textarea value={instructions} onChange={e => setInstructions(e.target.value)} rows={8}
+          className="w-full resize-y rounded-brand border border-brand-border bg-white px-3 py-2 text-sm leading-relaxed outline-none focus:border-accent" />
+      </div>
+      {kind === 'resource' && (
+        <div>
+          <label className="mb-1 block text-xs font-medium text-brand-text">Link (optional)</label>
+          <input value={link} onChange={e => setLink(e.target.value)} maxLength={1000} placeholder="https://…"
+            className="w-full rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+        </div>
+      )}
+      <div>
+        <label className="mb-1 block text-xs font-medium text-brand-text">Frist (optional)</label>
+        <input type="date" value={due} onChange={e => setDue(e.target.value)}
+          className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-sm outline-none focus:border-accent" />
+      </div>
+      <div className="flex items-center gap-3 border-t border-brand-border pt-3">
+        <button onClick={() => save.mutate()} disabled={!title.trim() || save.isPending} className="btn-primary !py-2 !px-4 !text-sm disabled:opacity-40">
+          {save.isPending ? 'Speichern …' : 'Speichern'}
+        </button>
+        <button onClick={onCancel} disabled={save.isPending} className="text-sm text-brand-muted hover:text-navy">Abbrechen</button>
+        {save.isError && <span className="text-xs text-red-600">Speichern fehlgeschlagen.</span>}
+      </div>
+    </div>
   )
 }
 
