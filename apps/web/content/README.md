@@ -35,8 +35,14 @@ Bauen (der „Validator") fängt Fehler ab und sagt dir genau, was zu korrigiere
 | `problem` | `content/problem/` | `/hilfe/<slug>` | problemorientierte Seite |
 | `scene` | `content/scene/` | `/szenen/<slug>` | fiktive Beziehungsszene (Ich-Perspektive) |
 
-Aktuell genutzt sind diese fünf. (Die Typen `guide`, `case-example`, `therapy-prep`
-existieren im Schema, werden aber noch nicht verwendet.)
+Aktuell aktiv sind diese fünf. Zusätzlich stehen drei **weitere Formate** bereit (noch
+ungenutzt, aber einsatzfertig – einfach eine `.md` mit dem jeweiligen `type` anlegen):
+
+| Typ | URL | Wofür |
+|-----|-----|-------|
+| `guide` | `/ratgeber/<slug>` | Praktischer Ratgeber / How-to („Wie führe ich …?", „5 Schritte …") |
+| `therapy-prep` | `/therapie-vorbereitung/<slug>` | Vorbereitung auf Therapie/Coaching (Erstgespräch, Therapeut:in finden) |
+| `case-example` | `/fallbeispiele/<slug>` | Analytische Fall-Darstellung (dritte Person; ergänzt die Ich-Szenen) |
 
 ---
 
@@ -106,6 +112,23 @@ Wenn du für eine Seite gezielt bestimmte Verweise setzen willst, kannst du opti
 Slugs müssen auf **veröffentlichte** Seiten zeigen – der Validator prüft das.
 
 ---
+
+## Häufige Fragen (FAQ) – optional
+
+Jede Seite kann ein optionales `faq`-Feld bekommen. Daraus entsteht am Artikelende eine
+**dezente** „Häufige Fragen"-Sektion (bewusst leise, kein aufklappbares Akkordeon) plus
+unsichtbares `FAQPage`-Markup für Google.
+
+```yaml
+faq:
+  - question: "Frage, die Leser:innen tatsächlich so googeln?"
+    answer: "Kurze, klare Antwort in 1–3 Sätzen – orientierend, nicht-diagnostisch."
+  - question: "Zweite Frage?"
+    answer: "Antwort. 2–5 Fragen sind ein guter Rahmen."
+```
+
+Nimm echte, gegoogelte Fragen mit knappen Antworten. Weniger ist mehr – die Sektion ist
+ein leises Angebot, kein Fragenkatalog.
 
 ## Wenn der Validator meckert (das ist gut so)
 

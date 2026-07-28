@@ -86,6 +86,14 @@ for (const file of walk(contentDir)) {
     for (const pos of fm.echo.cta_positions || [])
       if (!CTA_POSITIONS.includes(pos)) err(`echo.cta_positions ungültig: ${pos}`)
   }
+  // Optionale FAQ: jede Frage braucht question + answer (dezente FAQ-Sektion + FAQPage).
+  if (fm.faq !== undefined) {
+    if (!Array.isArray(fm.faq)) err('faq muss eine Liste sein')
+    else fm.faq.forEach((q, i) => {
+      if (!q || typeof q !== 'object' || !String(q.question || '').trim() || !String(q.answer || '').trim())
+        err(`faq[${i}] braucht question + answer`)
+    })
+  }
   // Veröffentlichungs-Gate (YMYL / fachliche Prüfung Pflicht):
   if (!fm.draft && !fm.reviewed_by?.name)
     err('reviewed_by fehlt — fachliche Prüfung ist Pflicht zur Veröffentlichung')

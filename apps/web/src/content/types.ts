@@ -82,6 +82,8 @@ export interface ContentFrontmatter {
   scene_tags?: string[]
   safety_tags?: string[]
   links?: ContentLinks
+  /** Optionale „Häufige Fragen" – dezente FAQ-Sektion am Artikelende + FAQPage-Markup. */
+  faq?: { question: string; answer: string }[]
   /** Nur bei type=scene: Erzähl-Perspektive („Aus Lenas Sicht"). */
   perspective?: string
   /** Nur bei type=scene: kuratiertes Zitat für die Übersichtskarte. */

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
-import type { Cluster, ContentMeta } from '@/content/types'
+import { CLUSTER_LABELS, type ContentMeta } from '@/content/types'
 
 /**
  * Interne Verlinkung – nicht „ähnliche Artikel", sondern nach Leser-Stufe
@@ -14,14 +14,6 @@ import type { Cluster, ContentMeta } from '@/content/types'
 const BY_SLUG = new Map(CONTENT_MANIFEST.map((m) => [m.slug, m]))
 const resolve = (slugs?: string[]): ContentMeta[] =>
   (slugs ?? []).map((s) => BY_SLUG.get(s)).filter((m): m is ContentMeta => !!m)
-
-const CLUSTER_LABEL: Record<Cluster, string> = {
-  dynamiken: 'Belastende Dynamiken',
-  bindung: 'Bindung & Nähe',
-  trennung: 'Trennung',
-  selbstreflexion: 'Selbstreflexion',
-  therapie: 'Therapie & Coaching',
-}
 
 type ArrayLinkKey = 'children' | 'comparison' | 'glossary' | 'case_example' | 'therapy_prep' | 'related'
 const ARRAY_GROUPS: { key: ArrayLinkKey; label: string }[] = [
@@ -51,7 +43,7 @@ export default function RelatedContentCluster({ meta }: { meta: ContentMeta }) {
 
   // 2) Automatisch: weitere Inhalte aus demselben Cluster (ohne Duplikate).
   const sameCluster = CONTENT_MANIFEST.filter((m) => m.cluster === meta.cluster && !shown.has(m.slug)).slice(0, 4)
-  if (sameCluster.length) groups.push({ label: `Mehr aus: ${CLUSTER_LABEL[meta.cluster]}`, items: sameCluster })
+  if (sameCluster.length) groups.push({ label: `Mehr aus: ${CLUSTER_LABELS[meta.cluster]}`, items: sameCluster })
 
   if (groups.length === 0) return null
 

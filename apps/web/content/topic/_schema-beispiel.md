@@ -27,6 +27,12 @@ links:
   children: []
   related: []
   glossary: []
+# Optionale „Häufige Fragen" – erzeugt eine dezente FAQ-Sektion + FAQPage-Markup.
+faq:
+  - question: "Beispiel-Frage, die Leser:innen tatsächlich so googeln?"
+    answer: "Kurze, klare Antwort in 1–3 Sätzen – orientierend, nicht-diagnostisch."
+  - question: "Zweite häufige Frage zum Thema?"
+    answer: "Antwort. 2–5 Fragen sind ein guter Rahmen; weniger ist mehr."
 ---
 
 Dies ist eine **Entwurfs-Seite** ausschließlich zur Dokumentation des Frontmatter-Schemas

@@ -1,4 +1,4 @@
-import type { Cluster, ContentMeta } from '@/content/types'
+import { CLUSTER_LABELS, type ContentMeta } from '@/content/types'
 import { getBody } from '@/content/bodies'
 import MarkdownArticle from './MarkdownArticle'
 import EchoReflectionCard from './EchoReflectionCard'
@@ -7,14 +7,6 @@ import SafetyNotice from './SafetyNotice'
 import Breadcrumbs from './Breadcrumbs'
 
 const SITE = 'https://echo-b.de'
-
-const CLUSTER_LABEL: Record<Cluster, string> = {
-  dynamiken: 'Belastende Dynamiken',
-  bindung: 'Bindung & Nähe',
-  trennung: 'Trennung',
-  selbstreflexion: 'Selbstreflexion',
-  therapie: 'Therapie & Coaching',
-}
 
 /**
  * Standard-Artikel-Template (topic/problem/glossary/… teilen sich diese Basis).
@@ -49,7 +41,7 @@ export default function ArticleTemplate({ meta }: { meta: ContentMeta }) {
       <section className="bg-navy px-6 pb-16 pt-[calc(60px+4rem)] text-white">
         <div className="mx-auto max-w-[720px]">
           <Breadcrumbs meta={meta} />
-          <span className="label mb-3 block">{CLUSTER_LABEL[meta.cluster]}</span>
+          <span className="label mb-3 block">{CLUSTER_LABELS[meta.cluster]}</span>
           <h1 className="text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.2] tracking-[-0.02em]">
             {meta.title}
           </h1>
@@ -67,6 +59,20 @@ export default function ArticleTemplate({ meta }: { meta: ContentMeta }) {
             {rest && <MarkdownArticle content={rest} />}
           </div>
 
+          {meta.faq && meta.faq.length > 0 && (
+            <section className="not-prose mt-12 border-t border-brand-border pt-8" aria-label="Häufige Fragen">
+              <h2 className="mb-5 text-sm font-semibold text-navy">Häufige Fragen</h2>
+              <div className="space-y-5">
+                {meta.faq.map((f, i) => (
+                  <div key={i}>
+                    <h3 className="text-[0.95rem] font-semibold text-navy">{f.question}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-brand-muted">{f.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {positions.includes('end') && <EchoReflectionCard meta={meta} position="end" />}
 
           <RelatedContentCluster meta={meta} />
@@ -78,6 +84,17 @@ export default function ArticleTemplate({ meta }: { meta: ContentMeta }) {
       </section>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {meta.faq && meta.faq.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: meta.faq.map((f) => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: { '@type': 'Answer', text: f.answer },
+          })),
+        }) }} />
+      )}
     </>
   )
 }
