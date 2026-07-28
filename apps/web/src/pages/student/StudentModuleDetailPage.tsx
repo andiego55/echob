@@ -1,7 +1,7 @@
 /**
  * /student/modules/:id — ein Lernmodul durcharbeiten (Lektionen lesen, als erledigt markieren).
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import StudentShell from '@/components/student/StudentShell'
@@ -20,6 +20,17 @@ export default function StudentModuleDetailPage() {
   const qc = useQueryClient()
 
   const { data, isLoading } = useQuery({ queryKey: ['student-module', id], queryFn: () => studentApi.module(id!), enabled: !!id })
+
+  // Der Modul-Abruf legt fehlende Aufgaben-Zuweisungen serverseitig an (find-or-create,
+  // _ensure_assignment). Wegen staleTime würde die Aufgaben-Liste die neu erzeugte
+  // Zuweisung sonst erst nach Ablauf zeigen – daher hier gezielt invalidieren.
+  useEffect(() => {
+    if (data?.steps.some(s => s.kind === 'assignment' && s.ref_assignment_id)) {
+      qc.invalidateQueries({ queryKey: ['student-assignments'] })
+      qc.invalidateQueries({ queryKey: ['student-inbox-count'] })
+    }
+  }, [data, qc])
+
   const complete = useMutation({
     mutationFn: ({ stepId, done }: { stepId: string; done: boolean }) => studentApi.moduleStepComplete(id!, stepId, done),
     onSuccess: (res) => {
