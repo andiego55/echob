@@ -55,6 +55,11 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   ungleichgewicht: 'Ungleichgewicht',
   'narzisstischer-elternteil': 'Narzisstischer Elternteil',
   eifersuchtsvorwuerfe: 'Eifersuchtsvorwürfe',
+  // Neue Tags – nur Overrides, wo die Ableitung falsch läge (Umlaute/Akronyme).
+  'intermittierende-verstaerkung': 'Intermittierende Verstärkung',
+  'schein-entschuldigung': 'Schein-Entschuldigung',
+  'taeter-opfer-umkehr': 'Täter-Opfer-Umkehr',
+  darvo: 'DARVO',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */
@@ -107,6 +112,26 @@ export const SCENE_TAG_ORDER: string[] = [
   'erschoepfung',
   'rueckzug',
   'wiederkehrendes-muster',
+  // Neue Tags (Content-Ausbau)
+  'intermittierende-verstaerkung',
+  'schein-entschuldigung',
+  'wortsalat',
+  'darvo',
+  'taeter-opfer-umkehr',
+  'emotionale-erpressung',
+  'aufrechnen',
+  'entzug',
+  'fawning',
+  'selbstverlust',
+  'anpassung',
+  'parentifizierung',
+  'ghosting',
+  'freundschaft',
+  'konkurrenz',
+  'neid',
+  'klarheit',
+  'aufbruch',
+  'grenze',
 ]
 
 /** Anzeige-Label eines Tag-Slugs (Override oder abgeleitet aus dem Slug). */

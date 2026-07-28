@@ -65,6 +65,122 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "coercive-control",
+    "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
+    "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose.",
+    "cluster": "dynamiken",
+    "search_intent": "Coercive Control Bedeutung Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Coercive Control gelesen. Möchtest du behutsam eine Situation anschauen, in der sich dein Handlungsspielraum kleiner angefühlt hat, als er sein sollte?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "faq": [
+      {
+        "question": "Was unterscheidet Coercive Control von einem normalen Streit?",
+        "answer": "Streit ist ein Ereignis; Coercive Control ist ein Muster. Es geht nicht um einen einzelnen Konflikt, sondern um eine schleichende Verengung von Freiheit, Kontakten und Selbstvertrauen über die Zeit."
+      },
+      {
+        "question": "Warum sehen Außenstehende es oft nicht?",
+        "answer": "Weil die einzelnen Bausteine für sich harmlos wirken – eine Bitte, eine Sorge, ein Kommentar. Erst das Muster im Ganzen ergibt das Bild. Nach außen kann die Person zudem charmant auftreten."
+      },
+      {
+        "question": "Muss dabei körperliche Gewalt im Spiel sein?",
+        "answer": "Nein. Coercive Control funktioniert oft ganz ohne körperliche Gewalt – über Kontrolle, Abwertung, Isolation und Regeln. Die Belastung ist deshalb nicht kleiner."
+      }
+    ],
+    "url": "/glossar/coercive-control"
+  },
+  {
+    "type": "glossary",
+    "slug": "emotionale-erpressung",
+    "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
+    "description": "Emotionale Erpressung wirkt über Furcht, Verpflichtung und Schuld (FOG). Wie man erkennt, dass Zustimmung erzwungen statt frei gegeben ist – und warum das kein böser Wille sein muss. Ohne Diagnose.",
+    "cluster": "dynamiken",
+    "search_intent": "emotionale Erpressung Beziehung erkennen",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über emotionale Erpressung gelesen. Möchtest du eine Situation anschauen, in der du Ja gesagt hast, obwohl sich alles in dir dagegen gesträubt hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist das FOG-Prinzip?",
+        "answer": "FOG steht für Fear, Obligation, Guilt – Furcht, Verpflichtung und Schuld. Über diese drei Hebel wird Zustimmung erzeugt: die Angst vor Konsequenzen, das Gefühl, etwas zu schulden, und Schuldgefühle, wenn man Nein sagt."
+      },
+      {
+        "question": "Wie unterscheide ich Erpressung von einem normalen Wunsch?",
+        "answer": "Ein Wunsch lässt dir ein echtes Nein. Bei emotionaler Erpressung hat ein Nein einen Preis: Rückzug, Vorwürfe, Liebesentzug. Du merkst es oft am Bauchgefühl – nicht Freude über ein Ja, sondern Erleichterung, dass die Drohung vorbei ist."
+      },
+      {
+        "question": "Tun Menschen das mit Absicht?",
+        "answer": "Nicht immer. Manche erpressen bewusst, andere greifen aus eigener Not oder erlernten Mustern dazu. Für die Wirkung auf dich ist die Absicht zweitrangig – entscheidend ist, ob deine Zustimmung frei war."
+      }
+    ],
+    "url": "/glossar/emotionale-erpressung"
+  },
+  {
+    "type": "glossary",
+    "slug": "fawning",
+    "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
+    "description": "Fawning ist die vierte Stressreaktion neben Kampf, Flucht und Erstarren: beschwichtigen und gefallen, um Sicherheit herzustellen. Warum das kein Charakterfehler ist – ohne Diagnose.",
+    "cluster": "selbstreflexion",
+    "search_intent": "Fawning Bedeutung Stressreaktion Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Fawning gelesen. Möchtest du eine Situation anschauen, in der du beschwichtigt oder dich angepasst hast, obwohl in dir etwas anderes wollte?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Fawning dasselbe wie People-Pleasing?",
+        "answer": "People-Pleasing ist die alltägliche Form davon. Fawning meint dasselbe Grundmuster als Stress- und Schutzreaktion: gefallen und beschwichtigen, um drohende Spannung oder Ablehnung abzuwenden."
+      },
+      {
+        "question": "Warum wehren sich Menschen in schwierigen Beziehungen oft nicht?",
+        "answer": "Weil sich Anpassen in dem Moment am sichersten anfühlt. Wer gelernt hat, dass Widerspruch Gefahr oder Liebesentzug bedeutet, dessen Nervensystem wählt Beschwichtigen – nicht aus Schwäche, sondern als Schutz."
+      },
+      {
+        "question": "Wie kommt man aus dem Muster heraus?",
+        "answer": "Meist in kleinen Schritten: zuerst überhaupt bemerken, dass man gerade fawnt, dann winzige eigene Bedürfnisse äußern und die Erfahrung machen, dass die Welt nicht einstürzt. Selbstmitgefühl hilft mehr als Selbstkritik."
+      }
+    ],
+    "url": "/glossar/fawning"
+  },
+  {
+    "type": "glossary",
     "slug": "gaslighting",
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest.",
@@ -95,6 +211,82 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/glossar/gaslighting"
+  },
+  {
+    "type": "glossary",
+    "slug": "intermittierende-verstaerkung",
+    "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
+    "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose.",
+    "cluster": "dynamiken",
+    "search_intent": "intermittierende Verstärkung Beziehung Bedeutung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über intermittierende Verstärkung gelesen. Möchtest du eine konkrete Situation anschauen, in der Zuwendung bei dir mal da war und mal weg – und was das mit dir gemacht hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum bindet unzuverlässige Zuwendung stärker als verlässliche?",
+        "answer": "Weil dein Gehirn auf Unvorhersehbarkeit mit erhöhter Aufmerksamkeit und Dopamin reagiert. Verlässliche Nähe beruhigt; unberechenbare Nähe hält dich in ständiger Erwartung – und genau dieses Hoffen fühlt sich intensiv an."
+      },
+      {
+        "question": "Ist das dasselbe wie Trauma-Bindung?",
+        "answer": "Eng verwandt. Intermittierende Verstärkung ist der Mechanismus (mal Belohnung, mal Entzug); Trauma-Bindung ist die starke emotionale Bindung, die daraus entstehen kann. Das eine erklärt das andere."
+      },
+      {
+        "question": "Heißt das, meine Gefühle sind nicht echt?",
+        "answer": "Nein. Deine Gefühle sind echt. Der Punkt ist nur: Ihre Intensität sagt wenig darüber aus, wie gut die Beziehung dir tut. Sog ist nicht dasselbe wie Sicherheit."
+      }
+    ],
+    "url": "/glossar/intermittierende-verstaerkung"
+  },
+  {
+    "type": "glossary",
+    "slug": "kognitive-dissonanz",
+    "title": "Kognitive Dissonanz – wenn zwei Wahrheiten nicht zusammenpassen",
+    "description": "Warum der Kopf die Realität umschreibt, um in einer widersprüchlichen Beziehung bleiben zu können: das Spannungsprinzip hinter Ausreden, Beschönigen und Selbstzweifel. Ohne Diagnose.",
+    "cluster": "selbstreflexion",
+    "search_intent": "kognitive Dissonanz Beziehung Bedeutung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über kognitive Dissonanz gelesen. Möchtest du eine Situation anschauen, in der dein Gefühl das eine sagte und dein Kopf sich eine Erklärung suchte, damit es passt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Woran merke ich kognitive Dissonanz in einer Beziehung?",
+        "answer": "An dem inneren Ringen, wenn du das Verhalten von jemandem erklärst, entschuldigst oder kleinredest, obwohl dich etwas daran verletzt hat. Der Kopf arbeitet dann daran, den Widerspruch zwischen „ich liebe ihn/sie\" und „das tut mir weh\" aufzulösen."
+      },
+      {
+        "question": "Warum reden wir uns Dinge schön?",
+        "answer": "Weil zwei widersprüchliche Überzeugungen unangenehm sind. Der schnellste Weg zur Entlastung ist oft nicht, die Situation zu ändern, sondern die eigene Wahrnehmung anzupassen – „so schlimm war es nicht\"."
+      },
+      {
+        "question": "Ist das ein Zeichen von Naivität?",
+        "answer": "Nein. Kognitive Dissonanz betrifft alle Menschen; sie ist ein Grundmechanismus des Denkens. Sie zu kennen hilft, die eigenen Beschönigungen früher zu bemerken."
+      }
+    ],
+    "url": "/glossar/kognitive-dissonanz"
   },
   {
     "type": "glossary",
@@ -491,6 +683,118 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-wetter-zuhause",
+    "title": "Das Wetter zuhause",
+    "description": "Eine Szene über das Leben nach der Stimmung eines anderen – wenn man die Wohnung betritt und zuerst das Klima prüft. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Theas Sicht",
+    "pull_quote": "Ich schließe die Tür auf und weiß in drei Sekunden, welcher Abend es wird. Ich habe gelernt, das Wetter zu lesen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass du zuerst die Stimmung eines anderen prüfst, bevor du dich selbst spürst? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "coercive-control",
+      "auf-eierschalen-gehen",
+      "kontrolle",
+      "rueckzug",
+      "erschoepfung"
+    ],
+    "url": "/szenen/das-wetter-zuhause"
+  },
+  {
+    "type": "scene",
+    "slug": "deine-ex-haette",
+    "title": "Deine Ex hätte",
+    "description": "Eine Szene über den ständigen Vergleich – wenn man an einem Menschen gemessen wird, gegen den man nicht gewinnen kann. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Kims Sicht",
+    "pull_quote": "Mal ist die Ex das Vorbild, mal die Verrückte. Immer bin ich das Gegenteil von dem, was gerade gebraucht wird.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – mit jemandem verglichen zu werden, gegen den du nie gewinnen kannst? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "vergleich",
+      "entwertung",
+      "triangulierung",
+      "sich-klein-fuehlen",
+      "selbstzweifel"
+    ],
+    "url": "/szenen/deine-ex-haette"
+  },
+  {
+    "type": "scene",
+    "slug": "der-kruemel",
+    "title": "Der Krümel",
+    "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sinas Sicht",
+    "pull_quote": "Neun Tage nichts. Und dann ein Herz unter mein Foto – und mein ganzer Körper macht wieder mit.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – dass ein winziges Zeichen von jemandem reicht, um alles wieder aufzuwühlen? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "breadcrumbing",
+      "hinhalten",
+      "intermittierende-verstaerkung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/der-kruemel"
+  },
+  {
+    "type": "scene",
+    "slug": "der-perfekte-tag",
+    "title": "Der perfekte Tag",
+    "description": "Eine Szene über intermittierende Verstärkung – ein einziger wunderbarer Tag, der Monate der Kälte auslöscht und die Hoffnung zurücksetzt. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Noras Sicht",
+    "pull_quote": "An einem Tag wie heute glaube ich wieder alles. Und ich hasse, wie leicht ich zu überzeugen bin.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – ein einziger guter Tag, der alle Zweifel wegwischt? Möchtest du so einen Moment und das Danach anschauen?"
+    },
+    "scene_tags": [
+      "intermittierende-verstaerkung",
+      "trauma-bindung",
+      "idealisierung-abwertung",
+      "naehe-distanz",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/der-perfekte-tag"
+  },
+  {
+    "type": "scene",
     "slug": "der-vorwurf",
     "title": "Der Vorwurf",
     "description": "Eine Szene über Eifersuchtsvorwürfe – wenn man sich ständig für Dinge rechtfertigt, die man nie getan hat, und beginnt, wie schuldig zu leben. Aus der Ich-Perspektive, fiktiv.",
@@ -542,6 +846,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "verlustangst"
     ],
     "url": "/szenen/die-eine-nachricht"
+  },
+  {
+    "type": "scene",
+    "slug": "die-liste",
+    "title": "Die Liste",
+    "description": "Eine Szene über das Aufrechnen – wenn jeder alte Fehler aufbewahrt und im nächsten Streit wieder hervorgeholt wird. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Bens Sicht",
+    "pull_quote": "Es ist, als führe sie ein Kontobuch über mich. Und ich stehe immer im Minus, egal, was ich einzahle.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – dass alte Fehler nie verjähren, sondern immer wieder auf den Tisch kommen? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "aufrechnen",
+      "entwertung",
+      "verachtung",
+      "wiederkehrendes-muster",
+      "sich-klein-fuehlen"
+    ],
+    "url": "/szenen/die-liste"
+  },
+  {
+    "type": "scene",
+    "slug": "die-tuer-war-offen",
+    "title": "Die Tür war offen",
+    "description": "Eine Szene über den stillen Moment der Klarheit – kein großer Knall, nur eine kleine Szene, nach der man weiß, dass man geht. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "trennung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Hannas Sicht",
+    "pull_quote": "Es war keine Katastrophe. Es war eine Kleinigkeit. Und trotzdem wusste ich in diesem Moment: Ich gehe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – dass Klarheit nicht laut kommt, sondern ganz leise, in einer Kleinigkeit? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "klarheit",
+      "aufbruch",
+      "grenze",
+      "wiederkehrendes-muster",
+      "rueckzug"
+    ],
+    "url": "/szenen/die-tuer-war-offen"
   },
   {
     "type": "scene",
@@ -626,6 +986,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "eine-spur-besser",
+    "title": "Eine Spur besser",
+    "description": "Eine Szene über eine Freundschaft mit feinem Konkurrenzdruck – wenn gute Nachrichten beim Gegenüber immer klein werden. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "selbstreflexion",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Fritzis Sicht",
+    "pull_quote": "Ich erzähle ihr etwas Schönes, und noch bevor ich fertig bin, hat sie etwas, das ein bisschen schöner ist.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – dass gute Nachrichten bei bestimmten Menschen sofort kleiner werden? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "freundschaft",
+      "konkurrenz",
+      "neid",
+      "entwertung",
+      "sich-klein-fuehlen"
+    ],
+    "url": "/szenen/eine-spur-besser"
+  },
+  {
+    "type": "scene",
     "slug": "erst-der-rausch-dann-die-kaelte",
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv.",
@@ -651,6 +1039,90 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/erst-der-rausch-dann-die-kaelte"
+  },
+  {
+    "type": "scene",
+    "slug": "es-tut-mir-leid-dass-du",
+    "title": "Es tut mir leid, dass du",
+    "description": "Eine Szene über die Schein-Entschuldigung – wenn ein „Sorry\" die Schuld leise zu dir zurückschiebt. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Levs Sicht",
+    "pull_quote": "„Es tut mir leid, dass du dich so fühlst.\" Und irgendwie stehe am Ende ich als der Empfindliche da.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – eine Entschuldigung, nach der du dich schlechter fühlst als vorher? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "schein-entschuldigung",
+      "schuldumkehr",
+      "entwertung",
+      "realitaetsverdrehung",
+      "selbstzweifel"
+    ],
+    "url": "/szenen/es-tut-mir-leid-dass-du"
+  },
+  {
+    "type": "scene",
+    "slug": "es-wird-leiser",
+    "title": "Es wird leiser",
+    "description": "Eine Szene über emotionalen Rückzug – keine Streits, kein Drama, nur ein langsames Weniger, bis man sich nebeneinander fremd wird. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "bindung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ediths Sicht",
+    "pull_quote": "Es gibt nichts zu zeigen. Keinen Streit, keine Wunde. Nur einen Menschen neben mir, der jeden Tag ein bisschen weiter weg ist.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – ein langsames Verstummen, ganz ohne Streit? Möchtest du behutsam so einer Entwicklung nachgehen?"
+    },
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "rueckzug",
+      "einsamkeit-zu-zweit",
+      "naehe-distanz",
+      "erschoepfung"
+    ],
+    "url": "/szenen/es-wird-leiser"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-hab-mich-geaendert",
+    "title": "Ich hab mich geändert",
+    "description": "Eine Szene über Hoovering – die Nachricht Wochen nach der Trennung, in der plötzlich alles anders sein soll. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "trennung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jules Sicht",
+    "pull_quote": "„Ich hab an mir gearbeitet\", steht da. Und ich merke, wie mein Widerstand kippt – nicht weil ich es glaube, sondern weil ich es glauben will.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass jemand nach der Trennung genau dann zurückkommt, wenn du fast weiter bist? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "hoovering",
+      "zukunftsversprechen",
+      "trauma-bindung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/ich-hab-mich-geaendert"
   },
   {
     "type": "scene",
@@ -681,6 +1153,90 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-vermisse-das-chaos",
+    "title": "Ich vermisse das Chaos",
+    "description": "Eine Szene über die Zeit nach der Trennung – frei, aber mit Sehnsucht nach der Intensität, und der Erkenntnis, dass Ruhe sich erst leer anfühlt. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "trennung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Pauls Sicht",
+    "pull_quote": "Es ist endlich ruhig. Und ich sitze in dieser Ruhe und vermisse ausgerechnet das, was mich fast zerrissen hat.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – nach einer Trennung ausgerechnet das Chaos zu vermissen? Möchtest du behutsam anschauen, was dieses Vermissen sein könnte?"
+    },
+    "scene_tags": [
+      "entzug",
+      "trauma-bindung",
+      "intermittierende-verstaerkung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/ich-vermisse-das-chaos"
+  },
+  {
+    "type": "scene",
+    "slug": "im-kreis",
+    "title": "Im Kreis",
+    "description": "Eine Szene über den Streit, der sich dreht, bis man das eigene Anliegen vergisst – Wortsalat und Themenwechsel als Nebel. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Maris Sicht",
+    "pull_quote": "Ich wollte über eine Sache reden. Eine Stunde später entschuldige ich mich für Dinge, die ich nicht mal verstehe.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – ein Gespräch, das sich so lange dreht, bis du nicht mehr weißt, worum es ging? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "wortsalat",
+      "realitaetsverdrehung",
+      "gaslighting",
+      "schuldumkehr",
+      "erschoepfung"
+    ],
+    "url": "/szenen/im-kreis"
+  },
+  {
+    "type": "scene",
+    "slug": "immer-derselbe-typ",
+    "title": "Immer derselbe Typ",
+    "description": "Eine Szene über Selbsterkenntnis – der Moment, in dem man sein eigenes wiederkehrendes Muster sieht und fragt, wovor es einen eigentlich schützt. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "selbstreflexion",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Rosas Sicht",
+    "pull_quote": "Andere Gesichter, andere Namen – und doch immer dieselbe Geschichte. Irgendwann ist die Gemeinsamkeit nicht mehr zu übersehen: ich.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – zu merken, dass sich deine Beziehungen ähneln? Möchtest du behutsam anschauen, was dieses Muster für dich tun könnte?"
+    },
+    "scene_tags": [
+      "wiederkehrendes-muster",
+      "bindungsangst",
+      "naehe-distanz",
+      "selbstzweifel",
+      "push-pull"
+    ],
+    "url": "/szenen/immer-derselbe-typ"
+  },
+  {
+    "type": "scene",
     "slug": "immer-die-andere",
     "title": "Immer die andere",
     "description": "Eine Szene über Triangulierung – ständig mit einem Ex, einer Kollegin, einem Ideal verglichen zu werden, gegen das man nicht gewinnen kann. Ich-Perspektive, fiktiv.",
@@ -705,6 +1261,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "sich-klein-fuehlen"
     ],
     "url": "/szenen/immer-die-andere"
+  },
+  {
+    "type": "scene",
+    "slug": "immer-die-grosse",
+    "title": "Immer die Große",
+    "description": "Eine Szene über Parentifizierung – wenn man als Kind zur Stütze der Eltern wurde und als Erwachsene die erste Grenze wie Verrat fühlt. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "selbstreflexion",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Lucies Sicht",
+    "pull_quote": "Ich war nie das Kind. Ich war immer die, die tröstet. Und ein einziges Nein fühlt sich an, als würde ich sie fallen lassen.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – früh gelernt zu haben, für die Gefühle deiner Eltern zuständig zu sein? Möchtest du behutsam so einem Muster nachgehen?"
+    },
+    "scene_tags": [
+      "parentifizierung",
+      "narzisstischer-elternteil",
+      "schuldgefuehle",
+      "grenzverletzung",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/immer-die-grosse"
+  },
+  {
+    "type": "scene",
+    "slug": "jeder-euro",
+    "title": "Jeder Euro",
+    "description": "Eine Szene über finanzielle Kontrolle – wenn man sich für die eigenen Ausgaben rechtfertigen muss und dabei kleiner wird. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Rahels Sicht",
+    "pull_quote": "Ich verdiene mein eigenes Geld. Und trotzdem stehe ich im Laden und überlege, ob ich die Ausgabe später erklären kann.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass sich etwas Eigenes plötzlich wie geliehen anfühlt? Möchtest du eine solche Situation anschauen?"
+    },
+    "scene_tags": [
+      "finanzielle-kontrolle",
+      "kontrolle",
+      "abhaengigkeit",
+      "sich-klein-fuehlen",
+      "coercive-control"
+    ],
+    "url": "/szenen/jeder-euro"
   },
   {
     "type": "scene",
@@ -762,6 +1374,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "kein-wort-mehr",
+    "title": "Kein Wort mehr",
+    "description": "Eine Szene über das Danach von Ghosting – die Stille, die keine Antwort gibt, und die Fragen, die man an sich selbst richtet. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "trennung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Davids Sicht",
+    "pull_quote": "Ein Ende hätte ich verstanden. Aber es gibt kein Ende – nur ein Aufhören, mitten im Satz, ohne Punkt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass jemand einfach verschwindet und dich mit deinen Fragen zurücklässt? Möchtest du behutsam so einer Situation nachgehen?"
+    },
+    "scene_tags": [
+      "ghosting",
+      "selbstzweifel",
+      "verlustangst",
+      "einsamkeit-zu-zweit",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/kein-wort-mehr"
+  },
+  {
+    "type": "scene",
     "slug": "mach-doch-was-du-willst",
     "title": "Mach doch, was du willst",
     "description": "Eine Szene über passiv-aggressives Verhalten – wenn ‚ist schon okay' das Gegenteil bedeutet und du die Stimmung errätst statt sie zu erfahren. Ich-Perspektive, fiktiv.",
@@ -786,6 +1426,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "schuldgefuehle"
     ],
     "url": "/szenen/mach-doch-was-du-willst"
+  },
+  {
+    "type": "scene",
+    "slug": "mitten-im-satz",
+    "title": "Mitten im Satz",
+    "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Yaras Sicht",
+    "pull_quote": "Ich rede noch, und er steht schon auf. Als hätte er einen Schalter, und ich rede gegen eine geschlossene Tür.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass sich jemand mitten im Gespräch komplett verschließt? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "stonewalling",
+      "mauern",
+      "rueckzug",
+      "emotionale-vernachlaessigung",
+      "einsamkeit-zu-zweit"
+    ],
+    "url": "/szenen/mitten-im-satz"
   },
   {
     "type": "scene",
@@ -816,6 +1484,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ploetzlich-die-taeterin",
+    "title": "Plötzlich die Täterin",
+    "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Esthers Sicht",
+    "pull_quote": "Ich wollte sagen, dass er mich verletzt hat. Zehn Minuten später halte ich ihn im Arm und sage, dass alles gut ist.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass aus deinem Schmerz plötzlich seiner wird und du am Ende tröstest? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "darvo",
+      "taeter-opfer-umkehr",
+      "schuldumkehr",
+      "entwertung",
+      "selbstzweifel"
+    ],
+    "url": "/szenen/ploetzlich-die-taeterin"
+  },
+  {
+    "type": "scene",
     "slug": "warum-ich-bleibe",
     "title": "Warum ich bleibe",
     "description": "Eine Szene über Trauma-Bindung – wenn der Wechsel aus Verletzung und großer Versöhnung eine Nähe schafft, aus der man kaum herausfindet. Ich-Perspektive, fiktiv.",
@@ -841,6 +1537,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/warum-ich-bleibe"
+  },
+  {
+    "type": "scene",
+    "slug": "wenn-du-mich-lieben-wuerdest",
+    "title": "Wenn du mich lieben würdest",
+    "description": "Eine Szene über emotionale Erpressung – wenn Liebe zum Hebel wird und ein Nein plötzlich einen Preis hat. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Timos Sicht",
+    "pull_quote": "„Wenn du mich lieben würdest, würdest du das tun.\" Und schon steht nicht mehr die Sache zur Debatte, sondern meine Liebe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – dass ein Nein plötzlich beweisen soll, dass du nicht genug liebst? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "emotionale-erpressung",
+      "schuldgefuehle",
+      "grenzverletzung",
+      "kontrolle",
+      "sich-klein-fuehlen"
+    ],
+    "url": "/szenen/wenn-du-mich-lieben-wuerdest"
+  },
+  {
+    "type": "scene",
+    "slug": "wer-war-ich-nochmal",
+    "title": "Wer war ich nochmal",
+    "description": "Eine Szene über Selbstverlust – der Moment, in dem man merkt, dass man langsam zu dem geworden ist, was jemand anderes wollte. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "selbstreflexion",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Aylins Sicht",
+    "pull_quote": "Ich blättere durch alte Fotos und suche eine Frau, die laut lacht. Ich erkenne sie kaum wieder – und sie bin ich.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – das Gefühl, dich in einer Beziehung selbst abhandengekommen zu sein? Möchtest du behutsam so einem Moment nachgehen?"
+    },
+    "scene_tags": [
+      "fawning",
+      "selbstverlust",
+      "anpassung",
+      "erschoepfung",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/wer-war-ich-nochmal"
   },
   {
     "type": "scene",
@@ -1544,9 +2296,29 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Bindungsangst – Definition und Anzeichen",
     "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt."
   },
+  "/glossar/coercive-control": {
+    "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
+    "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose."
+  },
+  "/glossar/emotionale-erpressung": {
+    "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
+    "description": "Emotionale Erpressung wirkt über Furcht, Verpflichtung und Schuld (FOG). Wie man erkennt, dass Zustimmung erzwungen statt frei gegeben ist – und warum das kein böser Wille sein muss. Ohne Diagnose."
+  },
+  "/glossar/fawning": {
+    "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
+    "description": "Fawning ist die vierte Stressreaktion neben Kampf, Flucht und Erstarren: beschwichtigen und gefallen, um Sicherheit herzustellen. Warum das kein Charakterfehler ist – ohne Diagnose."
+  },
   "/glossar/gaslighting": {
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
+  },
+  "/glossar/intermittierende-verstaerkung": {
+    "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
+    "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose."
+  },
+  "/glossar/kognitive-dissonanz": {
+    "title": "Kognitive Dissonanz – wenn zwei Wahrheiten nicht zusammenpassen",
+    "description": "Warum der Kopf die Realität umschreibt, um in einer widersprüchlichen Beziehung bleiben zu können: das Spannungsprinzip hinter Ausreden, Beschönigen und Selbstzweifel. Ohne Diagnose."
   },
   "/glossar/projektion": {
     "title": "Projektion – eigene Gefühle im anderen sehen",
@@ -1596,6 +2368,22 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/das-wetter-zuhause": {
+    "title": "Das Wetter zuhause",
+    "description": "Eine Szene über das Leben nach der Stimmung eines anderen – wenn man die Wohnung betritt und zuerst das Klima prüft. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/deine-ex-haette": {
+    "title": "Deine Ex hätte",
+    "description": "Eine Szene über den ständigen Vergleich – wenn man an einem Menschen gemessen wird, gegen den man nicht gewinnen kann. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/der-kruemel": {
+    "title": "Der Krümel",
+    "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/der-perfekte-tag": {
+    "title": "Der perfekte Tag",
+    "description": "Eine Szene über intermittierende Verstärkung – ein einziger wunderbarer Tag, der Monate der Kälte auslöscht und die Hoffnung zurücksetzt. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/der-vorwurf": {
     "title": "Der Vorwurf",
     "description": "Eine Szene über Eifersuchtsvorwürfe – wenn man sich ständig für Dinge rechtfertigt, die man nie getan hat, und beginnt, wie schuldig zu leben. Aus der Ich-Perspektive, fiktiv."
@@ -1603,6 +2391,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-eine-nachricht": {
     "title": "Die eine Nachricht",
     "description": "Eine Szene über Breadcrumbing – genau so viel Aufmerksamkeit, dass die Hoffnung nicht stirbt, aber nie genug, dass etwas Echtes wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-liste": {
+    "title": "Die Liste",
+    "description": "Eine Szene über das Aufrechnen – wenn jeder alte Fehler aufbewahrt und im nächsten Streit wieder hervorgeholt wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-tuer-war-offen": {
+    "title": "Die Tür war offen",
+    "description": "Eine Szene über den stillen Moment der Klarheit – kein großer Knall, nur eine kleine Szene, nach der man weiß, dass man geht. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/die-wand": {
     "title": "Die Wand",
@@ -1616,17 +2412,53 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Du machst das eh besser",
     "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/eine-spur-besser": {
+    "title": "Eine Spur besser",
+    "description": "Eine Szene über eine Freundschaft mit feinem Konkurrenzdruck – wenn gute Nachrichten beim Gegenüber immer klein werden. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/erst-der-rausch-dann-die-kaelte": {
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/es-tut-mir-leid-dass-du": {
+    "title": "Es tut mir leid, dass du",
+    "description": "Eine Szene über die Schein-Entschuldigung – wenn ein „Sorry\" die Schuld leise zu dir zurückschiebt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/es-wird-leiser": {
+    "title": "Es wird leiser",
+    "description": "Eine Szene über emotionalen Rückzug – keine Streits, kein Drama, nur ein langsames Weniger, bis man sich nebeneinander fremd wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-hab-mich-geaendert": {
+    "title": "Ich hab mich geändert",
+    "description": "Eine Szene über Hoovering – die Nachricht Wochen nach der Trennung, in der plötzlich alles anders sein soll. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/ich-muss-fragen": {
     "title": "Ich muss fragen",
     "description": "Eine Szene über finanzielle Kontrolle – wenn man für das eigene Geld um Erlaubnis bitten und jede Ausgabe rechtfertigen muss. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/ich-vermisse-das-chaos": {
+    "title": "Ich vermisse das Chaos",
+    "description": "Eine Szene über die Zeit nach der Trennung – frei, aber mit Sehnsucht nach der Intensität, und der Erkenntnis, dass Ruhe sich erst leer anfühlt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/im-kreis": {
+    "title": "Im Kreis",
+    "description": "Eine Szene über den Streit, der sich dreht, bis man das eigene Anliegen vergisst – Wortsalat und Themenwechsel als Nebel. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/immer-derselbe-typ": {
+    "title": "Immer derselbe Typ",
+    "description": "Eine Szene über Selbsterkenntnis – der Moment, in dem man sein eigenes wiederkehrendes Muster sieht und fragt, wovor es einen eigentlich schützt. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/immer-die-andere": {
     "title": "Immer die andere",
     "description": "Eine Szene über Triangulierung – ständig mit einem Ex, einer Kollegin, einem Ideal verglichen zu werden, gegen das man nicht gewinnen kann. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/immer-die-grosse": {
+    "title": "Immer die Große",
+    "description": "Eine Szene über Parentifizierung – wenn man als Kind zur Stütze der Eltern wurde und als Erwachsene die erste Grenze wie Verrat fühlt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/jeder-euro": {
+    "title": "Jeder Euro",
+    "description": "Eine Szene über finanzielle Kontrolle – wenn man sich für die eigenen Ausgaben rechtfertigen muss und dabei kleiner wird. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/kaum-bin-ich-nah": {
     "title": "Kaum bin ich nah, wirst du kalt",
@@ -1636,17 +2468,37 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kaum bin ich raus, bist du zurück",
     "description": "Eine Szene über Hoovering – kaum hast du Abstand gewonnen, taucht die andere Person von ihrer schönsten Seite wieder auf und zieht dich zurück. Ich-Perspektive, fiktiv."
   },
+  "/szenen/kein-wort-mehr": {
+    "title": "Kein Wort mehr",
+    "description": "Eine Szene über das Danach von Ghosting – die Stille, die keine Antwort gibt, und die Fragen, die man an sich selbst richtet. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/mach-doch-was-du-willst": {
     "title": "Mach doch, was du willst",
     "description": "Eine Szene über passiv-aggressives Verhalten – wenn ‚ist schon okay' das Gegenteil bedeutet und du die Stimmung errätst statt sie zu erfahren. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/mitten-im-satz": {
+    "title": "Mitten im Satz",
+    "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/nach-dem-anruf-bei-mama": {
     "title": "Nach dem Anruf bei Mama",
     "description": "Eine Szene über einen narzisstischen Elternteil – wenn jedes Gespräch bei ihrem Leid endet und man kleiner auflegt, als man angerufen hat. Ich-Perspektive, fiktiv."
   },
+  "/szenen/ploetzlich-die-taeterin": {
+    "title": "Plötzlich die Täterin",
+    "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/warum-ich-bleibe": {
     "title": "Warum ich bleibe",
     "description": "Eine Szene über Trauma-Bindung – wenn der Wechsel aus Verletzung und großer Versöhnung eine Nähe schafft, aus der man kaum herausfindet. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/wenn-du-mich-lieben-wuerdest": {
+    "title": "Wenn du mich lieben würdest",
+    "description": "Eine Szene über emotionale Erpressung – wenn Liebe zum Hebel wird und ein Nein plötzlich einen Preis hat. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/wer-war-ich-nochmal": {
+    "title": "Wer war ich nochmal",
+    "description": "Eine Szene über Selbstverlust – der Moment, in dem man merkt, dass man langsam zu dem geworden ist, was jemand anderes wollte. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/wo-bist-du-gerade": {
     "title": "Wo bist du gerade?",
