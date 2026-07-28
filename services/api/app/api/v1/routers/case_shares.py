@@ -101,6 +101,13 @@ async def create_share(
     pool=Depends(get_pool),
 ) -> CaseShareResponse:
     uid = current_user["user_id"]
+    # DSGVO: Freigabe sensibler Inhalte an eine Fachperson (inkl. KI-Verarbeitung) nur
+    # mit ausdrücklicher Einwilligung. Version + Zeitpunkt werden an der Freigabe belegt.
+    if not body.consent or not body.consent_version:
+        raise HTTPException(
+            status_code=400,
+            detail="Für die Freigabe ist deine ausdrückliche Einwilligung erforderlich.",
+        )
     async with pool.acquire() as conn:
         await _require_owned_case(conn, case_id, uid)
         connected = await conn.fetchrow(
@@ -116,13 +123,15 @@ async def create_share(
         async with conn.transaction():
             share = await conn.fetchrow(
                 """
-                INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status, message)
-                VALUES ($1, $2, $3, 'active', $4)
+                INSERT INTO case_shares
+                  (case_id, owner_user_id, professional_user_id, status, message, consent_version, consented_at)
+                VALUES ($1, $2, $3, 'active', $4, $5, NOW())
                 ON CONFLICT (case_id, professional_user_id) DO UPDATE SET
-                  status = 'active', message = EXCLUDED.message, updated_at = NOW(), revoked_at = NULL
+                  status = 'active', message = EXCLUDED.message, updated_at = NOW(), revoked_at = NULL,
+                  consent_version = EXCLUDED.consent_version, consented_at = NOW()
                 RETURNING *
                 """,
-                case_id, uid, body.professional_user_id, body.message,
+                case_id, uid, body.professional_user_id, body.message, body.consent_version,
             )
             await _set_elements(conn, share["id"], case_id, body.elements, body.scene_ids)
         return await _build_share_response(conn, share)

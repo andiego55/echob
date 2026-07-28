@@ -66,6 +66,8 @@ class ShareCreate(BaseModel):
     elements: list[ShareElementType] = Field(default_factory=list)
     scene_ids: list[UUID] = Field(default_factory=list)   # nur relevant bei element 'scene'
     message: str | None = Field(None, max_length=2000)
+    consent: bool = False                                  # ausdrueckliche Einwilligung (Pflicht)
+    consent_version: str | None = Field(None, max_length=64)
 
 
 class ShareUpdate(BaseModel):

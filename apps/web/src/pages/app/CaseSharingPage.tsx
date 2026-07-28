@@ -191,6 +191,9 @@ function ConnectionsCard() {
 
 // ── Neue Freigabe ───────────────────────────────────────────────────────────
 
+// Version des Einwilligungstexts (bei inhaltlicher Änderung hochzählen – wird protokolliert).
+const SHARE_CONSENT_VERSION = 'share-2026-07'
+
 function NewShareCard({ caseId, accepted, shares, scenes }: {
   caseId: string
   accepted: { professional_user_id: string | null; display_name: string | null; email: string }[]
@@ -202,6 +205,7 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   const [elements, setElements] = useState<ShareElementType[]>([])
   const [sceneIds, setSceneIds] = useState<string[]>([])
   const [message, setMessage] = useState('')
+  const [consent, setConsent] = useState(false)
   const [done, setDone] = useState(false)
 
   // Bestehende Freigabe der gewählten Fachperson vorbefüllen (= Bearbeiten)
@@ -214,8 +218,12 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
     } else {
       setElements([]); setSceneIds([]); setMessage('')
     }
+    setConsent(false)
     setDone(false)
   }, [proId, shares])
+
+  const selPro = accepted.find(c => c.professional_user_id === proId)
+  const selProName = selPro?.display_name || selPro?.email || 'die Fachperson'
 
   const toggle = (el: ShareElementType) =>
     setElements(prev => prev.includes(el) ? prev.filter(e => e !== el) : [...prev, el])
@@ -234,6 +242,8 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
         elements: els,
         scene_ids: allScenes ? [] : sceneIds,
         message: message.trim() || null,
+        consent: true,
+        consent_version: SHARE_CONSENT_VERSION,
       })
     },
     onSuccess: () => {
@@ -313,11 +323,25 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
             className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-y"
           />
 
+          {/* DSGVO: ausdrückliche, spezifische Einwilligung vor der Freigabe */}
+          {!nothingSelected && (
+            <label className="mt-4 flex cursor-pointer gap-3 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3">
+              <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 shrink-0 accent-accent" />
+              <span className="text-xs leading-relaxed text-brand-text">
+                Ich willige ausdrücklich ein, dass die ausgewählten Inhalte an <strong>{selProName}</strong> freigegeben werden.
+                Mir ist bewusst, dass die Fachperson sie in EchoB einsehen und – auch <strong>KI-gestützt (Echo)</strong> – verarbeiten kann;
+                die KI-Verarbeitung erfolgt derzeit über einen Dienstleister in den <strong>USA</strong>.
+                Ich kann diese Einwilligung jederzeit widerrufen. Details in der{' '}
+                <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Datenschutzerklärung</a>.
+              </span>
+            </label>
+          )}
+
           <div className="mt-3 flex items-center gap-3">
             <button
               onClick={() => create.mutate()}
-              disabled={create.isPending || nothingSelected}
-              className="btn-primary !py-2 !px-5 !text-sm"
+              disabled={create.isPending || nothingSelected || !consent}
+              className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50"
             >
               {create.isPending ? 'Wird freigegeben …' : done ? '✓ Freigegeben' : 'Freigeben'}
             </button>

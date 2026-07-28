@@ -913,6 +913,8 @@ export interface ShareCreate {
   elements: ShareElementType[]
   scene_ids?: string[]
   message?: string | null
+  consent?: boolean
+  consent_version?: string
 }
 
 export interface InboxItem {
