@@ -6,7 +6,7 @@
 // Skalierung: bei sehr vielen Seiten kann das später auf lazy + Prerender-aus-
 // Datei umgestellt werden. Für den MVP (Dutzende Seiten) ist eager unkritisch.
 
-const RAW = import.meta.glob('../../content/**/*.md', {
+const RAW = import.meta.glob(['../../content/**/*.md', '!../../content/**/README.md'], {
   query: '?raw',
   import: 'default',
   eager: true,

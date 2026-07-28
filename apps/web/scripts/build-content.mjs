@@ -32,7 +32,8 @@ function walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name)
     if (e.isDirectory()) out.push(...walk(p))
-    else if (e.isFile() && e.name.endsWith('.md')) out.push(p)
+    // README.md ist die Autor:innen-Anleitung, kein Inhalt – überspringen.
+    else if (e.isFile() && e.name.endsWith('.md') && e.name.toLowerCase() !== 'readme.md') out.push(p)
   }
   return out
 }
