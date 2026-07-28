@@ -60,6 +60,14 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   'schein-entschuldigung': 'Schein-Entschuldigung',
   'taeter-opfer-umkehr': 'Täter-Opfer-Umkehr',
   darvo: 'DARVO',
+  // Kommunikation & Grenzen
+  missverstaendnis: 'Missverständnis',
+  'sich-nicht-gehoert-fuehlen': 'Sich nicht gehört fühlen',
+  enttaeuschung: 'Enttäuschung',
+  'aktives-zuhoeren': 'Aktives Zuhören',
+  'gehoert-werden': 'Gehört werden',
+  'nein-sagen': 'Nein sagen',
+  selbstfuersorge: 'Selbstfürsorge',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */
@@ -132,6 +140,22 @@ export const SCENE_TAG_ORDER: string[] = [
   'klarheit',
   'aufbruch',
   'grenze',
+  // Kommunikation & Grenzen
+  'nein-sagen',
+  'konsequenz',
+  'selbstfuersorge',
+  'autonomie',
+  'aktives-zuhoeren',
+  'gehoert-werden',
+  'verbindung',
+  'missverstaendnis',
+  'sich-nicht-gehoert-fuehlen',
+  'rechthaben',
+  'eskalation',
+  'erwartung',
+  'gedankenlesen',
+  'enttaeuschung',
+  'angst',
 ]
 
 /** Anzeige-Label eines Tag-Slugs (Override oder abgeleitet aus dem Slug). */

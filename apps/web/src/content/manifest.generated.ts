@@ -5,6 +5,40 @@ import type { ContentMeta } from './types'
 export const CONTENT_MANIFEST: ContentMeta[] = [
   {
     "type": "glossary",
+    "slug": "aktives-zuhoeren",
+    "title": "Aktives Zuhören – verstehen wollen, statt schon zu antworten",
+    "description": "Was aktives Zuhören wirklich bedeutet, warum es mehr ist als Schweigen und Nicken, und wie es in Beziehungen Nähe herstellt. Ohne Diagnose.",
+    "cluster": "kommunikation",
+    "search_intent": "aktives Zuhören Bedeutung Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Fühlst du dich in deiner Beziehung oft nicht wirklich gehört? Möchtest du anschauen, woran das liegen könnte?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Woran merke ich, dass mir jemand wirklich zuhört?",
+        "answer": "Daran, dass die Person nachfragt statt gleich zu bewerten, deine Worte manchmal in eigenen wiedergibt und dir das Gefühl gibt, verstanden zu sein – auch ohne dass sie deiner Meinung sein muss."
+      },
+      {
+        "question": "Muss ich zustimmen, wenn ich aktiv zuhöre?",
+        "answer": "Nein. Verstehen heißt nicht einverstanden sein. Man kann jemanden vollständig verstehen und trotzdem anderer Meinung bleiben. Genau das macht aktives Zuhören so entlastend – es setzt Verständnis vor die Klärung, wer recht hat."
+      }
+    ],
+    "url": "/glossar/aktives-zuhoeren"
+  },
+  {
+    "type": "glossary",
     "slug": "ambivalenz",
     "title": "Ambivalenz – wenn du hin- und hergerissen bist",
     "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist.",
@@ -214,6 +248,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "ich-botschaft",
+    "title": "Ich-Botschaft – sagen, was in mir ist, ohne anzuklagen",
+    "description": "Was eine Ich-Botschaft ist, wie sie sich von der Du-Botschaft unterscheidet und warum sie Gespräche entschärft, ohne das Anliegen zu verkleinern. Ohne Diagnose.",
+    "cluster": "kommunikation",
+    "search_intent": "Ich-Botschaft Beispiel Bedeutung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Möchtest du eine konkrete Situation in eine Ich-Botschaft übersetzen – also herausfinden, was du eigentlich sagen willst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ich-Botschaft vs. Du-Botschaft – was ist der Unterschied?",
+        "answer": "Eine Du-Botschaft bewertet den anderen („Du bist rücksichtslos\"). Eine Ich-Botschaft beschreibt deine Innenseite („Ich fühle mich übergangen\"). Die eine erzeugt Abwehr, die andere lädt zum Zuhören ein."
+      },
+      {
+        "question": "Kann man mit einer Ich-Botschaft auch manipulieren?",
+        "answer": "Ja – wenn man ein verstecktes „Du bist schuld\" hineinpackt („Ich fühle mich von dir absichtlich verletzt\"). Eine echte Ich-Botschaft bleibt bei der eigenen Wahrnehmung, ohne dem anderen eine Absicht zu unterstellen."
+      }
+    ],
+    "url": "/glossar/ich-botschaft"
+  },
+  {
+    "type": "glossary",
     "slug": "intermittierende-verstaerkung",
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
     "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose.",
@@ -290,6 +358,108 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "konsequenz",
+    "title": "Konsequenz – was eine Grenze von einem Wunsch unterscheidet",
+    "description": "Warum eine Grenze ohne Konsequenz nur ein Wunsch bleibt, und was der Unterschied zwischen einer Konsequenz und einer Drohung ist. Ohne Diagnose.",
+    "cluster": "grenzen",
+    "search_intent": "Grenze Konsequenz Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Hast du eine Grenze, die immer wieder übergangen wird? Möchtest du anschauen, welche Konsequenz in deiner Hand liegen könnte?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen einer Konsequenz und einer Drohung?",
+        "answer": "Eine Konsequenz betrifft dein eigenes Handeln („Ich beende das Gespräch, wenn geschrien wird\"). Eine Drohung will das Verhalten des anderen erzwingen („Wenn du schreist, verlasse ich dich\"). Die eine schützt dich, die andere übt Druck aus."
+      },
+      {
+        "question": "Muss ich eine Konsequenz immer durchziehen?",
+        "answer": "Ja – sonst lernt das Gegenüber, dass die Grenze nicht ernst gemeint ist. Genau deshalb sollte eine Konsequenz etwas sein, das du wirklich umsetzen kannst und willst, nicht die größtmögliche Drohung."
+      }
+    ],
+    "url": "/glossar/konsequenz"
+  },
+  {
+    "type": "glossary",
+    "slug": "metakommunikation",
+    "title": "Metakommunikation – über das Reden reden",
+    "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose.",
+    "cluster": "kommunikation",
+    "search_intent": "Metakommunikation Bedeutung Beispiel",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es ein Gesprächsmuster, in dem ihr euch immer wieder verfangt? Möchtest du es einmal von außen anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist ein Beispiel für Metakommunikation?",
+        "answer": "Statt weiter über das Streitthema zu reden, sagt man etwas über das Gespräch selbst: „Mir fällt auf, dass wir uns im Kreis drehen\" oder „Ich glaube, wir reden gerade aneinander vorbei\". Man tritt einen Schritt zurück und schaut auf das Wie."
+      },
+      {
+        "question": "Wann ist Metakommunikation sinnvoll?",
+        "answer": "Vor allem, wenn ein Gespräch sich festfährt, immer gleich eskaliert oder man das Gefühl hat, gegen eine Wand zu reden. Dann bringt oft nicht das nächste Argument weiter, sondern der Blick auf das Muster."
+      }
+    ],
+    "url": "/glossar/metakommunikation"
+  },
+  {
+    "type": "glossary",
+    "slug": "persoenliche-grenzen",
+    "title": "Persönliche Grenzen – die Linie zwischen dir und den anderen",
+    "description": "Was persönliche Grenzen sind, welche Arten es gibt und warum sie kein Zeichen von Abweisung sind, sondern die Voraussetzung für echte Nähe. Ohne Diagnose.",
+    "cluster": "grenzen",
+    "search_intent": "persönliche Grenzen Bedeutung Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Möchtest du herausfinden, wo deine persönlichen Grenzen verlaufen – und an welcher Stelle sie in letzter Zeit übergangen wurden?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Welche Arten von Grenzen gibt es?",
+        "answer": "Zum Beispiel körperliche (Nähe, Berührung), emotionale (wie viel man von sich teilt, wofür man sich verantwortlich fühlt), zeitliche (eigene Zeit) und materielle (Geld, Besitz). In belastenden Beziehungen werden oft mehrere gleichzeitig überschritten."
+      },
+      {
+        "question": "Woran merke ich, dass eine Grenze überschritten wurde?",
+        "answer": "Meist am Körpergefühl, bevor der Kopf es benennt: Enge, Groll, Erschöpfung, das Gefühl, benutzt zu werden. Diese Signale sind wertvolle Hinweise – kein Grund, sich schlecht zu fühlen."
+      }
+    ],
+    "url": "/glossar/persoenliche-grenzen"
+  },
+  {
+    "type": "glossary",
     "slug": "projektion",
     "title": "Projektion – eigene Gefühle im anderen sehen",
     "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt.",
@@ -317,6 +487,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/glossar/projektion"
+  },
+  {
+    "type": "glossary",
+    "slug": "selbstfuersorge",
+    "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
+    "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose.",
+    "cluster": "grenzen",
+    "search_intent": "Selbstfürsorge Bedeutung Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Sorgst du oft besser für andere als für dich selbst? Möchtest du anschauen, wo du dich in letzter Zeit übergangen hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Selbstfürsorge dasselbe wie Egoismus?",
+        "answer": "Nein. Egoismus stellt sich über andere; Selbstfürsorge stellt sich neben andere. Sie sorgt dafür, dass man sich nicht chronisch übergeht – und gerade dadurch länger echt und zugewandt bleiben kann."
+      },
+      {
+        "question": "Ist Selbstfürsorge einfach Wellness?",
+        "answer": "Bäder und Kerzen können dazugehören, sind aber nicht der Kern. Echte Selbstfürsorge ist oft unglamourös: ein Nein, eine Grenze, genug Schlaf, ein ehrliches Gespräch mit sich selbst. Sie schützt Bedürfnisse, statt sie nur kurz zu betäuben."
+      }
+    ],
+    "url": "/glossar/selbstfuersorge"
   },
   {
     "type": "problem",
@@ -519,6 +723,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "als-sie-endlich-zuhoerte",
+    "title": "Als sie endlich zuhörte",
+    "description": "Eine Szene über den seltenen Moment, wirklich gehört zu werden – und wie viel ein einziges echtes Zuhören verändern kann. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "kommunikation",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Kajas Sicht",
+    "pull_quote": "Sie hat nicht widersprochen, nicht erklärt, nicht relativiert. Sie hat nur gesagt: „Das klingt wirklich schwer.\" Und irgendetwas in mir ließ los.",
+    "echo": {
+      "mode": "base",
+      "opening_question": "Kennst du das seltene, gute Gefühl, wirklich gehört zu werden? Möchtest du anschauen, was dir dieses Gehört-werden bedeutet?"
+    },
+    "scene_tags": [
+      "aktives-zuhoeren",
+      "verbindung",
+      "gehoert-werden",
+      "ressource",
+      "klarheit"
+    ],
+    "url": "/szenen/als-sie-endlich-zuhoerte"
+  },
+  {
+    "type": "scene",
     "slug": "am-ende-entschuldige-ich-mich",
     "title": "Am Ende entschuldige ich mich",
     "description": "Eine Szene über Schuldumkehr – du bringst ein Anliegen vor und verlässt das Gespräch als die, die sich entschuldigt. Aus der Ich-Perspektive, fiktiv.",
@@ -575,6 +807,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "aneinander-vorbei",
+    "title": "Aneinander vorbei",
+    "description": "Eine Szene über ein Gespräch, in dem beide reden und keiner hört – jeder verteidigt, niemand versteht. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "kommunikation",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Idas Sicht",
+    "pull_quote": "Wir reden beide, laut und lange. Und am Ende hat keiner von uns ein einziges Wort des anderen wirklich gehört.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – ein Gespräch, in dem beide nur noch senden und keiner mehr empfängt? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "missverstaendnis",
+      "rechthaben",
+      "sich-nicht-gehoert-fuehlen",
+      "eskalation",
+      "erschoepfung"
+    ],
+    "url": "/szenen/aneinander-vorbei"
+  },
+  {
+    "type": "scene",
     "slug": "auf-ihrer-buehne",
     "title": "Auf ihrer Bühne",
     "description": "Eine Szene über grandiosen Narzissmus – wenn du zum Publikum im Leben eines anderen wirst und dein eigenes leiser und leiser wird. Ich-Perspektive, fiktiv.",
@@ -599,6 +859,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "einsamkeit-zu-zweit"
     ],
     "url": "/szenen/auf-ihrer-buehne"
+  },
+  {
+    "type": "scene",
+    "slug": "bis-hierhin-und-nicht-weiter",
+    "title": "Bis hierhin und nicht weiter",
+    "description": "Eine Szene über eine Grenze, die getestet wird – und den ruhigen Moment, in dem man sie zum ersten Mal wirklich hält. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "grenzen",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Franzis Sicht",
+    "pull_quote": "Er testet, ob ich es ernst meine. Und zum ersten Mal seit langem meine ich es ernst.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – dass eine Grenze sofort getestet wird, kaum hast du sie gezogen? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "grenze",
+      "konsequenz",
+      "kontrolle",
+      "selbstfuersorge",
+      "klarheit"
+    ],
+    "url": "/szenen/bis-hierhin-und-nicht-weiter"
   },
   {
     "type": "scene",
@@ -656,6 +944,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-haette-er-wissen-muessen",
+    "title": "Das hätte er wissen müssen",
+    "description": "Eine Szene über die stille Erwartung, dass der andere Bedürfnisse errät – und die Enttäuschung, wenn er es nicht tut. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "kommunikation",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Merets Sicht",
+    "pull_quote": "Ich habe nichts gesagt. Aber tief drin war ich überzeugt: Wenn er mich wirklich lieben würde, hätte er es gewusst.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – enttäuscht zu sein, weil jemand etwas nicht erahnt hat, das du nie ausgesprochen hast? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "erwartung",
+      "gedankenlesen",
+      "enttaeuschung",
+      "sich-nicht-gehoert-fuehlen",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/das-haette-er-wissen-muessen"
+  },
+  {
+    "type": "scene",
     "slug": "das-haus-das-nie-kommt",
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv.",
@@ -680,6 +996,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "idealisierung-abwertung"
     ],
     "url": "/szenen/das-haus-das-nie-kommt"
+  },
+  {
+    "type": "scene",
+    "slug": "das-schlechte-gewissen",
+    "title": "Das schlechte Gewissen",
+    "description": "Eine Szene über die Schuldwelle, die nach einer gehaltenen Grenze kommt – und die Erkenntnis, dass sie ein alter Reflex ist, kein Urteil. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "grenzen",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Milans Sicht",
+    "pull_quote": "Ich habe nichts Falsches getan. Und trotzdem fühle ich mich schuldig, als hätte ich jemanden im Stich gelassen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – nach einer Grenze überschwemmt dich das schlechte Gewissen? Möchtest du behutsam anschauen, woher das kommt?"
+    },
+    "scene_tags": [
+      "schuldgefuehle",
+      "grenze",
+      "selbstzweifel",
+      "nein-sagen",
+      "selbstfuersorge"
+    ],
+    "url": "/szenen/das-schlechte-gewissen"
   },
   {
     "type": "scene",
@@ -1153,6 +1497,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-muss-nicht-sofort",
+    "title": "Ich muss nicht sofort",
+    "description": "Eine Szene über eine kleine, große Grenze – nicht mehr auf jede Nachricht sofort zu reagieren und die eigene Zeit zurückzuerobern. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "grenzen",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sonjas Sicht",
+    "pull_quote": "Das Handy leuchtet auf. Und zum ersten Mal drehe ich es einfach um und trinke meinen Kaffee zu Ende.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – das Gefühl, immer sofort erreichbar sein zu müssen? Möchtest du anschauen, was passiert, wenn du es nicht mehr bist?"
+    },
+    "scene_tags": [
+      "grenze",
+      "autonomie",
+      "kontrolle",
+      "selbstfuersorge",
+      "erschoepfung"
+    ],
+    "url": "/szenen/ich-muss-nicht-sofort"
+  },
+  {
+    "type": "scene",
     "slug": "ich-vermisse-das-chaos",
     "title": "Ich vermisse das Chaos",
     "description": "Eine Szene über die Zeit nach der Trennung – frei, aber mit Sehnsucht nach der Intensität, und der Erkenntnis, dass Ruhe sich erst leer anfühlt. Aus der Ich-Perspektive, fiktiv.",
@@ -1178,6 +1550,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/ich-vermisse-das-chaos"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-wollte-doch-nur-reden",
+    "title": "Ich wollte doch nur reden",
+    "description": "Eine Szene über den Versuch, ein Bedürfnis anzusprechen, der sofort zum Streit über den Streit wird. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "kommunikation",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Toms Sicht",
+    "pull_quote": "Ich habe vorsichtig angefangen. Zwei Sätze später geht es nicht mehr um mein Anliegen, sondern darum, dass ich es überhaupt angesprochen habe.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – ein behutsamer Anlauf zum Reden, der sofort kippt? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "missverstaendnis",
+      "eskalation",
+      "rueckzug",
+      "verbindung",
+      "sich-nicht-gehoert-fuehlen"
+    ],
+    "url": "/szenen/ich-wollte-doch-nur-reden"
   },
   {
     "type": "scene",
@@ -1429,6 +1829,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "mein-erstes-nein",
+    "title": "Mein erstes Nein",
+    "description": "Eine Szene über das erste echte Nein – die Angst davor, das Zittern dabei und das ungewohnte Gefühl danach. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "grenzen",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ronjas Sicht",
+    "pull_quote": "Ein kleines Wort. Zwei Buchstaben. Und mein Herz schlägt, als hätte ich gerade etwas Verbotenes getan.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – wie groß sich ein kleines Nein anfühlen kann? Möchtest du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "nein-sagen",
+      "grenze",
+      "schuldgefuehle",
+      "angst",
+      "selbstfuersorge"
+    ],
+    "url": "/szenen/mein-erstes-nein"
+  },
+  {
+    "type": "scene",
     "slug": "mitten-im-satz",
     "title": "Mitten im Satz",
     "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv.",
@@ -1649,6 +2077,44 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "naehe-distanz"
     ],
     "url": "/szenen/zwischen-himmel-und-abgrund"
+  },
+  {
+    "type": "topic",
+    "slug": "beduerfnisse-aeussern",
+    "title": "Bedürfnisse äußern statt Vorwürfe: die Kunst der Ich-Botschaft",
+    "description": "Wie man sagt, was man braucht, ohne den anderen anzuklagen – der Unterschied zwischen Vorwurf und Bitte, und warum klare Bedürfnisse Nähe schaffen statt Streit. Ohne Diagnose.",
+    "cluster": "kommunikation",
+    "search_intent": "Bedürfnisse äußern Beziehung Ich-Botschaft",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es ein Bedürfnis, das du in deiner Beziehung selten ausgesprochen hast? Möchtest du zusammen herausfinden, was du eigentlich brauchst – und warum es schwerfällt, es zu sagen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist eine Ich-Botschaft?",
+        "answer": "Eine Aussage, die bei dir bleibt: Sie beschreibt deine Beobachtung, dein Gefühl und dein Bedürfnis, statt das Verhalten des anderen zu bewerten. „Ich fühle mich übersehen, wenn …\" statt „Du ignorierst mich immer\"."
+      },
+      {
+        "question": "Warum lösen Vorwürfe fast immer Abwehr aus?",
+        "answer": "Weil sie als Angriff auf den Charakter ankommen, nicht als Wunsch. Wer sich angegriffen fühlt, verteidigt sich – und hört das eigentliche Bedürfnis dahinter gar nicht mehr."
+      },
+      {
+        "question": "Ist das nicht einfach nur höflicher formulieren?",
+        "answer": "Nein. Es geht nicht um Höflichkeit, sondern um Klarheit über dich selbst: Was brauche ich eigentlich? Diese Klarheit fehlt oft – und ohne sie wird aus einem Bedürfnis leicht ein Vorwurf."
+      }
+    ],
+    "url": "/wissen/beduerfnisse-aeussern"
   },
   {
     "type": "topic",
@@ -2015,6 +2481,45 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "grenzen-setzen-lernen",
+    "title": "Grenzen setzen lernen: der Anfang liegt bei dir selbst",
+    "description": "Wie man Grenzen setzt, ohne die Beziehung zu riskieren – warum eine Grenze zuerst innere Klarheit braucht, wie man sie freundlich, aber bestimmt kommuniziert, und was der Unterschied zu einer Mauer ist. Ohne Diagnose.",
+    "cluster": "grenzen",
+    "search_intent": "Grenzen setzen lernen Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es eine Grenze, die du dir schon lange zu setzen wünschst, aber nicht traust? Möchtest du gemeinsam herausfinden, was dich zurückhält?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie setze ich eine Grenze, ohne den anderen zu verletzen?",
+        "answer": "Indem du sie als Aussage über dich formulierst, nicht als Angriff: „Ich brauche abends eine Stunde für mich\" statt „Du erdrückst mich\". Eine klare, ruhige Grenze ist kein Angriff – auch wenn das Gegenüber sie zunächst so empfindet."
+      },
+      {
+        "question": "Was mache ich, wenn meine Grenze nicht respektiert wird?",
+        "answer": "Eine Grenze braucht eine Konsequenz, die du selbst in der Hand hast – nicht eine Drohung an den anderen. Zum Beispiel das Gespräch zu beenden, wenn es respektlos wird. Ohne Konsequenz bleibt eine Grenze ein Wunsch."
+      },
+      {
+        "question": "Ist Grenzen setzen egoistisch?",
+        "answer": "Nein. Grenzen schützen die Beziehung genauso wie dich selbst: Wer sich nicht ständig übergeht, staut weniger Groll an und bleibt länger echt zugewandt. Selbstaufgabe ist keine Liebe, sondern ein langsames Verschwinden."
+      }
+    ],
+    "url": "/wissen/grenzen-setzen-lernen"
+  },
+  {
+    "type": "topic",
     "slug": "kommunikation-konflikte",
     "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
     "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft.",
@@ -2077,6 +2582,44 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "krise"
     ],
     "url": "/wissen/krisentelefone"
+  },
+  {
+    "type": "topic",
+    "slug": "nein-sagen",
+    "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",
+    "description": "Woher die Angst vor dem Nein kommt, warum ein Ja aus Angst niemandem hilft und wie man freundlich Nein sagt, ohne sich endlos zu rechtfertigen. Ohne Diagnose.",
+    "cluster": "grenzen",
+    "search_intent": "Nein sagen lernen ohne schlechtes Gewissen",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Fällt es dir schwer, Nein zu sagen? Möchtest du eine konkrete Situation anschauen, in der du Ja gesagt hast, obwohl du Nein gemeint hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie sage ich Nein, ohne mich zu rechtfertigen?",
+        "answer": "Ein Nein braucht keine lange Begründung – oft reicht ein klarer, freundlicher Satz: „Das geht bei mir gerade nicht.\" Je mehr man erklärt, desto mehr Angriffsfläche bietet man für Gegenargumente. Ein kurzes, ruhiges Nein ist ein vollständiger Satz."
+      },
+      {
+        "question": "Warum habe ich nach einem Nein ein schlechtes Gewissen?",
+        "answer": "Weil viele früh gelernt haben, dass Nein sagen Ärger, Enttäuschung oder Liebesentzug bedeutet. Das schlechte Gewissen ist ein alter Reflex – kein Beweis, dass dein Nein falsch war."
+      },
+      {
+        "question": "Was, wenn der andere gekränkt reagiert?",
+        "answer": "Die Reaktion des anderen liegt nicht in deiner Verantwortung. Du bist für dein Nein zuständig, nicht für die Gefühle, die es beim Gegenüber auslöst. Ein Nein, das nur gilt, wenn niemand enttäuscht ist, ist kein echtes Nein."
+      }
+    ],
+    "url": "/wissen/nein-sagen"
   },
   {
     "type": "topic",
@@ -2154,6 +2697,45 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/professionelle-hilfe"
+  },
+  {
+    "type": "topic",
+    "slug": "schwierige-gespraeche-fuehren",
+    "title": "Schwierige Gespräche führen: heikle Themen ansprechen, ohne dass es eskaliert",
+    "description": "Wie man ein belastendes Thema anspricht, ohne dass es in Streit oder Rückzug kippt – mit einem klaren Einstieg, Timing und dem Unterschied zwischen Vorwurf und Bitte. Ohne Diagnose.",
+    "cluster": "kommunikation",
+    "search_intent": "schwieriges Gespräch führen Beziehung Tipps",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Es gibt ein Gespräch, das du seit Längerem vor dir herschiebst? Möchtest du es hier erst einmal für dich sortieren – worum es dir eigentlich geht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie beginne ich ein schwieriges Gespräch am besten?",
+        "answer": "Mit dem Anliegen bei dir statt mit einem Vorwurf: beschreibe die konkrete Situation, was sie in dir auslöst und was du dir wünschst. Ein weicher, ehrlicher Einstieg lädt eher zum Zuhören ein als ein Angriff."
+      },
+      {
+        "question": "Was, wenn mein Gegenüber sofort abblockt?",
+        "answer": "Oft hilft, kurz zu benennen, was gerade passiert („Ich merke, das ist schwer\") und das Tempo herauszunehmen. Ein Thema muss nicht in einem Gespräch gelöst werden – ein erster ehrlicher Austausch ist schon viel."
+      },
+      {
+        "question": "Wann ist der richtige Zeitpunkt?",
+        "answer": "Selten mitten im Konflikt oder zwischen Tür und Angel. Besser: beide einigermaßen ausgeruht, ungestört, mit etwas Zeit. Du darfst ein Gespräch sogar ankündigen, statt es zu überfallen."
+      }
+    ],
+    "url": "/wissen/schwierige-gespraeche-fuehren"
   },
   {
     "type": "topic",
@@ -2288,6 +2870,10 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
 ]
 
 export const CONTENT_ROUTE_META: Record<string, { title: string; description: string }> = {
+  "/glossar/aktives-zuhoeren": {
+    "title": "Aktives Zuhören – verstehen wollen, statt schon zu antworten",
+    "description": "Was aktives Zuhören wirklich bedeutet, warum es mehr ist als Schweigen und Nicken, und wie es in Beziehungen Nähe herstellt. Ohne Diagnose."
+  },
   "/glossar/ambivalenz": {
     "title": "Ambivalenz – wenn du hin- und hergerissen bist",
     "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist."
@@ -2312,6 +2898,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
   },
+  "/glossar/ich-botschaft": {
+    "title": "Ich-Botschaft – sagen, was in mir ist, ohne anzuklagen",
+    "description": "Was eine Ich-Botschaft ist, wie sie sich von der Du-Botschaft unterscheidet und warum sie Gespräche entschärft, ohne das Anliegen zu verkleinern. Ohne Diagnose."
+  },
   "/glossar/intermittierende-verstaerkung": {
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
     "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose."
@@ -2320,9 +2910,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kognitive Dissonanz – wenn zwei Wahrheiten nicht zusammenpassen",
     "description": "Warum der Kopf die Realität umschreibt, um in einer widersprüchlichen Beziehung bleiben zu können: das Spannungsprinzip hinter Ausreden, Beschönigen und Selbstzweifel. Ohne Diagnose."
   },
+  "/glossar/konsequenz": {
+    "title": "Konsequenz – was eine Grenze von einem Wunsch unterscheidet",
+    "description": "Warum eine Grenze ohne Konsequenz nur ein Wunsch bleibt, und was der Unterschied zwischen einer Konsequenz und einer Drohung ist. Ohne Diagnose."
+  },
+  "/glossar/metakommunikation": {
+    "title": "Metakommunikation – über das Reden reden",
+    "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose."
+  },
+  "/glossar/persoenliche-grenzen": {
+    "title": "Persönliche Grenzen – die Linie zwischen dir und den anderen",
+    "description": "Was persönliche Grenzen sind, welche Arten es gibt und warum sie kein Zeichen von Abweisung sind, sondern die Voraussetzung für echte Nähe. Ohne Diagnose."
+  },
   "/glossar/projektion": {
     "title": "Projektion – eigene Gefühle im anderen sehen",
     "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt."
+  },
+  "/glossar/selbstfuersorge": {
+    "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
+    "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose."
   },
   "/hilfe/an-eigener-wahrnehmung-zweifeln": {
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
@@ -2344,6 +2950,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Allein zu zweit",
     "description": "Eine Szene über emotionale Vernachlässigung – dieselbe Wohnung, dasselbe Sofa, und trotzdem eine Einsamkeit, die man niemandem erklären kann. Ich-Perspektive, fiktiv."
   },
+  "/szenen/als-sie-endlich-zuhoerte": {
+    "title": "Als sie endlich zuhörte",
+    "description": "Eine Szene über den seltenen Moment, wirklich gehört zu werden – und wie viel ein einziges echtes Zuhören verändern kann. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/am-ende-entschuldige-ich-mich": {
     "title": "Am Ende entschuldige ich mich",
     "description": "Eine Szene über Schuldumkehr – du bringst ein Anliegen vor und verlässt das Gespräch als die, die sich entschuldigt. Aus der Ich-Perspektive, fiktiv."
@@ -2352,9 +2962,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Am Ende tröste ich ihn",
     "description": "Eine Szene über verdeckten Narzissmus: Du kommst mit deinem Schmerz – und gehst mit seinem. Wie aus deinem Anliegen sein Leid wird. Ich-Perspektive, fiktiv."
   },
+  "/szenen/aneinander-vorbei": {
+    "title": "Aneinander vorbei",
+    "description": "Eine Szene über ein Gespräch, in dem beide reden und keiner hört – jeder verteidigt, niemand versteht. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/auf-ihrer-buehne": {
     "title": "Auf ihrer Bühne",
     "description": "Eine Szene über grandiosen Narzissmus – wenn du zum Publikum im Leben eines anderen wirst und dein eigenes leiser und leiser wird. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/bis-hierhin-und-nicht-weiter": {
+    "title": "Bis hierhin und nicht weiter",
+    "description": "Eine Szene über eine Grenze, die getestet wird – und den ruhigen Moment, in dem man sie zum ersten Mal wirklich hält. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/das-augenrollen": {
     "title": "Das Augenrollen",
@@ -2364,9 +2982,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das habe ich nie gesagt",
     "description": "Eine Szene über Gaslighting – wenn deine Erinnerung Stück für Stück in Frage gestellt wird, bis du an dir selbst zweifelst. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/das-haette-er-wissen-muessen": {
+    "title": "Das hätte er wissen müssen",
+    "description": "Eine Szene über die stille Erwartung, dass der andere Bedürfnisse errät – und die Enttäuschung, wenn er es nicht tut. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/das-haus-das-nie-kommt": {
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/das-schlechte-gewissen": {
+    "title": "Das schlechte Gewissen",
+    "description": "Eine Szene über die Schuldwelle, die nach einer gehaltenen Grenze kommt – und die Erkenntnis, dass sie ein alter Reflex ist, kein Urteil. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/das-wetter-zuhause": {
     "title": "Das Wetter zuhause",
@@ -2436,9 +3062,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich muss fragen",
     "description": "Eine Szene über finanzielle Kontrolle – wenn man für das eigene Geld um Erlaubnis bitten und jede Ausgabe rechtfertigen muss. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/ich-muss-nicht-sofort": {
+    "title": "Ich muss nicht sofort",
+    "description": "Eine Szene über eine kleine, große Grenze – nicht mehr auf jede Nachricht sofort zu reagieren und die eigene Zeit zurückzuerobern. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/ich-vermisse-das-chaos": {
     "title": "Ich vermisse das Chaos",
     "description": "Eine Szene über die Zeit nach der Trennung – frei, aber mit Sehnsucht nach der Intensität, und der Erkenntnis, dass Ruhe sich erst leer anfühlt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-wollte-doch-nur-reden": {
+    "title": "Ich wollte doch nur reden",
+    "description": "Eine Szene über den Versuch, ein Bedürfnis anzusprechen, der sofort zum Streit über den Streit wird. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/im-kreis": {
     "title": "Im Kreis",
@@ -2476,6 +3110,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Mach doch, was du willst",
     "description": "Eine Szene über passiv-aggressives Verhalten – wenn ‚ist schon okay' das Gegenteil bedeutet und du die Stimmung errätst statt sie zu erfahren. Ich-Perspektive, fiktiv."
   },
+  "/szenen/mein-erstes-nein": {
+    "title": "Mein erstes Nein",
+    "description": "Eine Szene über das erste echte Nein – die Angst davor, das Zittern dabei und das ungewohnte Gefühl danach. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/mitten-im-satz": {
     "title": "Mitten im Satz",
     "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv."
@@ -2507,6 +3145,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/zwischen-himmel-und-abgrund": {
     "title": "Zwischen Himmel und Abgrund",
     "description": "Eine Szene über intensive Beziehungsdynamik – Idealisierung, Angst vorm Verlassenwerden und plötzliche Kälte, an einem einzigen Tag. Ich-Perspektive, fiktiv, keine Diagnose."
+  },
+  "/wissen/beduerfnisse-aeussern": {
+    "title": "Bedürfnisse äußern statt Vorwürfe: die Kunst der Ich-Botschaft",
+    "description": "Wie man sagt, was man braucht, ohne den anderen anzuklagen – der Unterschied zwischen Vorwurf und Bitte, und warum klare Bedürfnisse Nähe schaffen statt Streit. Ohne Diagnose."
   },
   "/wissen/beobachtung-gefuehl": {
     "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",
@@ -2544,6 +3186,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Grenzen setzen: was sie sind und warum sie so schwerfallen",
     "description": "Was Grenzen wirklich sind, warum sie so schwer zu setzen sind und wie du sie klar kommunizierst – ohne Angriff und ohne Rechtfertigungsdruck."
   },
+  "/wissen/grenzen-setzen-lernen": {
+    "title": "Grenzen setzen lernen: der Anfang liegt bei dir selbst",
+    "description": "Wie man Grenzen setzt, ohne die Beziehung zu riskieren – warum eine Grenze zuerst innere Klarheit braucht, wie man sie freundlich, aber bestimmt kommuniziert, und was der Unterschied zu einer Mauer ist. Ohne Diagnose."
+  },
   "/wissen/kommunikation-konflikte": {
     "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
     "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft."
@@ -2552,6 +3198,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Krisentelefone und Anlaufstellen (D/A/CH)",
     "description": "Kostenlose, anonyme Hilfsangebote in Deutschland, Österreich und der Schweiz – rund um die Uhr erreichbar. Bei akuter Gefahr: Notruf 112."
   },
+  "/wissen/nein-sagen": {
+    "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",
+    "description": "Woher die Angst vor dem Nein kommt, warum ein Ja aus Angst niemandem hilft und wie man freundlich Nein sagt, ohne sich endlos zu rechtfertigen. Ohne Diagnose."
+  },
   "/wissen/persoenlichkeit-verhalten": {
     "title": "Persönlichkeit und Verhalten verstehen – ohne Ferndiagnose",
     "description": "Was Persönlichkeitsmerkmale sind und was nicht: Big Five, Narzissmus und das Dunkle Dreieck – verständlich erklärt, ohne andere zu etikettieren."
@@ -2559,6 +3209,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/professionelle-hilfe": {
     "title": "Wann professionelle Hilfe sinnvoll ist",
     "description": "Woran du erkennst, dass professionelle Unterstützung sinnvoll ist, was Therapie, Beratung und Coaching leisten – und wie du die Hürde zum ersten Gespräch überwindest."
+  },
+  "/wissen/schwierige-gespraeche-fuehren": {
+    "title": "Schwierige Gespräche führen: heikle Themen ansprechen, ohne dass es eskaliert",
+    "description": "Wie man ein belastendes Thema anspricht, ohne dass es in Streit oder Rückzug kippt – mit einem klaren Einstieg, Timing und dem Unterschied zwischen Vorwurf und Bitte. Ohne Diagnose."
   },
   "/wissen/sich-trennen": {
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",

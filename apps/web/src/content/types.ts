@@ -24,6 +24,8 @@ export const CLUSTERS = [
   'trennung', // Trennung
   'selbstreflexion', // Selbstreflexion
   'therapie', // Therapie & Coaching
+  'kommunikation', // Kommunikation
+  'grenzen', // Grenzen setzen
 ] as const
 export type Cluster = (typeof CLUSTERS)[number]
 
@@ -119,6 +121,8 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   trennung: 'Trennung',
   selbstreflexion: 'Selbstreflexion',
   therapie: 'Therapie & Coaching',
+  kommunikation: 'Kommunikation',
+  grenzen: 'Grenzen setzen',
 }
 
 /** Kurzes Anzeige-Label je Content-Typ (Badge). */

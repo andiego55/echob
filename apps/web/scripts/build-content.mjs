@@ -14,7 +14,7 @@ const contentDir = path.join(webRoot, 'content')
 const outFile = path.join(webRoot, 'src', 'content', 'manifest.generated.ts')
 
 const CONTENT_TYPES = ['topic', 'problem', 'glossary', 'guide', 'case-example', 'comparison', 'therapy-prep', 'scene']
-const CLUSTERS = ['dynamiken', 'bindung', 'trennung', 'selbstreflexion', 'therapie']
+const CLUSTERS = ['dynamiken', 'bindung', 'trennung', 'selbstreflexion', 'therapie', 'kommunikation', 'grenzen']
 const ECHO_MODES = ['base', 'stabilize', 'clarity', 'radical', 'analysis']
 const CTA_POSITIONS = ['after-intro', 'after-reflection', 'end']
 const URL_PREFIX = {
