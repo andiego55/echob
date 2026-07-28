@@ -177,6 +177,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "emotionale-ueberflutung",
+    "title": "Emotionale Überflutung – wenn das Gefühl das Denken überrollt",
+    "description": "Was emotionale Überflutung (Flooding) ist, warum man in diesem Zustand nicht mehr klar denken oder streiten kann und was dann wirklich hilft. Ohne Diagnose.",
+    "cluster": "gefuehle",
+    "search_intent": "emotionale Überflutung Flooding Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du den Moment, in dem ein Gefühl so groß wird, dass du nicht mehr klar denken kannst? Möchtest du so eine Situation anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Woran merke ich, dass ich überflutet bin?",
+        "answer": "Am Körper: Herzrasen, Enge, Hitze, das Gefühl, gleich zu explodieren oder dichtzumachen. Der Kopf wird eng, gute Argumente sind weg. In diesem Zustand kann man kaum noch zuhören oder fair reagieren."
+      },
+      {
+        "question": "Was hilft gegen emotionale Überflutung?",
+        "answer": "Zuerst eine echte Pause – nicht weiterreden, sondern den Körper beruhigen: langsam ausatmen, sich bewegen, kaltes Wasser. Fachleute empfehlen mindestens 20 Minuten, bis das Nervensystem wirklich runterkommt. Erst dann ist ein Gespräch wieder möglich."
+      }
+    ],
+    "url": "/glossar/emotionale-ueberflutung"
+  },
+  {
+    "type": "glossary",
+    "slug": "eskalationsspirale",
+    "title": "Eskalationsspirale – wie aus einer Kleinigkeit ein großer Streit wird",
+    "description": "Wie sich Konflikte hochschaukeln, warum jede Reaktion die nächste verschärft und an welcher Stelle man aus der Spirale aussteigen kann. Ohne Diagnose.",
+    "cluster": "konflikt",
+    "search_intent": "Eskalation Streit Spirale Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kippt ein Streit bei euch oft aus einer Kleinigkeit ins Große? Möchtest du so eine Eskalation einmal in Zeitlupe anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie entsteht eine Eskalationsspirale?",
+        "answer": "Eine schärfere Aussage löst eine noch schärfere Antwort aus, die wiederum die nächste steigert. Jeder reagiert auf die letzte Stufe, nicht auf das ursprüngliche Thema – so schaukelt sich der Konflikt hoch, oft in Minuten."
+      },
+      {
+        "question": "Wie steige ich aus der Spirale aus?",
+        "answer": "Meist nicht mit dem besseren Argument, sondern durch einen Ausstieg aus dem Muster: eine Pause, ein ruhiger Satz über das, was gerade passiert, oder ein Reparaturversuch. Jemand muss die Spirale bewusst unterbrechen – gewinnen kann sie niemand."
+      }
+    ],
+    "url": "/glossar/eskalationsspirale"
+  },
+  {
+    "type": "glossary",
     "slug": "fawning",
     "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
     "description": "Fawning ist die vierte Stressreaktion neben Kampf, Flucht und Erstarren: beschwichtigen und gefallen, um Sicherheit herzustellen. Warum das kein Charakterfehler ist – ohne Diagnose.",
@@ -490,6 +558,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "reparaturversuch",
+    "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
+    "description": "Was ein Reparaturversuch ist, warum die Fähigkeit, ihn zu senden und anzunehmen, über die Zukunft einer Beziehung entscheidet, und wie man ihn erkennt. Ohne Diagnose.",
+    "cluster": "konflikt",
+    "search_intent": "Reparaturversuch Beziehung Gottman",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wie geht ihr nach einem Streit wieder aufeinander zu? Möchtest du anschauen, was bei euch nach dem Konflikt passiert?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist ein Beispiel für einen Reparaturversuch?",
+        "answer": "Ein Lächeln mitten im Streit, ein „Sorry, das war zu scharf\", eine ausgestreckte Hand, ein Witz, der die Spannung löst. Alles, was signalisiert: Mir ist unsere Verbindung wichtiger als das Rechthaben."
+      },
+      {
+        "question": "Warum sind Reparaturversuche so wichtig?",
+        "answer": "Weil sie einen Streit bremsen, bevor er entgleist. Der Paarforscher Gottman fand: Nicht wie heftig Paare streiten entscheidet über ihre Zukunft, sondern ob sie Reparaturversuche senden – und ob der andere sie annimmt."
+      }
+    ],
+    "url": "/glossar/reparaturversuch"
+  },
+  {
+    "type": "glossary",
+    "slug": "scham",
+    "title": "Scham – das Gefühl, nicht zu genügen",
+    "description": "Was Scham von Schuld unterscheidet, warum sie so isoliert und lähmt und wie man ihr begegnen kann, ohne sich in ihr zu verlieren. Ohne Diagnose.",
+    "cluster": "gefuehle",
+    "search_intent": "Scham Bedeutung Unterschied Schuld",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das schwere Gefühl, im Kern nicht zu genügen? Möchtest du behutsam anschauen, in welchen Momenten es besonders auftaucht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen Scham und Schuld?",
+        "answer": "Schuld sagt: „Ich habe etwas Falsches getan.\" Scham sagt: „Ich bin falsch.\" Schuld bezieht sich auf ein Verhalten und lässt sich wiedergutmachen; Scham trifft die ganze Person und lähmt eher, als dass sie zur Veränderung antreibt."
+      },
+      {
+        "question": "Warum spricht kaum jemand über Scham?",
+        "answer": "Weil das Wesen der Scham gerade das Verstecken ist. Sie flüstert: „Wenn andere wüssten, wie du wirklich bist, würden sie sich abwenden.\" Genau deshalb wächst sie im Verborgenen – und schrumpft, sobald man sie jemandem anvertraut, der nicht urteilt."
+      }
+    ],
+    "url": "/glossar/scham"
+  },
+  {
+    "type": "glossary",
     "slug": "selbstfuersorge",
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
     "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose.",
@@ -521,6 +657,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/selbstfuersorge"
+  },
+  {
+    "type": "glossary",
+    "slug": "verachtung",
+    "title": "Verachtung – das gefährlichste Gift für eine Beziehung",
+    "description": "Warum Verachtung – Spott, Augenrollen, Herabsetzung – laut Paarforschung der stärkste Vorbote einer Trennung ist, und was ihr entgegenwirkt. Ohne Diagnose.",
+    "cluster": "konflikt",
+    "search_intent": "Verachtung Beziehung Bedeutung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du in deiner Beziehung Momente von Spott oder Herabsetzung? Möchtest du so eine Situation genauer anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Woran erkenne ich Verachtung?",
+        "answer": "An allem, was von oben herab kommt: Augenrollen, Sarkasmus, Spott, abschätzige Bemerkungen, Nachäffen. Verachtung behandelt den anderen nicht als gleichwertig, sondern als jemanden, über den man steht."
+      },
+      {
+        "question": "Warum ist Verachtung so schädlich?",
+        "answer": "Weil sie die Grundlage jeder Beziehung angreift – die Achtung voreinander. Der Paarforscher Gottman fand sie als den stärksten einzelnen Vorboten einer Trennung. Wer verachtet wird, fühlt sich nicht kritisiert, sondern wertlos."
+      }
+    ],
+    "url": "/glossar/verachtung"
+  },
+  {
+    "type": "glossary",
+    "slug": "wut",
+    "title": "Wut – der missverstandene Bote",
+    "description": "Warum Wut kein Feind ist, sondern ein Signal, was oft unter ihr liegt und wie man ihre Energie nutzen kann, ohne von ihr überrollt zu werden. Ohne Diagnose.",
+    "cluster": "gefuehle",
+    "search_intent": "Wut verstehen Beziehung Bedeutung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es eine Wut in dir, die du dir selbst kaum erlaubst? Möchtest du behutsam anschauen, was sie dir sagen will?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Wut ein schlechtes Gefühl?",
+        "answer": "Nein. Wut selbst ist weder gut noch schlecht – sie ist ein Signal, meist für eine überschrittene Grenze oder eine Verletzung. Problematisch ist nicht die Wut, sondern was man mit ihr tut. Unterdrückt oder ungezielt ausagiert schadet sie; verstanden kann sie Klarheit und Kraft geben."
+      },
+      {
+        "question": "Was steckt oft unter der Wut?",
+        "answer": "Häufig ein weicheres Gefühl: Verletzung, Angst, Ohnmacht, Enttäuschung. Wut ist manchmal die Rüstung über einer Wunde. Wer fragt „Was tut darunter eigentlich weh?\", kommt oft näher an das Eigentliche."
+      }
+    ],
+    "url": "/glossar/wut"
   },
   {
     "type": "problem",
@@ -862,6 +1066,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "aus-einer-muecke",
+    "title": "Aus einer Mücke",
+    "description": "Eine Szene über die Eskalationsspirale – wie aus einer Bemerkung über den Abwasch ein Streit über die ganze Beziehung wird. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "konflikt",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Vics Sicht",
+    "pull_quote": "Es ging um eine Pfanne. Zwanzig Minuten später geht es um alles, was in fünf Jahren jemals schiefgelaufen ist.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das – ein Streit, der aus dem Nichts riesig wird? Möchtest du so eine Eskalation einmal in Ruhe anschauen?"
+    },
+    "scene_tags": [
+      "eskalationsspirale",
+      "eskalation",
+      "wiederkehrendes-muster",
+      "erschoepfung",
+      "sich-nicht-gehoert-fuehlen"
+    ],
+    "url": "/szenen/aus-einer-muecke"
+  },
+  {
+    "type": "scene",
     "slug": "bis-hierhin-und-nicht-weiter",
     "title": "Bis hierhin und nicht weiter",
     "description": "Eine Szene über eine Grenze, die getestet wird – und den ruhigen Moment, in dem man sie zum ersten Mal wirklich hält. Aus der Ich-Perspektive, fiktiv.",
@@ -1111,6 +1343,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-morgen-danach",
+    "title": "Der Morgen danach",
+    "description": "Eine Szene über die kalte Stille nach einem großen Streit – und die Frage, wer den ersten Schritt zurück zueinander macht. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "konflikt",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Antons Sicht",
+    "pull_quote": "Wir frühstücken schweigend, dreißig Zentimeter und eine ganze Nacht Streit zwischen uns. Beide warten wir darauf, dass der andere anfängt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du die Stille am Morgen nach einem großen Streit? Möchtest du anschauen, was dich am ersten Schritt hindert?"
+    },
+    "scene_tags": [
+      "rueckzug",
+      "einsamkeit-zu-zweit",
+      "reparaturversuch",
+      "wiederkehrendes-muster",
+      "erschoepfung"
+    ],
+    "url": "/szenen/der-morgen-danach"
+  },
+  {
+    "type": "scene",
     "slug": "der-perfekte-tag",
     "title": "Der perfekte Tag",
     "description": "Eine Szene über intermittierende Verstärkung – ein einziger wunderbarer Tag, der Monate der Kälte auslöscht und die Hoffnung zurücksetzt. Aus der Ich-Perspektive, fiktiv.",
@@ -1221,6 +1481,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "die-scham-danach",
+    "title": "Die Scham danach",
+    "description": "Eine Szene über die Scham, die kommt, nachdem man sich gezeigt hat – und den Impuls, sich sofort wieder zu verstecken. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "gefuehle",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Robins Sicht",
+    "pull_quote": "Ich habe geweint vor ihr. Zum ersten Mal. Und am nächsten Morgen will ich vor allem eins: dass sie es vergisst.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du die Scham, nachdem du dich verletzlich gezeigt hast? Möchtest du behutsam anschauen, was dieser Rückzug schützen will?"
+    },
+    "scene_tags": [
+      "scham",
+      "selbstzweifel",
+      "rueckzug",
+      "verletzung",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/die-scham-danach"
+  },
+  {
+    "type": "scene",
     "slug": "die-tuer-war-offen",
     "title": "Die Tür war offen",
     "description": "Eine Szene über den stillen Moment der Klarheit – kein großer Knall, nur eine kleine Szene, nach der man weiß, dass man geht. Aus der Ich-Perspektive, fiktiv.",
@@ -1272,6 +1560,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "rueckzug"
     ],
     "url": "/szenen/die-wand"
+  },
+  {
+    "type": "scene",
+    "slug": "dieser-blick",
+    "title": "Dieser Blick",
+    "description": "Eine Szene über Verachtung im Alltag – das Augenrollen, der spöttische Ton, und wie klein man darunter wird. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "konflikt",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jorans Sicht",
+    "pull_quote": "Sie sagt kein böses Wort. Sie rollt nur mit den Augen. Und in dieser kleinen Bewegung liegt ein ganzes Urteil über mich.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – ein Blick, ein Ton, der dich kleiner macht als jedes Wort? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "verachtung",
+      "entwertung",
+      "sich-klein-fuehlen",
+      "sich-nicht-gehoert-fuehlen",
+      "erschoepfung"
+    ],
+    "url": "/szenen/dieser-blick"
   },
   {
     "type": "scene",
@@ -1439,6 +1755,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "erschoepfung"
     ],
     "url": "/szenen/es-wird-leiser"
+  },
+  {
+    "type": "scene",
+    "slug": "es-wird-mir-zu-viel",
+    "title": "Es wird mir zu viel",
+    "description": "Eine Szene über emotionale Überflutung – der Moment, in dem das Gefühl das Denken überrollt und man nur noch raus muss. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "gefuehle",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Juris Sicht",
+    "pull_quote": "Mein Kopf ist plötzlich leer und laut zugleich. Ich höre seine Worte, aber sie kommen nicht mehr an. Ich muss raus.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du den Punkt, an dem ein Streit zu viel wird und dein Kopf einfach dichtmacht? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "emotionale-ueberflutung",
+      "eskalation",
+      "rueckzug",
+      "erschoepfung",
+      "selbstfuersorge"
+    ],
+    "url": "/szenen/es-wird-mir-zu-viel"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-brauch-eine-pause",
+    "title": "Ich brauch eine Pause",
+    "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "konflikt",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Neles Sicht",
+    "pull_quote": "Zum ersten Mal renne ich nicht die Treppe mit hoch. Ich sage: „Ich brauch eine Pause\" – und meine es nicht als Waffe.",
+    "echo": {
+      "mode": "base",
+      "opening_question": "Kennst du den Unterschied zwischen einer Pause als Schutz und einem Rückzug als Strafe? Möchtest du so einen Moment anschauen?"
+    },
+    "scene_tags": [
+      "reparaturversuch",
+      "deeskalation",
+      "klarheit",
+      "selbstfuersorge",
+      "verbindung"
+    ],
+    "url": "/szenen/ich-brauch-eine-pause"
   },
   {
     "type": "scene",
@@ -1912,6 +2284,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "neben-dir-ruhig",
+    "title": "Neben dir ruhig",
+    "description": "Eine Szene über Co-Regulation – wie die ruhige Nähe eines Menschen ein aufgewühltes Inneres beruhigt, ganz ohne Worte. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "gefuehle",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Malins Sicht",
+    "pull_quote": "Sie sagt gar nichts. Sie legt nur ihre Hand auf meinen Rücken und atmet ruhig. Und mein ganzes System hört auf, Alarm zu schlagen.",
+    "echo": {
+      "mode": "base",
+      "opening_question": "Kennst du Menschen, in deren Nähe du einfach ruhiger wirst? Möchtest du anschauen, was dir diese beruhigende Nähe bedeutet?"
+    },
+    "scene_tags": [
+      "co-regulation",
+      "verbindung",
+      "ressource",
+      "klarheit",
+      "selbstfuersorge"
+    ],
+    "url": "/szenen/neben-dir-ruhig"
+  },
+  {
+    "type": "scene",
     "slug": "ploetzlich-die-taeterin",
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv.",
@@ -1937,6 +2337,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "selbstzweifel"
     ],
     "url": "/szenen/ploetzlich-die-taeterin"
+  },
+  {
+    "type": "scene",
+    "slug": "unter-der-wut",
+    "title": "Unter der Wut",
+    "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv.",
+    "cluster": "gefuehle",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Elias Sicht",
+    "pull_quote": "Ich bin so wütend, dass ich zittere. Und irgendwann, ganz leise, merke ich: Unter der Wut sitzt kein Zorn. Da sitzt ein verletztes Kind.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das – dass unter deiner Wut etwas Weicheres liegt? Möchtest du behutsam nachschauen, was das sein könnte?"
+    },
+    "scene_tags": [
+      "wut",
+      "verletzung",
+      "selbstzweifel",
+      "erschoepfung",
+      "klarheit"
+    ],
+    "url": "/szenen/unter-der-wut"
   },
   {
     "type": "scene",
@@ -2237,6 +2665,78 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "co-regulation",
+    "title": "Co-Regulation: warum wir uns aneinander beruhigen",
+    "description": "Wie Menschen sich gegenseitig beruhigen, warum ein ruhiges Gegenüber ein aufgewühltes Nervensystem besänftigt und wieso Co-Regulation kein Zeichen von Abhängigkeit ist. Ohne Diagnose.",
+    "cluster": "gefuehle",
+    "search_intent": "Co-Regulation Bedeutung Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es Menschen, in deren Nähe du ruhiger wirst – und andere, bei denen du dich anspannst? Möchtest du dem einmal nachgehen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist Co-Regulation?",
+        "answer": "Das gegenseitige Beruhigen zweier Nervensysteme: Ein ruhiges, zugewandtes Gegenüber hilft dir, aus Stress oder Aufregung wieder in Ruhe zu finden – und umgekehrt. Das geschieht meist unbewusst, über Stimme, Blick, Berührung und Präsenz."
+      },
+      {
+        "question": "Ist Co-Regulation nicht ungesunde Abhängigkeit?",
+        "answer": "Nein. Sich aneinander zu beruhigen ist von Geburt an angelegt und bleibt ein Leben lang gesund. Problematisch wäre nur, sich gar nicht mehr allein beruhigen zu können. Gesund ist die Mischung: sich selbst regulieren und sich regulieren lassen können."
+      }
+    ],
+    "url": "/wissen/co-regulation"
+  },
+  {
+    "type": "topic",
+    "slug": "die-vier-reiter",
+    "title": "Die vier apokalyptischen Reiter: was Beziehungen von innen zersetzt",
+    "description": "Kritik, Verachtung, Rechtfertigung und Mauern – die vier Kommunikationsmuster, die laut Paarforschung (Gottman) Beziehungen zerstören, und ihre Gegenmittel. Ohne Diagnose.",
+    "cluster": "konflikt",
+    "search_intent": "vier apokalyptische Reiter Gottman Beziehung",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Erkennst du eines dieser vier Muster bei euch wieder? Möchtest du anschauen, in welchen Situationen es besonders auftritt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was sind die vier apokalyptischen Reiter?",
+        "answer": "Ein Bild des Paarforschers John Gottman für vier zerstörerische Kommunikationsmuster: Kritik (Angriff auf den Charakter), Verachtung (Herabsetzung), Rechtfertigung (Abwehr statt Verantwortung) und Mauern (sich verschließen)."
+      },
+      {
+        "question": "Welcher der vier ist am gefährlichsten?",
+        "answer": "Verachtung. Sie sagt dem anderen: „Ich stehe über dir.\" Gottman fand sie als den stärksten einzelnen Vorboten einer Trennung. Umso wichtiger ist, sie früh zu erkennen und durch Wertschätzung zu ersetzen."
+      },
+      {
+        "question": "Heißt ein Reiter im Streit, dass die Beziehung am Ende ist?",
+        "answer": "Nein. Alle vier tauchen mal auf. Entscheidend ist, ob sie zum Dauermuster werden und ob es Gegengewichte gibt – vor allem gelungene Reparaturversuche und ein Grundklima aus Wertschätzung."
+      }
+    ],
+    "url": "/wissen/die-vier-reiter"
+  },
+  {
+    "type": "topic",
     "slug": "eifersucht",
     "title": "Eifersucht verstehen: woher sie kommt und was sie mit dir macht",
     "description": "Was hinter Eifersucht steckt, wann sie zur Belastung wird und wie du ihr weniger ausgeliefert bist – ohne dich dafür zu verurteilen.",
@@ -2371,6 +2871,45 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "emotionen-regulieren",
+    "title": "Emotionen regulieren: mit starken Gefühlen umgehen, ohne sie wegzudrücken",
+    "description": "Was Emotionsregulation wirklich bedeutet – nicht Gefühle unterdrücken, sondern sie halten können –, warum Wegdrücken nicht funktioniert und welche Wege im Alltag helfen. Ohne Diagnose.",
+    "cluster": "gefuehle",
+    "search_intent": "Emotionen regulieren lernen",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es ein Gefühl, das dich immer wieder überwältigt? Möchtest du eine konkrete Situation anschauen, in der es besonders stark war?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Heißt Emotionen regulieren, sie zu unterdrücken?",
+        "answer": "Nein – eher das Gegenteil. Unterdrückte Gefühle verschwinden nicht, sie stauen sich. Regulieren heißt, ein Gefühl zulassen und es aushalten zu können, ohne von ihm überrollt oder zu ihm zu werden."
+      },
+      {
+        "question": "Wie beruhige ich mich, wenn ein Gefühl mich überflutet?",
+        "answer": "Oft zuerst über den Körper: langsamer ausatmen als einatmen, die Füße spüren, kaltes Wasser, Bewegung. Ein überflutetes Nervensystem lässt sich schlecht durch Nachdenken beruhigen – der Körper ist der schnellere Weg."
+      },
+      {
+        "question": "Warum reagiere ich manchmal viel heftiger, als die Situation es hergibt?",
+        "answer": "Weil aktuelle Situationen oft alte Gefühle mit anstoßen. Wenn eine kleine Sache eine große Reaktion auslöst, ist meist mehr im Spiel als das Jetzt – ein alter, wunder Punkt wird mitberührt."
+      }
+    ],
+    "url": "/wissen/emotionen-regulieren"
+  },
+  {
+    "type": "topic",
     "slug": "emotionsregulation",
     "title": "Emotionsregulation: das Toleranzfenster und was Gefühle steuert",
     "description": "Warum manche Menschen Gefühle schwer regulieren können, was das Toleranzfenster ist und wie sich Dysregulation auf Beziehungen auswirkt – erklärend, nicht entschuldigend.",
@@ -2406,6 +2945,45 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/emotionsregulation"
+  },
+  {
+    "type": "topic",
+    "slug": "fair-streiten",
+    "title": "Fair streiten: wie Konflikte verbinden statt verletzen",
+    "description": "Warum Streiten nicht das Problem ist, sondern die Art zu streiten – mit Regeln für faire Konflikte, dem Unterschied zwischen Klärung und Verletzung und Wegen aus der Eskalation. Ohne Diagnose.",
+    "cluster": "konflikt",
+    "search_intent": "fair streiten Beziehung Regeln",
+    "updated": "2026-07-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es einen Streit, der bei euch immer gleich abläuft? Möchtest du ihn einmal in Ruhe von außen anschauen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Streiten in einer Beziehung schlecht?",
+        "answer": "Nein. Paare, die gut zusammenpassen, streiten nicht weniger – sie streiten anders. Konflikt ist normal und sogar nötig; entscheidend ist, ob er zur Klärung führt oder zur Verletzung."
+      },
+      {
+        "question": "Was sind gute Regeln für einen fairen Streit?",
+        "answer": "Bei einem Thema bleiben, beim eigenen Erleben statt beim Vorwurf, keine Verallgemeinerungen wie „immer\" und „nie\", Pausen erlauben, wenn es zu viel wird – und am Ende wieder aufeinander zugehen, statt recht behalten zu wollen."
+      },
+      {
+        "question": "Wie beende ich einen Streit, der sich im Kreis dreht?",
+        "answer": "Oft hilft, das Thema kurz zu vertagen und zuerst das Miteinander zu beruhigen: „Lass uns eine Pause machen und später weiterreden.\" Ein Streit muss nicht in einer Sitzung gelöst werden."
+      }
+    ],
+    "url": "/wissen/fair-streiten"
   },
   {
     "type": "comparison",
@@ -2890,6 +3468,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
     "description": "Emotionale Erpressung wirkt über Furcht, Verpflichtung und Schuld (FOG). Wie man erkennt, dass Zustimmung erzwungen statt frei gegeben ist – und warum das kein böser Wille sein muss. Ohne Diagnose."
   },
+  "/glossar/emotionale-ueberflutung": {
+    "title": "Emotionale Überflutung – wenn das Gefühl das Denken überrollt",
+    "description": "Was emotionale Überflutung (Flooding) ist, warum man in diesem Zustand nicht mehr klar denken oder streiten kann und was dann wirklich hilft. Ohne Diagnose."
+  },
+  "/glossar/eskalationsspirale": {
+    "title": "Eskalationsspirale – wie aus einer Kleinigkeit ein großer Streit wird",
+    "description": "Wie sich Konflikte hochschaukeln, warum jede Reaktion die nächste verschärft und an welcher Stelle man aus der Spirale aussteigen kann. Ohne Diagnose."
+  },
   "/glossar/fawning": {
     "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
     "description": "Fawning ist die vierte Stressreaktion neben Kampf, Flucht und Erstarren: beschwichtigen und gefallen, um Sicherheit herzustellen. Warum das kein Charakterfehler ist – ohne Diagnose."
@@ -2926,9 +3512,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Projektion – eigene Gefühle im anderen sehen",
     "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt."
   },
+  "/glossar/reparaturversuch": {
+    "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
+    "description": "Was ein Reparaturversuch ist, warum die Fähigkeit, ihn zu senden und anzunehmen, über die Zukunft einer Beziehung entscheidet, und wie man ihn erkennt. Ohne Diagnose."
+  },
+  "/glossar/scham": {
+    "title": "Scham – das Gefühl, nicht zu genügen",
+    "description": "Was Scham von Schuld unterscheidet, warum sie so isoliert und lähmt und wie man ihr begegnen kann, ohne sich in ihr zu verlieren. Ohne Diagnose."
+  },
   "/glossar/selbstfuersorge": {
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
     "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose."
+  },
+  "/glossar/verachtung": {
+    "title": "Verachtung – das gefährlichste Gift für eine Beziehung",
+    "description": "Warum Verachtung – Spott, Augenrollen, Herabsetzung – laut Paarforschung der stärkste Vorbote einer Trennung ist, und was ihr entgegenwirkt. Ohne Diagnose."
+  },
+  "/glossar/wut": {
+    "title": "Wut – der missverstandene Bote",
+    "description": "Warum Wut kein Feind ist, sondern ein Signal, was oft unter ihr liegt und wie man ihre Energie nutzen kann, ohne von ihr überrollt zu werden. Ohne Diagnose."
   },
   "/hilfe/an-eigener-wahrnehmung-zweifeln": {
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
@@ -2970,6 +3572,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Auf ihrer Bühne",
     "description": "Eine Szene über grandiosen Narzissmus – wenn du zum Publikum im Leben eines anderen wirst und dein eigenes leiser und leiser wird. Ich-Perspektive, fiktiv."
   },
+  "/szenen/aus-einer-muecke": {
+    "title": "Aus einer Mücke",
+    "description": "Eine Szene über die Eskalationsspirale – wie aus einer Bemerkung über den Abwasch ein Streit über die ganze Beziehung wird. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/bis-hierhin-und-nicht-weiter": {
     "title": "Bis hierhin und nicht weiter",
     "description": "Eine Szene über eine Grenze, die getestet wird – und den ruhigen Moment, in dem man sie zum ersten Mal wirklich hält. Aus der Ich-Perspektive, fiktiv."
@@ -3006,6 +3612,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Der Krümel",
     "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/der-morgen-danach": {
+    "title": "Der Morgen danach",
+    "description": "Eine Szene über die kalte Stille nach einem großen Streit – und die Frage, wer den ersten Schritt zurück zueinander macht. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/der-perfekte-tag": {
     "title": "Der perfekte Tag",
     "description": "Eine Szene über intermittierende Verstärkung – ein einziger wunderbarer Tag, der Monate der Kälte auslöscht und die Hoffnung zurücksetzt. Aus der Ich-Perspektive, fiktiv."
@@ -3022,6 +3632,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Die Liste",
     "description": "Eine Szene über das Aufrechnen – wenn jeder alte Fehler aufbewahrt und im nächsten Streit wieder hervorgeholt wird. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/die-scham-danach": {
+    "title": "Die Scham danach",
+    "description": "Eine Szene über die Scham, die kommt, nachdem man sich gezeigt hat – und den Impuls, sich sofort wieder zu verstecken. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/die-tuer-war-offen": {
     "title": "Die Tür war offen",
     "description": "Eine Szene über den stillen Moment der Klarheit – kein großer Knall, nur eine kleine Szene, nach der man weiß, dass man geht. Aus der Ich-Perspektive, fiktiv."
@@ -3029,6 +3643,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-wand": {
     "title": "Die Wand",
     "description": "Eine Szene über Stonewalling – wenn das Gegenüber mitten im Gespräch dichtmacht und eine Wand steht, wo eben noch ein Mensch war. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/dieser-blick": {
+    "title": "Dieser Blick",
+    "description": "Eine Szene über Verachtung im Alltag – das Augenrollen, der spöttische Ton, und wie klein man darunter wird. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/drei-tage-schweigen": {
     "title": "Drei Tage Schweigen",
@@ -3053,6 +3671,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/es-wird-leiser": {
     "title": "Es wird leiser",
     "description": "Eine Szene über emotionalen Rückzug – keine Streits, kein Drama, nur ein langsames Weniger, bis man sich nebeneinander fremd wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/es-wird-mir-zu-viel": {
+    "title": "Es wird mir zu viel",
+    "description": "Eine Szene über emotionale Überflutung – der Moment, in dem das Gefühl das Denken überrollt und man nur noch raus muss. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-brauch-eine-pause": {
+    "title": "Ich brauch eine Pause",
+    "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/ich-hab-mich-geaendert": {
     "title": "Ich hab mich geändert",
@@ -3122,9 +3748,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Nach dem Anruf bei Mama",
     "description": "Eine Szene über einen narzisstischen Elternteil – wenn jedes Gespräch bei ihrem Leid endet und man kleiner auflegt, als man angerufen hat. Ich-Perspektive, fiktiv."
   },
+  "/szenen/neben-dir-ruhig": {
+    "title": "Neben dir ruhig",
+    "description": "Eine Szene über Co-Regulation – wie die ruhige Nähe eines Menschen ein aufgewühltes Inneres beruhigt, ganz ohne Worte. Aus der Ich-Perspektive, fiktiv."
+  },
   "/szenen/ploetzlich-die-taeterin": {
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/unter-der-wut": {
+    "title": "Unter der Wut",
+    "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv."
   },
   "/szenen/warum-ich-bleibe": {
     "title": "Warum ich bleibe",
@@ -3162,6 +3796,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Bindungsstile: sicher, ängstlich, vermeidend, desorganisiert",
     "description": "Wie frühe Bindungserfahrungen unser Beziehungsverhalten als Erwachsene prägen – die vier Bindungsstile verständlich erklärt, ohne Menschen zu etikettieren."
   },
+  "/wissen/co-regulation": {
+    "title": "Co-Regulation: warum wir uns aneinander beruhigen",
+    "description": "Wie Menschen sich gegenseitig beruhigen, warum ein ruhiges Gegenüber ein aufgewühltes Nervensystem besänftigt und wieso Co-Regulation kein Zeichen von Abhängigkeit ist. Ohne Diagnose."
+  },
+  "/wissen/die-vier-reiter": {
+    "title": "Die vier apokalyptischen Reiter: was Beziehungen von innen zersetzt",
+    "description": "Kritik, Verachtung, Rechtfertigung und Mauern – die vier Kommunikationsmuster, die laut Paarforschung (Gottman) Beziehungen zerstören, und ihre Gegenmittel. Ohne Diagnose."
+  },
   "/wissen/eifersucht": {
     "title": "Eifersucht verstehen: woher sie kommt und was sie mit dir macht",
     "description": "Was hinter Eifersucht steckt, wann sie zur Belastung wird und wie du ihr weniger ausgeliefert bist – ohne dich dafür zu verurteilen."
@@ -3174,9 +3816,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Emotionale Manipulation in Beziehungen erkennen",
     "description": "Wie emotionale Manipulation funktioniert, welche Muster typisch sind und wie du deine eigene Wahrnehmung wieder ernst nimmst – vorsichtig erklärt, ohne Ferndiagnose."
   },
+  "/wissen/emotionen-regulieren": {
+    "title": "Emotionen regulieren: mit starken Gefühlen umgehen, ohne sie wegzudrücken",
+    "description": "Was Emotionsregulation wirklich bedeutet – nicht Gefühle unterdrücken, sondern sie halten können –, warum Wegdrücken nicht funktioniert und welche Wege im Alltag helfen. Ohne Diagnose."
+  },
   "/wissen/emotionsregulation": {
     "title": "Emotionsregulation: das Toleranzfenster und was Gefühle steuert",
     "description": "Warum manche Menschen Gefühle schwer regulieren können, was das Toleranzfenster ist und wie sich Dysregulation auf Beziehungen auswirkt – erklärend, nicht entschuldigend."
+  },
+  "/wissen/fair-streiten": {
+    "title": "Fair streiten: wie Konflikte verbinden statt verletzen",
+    "description": "Warum Streiten nicht das Problem ist, sondern die Art zu streiten – mit Regeln für faire Konflikte, dem Unterschied zwischen Klärung und Verletzung und Wegen aus der Eskalation. Ohne Diagnose."
   },
   "/wissen/gaslighting-oder-missverstaendnis": {
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",

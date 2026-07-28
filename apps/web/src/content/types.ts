@@ -26,6 +26,8 @@ export const CLUSTERS = [
   'therapie', // Therapie & Coaching
   'kommunikation', // Kommunikation
   'grenzen', // Grenzen setzen
+  'konflikt', // Konflikt & Streit
+  'gefuehle', // Gefühle verstehen
 ] as const
 export type Cluster = (typeof CLUSTERS)[number]
 
@@ -123,6 +125,8 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   therapie: 'Therapie & Coaching',
   kommunikation: 'Kommunikation',
   grenzen: 'Grenzen setzen',
+  konflikt: 'Konflikt & Streit',
+  gefuehle: 'Gefühle verstehen',
 }
 
 /** Kurzes Anzeige-Label je Content-Typ (Badge). */

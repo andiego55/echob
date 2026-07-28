@@ -68,6 +68,9 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   'gehoert-werden': 'Gehört werden',
   'nein-sagen': 'Nein sagen',
   selbstfuersorge: 'Selbstfürsorge',
+  // Konflikt & Gefühle
+  'emotionale-ueberflutung': 'Emotionale Überflutung',
+  'co-regulation': 'Co-Regulation',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */
@@ -156,6 +159,15 @@ export const SCENE_TAG_ORDER: string[] = [
   'gedankenlesen',
   'enttaeuschung',
   'angst',
+  // Konflikt & Gefühle
+  'eskalationsspirale',
+  'deeskalation',
+  'reparaturversuch',
+  'wut',
+  'verletzung',
+  'scham',
+  'emotionale-ueberflutung',
+  'co-regulation',
 ]
 
 /** Anzeige-Label eines Tag-Slugs (Override oder abgeleitet aus dem Slug). */
