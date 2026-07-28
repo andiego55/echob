@@ -74,12 +74,6 @@ export default function UeberMissionPage() {
             Für Menschen, die Hilfe suchen und gerade keine andere finden, kann EchoB der erste Schritt
             sein, um Ordnung und Klarheit zu gewinnen.
           </p>
-          <div className="mt-6 rounded-brand border border-amber-200 bg-amber-50 px-5 py-4 max-w-xl">
-            <p className="text-sm text-amber-800">
-              EchoB ersetzt keine Therapie und ist keine Notfallhilfe. Bei akuter Gefahr braucht es Menschen –
-              sofort: Telefonseelsorge <strong>0800 111 0 111</strong> (kostenlos, 24/7) oder Notruf <strong>112</strong>.
-            </p>
-          </div>
         </div>
       </section>
 
