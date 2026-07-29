@@ -880,6 +880,11 @@ export interface ProfessionalProfile {
   display_name: string | null
   title: string | null
   created_at: string
+  // Auftragsverarbeitung (Art. 28 DSGVO) — steuert das AVV-Zustimmungs-Gate
+  avv_current_version?: string | null
+  avv_accepted?: boolean
+  avv_accepted_version?: string | null
+  avv_accepted_at?: string | null
 }
 
 export interface Connection {

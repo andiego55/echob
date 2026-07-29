@@ -27,12 +27,23 @@ class ProfessionalProfileResponse(BaseModel):
     title: str | None = None
     created_at: datetime
 
+    # Auftragsverarbeitung (Art. 28 DSGVO): steuert das AVV-Zustimmungs-Gate.
+    avv_current_version: str | None = None
+    avv_accepted: bool = False
+    avv_accepted_version: str | None = None
+    avv_accepted_at: datetime | None = None
+
     model_config = {"from_attributes": True}
 
 
 class ProfessionalRegister(BaseModel):
     display_name: str = Field(..., min_length=1, max_length=120)
     title: str | None = Field(None, max_length=160)
+
+
+class AgreementAccept(BaseModel):
+    """Zustimmung der Fachperson zu einer Vertragsversion (AVV, Art. 28)."""
+    version: str = Field(..., min_length=1, max_length=64)
 
 
 # ── Einladungen & Verbindungen (nutzerseitig) ─────────────────────────────────

@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { professionalApi } from '@/api/professional'
+import ProfessionalAvvGate from '@/components/professional/ProfessionalAvvGate'
 
 function Spinner() {
   return (
@@ -31,6 +32,10 @@ export default function ProfessionalRoute({ children }: { children: React.ReactN
   if (loading || (session && isLoading)) return <Spinner />
   if (!session) return <Navigate to="/auth" replace />
   if (isError || !data) return <Navigate to="/app" replace />
+  // Art. 28: Bis der AVV abgeschlossen ist, blockiert das Gate den gesamten Bereich.
+  // Fail-open (wie das Einwilligungs-Gate): nur bei explizitem false sperren – fehlt das
+  // Feld (z. B. Backend noch nicht deployt), wird NICHT gesperrt, um Aussperren zu vermeiden.
+  if (data.avv_accepted === false) return <ProfessionalAvvGate />
   return <>{children}</>
 }
 

@@ -14,6 +14,7 @@ from typing import Any
 from fastapi import HTTPException
 
 from app.core import crypto
+from app.services import agreement_service
 from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import build_hypothesis_context
 from app.services.person_profile_service import build_person_context
@@ -51,6 +52,15 @@ async def require_active_share(professional_user_id, case_id, conn) -> dict[str,
     )
     if not row:
         raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+    # Art. 28 DSGVO: Ohne abgeschlossenen Auftragsverarbeitungsvertrag (AVV) verarbeitet
+    # die Fachperson keine freigegebenen Klient-Daten. Serverseitige Durchsetzung des
+    # Zustimmungs-Gates — greift erst NACH der Freigabe-Prüfung, damit die 404-
+    # Existenz-Absicherung fremder Fälle erhalten bleibt.
+    if not await agreement_service.has_accepted_current_avv(conn, professional_user_id):
+        raise HTTPException(
+            status_code=403,
+            detail="Auftragsverarbeitungsvertrag (AVV) noch nicht abgeschlossen.",
+        )
     return dict(row)
 
 

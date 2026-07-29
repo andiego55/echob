@@ -130,9 +130,13 @@ async def get_current_professional(
         org = await ensure_org_for_professional(
             current_user["user_id"], conn, row["display_name"],
         )
+        # AVV-Status (Art. 28): steuert das Zustimmungs-Gate + serverseitige Durchsetzung.
+        from app.services import agreement_service
+        avv = await agreement_service.get_avv_status(conn, current_user["user_id"])
     return {
         **current_user, "professional": dict(row),
         "org_id": org["org_id"], "org_role": org["role"],
+        "avv": avv,
     }
 
 

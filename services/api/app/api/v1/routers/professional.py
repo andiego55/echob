@@ -10,12 +10,13 @@ import json
 from datetime import UTC, date, datetime, time
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel as _BaseModel
 
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_current_user, get_pool
 from app.schemas.professional import (
+    AgreementAccept,
     GlossaryTerm,
     InboxItem,
     ProfessionalCaseSummary,
@@ -151,7 +152,7 @@ async def get_me(
     """
     async with pool.acquire() as conn:
         await ensure_demo_for_professional(current["user_id"], conn)
-    return ProfessionalProfileResponse(**current["professional"])
+    return ProfessionalProfileResponse(**current["professional"], **current["avv"])
 
 
 @router.post("/register", response_model=ProfessionalProfileResponse)
@@ -193,6 +194,37 @@ async def register(
         await ensure_org_for_professional(user_id, conn, body.display_name)
         await ensure_demo_for_professional(user_id, conn)
     return ProfessionalProfileResponse(**dict(row))
+
+
+@router.post("/agreements/accept", response_model=ProfessionalProfileResponse)
+async def accept_agreement(
+    body: AgreementAccept,
+    request: Request,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalProfileResponse:
+    """Schließt den Auftragsverarbeitungsvertrag (AVV, Art. 28 DSGVO) ab.
+
+    Die Fachperson (Verantwortliche) akzeptiert die aktuell gültige Vertragsversion,
+    bevor sie freigegebene Klient-Daten mit EchoB (Auftragsverarbeiter) verarbeitet.
+    Append-only Nachweis (Version + Zeitpunkt). Erst danach hebt das Gate auf und der
+    Zugriff auf Falldaten ist serverseitig freigeschaltet (sharing_service).
+    """
+    from app.services import agreement_service
+    xff = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
+    ip = xff or (request.client.host if request.client else None)
+    async with pool.acquire() as conn:
+        try:
+            avv = await agreement_service.record_avv_acceptance(
+                conn, current["user_id"], body.version,
+                user_agent=request.headers.get("user-agent"), ip_address=ip,
+            )
+        except ValueError:
+            raise HTTPException(
+                status_code=400,
+                detail="Diese Vertragsversion ist nicht mehr aktuell. Bitte lade die Seite neu.",
+            )
+    return ProfessionalProfileResponse(**current["professional"], **avv)
 
 
 # ── Echo-Aussteuerung (therapeutischer Ansatz + Regler + Freitext) ────────────

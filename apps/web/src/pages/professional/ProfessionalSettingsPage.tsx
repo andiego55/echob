@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@/components/settings/EchoSteeringForm'
+import AvvDocument from '@/components/professional/AvvDocument'
 import { professionalApi } from '@/api/professional'
 
 const PRO_APPROACHES: EchoModeOption[] = [
@@ -91,8 +92,61 @@ export default function ProfessionalSettingsPage() {
 
         <PracticeSection />
         <BillingSection />
+        <AgreementSection />
       </div>
     </ProfessionalShell>
+  )
+}
+
+/** Auftragsverarbeitung (Art. 28 DSGVO): Status des abgeschlossenen AVV + einsehbares Dokument. */
+function AgreementSection() {
+  const { data: me } = useQuery({ queryKey: ['professional-me'], queryFn: professionalApi.me })
+  const [open, setOpen] = useState(false)
+
+  const fmtDT = (s: string) =>
+    new Date(s).toLocaleString('de-DE', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    })
+
+  return (
+    <div className="mt-8 card">
+      <h2 className="text-lg font-semibold text-navy">Auftragsverarbeitung (AVV)</h2>
+      <p className="mt-1 text-sm text-brand-muted">
+        Wenn Klient:innen Inhalte für Sie freigeben, sind Sie die Verantwortliche und EchoB ist Ihr
+        Auftragsverarbeiter (Art. 28 DSGVO). Hier finden Sie den abgeschlossenen Vertrag und die
+        eingesetzten Unterauftragsverarbeiter (u. a. OpenAI).
+      </p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
+        <div>
+          <span className="text-brand-muted">Status:</span>{' '}
+          {me?.avv_accepted
+            ? <span className="font-semibold text-green-700">abgeschlossen ✓</span>
+            : <span className="font-semibold text-amber-700">offen</span>}
+        </div>
+        {me?.avv_accepted_version && (
+          <div><span className="text-brand-muted">Version:</span>{' '}
+            <span className="font-medium text-navy">{me.avv_accepted_version}</span></div>
+        )}
+        {me?.avv_accepted_at && (
+          <div><span className="text-brand-muted">Zugestimmt am:</span>{' '}
+            <span className="font-medium text-navy">{fmtDT(me.avv_accepted_at)}</span></div>
+        )}
+      </div>
+
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="mt-4 text-sm font-semibold text-accent hover:underline"
+      >
+        {open ? 'Vertragstext ausblenden' : 'Vertragstext ansehen'}
+      </button>
+
+      {open && (
+        <div className="mt-4 border-t border-brand-border pt-4">
+          <AvvDocument version={me?.avv_accepted_version || me?.avv_current_version} />
+        </div>
+      )}
+    </div>
   )
 }
 

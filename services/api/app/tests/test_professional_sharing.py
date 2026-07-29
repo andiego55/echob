@@ -18,6 +18,7 @@ import asyncpg
 import pytest
 from fastapi import HTTPException
 
+from app.services.agreement_service import CURRENT_AVV_VERSION
 from app.services.sharing_service import (
     build_shared_case_context,
     load_shared_bundle,
@@ -74,6 +75,10 @@ async def _seed(conn):
     await conn.execute(
         "INSERT INTO case_share_elements (share_id, element_type, scene_id) VALUES ($1,'scene',$2)",
         share_id, shared_scene)
+    # Art. 28: eine arbeitende Fachperson hat den AVV abgeschlossen (sonst 403, s. u.).
+    await conn.execute(
+        "INSERT INTO professional_agreements (professional_user_id, kind, version) VALUES ($1,'avv',$2)",
+        pro, CURRENT_AVV_VERSION)
     return owner, pro, case_id, share_id
 
 
@@ -132,6 +137,26 @@ async def test_unrelated_professional_has_no_access(db):
     with pytest.raises(HTTPException) as exc:
         await require_active_share(stranger, case_id, db)
     assert exc.value.status_code == 404
+
+
+async def test_missing_avv_blocks_access(db):
+    """Art. 28: Ohne abgeschlossenen AVV kein Zugriff auf freigegebene Falldaten (403).
+    Die Freigabe besteht, nur der Vertrag fehlt → 403 (nicht 404, da Fall real freigegeben)."""
+    _, pro, case_id, _ = await _seed(db)
+    # AVV-Nachweis der Fachperson entfernen → simuliert „noch nicht zugestimmt".
+    await db.execute("DELETE FROM professional_agreements WHERE professional_user_id=$1", pro)
+    with pytest.raises(HTTPException) as exc:
+        await require_active_share(pro, case_id, db)
+    assert exc.value.status_code == 403
+
+
+async def test_outdated_avv_blocks_access(db):
+    """Nur die AKTUELLE Vertragsversion gilt: eine veraltete Zustimmung blockt (403)."""
+    _, pro, case_id, _ = await _seed(db)
+    await db.execute("UPDATE professional_agreements SET version='avv-2000-01' WHERE professional_user_id=$1", pro)
+    with pytest.raises(HTTPException) as exc:
+        await require_active_share(pro, case_id, db)
+    assert exc.value.status_code == 403
 
 
 async def test_response_sanitizers_strip_owner_data():

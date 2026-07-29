@@ -265,6 +265,15 @@ export default function DatenschutzPage() {
               Mit den Auftragsverarbeitern bestehen Verträge nach Art. 28 DSGVO; für Übermittlungen in Drittländer
               bestehen Standardvertragsklauseln (Art. 46 DSGVO).
             </p>
+            <p className="text-brand-muted text-sm mt-3">
+              <strong className="text-navy">Rollen bei Nutzung über eine Fachperson:</strong> Ist eine Fachperson
+              die Verantwortliche (Abschnitt 1 und 11), handeln wir als ihr Auftragsverarbeiter. Die vorstehend
+              genannten Auftragsverarbeiter – insbesondere <strong className="text-navy">OpenAI</strong> – sind in
+              dieser Konstellation <strong className="text-navy">Unterauftragsverarbeiter</strong>, die wir mit
+              Genehmigung der Fachperson einsetzen und nach Art. 28 Abs. 4 DSGVO auf dieselben Datenschutzpflichten
+              verpflichten. Die Fachperson schließt hierzu bei der Anmeldung einen Vertrag zur Auftragsverarbeitung
+              (AVV), der die Unterauftragsverarbeiter mit Zweck, Ort und Garantien benennt.
+            </p>
           </div>
 
           {/* 10. Pseudonymisierung & Zugriff */}

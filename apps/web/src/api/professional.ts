@@ -119,6 +119,9 @@ export const professionalApi = {
     apiClient.get<ProfessionalProfile>('/professional/me').then(r => r.data),
   register: (data: { display_name: string; title?: string | null }) =>
     apiClient.post<ProfessionalProfile>('/professional/register', data).then(r => r.data),
+  /** AVV (Art. 28) abschließen — akzeptiert die angezeigte Vertragsversion (Nachweis serverseitig). */
+  acceptAgreement: (version: string) =>
+    apiClient.post<ProfessionalProfile>('/professional/agreements/accept', { version }).then(r => r.data),
 
   // Echo-Aussteuerung (therapeutischer Ansatz + Regler + Freitext)
   getEchoSettings: () =>
