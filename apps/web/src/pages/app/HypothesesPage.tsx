@@ -6,8 +6,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
-import MarkdownMessage from '@/components/app/MarkdownMessage'
 import HypothesisIcon from '@/components/HypothesisIcon'
+import HypothesisSummary from '@/components/HypothesisSummary'
 import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
 
 export default function HypothesesPage() {
@@ -63,19 +63,11 @@ export default function HypothesesPage() {
                 </div>
 
                 {s && (
-                  <div className="mt-3 rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-[11px] font-semibold text-brand-muted uppercase tracking-wide">Gespeicherte Hypothese</p>
-                      <button
-                        onClick={() => { if (window.confirm('Diese Hypothese löschen?')) remove.mutate(h.id) }}
-                        disabled={remove.isPending}
-                        className="text-xs text-brand-muted hover:text-red-600 transition-colors disabled:opacity-40"
-                      >
-                        Löschen
-                      </button>
-                    </div>
-                    <div className="text-sm text-brand-text leading-relaxed"><MarkdownMessage content={s.summary_text} /></div>
-                  </div>
+                  <HypothesisSummary
+                    summaryText={s.summary_text}
+                    onDelete={() => { if (window.confirm('Diese Hypothese löschen?')) remove.mutate(h.id) }}
+                    deleting={remove.isPending}
+                  />
                 )}
               </div>
             )
