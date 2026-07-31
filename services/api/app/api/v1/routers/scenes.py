@@ -9,7 +9,6 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Uplo
 from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.scene import (
-    SceneConfirm,
     SceneCreate,
     SceneListResponse,
     SceneResponse,
@@ -58,11 +57,16 @@ async def create_scene(
     async with pool.acquire() as conn:
         await _assert_case_owner(case_id, user_id, conn)
         await enforce_trial_limits(user_id, conn, check_scene=True)
+        # confirmed_by_user = true: Die nutzende Person legt die Szene selbst über das
+        # Formular an (bzw. prüft den Schnellerfassungs-Entwurf) — das Speichern IST die
+        # Bestätigung. Ohne dies wäre die Szene für Echo/Berichte/Skalen unsichtbar
+        # (die filtern auf confirmed_by_user = true). Kein separater Bestätigungsschritt.
         row = await conn.fetchrow(
             """
             INSERT INTO scenes (case_id, user_id, title, scene_date, description,
-                user_reaction, distress_score, safety_level, pattern_tags, input_mode)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10)
+                user_reaction, distress_score, safety_level, pattern_tags, input_mode,
+                confirmed_by_user)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10, true)
             RETURNING *
             """,
             case_id, user_id, body.title, body.scene_date, crypto.encrypt(body.description),
@@ -179,37 +183,6 @@ async def update_scene(
             f"UPDATE scenes SET {set_clauses}, updated_at = NOW() "
             f"WHERE id = $1 AND case_id = ${len(values) + 2} RETURNING *",
             scene_id, *values, case_id,
-        )
-    if not row:
-        raise HTTPException(status_code=404, detail="Szene nicht gefunden.")
-    return _row_to_scene(row)
-
-
-@router.post("/{scene_id}/confirm", response_model=SceneResponse)
-async def confirm_scene(
-    case_id: UUID,
-    scene_id: UUID,
-    body: SceneConfirm,
-    current_user: dict = Depends(get_current_user),
-    pool=Depends(get_pool),
-) -> SceneResponse:
-    """Nutzer bestätigt KI-Vorschlag für eine Szene."""
-    import json
-    async with pool.acquire() as conn:
-        await _assert_case_owner(case_id, current_user["user_id"], conn)
-        row = await conn.fetchrow(
-            """
-            UPDATE scenes SET
-                pattern_tags = $3::jsonb,
-                distress_score = $4,
-                safety_level = $5,
-                confirmed_by_user = true,
-                updated_at = NOW()
-            WHERE id = $1 AND case_id = $2
-            RETURNING *
-            """,
-            scene_id, case_id,
-            json.dumps(body.pattern_tags), body.distress_score, body.safety_level,
         )
     if not row:
         raise HTTPException(status_code=404, detail="Szene nicht gefunden.")

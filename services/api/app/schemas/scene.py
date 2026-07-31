@@ -34,12 +34,6 @@ class SceneUpdate(BaseModel):
     confirmed_by_user: bool | None = None
 
 
-class SceneConfirm(BaseModel):
-    """Nutzer bestätigt einen KI-Vorschlag für eine Szene."""
-    pattern_tags: list[str] = Field(default_factory=list)
-    distress_score: int | None = Field(None, ge=1, le=5)
-    safety_level: SafetyLevel = "none"
-
 # ── Response ──────────────────────────────────────────────────────────────────
 
 class SceneResponse(BaseModel):

@@ -87,11 +87,6 @@ function SceneRow({ scene: s, caseId }: { scene: Scene; caseId: string }) {
               {SAFETY_LABELS[s.safety_level]}
             </span>
           )}
-          {!s.confirmed_by_user && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-brand-border text-brand-muted">
-              Unbestätigt
-            </span>
-          )}
         </div>
         {s.scene_date && (
           <p className="text-xs text-brand-muted mb-1">{formatDate(s.scene_date)}</p>

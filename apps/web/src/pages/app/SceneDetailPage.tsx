@@ -40,9 +40,6 @@ export default function SceneDetailPage() {
   const [editDistress, setEditDistress] = useState<number | null>(null)
   const [editTags, setEditTags] = useState<string[]>([])
 
-  const [tags, setTags] = useState<string[]>([])
-  const [distress] = useState<number | null>(null)
-
   const startEdit = () => {
     if (!scene) return
     setEditTitle(scene.title)
@@ -67,18 +64,6 @@ export default function SceneDetailPage() {
       qc.invalidateQueries({ queryKey: ['scene', caseId, sceneId] })
       qc.invalidateQueries({ queryKey: ['scenes', caseId] })
       setEditMode(false)
-    },
-  })
-
-  const confirmMutation = useMutation({
-    mutationFn: () => scenesApi.confirm(caseId!, sceneId!, {
-      pattern_tags: tags,
-      distress_score: distress ?? undefined,
-      safety_level: scene?.safety_level ?? 'none',
-    }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['scene', caseId, sceneId] })
-      qc.invalidateQueries({ queryKey: ['scenes', caseId] })
     },
   })
 
@@ -123,11 +108,6 @@ export default function SceneDetailPage() {
             <span className={`text-xs font-medium px-3 py-1 rounded-full ${safety.cls}`}>
               {safety.label}
             </span>
-            {!scene.confirmed_by_user && (
-              <span className="text-xs px-3 py-1 rounded-full bg-brand-border text-brand-muted">
-                Unbestätigt
-              </span>
-            )}
             <button
               onClick={startEdit}
               className="rounded border border-brand-border px-3 py-1.5 text-sm text-brand-text hover:border-accent hover:text-accent transition-colors"
@@ -279,40 +259,7 @@ export default function SceneDetailPage() {
             <span className="ml-2 text-xs font-normal text-brand-muted">(Hypothesen, keine Diagnosen)</span>
           </p>
 
-          {!scene.confirmed_by_user && (
-            <div className="mb-4">
-              <p className="text-xs text-brand-muted mb-2">
-                Welche Muster könnten in dieser Szene vorgekommen sein? Wähle aus und bestätige.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {PATTERN_TAG_OPTIONS.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => setTags((prev) =>
-                      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-                    )}
-                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
-                      tags.includes(tag)
-                        ? 'border-accent bg-accent/10 text-accent font-medium'
-                        : 'border-brand-border text-brand-muted hover:border-accent/40'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => confirmMutation.mutate()}
-                disabled={confirmMutation.isPending}
-                className="btn-primary !py-2 !px-4 !text-sm"
-              >
-                {confirmMutation.isPending ? 'Wird gespeichert …' : 'Szene bestätigen'}
-              </button>
-            </div>
-          )}
-
-          {scene.confirmed_by_user && scene.pattern_tags.length > 0 && (
+          {scene.pattern_tags.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {scene.pattern_tags.map((tag) => (
                 <span key={tag} className="text-xs px-3 py-1.5 bg-accent/10 text-accent rounded-full font-medium">
@@ -320,10 +267,8 @@ export default function SceneDetailPage() {
                 </span>
               ))}
             </div>
-          )}
-
-          {scene.confirmed_by_user && scene.pattern_tags.length === 0 && (
-            <p className="text-xs text-brand-muted">Keine Muster-Tags markiert.</p>
+          ) : (
+            <p className="text-xs text-brand-muted">Keine Muster-Tags markiert. Über „Bearbeiten" ergänzen.</p>
           )}
         </div>
 

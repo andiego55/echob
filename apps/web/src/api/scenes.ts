@@ -42,13 +42,6 @@ export const scenesApi = {
   update: (caseId: string, sceneId: string, data: Partial<SceneCreate>) =>
     apiClient.patch<Scene>(`/cases/${caseId}/scenes/${sceneId}`, data).then(r => r.data),
 
-  confirm: (caseId: string, sceneId: string, data: {
-    pattern_tags: string[]
-    distress_score?: number
-    safety_level?: string
-  }) =>
-    apiClient.post<Scene>(`/cases/${caseId}/scenes/${sceneId}/confirm`, data).then(r => r.data),
-
   delete: (caseId: string, sceneId: string) =>
     apiClient.delete(`/cases/${caseId}/scenes/${sceneId}`),
 }
