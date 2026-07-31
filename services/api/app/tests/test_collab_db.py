@@ -15,6 +15,7 @@ from fastapi import HTTPException
 from app.core import crypto
 from app.core.config import settings
 from app.services import collab_service
+from app.services.agreement_service import CURRENT_AVV_VERSION
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
 
@@ -64,6 +65,11 @@ async def _case_with_share(conn):
         "INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status) "
         "VALUES ($1,$2,$3,'active')",
         case_id, owner, pro,
+    )
+    # Art. 28: eine arbeitende Fachperson hat den AVV abgeschlossen (sonst 403 am Freigabe-Gate).
+    await conn.execute(
+        "INSERT INTO professional_agreements (professional_user_id, kind, version) VALUES ($1,'avv',$2)",
+        pro, CURRENT_AVV_VERSION,
     )
     return owner, pro, case_id
 

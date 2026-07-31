@@ -15,6 +15,7 @@ import pytest
 from fastapi import HTTPException
 
 from app.services import couple_service
+from app.services.agreement_service import CURRENT_AVV_VERSION
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
 
@@ -56,6 +57,10 @@ async def _seed_case(conn, pro, marker, *, share=True):
         await conn.execute(
             "INSERT INTO case_share_elements (share_id, element_type, scene_id) VALUES ($1,'scene',$2)",
             share_id, scene)
+    # Art. 28: eine arbeitende Fachperson hat den AVV abgeschlossen (sonst 403 am Freigabe-Gate).
+    await conn.execute(
+        "INSERT INTO professional_agreements (professional_user_id, kind, version) VALUES ($1,'avv',$2)",
+        pro, CURRENT_AVV_VERSION)
     return case_id, share_id
 
 
