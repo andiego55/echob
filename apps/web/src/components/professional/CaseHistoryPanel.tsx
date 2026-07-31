@@ -9,11 +9,23 @@ import { useQuery } from '@tanstack/react-query'
 import { professionalApi, type CaseHistoryEvent } from '@/api/professional'
 import { SCALE_LABELS } from '@/types'
 
-const KIND_ICON: Record<string, string> = {
-  share: '🔓', assignment_sent: '📤', assignment_done: '✅', appointment: '📅',
-  session_note: '🗒️', report: '📄', echo: '💬', notes: '✏️',
-  scene: '🎬', scale: '📊', client_report: '📝', onboarding: '🧭', profile: '👤',
+// Gebrandete Linien-Icons (24x24-viewBox, currentColor) statt Emoji — im EchoB-Stil.
+const KIND_ICON_PATH: Record<string, string> = {
+  share:           'M9 15l6-6M10 6l1-1a4 4 0 015 5l-1 1M14 18l-1 1a4 4 0 01-5-5l1-1',
+  assignment_sent: 'M12 20V5M6 11l6-6 6 6',
+  assignment_done: 'M5 13l4 4L19 7',
+  appointment:     'M4 8h16M7 3v3M17 3v3M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z',
+  session_note:    'M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1zM9 8h6M9 12h6M9 16h4',
+  report:          'M7 3h7l5 5v12a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1zM14 3v5h5',
+  echo:            'M4 5h16a1 1 0 011 1v9a1 1 0 01-1 1H9l-4 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z',
+  notes:           'M12 20h9M4 20l1-4L16 5l3 3L8 19l-4 1z',
+  scene:           'M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1zM3 16l5-5 4 4 3-3 6 6',
+  scale:           'M5 20V11M12 20V5M19 20v-6M4 20h16',
+  client_report:   'M7 3h7l5 5v12a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1zM14 3v5h5',
+  onboarding:      'M12 21a9 9 0 100-18 9 9 0 000 18zM15.5 8.5l-2 5-5 2 2-5z',
+  profile:         'M12 12a4 4 0 100-8 4 4 0 000 8zM5 20a7 7 0 0114 0',
 }
+const KIND_ICON_FALLBACK = 'M12 9a3 3 0 100 6 3 3 0 000-6z'
 
 const fmtDay = (iso: string) =>
   new Date(iso).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric' })
@@ -73,8 +85,16 @@ function EventRow({ e }: { e: CaseHistoryEvent }) {
         className={`flex items-start gap-3 ${expandable ? 'cursor-pointer' : ''}`}
         onClick={expandable ? () => setOpen(o => !o) : undefined}
       >
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-bg text-sm" aria-hidden>
-          {KIND_ICON[e.kind] ?? '•'}
+        <span
+          aria-hidden
+          className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
+            isClient ? 'bg-accent/10 text-accent' : 'bg-brand-bg text-brand-muted'
+          }`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7}
+            strokeLinecap="round" strokeLinejoin="round" className="h-[15px] w-[15px]">
+            <path d={KIND_ICON_PATH[e.kind] ?? KIND_ICON_FALLBACK} />
+          </svg>
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">

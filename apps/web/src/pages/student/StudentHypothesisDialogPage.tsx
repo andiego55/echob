@@ -10,6 +10,7 @@ import StudentShell from '@/components/student/StudentShell'
 import StudentCaseNav from '@/components/student/StudentCaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import HypothesisIcon from '@/components/HypothesisIcon'
 import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { studentApi } from '@/api/student'
 import { HYPOTHESES } from '@/api/hypotheses'
@@ -117,7 +118,9 @@ export default function StudentHypothesisDialogPage() {
         <div className="border-b border-brand-border bg-white px-6 py-3 flex items-center justify-between gap-4 flex-shrink-0">
           <div>
             <span className="label text-xs">Hypothese</span>
-            <p className="text-sm font-semibold text-navy">{hyp.icon} {hyp.label}</p>
+            <p className="mt-0.5 flex items-center gap-2 text-sm font-semibold text-navy">
+              <HypothesisIcon path={hyp.icon} size="sm" /> {hyp.label}
+            </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <button

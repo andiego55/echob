@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import HypothesisIcon from '@/components/HypothesisIcon'
 import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
 
 export default function HypothesesPage() {
@@ -46,9 +47,12 @@ export default function HypothesesPage() {
             return (
               <div key={h.id} className="card">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-navy">{h.icon} {h.label}</p>
-                    <p className="text-xs text-brand-muted mt-0.5">{h.description}</p>
+                  <div className="flex min-w-0 items-start gap-3">
+                    <HypothesisIcon path={h.icon} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-navy">{h.label}</p>
+                      <p className="text-xs text-brand-muted mt-0.5">{h.description}</p>
+                    </div>
                   </div>
                   <button
                     onClick={() => navigate(`/app/cases/${caseId}/hypotheses/${h.id}`)}
