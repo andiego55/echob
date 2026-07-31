@@ -1,6 +1,7 @@
 import { apiClient } from './client'
 import type {
   ProfessionalProfile,
+  IncomingRequest,
   InboxItem,
   ProfessionalClientGroup,
   ProfessionalNote,
@@ -122,6 +123,16 @@ export const professionalApi = {
   /** AVV (Art. 28) abschließen — akzeptiert die angezeigte Vertragsversion (Nachweis serverseitig). */
   acceptAgreement: (version: string) =>
     apiClient.post<ProfessionalProfile>('/professional/agreements/accept', { version }).then(r => r.data),
+
+  // Auffindbarkeit (Opt-in) + eingehende Verbindungsanfragen
+  setDiscoverable: (discoverable: boolean) =>
+    apiClient.put<ProfessionalProfile>('/professional/discoverable', { discoverable }).then(r => r.data),
+  incomingRequests: () =>
+    apiClient.get<IncomingRequest[]>('/professional/requests').then(r => r.data),
+  acceptRequest: (clientId: string) =>
+    apiClient.post(`/professional/requests/${clientId}/accept`).then(r => r.data),
+  declineRequest: (clientId: string) =>
+    apiClient.post(`/professional/requests/${clientId}/decline`).then(r => r.data),
 
   // Echo-Aussteuerung (therapeutischer Ansatz + Regler + Freitext)
   getEchoSettings: () =>

@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { CaseShare, ShareCreate, Connection } from '@/types'
+import type { CaseShare, ShareCreate, Connection, ProfessionalSearchResult } from '@/types'
 
 /** Nutzerseitige Freigaben eines Falls. */
 export const sharesApi = {
@@ -17,6 +17,12 @@ export const sharesApi = {
 export const professionalsApi = {
   connections: () =>
     apiClient.get<Connection[]>('/professionals/connections').then(r => r.data),
+  /** Auffindbare (opt-in) Fachpersonen nach Name/Fachrichtung suchen. */
+  search: (q: string) =>
+    apiClient.get<ProfessionalSearchResult[]>('/professionals/search', { params: { q } }).then(r => r.data),
+  /** Einer auffindbaren Fachperson eine Verbindungsanfrage senden (wartet auf Zustimmung). */
+  request: (professionalUserId: string) =>
+    apiClient.post<Connection>('/professionals/request', { professional_user_id: professionalUserId }).then(r => r.data),
   invite: (email: string, opts?: { inviter_name?: string | null; message?: string | null }) =>
     apiClient.post<Connection>('/professionals/invite', { email, ...opts }).then(r => r.data),
   /** Verbindung auflösen: widerruft aktive Freigaben an die Fachperson + entfernt die Verbindung. */

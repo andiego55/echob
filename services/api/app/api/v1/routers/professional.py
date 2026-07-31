@@ -17,8 +17,10 @@ from app.core import crypto
 from app.core.dependencies import get_current_professional, get_current_user, get_pool
 from app.schemas.professional import (
     AgreementAccept,
+    DiscoverableUpdate,
     GlossaryTerm,
     InboxItem,
+    IncomingRequest,
     ProfessionalCaseSummary,
     ProfessionalClientGroup,
     ProfessionalNote,
@@ -225,6 +227,96 @@ async def accept_agreement(
                 detail="Diese Vertragsversion ist nicht mehr aktuell. Bitte lade die Seite neu.",
             )
     return ProfessionalProfileResponse(**current["professional"], **avv)
+
+
+# ── Auffindbarkeit + Verbindungsanfragen (Opt-in) ─────────────────────────────
+
+@router.put("/discoverable", response_model=ProfessionalProfileResponse)
+async def set_discoverable(
+    body: DiscoverableUpdate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalProfileResponse:
+    """Opt-in: Fachperson in der EchoB-Suche auffindbar machen (oder wieder verbergen)."""
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE professional_profiles SET discoverable = $1, updated_at = NOW() "
+            "WHERE user_id = $2 RETURNING *",
+            body.discoverable, current["user_id"],
+        )
+    return ProfessionalProfileResponse(**dict(row), **current["avv"])
+
+
+@router.get("/requests", response_model=list[IncomingRequest])
+async def incoming_requests(
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> list[IncomingRequest]:
+    """Eingehende Verbindungsanfragen (über die Suche), die auf Zustimmung warten."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT i.inviter_user_id, i.created_at, up.display_name "
+            "FROM professional_invites i "
+            "LEFT JOIN user_profiles up ON up.user_id = i.inviter_user_id "
+            "WHERE i.professional_user_id = $1 AND i.status = 'requested' "
+            "ORDER BY i.created_at DESC",
+            pid,
+        )
+    return [
+        IncomingRequest(
+            inviter_user_id=r["inviter_user_id"],
+            display_name=r["display_name"] or "Eine Person",
+            created_at=r["created_at"],
+        )
+        for r in rows
+    ]
+
+
+@router.post("/requests/{client_id}/accept")
+async def accept_request(
+    client_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fachperson nimmt eine Verbindungsanfrage an → Verbindung besteht (Sharing möglich)."""
+    pid = current["user_id"]
+    pro_name = (current.get("professional") or {}).get("display_name") or "Deine Fachperson"
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            result = await conn.execute(
+                "UPDATE professional_invites SET status = 'accepted', accepted_at = NOW() "
+                "WHERE professional_user_id = $1 AND inviter_user_id = $2 AND status = 'requested'",
+                pid, client_id,
+            )
+            if result == "UPDATE 0":
+                raise HTTPException(status_code=404, detail="Anfrage nicht gefunden.")
+            await conn.execute(
+                "INSERT INTO client_notifications (user_id, kind, body) "
+                "VALUES ($1, 'connection_accepted', $2)",
+                client_id,
+                f"{pro_name} hat deine Verbindungsanfrage angenommen. Du kannst jetzt Fälle freigeben.",
+            )
+    return {"accepted": True}
+
+
+@router.post("/requests/{client_id}/decline")
+async def decline_request(
+    client_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> dict:
+    """Fachperson lehnt eine Verbindungsanfrage ab (die Anfrage wird entfernt)."""
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "DELETE FROM professional_invites "
+            "WHERE professional_user_id = $1 AND inviter_user_id = $2 AND status = 'requested'",
+            pid, client_id,
+        )
+    if result == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Anfrage nicht gefunden.")
+    return {"declined": True}
 
 
 # ── Echo-Aussteuerung (therapeutischer Ansatz + Regler + Freitext) ────────────

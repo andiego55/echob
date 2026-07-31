@@ -9,8 +9,10 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.professional import (
+    ConnectionRequestCreate,
     ConnectionResponse,
     ProfessionalInviteCreate,
+    ProfessionalSearchResult,
 )
 from app.services import seat_service
 from app.services.invite_service import send_professional_invite_email
@@ -45,6 +47,110 @@ async def list_connections(
             uid,
         )
     return [ConnectionResponse(**dict(r)) for r in rows]
+
+
+@router.get("/search", response_model=list[ProfessionalSearchResult])
+async def search_professionals(
+    q: str,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[ProfessionalSearchResult]:
+    """Sucht auffindbare (opt-in) Fachpersonen nach Name/Fachrichtung.
+
+    Gibt keine E-Mail/PII zurück und listet nur Fachpersonen, die sich ausdrücklich
+    auffindbar gemacht haben. Annotiert, ob bereits eine Anfrage läuft oder eine
+    Verbindung besteht.
+    """
+    term = (q or "").strip()
+    if len(term) < 2:
+        return []
+    uid = current_user["user_id"]
+    like = f"%{term}%"
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT p.user_id, p.display_name, p.title, i.status AS conn_status
+            FROM professional_profiles p
+            LEFT JOIN professional_invites i
+              ON i.professional_user_id = p.user_id AND i.inviter_user_id = $2
+            WHERE p.discoverable = true
+              AND p.user_id <> $2
+              AND (p.display_name ILIKE $1 OR p.title ILIKE $1)
+            ORDER BY p.display_name
+            LIMIT 20
+            """,
+            like, uid,
+        )
+
+    def _status(s: str | None) -> str:
+        if s == "accepted":
+            return "connected"
+        if s == "requested":
+            return "requested"
+        return "none"
+
+    return [
+        ProfessionalSearchResult(
+            professional_user_id=r["user_id"], display_name=r["display_name"],
+            title=r["title"], connection_status=_status(r["conn_status"]),
+        )
+        for r in rows
+    ]
+
+
+@router.post("/request", response_model=ConnectionResponse)
+async def request_connection(
+    body: ConnectionRequestCreate,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> ConnectionResponse:
+    """Sendet einer auffindbaren Fachperson eine Verbindungsanfrage.
+
+    Die Anfrage bleibt 'requested', bis die Fachperson zustimmt (kein Auto-Connect).
+    Besteht bereits eine Verbindung, bleibt sie 'accepted'.
+    """
+    uid = current_user["user_id"]
+    async with pool.acquire() as conn:
+        pro = await conn.fetchrow(
+            "SELECT user_id, email, display_name, title FROM professional_profiles "
+            "WHERE user_id = $1 AND discoverable = true",
+            body.professional_user_id,
+        )
+        if not pro:
+            raise HTTPException(status_code=404, detail="Fachperson nicht gefunden.")
+        if pro["user_id"] == uid:
+            raise HTTPException(
+                status_code=400, detail="Du kannst dich nicht mit dir selbst verbinden.")
+        email = (pro["email"] or "").strip().lower() or f"proid:{pro['user_id']}"
+        async with conn.transaction():
+            row = await conn.fetchrow(
+                """
+                INSERT INTO professional_invites
+                  (inviter_user_id, email, professional_user_id, status)
+                VALUES ($1, $2, $3, 'requested')
+                ON CONFLICT (inviter_user_id, email) DO UPDATE SET
+                  professional_user_id = EXCLUDED.professional_user_id,
+                  status = CASE WHEN professional_invites.status = 'accepted'
+                                THEN 'accepted' ELSE 'requested' END
+                RETURNING *
+                """,
+                uid, email, pro["user_id"],
+            )
+            if row["status"] == "requested":
+                client_name = await conn.fetchval(
+                    "SELECT display_name FROM user_profiles WHERE user_id = $1", uid
+                ) or "Eine Person"
+                await conn.execute(
+                    "INSERT INTO client_notifications (user_id, kind, body) "
+                    "VALUES ($1, 'connection_request', $2)",
+                    pro["user_id"],
+                    f"{client_name} möchte sich mit dir verbinden – die Anfrage liegt in deinem Dashboard.",
+                )
+    return ConnectionResponse(
+        email=row["email"], status=row["status"],
+        professional_user_id=pro["user_id"], display_name=pro["display_name"],
+        title=pro["title"], created_at=row["created_at"],
+    )
 
 
 @router.post("/invite", response_model=ConnectionResponse)

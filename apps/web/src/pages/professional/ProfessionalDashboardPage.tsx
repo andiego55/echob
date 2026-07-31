@@ -66,6 +66,21 @@ export default function ProfessionalDashboardPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-dashboard'] }),
   })
 
+  const { data: requests = [] } = useQuery({
+    queryKey: ['prof-requests'], queryFn: professionalApi.incomingRequests,
+  })
+  const acceptReq = useMutation({
+    mutationFn: (id: string) => professionalApi.acceptRequest(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['prof-requests'] })
+      qc.invalidateQueries({ queryKey: ['prof-dashboard'] })
+    },
+  })
+  const declineReq = useMutation({
+    mutationFn: (id: string) => professionalApi.declineRequest(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['prof-requests'] }),
+  })
+
   const [openCases, setOpenCases] = useState<Record<string, boolean>>({})
   const inited = useRef(false)
   useEffect(() => {
@@ -113,6 +128,41 @@ export default function ProfessionalDashboardPage() {
           <Tile label="Braucht Aufmerksamkeit" value={totalUnread} icon={<IconBell />} to="/professional" accent={totalUnread > 0} />
           <Tile label="Offene Aufgaben" value={totalOpen} icon={<IconClock />} active={filter === 'open'} onClick={() => setFilter('open')} />
         </div>
+
+        {requests.length > 0 && (
+          <div className="mb-6 rounded-brand border border-accent/30 bg-accent/[0.04] p-4">
+            <h2 className="text-sm font-semibold text-navy">Verbindungsanfragen ({requests.length})</h2>
+            <p className="mt-0.5 text-xs text-brand-muted">
+              Diese Personen möchten sich mit dir verbinden. Nach Annahme können sie dir Fälle freigeben.
+            </p>
+            <div className="mt-3 space-y-2">
+              {requests.map((r) => (
+                <div key={r.inviter_user_id}
+                  className="flex items-center gap-2.5 rounded-brand border border-brand-border bg-white px-3 py-2">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-[11px] font-bold text-accent">
+                    {initials(r.display_name)}
+                  </span>
+                  <span className="min-w-0 text-sm">
+                    <span className="font-medium text-navy">{r.display_name}</span>
+                    <span className="block text-[11px] text-brand-muted">angefragt {fmtDay(r.created_at)}</span>
+                  </span>
+                  <div className="ml-auto flex shrink-0 items-center gap-2">
+                    <button onClick={() => acceptReq.mutate(r.inviter_user_id)}
+                      disabled={acceptReq.isPending || declineReq.isPending}
+                      className="rounded-brand bg-accent px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-accent/90 disabled:opacity-50">
+                      Annehmen
+                    </button>
+                    <button onClick={() => declineReq.mutate(r.inviter_user_id)}
+                      disabled={acceptReq.isPending || declineReq.isPending}
+                      className="text-xs font-medium text-brand-muted transition-colors hover:text-red-600 disabled:opacity-40">
+                      Ablehnen
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {pending.length > 0 && (
           <div className="mb-6 rounded-brand border border-amber-200 bg-amber-50/50 p-4">

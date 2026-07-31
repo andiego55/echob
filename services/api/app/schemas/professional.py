@@ -33,6 +33,9 @@ class ProfessionalProfileResponse(BaseModel):
     avv_accepted_version: str | None = None
     avv_accepted_at: datetime | None = None
 
+    # Opt-in: in der EchoB-Suche fuer Nutzer:innen auffindbar.
+    discoverable: bool = False
+
     model_config = {"from_attributes": True}
 
 
@@ -55,9 +58,13 @@ class ProfessionalInviteCreate(BaseModel):
 
 
 class ConnectionResponse(BaseModel):
-    """Eine Fachperson-Verbindung aus Sicht der nutzenden Person."""
+    """Eine Fachperson-Verbindung aus Sicht der nutzenden Person.
+
+    'requested' = Nutzer:in hat via Suche eine Verbindungsanfrage gesendet, die
+    Fachperson muss noch zustimmen. 'accepted' = verbunden.
+    """
     email: str
-    status: Literal["pending", "accepted"]
+    status: Literal["pending", "accepted", "requested"]
     professional_user_id: UUID | None = None
     display_name: str | None = None
     title: str | None = None
@@ -68,6 +75,31 @@ class ProfessionalLookupResult(BaseModel):
     professional_user_id: UUID
     display_name: str | None = None
     title: str | None = None
+
+
+# ── Auffindbarkeit / Verbindungsanfragen (Opt-in) ─────────────────────────────
+
+class ProfessionalSearchResult(BaseModel):
+    """Ein Suchtreffer (nur auffindbare Fachpersonen; keine E-Mail/PII)."""
+    professional_user_id: UUID
+    display_name: str | None = None
+    title: str | None = None
+    connection_status: Literal["none", "requested", "connected"] = "none"
+
+
+class ConnectionRequestCreate(BaseModel):
+    professional_user_id: UUID
+
+
+class IncomingRequest(BaseModel):
+    """Eine eingehende Verbindungsanfrage aus Sicht der Fachperson."""
+    inviter_user_id: UUID
+    display_name: str
+    created_at: datetime
+
+
+class DiscoverableUpdate(BaseModel):
+    discoverable: bool
 
 
 # ── Freigaben (nutzerseitig) ──────────────────────────────────────────────────

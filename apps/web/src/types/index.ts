@@ -885,14 +885,31 @@ export interface ProfessionalProfile {
   avv_accepted?: boolean
   avv_accepted_version?: string | null
   avv_accepted_at?: string | null
+  // Opt-in: in der EchoB-Suche fuer Nutzer:innen auffindbar
+  discoverable?: boolean
 }
 
 export interface Connection {
   email: string
-  status: 'pending' | 'accepted'
+  status: 'pending' | 'accepted' | 'requested'
   professional_user_id: string | null
   display_name: string | null
   title: string | null
+  created_at: string
+}
+
+/** Suchtreffer fuer eine auffindbare Fachperson (keine E-Mail/PII). */
+export interface ProfessionalSearchResult {
+  professional_user_id: string
+  display_name: string | null
+  title: string | null
+  connection_status: 'none' | 'requested' | 'connected'
+}
+
+/** Eingehende Verbindungsanfrage aus Sicht der Fachperson. */
+export interface IncomingRequest {
+  inviter_user_id: string
+  display_name: string
   created_at: string
 }
 
