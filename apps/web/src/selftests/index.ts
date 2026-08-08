@@ -4,8 +4,19 @@ import { beziehungsgesundheit } from './tests/beziehungsgesundheit'
 import { belastendeMuster } from './tests/belastende-muster'
 import { bindungsstil } from './tests/bindungsstil'
 import { eigenerAnteil } from './tests/eigener-anteil'
+import { bleibenOderGehen } from './tests/bleiben-oder-gehen'
+import { verliereIchMich } from './tests/verliere-ich-mich'
+import { streitmuster } from './tests/streitmuster'
 
-export const SELF_TESTS: SelfTest[] = [beziehungsgesundheit, belastendeMuster, bindungsstil, eigenerAnteil]
+export const SELF_TESTS: SelfTest[] = [
+  beziehungsgesundheit,
+  bleibenOderGehen,
+  belastendeMuster,
+  streitmuster,
+  bindungsstil,
+  verliereIchMich,
+  eigenerAnteil,
+]
 
 const BY_SLUG = new Map(SELF_TESTS.map((t) => [t.slug, t]))
 export function getSelfTest(slug: string): SelfTest | undefined {
