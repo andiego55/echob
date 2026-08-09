@@ -28,6 +28,8 @@ Ein Blick, ein Name auf dem Handy, ein Lachen über eine Nachricht – und in di
 
 Dieser Text erklärt, woher Eifersucht kommt und was sie mit einer Beziehung macht. Er verurteilt dich nicht und stellt keine Diagnose – weder über dich noch über dein Gegenüber.
 
+Wenn du sortieren möchtest, wie sehr Eifersucht dich gerade steuert, kann der [Selbsttest „Eifersucht & Vertrauen"](/selbsttests/eifersucht-vertrauen) dir in fünf Bereichen – Verlustangst, Kontrolle, Vergleich, Misstrauen und der Eifersucht auf die Vergangenheit – einen ehrlichen Überblick geben.
+
 ## Was Eifersucht ist
 
 Eifersucht ist zunächst ein Signal, kein Charakterfehler. In ihr stecken oft mehrere Zutaten auf einmal: die Angst, jemanden zu verlieren, Zweifel am eigenen Wert und der Vergleich mit anderen. Ein Funken Eifersucht gehört für viele Menschen dazu. Zur Belastung wird sie erst, wenn sie das Denken übernimmt.

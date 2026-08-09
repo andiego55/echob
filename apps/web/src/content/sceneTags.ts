@@ -71,6 +71,9 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   // Konflikt & Gefühle
   'emotionale-ueberflutung': 'Emotionale Überflutung',
   'co-regulation': 'Co-Regulation',
+  // Eifersucht & Trennung
+  gruebeln: 'Grübeln',
+  'retrospektive-eifersucht': 'Retrospektive Eifersucht',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */

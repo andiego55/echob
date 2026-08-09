@@ -7,12 +7,16 @@ import { eigenerAnteil } from './tests/eigener-anteil'
 import { bleibenOderGehen } from './tests/bleiben-oder-gehen'
 import { verliereIchMich } from './tests/verliere-ich-mich'
 import { streitmuster } from './tests/streitmuster'
+import { eifersuchtVertrauen } from './tests/eifersucht-vertrauen'
+import { loslassenNachTrennung } from './tests/loslassen-nach-trennung'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
   bleibenOderGehen,
+  loslassenNachTrennung,
   belastendeMuster,
   streitmuster,
+  eifersuchtVertrauen,
   bindungsstil,
   verliereIchMich,
   eigenerAnteil,

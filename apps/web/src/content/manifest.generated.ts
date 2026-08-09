@@ -316,6 +316,44 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "gruebeln",
+    "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
+    "description": "Grübeln (Rumination) ist das kreisende Wiederholen derselben Gedanken ohne Lösung. Warum es sich nach Nachdenken anfühlt, aber die Wunde offen hält – und wie du den Kreis unterbrichst. Ohne Diagnose.",
+    "cluster": "gefuehle",
+    "search_intent": "Grübeln stoppen Gedankenkreisen unterbrechen",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Grübeln gelesen. Magst du erzählen, welcher Gedanke sich bei dir gerade am hartnäckigsten im Kreis dreht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen Grübeln und Nachdenken?",
+        "answer": "Nachdenken bewegt sich auf etwas zu: eine Einsicht, eine Entscheidung, einen nächsten Schritt. Grübeln dreht sich im Kreis – dieselben Fragen, dieselben Bilder, ohne Ergebnis. Ein einfacher Test: Bringt dich dieser Gedankengang näher an eine Handlung oder Klarheit? Wenn nach zehn Minuten nur mehr Anspannung da ist, ist es Grübeln."
+      },
+      {
+        "question": "Warum grüble ich, wenn es mir doch nicht hilft?",
+        "answer": "Weil Grübeln sich nach Problemlösung anfühlt – das Gehirn glaubt, es arbeite an der Sache. Außerdem gibt es kurzfristig ein Gefühl von Kontrolle. Tatsächlich hält es das Problem nur warm und verstärkt oft Traurigkeit oder Angst."
+      },
+      {
+        "question": "Wie kann ich mit dem Grübeln aufhören?",
+        "answer": "Nicht durch „hör auf zu denken\" – das verstärkt es. Hilfreicher ist, den Kreis zu unterbrechen: den Moment benennen („Ich grüble gerade\"), den Körper und die Umgebung wechseln (aufstehen, rausgehen, Bewegung), oder eine feste „Grübelzeit\" verabreden und die Gedanken bis dahin zu vertagen."
+      }
+    ],
+    "url": "/glossar/gruebeln"
+  },
+  {
+    "type": "glossary",
     "slug": "ich-botschaft",
     "title": "Ich-Botschaft – sagen, was in mir ist, ohne anzuklagen",
     "description": "Was eine Ich-Botschaft ist, wie sie sich von der Du-Botschaft unterscheidet und warum sie Gespräche entschärft, ohne das Anliegen zu verkleinern. Ohne Diagnose.",
@@ -460,6 +498,44 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "kontaktabbruch",
+    "title": "Kontaktabbruch (No Contact) – warum Abstand nach der Trennung hilft",
+    "description": "Kontaktabbruch bedeutet, nach einer Trennung bewusst keinen Kontakt zu halten. Warum das keine Strafe ist, sondern hilft zu heilen – und wie man es mit gemeinsamen Kindern handhabt. Ohne Diagnose.",
+    "cluster": "trennung",
+    "search_intent": "Kontaktabbruch nach Trennung No Contact sinnvoll",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Kontaktabbruch gelesen. Magst du anschauen, was dich am meisten in Kontakt zieht – und was du dir davon erhoffst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was bedeutet No Contact genau?",
+        "answer": "Kontaktabbruch (englisch „No Contact\") meint, nach einer Trennung bewusst keinen Kontakt aufzunehmen: keine Nachrichten, keine Anrufe, kein Verfolgen in sozialen Medien. Ziel ist nicht Bestrafung, sondern Ruhe für die Wunde – Abstand, der dem Nervensystem erlaubt, sich zu beruhigen."
+      },
+      {
+        "question": "Wie lange sollte der Kontaktabbruch dauern?",
+        "answer": "Es gibt keine feste Regel. Für viele hilft ein klarer Zeitraum von einigen Wochen bis Monaten, in dem sich der akute Schmerz legt und Abstand entsteht. Manche finden später zu einer distanzierten Freundlichkeit; andere bleiben dauerhaft ohne Kontakt. Wichtig ist, was dir hilft – nicht, was „man macht\"."
+      },
+      {
+        "question": "Was, wenn wir gemeinsame Kinder haben?",
+        "answer": "Dann ist völliger Kontaktabbruch weder möglich noch sinnvoll. Hilfreich ist ein klarer Minimalkontakt: sachlich, auf die Organisation rund um die Kinder begrenzt, ohne Beziehungsthemen. Manche nutzen dafür feste Kanäle oder Zeiten, um das Emotionale herauszuhalten."
+      }
+    ],
+    "url": "/glossar/kontaktabbruch"
+  },
+  {
+    "type": "glossary",
     "slug": "metakommunikation",
     "title": "Metakommunikation – über das Reden reden",
     "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose.",
@@ -589,6 +665,44 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/reparaturversuch"
+  },
+  {
+    "type": "glossary",
+    "slug": "retrospektive-eifersucht",
+    "title": "Retrospektive Eifersucht – wenn dich die Vergangenheit deines Gegenübers quält",
+    "description": "Retrospektive Eifersucht ist die Eifersucht auf frühere Partner:innen des Gegenübers. Warum sie so quälend ist, obwohl sie sich gegen Unveränderbares richtet – und was hilft. Ohne Diagnose.",
+    "cluster": "dynamiken",
+    "search_intent": "retrospektive Eifersucht auf Ex des Partners",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über retrospektive Eifersucht gelesen. Möchtest du anschauen, welche Vorstellung aus der Vergangenheit deines Gegenübers dich am meisten beschäftigt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist retrospektive Eifersucht normal?",
+        "answer": "Ein gewisses Interesse an der Vergangenheit des Gegenübers ist normal. Von retrospektiver Eifersucht spricht man, wenn frühere Beziehungen so stark beschäftigen, dass sich aufdrängende Bilder, Fragen und Vergleiche belasten – manchmal fast zwanghaft. Häufig steckt eigene Unsicherheit dahinter, seltener ein reales Problem in der Gegenwart."
+      },
+      {
+        "question": "Warum hilft Nachfragen nicht?",
+        "answer": "Weil jede Antwort neue Fragen erzeugt. Die Sicherheit, die du suchst, liegt nicht in Details über die Vergangenheit – die kannst du ohnehin nicht ändern. Nachfragen beruhigt kurz und füttert langfristig den Zweifel, ähnlich wie Kontrolle bei anderen Formen von Eifersucht."
+      },
+      {
+        "question": "Was hilft gegen retrospektive Eifersucht?",
+        "answer": "Den Blick von der Vergangenheit zurück in die Gegenwart holen: Was ist heute zwischen euch real und gut? Und den Kern anschauen – meist ist es die Angst, nicht zu genügen. An dieser Unsicherheit zu arbeiten, hilft mehr als jede weitere Frage nach dem Davor."
+      }
+    ],
+    "url": "/glossar/retrospektive-eifersucht"
   },
   {
     "type": "glossary",
@@ -1204,6 +1318,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-handy-auf-dem-kuechentisch",
+    "title": "Das Handy auf dem Küchentisch",
+    "description": "Eine fiktive Szene: Sein Handy leuchtet auf, er ist unter der Dusche – und in mir beginnt der Kampf zwischen „schau nach\" und „lass es\". Über den Sog der Eifersucht.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ninas Sicht",
+    "pull_quote": "Ich will es nicht wissen. Und ich muss es wissen. Beides gleichzeitig, jeden Tag.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du diesen Sog, dich vergewissern zu müssen? Magst du erzählen, was in dir passiert, kurz bevor du nachschaust?"
+    },
+    "scene_tags": [
+      "eifersucht",
+      "kontrolle",
+      "misstrauen",
+      "verlustangst",
+      "selbstzweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/das-handy-auf-dem-kuechentisch"
+  },
+  {
+    "type": "scene",
     "slug": "das-haus-das-nie-kommt",
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv.",
@@ -1312,6 +1455,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "selbstzweifel"
     ],
     "url": "/szenen/deine-ex-haette"
+  },
+  {
+    "type": "scene",
+    "slug": "der-daumen-ueber-dem-profil",
+    "title": "Der Daumen über dem Profil",
+    "description": "Eine fiktive Szene: entfolgt, stummgeschaltet – und trotzdem kennt der Daumen den Weg zu ihrem Profil auswendig. Über das Nicht-loslassen-Können nach einer Trennung.",
+    "cluster": "trennung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tims Sicht",
+    "pull_quote": "Ich habe sie entfolgt. Ich kenne den Weg zu ihrem Profil trotzdem auswendig.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diesen Reflex, immer wieder nachzuschauen, obwohl es weh tut? Magst du erzählen, was du dir davon erhoffst?"
+    },
+    "scene_tags": [
+      "loslassen",
+      "kontaktabbruch",
+      "gruebeln",
+      "sehnsucht"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-daumen-ueber-dem-profil"
   },
   {
     "type": "scene",
@@ -1617,6 +1788,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "naehe-distanz"
     ],
     "url": "/szenen/drei-tage-schweigen"
+  },
+  {
+    "type": "scene",
+    "slug": "drei-uhr-nachts",
+    "title": "Drei Uhr nachts",
+    "description": "Eine fiktive Szene: die leere Seite des Betts, das Handy in der Hand, ein Chat, der offen ist. Über die Nächte nach einer Trennung, in denen die Sehnsucht am lautesten ist.",
+    "cluster": "trennung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Lenas Sicht",
+    "pull_quote": "Der Cursor blinkt in einem leeren Chat. „Hey\", tippe ich. Und lösche es wieder.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diese Nächte, in denen die Sehnsucht am lautesten ist? Magst du erzählen, was dich in solchen Momenten am meisten zieht?"
+    },
+    "scene_tags": [
+      "sehnsucht",
+      "gruebeln",
+      "loslassen",
+      "verlustangst"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/drei-uhr-nachts"
   },
   {
     "type": "scene",
@@ -1950,6 +2149,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "sich-nicht-gehoert-fuehlen"
     ],
     "url": "/szenen/ich-wollte-doch-nur-reden"
+  },
+  {
+    "type": "scene",
+    "slug": "ihr-name-in-meinem-kopf",
+    "title": "Ihr Name in meinem Kopf",
+    "description": "Eine fiktive Szene: Seine Ex ist seit Jahren weg – und trotzdem sitzt sie jeden Tag mit am Tisch, in meinem Kopf. Über retrospektive Eifersucht und den Kampf gegen etwas Unveränderbares.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jonas' Sicht",
+    "pull_quote": "Sie ist seit drei Jahren weg. In meinem Kopf ist sie jeden Tag im Raum.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, gegen eine Vergangenheit zu kämpfen, die du nicht ändern kannst? Magst du erzählen, welche Vorstellung dich am meisten quält?"
+    },
+    "scene_tags": [
+      "eifersucht",
+      "retrospektive-eifersucht",
+      "vergleich",
+      "selbstzweifel",
+      "gruebeln"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ihr-name-in-meinem-kopf"
   },
   {
     "type": "scene",
@@ -3223,6 +3451,45 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "loslassen-nach-trennung",
+    "title": "Loslassen lernen: über eine Trennung hinwegkommen",
+    "description": "Warum Loslassen nach einer Trennung so schwerfällt, warum die Erinnerung dich täuscht und was wirklich hilft – von Kontaktabbruch über das Unterbrechen des Grübelns bis zurück zu dir selbst. Ohne Zeitdruck, ohne Diagnose.",
+    "cluster": "trennung",
+    "search_intent": "über eine Trennung hinwegkommen loslassen lernen",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du trägst gerade den Schmerz einer Trennung. Magst du erzählen, was dir am schwersten fällt loszulassen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie lange dauert es, über eine Trennung hinwegzukommen?",
+        "answer": "Es gibt keinen festen Zeitplan – und kein „zu langsam\". Wie lange es dauert, hängt von der Dauer und Tiefe der Beziehung ab, von der Art der Trennung und von deiner Situation. Wichtiger als eine Frist ist die Richtung: Geht es dir über Wochen hinweg im Schnitt etwas besser? Rückschläge gehören dazu und sind kein Scheitern."
+      },
+      {
+        "question": "Ist Kontaktabbruch wirklich nötig?",
+        "answer": "Für die meisten Menschen hilft klarer Abstand am stärksten. Jeder Kontakt – auch ein Blick aufs Profil – öffnet die Wunde neu und hält die Sehnsucht wach. Wo gemeinsame Kinder oder Verpflichtungen bestehen, ist völliger Abbruch nicht möglich; dann hilft es, den Kontakt auf das Nötige zu begrenzen und sachlich zu halten."
+      },
+      {
+        "question": "Warum vermisse ich jemanden, der mir gar nicht gutgetan hat?",
+        "answer": "Weil Vermissen und „gut für dich\" nicht dasselbe sind. Bindung entsteht durch Vertrautheit und gemeinsame Zeit, nicht durch Gesundheit der Beziehung. Dein Nervensystem vermisst das Vertraute – selbst wenn dein Verstand weiß, dass es dir nicht gutgetan hat. Das macht dich nicht schwach."
+      }
+    ],
+    "url": "/wissen/loslassen-nach-trennung"
+  },
+  {
+    "type": "topic",
     "slug": "nein-sagen",
     "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",
     "description": "Woher die Angst vor dem Nein kommt, warum ein Ja aus Angst niemandem hilft und wie man freundlich Nein sagt, ohne sich endlos zu rechtfertigen. Ohne Diagnose.",
@@ -3583,6 +3850,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
   },
+  "/glossar/gruebeln": {
+    "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
+    "description": "Grübeln (Rumination) ist das kreisende Wiederholen derselben Gedanken ohne Lösung. Warum es sich nach Nachdenken anfühlt, aber die Wunde offen hält – und wie du den Kreis unterbrichst. Ohne Diagnose."
+  },
   "/glossar/ich-botschaft": {
     "title": "Ich-Botschaft – sagen, was in mir ist, ohne anzuklagen",
     "description": "Was eine Ich-Botschaft ist, wie sie sich von der Du-Botschaft unterscheidet und warum sie Gespräche entschärft, ohne das Anliegen zu verkleinern. Ohne Diagnose."
@@ -3599,6 +3870,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Konsequenz – was eine Grenze von einem Wunsch unterscheidet",
     "description": "Warum eine Grenze ohne Konsequenz nur ein Wunsch bleibt, und was der Unterschied zwischen einer Konsequenz und einer Drohung ist. Ohne Diagnose."
   },
+  "/glossar/kontaktabbruch": {
+    "title": "Kontaktabbruch (No Contact) – warum Abstand nach der Trennung hilft",
+    "description": "Kontaktabbruch bedeutet, nach einer Trennung bewusst keinen Kontakt zu halten. Warum das keine Strafe ist, sondern hilft zu heilen – und wie man es mit gemeinsamen Kindern handhabt. Ohne Diagnose."
+  },
   "/glossar/metakommunikation": {
     "title": "Metakommunikation – über das Reden reden",
     "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose."
@@ -3614,6 +3889,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/reparaturversuch": {
     "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
     "description": "Was ein Reparaturversuch ist, warum die Fähigkeit, ihn zu senden und anzunehmen, über die Zukunft einer Beziehung entscheidet, und wie man ihn erkennt. Ohne Diagnose."
+  },
+  "/glossar/retrospektive-eifersucht": {
+    "title": "Retrospektive Eifersucht – wenn dich die Vergangenheit deines Gegenübers quält",
+    "description": "Retrospektive Eifersucht ist die Eifersucht auf frühere Partner:innen des Gegenübers. Warum sie so quälend ist, obwohl sie sich gegen Unveränderbares richtet – und was hilft. Ohne Diagnose."
   },
   "/glossar/scham": {
     "title": "Scham – das Gefühl, nicht zu genügen",
@@ -3691,6 +3970,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das hätte er wissen müssen",
     "description": "Eine Szene über die stille Erwartung, dass der andere Bedürfnisse errät – und die Enttäuschung, wenn er es nicht tut. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/das-handy-auf-dem-kuechentisch": {
+    "title": "Das Handy auf dem Küchentisch",
+    "description": "Eine fiktive Szene: Sein Handy leuchtet auf, er ist unter der Dusche – und in mir beginnt der Kampf zwischen „schau nach\" und „lass es\". Über den Sog der Eifersucht."
+  },
   "/szenen/das-haus-das-nie-kommt": {
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv."
@@ -3706,6 +3989,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/deine-ex-haette": {
     "title": "Deine Ex hätte",
     "description": "Eine Szene über den ständigen Vergleich – wenn man an einem Menschen gemessen wird, gegen den man nicht gewinnen kann. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/der-daumen-ueber-dem-profil": {
+    "title": "Der Daumen über dem Profil",
+    "description": "Eine fiktive Szene: entfolgt, stummgeschaltet – und trotzdem kennt der Daumen den Weg zu ihrem Profil auswendig. Über das Nicht-loslassen-Können nach einer Trennung."
   },
   "/szenen/der-kruemel": {
     "title": "Der Krümel",
@@ -3750,6 +4037,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/drei-tage-schweigen": {
     "title": "Drei Tage Schweigen",
     "description": "Eine Szene über das Schweigen nach dem Streit – wenn Nähe zur Belohnung wird und Stille sich anfühlt wie Strafe. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/drei-uhr-nachts": {
+    "title": "Drei Uhr nachts",
+    "description": "Eine fiktive Szene: die leere Seite des Betts, das Handy in der Hand, ein Chat, der offen ist. Über die Nächte nach einer Trennung, in denen die Sehnsucht am lautesten ist."
   },
   "/szenen/du-machst-das-eh-besser": {
     "title": "Du machst das eh besser",
@@ -3798,6 +4089,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-wollte-doch-nur-reden": {
     "title": "Ich wollte doch nur reden",
     "description": "Eine Szene über den Versuch, ein Bedürfnis anzusprechen, der sofort zum Streit über den Streit wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ihr-name-in-meinem-kopf": {
+    "title": "Ihr Name in meinem Kopf",
+    "description": "Eine fiktive Szene: Seine Ex ist seit Jahren weg – und trotzdem sitzt sie jeden Tag mit am Tisch, in meinem Kopf. Über retrospektive Eifersucht und den Kampf gegen etwas Unveränderbares."
   },
   "/szenen/im-kreis": {
     "title": "Im Kreis",
@@ -3954,6 +4249,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/krisentelefone": {
     "title": "Krisentelefone und Anlaufstellen (D/A/CH)",
     "description": "Kostenlose, anonyme Hilfsangebote in Deutschland, Österreich und der Schweiz – rund um die Uhr erreichbar. Bei akuter Gefahr: Notruf 112."
+  },
+  "/wissen/loslassen-nach-trennung": {
+    "title": "Loslassen lernen: über eine Trennung hinwegkommen",
+    "description": "Warum Loslassen nach einer Trennung so schwerfällt, warum die Erinnerung dich täuscht und was wirklich hilft – von Kontaktabbruch über das Unterbrechen des Grübelns bis zurück zu dir selbst. Ohne Zeitdruck, ohne Diagnose."
   },
   "/wissen/nein-sagen": {
     "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",
