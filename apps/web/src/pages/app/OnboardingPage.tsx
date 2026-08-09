@@ -7,6 +7,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import Avatar from '@/components/Avatar'
+import AvatarPicker from '@/components/AvatarPicker'
 import { onboardingApi, type OnboardingAnswers } from '@/api/onboarding'
 
 // ── Schritte ──────────────────────────────────────────────────────────────────
@@ -99,6 +101,7 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(false)
   const [savedOk, setSavedOk] = useState(false)
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false)
 
   const { data: existing, isLoading } = useQuery({
     queryKey: ['onboarding', caseId],
@@ -119,6 +122,7 @@ export default function OnboardingPage() {
         typical_scenes:           existing.typical_scenes ?? '',
         significant_event:        existing.significant_event ?? '',
         distress_score:           existing.distress_score ?? 5,
+        avatar:                   existing.avatar ?? undefined,
       })
     }
   }, [isLoading, existing])
@@ -272,6 +276,22 @@ export default function OnboardingPage() {
             />
           )}
 
+          {step.key === 'person_name' && (
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-medium text-brand-text">
+                Ein kleines Bild für die Person <span className="font-normal text-brand-muted">(optional)</span>
+              </p>
+              <button
+                type="button"
+                onClick={() => setAvatarPickerOpen(true)}
+                className="flex items-center gap-2.5 rounded-brand border border-brand-border bg-white px-3 py-2 transition-colors hover:border-accent/50"
+              >
+                <Avatar value={answers.avatar} size="md" />
+                <span className="text-sm font-medium text-navy">{answers.avatar ? 'Avatar ändern' : 'Avatar wählen'}</span>
+              </button>
+            </div>
+          )}
+
           <div className="mt-5 flex items-center gap-3 flex-wrap">
             {currentStep > 0 && (
               <button
@@ -324,6 +344,15 @@ export default function OnboardingPage() {
             Beziehungsmuster zu strukturieren – nicht, die andere Person zu bewerten oder zu pathologisieren.
           </p>
         </div>
+
+        {avatarPickerOpen && (
+          <AvatarPicker
+            value={answers.avatar}
+            onSelect={(a) => setAnswers(p => ({ ...p, avatar: a }))}
+            onClose={() => setAvatarPickerOpen(false)}
+            title="Avatar für die Person"
+          />
+        )}
       </div>
     </AppShell>
   )

@@ -9,6 +9,7 @@ export interface OnboardingAnswers {
   memorable_scenes?: string | null
   distress_score?: number | null
   safety_status?: string | null
+  avatar?: string | null
 }
 
 export interface OnboardingResponse extends OnboardingAnswers {

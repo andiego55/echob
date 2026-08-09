@@ -23,6 +23,7 @@ class OnboardingAnswers(BaseModel):
     memorable_scenes: str | None = None
     distress_score: int | None = None
     safety_status: str | None = None
+    avatar: str | None = None  # Fall-Avatar (Emoji) – nicht sensibel, unverschlüsselt
 
 
 class OnboardingResponse(OnboardingAnswers):
@@ -64,8 +65,8 @@ async def save_onboarding(
             INSERT INTO onboarding_answers
               (case_id, user_id, person_name, relationship_description, main_burden,
                typical_scenes, significant_event, memorable_scenes,
-               distress_score, safety_status, completed_at)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, NOW())
+               distress_score, safety_status, avatar, completed_at)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, NOW())
             ON CONFLICT (case_id) DO UPDATE SET
               person_name            = EXCLUDED.person_name,
               relationship_description = EXCLUDED.relationship_description,
@@ -75,6 +76,7 @@ async def save_onboarding(
               memorable_scenes       = EXCLUDED.memorable_scenes,
               distress_score         = EXCLUDED.distress_score,
               safety_status          = EXCLUDED.safety_status,
+              avatar                 = EXCLUDED.avatar,
               completed_at           = NOW(),
               updated_at             = NOW()
             RETURNING *
@@ -88,6 +90,7 @@ async def save_onboarding(
             crypto.encrypt(body.memorable_scenes),
             body.distress_score,
             body.safety_status or "none",
+            (body.avatar or "").strip()[:16] or None,
         )
     return _row_to_response(row)
 

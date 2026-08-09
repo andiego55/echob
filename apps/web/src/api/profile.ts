@@ -34,4 +34,7 @@ export const profileApi = {
 
   saveDisplayName: (display_name: string) =>
     apiClient.put<UserProfile>('/profile/display-name', { display_name }).then(r => r.data),
+
+  saveAvatar: (avatar: string) =>
+    apiClient.put<UserProfile>('/profile/avatar', { avatar }).then(r => r.data),
 }

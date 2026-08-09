@@ -29,6 +29,7 @@ async def list_cases(
             SELECT c.*,
                    (SELECT COUNT(*) FROM scenes s WHERE s.case_id = c.id)::int AS scene_count,
                    (SELECT o.person_name FROM onboarding_answers o WHERE o.case_id = c.id LIMIT 1) AS person_name,
+                   (SELECT o.avatar FROM onboarding_answers o WHERE o.case_id = c.id LIMIT 1) AS avatar,
                    GREATEST(
                        c.created_at,
                        COALESCE((SELECT MAX(s.created_at) FROM scenes s WHERE s.case_id = c.id), c.created_at),

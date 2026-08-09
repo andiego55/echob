@@ -31,6 +31,7 @@ class ProfileResponse(BaseModel):
     completed_modules: list[str]
     summary_text: str | None = None
     display_name: str | None = None
+    avatar: str | None = None
     created_at: datetime
     updated_at: datetime
 

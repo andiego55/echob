@@ -3,10 +3,12 @@
  * Persönliche Begrüßung, Weitermachen-Karte, Fortschritt,
  * Fallliste, Tagesimpuls.
  */
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
+import Avatar from '@/components/Avatar'
+import AvatarPicker from '@/components/AvatarPicker'
 import { casesApi } from '@/api/cases'
 import { profileApi } from '@/api/profile'
 import { subscriptionApi } from '@/api/subscription'
@@ -70,6 +72,13 @@ export default function CasesOverviewPage() {
     queryFn: subscriptionApi.getStatus,
   })
 
+  const qc = useQueryClient()
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const saveAvatar = useMutation({
+    mutationFn: (a: string) => profileApi.saveAvatar(a),
+    onSuccess: (updated) => qc.setQueryData(['profile'], updated),
+  })
+
   const cases = data?.cases ?? []
   const lastCase = cases[0] ?? null   // Backend sortiert nach letzter Aktivität
 
@@ -123,22 +132,43 @@ export default function CasesOverviewPage() {
 
         {/* Begrüßung */}
         <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
-          <div>
-            <h1 className="text-2xl font-bold text-navy">
-              {blogLabel
-                ? 'Fall auswählen'
-                : `${greeting()}${displayName ? `, ${displayName}` : ''}`}
-            </h1>
-            <p className="mt-1 text-sm text-brand-muted">
-              {blogLabel
-                ? 'Welchen Fall möchtest du als Kontext für diesen Dialog nutzen?'
-                : 'Schön, dass du da bist. Nimm dir die Zeit, die du brauchst.'}
-            </p>
+          <div className="flex items-center gap-3.5">
+            {!blogLabel && (
+              <button
+                onClick={() => setPickerOpen(true)}
+                title="Avatar ändern"
+                aria-label="Avatar ändern"
+                className="rounded-full transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                <Avatar value={profile?.avatar} size="lg" />
+              </button>
+            )}
+            <div>
+              <h1 className="text-2xl font-bold text-navy">
+                {blogLabel
+                  ? 'Fall auswählen'
+                  : `${greeting()}${displayName ? `, ${displayName}` : ''}`}
+              </h1>
+              <p className="mt-1 text-sm text-brand-muted">
+                {blogLabel
+                  ? 'Welchen Fall möchtest du als Kontext für diesen Dialog nutzen?'
+                  : 'Schön, dass du da bist. Nimm dir die Zeit, die du brauchst.'}
+              </p>
+            </div>
           </div>
           <Link to="/app/cases/new" className="btn-primary !py-2 !px-5 !text-sm shrink-0">
             + Fall anlegen
           </Link>
         </div>
+
+        {pickerOpen && (
+          <AvatarPicker
+            value={profile?.avatar}
+            onSelect={(a) => saveAvatar.mutate(a)}
+            onClose={() => setPickerOpen(false)}
+            title="Dein Avatar"
+          />
+        )}
 
         {isLoading && (
           <div className="text-brand-muted text-sm">Wird geladen …</div>
@@ -303,10 +333,13 @@ function CaseCard({ case_: c, blogTopic }: { case_: Case; blogTopic?: string }) 
       <div className="flex items-start justify-between gap-2 mb-3">
         <span className="label">{typeLabel}</span>
       </div>
-      <p className="text-sm font-semibold text-navy mb-1">{personName || statusLabel}</p>
-      {personName && (
-        <p className="text-xs text-brand-muted mb-1">{statusLabel}</p>
-      )}
+      <div className="flex items-center gap-2.5 mb-1">
+        <Avatar value={c.avatar} size="md" />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-navy truncate">{personName || statusLabel}</p>
+          {personName && <p className="text-xs text-brand-muted">{statusLabel}</p>}
+        </div>
+      </div>
       {c.main_concern && (
         <p className="text-xs text-brand-muted line-clamp-2">{c.main_concern}</p>
       )}

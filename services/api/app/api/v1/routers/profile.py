@@ -22,6 +22,9 @@ class SummaryTextUpdate(_BaseModel):
 class DisplayNameUpdate(_BaseModel):
     display_name: str
 
+class AvatarUpdate(_BaseModel):
+    avatar: str | None = None
+
 class EchoSettings(_BaseModel):
     echo_mode: str = "base"
     echo_tone: int | None = None
@@ -178,6 +181,24 @@ async def save_display_name(
             name or None,
             datetime.now(UTC),
             user_id,
+        )
+    return _row_to_response(dict(row))
+
+
+@router.put("/avatar", response_model=ProfileResponse)
+async def save_avatar(
+    body: AvatarUpdate,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> ProfileResponse:
+    """Speichert den gewählten Avatar (Emoji aus der Palette)."""
+    user_id = current_user["user_id"]
+    avatar = (body.avatar or "").strip()[:16] or None
+    async with pool.acquire() as conn:
+        await _get_or_create_profile(conn, user_id)
+        row = await conn.fetchrow(
+            "UPDATE user_profiles SET avatar = $1, updated_at = $2 WHERE user_id = $3 RETURNING *",
+            avatar, datetime.now(UTC), user_id,
         )
     return _row_to_response(dict(row))
 
@@ -354,8 +375,9 @@ def _row_to_response(row: dict) -> ProfileResponse:
     # summary-JSONB enthält ggf. verschlüsselten summary_text → entschlüsseln
     row["summary"] = crypto.decrypt_summary_text(row.get("summary") or {})
     row["summary_text"] = row["summary"].get("summary_text")
-    # display_name direkt aus der Spalte
+    # display_name + avatar direkt aus der Spalte
     row.setdefault("display_name", None)
+    row.setdefault("avatar", None)
     return ProfileResponse(**row)
 
 

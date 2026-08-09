@@ -56,6 +56,7 @@ class CaseResponse(BaseModel):
     scene_count: int = 0
     last_activity_at: datetime | None = None
     person_name: str | None = None  # Pseudonym der Fallperson (entschlüsselt aus onboarding_answers)
+    avatar: str | None = None        # Fall-Avatar (Emoji, aus onboarding_answers)
 
     model_config = {"from_attributes": True}
 

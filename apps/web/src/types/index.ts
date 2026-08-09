@@ -120,6 +120,7 @@ export interface Case {
   scene_count: number
   last_activity_at: string | null
   person_name?: string | null   // Pseudonym der Fallperson (angereichert in der Listen-API)
+  avatar?: string | null         // Fall-Avatar (Emoji, aus dem Onboarding)
 }
 
 // ── Ausbildungsbereich (Institut) ─────────────────────────────────────────────
@@ -803,6 +804,7 @@ export interface UserProfile {
   completed_modules: string[]
   summary_text: string | null
   display_name: string | null
+  avatar: string | null
   created_at: string
   updated_at: string
 }

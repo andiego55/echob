@@ -12,6 +12,7 @@ import { professionalApi } from '@/api/professional'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import SavedTestResultView from '@/components/selftests/SavedTestResultView'
 import AssignmentTypePanel from '@/components/professional/AssignmentTypePanel'
+import type { AssignmentType } from '@/api/collab'
 import AppointmentsPanel from '@/components/professional/AppointmentsPanel'
 import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
 import {
@@ -39,10 +40,7 @@ const HYP_LABELS: Record<string, string> = {
 
 const TABS = [
   { key: 'ueber', label: 'Übersicht' },
-  { key: 'dialog', label: 'Dialoge' },
-  { key: 'questionnaire', label: 'Fragebögen' },
-  { key: 'message', label: 'Nachrichten' },
-  { key: 'resource', label: 'Ressourcen' },
+  { key: 'collab', label: 'Zusammenarbeit' },
   { key: 'echo', label: 'Echo' },
   { key: 'reports', label: 'Berichte' },
   { key: 'notes', label: 'Notizen' },
@@ -50,6 +48,15 @@ const TABS = [
   { key: 'history', label: 'Verlauf' },
 ] as const
 type TabKey = (typeof TABS)[number]['key']
+
+// „Zusammenarbeit" bündelt die vier Zuweisungsarten (früher eigene Reiter).
+const COLLAB_TYPES: { key: AssignmentType; label: string }[] = [
+  { key: 'dialog', label: 'Dialoge' },
+  { key: 'questionnaire', label: 'Fragebögen' },
+  { key: 'message', label: 'Nachrichten' },
+  { key: 'resource', label: 'Ressourcen' },
+]
+const COLLAB_KEYS = COLLAB_TYPES.map(t => t.key) as string[]
 
 /** Zweite Headerleiste des Fall-Arbeitsplatzes – Stil wie die Nutzer-CaseNav.
  *  Links steht fest die aktuell gewählte Klient:in (bleibt beim Scrollen sichtbar). */
@@ -302,9 +309,11 @@ export default function ProfessionalCaseDetailPage() {
   const { caseId } = useParams<{ caseId: string }>()
   const [searchParams] = useSearchParams()
   const [tab, setTab] = useState<TabKey>('ueber')
+  const [collabSub, setCollabSub] = useState<AssignmentType>('dialog')
   useEffect(() => {
     const t = searchParams.get('tab')
-    if (t && TABS.some(x => x.key === t)) setTab(t as TabKey)
+    if (t && COLLAB_KEYS.includes(t)) { setTab('collab'); setCollabSub(t as AssignmentType) }
+    else if (t && TABS.some(x => x.key === t)) setTab(t as TabKey)
   }, [searchParams])
   const { data: bundle, isLoading, isError } = useQuery({
     queryKey: ['prof-case', caseId],
@@ -363,10 +372,7 @@ export default function ProfessionalCaseDetailPage() {
         {!bundle.is_demo && bundle.activated && <CaseSeatActive caseId={caseId!} />}
 
         {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
-        {tab === 'dialog' && <AssignmentTypePanel caseId={caseId!} type="dialog" />}
-        {tab === 'questionnaire' && <AssignmentTypePanel caseId={caseId!} type="questionnaire" />}
-        {tab === 'message' && <AssignmentTypePanel caseId={caseId!} type="message" />}
-        {tab === 'resource' && <AssignmentTypePanel caseId={caseId!} type="resource" />}
+        {tab === 'collab' && <CollabPanel caseId={caseId!} initialType={collabSub} />}
         {tab === 'echo' && (
           <EchoPanel
             caseId={caseId!}
@@ -384,6 +390,34 @@ export default function ProfessionalCaseDetailPage() {
         {tab === 'history' && <CaseHistoryPanel caseId={caseId!} />}
       </div>
     </ProfessionalShell>
+  )
+}
+
+/** Reiter „Zusammenarbeit": bündelt Dialoge/Fragebögen/Nachrichten/Ressourcen mit On-Page-Auswahl. */
+function CollabPanel({ caseId, initialType }: { caseId: string; initialType: AssignmentType }) {
+  const [sub, setSub] = useState<AssignmentType>(initialType)
+  useEffect(() => { setSub(initialType) }, [initialType])
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Art der Zusammenarbeit">
+        {COLLAB_TYPES.map(t => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={sub === t.key}
+            onClick={() => setSub(t.key)}
+            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              sub === t.key
+                ? 'border-accent bg-accent text-white'
+                : 'border-brand-border bg-white text-brand-muted hover:border-accent/50 hover:text-accent'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <AssignmentTypePanel caseId={caseId} type={sub} />
+    </div>
   )
 }
 
