@@ -13,6 +13,7 @@ export default function FachpersonenFindenPage() {
   const [city, setCity] = useState('')
   const [format, setFormat] = useState('')
   const [freeIntro, setFreeIntro] = useState(false)
+  const [bills, setBills] = useState(false)
   const [page, setPage] = useState(1)
   const [items, setItems] = useState<Listing[]>([])
 
@@ -22,6 +23,7 @@ export default function FachpersonenFindenPage() {
     city: city || undefined,
     format: format || undefined,
     free_intro: freeIntro || undefined,
+    bills: bills || undefined,
   }
 
   const { data: facets } = useQuery({ queryKey: ['dir-facets'], queryFn: directoryApi.facets })
@@ -31,7 +33,7 @@ export default function FachpersonenFindenPage() {
   })
 
   // Filteränderung → zurück auf Seite 1.
-  useEffect(() => { setPage(1) }, [q, profession, city, format, freeIntro])
+  useEffect(() => { setPage(1) }, [q, profession, city, format, freeIntro, bills])
   // Ergebnisse: Seite 1 ersetzt, Folgeseiten hängen an.
   useEffect(() => {
     if (!data) return
@@ -40,11 +42,11 @@ export default function FachpersonenFindenPage() {
 
   const total = data?.total ?? 0
   const hasMore = items.length < total
-  const anyFilter = !!(q || profession || city || format || freeIntro)
+  const anyFilter = !!(q || profession || city || format || freeIntro || bills)
   const cityLabel = facets?.cities.find((c) => c.slug === city)?.label
 
   const resetAll = () => {
-    setQ(''); setQInput(''); setProfession(''); setCity(''); setFormat(''); setFreeIntro(false)
+    setQ(''); setQInput(''); setProfession(''); setCity(''); setFormat(''); setFreeIntro(false); setBills(false)
   }
 
   return (
@@ -105,6 +107,10 @@ export default function FachpersonenFindenPage() {
             <label className="flex cursor-pointer items-center gap-2 rounded-brand-sm border border-brand-border bg-white px-3 py-2 text-[0.85rem] text-navy">
               <input type="checkbox" checked={freeIntro} onChange={(e) => setFreeIntro(e.target.checked)} className="accent-accent" />
               Kostenloses Erstgespräch
+            </label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-brand-sm border border-brand-border bg-white px-3 py-2 text-[0.85rem] text-navy">
+              <input type="checkbox" checked={bills} onChange={(e) => setBills(e.target.checked)} className="accent-accent" />
+              Kassensitz (gesetzl. KK)
             </label>
             {anyFilter && (
               <button onClick={resetAll} className="text-[0.82rem] font-medium text-brand-muted hover:text-accent">

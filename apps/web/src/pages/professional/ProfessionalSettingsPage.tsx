@@ -90,55 +90,11 @@ export default function ProfessionalSettingsPage() {
           )}
         </div>
 
-        <DiscoverabilitySection />
         <PracticeSection />
         <BillingSection />
         <AgreementSection />
       </div>
     </ProfessionalShell>
-  )
-}
-
-/** Auffindbarkeit (Opt-in): in der EchoB-Suche fuer Nutzer:innen sichtbar machen. */
-function DiscoverabilitySection() {
-  const qc = useQueryClient()
-  const { data: me } = useQuery({ queryKey: ['professional-me'], queryFn: professionalApi.me })
-  const toggle = useMutation({
-    mutationFn: (v: boolean) => professionalApi.setDiscoverable(v),
-    onSuccess: (profile) => qc.setQueryData(['professional-me'], profile),
-  })
-  const on = !!me?.discoverable
-
-  return (
-    <div className="mt-8 card">
-      <h2 className="text-lg font-semibold text-navy">Auffindbarkeit</h2>
-      <p className="mt-1 text-sm text-brand-muted">
-        Wenn aktiviert, können dich Nutzer:innen in EchoB per Name oder Fachrichtung finden und dir
-        eine Verbindungsanfrage senden – die du erst bestätigen musst. Standardmäßig bist du
-        <span className="font-medium text-navy"> nicht gelistet</span>. Deine E-Mail-Adresse wird nie
-        angezeigt.
-      </p>
-      <div className="mt-4 flex items-center gap-3">
-        <button
-          type="button"
-          role="switch"
-          aria-checked={on}
-          onClick={() => toggle.mutate(!on)}
-          disabled={toggle.isPending}
-          className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
-            on ? 'bg-accent' : 'bg-brand-border'
-          }`}
-        >
-          <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
-            on ? 'left-[22px]' : 'left-0.5'
-          }`} />
-        </button>
-        <span className="text-sm font-medium text-navy">
-          {on ? 'In EchoB auffindbar' : 'Nicht auffindbar'}
-        </span>
-        {toggle.isError && <span className="text-xs text-red-600">Speichern fehlgeschlagen.</span>}
-      </div>
-    </div>
   )
 }
 

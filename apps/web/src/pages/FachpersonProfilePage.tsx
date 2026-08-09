@@ -5,6 +5,7 @@ import PageLayout from '@/components/layout/PageLayout'
 import { directoryApi } from '@/api/directory'
 import { formatLabel, tierBadge } from '@/directory/taxonomy'
 import ContactDialog from '@/components/directory/ContactDialog'
+import ProfileText from '@/components/directory/ProfileText'
 
 function initials(name: string): string {
   return name.replace(/^(Dr\.|Prof\.|Praxis|Institut)\s+/i, '').split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
@@ -61,7 +62,7 @@ export default function FachpersonProfilePage() {
               </div>
               {p.title && <p className="mt-1.5 text-[0.95rem] text-white/75">{p.title}</p>}
               <p className="mt-2 text-[0.9rem] text-white/60">
-                <span className="font-medium text-white/85">{p.profession_label}</span> · {p.city}
+                <span className="font-medium text-white/85">{(p.profession_labels.length ? p.profession_labels : [p.profession_label]).join(' · ')}</span> · {p.city}
                 {p.postal_code && ` (${p.postal_code})`}
               </p>
               {p.headline && <p className="mt-4 max-w-[540px] font-serif text-[1.1rem] italic leading-relaxed text-brand-blue">{p.headline}</p>}
@@ -139,11 +140,27 @@ export default function FachpersonProfilePage() {
             <div className="rounded-brand-lg border border-brand-border bg-brand-bg p-5">
               <p className="mb-3 text-[0.68rem] font-bold uppercase tracking-wider text-brand-muted">Auf einen Blick</p>
               <dl className="space-y-3 text-[0.85rem]">
-                <Fact label="Fachrichtung" value={p.profession_label} />
+                <Fact
+                  label={p.profession_labels.length > 1 ? 'Fachrichtungen' : 'Fachrichtung'}
+                  value={(p.profession_labels.length ? p.profession_labels : [p.profession_label]).join(', ')}
+                />
                 <Fact label="Ort" value={`${p.city}${p.state ? ', ' + p.state : ''}`} />
                 {p.formats.length > 0 && <Fact label="Setting" value={p.formats.map(formatLabel).join(', ')} />}
                 {p.languages.length > 0 && <Fact label="Sprachen" value={p.languages.join(', ')} />}
+                {p.bills_insurance && <Fact label="Abrechnung" value="Gesetzliche Krankenkasse (Kassensitz)" />}
                 {p.offers_free_intro && <Fact label="Erstgespräch" value="Kostenlos" />}
+                {p.contactable && p.phone && (
+                  <div>
+                    <dt className="text-brand-muted">Telefon</dt>
+                    <dd className="mt-0.5"><a href={`tel:${p.phone.replace(/\s/g, '')}`} className="font-medium text-accent hover:underline">{p.phone}</a></dd>
+                  </div>
+                )}
+                {p.contactable && p.website && (
+                  <div>
+                    <dt className="text-brand-muted">Website</dt>
+                    <dd className="mt-0.5"><a href={p.website} target="_blank" rel="noopener noreferrer nofollow" className="font-medium text-accent hover:underline">{p.website.replace(/^https?:\/\//, '')} ↗</a></dd>
+                  </div>
+                )}
               </dl>
               {p.contactable && (
                 <button onClick={() => setContactOpen(true)} className="btn-primary mt-5 w-full !py-2.5">Termin anfragen</button>
@@ -167,9 +184,7 @@ function Section({ title, body }: { title: string; body: string }) {
   return (
     <div className="mb-8">
       <h2 className="mb-2.5 text-[1.1rem] font-bold text-navy">{title}</h2>
-      {body.split(/\n{2,}/).map((para, i) => (
-        <p key={i} className="mb-3 text-[0.92rem] leading-relaxed text-brand-text">{para}</p>
-      ))}
+      <ProfileText content={body} />
     </div>
   )
 }

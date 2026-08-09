@@ -10,14 +10,17 @@ class DirectoryCard(BaseModel):
     """Kompakter Eintrag für Suchergebnis-/Regionallisten."""
     slug: str
     display_name: str
-    profession: str
+    profession: str                  # Primär-Kategorie (= professions[0]) für Regionalseiten
     profession_label: str
+    professions: list[str] = []      # alle Fachrichtungen (Mehrfachnennung)
+    profession_labels: list[str] = []
     title: str | None = None
     city: str
     city_slug: str
     tier: str
     verified: bool = False
     contactable: bool = False        # tier != researched
+    bills_insurance: bool = False    # kann mit gesetzlicher KK abrechnen
     photo_url: str | None = None
     headline: str | None = None
     focus_areas: list[str] = []
@@ -74,7 +77,9 @@ class ContactAck(BaseModel):
 
 class DirectoryProfileUpdate(BaseModel):
     display_name: str = Field(min_length=1, max_length=120)
-    profession: str = ""
+    profession: str = ""              # Rückwärtskompat; maßgeblich ist professions
+    professions: list[str] = []
+    bills_insurance: bool = False
     title: str | None = None
     city: str | None = None
     postal_code: str | None = None
@@ -105,6 +110,8 @@ class DirectoryMe(BaseModel):
     slug: str
     display_name: str
     profession: str
+    professions: list[str] = []
+    bills_insurance: bool = False
     title: str | None = None
     city: str = ""
     postal_code: str | None = None
@@ -151,6 +158,7 @@ class AdminListingRow(BaseModel):
     tier: str
     published: bool
     verified: bool
+    bills_insurance: bool = False
     contact_email: str | None = None
     website: str | None = None
     phone: str | None = None
@@ -183,6 +191,7 @@ class AdminListingUpdate(BaseModel):
     tier: str | None = None
     published: bool | None = None
     verified: bool | None = None
+    bills_insurance: bool | None = None
 
 
 class AdminInvite(BaseModel):

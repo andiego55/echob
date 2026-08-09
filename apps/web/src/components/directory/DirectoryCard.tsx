@@ -53,7 +53,7 @@ export default function DirectoryCard({ item }: { item: Listing }) {
             </Link>
             {item.title && <p className="mt-0.5 truncate text-[0.8rem] text-brand-muted">{item.title}</p>}
             <p className="mt-1 text-[0.78rem] text-brand-muted">
-              <span className="font-medium text-navy/80">{item.profession_label}</span>
+              <span className="font-medium text-navy/80">{(item.profession_labels.length ? item.profession_labels : [item.profession_label]).join(' · ')}</span>
               <span className="mx-1.5 text-brand-border">·</span>
               {item.city}
             </p>
@@ -74,9 +74,12 @@ export default function DirectoryCard({ item }: { item: Listing }) {
           </div>
         )}
 
-        {(item.formats.length > 0 || item.offers_free_intro) && (
+        {(item.formats.length > 0 || item.offers_free_intro || item.bills_insurance) && (
           <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.72rem] text-brand-muted">
             {item.formats.map((f) => formatLabel(f)).join(' · ')}
+            {item.bills_insurance && (
+              <span className="rounded-full bg-navy/[0.06] px-2 py-0.5 font-semibold text-navy">Kassensitz</span>
+            )}
             {item.offers_free_intro && (
               <span className="rounded-full bg-accent/[0.08] px-2 py-0.5 font-semibold text-accent">
                 Kostenloses Erstgespräch

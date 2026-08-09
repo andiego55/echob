@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { directoryProfileApi, type DirectoryMe, type DirectoryProfilePayload } from '@/api/directory'
+import { professionalApi } from '@/api/professional'
 import { FORMATS, PROFESSIONS } from '@/directory/taxonomy'
 
 type FormState = Omit<DirectoryMe, 'completeness' | 'stars' | 'missing' | 'publishable' | 'missing_required'>
 
 function toForm(m: DirectoryMe): FormState {
   return {
-    slug: m.slug, display_name: m.display_name, profession: m.profession, title: m.title,
+    slug: m.slug, display_name: m.display_name, profession: m.profession,
+    professions: m.professions, bills_insurance: m.bills_insurance, title: m.title,
     city: m.city, postal_code: m.postal_code, state: m.state, website: m.website, phone: m.phone,
     contact_email: m.contact_email, photo_url: m.photo_url, headline: m.headline, about: m.about,
     approach: m.approach, fees: m.fees, focus_areas: m.focus_areas, formats: m.formats,
@@ -19,7 +21,8 @@ function toForm(m: DirectoryMe): FormState {
 
 function toPayload(f: FormState, published: boolean): DirectoryProfilePayload {
   return {
-    display_name: f.display_name, profession: f.profession, title: f.title, city: f.city,
+    display_name: f.display_name, profession: f.professions[0] ?? '', professions: f.professions,
+    bills_insurance: f.bills_insurance, title: f.title, city: f.city,
     postal_code: f.postal_code, state: f.state, website: f.website, phone: f.phone,
     contact_email: f.contact_email, headline: f.headline, about: f.about, approach: f.approach,
     fees: f.fees, focus_areas: f.focus_areas, formats: f.formats, languages: f.languages,
@@ -48,7 +51,7 @@ function completeness(f: FormState) {
 
 const REQUIRED: { label: string; ok: (f: FormState) => boolean }[] = [
   { label: 'Name', ok: (f) => !!f.display_name?.trim() },
-  { label: 'Fachrichtung', ok: (f) => !!f.profession?.trim() },
+  { label: 'Fachrichtung', ok: (f) => f.professions.length > 0 },
   { label: 'Ort', ok: (f) => !!f.city?.trim() },
   { label: 'Kontakt-E-Mail', ok: (f) => !!f.contact_email?.trim() },
 ]
@@ -83,6 +86,13 @@ export default function ProfessionalProfilePage() {
   const photo = useMutation({
     mutationFn: (file: File) => directoryProfileApi.uploadPhoto(file),
     onSuccess: (r) => setForm((f) => (f ? { ...f, photo_url: r.photo_url } : f)),
+  })
+
+  const meProf = useQuery({ queryKey: ['professional-me'], queryFn: professionalApi.me })
+  const discoverable = !!meProf.data?.discoverable
+  const setDiscoverable = useMutation({
+    mutationFn: (v: boolean) => professionalApi.setDiscoverable(v),
+    onSuccess: (p) => qc.setQueryData(['professional-me'], p),
   })
 
   if (isLoading || !form) {
@@ -136,13 +146,27 @@ export default function ProfessionalProfilePage() {
                   <Field label="Name / Praxis" required value={form.display_name} onChange={(v) => set({ display_name: v })} />
                   <Field label="Berufsbezeichnung" value={form.title ?? ''} onChange={(v) => set({ title: v })}
                     placeholder="z. B. Psychologische Psychotherapeutin, Paartherapeutin" />
-                  <label className="block">
-                    <span className="mb-1 block text-[0.8rem] font-medium text-navy">Fachrichtung <span className="text-accent">*</span></span>
-                    <select value={form.profession} onChange={(e) => set({ profession: e.target.value })} className="input">
-                      <option value="">Bitte wählen …</option>
-                      {PROFESSIONS.map((p) => <option key={p.slug} value={p.slug}>{p.label}</option>)}
-                    </select>
-                  </label>
+                  <div>
+                    <span className="mb-1.5 block text-[0.8rem] font-medium text-navy">
+                      Fachrichtung(en) <span className="text-accent">*</span>{' '}
+                      <span className="font-normal text-brand-muted">– Mehrfachauswahl möglich</span>
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {PROFESSIONS.map((p) => {
+                        const on = form.professions.includes(p.slug)
+                        return (
+                          <button
+                            key={p.slug}
+                            type="button"
+                            onClick={() => set({ professions: on ? form.professions.filter((x) => x !== p.slug) : [...form.professions, p.slug] })}
+                            className={`rounded-full border px-3 py-1 text-[0.8rem] transition-colors ${on ? 'border-accent bg-accent text-white' : 'border-brand-border bg-white text-navy hover:border-accent/50'}`}
+                          >
+                            {p.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     <Field label="Ort" required value={form.city} onChange={(v) => set({ city: v })} placeholder="z. B. Kassel" />
                     <Field label="PLZ" value={form.postal_code ?? ''} onChange={(v) => set({ postal_code: v })} />
@@ -160,11 +184,13 @@ export default function ProfessionalProfilePage() {
             <Card title="Über mich" hint="Wer bist du, wen begleitest du? Menschen entscheiden nach Sympathie.">
               <Area value={form.about ?? ''} onChange={(v) => set({ about: v })} rows={5} min={80}
                 placeholder="Erzähl in ein paar Sätzen, wer du bist und mit welcher Haltung du arbeitest." />
+              <MdHint />
             </Card>
 
             <Card title="Mein Vorgehen" hint="Wie läuft die Zusammenarbeit ab? Welche Methode?">
               <Area value={form.approach ?? ''} onChange={(v) => set({ approach: v })} rows={4} min={60}
                 placeholder="z. B. integrativ auf Basis der Emotionsfokussierten Paartherapie …" />
+              <MdHint />
             </Card>
 
             <Card title="Schwerpunkte" hint="Womit kommen Menschen zu dir? 3–6 Themen wirken am stärksten.">
@@ -200,6 +226,10 @@ export default function ProfessionalProfilePage() {
                 <label className="flex cursor-pointer items-center gap-2.5 text-[0.88rem] text-navy">
                   <input type="checkbox" checked={form.offers_free_intro} onChange={(e) => set({ offers_free_intro: e.target.checked })} className="h-4 w-4 accent-accent" />
                   Ich biete ein kostenloses Erstgespräch an
+                </label>
+                <label className="flex cursor-pointer items-center gap-2.5 text-[0.88rem] text-navy">
+                  <input type="checkbox" checked={form.bills_insurance} onChange={(e) => set({ bills_insurance: e.target.checked })} className="h-4 w-4 accent-accent" />
+                  Ich kann mit der gesetzlichen Krankenkasse abrechnen (Kassensitz)
                 </label>
                 <Field label="Buchungslink (optional)" value={form.booking_url ?? ''} onChange={(v) => set({ booking_url: v })} placeholder="https://…" />
               </div>
@@ -252,8 +282,8 @@ export default function ProfessionalProfilePage() {
               <div className="rounded-brand-lg border border-brand-border bg-white p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[0.85rem] font-bold text-navy">Öffentlich sichtbar</p>
-                    <p className="text-[0.72rem] text-brand-muted">{form.published ? 'Dein Profil ist gelistet.' : 'Noch als Entwurf.'}</p>
+                    <p className="text-[0.85rem] font-bold text-navy">Öffentliches Verzeichnis</p>
+                    <p className="text-[0.72rem] text-brand-muted">{form.published ? 'Auf echo-b.de sichtbar.' : 'Noch als Entwurf.'}</p>
                   </div>
                   <button
                     role="switch" aria-checked={form.published}
@@ -264,6 +294,9 @@ export default function ProfessionalProfilePage() {
                     <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${form.published ? 'left-[22px]' : 'left-0.5'}`} />
                   </button>
                 </div>
+                <p className="mt-2 text-[0.72rem] leading-relaxed text-brand-muted">
+                  Dein Profil erscheint öffentlich auf <span className="font-medium text-navy">echo-b.de/fachpersonen</span> – für alle sichtbar, auch ohne EchoB-Konto.
+                </p>
                 {!publishable && (
                   <p className="mt-2 text-[0.72rem] text-brand-muted">Zum Veröffentlichen fehlt: {missingRequired.join(', ')}.</p>
                 )}
@@ -279,6 +312,28 @@ export default function ProfessionalProfilePage() {
                     Öffentliches Profil ansehen ↗
                   </a>
                 )}
+              </div>
+
+              {/* Auffindbar in EchoB (App) – abgegrenzt vom öffentlichen Verzeichnis */}
+              <div className="rounded-brand-lg border border-brand-border bg-white p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[0.85rem] font-bold text-navy">Auffindbar in EchoB</p>
+                    <p className="text-[0.72rem] text-brand-muted">{discoverable ? 'In der App auffindbar.' : 'Nicht auffindbar.'}</p>
+                  </div>
+                  <button
+                    role="switch" aria-checked={discoverable}
+                    onClick={() => setDiscoverable.mutate(!discoverable)}
+                    disabled={setDiscoverable.isPending}
+                    className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${discoverable ? 'bg-accent' : 'bg-brand-border'}`}
+                  >
+                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${discoverable ? 'left-[22px]' : 'left-0.5'}`} />
+                  </button>
+                </div>
+                <p className="mt-2 text-[0.72rem] leading-relaxed text-brand-muted">
+                  Etwas anderes als das Verzeichnis: EchoB-Nutzer:innen können dich <span className="font-medium text-navy">in der App</span> per
+                  Name/Fachrichtung finden und dir vertraulich ihren Fall freigeben – erst <span className="font-medium text-navy">nach deiner Bestätigung</span>.
+                </p>
               </div>
             </div>
           </div>
@@ -297,6 +352,15 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
       {hint && <p className="mt-0.5 mb-3 text-[0.78rem] text-brand-muted">{hint}</p>}
       <div className={hint ? '' : 'mt-3'}>{children}</div>
     </section>
+  )
+}
+
+function MdHint() {
+  return (
+    <p className="mt-1.5 text-[0.72rem] text-brand-muted">
+      Formatierung möglich: Links <code className="rounded bg-brand-bg px-1">[Text](https://…)</code> ·
+      Aufzählung mit <code className="rounded bg-brand-bg px-1">-</code> am Zeilenanfang.
+    </p>
   )
 }
 

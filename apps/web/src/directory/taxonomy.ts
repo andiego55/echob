@@ -25,6 +25,10 @@ export function professionLabel(slug: string | null | undefined): string {
   return PROF_LABEL[slug] ?? slug.replace(/-/g, ' ')
 }
 
+export function professionLabels(slugs: string[] | null | undefined): string[] {
+  return (slugs ?? []).map(professionLabel)
+}
+
 export const FORMATS: { slug: string; label: string }[] = [
   { slug: 'praxis', label: 'Vor Ort (Praxis)' },
   { slug: 'online', label: 'Online' },

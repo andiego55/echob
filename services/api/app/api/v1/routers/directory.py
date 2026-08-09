@@ -48,6 +48,7 @@ async def search(
     city: str | None = Query(default=None, max_length=80),
     format: str | None = Query(default=None, max_length=20),
     free_intro: bool = Query(default=False),
+    bills: bool = Query(default=False),
     page: int = Query(default=1, ge=1, le=200),
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> DirectorySearchResponse:
@@ -55,7 +56,7 @@ async def search(
     limit = 24
     total, items = await directory_service.search_listings(
         pool, q=q, profession=profession, city=city, fmt=format,
-        free_intro=free_intro, limit=limit, offset=(page - 1) * limit,
+        free_intro=free_intro, bills=bills, limit=limit, offset=(page - 1) * limit,
     )
     return DirectorySearchResponse(total=total, items=items)
 

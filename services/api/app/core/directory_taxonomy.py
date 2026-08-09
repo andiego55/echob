@@ -38,6 +38,10 @@ def profession_label(slug: str | None) -> str:
     return PROFESSIONS.get(slug, slug.replace("-", " ").title())
 
 
+def profession_labels(slugs: list[str] | None) -> list[str]:
+    return [profession_label(s) for s in (slugs or [])]
+
+
 def format_label(slug: str) -> str:
     return FORMATS.get(slug, slug.title())
 

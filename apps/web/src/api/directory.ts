@@ -5,12 +5,15 @@ export interface DirectoryCard {
   display_name: string
   profession: string
   profession_label: string
+  professions: string[]
+  profession_labels: string[]
   title: string | null
   city: string
   city_slug: string
   tier: string
   verified: boolean
   contactable: boolean
+  bills_insurance: boolean
   photo_url: string | null
   headline: string | null
   focus_areas: string[]
@@ -54,6 +57,7 @@ export interface DirectorySearchParams {
   city?: string
   format?: string
   free_intro?: boolean
+  bills?: boolean
   page?: number
 }
 
@@ -90,6 +94,8 @@ export interface DirectoryMe {
   slug: string
   display_name: string
   profession: string
+  professions: string[]
+  bills_insurance: boolean
   title: string | null
   city: string
   postal_code: string | null
@@ -120,6 +126,8 @@ export interface DirectoryMe {
 export interface DirectoryProfilePayload {
   display_name: string
   profession: string
+  professions: string[]
+  bills_insurance: boolean
   title?: string | null
   city?: string | null
   postal_code?: string | null
@@ -170,6 +178,7 @@ export interface AdminListingRow {
   tier: string
   published: boolean
   verified: boolean
+  bills_insurance: boolean
   contact_email: string | null
   website: string | null
   phone: string | null
@@ -202,6 +211,7 @@ export interface AdminListingUpdate {
   tier?: string
   published?: boolean
   verified?: boolean
+  bills_insurance?: boolean
 }
 
 export interface AdminInviteResult {

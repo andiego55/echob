@@ -16,6 +16,7 @@ from app.core.directory_taxonomy import (
     TIERS,
     is_contactable,
     profession_label,
+    profession_labels,
 )
 from app.core.logging import get_logger
 from app.schemas.directory import (
@@ -47,23 +48,36 @@ _ORDER = (
 )
 
 
+def _profs(r: asyncpg.Record) -> list[str]:
+    ps = list(r["professions"] or [])
+    if not ps and r["profession"]:
+        ps = [r["profession"]]
+    return ps
+
+
 def _card(r: asyncpg.Record) -> DirectoryCard:
+    profs = _profs(r)
     return DirectoryCard(
         slug=r["slug"], display_name=r["display_name"], profession=r["profession"],
-        profession_label=profession_label(r["profession"]), title=r["title"],
-        city=r["city"], city_slug=r["city_slug"], tier=r["tier"], verified=r["verified"],
-        contactable=is_contactable(r["tier"]), photo_url=r["photo_url"],
+        profession_label=profession_label(r["profession"]),
+        professions=profs, profession_labels=profession_labels(profs),
+        title=r["title"], city=r["city"], city_slug=r["city_slug"], tier=r["tier"],
+        verified=r["verified"], contactable=is_contactable(r["tier"]),
+        bills_insurance=r["bills_insurance"], photo_url=r["photo_url"],
         headline=r["headline"], focus_areas=list(r["focus_areas"] or []),
         formats=list(r["formats"] or []), offers_free_intro=r["offers_free_intro"],
     )
 
 
 def _detail(r: asyncpg.Record) -> DirectoryDetail:
+    profs = _profs(r)
     return DirectoryDetail(
         slug=r["slug"], display_name=r["display_name"], profession=r["profession"],
-        profession_label=profession_label(r["profession"]), title=r["title"],
-        city=r["city"], city_slug=r["city_slug"], tier=r["tier"], verified=r["verified"],
-        contactable=is_contactable(r["tier"]), photo_url=r["photo_url"], headline=r["headline"],
+        profession_label=profession_label(r["profession"]),
+        professions=profs, profession_labels=profession_labels(profs),
+        title=r["title"], city=r["city"], city_slug=r["city_slug"], tier=r["tier"],
+        verified=r["verified"], contactable=is_contactable(r["tier"]),
+        bills_insurance=r["bills_insurance"], photo_url=r["photo_url"], headline=r["headline"],
         focus_areas=list(r["focus_areas"] or []), formats=list(r["formats"] or []),
         offers_free_intro=r["offers_free_intro"], postal_code=r["postal_code"], state=r["state"],
         website=r["website"], phone=r["phone"], about=r["about"], approach=r["approach"],
@@ -75,7 +89,7 @@ def _detail(r: asyncpg.Record) -> DirectoryDetail:
 async def search_listings(
     pool: asyncpg.Pool, *, q: str | None = None, profession: str | None = None,
     city: str | None = None, fmt: str | None = None, free_intro: bool = False,
-    limit: int = 24, offset: int = 0,
+    bills: bool = False, limit: int = 24, offset: int = 0,
 ) -> tuple[int, list[DirectoryCard]]:
     where = ["published = true"]
     params: list[object] = []
@@ -86,7 +100,8 @@ async def search_listings(
         where.append(f"(display_name ILIKE ${i} OR city ILIKE ${i} OR title ILIKE ${i})")
     if profession:
         params.append(profession)
-        where.append(f"profession = ${len(params)}")
+        i = len(params)
+        where.append(f"(${i} = ANY(professions) OR profession = ${i})")
     if city:
         params.append(city)
         where.append(f"city_slug = ${len(params)}")
@@ -95,6 +110,8 @@ async def search_listings(
         where.append(f"${len(params)} = ANY(formats)")
     if free_intro:
         where.append("offers_free_intro = true")
+    if bills:
+        where.append("bills_insurance = true")
 
     where_sql = " AND ".join(where)
     async with pool.acquire() as conn:
@@ -120,8 +137,9 @@ async def get_listing(pool: asyncpg.Pool, slug: str) -> DirectoryDetail | None:
 async def get_facets(pool: asyncpg.Pool) -> DirectoryFacets:
     async with pool.acquire() as conn:
         prof_rows = await conn.fetch(
-            "SELECT profession, count(*) AS c FROM directory_listings "
-            "WHERE published GROUP BY profession"
+            "SELECT p AS profession, count(*) AS c FROM directory_listings, "
+            "  unnest(CASE WHEN professions <> '{}' THEN professions ELSE ARRAY[profession] END) AS p "
+            "WHERE published AND p <> '' GROUP BY p"
         )
         city_rows = await conn.fetch(
             "SELECT city_slug, max(city) AS city, count(*) AS c FROM directory_listings "
@@ -259,6 +277,7 @@ def _me(row: asyncpg.Record) -> DirectoryMe:
     missing_required = [label for key, label in _REQUIRED if not (row[key] or "").strip()]
     return DirectoryMe(
         slug=row["slug"], display_name=row["display_name"], profession=row["profession"],
+        professions=list(row["professions"] or []), bills_insurance=row["bills_insurance"],
         title=row["title"], city=row["city"] or "", postal_code=row["postal_code"], state=row["state"],
         website=row["website"], phone=row["phone"], contact_email=row["contact_email"],
         photo_url=row["photo_url"], headline=row["headline"], about=row["about"], approach=row["approach"],
@@ -307,12 +326,13 @@ async def update_my_listing(
 
     city = _clean(p.city)
     contact_email = (_clean(p.contact_email) or "").lower() or None
+    profs = [x for x in p.professions if x in PROFESSIONS][:5]
 
     if p.published:
         missing = []
         if not _clean(p.display_name):
             missing.append("Name")
-        if not _clean(p.profession):
+        if not profs:
             missing.append("Fachrichtung")
         if not city:
             missing.append("Ort")
@@ -325,7 +345,8 @@ async def update_my_listing(
         row = await conn.fetchrow(
             """
             UPDATE directory_listings SET
-              display_name = $2, profession = $3, title = $4, city = $5, city_slug = $6,
+              display_name = $2, profession = $3, professions = $22, bills_insurance = $23,
+              title = $4, city = $5, city_slug = $6,
               postal_code = $7, state = $8, website = $9, phone = $10, contact_email = $11,
               headline = $12, about = $13, approach = $14, fees = $15,
               focus_areas = $16, formats = $17, languages = $18,
@@ -335,7 +356,7 @@ async def update_my_listing(
             WHERE claimed_by_user_id = $1
             RETURNING *
             """,
-            user_id, _clean(p.display_name) or "Meine Praxis", _clean(p.profession) or "",
+            user_id, _clean(p.display_name) or "Meine Praxis", (profs[0] if profs else ""),
             _clean(p.title), city or "", _slugify(city) if city else "",
             _clean(p.postal_code), _clean(p.state), _clean(p.website), _clean(p.phone), contact_email,
             _clean(p.headline), _clean(p.about), _clean(p.approach), _clean(p.fees),
@@ -343,6 +364,7 @@ async def update_my_listing(
             [f for f in p.formats if f in ("praxis", "online", "telefon")],
             [t.strip() for t in p.languages if t.strip()][:8],
             p.offers_free_intro, _clean(p.booking_url), p.published,
+            profs, bool(p.bills_insurance),
         )
     return _me(row)
 
@@ -373,6 +395,7 @@ def _admin_row(r: asyncpg.Record) -> AdminListingRow:
         profession=r["profession"], profession_label=profession_label(r["profession"]),
         title=r["title"], city=r["city"], postal_code=r["postal_code"], state=r["state"],
         tier=r["tier"], published=r["published"], verified=r["verified"],
+        bills_insurance=r["bills_insurance"],
         contact_email=r["contact_email"], website=r["website"], phone=r["phone"],
         claimed=r["claimed_by_user_id"] is not None, claim_sent_at=r["claim_sent_at"],
     )
@@ -395,15 +418,16 @@ async def admin_list(pool: asyncpg.Pool, status: str | None = None) -> list[Admi
 async def admin_create(pool: asyncpg.Pool, p: AdminListingCreate) -> AdminListingRow:
     async with pool.acquire() as conn:
         slug = await _unique_slug(conn, _slugify(f"{p.display_name}-{p.city}"))
+        prof = _clean(p.profession) or ""
         row = await conn.fetchrow(
             """
             INSERT INTO directory_listings
-              (slug, display_name, profession, title, city, city_slug, postal_code, state,
+              (slug, display_name, profession, professions, title, city, city_slug, postal_code, state,
                website, phone, contact_email, tier, published)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'researched',true)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'researched',true)
             RETURNING *
             """,
-            slug, _clean(p.display_name) or "", _clean(p.profession) or "", _clean(p.title),
+            slug, _clean(p.display_name) or "", prof, [prof] if prof else [], _clean(p.title),
             _clean(p.city) or "", _slugify(p.city or ""), _clean(p.postal_code), _clean(p.state),
             _clean(p.website), _clean(p.phone), (_clean(p.contact_email) or "").lower() or None,
         )
@@ -432,12 +456,17 @@ async def admin_update(pool: asyncpg.Pool, listing_id: str, p: AdminListingUpdat
         add("city_slug", _slugify(fields["city"] or ""))
     if "contact_email" in fields:
         add("contact_email", (_clean(fields["contact_email"]) or "").lower() or None)
+    if "profession" in fields:
+        pv = _clean(fields["profession"]) or ""
+        add("professions", [pv] if pv else [])
     if "tier" in fields:
         add("tier", fields["tier"])
     if "published" in fields:
         add("published", bool(fields["published"]))
     if "verified" in fields:
         add("verified", bool(fields["verified"]))
+    if "bills_insurance" in fields:
+        add("bills_insurance", bool(fields["bills_insurance"]))
 
     async with pool.acquire() as conn:
         if not sets:
