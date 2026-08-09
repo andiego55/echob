@@ -137,7 +137,7 @@ export default function UeberMissionPage() {
             Für Fachpersonen heißt das: mehr Wirkung in der Zeit, die man hat – und Klient:innen, die zwischen den
             Sitzungen nicht allein sind. <span className="text-navy">EchoB ist die Brücke, nicht der Ersatz.</span>
           </p>
-          <Link to="/fachpersonen" className="mt-6 inline-block text-accent font-medium hover:underline no-underline">
+          <Link to="/fuer-fachpersonen" className="mt-6 inline-block text-accent font-medium hover:underline no-underline">
             EchoB für Fachpersonen →
           </Link>
         </div>

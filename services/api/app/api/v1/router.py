@@ -12,6 +12,8 @@ from app.api.v1.routers import (
     cases,
     client_invites,
     contact,
+    directory,
+    directory_profile,
     echo,
     health,
     hypotheses,
@@ -51,6 +53,10 @@ v1_router.include_router(health.router)
 # ── Phase 0: Warteliste + Kontakt ─────────────────────────────────────────────
 v1_router.include_router(waitlist.router)
 v1_router.include_router(contact.router)
+
+# ── Fachpersonen-Verzeichnis (öffentlich, "Fachperson finden") ─────────────────
+v1_router.include_router(directory.router)
+v1_router.include_router(directory_profile.router)  # authentifiziert: /directory/me
 
 # ── Phase 1: Kern-App ─────────────────────────────────────────────────────────
 v1_router.include_router(cases.router)

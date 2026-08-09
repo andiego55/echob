@@ -52,6 +52,14 @@
            hover:shadow-brand-lg hover:-translate-y-0.5;
   }
 
+  /* ── Formularfelder ──────────────────────────────────────────── */
+  .input {
+    @apply w-full rounded-brand-sm border border-brand-border bg-white px-3.5 py-2.5
+           text-[0.9rem] text-navy placeholder:text-brand-muted/60
+           transition-colors focus:border-accent focus:outline-none
+           focus:ring-2 focus:ring-accent/20;
+  }
+
   /* ── Safety Notice ───────────────────────────────────────────── */
   .safety-notice {
     @apply bg-[#eef5fb] border border-[#c0d8ed] border-l-4 border-l-[#3b6a9a]

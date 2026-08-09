@@ -21,9 +21,14 @@ export const ROUTE_META: Record<string, PageMeta> = {
   '/': { title: DEFAULT_TITLE, description: DEFAULT_DESC },
 
   '/fachpersonen': {
+    title: 'Fachperson finden: Paartherapie, Coaching & Beratung – EchoB',
+    description:
+      'Finde die passende Fachperson – Paartherapeut:innen, Schematherapeut:innen, Coaches und Berater:innen. Kuratiertes Verzeichnis mit Filtern nach Ort, Schwerpunkt und Setting. Oder lass dir von EchoB in einem Erstgespräch direkt weiterhelfen.',
+  },
+  '/fuer-fachpersonen': {
     title: 'Für Fachpersonen – EchoB',
     description:
-      'EchoB für Therapie, Beratung und Coaching: ein Arbeitsplatz mit ausschließlich freigegebenem Fallkontext, KI-gestützten Berichten und Sitzungsnotizen – streng einwilligungsbasiert.',
+      'EchoB für Therapie, Beratung und Coaching: ein Arbeitsplatz mit ausschließlich freigegebenem Fallkontext, KI-gestützten Berichten und Sitzungsnotizen – streng einwilligungsbasiert. Kostenlos ins Fachpersonen-Verzeichnis eintragen.',
   },
   '/ausbildungsinstitute': {
     title: 'EchoB für Ausbildungsinstitute – am Fall ausbilden',

@@ -398,7 +398,7 @@ export default function AusbildungPage() {
               className="btn-primary"
               label="Demo für Ihr Institut" heading="Demo für Ausbildungsinstitute anfragen"
               kind="demo" source="ausbildung_cta" />
-            <Link to="/fachpersonen" className="btn bg-white text-navy border-2 border-transparent hover:border-navy/20">
+            <Link to="/fuer-fachpersonen" className="btn bg-white text-navy border-2 border-transparent hover:border-navy/20">
               EchoB für Fachpersonen
             </Link>
           </div>

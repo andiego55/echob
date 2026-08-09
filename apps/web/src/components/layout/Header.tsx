@@ -86,13 +86,6 @@ const WISSEN_FEATURES = [
   },
 ]
 
-const NAV_SIMPLE = [
-  { to: '/',             label: 'Start' },
-  { to: '/coaching',     label: 'Coaching' },
-  { to: '/fachpersonen', label: 'Fachpersonen' },
-  { to: '/ueber',        label: 'Über' },
-]
-
 const LINK_CLS = (active: boolean) =>
   `text-[0.88rem] font-medium no-underline transition-colors duration-150 ${
     active ? 'text-white' : 'text-white/70 hover:text-white'
@@ -108,6 +101,10 @@ export default function Header() {
     location.pathname.startsWith('/selbsttests') ||
     location.pathname.startsWith('/kompatibilitaet')
   const ueberActive = location.pathname.startsWith('/ueber')
+  const fachpersonenActive =
+    location.pathname === '/fachpersonen' ||
+    location.pathname.startsWith('/fachpersonen/') ||
+    location.pathname.startsWith('/fuer-fachpersonen')
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-navy border-b border-white/[0.07]">
@@ -212,12 +209,49 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Fachpersonen */}
-          {NAV_SIMPLE.slice(2, 3).map(({ to, label }) => (
-            <NavLink key={to} to={to} end className={({ isActive }) => LINK_CLS(isActive)}>
-              {label}
+          {/* Fachpersonen mit Dropdown */}
+          <div className="relative group">
+            <NavLink
+              to="/fachpersonen"
+              end
+              className={() => LINK_CLS(fachpersonenActive) + ' flex items-center gap-1'}
+            >
+              Fachpersonen
+              <svg
+                className="w-3 h-3 opacity-60 transition-transform group-hover:rotate-180"
+                fill="none"
+                viewBox="0 0 12 12"
+              >
+                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </NavLink>
-          ))}
+
+            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3
+                            opacity-0 pointer-events-none
+                            group-hover:opacity-100 group-hover:pointer-events-auto
+                            transition-opacity duration-150 z-50">
+              <div className="w-[320px] rounded-brand-lg border border-brand-border bg-white shadow-2xl overflow-hidden p-2">
+                <Link to="/fachpersonen" className="flex items-start gap-3 rounded-brand-sm p-3 no-underline transition-colors hover:bg-brand-bg">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-[18px] w-[18px]"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" /></svg>
+                  </span>
+                  <span>
+                    <p className="text-[0.9rem] font-bold text-navy">Fachperson finden</p>
+                    <p className="mt-0.5 text-[0.75rem] leading-snug text-brand-muted">Therapeut:innen, Coaches & Berater:innen im Verzeichnis suchen.</p>
+                  </span>
+                </Link>
+                <Link to="/fuer-fachpersonen" className="flex items-start gap-3 rounded-brand-sm p-3 no-underline transition-colors hover:bg-brand-bg">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-[18px] w-[18px]"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                  </span>
+                  <span>
+                    <p className="text-[0.9rem] font-bold text-navy">Für Fachpersonen</p>
+                    <p className="mt-0.5 text-[0.75rem] leading-snug text-brand-muted">EchoB als Arbeitsplatz – oder kostenlos ins Verzeichnis eintragen.</p>
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
 
           {/* Ausbildung */}
           <NavLink to="/ausbildungsinstitute" end className={({ isActive }) => LINK_CLS(isActive)}>

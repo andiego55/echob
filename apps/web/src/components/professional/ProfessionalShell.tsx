@@ -29,6 +29,7 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
           <nav className="hidden md:flex items-center gap-1">
             {[
               { to: '/professional/dashboard', label: 'Dashboard',    end: false },
+              { to: '/professional/profil',    label: 'Profil',       end: false },
               { to: '/professional/templates', label: 'Ressourcen',   end: false },
               { to: '/professional/report-templates', label: 'Berichtsvorlagen', end: false },
               { to: '/professional',           label: 'Postfach',     end: true },

@@ -16,6 +16,8 @@ import UeberMissionPage     from '@/pages/UeberMissionPage'
 import GruenderInterviewPage from '@/pages/GruenderInterviewPage'
 import TeamPage             from '@/pages/TeamPage'
 import FachpersonenPage     from '@/pages/FachpersonenPage'
+import FachpersonenFindenPage from '@/pages/FachpersonenFindenPage'
+import FachpersonProfilePage from '@/pages/FachpersonProfilePage'
 import AusbildungPage       from '@/pages/AusbildungPage'
 import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
@@ -97,6 +99,7 @@ import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage
 import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboardPage'
 import ProfessionalTemplatesPage from '@/pages/professional/ProfessionalTemplatesPage'
 import ProfessionalSettingsPage  from '@/pages/professional/ProfessionalSettingsPage'
+import ProfessionalProfilePage   from '@/pages/professional/ProfessionalProfilePage'
 import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalReportTemplatesPage'
 import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
 import CoupleEchoPage from '@/pages/professional/CoupleEchoPage'
@@ -178,7 +181,9 @@ export function AppRoutes() {
       <Route path="/ueber/mission" element={<UeberMissionPage />} />
       <Route path="/ueber/gruender" element={<GruenderInterviewPage />} />
       <Route path="/ueber/team" element={<TeamPage />} />
-      <Route path="/fachpersonen" element={<FachpersonenPage />} />
+      <Route path="/fachpersonen" element={<FachpersonenFindenPage />} />
+      <Route path="/fachpersonen/:slug" element={<FachpersonProfilePage />} />
+      <Route path="/fuer-fachpersonen" element={<FachpersonenPage />} />
       <Route path="/ausbildungsinstitute" element={<AusbildungPage />} />
       <Route path="/wissen"                          element={<WissenPage />} />
       <Route path="/wissen/:slug"                    element={<ContentPage />} />
@@ -231,6 +236,7 @@ export function AppRoutes() {
       <Route path="/professional/dashboard" element={<ProfessionalRoute><ProfessionalDashboardPage /></ProfessionalRoute>} />
       <Route path="/professional/templates" element={<ProfessionalRoute><ProfessionalTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/settings" element={<ProfessionalRoute><ProfessionalSettingsPage /></ProfessionalRoute>} />
+      <Route path="/professional/profil" element={<ProfessionalRoute><ProfessionalProfilePage /></ProfessionalRoute>} />
       <Route path="/professional/report-templates" element={<ProfessionalRoute><ProfessionalReportTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
