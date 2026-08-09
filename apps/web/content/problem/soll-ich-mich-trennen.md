@@ -45,4 +45,6 @@ Dass du keine klare Antwort findest, heißt nicht, dass mit dir etwas nicht stim
 - **Angst von Wunsch trennen:** Bleibst du, weil du willst – oder weil du dich vor dem Danach fürchtest?
 - **Eine Situation nach der anderen** ehrlich ansehen, statt „alles" auf einmal.
 
+Wenn du dein Erleben lieber strukturiert sortieren möchtest, statt im Kreis zu grübeln, kann der [Selbsttest „Bleiben oder gehen?"](/selbsttests/bleiben-oder-gehen) dir helfen: Er spiegelt dir in mehreren Bereichen zurück – von der Belastung bis zu der Frage, was dich eigentlich hält –, was gerade Gewicht hat, ohne dir eine Antwort vorzuschreiben.
+
 Die Merkmale, die beim Abwägen helfen, findest du unter [Trennen oder bleiben?](/wissen/trennen-oder-bleiben); den größeren Zusammenhang unter [Sich trennen](/wissen/sich-trennen). Und wenn du dich nicht sicher fühlst oder dich die Frage verzweifeln lässt, hol dir bitte Unterstützung – das ist keine Schwäche, sondern klug.

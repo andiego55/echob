@@ -2340,6 +2340,36 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "und-wie-geht-es-dir",
+    "title": "Und wie geht es dir?",
+    "description": "Eine fiktive Szene: Eine alte Freundin fragt „Wie geht es dir?\" – nicht euch, dir. Und zum ersten Mal seit Langem merkt sie, dass sie die Antwort nicht kennt. Über das leise Verschwinden in einer Beziehung.",
+    "cluster": "grenzen",
+    "updated": "2026-08-08",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Marlenes Sicht",
+    "pull_quote": "Und wie geht es dir?, fragt sie noch einmal. Nicht uns. Dir. Und ich sitze da und merke, dass ich die Antwort nicht weiß.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Hast du dich in deiner Beziehung selbst manchmal aus den Augen verloren? Magst du erzählen, an welcher Situation dir das zuletzt aufgefallen ist?"
+    },
+    "scene_tags": [
+      "selbstverlust",
+      "anpassung",
+      "fawning",
+      "erschoepfung",
+      "selbstzweifel",
+      "grenze"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/und-wie-geht-es-dir"
+  },
+  {
+    "type": "scene",
     "slug": "unter-der-wut",
     "title": "Unter der Wut",
     "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv.",
@@ -2477,6 +2507,36 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "auf-eierschalen-gehen"
     ],
     "url": "/szenen/wo-bist-du-gerade"
+  },
+  {
+    "type": "scene",
+    "slug": "zwischen-bleiben-und-gehen",
+    "title": "Zwischen Bleiben und Gehen",
+    "description": "Eine fiktive Szene: der Moment am Küchentisch, in dem sie längst weiß, dass etwas nicht stimmt – und trotzdem nicht gehen kann. Über die Zerrissenheit, die von außen niemand sieht.",
+    "cluster": "trennung",
+    "updated": "2026-08-08",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Janas Sicht",
+    "pull_quote": "Wäre es wirklich so schlimm, wäre ich doch längst gegangen, denke ich. Aber ich gehe nicht. Und besser wird es auch nicht.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du dieses Hin- und Hergerissensein zwischen Bleiben und Gehen? Magst du erzählen, woran es sich bei dir festmacht?"
+    },
+    "scene_tags": [
+      "zerrissenheit",
+      "verlustangst",
+      "erschoepfung",
+      "entscheidung",
+      "wiederkehrendes-muster",
+      "selbstzweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/zwischen-bleiben-und-gehen"
   },
   {
     "type": "scene",
@@ -3317,6 +3377,45 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "sich-selbst-verlieren",
+    "title": "Sich selbst verlieren in der Beziehung – und den Weg zurückfinden",
+    "description": "Wenn du nur noch funktionierst, dich ständig anpasst und kaum noch spürst, was du selbst willst: woran Selbstverlust erkennbar ist, wie es dazu kommt und welche ersten Schritte zurück zu dir führen. Ohne Diagnose.",
+    "cluster": "grenzen",
+    "search_intent": "sich selbst verlieren in der Beziehung",
+    "updated": "2026-08-08",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Hast du das Gefühl, dich in deiner Beziehung selbst aus den Augen verloren zu haben? Möchtest du gemeinsam anschauen, wo das angefangen hat?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Woran merke ich, dass ich mich in der Beziehung verliere?",
+        "answer": "Ein deutliches Zeichen ist, wenn du zuerst weißt, was der andere will, und erst danach – wenn überhaupt – merkst, was du selbst willst. Auch wenn deine Stimmung fast vollständig von seiner oder ihrer Stimmung abhängt, wenn Hobbys, Freundschaften und eigene Meinungen leiser geworden sind und du dich oft für Dinge entschuldigst, die keine Schuld sind, deutet das auf schleichenden Selbstverlust hin."
+      },
+      {
+        "question": "Ist es nicht normal, in einer Beziehung Kompromisse zu machen?",
+        "answer": "Doch, und gesunde Beziehungen leben von Rücksicht und Entgegenkommen. Der Unterschied liegt in der Richtung: Beim gesunden Kompromiss geben beide etwas und bekommen etwas. Beim Selbstverlust gibst überwiegend du – und mit der Zeit nicht nur einzelne Wünsche, sondern das Gespür dafür, wer du eigentlich bist."
+      },
+      {
+        "question": "Muss ich mich trennen, um wieder zu mir zu finden?",
+        "answer": "Nicht zwangsläufig. Der Weg zurück beginnt nicht mit einem großen Bruch, sondern damit, wieder zu spüren, was du selbst willst, und es in kleinen Schritten ernst zu nehmen. Ob das innerhalb der Beziehung möglich ist, zeigt sich oft erst, wenn du anfängst, wieder Raum für dich einzunehmen."
+      }
+    ],
+    "url": "/wissen/sich-selbst-verlieren"
+  },
+  {
+    "type": "topic",
     "slug": "sich-trennen",
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",
     "description": "Warum die Trennungsfrage so schwer ist, welche Zweifel dazugehören und wie du Schritt für Schritt zu mehr Klarheit findest – ohne dass dir jemand die Entscheidung abnimmt.",
@@ -3756,6 +3855,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/und-wie-geht-es-dir": {
+    "title": "Und wie geht es dir?",
+    "description": "Eine fiktive Szene: Eine alte Freundin fragt „Wie geht es dir?\" – nicht euch, dir. Und zum ersten Mal seit Langem merkt sie, dass sie die Antwort nicht kennt. Über das leise Verschwinden in einer Beziehung."
+  },
   "/szenen/unter-der-wut": {
     "title": "Unter der Wut",
     "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv."
@@ -3775,6 +3878,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/wo-bist-du-gerade": {
     "title": "Wo bist du gerade?",
     "description": "Eine Szene über Kontrolle und Eifersucht – wenn Fürsorge zur Überwachung wird und dein Radius Woche für Woche kleiner. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/zwischen-bleiben-und-gehen": {
+    "title": "Zwischen Bleiben und Gehen",
+    "description": "Eine fiktive Szene: der Moment am Küchentisch, in dem sie längst weiß, dass etwas nicht stimmt – und trotzdem nicht gehen kann. Über die Zerrissenheit, die von außen niemand sieht."
   },
   "/szenen/zwischen-himmel-und-abgrund": {
     "title": "Zwischen Himmel und Abgrund",
@@ -3863,6 +3970,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/schwierige-gespraeche-fuehren": {
     "title": "Schwierige Gespräche führen: heikle Themen ansprechen, ohne dass es eskaliert",
     "description": "Wie man ein belastendes Thema anspricht, ohne dass es in Streit oder Rückzug kippt – mit einem klaren Einstieg, Timing und dem Unterschied zwischen Vorwurf und Bitte. Ohne Diagnose."
+  },
+  "/wissen/sich-selbst-verlieren": {
+    "title": "Sich selbst verlieren in der Beziehung – und den Weg zurückfinden",
+    "description": "Wenn du nur noch funktionierst, dich ständig anpasst und kaum noch spürst, was du selbst willst: woran Selbstverlust erkennbar ist, wie es dazu kommt und welche ersten Schritte zurück zu dir führen. Ohne Diagnose."
   },
   "/wissen/sich-trennen": {
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",

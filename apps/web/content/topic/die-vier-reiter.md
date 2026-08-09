@@ -45,3 +45,5 @@ Irgendwann macht einer dicht – schweigt, schaut weg, verlässt innerlich den R
 ## Der Ausweg liegt nicht in Perfektion
 
 Alle vier Reiter reiten mal durch jede Beziehung. Es geht nicht darum, sie völlig zu vermeiden, sondern sie zu erkennen und ihnen etwas entgegenzusetzen. Entscheidend ist das Verhältnis: viel mehr Wärme, Wertschätzung und gelungene Reparatur als Gift. Dann tragen Beziehungen auch heftige Stürme.
+
+Wenn du herausfinden möchtest, welcher der vier Reiter bei euch am häufigsten mitreitet, kannst du das im [Selbsttest „Wie streitet ihr? Die vier Reiter im Test"](/selbsttests/streitmuster) für dich sortieren – nicht als Urteil über eure Beziehung, sondern als Ausgangspunkt, um genauer hinzuschauen, wo ihr ansetzen könnt.
