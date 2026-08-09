@@ -104,6 +104,18 @@ async def get_optional_user(
         return None
 
 
+def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
+    """Nur der konfigurierte Admin (settings.admin_user_id) darf durch.
+
+    Für das Verzeichnis-Admin (Fachpersonen recherchieren/anlegen/einladen).
+    Leerer admin_user_id oder abweichende user_id → 403.
+    """
+    from app.core.config import settings
+    if not settings.admin_user_id or current_user["user_id"] != settings.admin_user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Kein Admin-Zugriff.")
+    return current_user
+
+
 async def get_current_professional(
     current_user: dict = Depends(get_current_user),
     pool: asyncpg.Pool = Depends(get_pool),

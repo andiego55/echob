@@ -100,6 +100,9 @@ import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboar
 import ProfessionalTemplatesPage from '@/pages/professional/ProfessionalTemplatesPage'
 import ProfessionalSettingsPage  from '@/pages/professional/ProfessionalSettingsPage'
 import ProfessionalProfilePage   from '@/pages/professional/ProfessionalProfilePage'
+import AdminDirectoryPage        from '@/pages/admin/AdminDirectoryPage'
+import RegionalPage              from '@/pages/RegionalPage'
+import { REGION_PROFESSIONS }    from '@/directory/regions'
 import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalReportTemplatesPage'
 import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
 import CoupleEchoPage from '@/pages/professional/CoupleEchoPage'
@@ -184,6 +187,10 @@ export function AppRoutes() {
       <Route path="/fachpersonen" element={<FachpersonenFindenPage />} />
       <Route path="/fachpersonen/:slug" element={<FachpersonProfilePage />} />
       <Route path="/fuer-fachpersonen" element={<FachpersonenPage />} />
+      {/* SEO-Regionalseiten: /<profession>/:city (z. B. /paartherapie/kassel) */}
+      {REGION_PROFESSIONS.map((p) => (
+        <Route key={p.slug} path={`/${p.slug}/:city`} element={<RegionalPage professionSlug={p.slug} />} />
+      ))}
       <Route path="/ausbildungsinstitute" element={<AusbildungPage />} />
       <Route path="/wissen"                          element={<WissenPage />} />
       <Route path="/wissen/:slug"                    element={<ContentPage />} />
@@ -237,6 +244,7 @@ export function AppRoutes() {
       <Route path="/professional/templates" element={<ProfessionalRoute><ProfessionalTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/settings" element={<ProfessionalRoute><ProfessionalSettingsPage /></ProfessionalRoute>} />
       <Route path="/professional/profil" element={<ProfessionalRoute><ProfessionalProfilePage /></ProfessionalRoute>} />
+      <Route path="/admin/verzeichnis" element={<ProtectedRoute><AdminDirectoryPage /></ProtectedRoute>} />
       <Route path="/professional/report-templates" element={<ProfessionalRoute><ProfessionalReportTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />

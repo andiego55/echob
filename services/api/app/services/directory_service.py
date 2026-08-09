@@ -10,13 +10,19 @@ import time
 
 import asyncpg
 
+from app.core.config import settings
 from app.core.directory_taxonomy import (
     PROFESSIONS,
+    TIERS,
     is_contactable,
     profession_label,
 )
 from app.core.logging import get_logger
 from app.schemas.directory import (
+    AdminInviteResult,
+    AdminListingCreate,
+    AdminListingRow,
+    AdminListingUpdate,
     ContactAck,
     DirectoryCard,
     DirectoryContactCreate,
@@ -357,3 +363,135 @@ async def set_my_photo(pool: asyncpg.Pool, user_id: str, data: bytes, content_ty
             user_id, url,
         )
     return url
+
+
+# ── Admin (Verzeichnis aufbauen + Fachpersonen einladen) ─────────────────────
+
+def _admin_row(r: asyncpg.Record) -> AdminListingRow:
+    return AdminListingRow(
+        id=str(r["id"]), slug=r["slug"], display_name=r["display_name"],
+        profession=r["profession"], profession_label=profession_label(r["profession"]),
+        title=r["title"], city=r["city"], postal_code=r["postal_code"], state=r["state"],
+        tier=r["tier"], published=r["published"], verified=r["verified"],
+        contact_email=r["contact_email"], website=r["website"], phone=r["phone"],
+        claimed=r["claimed_by_user_id"] is not None, claim_sent_at=r["claim_sent_at"],
+    )
+
+
+async def admin_list(pool: asyncpg.Pool, status: str | None = None) -> list[AdminListingRow]:
+    where = {
+        "researched": "WHERE tier = 'researched'",
+        "claimed": "WHERE claimed_by_user_id IS NOT NULL",
+        "published": "WHERE published",
+        "invited": "WHERE claim_sent_at IS NOT NULL",
+    }.get(status or "", "")
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"SELECT * FROM directory_listings {where} ORDER BY created_at DESC LIMIT 500"
+        )
+    return [_admin_row(r) for r in rows]
+
+
+async def admin_create(pool: asyncpg.Pool, p: AdminListingCreate) -> AdminListingRow:
+    async with pool.acquire() as conn:
+        slug = await _unique_slug(conn, _slugify(f"{p.display_name}-{p.city}"))
+        row = await conn.fetchrow(
+            """
+            INSERT INTO directory_listings
+              (slug, display_name, profession, title, city, city_slug, postal_code, state,
+               website, phone, contact_email, tier, published)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'researched',true)
+            RETURNING *
+            """,
+            slug, _clean(p.display_name) or "", _clean(p.profession) or "", _clean(p.title),
+            _clean(p.city) or "", _slugify(p.city or ""), _clean(p.postal_code), _clean(p.state),
+            _clean(p.website), _clean(p.phone), (_clean(p.contact_email) or "").lower() or None,
+        )
+    return _admin_row(row)
+
+
+async def admin_update(pool: asyncpg.Pool, listing_id: str, p: AdminListingUpdate) -> AdminListingRow | None:
+    if p.tier is not None and p.tier not in TIERS:
+        raise ValueError("Ungültige Stufe.")
+    fields = p.model_dump(exclude_unset=True)
+    notnull = {"display_name", "profession", "city"}
+    sets: list[str] = []
+    params: list[object] = []
+
+    def add(col: str, val: object) -> None:
+        params.append(val)
+        sets.append(f"{col} = ${len(params)}")
+
+    for col in ("display_name", "profession", "title", "city", "postal_code", "state", "website", "phone"):
+        if col in fields:
+            val = _clean(fields[col])
+            if val is None and col in notnull:
+                val = ""
+            add(col, val)
+    if "city" in fields:
+        add("city_slug", _slugify(fields["city"] or ""))
+    if "contact_email" in fields:
+        add("contact_email", (_clean(fields["contact_email"]) or "").lower() or None)
+    if "tier" in fields:
+        add("tier", fields["tier"])
+    if "published" in fields:
+        add("published", bool(fields["published"]))
+    if "verified" in fields:
+        add("verified", bool(fields["verified"]))
+
+    async with pool.acquire() as conn:
+        if not sets:
+            row = await conn.fetchrow("SELECT * FROM directory_listings WHERE id = $1", listing_id)
+            return _admin_row(row) if row else None
+        params.append(listing_id)
+        row = await conn.fetchrow(
+            f"UPDATE directory_listings SET {', '.join(sets)}, updated_at = NOW() "
+            f"WHERE id = ${len(params)} RETURNING *",
+            *params,
+        )
+    return _admin_row(row) if row else None
+
+
+async def admin_delete(pool: asyncpg.Pool, listing_id: str) -> bool:
+    async with pool.acquire() as conn:
+        res = await conn.execute("DELETE FROM directory_listings WHERE id = $1", listing_id)
+    return res != "DELETE 0"
+
+
+async def admin_invite(
+    pool: asyncpg.Pool, supabase, listing_id: str, email_override: str | None
+) -> AdminInviteResult:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT id, display_name, contact_email FROM directory_listings WHERE id = $1",
+            listing_id,
+        )
+    if not row:
+        return AdminInviteResult(ok=False, email="", detail="Eintrag nicht gefunden.")
+    email = (email_override or row["contact_email"] or "").strip().lower()
+    if "@" not in email:
+        return AdminInviteResult(ok=False, email=email, detail="Keine gültige E-Mail hinterlegt.")
+
+    redirect_to = f"{settings.frontend_url.rstrip('/')}/auth?role=professional"
+    try:
+        resp = supabase.auth.admin.invite_user_by_email(
+            email,
+            {"redirect_to": redirect_to,
+             "data": {"pending_role": "professional", "needs_password": True}},
+        )
+        user_id = resp.user.id
+    except Exception as exc:  # noqa: BLE001 — meist: Konto existiert bereits
+        logger.warning("Verzeichnis-Einladung fehlgeschlagen (%s): %s", email, exc)
+        return AdminInviteResult(
+            ok=False, email=email,
+            detail="Einladung fehlgeschlagen – evtl. existiert für diese E-Mail schon ein Konto.",
+        )
+
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE directory_listings SET claimed_by_user_id = $1, claim_sent_at = NOW(), "
+            "updated_at = NOW() WHERE id = $2",
+            user_id, listing_id,
+        )
+    logger.info("Verzeichnis-Einladung versendet + Listing zugeordnet: %s", listing_id)
+    return AdminInviteResult(ok=True, email=email)

@@ -134,3 +134,62 @@ class DirectoryMe(BaseModel):
 
 class PhotoResult(BaseModel):
     photo_url: str
+
+
+# ── Admin (Gründer: Fachpersonen recherchieren, anlegen, einladen) ────────────
+
+class AdminListingRow(BaseModel):
+    id: str
+    slug: str
+    display_name: str
+    profession: str
+    profession_label: str
+    title: str | None = None
+    city: str
+    postal_code: str | None = None
+    state: str | None = None
+    tier: str
+    published: bool
+    verified: bool
+    contact_email: str | None = None
+    website: str | None = None
+    phone: str | None = None
+    claimed: bool
+    claim_sent_at: datetime | None = None
+
+
+class AdminListingCreate(BaseModel):
+    display_name: str = Field(min_length=1, max_length=120)
+    profession: str
+    city: str = Field(min_length=1, max_length=80)
+    title: str | None = None
+    postal_code: str | None = None
+    state: str | None = None
+    website: str | None = None
+    phone: str | None = None
+    contact_email: str | None = None
+
+
+class AdminListingUpdate(BaseModel):
+    display_name: str | None = None
+    profession: str | None = None
+    title: str | None = None
+    city: str | None = None
+    postal_code: str | None = None
+    state: str | None = None
+    website: str | None = None
+    phone: str | None = None
+    contact_email: str | None = None
+    tier: str | None = None
+    published: bool | None = None
+    verified: bool | None = None
+
+
+class AdminInvite(BaseModel):
+    email: str | None = None
+
+
+class AdminInviteResult(BaseModel):
+    ok: bool
+    email: str
+    detail: str | None = None

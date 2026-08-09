@@ -13,6 +13,7 @@ from app.api.v1.routers import (
     client_invites,
     contact,
     directory,
+    directory_admin,
     directory_profile,
     echo,
     health,
@@ -57,6 +58,7 @@ v1_router.include_router(contact.router)
 # ── Fachpersonen-Verzeichnis (öffentlich, "Fachperson finden") ─────────────────
 v1_router.include_router(directory.router)
 v1_router.include_router(directory_profile.router)  # authentifiziert: /directory/me
+v1_router.include_router(directory_admin.router)    # nur Admin: /directory/admin
 
 # ── Phase 1: Kern-App ─────────────────────────────────────────────────────────
 v1_router.include_router(cases.router)

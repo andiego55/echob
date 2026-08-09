@@ -154,3 +154,75 @@ export const directoryProfileApi = {
       .then((r) => r.data)
   },
 }
+
+// ── Admin (Gründer) ──────────────────────────────────────────────────────────
+
+export interface AdminListingRow {
+  id: string
+  slug: string
+  display_name: string
+  profession: string
+  profession_label: string
+  title: string | null
+  city: string
+  postal_code: string | null
+  state: string | null
+  tier: string
+  published: boolean
+  verified: boolean
+  contact_email: string | null
+  website: string | null
+  phone: string | null
+  claimed: boolean
+  claim_sent_at: string | null
+}
+
+export interface AdminListingCreate {
+  display_name: string
+  profession: string
+  city: string
+  title?: string
+  postal_code?: string
+  state?: string
+  website?: string
+  phone?: string
+  contact_email?: string
+}
+
+export interface AdminListingUpdate {
+  display_name?: string
+  profession?: string
+  title?: string
+  city?: string
+  postal_code?: string
+  state?: string
+  website?: string
+  phone?: string
+  contact_email?: string
+  tier?: string
+  published?: boolean
+  verified?: boolean
+}
+
+export interface AdminInviteResult {
+  ok: boolean
+  email: string
+  detail: string | null
+}
+
+export const directoryAdminApi = {
+  list: (status?: string) =>
+    apiClient
+      .get<AdminListingRow[]>('/directory/admin/listings', { params: status ? { status } : {} })
+      .then((r) => r.data),
+  create: (payload: AdminListingCreate) =>
+    apiClient.post<AdminListingRow>('/directory/admin/listings', payload).then((r) => r.data),
+  update: (id: string, payload: AdminListingUpdate) =>
+    apiClient.patch<AdminListingRow>(`/directory/admin/listings/${id}`, payload).then((r) => r.data),
+  remove: (id: string) =>
+    apiClient.delete(`/directory/admin/listings/${id}`).then((r) => r.data),
+  invite: (id: string, email?: string) =>
+    apiClient
+      .post<AdminInviteResult>(`/directory/admin/listings/${id}/invite`, { email })
+      .then((r) => r.data),
+}

@@ -7,6 +7,7 @@
 
 import { CONTENT_ROUTE_META } from '@/content/manifest.generated'
 import { SELFTEST_ROUTE_META } from '@/selftests'
+import { REGION_ROUTE_META } from '@/directory/regions'
 
 const SITE = 'https://echo-b.de'
 
@@ -110,10 +111,10 @@ export const ROUTE_META: Record<string, PageMeta> = {
 }
 
 /** Alle öffentlichen Metadaten: statische Routen + generierte Content-Seiten + Selbsttests. */
-const ALL_META: Record<string, PageMeta> = { ...ROUTE_META, ...CONTENT_ROUTE_META, ...SELFTEST_ROUTE_META }
+const ALL_META: Record<string, PageMeta> = { ...ROUTE_META, ...CONTENT_ROUTE_META, ...SELFTEST_ROUTE_META, ...REGION_ROUTE_META }
 
 /** Login-/App-Bereiche sollen nicht indexiert werden. */
-const NOINDEX_RE = /^\/(app|professional|auth|pseudonym|einladung|reflektieren)(\/|$)/
+const NOINDEX_RE = /^\/(app|professional|admin|auth|pseudonym|einladung|reflektieren)(\/|$)/
 
 export type Head = { title: string; description: string; url: string; robots: string }
 

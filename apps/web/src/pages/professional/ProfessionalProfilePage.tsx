@@ -104,6 +104,16 @@ export default function ProfessionalProfilePage() {
           </p>
         </header>
 
+        {!form.published && !!form.profession && form.display_name !== 'Meine Praxis' && (
+          <div className="mb-6 rounded-brand-lg border border-accent/25 bg-accent/[0.06] px-5 py-4">
+            <p className="text-[0.9rem] font-bold text-navy">Willkommen bei EchoB</p>
+            <p className="mt-1 text-[0.85rem] leading-relaxed text-brand-muted">
+              Wir haben dein Profil aus öffentlich verfügbaren Angaben schon vorbereitet. Ergänze ein Foto
+              und ein paar Sätze – und schalte es mit einem Klick öffentlich. Der Eintrag ist und bleibt kostenlos.
+            </p>
+          </div>
+        )}
+
         <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
           {/* Formular */}
           <div className="order-2 space-y-5 lg:order-1">

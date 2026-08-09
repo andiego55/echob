@@ -46,6 +46,11 @@ class Settings(BaseSettings):
     # ── Datenbank ──────────────────────────────────────────────────────
     database_url: str = ""
 
+    # ── Admin ──────────────────────────────────────────────────────────
+    # Supabase-user_id des Gründers/Admins. Nur dieser Account darf das
+    # Verzeichnis-Admin (Fachpersonen anlegen/einladen) nutzen. Leer = Admin aus.
+    admin_user_id: str = ""
+
     # ── Auth / Sicherheit ──────────────────────────────────────────────
     secret_key: str = _INSECURE_KEY
     # Feldverschlüsselung sensibler Freitexte (Art. 32). Fernet-Key (urlsafe-base64).
