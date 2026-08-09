@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useMutation } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { Link } from 'react-router-dom'
@@ -120,7 +121,9 @@ function LeadModal({ kind, heading, source, onClose }: {
     })
   }
 
-  return (
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[120] flex items-start justify-center overflow-y-auto bg-navy/60 p-4 backdrop-blur-sm sm:p-8"
       onClick={onClose}
@@ -223,6 +226,7 @@ function LeadModal({ kind, heading, source, onClose }: {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

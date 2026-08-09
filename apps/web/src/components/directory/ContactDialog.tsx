@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useMutation } from '@tanstack/react-query'
 import { directoryApi, type DirectoryContactPayload } from '@/api/directory'
 import { FORMATS } from '@/directory/taxonomy'
@@ -45,7 +46,9 @@ export default function ContactDialog({ slug, name, offersFreeIntro, onClose }: 
 
   const valid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())
 
-  return (
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-end justify-center bg-navy/50 p-0 backdrop-blur-sm sm:items-center sm:p-6"
       onClick={onClose}
@@ -138,6 +141,7 @@ export default function ContactDialog({ slug, name, offersFreeIntro, onClose }: 
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
