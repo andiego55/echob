@@ -6,6 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import Avatar from '@/components/Avatar'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { casesApi } from '@/api/cases'
 import { scenesApi } from '@/api/scenes'
@@ -72,14 +73,18 @@ export default function CaseDetailPage() {
         {/* Fall-Header */}
         <div className="card mb-4">
           <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <span className="label mb-2">{RELATIONSHIP_TYPE_LABELS[c.relationship_type]}</span>
-              <h1 className="mt-2 text-xl font-bold text-navy">
-                {RELATIONSHIP_STATUS_LABELS[c.relationship_status]}
-              </h1>
-              <p className="mt-1 text-sm text-brand-muted">
-                Kontakt: {CONTACT_FREQUENCY_LABELS[c.contact_frequency]}
-              </p>
+            <div className="flex items-start gap-3.5">
+              <Avatar value={c.avatar} size="lg" />
+              <div>
+                <span className="label mb-2">{RELATIONSHIP_TYPE_LABELS[c.relationship_type]}</span>
+                <h1 className="mt-2 text-xl font-bold text-navy">
+                  {c.person_name?.trim() || RELATIONSHIP_STATUS_LABELS[c.relationship_status]}
+                </h1>
+                <p className="mt-1 text-sm text-brand-muted">
+                  {c.person_name?.trim() && <>{RELATIONSHIP_STATUS_LABELS[c.relationship_status]} · </>}
+                  Kontakt: {CONTACT_FREQUENCY_LABELS[c.contact_frequency]}
+                </p>
+              </div>
             </div>
             <div className="flex gap-2 flex-wrap shrink-0">
               <Link
@@ -134,18 +139,21 @@ export default function CaseDetailPage() {
             }
             to={`/app/cases/${caseId}/scenes`}
             cta={sceneCount === 0 ? 'Erste Szene festhalten' : 'Alle Szenen ansehen'}
+            icon={<QuickIcon><path d="M12 6.5C9.8 5.1 6.4 5.1 4 6v12c2.4-.9 5.8-.9 8 .5 2.2-1.4 5.6-1.4 8-.5V6c-2.4-.9-5.8-.9-8 .5Z" /><path d="M12 6.5V19" /></QuickIcon>}
           />
           <QuickCard
             title="Echo"
             value="Dein KI-Begleiter"
             to={`/app/cases/${caseId}/echo`}
             cta="Gespräch starten"
+            icon={<QuickIcon><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" /></QuickIcon>}
           />
           <QuickCard
             title="Berichte"
             value="Muster & Verlauf"
             to={`/app/cases/${caseId}/reports`}
             cta="Bericht erstellen"
+            icon={<QuickIcon><path d="M6 20V12M12 20V6M18 20v-5" /></QuickIcon>}
           />
         </div>
 
@@ -153,6 +161,7 @@ export default function CaseDetailPage() {
         <div className="mt-6">
           <PersonProfileCard
             caseId={caseId!}
+            avatar={c.avatar}
             hasModules={(personProfile?.completed_modules?.length ?? 0) > 0}
             summaryText={personProfile?.summary_text ?? null}
           />
@@ -267,8 +276,9 @@ function NextStepCard({ caseId, sceneCount, topicCount }: {
   )
 }
 
-function PersonProfileCard({ caseId, hasModules, summaryText }: {
+function PersonProfileCard({ caseId, avatar, hasModules, summaryText }: {
   caseId: string
+  avatar?: string | null
   hasModules: boolean
   summaryText: string | null
 }) {
@@ -279,7 +289,7 @@ function PersonProfileCard({ caseId, hasModules, summaryText }: {
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <div className="text-2xl mb-2">👤</div>
+          <Avatar value={avatar} size="lg" className="mb-2" />
           <p className="text-xs font-semibold text-brand-muted mb-1">Personenprofil</p>
           {hasModules ? (
             <>
@@ -632,11 +642,25 @@ function HypothesesOverviewCard({ caseId }: { caseId: string }) {
   )
 }
 
-function QuickCard({ title, value, to, cta }: {
-  title: string; value: string; to: string; cta: string
+function QuickIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {children}
+    </svg>
+  )
+}
+
+function QuickCard({ title, value, to, cta, icon }: {
+  title: string; value: string; to: string; cta: string; icon?: React.ReactNode
 }) {
   return (
-    <Link to={to} className="card block no-underline hover:border-accent/40 transition-all">
+    <Link to={to} className="card group block no-underline hover:border-accent/40 transition-all">
+      {icon && (
+        <span className="mb-3 grid h-10 w-10 place-items-center rounded-lg bg-accent/10 text-accent transition-colors group-hover:bg-accent group-hover:text-white">
+          {icon}
+        </span>
+      )}
       <p className="text-xs font-semibold text-brand-muted mb-1">{title}</p>
       <p className="text-sm font-medium text-navy mb-3">{value}</p>
       <span className="text-xs text-accent font-medium">{cta} →</span>

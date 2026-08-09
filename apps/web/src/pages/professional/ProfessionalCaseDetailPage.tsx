@@ -15,6 +15,7 @@ import AssignmentTypePanel from '@/components/professional/AssignmentTypePanel'
 import type { AssignmentType } from '@/api/collab'
 import AppointmentsPanel from '@/components/professional/AppointmentsPanel'
 import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
+import Avatar from '@/components/Avatar'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
@@ -60,8 +61,8 @@ const COLLAB_KEYS = COLLAB_TYPES.map(t => t.key) as string[]
 
 /** Zweite Headerleiste des Fall-Arbeitsplatzes – Stil wie die Nutzer-CaseNav.
  *  Links steht fest die aktuell gewählte Klient:in (bleibt beim Scrollen sichtbar). */
-function CaseWorkspaceNav({ active, onSelect, clientName }: {
-  active: TabKey; onSelect: (k: TabKey) => void; clientName: string
+function CaseWorkspaceNav({ active, onSelect, clientName, clientAvatar }: {
+  active: TabKey; onSelect: (k: TabKey) => void; clientName: string; clientAvatar?: string | null
 }) {
   return (
     <div className="border-b border-brand-border bg-white sticky top-14 z-30">
@@ -73,6 +74,7 @@ function CaseWorkspaceNav({ active, onSelect, clientName }: {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
+          <Avatar value={clientAvatar} size="sm" />
           <span className="text-sm font-semibold text-navy whitespace-nowrap">{clientName}</span>
         </div>
         <nav className="flex gap-0 overflow-x-auto flex-1 min-w-0" aria-label="Fall-Navigation">
@@ -353,19 +355,22 @@ export default function ProfessionalCaseDetailPage() {
 
   return (
     <ProfessionalShell>
-      <CaseWorkspaceNav active={tab} onSelect={setTab} clientName={bundle.client_display_name} />
+      <CaseWorkspaceNav active={tab} onSelect={setTab} clientName={bundle.client_display_name} clientAvatar={bundle.client_avatar} />
       <div className="mx-auto max-w-[1100px] px-6 py-10">
         {/* Fall-Kopf (Klient:in steht oben in der Leiste) */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-navy">
-            {bundle.case_title}
-            {bundle.is_demo && (
-              <span className="ml-2 align-middle px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">
-                Beispiel
-              </span>
-            )}
-          </h1>
-          <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
+        <div className="mb-6 flex items-start gap-3.5">
+          <Avatar value={bundle.case_avatar} size="lg" />
+          <div>
+            <h1 className="text-2xl font-bold text-navy">
+              {bundle.case_title}
+              {bundle.is_demo && (
+                <span className="ml-2 align-middle px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">
+                  Beispiel
+                </span>
+              )}
+            </h1>
+            <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
+          </div>
         </div>
         {bundle.is_demo && <DemoIntro onGoto={setTab} />}
         {!bundle.is_demo && !bundle.activated && <CaseActivationGate caseId={caseId!} />}

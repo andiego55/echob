@@ -85,16 +85,23 @@ async def get_case(
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CaseResponse:
-    """Einzelnen Fall abrufen."""
+    """Einzelnen Fall abrufen (inkl. Pseudonym + Avatar der Fallperson)."""
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT * FROM cases WHERE id = $1 AND user_id = $2",
+            """
+            SELECT c.*,
+                   (SELECT o.person_name FROM onboarding_answers o WHERE o.case_id = c.id LIMIT 1) AS person_name,
+                   (SELECT o.avatar FROM onboarding_answers o WHERE o.case_id = c.id LIMIT 1) AS avatar
+            FROM cases c WHERE c.id = $1 AND c.user_id = $2
+            """,
             case_id,
             current_user["user_id"],
         )
     if not row:
         raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
-    return CaseResponse(**dict(row))
+    d = dict(row)
+    d["person_name"] = crypto.decrypt(d.get("person_name"))  # Pseudonym entschlüsseln
+    return CaseResponse(**d)
 
 
 @router.patch("/{case_id}", response_model=CaseResponse)

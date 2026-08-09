@@ -1112,6 +1112,8 @@ export interface ActivationLogEntry {
 export interface SharedCaseBundle {
   case_id: string
   client_display_name: string
+  client_avatar?: string | null
+  case_avatar?: string | null
   case_title: string
   is_demo?: boolean
   activated?: boolean

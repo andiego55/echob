@@ -729,8 +729,12 @@ async def case_detail(
     async with pool.acquire() as conn:
         bundle = await load_shared_bundle(pid, case_id, conn)   # 404, wenn keine aktive Freigabe
         owner_row = await conn.fetchrow(
-            "SELECT display_name FROM user_profiles WHERE user_id = $1",
+            "SELECT display_name, avatar FROM user_profiles WHERE user_id = $1",
             bundle.share["owner_user_id"],
+        )
+        # Avatare (nicht sensibel, nur Emoji) – zur besseren Orientierung der Fachperson.
+        case_avatar = await conn.fetchval(
+            "SELECT avatar FROM onboarding_answers WHERE case_id = $1", case_id
         )
         note_row = await conn.fetchrow(
             "SELECT * FROM professional_notes WHERE professional_user_id = $1 AND case_id = $2",
@@ -747,6 +751,8 @@ async def case_detail(
     return {
         "case_id": str(case_id),
         "client_display_name": (owner_row["display_name"] if owner_row else None) or "Klient:in",
+        "client_avatar": (owner_row["avatar"] if owner_row else None),
+        "case_avatar": case_avatar,
         "case_title": _case_title(bundle.case.get("relationship_type") if bundle.case else None),
         "is_demo": bool(bundle.share.get("is_demo")),
         "activated": activated,

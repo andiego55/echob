@@ -76,7 +76,10 @@ export default function CasesOverviewPage() {
   const [pickerOpen, setPickerOpen] = useState(false)
   const saveAvatar = useMutation({
     mutationFn: (a: string) => profileApi.saveAvatar(a),
-    onSuccess: (updated) => qc.setQueryData(['profile'], updated),
+    onSuccess: (updated) => {
+      qc.setQueryData(['profile'], updated)
+      qc.invalidateQueries({ queryKey: ['profile'] })
+    },
   })
 
   const cases = data?.cases ?? []
