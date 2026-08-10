@@ -85,6 +85,7 @@ def _build_attention(assignments: list[dict], case_info: dict) -> list[dict]:
             "assignment_id": str(a["id"]),
             "case_id": str(a["case_id"]),
             "client_display_name": info["client_display_name"],
+            "client_avatar": info.get("client_avatar"),
             "kind": kind,
             "title": a.get("title") or _TITLE_BY_KIND.get(kind, ""),
             "detail": detail,
@@ -662,7 +663,7 @@ async def postfach(
     async with pool.acquire() as conn:
         share_rows = await conn.fetch(
             "SELECT s.case_id, s.created_at AS shared_at, c.relationship_type, "
-            "       up.display_name AS client_display_name "
+            "       up.display_name AS client_display_name, up.avatar AS client_avatar "
             "FROM case_shares s JOIN cases c ON c.id = s.case_id "
             "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
             "WHERE s.professional_user_id = $1 AND s.status = 'active' "
@@ -674,6 +675,7 @@ async def postfach(
         case_info = {
             r["case_id"]: {
                 "client_display_name": r["client_display_name"] or "Klient:in",
+                "client_avatar": r["client_avatar"],
                 "case_title": _case_title(r["relationship_type"]),
             }
             for r in share_rows
@@ -686,6 +688,7 @@ async def postfach(
         {
             "case_id": str(r["case_id"]),
             "client_display_name": r["client_display_name"] or "Klient:in",
+            "client_avatar": r["client_avatar"],
             "case_title": _case_title(r["relationship_type"]),
             "shared_at": r["shared_at"],
         }

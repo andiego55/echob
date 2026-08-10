@@ -90,6 +90,7 @@ export interface PostfachAttention {
   assignment_id: string
   case_id: string
   client_display_name: string
+  client_avatar?: string | null
   kind: 'questionnaire_answered' | 'dialog_summary' | 'message_reply'
   title: string
   detail: string
@@ -99,6 +100,7 @@ export interface PostfachAttention {
 export interface PostfachShare {
   case_id: string
   client_display_name: string
+  client_avatar?: string | null
   case_title: string
   shared_at: string
 }

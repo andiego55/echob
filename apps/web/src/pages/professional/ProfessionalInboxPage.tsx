@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { professionalApi, type PostfachAttention } from '@/api/professional'
 import { IconChat, IconClipboard, IconInbox, IconMail } from '@/components/professional/ProfIcons'
+import { avatarBg } from '@/utils/avatars'
 
 const KIND_ICON: Record<PostfachAttention['kind'], ReactNode> = {
   questionnaire_answered: <IconClipboard className="h-3 w-3" />,
@@ -37,6 +38,22 @@ function initials(name: string): string {
   if (p.length === 0) return '·'
   if (p.length === 1) return p[0].slice(0, 2).toUpperCase()
   return (p[0][0] + p[p.length - 1][0]).toUpperCase()
+}
+
+/** Klient:innen-Kreis: Tier-Avatar (Emoji auf Pastell) oder Initialen als Fallback. */
+function ClientAvatar({ avatar, name, className }: { avatar?: string | null; name: string; className?: string }) {
+  if (avatar) {
+    return (
+      <span className={`grid h-9 w-9 place-items-center rounded-full text-lg leading-none ${avatarBg(avatar)} ${className ?? ''}`} aria-hidden="true">
+        {avatar}
+      </span>
+    )
+  }
+  return (
+    <span className={`grid h-9 w-9 place-items-center rounded-full bg-accent/10 text-[11px] font-bold text-accent ${className ?? ''}`}>
+      {initials(name)}
+    </span>
+  )
 }
 
 /** Runder Akzent-„Öffnen"-Button (Pille) – identisch zum Dashboard. */
@@ -112,9 +129,7 @@ export default function ProfessionalInboxPage() {
                 >
                   <span className="flex items-center gap-3 min-w-0">
                     <span className="relative shrink-0">
-                      <span className="grid h-9 w-9 place-items-center rounded-full bg-accent/10 text-[11px] font-bold text-accent">
-                        {initials(a.client_display_name)}
-                      </span>
+                      <ClientAvatar avatar={a.client_avatar} name={a.client_display_name} />
                       <span className="absolute -bottom-1 -right-1 grid h-[18px] w-[18px] place-items-center rounded-full bg-brand-card text-accent shadow-sm ring-1 ring-brand-border">
                         {KIND_ICON[a.kind]}
                       </span>
@@ -151,9 +166,7 @@ export default function ProfessionalInboxPage() {
                 <Link key={s.case_id} to={`/professional/cases/${s.case_id}`}
                   className="group flex items-center justify-between gap-3 rounded-brand border border-brand-border bg-brand-card p-4 no-underline shadow-brand transition-all duration-200 hover:-translate-y-0.5 hover:shadow-brand-lg hover:border-accent/30">
                   <span className="flex items-center gap-3 min-w-0">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent/10 text-[11px] font-bold text-accent">
-                      {initials(s.client_display_name)}
-                    </span>
+                    <ClientAvatar avatar={s.client_avatar} name={s.client_display_name} className="shrink-0" />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold text-navy">{s.client_display_name}</span>
                       <span className="block text-xs text-brand-muted">{s.case_title} · freigegeben {fmtDate(s.shared_at)}</span>
