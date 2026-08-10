@@ -3,7 +3,7 @@ type: scene
 slug: fragst-du-gar-nicht
 title: "Fragst du gar nicht?"
 description: 'Eine fiktive Szene: zurück von einem Wochenende, voller Erlebnisse – und keine einzige Frage. Über Desinteresse ohne offene Aggression und das Gefühl, dass die eigene innere Welt beim Gegenüber kaum Neugier weckt.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

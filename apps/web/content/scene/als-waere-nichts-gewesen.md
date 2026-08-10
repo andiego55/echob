@@ -3,7 +3,7 @@ type: scene
 slug: als-waere-nichts-gewesen
 title: "Als wäre nichts gewesen"
 description: 'Eine fiktive Szene: Gestern der Satz „Ich gehe." Heute die Frage, ob noch Milch da ist. Kein Wort über gestern. Über Konflikte, die keine Reparatur bekommen – und die Einsamkeit, mit dem Geschehenen allein zu bleiben.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

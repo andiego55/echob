@@ -3,7 +3,7 @@ type: scene
 slug: zwei-wochen-ohne-sie
 title: "Zwei Wochen ohne sie"
 description: 'Eine fiktive Szene: Sie ist verreist, und in der Stille bemerkt er, wie sehr sein Körper sich entspannt. Die Erleichterung ist keine Laune – sie ist eine Information. Über Dauerstress, Ambivalenz und die Klarheit der Abwesenheit.'
-cluster: trennung
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

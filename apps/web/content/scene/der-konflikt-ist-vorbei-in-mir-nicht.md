@@ -3,7 +3,7 @@ type: scene
 slug: der-konflikt-ist-vorbei-in-mir-nicht
 title: "Der Konflikt ist vorbei. In mir nicht."
 description: 'Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist.'
-cluster: gefuehle
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

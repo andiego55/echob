@@ -3,7 +3,7 @@ type: scene
 slug: ein-gespraech-mit-mir-selbst
 title: "Ein Gespräch mit mir selbst"
 description: 'Eine fiktive Szene: Er trägt beide Enden des Gesprächs, denkt sich ihre Antworten dazu, weil echte selten kommen. Über einseitige Kommunikation und die Einsamkeit, neben jemandem zu leben, der nicht zurückspricht.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

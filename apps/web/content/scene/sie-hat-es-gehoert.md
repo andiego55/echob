@@ -3,7 +3,7 @@ type: scene
 slug: sie-hat-es-gehoert
 title: "Sie hat es gehört"
 description: 'Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

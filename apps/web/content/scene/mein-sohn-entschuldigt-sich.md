@@ -3,7 +3,7 @@ type: scene
 slug: mein-sohn-entschuldigt-sich
 title: "Mein Sohn entschuldigt sich"
 description: 'Eine fiktive Szene: Der kleine Junge sagt „Entschuldigung", noch bevor klar ist, ob etwas passiert ist – genau wie sein Vater. Über weitergegebene Muster und den Moment, in dem man das eigene Verhalten im Kind wiedererkennt.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

@@ -3,7 +3,7 @@ type: scene
 slug: wenn-hausarbeit-liebe-beweisen-soll
 title: "Wenn Hausarbeit Liebe beweisen soll"
 description: 'Eine fiktive Szene: Er hat gekocht, eingekauft, geputzt – eine Sache blieb liegen, und daran entzündet sich alles. Über bedingte Zuwendung und Aufgaben, die zum Beweis der Liebe werden.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

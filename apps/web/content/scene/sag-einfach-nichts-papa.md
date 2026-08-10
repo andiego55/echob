@@ -3,7 +3,7 @@ type: scene
 slug: sag-einfach-nichts-papa
 title: "Sag einfach nichts, Papa"
 description: 'Eine fiktive Szene: Ein Kind, das die Stimmung im Auto liest, bevor die Eltern es tun, und den Vater zum Schweigen bittet, um den Frieden zu retten. Über Kinder im Elternkonflikt und die Last, die sie tragen.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

@@ -3,7 +3,7 @@ type: scene
 slug: mein-ja-das-ein-nein-war
 title: "Mein Ja, das ein Nein war"
 description: 'Eine fiktive Szene: Er sagt Ja zu einem Wochenende, das er nicht will, und spürt in sich das Nein, das er nicht ausspricht. Über Selbstaufgabe durch Nachgeben und die Frage, wo die eigenen Wünsche geblieben sind.'
-cluster: selbstreflexion
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

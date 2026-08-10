@@ -3,7 +3,7 @@ type: scene
 slug: bevor-sie-es-merkt
 title: "Bevor sie es merkt"
 description: 'Eine fiktive Szene: Er räumt Fehler weg, bevor sie auffallen, und entschärft Situationen, bevor sie entstehen. Über vorauseilende Anpassung und ein Leben, das sich um die Vermeidung des nächsten Vorwurfs organisiert.'
-cluster: selbstreflexion
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

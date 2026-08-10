@@ -139,6 +139,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "double-bind",
+    "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
+    "description": "Ein Double Bind ist eine Zwickmühle aus zwei widersprüchlichen Botschaften, bei der jede Reaktion falsch ist – und das Benennen des Widerspruchs verboten scheint. Warum das so tief verunsichert. Ohne Diagnose.",
+    "cluster": "emotionaler-missbrauch",
+    "search_intent": "Double Bind Bedeutung Beziehung Beispiel",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über den Double Bind gelesen. Möchtest du eine Situation anschauen, in der du das Gefühl hattest, es egal wie falsch zu machen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist ein Double Bind einfach erklärt?",
+        "answer": "Eine Zwickmühle aus zwei widersprüchlichen Botschaften auf verschiedenen Ebenen – etwa Worte, die Ja sagen, und ein Ton, der Nein sagt. Egal, worauf du reagierst, du liegst falsch. Und den Widerspruch offen anzusprechen, ist auch nicht erlaubt."
+      },
+      {
+        "question": "Ist ein Double Bind immer Absicht?",
+        "answer": "Nicht unbedingt. Widersprüchliche Botschaften entstehen oft ungewollt. Belastend wird es, wenn sich das Muster wiederholt und du dich danach regelmäßig verunsichert und schuldig fühlst – unabhängig davon, ob eine Absicht dahintersteht."
+      }
+    ],
+    "url": "/glossar/double-bind"
+  },
+  {
+    "type": "glossary",
     "slug": "emotionale-erpressung",
     "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
     "description": "Emotionale Erpressung wirkt über Furcht, Verpflichtung und Schuld (FOG). Wie man erkennt, dass Zustimmung erzwungen statt frei gegeben ist – und warum das kein böser Wille sein muss. Ohne Diagnose.",
@@ -351,6 +385,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/gruebeln"
+  },
+  {
+    "type": "glossary",
+    "slug": "hypervigilanz",
+    "title": "Hypervigilanz – ständig in Alarmbereitschaft",
+    "description": "Hypervigilanz ist die dauerhafte innere Habachtstellung: das ständige Lesen von Stimmungen, das Vorwegnehmen von Ärger, das Gefühl, nie ganz entspannen zu können. Warum das eine Schutzreaktion ist – ohne Diagnose.",
+    "cluster": "emotionaler-missbrauch",
+    "search_intent": "Hypervigilanz Beziehung ständig angespannt",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Hypervigilanz gelesen. Möchtest du einer Situation nachgehen, in der du besonders wachsam warst, obwohl eigentlich nichts geschah?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was bedeutet Hypervigilanz in einer Beziehung?",
+        "answer": "Ein Zustand dauerhafter Wachsamkeit: Man liest ständig die Stimmung des Gegenübers, nimmt möglichen Ärger vorweg und passt sein Verhalten laufend an. Der Körper bleibt in Alarmbereitschaft, selbst wenn gerade nichts passiert."
+      },
+      {
+        "question": "Ist Hypervigilanz eine Krankheit?",
+        "answer": "Nein, sie ist zunächst eine Schutzreaktion des Nervensystems. Sie kann in belastenden Situationen entstehen und sich verselbstständigen. Wenn sie dich dauerhaft erschöpft, ist das ein guter Grund, dir Unterstützung zu holen – dieser Text stellt aber keine Diagnose."
+      }
+    ],
+    "url": "/glossar/hypervigilanz"
   },
   {
     "type": "glossary",
@@ -570,6 +638,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "parentifizierung",
+    "title": "Parentifizierung – wenn Kinder die Erwachsenen tragen",
+    "description": "Parentifizierung meint die Rollenumkehr, bei der ein Kind Verantwortung für die Gefühle oder Konflikte der Eltern übernimmt. Warum das überfordert, auch wenn es nach Reife aussieht. Ohne Diagnose.",
+    "cluster": "emotionaler-missbrauch",
+    "search_intent": "Parentifizierung Kind Bedeutung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Parentifizierung gelesen. Möchtest du anschauen, welche Rolle ein Kind in einer Situation trägt, die dich beschäftigt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist Parentifizierung?",
+        "answer": "Eine Umkehr der Rollen: Ein Kind übernimmt Aufgaben oder Verantwortung, die eigentlich zu den Erwachsenen gehören – emotional (Trösten, Vermitteln, Stimmung regulieren) oder praktisch. Es sorgt für die Eltern, statt umgekehrt."
+      },
+      {
+        "question": "Ist es schlimm, wenn ein Kind mal hilft?",
+        "answer": "Mithelfen und Verantwortung übernehmen ist gesund. Problematisch wird es, wenn ein Kind dauerhaft die emotionale Last der Erwachsenen trägt, deren Konflikte regeln soll oder für ihr Wohlbefinden zuständig gemacht wird – das überfordert, auch wenn es nach außen reif wirkt."
+      }
+    ],
+    "url": "/glossar/parentifizierung"
+  },
+  {
+    "type": "glossary",
     "slug": "persoenliche-grenzen",
     "title": "Persönliche Grenzen – die Linie zwischen dir und den anderen",
     "description": "Was persönliche Grenzen sind, welche Arten es gibt und warum sie kein Zeichen von Abweisung sind, sondern die Voraussetzung für echte Nähe. Ohne Diagnose.",
@@ -771,6 +873,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/selbstfuersorge"
+  },
+  {
+    "type": "glossary",
+    "slug": "taeter-opfer-umkehr",
+    "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
+    "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose.",
+    "cluster": "emotionaler-missbrauch",
+    "search_intent": "Täter-Opfer-Umkehr DARVO Beziehung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über die Täter-Opfer-Umkehr gelesen. Möchtest du eine Situation anschauen, nach der du dich am Ende entschuldigt hast, obwohl du verletzt worden warst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was bedeutet Täter-Opfer-Umkehr?",
+        "answer": "Wer ein Verhalten anspricht oder eine Verletzung benennt, wird selbst zum Schuldigen gemacht. Am Ende steht die Person, die etwas erlebt hat, als die da, die überreagiert, angreift oder alles verdreht – und entschuldigt sich womöglich sogar."
+      },
+      {
+        "question": "Wofür steht DARVO?",
+        "answer": "DARVO ist ein englisches Kürzel für ein häufiges Muster: Deny (leugnen), Attack (angreifen), Reverse Victim and Offender (Opfer und Täter vertauschen). Es beschreibt, wie aus einer Beschwerde ein Gegenangriff wird."
+      }
+    ],
+    "url": "/glossar/taeter-opfer-umkehr"
   },
   {
     "type": "glossary",
@@ -1072,7 +1208,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "als-waere-nichts-gewesen",
     "title": "Als wäre nichts gewesen",
     "description": "Eine fiktive Szene: Gestern der Satz „Ich gehe.\" Heute die Frage, ob noch Milch da ist. Kein Wort über gestern. Über Konflikte, die keine Reparatur bekommen – und die Einsamkeit, mit dem Geschehenen allein zu bleiben.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -1240,7 +1376,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "bevor-sie-es-merkt",
     "title": "Bevor sie es merkt",
     "description": "Eine fiktive Szene: Er räumt Fehler weg, bevor sie auffallen, und entschärft Situationen, bevor sie entstehen. Über vorauseilende Anpassung und ein Leben, das sich um die Vermeidung des nächsten Vorwurfs organisiert.",
-    "cluster": "selbstreflexion",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -1576,7 +1712,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "der-konflikt-ist-vorbei-in-mir-nicht",
     "title": "Der Konflikt ist vorbei. In mir nicht.",
     "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist.",
-    "cluster": "gefuehle",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -1689,7 +1825,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "der-schluessel-im-schloss",
     "title": "Der Schlüssel im Schloss",
     "description": "Eine fiktive Szene: Am Geräusch des Heimkommens liest er schon ab, welcher Abend es wird. Über Hypervigilanz, das ständige Lesen der Stimmung und einen Alltag auf Habachtstellung.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -1993,7 +2129,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "ein-gespraech-mit-mir-selbst",
     "title": "Ein Gespräch mit mir selbst",
     "description": "Eine fiktive Szene: Er trägt beide Enden des Gesprächs, denkt sich ihre Antworten dazu, weil echte selten kommen. Über einseitige Kommunikation und die Einsamkeit, neben jemandem zu leben, der nicht zurückspricht.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2050,7 +2186,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "entschuldigung-damit-es-aufhoert",
     "title": "Entschuldigung, damit es aufhört",
     "description": "Eine fiktive Szene: Er entschuldigt sich für etwas, das er nicht getan hat – nicht aus Einsicht, sondern damit der Druck endet. Über Fawning, Konfliktvermeidung und erlernte Unterwerfung.",
-    "cluster": "selbstreflexion",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2107,7 +2243,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "erst-wenn-ich-liefere",
     "title": "Erst wenn ich liefere",
     "description": "Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2220,7 +2356,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "fragst-du-gar-nicht",
     "title": "Fragst du gar nicht?",
     "description": "Eine fiktive Szene: zurück von einem Wochenende, voller Erlebnisse – und keine einzige Frage. Über Desinteresse ohne offene Aggression und das Gefühl, dass die eigene innere Welt beim Gegenüber kaum Neugier weckt.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2582,10 +2718,39 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "in-der-therapie-war-ich-sicher",
+    "title": "In der Therapie war ich plötzlich sicher",
+    "description": "Eine fiktive Szene: Zum ersten Mal kann er zu Ende sprechen – weil eine dritte Person im Raum ist. Über die Anwesenheit einer Zeugin als Schutz, ohne dem Gegenüber Absicht zu unterstellen.",
+    "cluster": "emotionaler-missbrauch",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Benedikts Sicht",
+    "pull_quote": "Ich kann das hier sagen, weil jemand zusieht. Nicht, weil ich mutiger geworden bin. Sondern weil ein Dritter im Raum ist.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass du dich in Anwesenheit anderer sicherer fühlst, deine Sicht zu sagen? Magst du dem behutsam nachgehen?"
+    },
+    "scene_tags": [
+      "paartherapie",
+      "sicherer-raum",
+      "zeuge",
+      "machtasymmetrie",
+      "gespraechsabbruch"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/in-der-therapie-war-ich-sicher"
+  },
+  {
+    "type": "scene",
     "slug": "jede-stunde-muss-sich-rechnen",
     "title": "Jede Stunde muss sich rechnen",
     "description": "Eine fiktive Szene: Zehn Minuten zu spät, und schon muss er Rechenschaft ablegen, wo er war und mit wem. Über Kontrolle im Alltag und das Gefühl, über die eigene Zeit nicht mehr frei zu verfügen.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2779,7 +2944,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "mein-ja-das-ein-nein-war",
     "title": "Mein Ja, das ein Nein war",
     "description": "Eine fiktive Szene: Er sagt Ja zu einem Wochenende, das er nicht will, und spürt in sich das Nein, das er nicht ausspricht. Über Selbstaufgabe durch Nachgeben und die Frage, wo die eigenen Wünsche geblieben sind.",
-    "cluster": "selbstreflexion",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2808,7 +2973,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "mein-koerper-erinnert-sich",
     "title": "Mein Körper erinnert sich",
     "description": "Eine fiktive Szene: Eine harmlose Bewegung, ein bestimmter Tonfall – und er zuckt zusammen, ohne dass etwas passiert wäre. Über konditionierte Anspannung und einen Körper, der in Habachtstellung geblieben ist.",
-    "cluster": "gefuehle",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2837,7 +3002,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "mein-sohn-entschuldigt-sich",
     "title": "Mein Sohn entschuldigt sich",
     "description": "Eine fiktive Szene: Der kleine Junge sagt „Entschuldigung\", noch bevor klar ist, ob etwas passiert ist – genau wie sein Vater. Über weitergegebene Muster und den Moment, in dem man das eigene Verhalten im Kind wiedererkennt.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2866,7 +3031,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "mein-zimmer-im-haus",
     "title": "Mein Zimmer im Haus",
     "description": "Eine fiktive Szene: Das Haus ist groß, doch sein ganzes Leben passt auf zehn Quadratmeter. Niemand hat es verboten – er hat sich selbst immer kleiner gemacht. Über Coercive Control und schleichenden Raumverlust.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2978,7 +3143,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "niemand-hat-gratuliert",
     "title": "Niemand hat gratuliert",
     "description": "Eine fiktive Szene: Ein guter Tag, ein kleiner Erfolg – und zu Hause niemand, der sich mitfreut. Über fehlende Mitfreude und die besondere Einsamkeit, eine gute Nachricht nicht teilen zu können.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3035,7 +3200,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "sag-einfach-nichts-papa",
     "title": "Sag einfach nichts, Papa",
     "description": "Eine fiktive Szene: Ein Kind, das die Stimmung im Auto liest, bevor die Eltern es tun, und den Vater zum Schweigen bittet, um den Frieden zu retten. Über Kinder im Elternkonflikt und die Last, die sie tragen.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3064,7 +3229,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "sie-hat-es-gehoert",
     "title": "Sie hat es gehört",
     "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3093,7 +3258,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "sie-uebersetzt-fuer-uns",
     "title": "Sie übersetzt für uns",
     "description": "Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3116,6 +3281,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/sie-uebersetzt-fuer-uns"
+  },
+  {
+    "type": "scene",
+    "slug": "troeste-mich",
+    "title": "Tröste mich",
+    "description": "Eine fiktive Szene: Sie trifft ihn mit gezielten Sätzen, dann weint sie – und wirft ihm vor, sie nicht zu trösten. Über Rollenumkehr und die Zumutung, die Person zu regulieren, von der der Angriff ausging.",
+    "cluster": "emotionaler-missbrauch",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Timos Sicht",
+    "pull_quote": "Eben noch war ich der, der getroffen wurde. Jetzt bin ich der, der versagt – weil ich die nicht tröste, die mich gerade getroffen hat.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, den anderen trösten zu sollen, während du selbst noch verletzt bist? Magst du erzählen, wie sich das anfühlt?"
+    },
+    "scene_tags": [
+      "rollenumkehr",
+      "trostforderung",
+      "emotionale-ueberforderung",
+      "schuldumkehr",
+      "empathie"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/troeste-mich"
   },
   {
     "type": "scene",
@@ -3205,6 +3399,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "was-habe-ich-gerade-gesagt",
+    "title": "Was habe ich gerade gesagt?",
+    "description": "Eine fiktive Szene: Ihre Worte sagen Ja, ihr Gesicht sagt Nein – und als er auf das Nein reagiert, soll er ihre Worte wiederholen. Über den Double Bind und das Zweifeln an der eigenen Wahrnehmung.",
+    "cluster": "emotionaler-missbrauch",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Fabians Sicht",
+    "pull_quote": "Ich soll wählen zwischen dem, was ich gehört habe, und dem, was ich gesehen habe. Und was ich auch wähle – ich habe unrecht.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, in eine Frage zu geraten, auf die es keine richtige Antwort gibt? Magst du eine solche Situation behutsam anschauen?"
+    },
+    "scene_tags": [
+      "double-bind",
+      "wahrnehmungszweifel",
+      "nonverbale-kommunikation",
+      "gaslighting",
+      "auf-eierschalen-gehen"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/was-habe-ich-gerade-gesagt"
+  },
+  {
+    "type": "scene",
     "slug": "wenn-du-mich-lieben-wuerdest",
     "title": "Wenn du mich lieben würdest",
     "description": "Eine Szene über emotionale Erpressung – wenn Liebe zum Hebel wird und ein Nein plötzlich einen Preis hat. Aus der Ich-Perspektive, fiktiv.",
@@ -3236,7 +3459,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "wenn-hausarbeit-liebe-beweisen-soll",
     "title": "Wenn Hausarbeit Liebe beweisen soll",
     "description": "Eine fiktive Szene: Er hat gekocht, eingekauft, geputzt – eine Sache blieb liegen, und daran entzündet sich alles. Über bedingte Zuwendung und Aufgaben, die zum Beweis der Liebe werden.",
-    "cluster": "dynamiken",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3321,7 +3544,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "zwei-wochen-ohne-sie",
     "title": "Zwei Wochen ohne sie",
     "description": "Eine fiktive Szene: Sie ist verreist, und in der Stille bemerkt er, wie sehr sein Körper sich entspannt. Die Erleichterung ist keine Laune – sie ist eine Information. Über Dauerstress, Ambivalenz und die Klarheit der Abwesenheit.",
-    "cluster": "trennung",
+    "cluster": "emotionaler-missbrauch",
     "updated": "2026-08-10",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3722,6 +3945,66 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "emotionale-gewalt-gegen-maenner",
+    "title": "Wenn Männer emotionale Gewalt erleben",
+    "description": "Emotionale Gewalt trifft auch Männer – und wird bei ihnen besonders leicht übersehen. Über Rollenbilder, Scham und die Angst, nicht ernst genommen zu werden. Und darüber, dass es Hilfe gibt. Ohne Ferndiagnose.",
+    "cluster": "emotionaler-missbrauch",
+    "search_intent": "emotionale Gewalt gegen Männer Beziehung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast darüber gelesen, dass auch Männer emotionale Gewalt erleben. Möchtest du eine eigene Situation anschauen, die du bisher vielleicht kleingeredet hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "wahrnehmungszweifel",
+      "kontrolle",
+      "sich-klein-fuehlen"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "parent": "emotionaler-missbrauch",
+      "glossary": [
+        "coercive-control",
+        "fawning"
+      ],
+      "related": [
+        "emotionale-manipulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist emotionale Gewalt gegen Männer wirklich ein Thema?",
+        "answer": "Ja. Emotionale Gewalt ist nicht an ein Geschlecht gebunden. Männer erleben Kontrolle, Abwertung, Schuldumkehr und Vernachlässigung ebenso – berichten aber seltener davon und werden seltener ernst genommen. Dieser Text nimmt Frauen als Betroffene nicht weg, sondern ergänzt eine oft übersehene Seite."
+      },
+      {
+        "question": "Warum sprechen betroffene Männer so selten darüber?",
+        "answer": "Weil das Rollenbild dagegensteht: Ein Mann soll stark sein, sich wehren, so etwas nicht an sich heranlassen. Scham, die Angst, ausgelacht oder nicht geglaubt zu werden, und die Sorge um die Kinder halten viele davon ab, sich Hilfe zu holen."
+      },
+      {
+        "question": "An wen können sich betroffene Männer wenden?",
+        "answer": "Zum Beispiel an das bundesweite Hilfetelefon Gewalt an Männern (0800 123 9900) oder an eine Beratungsstelle in der Nähe. Bei akuter Gefahr gilt für alle der Notruf 110 / 112."
+      }
+    ],
+    "url": "/wissen/emotionale-gewalt-gegen-maenner"
+  },
+  {
+    "type": "topic",
     "slug": "emotionale-manipulation",
     "title": "Emotionale Manipulation in Beziehungen erkennen",
     "description": "Wie emotionale Manipulation funktioniert, welche Muster typisch sind und wie du deine eigene Wahrnehmung wieder ernst nimmst – vorsichtig erklärt, ohne Ferndiagnose.",
@@ -3765,6 +4048,127 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/emotionale-manipulation"
+  },
+  {
+    "type": "topic",
+    "slug": "emotionale-vernachlaessigung",
+    "title": "Emotionale Vernachlässigung: einsam in der Beziehung",
+    "description": "Wenn nichts Schlimmes passiert und du dich trotzdem tief allein fühlst: über die stille Form von emotionalem Mangel – kein Interesse, keine Fürsorge, keine geteilte Freude – und warum das keine Kleinigkeit ist.",
+    "cluster": "emotionaler-missbrauch",
+    "search_intent": "emotionale Vernachlässigung Beziehung einsam",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über emotionale Vernachlässigung gelesen. Möchtest du eine Situation anschauen, in der du dich neben deinem Gegenüber besonders allein gefühlt hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "bindung"
+    ],
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "einsamkeit-zu-zweit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "emotionaler-missbrauch",
+      "related": [
+        "sich-selbst-verlieren",
+        "verlustangst"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist emotionale Vernachlässigung schlimmer als Streit?",
+        "answer": "Sie ist anders, nicht harmloser. Streit ist wenigstens Kontakt. Bei anhaltender Vernachlässigung fehlt gerade das: Resonanz, Interesse, Fürsorge. Viele Betroffene beschreiben diese Stille als zermürbender als offenen Konflikt."
+      },
+      {
+        "question": "Verlange ich einfach zu viel Nähe?",
+        "answer": "Das Bedürfnis, gesehen zu werden, ist kein Zuviel – es ist ein menschliches Grundbedürfnis. Wenn du dich in deiner Beziehung dauerhaft allein fühlst, ist das ein ernstzunehmendes Signal, kein Charakterfehler und keine Überempfindlichkeit."
+      },
+      {
+        "question": "Kann man aus so einem Muster wieder herausfinden?",
+        "answer": "Manchmal ja – wenn beide es sehen wollen und bereit sind, Resonanz neu zu lernen, oft mit Unterstützung. Manchmal zeigt der ehrliche Blick auch, dass dauerhaft zu wenig zurückkommt. Beides darf zunächst nebeneinander stehen."
+      }
+    ],
+    "url": "/wissen/emotionale-vernachlaessigung"
+  },
+  {
+    "type": "topic",
+    "slug": "emotionaler-missbrauch",
+    "title": "Emotionaler Missbrauch: erkennen, einordnen, ernst nehmen",
+    "description": "Was emotionaler Missbrauch ist, welche Formen es gibt – von Kontrolle bis Vernachlässigung –, warum er so schwer zu sehen ist und wie du deine eigene Wahrnehmung wieder ernst nimmst. Vorsichtig erklärt, ohne Ferndiagnose.",
+    "cluster": "emotionaler-missbrauch",
+    "search_intent": "emotionaler Missbrauch Beziehung erkennen",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast gerade über emotionalen Missbrauch gelesen. Möchtest du behutsam eine Situation anschauen, nach der du dich kleiner oder verunsicherter gefühlt hast, als es sein sollte?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "wahrnehmungszweifel",
+      "kontrolle",
+      "emotionale-vernachlaessigung"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "children": [
+        "emotionale-vernachlaessigung",
+        "emotionale-gewalt-gegen-maenner"
+      ],
+      "glossary": [
+        "coercive-control",
+        "gaslighting",
+        "double-bind",
+        "taeter-opfer-umkehr",
+        "fawning"
+      ],
+      "related": [
+        "emotionale-manipulation",
+        "sich-selbst-verlieren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist jeder schwierige Streit schon emotionaler Missbrauch?",
+        "answer": "Nein. Konflikte, Fehler und verletzende Sätze gehören zu jeder Beziehung. Von Missbrauch spricht man erst bei einem wiederkehrenden Muster, das in eine Richtung zeigt: Dein Spielraum wird kleiner, dein Selbstvertrauen schwächer, und du zweifelst zunehmend an deiner eigenen Wahrnehmung."
+      },
+      {
+        "question": "Kann emotionaler Missbrauch ohne Absicht passieren?",
+        "answer": "Ja. Menschen verletzen manchmal, ohne es zu wollen. Für die Einordnung ist die Wirkung entscheidender als die Absicht: Es geht nicht darum, dem anderen etwas nachzuweisen, sondern darum, dein eigenes Erleben ernst zu nehmen und dich zu schützen."
+      },
+      {
+        "question": "Sind nur Frauen betroffen?",
+        "answer": "Nein. Emotionale Gewalt trifft Menschen jeden Geschlechts. Männer sprechen seltener darüber und werden seltener ernst genommen – was es für sie oft besonders schwer macht, das Erlebte überhaupt zu benennen."
+      }
+    ],
+    "url": "/wissen/emotionaler-missbrauch"
   },
   {
     "type": "topic",
@@ -4439,6 +4843,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose."
   },
+  "/glossar/double-bind": {
+    "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
+    "description": "Ein Double Bind ist eine Zwickmühle aus zwei widersprüchlichen Botschaften, bei der jede Reaktion falsch ist – und das Benennen des Widerspruchs verboten scheint. Warum das so tief verunsichert. Ohne Diagnose."
+  },
   "/glossar/emotionale-erpressung": {
     "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
     "description": "Emotionale Erpressung wirkt über Furcht, Verpflichtung und Schuld (FOG). Wie man erkennt, dass Zustimmung erzwungen statt frei gegeben ist – und warum das kein böser Wille sein muss. Ohne Diagnose."
@@ -4462,6 +4870,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/gruebeln": {
     "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
     "description": "Grübeln (Rumination) ist das kreisende Wiederholen derselben Gedanken ohne Lösung. Warum es sich nach Nachdenken anfühlt, aber die Wunde offen hält – und wie du den Kreis unterbrichst. Ohne Diagnose."
+  },
+  "/glossar/hypervigilanz": {
+    "title": "Hypervigilanz – ständig in Alarmbereitschaft",
+    "description": "Hypervigilanz ist die dauerhafte innere Habachtstellung: das ständige Lesen von Stimmungen, das Vorwegnehmen von Ärger, das Gefühl, nie ganz entspannen zu können. Warum das eine Schutzreaktion ist – ohne Diagnose."
   },
   "/glossar/ich-botschaft": {
     "title": "Ich-Botschaft – sagen, was in mir ist, ohne anzuklagen",
@@ -4487,6 +4899,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Metakommunikation – über das Reden reden",
     "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose."
   },
+  "/glossar/parentifizierung": {
+    "title": "Parentifizierung – wenn Kinder die Erwachsenen tragen",
+    "description": "Parentifizierung meint die Rollenumkehr, bei der ein Kind Verantwortung für die Gefühle oder Konflikte der Eltern übernimmt. Warum das überfordert, auch wenn es nach Reife aussieht. Ohne Diagnose."
+  },
   "/glossar/persoenliche-grenzen": {
     "title": "Persönliche Grenzen – die Linie zwischen dir und den anderen",
     "description": "Was persönliche Grenzen sind, welche Arten es gibt und warum sie kein Zeichen von Abweisung sind, sondern die Voraussetzung für echte Nähe. Ohne Diagnose."
@@ -4510,6 +4926,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/selbstfuersorge": {
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
     "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose."
+  },
+  "/glossar/taeter-opfer-umkehr": {
+    "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
+    "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose."
   },
   "/glossar/verachtung": {
     "title": "Verachtung – das gefährlichste Gift für eine Beziehung",
@@ -4759,6 +5179,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Immer die Große",
     "description": "Eine Szene über Parentifizierung – wenn man als Kind zur Stütze der Eltern wurde und als Erwachsene die erste Grenze wie Verrat fühlt. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/in-der-therapie-war-ich-sicher": {
+    "title": "In der Therapie war ich plötzlich sicher",
+    "description": "Eine fiktive Szene: Zum ersten Mal kann er zu Ende sprechen – weil eine dritte Person im Raum ist. Über die Anwesenheit einer Zeugin als Schutz, ohne dem Gegenüber Absicht zu unterstellen."
+  },
   "/szenen/jede-stunde-muss-sich-rechnen": {
     "title": "Jede Stunde muss sich rechnen",
     "description": "Eine fiktive Szene: Zehn Minuten zu spät, und schon muss er Rechenschaft ablegen, wo er war und mit wem. Über Kontrolle im Alltag und das Gefühl, über die eigene Zeit nicht mehr frei zu verfügen."
@@ -4835,6 +5259,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sie übersetzt für uns",
     "description": "Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden."
   },
+  "/szenen/troeste-mich": {
+    "title": "Tröste mich",
+    "description": "Eine fiktive Szene: Sie trifft ihn mit gezielten Sätzen, dann weint sie – und wirft ihm vor, sie nicht zu trösten. Über Rollenumkehr und die Zumutung, die Person zu regulieren, von der der Angriff ausging."
+  },
   "/szenen/und-wie-geht-es-dir": {
     "title": "Und wie geht es dir?",
     "description": "Eine fiktive Szene: Eine alte Freundin fragt „Wie geht es dir?\" – nicht euch, dir. Und zum ersten Mal seit Langem merkt sie, dass sie die Antwort nicht kennt. Über das leise Verschwinden in einer Beziehung."
@@ -4846,6 +5274,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/warum-ich-bleibe": {
     "title": "Warum ich bleibe",
     "description": "Eine Szene über Trauma-Bindung – wenn der Wechsel aus Verletzung und großer Versöhnung eine Nähe schafft, aus der man kaum herausfindet. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/was-habe-ich-gerade-gesagt": {
+    "title": "Was habe ich gerade gesagt?",
+    "description": "Eine fiktive Szene: Ihre Worte sagen Ja, ihr Gesicht sagt Nein – und als er auf das Nein reagiert, soll er ihre Worte wiederholen. Über den Double Bind und das Zweifeln an der eigenen Wahrnehmung."
   },
   "/szenen/wenn-du-mich-lieben-wuerdest": {
     "title": "Wenn du mich lieben würdest",
@@ -4907,9 +5339,21 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Eifersucht oder berechtigtes Bauchgefühl?",
     "description": "Nicht jede Eifersucht ist unbegründet – und nicht jedes Misstrauen trifft zu. Diese Merkmale helfen dir, ehrlicher hinzuschauen, ohne dich oder den anderen vorzuverurteilen."
   },
+  "/wissen/emotionale-gewalt-gegen-maenner": {
+    "title": "Wenn Männer emotionale Gewalt erleben",
+    "description": "Emotionale Gewalt trifft auch Männer – und wird bei ihnen besonders leicht übersehen. Über Rollenbilder, Scham und die Angst, nicht ernst genommen zu werden. Und darüber, dass es Hilfe gibt. Ohne Ferndiagnose."
+  },
   "/wissen/emotionale-manipulation": {
     "title": "Emotionale Manipulation in Beziehungen erkennen",
     "description": "Wie emotionale Manipulation funktioniert, welche Muster typisch sind und wie du deine eigene Wahrnehmung wieder ernst nimmst – vorsichtig erklärt, ohne Ferndiagnose."
+  },
+  "/wissen/emotionale-vernachlaessigung": {
+    "title": "Emotionale Vernachlässigung: einsam in der Beziehung",
+    "description": "Wenn nichts Schlimmes passiert und du dich trotzdem tief allein fühlst: über die stille Form von emotionalem Mangel – kein Interesse, keine Fürsorge, keine geteilte Freude – und warum das keine Kleinigkeit ist."
+  },
+  "/wissen/emotionaler-missbrauch": {
+    "title": "Emotionaler Missbrauch: erkennen, einordnen, ernst nehmen",
+    "description": "Was emotionaler Missbrauch ist, welche Formen es gibt – von Kontrolle bis Vernachlässigung –, warum er so schwer zu sehen ist und wie du deine eigene Wahrnehmung wieder ernst nimmst. Vorsichtig erklärt, ohne Ferndiagnose."
   },
   "/wissen/emotionen-regulieren": {
     "title": "Emotionen regulieren: mit starken Gefühlen umgehen, ohne sie wegzudrücken",

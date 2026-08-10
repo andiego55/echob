@@ -3,7 +3,7 @@ type: scene
 slug: der-schluessel-im-schloss
 title: "Der Schlüssel im Schloss"
 description: 'Eine fiktive Szene: Am Geräusch des Heimkommens liest er schon ab, welcher Abend es wird. Über Hypervigilanz, das ständige Lesen der Stimmung und einen Alltag auf Habachtstellung.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

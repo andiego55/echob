@@ -3,7 +3,7 @@ type: scene
 slug: sie-uebersetzt-fuer-uns
 title: "Sie übersetzt für uns"
 description: 'Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

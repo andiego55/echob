@@ -3,7 +3,7 @@ type: scene
 slug: entschuldigung-damit-es-aufhoert
 title: "Entschuldigung, damit es aufhört"
 description: 'Eine fiktive Szene: Er entschuldigt sich für etwas, das er nicht getan hat – nicht aus Einsicht, sondern damit der Druck endet. Über Fawning, Konfliktvermeidung und erlernte Unterwerfung.'
-cluster: selbstreflexion
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

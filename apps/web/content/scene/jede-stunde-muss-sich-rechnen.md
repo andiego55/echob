@@ -3,7 +3,7 @@ type: scene
 slug: jede-stunde-muss-sich-rechnen
 title: "Jede Stunde muss sich rechnen"
 description: 'Eine fiktive Szene: Zehn Minuten zu spät, und schon muss er Rechenschaft ablegen, wo er war und mit wem. Über Kontrolle im Alltag und das Gefühl, über die eigene Zeit nicht mehr frei zu verfügen.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

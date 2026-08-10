@@ -9,9 +9,11 @@ import { verliereIchMich } from './tests/verliere-ich-mich'
 import { streitmuster } from './tests/streitmuster'
 import { eifersuchtVertrauen } from './tests/eifersucht-vertrauen'
 import { loslassenNachTrennung } from './tests/loslassen-nach-trennung'
+import { emotionalerMissbrauch } from './tests/emotionaler-missbrauch'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
+  emotionalerMissbrauch,
   bleibenOderGehen,
   loslassenNachTrennung,
   belastendeMuster,

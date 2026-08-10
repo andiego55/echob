@@ -80,6 +80,8 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   'kind-im-elternkonflikt': 'Kind im Elternkonflikt',
   loyalitaetsdruck: 'Loyalitätsdruck',
   koerpergedaechtnis: 'Körpergedächtnis',
+  'emotionale-ueberforderung': 'Emotionale Überforderung',
+  gespraechsabbruch: 'Gesprächsabbruch',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */

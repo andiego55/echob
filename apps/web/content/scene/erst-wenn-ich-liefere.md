@@ -3,7 +3,7 @@ type: scene
 slug: erst-wenn-ich-liefere
 title: "Erst wenn ich liefere"
 description: 'Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

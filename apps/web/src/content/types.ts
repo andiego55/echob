@@ -20,6 +20,7 @@ export type ContentType = (typeof CONTENT_TYPES)[number]
 
 export const CLUSTERS = [
   'dynamiken', // Belastende Dynamiken
+  'emotionaler-missbrauch', // Emotionaler Missbrauch (Coercive Control, Vernachlässigung, subtile Gewalt)
   'bindung', // Bindung & Nähe
   'trennung', // Trennung
   'selbstreflexion', // Selbstreflexion
@@ -119,6 +120,7 @@ export function contentUrl(type: ContentType, slug: string): string {
 /** Anzeige-Label je Cluster (für Hub/Übersichten). */
 export const CLUSTER_LABELS: Record<Cluster, string> = {
   dynamiken: 'Belastende Dynamiken',
+  'emotionaler-missbrauch': 'Emotionaler Missbrauch',
   bindung: 'Bindung & Nähe',
   trennung: 'Trennung',
   selbstreflexion: 'Selbstreflexion',

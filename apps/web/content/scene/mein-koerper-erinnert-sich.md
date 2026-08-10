@@ -3,7 +3,7 @@ type: scene
 slug: mein-koerper-erinnert-sich
 title: "Mein Körper erinnert sich"
 description: 'Eine fiktive Szene: Eine harmlose Bewegung, ein bestimmter Tonfall – und er zuckt zusammen, ohne dass etwas passiert wäre. Über konditionierte Anspannung und einen Körper, der in Habachtstellung geblieben ist.'
-cluster: gefuehle
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

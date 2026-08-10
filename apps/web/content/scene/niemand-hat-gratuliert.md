@@ -3,7 +3,7 @@ type: scene
 slug: niemand-hat-gratuliert
 title: "Niemand hat gratuliert"
 description: 'Eine fiktive Szene: Ein guter Tag, ein kleiner Erfolg – und zu Hause niemand, der sich mitfreut. Über fehlende Mitfreude und die besondere Einsamkeit, eine gute Nachricht nicht teilen zu können.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion

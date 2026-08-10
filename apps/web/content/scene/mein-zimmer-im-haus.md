@@ -3,7 +3,7 @@ type: scene
 slug: mein-zimmer-im-haus
 title: "Mein Zimmer im Haus"
 description: 'Eine fiktive Szene: Das Haus ist groß, doch sein ganzes Leben passt auf zehn Quadratmeter. Niemand hat es verboten – er hat sich selbst immer kleiner gemacht. Über Coercive Control und schleichenden Raumverlust.'
-cluster: dynamiken
+cluster: emotionaler-missbrauch
 updated: "2026-08-10"
 author:
   name: EchoB-Redaktion
