@@ -16,6 +16,7 @@ import type { AssignmentType } from '@/api/collab'
 import AppointmentsPanel from '@/components/professional/AppointmentsPanel'
 import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
 import Avatar from '@/components/Avatar'
+import { IconChat, IconCheck, IconLink, IconLock } from '@/components/professional/ProfIcons'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
@@ -100,7 +101,10 @@ function CaseWorkspaceNav({ active, onSelect, clientName, clientAvatar }: {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy mb-3">{title}</h2>
+      <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-navy">
+        <span className="h-4 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+        {title}
+      </h2>
       {children}
     </div>
   )
@@ -120,7 +124,7 @@ function CaseSeatActive({ caseId }: { caseId: string }) {
   })
   return (
     <div className="mb-4 flex items-center justify-between gap-3 flex-wrap rounded-brand border border-green-200 bg-green-50 px-4 py-2.5">
-      <p className="text-xs text-green-800">✓ Fall ist in diesem Abrechnungsmonat aktiviert – Werkzeuge frei.</p>
+      <p className="flex items-center gap-1.5 text-xs text-green-800"><IconCheck className="h-4 w-4 shrink-0" />Fall ist in diesem Abrechnungsmonat aktiviert – Werkzeuge frei.</p>
       <button
         onClick={() => {
           if (window.confirm(
@@ -342,7 +346,9 @@ export default function ProfessionalCaseDetailPage() {
     return (
       <ProfessionalShell>
         <div className="mx-auto max-w-[700px] px-6 py-16 text-center">
-          <div className="text-4xl mb-4">🔒</div>
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full bg-brand-bg text-brand-muted">
+            <IconLock className="h-7 w-7" />
+          </span>
           <h1 className="text-lg font-semibold text-navy mb-2">Kein Zugriff</h1>
           <p className="text-sm text-brand-muted">
             Dieser Fall ist nicht (mehr) für Sie freigegeben. Möglicherweise wurde die Freigabe widerrufen.
@@ -460,7 +466,7 @@ function CouplePanel({ caseId }: { caseId: string }) {
     return (
       <div className="mb-6 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
         <div className="text-sm">
-          <span className="font-semibold text-navy">🔗 Partner gekoppelt{partnerLabel ? ` mit ${partnerLabel}` : ''}.</span>{' '}
+          <span className="inline-flex items-center gap-1.5 font-semibold text-navy"><IconLink className="h-4 w-4 text-accent" />Partner gekoppelt{partnerLabel ? ` mit ${partnerLabel}` : ''}.</span>{' '}
           <span className="text-brand-muted">Sie können mit Echo über beide Fälle gemeinsam sprechen.</span>
           {status.partner_case_id && (
             <Link to={`/professional/cases/${status.partner_case_id}`} className="ml-2 text-xs text-accent hover:underline">Partnerfall öffnen →</Link>
@@ -727,8 +733,9 @@ function EchoPanel({ caseId, glossary, summaries, onDelete, deleting, onUpdate, 
           <h2 className="text-sm font-bold text-navy mb-1">Mit Echo über diesen Fall sprechen</h2>
           <p className="text-xs text-brand-muted">Vorbereitung auf Basis der freigegebenen Inhalte – ohne Diagnosen.</p>
         </div>
-        <Link to={`/professional/cases/${caseId}/echo`} className="btn-primary !py-2 !px-5 !text-sm shrink-0">
-          💬 Echo öffnen
+        <Link to={`/professional/cases/${caseId}/echo`} className="btn-primary !py-2 !px-5 !text-sm shrink-0 gap-2">
+          <IconChat className="h-4 w-4" />
+          Echo öffnen
         </Link>
       </div>
 
@@ -852,7 +859,7 @@ function ReportsPanel({ caseId }: { caseId: string }) {
             <div className="grid gap-2 sm:grid-cols-3">
               <button onClick={() => setSelected('standard:couple')}
                 className={tile(selected === 'standard:couple')}>
-                <div className="text-sm font-semibold text-navy">🔗 Paaranalyse-Bericht</div>
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-navy"><IconLink className="h-3.5 w-3.5 text-accent" />Paaranalyse-Bericht</div>
                 <div className="text-[11px] text-brand-muted">Über beide gekoppelten Fälle</div>
               </button>
             </div>
