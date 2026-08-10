@@ -283,19 +283,23 @@ export default function ProfessionalDashboardPage() {
         ) : (
           <>
             <input value={q} onChange={e => setQ(e.target.value)} placeholder="Klient:in suchen …"
-              className="w-full max-w-sm rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
+              className="w-full max-w-sm rounded-full border border-brand-border bg-white px-4 py-2 text-sm shadow-brand-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20" />
             {filter === 'open' && (
               <p className="mt-2 text-xs text-brand-muted">
                 Gefiltert: nur Fälle mit offenen Aufgaben · <button onClick={() => setFilter('all')} className="text-accent hover:underline">alle zeigen</button>
               </p>
             )}
 
-            <div className="space-y-2 mt-4">
+            <div className="space-y-3 mt-4">
               {shown.length === 0 && <p className="text-sm text-brand-muted">Nichts gefunden.</p>}
               {shown.map(c => {
                 const isOpen = !!openCases[c.case_id]
                 return (
-                  <div key={c.case_id} className={`card transition-shadow hover:shadow-sm ${c.unread_count > 0 ? 'border-accent/40 border-l-[3px] border-l-accent' : ''}`}>
+                  <div key={c.case_id} className={`rounded-brand border p-4 shadow-brand transition-all duration-200 hover:-translate-y-0.5 hover:shadow-brand-lg ${
+                    c.unread_count > 0
+                      ? 'border-accent/30 border-l-[3px] border-l-accent bg-gradient-to-r from-accent/[0.05] to-brand-card'
+                      : 'border-brand-border bg-brand-card hover:border-accent/30'
+                  }`}>
                     <div className="flex items-center justify-between gap-3">
                       <Link to={`/professional/cases/${c.case_id}`} className="flex items-center gap-3 min-w-0 no-underline group">
                         <ClientCaseAvatar
@@ -303,28 +307,43 @@ export default function ProfessionalDashboardPage() {
                           clientName={c.client_display_name} unread={c.unread_count > 0}
                         />
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors">
-                            {c.client_display_name} · {c.case_title}
+                          <p className="flex items-center gap-2 min-w-0">
+                            <span className="truncate text-[0.95rem] font-bold text-navy transition-colors group-hover:text-accent">
+                              {c.client_display_name}
+                            </span>
                             {c.is_demo && (
-                              <span className="ml-2 align-middle px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">
+                              <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
                                 Beispiel
                               </span>
                             )}
                           </p>
-                          <p className="text-xs text-brand-muted">Zuletzt aktiv: {fmtDay(c.last_activity)}</p>
+                          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-brand-muted">
+                            <span className="truncate">{c.case_title}</span>
+                            <span className="text-brand-border">·</span>
+                            <span className="shrink-0">zuletzt aktiv {fmtDay(c.last_activity)}</span>
+                          </p>
                         </div>
                       </Link>
-                      <div className="flex items-center gap-2 text-xs shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         {c.unread_count > 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">{c.unread_count} ungelesen</span>
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-semibold text-accent">
+                            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                            {c.unread_count} neu
+                          </span>
                         )}
                         {c.open_count > 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-brand-bg text-brand-muted">{c.open_count} offen</span>
+                          <span className="hidden items-center gap-1 rounded-full border border-brand-border bg-brand-bg px-2.5 py-1 text-[11px] font-medium text-brand-muted sm:inline-flex">
+                            {c.open_count} offen
+                          </span>
                         )}
                         <Link to={`/professional/cases/${c.case_id}`}
-                          className="hidden sm:inline text-accent font-medium no-underline hover:underline">Öffnen →</Link>
+                          className="hidden items-center gap-1 rounded-full border border-accent/30 bg-accent/5 px-3 py-1 text-xs font-semibold text-accent no-underline transition-colors hover:bg-accent hover:text-white sm:inline-flex">
+                          Öffnen
+                          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                        </Link>
                         <button onClick={() => setOpenCases(o => ({ ...o, [c.case_id]: !o[c.case_id] }))}
-                          aria-label={isOpen ? 'Zuklappen' : 'Aufklappen'} className="text-brand-muted hover:text-navy p-1">
+                          aria-label={isOpen ? 'Zuklappen' : 'Aufklappen'}
+                          className="grid h-7 w-7 place-items-center rounded-full text-brand-muted transition-colors hover:bg-brand-bg hover:text-navy">
                           <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -397,8 +416,8 @@ function Tile({ label, value, icon, to, onClick, active, accent }: {
   to?: string; onClick?: () => void; active?: boolean; accent?: boolean
 }) {
   const highlight = active || (accent && value > 0)
-  const cls = `flex items-center gap-3 text-left rounded-brand border px-3.5 py-3 transition-colors ${
-    highlight ? 'border-accent bg-accent/5' : 'border-brand-border bg-white hover:border-accent/40'
+  const cls = `flex items-center gap-3 text-left rounded-brand border px-3.5 py-3 shadow-brand-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-brand ${
+    highlight ? 'border-accent bg-accent/5' : 'border-brand-border bg-brand-card hover:border-accent/40'
   }`
   const inner = (
     <>
