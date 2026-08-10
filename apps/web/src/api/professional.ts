@@ -52,6 +52,8 @@ export interface DashboardItem {
 export interface DashboardCase {
   case_id: string
   client_display_name: string
+  client_avatar?: string | null
+  case_avatar?: string | null
   case_title: string
   is_demo?: boolean
   element_types: string[]
@@ -64,6 +66,7 @@ export interface DashboardCase {
 export interface PendingConnection {
   user_id: string
   display_name: string
+  avatar?: string | null
   connected_at: string | null
 }
 export interface ProfessionalDashboard {

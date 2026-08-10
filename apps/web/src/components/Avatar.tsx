@@ -1,6 +1,7 @@
 import { avatarBg } from '@/utils/avatars'
 
 const SIZES = {
+  xs: 'h-5 w-5 text-[11px]',
   sm: 'h-8 w-8 text-base',
   md: 'h-10 w-10 text-xl',
   lg: 'h-12 w-12 text-2xl',

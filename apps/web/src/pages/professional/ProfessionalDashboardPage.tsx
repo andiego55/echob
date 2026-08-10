@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import ClientInviteButton from '@/components/professional/ClientInviteButton'
 import NotificationsBanner from '@/components/NotificationsBanner'
+import Avatar from '@/components/Avatar'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi, type DashboardItem } from '@/api/professional'
 import { SHARE_ELEMENT_LABELS } from '@/types'
@@ -30,9 +31,6 @@ function fmtItem(iso: string | null): string {
   })
 }
 
-const ITEM_ICON: Record<DashboardItem['kind'], string> = {
-  questionnaire_answered: '📋', dialog_summary: '💬', message_reply: '✉️', open_task: '⏳',
-}
 const elLabel = (et: string) => (SHARE_ELEMENT_LABELS as Record<string, string>)[et] ?? et
 
 const svgProps = {
@@ -51,11 +49,66 @@ const IconBell = () => (
 const IconClock = () => (
   <svg {...svgProps}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 1.8" /></svg>
 )
+
+// Kompakte Strichicons (Card-Items, Termine, Leerzustand) – gleicher Stil, kleiner.
+const miniProps = {
+  viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7,
+  strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, className: 'h-[15px] w-[15px]',
+}
+const IconClipboard = () => (
+  <svg {...miniProps}><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3" /><rect x="8" y="2.5" width="8" height="4" rx="1" /><path d="m8.5 13 2 2 4-4" /></svg>
+)
+const IconChat = () => (
+  <svg {...miniProps}><path d="M21 11.5a8.5 8.5 0 0 1-11.9 7.8L3 21l1.7-5.1A8.5 8.5 0 1 1 21 11.5Z" /></svg>
+)
+const IconMail = () => (
+  <svg {...miniProps}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7.5 8 5.5 8-5.5" /></svg>
+)
+const IconWaiting = () => (
+  <svg {...miniProps}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 1.8" /></svg>
+)
+const IconCalendar = () => (
+  <svg {...miniProps}><rect x="3.5" y="5" width="17" height="15" rx="2" /><path d="M3.5 9.5h17M8 3v4M16 3v4" /></svg>
+)
+const IconInbox = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}
+    strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+    <path d="M3 13h4l1.5 3h7L17 13h4" /><path d="M5 13 6.4 6.6A2 2 0 0 1 8.3 5h7.4a2 2 0 0 1 1.9 1.6L19 13" />
+    <path d="M3 13v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4" />
+  </svg>
+)
+
+const ITEM_ICON: Record<DashboardItem['kind'], ReactNode> = {
+  questionnaire_answered: <IconClipboard />, dialog_summary: <IconChat />,
+  message_reply: <IconMail />, open_task: <IconWaiting />,
+}
 function initials(name: string): string {
   const p = name.trim().split(/\s+/).filter(Boolean)
   if (p.length === 0) return '·'
   if (p.length === 1) return p[0].slice(0, 2).toUpperCase()
   return (p[0][0] + p[p.length - 1][0]).toUpperCase()
+}
+
+/** Klient:in (Nutzer-Avatar oder Initialen) mit der Fallperson als kleinem Eck-Badge. */
+function ClientCaseAvatar({ clientAvatar, caseAvatar, clientName, unread }: {
+  clientAvatar?: string | null; caseAvatar?: string | null; clientName: string; unread?: boolean
+}) {
+  return (
+    <span className="relative shrink-0">
+      {clientAvatar
+        ? <Avatar value={clientAvatar} size="md" />
+        : (
+          <span className={`grid h-10 w-10 place-items-center rounded-full text-xs font-bold ${
+            unread ? 'bg-accent text-white' : 'bg-accent/10 text-accent'
+          }`}>{initials(clientName)}</span>
+        )}
+      {caseAvatar && (
+        <span className="absolute -bottom-1 -right-1 rounded-full bg-white p-[1.5px] shadow-sm" title="Fallperson">
+          <Avatar value={caseAvatar} size="xs" />
+        </span>
+      )}
+    </span>
+  )
 }
 
 export default function ProfessionalDashboardPage() {
@@ -114,8 +167,9 @@ export default function ProfessionalDashboardPage() {
       <div className="mx-auto max-w-[1100px] px-6 py-10">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-navy">Dashboard</h1>
-            <p className="mt-1 text-sm text-brand-muted">Deine Klient:innen auf einen Blick.</p>
+            <span className="text-[0.7rem] font-bold uppercase tracking-[0.12em] text-accent">Praxis</span>
+            <h1 className="mt-0.5 text-2xl font-bold text-navy">Dashboard</h1>
+            <p className="mt-1 text-sm text-brand-muted">Deine Klient:innen und Fälle auf einen Blick.</p>
           </div>
           <ClientInviteButton />
         </div>
@@ -187,8 +241,10 @@ export default function ProfessionalDashboardPage() {
               {pending.map((p) => (
                 <span key={p.user_id}
                   className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white px-2.5 py-1">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700">
-                    {initials(p.display_name)}
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 leading-none text-amber-800">
+                    {p.avatar
+                      ? <span aria-hidden="true" className="text-[13px]">{p.avatar}</span>
+                      : <span className="text-[10px] font-bold">{initials(p.display_name)}</span>}
                   </span>
                   <span className="text-xs font-medium text-navy">{p.display_name}</span>
                   {p.connected_at && (
@@ -212,7 +268,9 @@ export default function ProfessionalDashboardPage() {
 
         {cases.length === 0 ? (
           <div className="card text-center py-12">
-            <div className="text-4xl mb-3">📋</div>
+            <span className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-accent/10 text-accent">
+              <IconInbox />
+            </span>
             <h2 className="text-lg font-semibold text-navy mb-1">Noch keine Klient:innen</h2>
             <p className="mx-auto mb-5 max-w-md text-sm text-brand-muted">
               Laden Sie Ihre erste Klient:in ein – sie bekommt einen Link + Code, registriert sich
@@ -237,14 +295,13 @@ export default function ProfessionalDashboardPage() {
               {shown.map(c => {
                 const isOpen = !!openCases[c.case_id]
                 return (
-                  <div key={c.case_id} className={`card ${c.unread_count > 0 ? 'border-accent/40' : ''}`}>
+                  <div key={c.case_id} className={`card transition-shadow hover:shadow-sm ${c.unread_count > 0 ? 'border-accent/40 border-l-[3px] border-l-accent' : ''}`}>
                     <div className="flex items-center justify-between gap-3">
-                      <Link to={`/professional/cases/${c.case_id}`} className="flex items-center gap-2.5 min-w-0 no-underline group">
-                        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                          c.unread_count > 0 ? 'bg-accent text-white' : 'bg-accent/10 text-accent'
-                        }`}>
-                          {initials(c.client_display_name)}
-                        </span>
+                      <Link to={`/professional/cases/${c.case_id}`} className="flex items-center gap-3 min-w-0 no-underline group">
+                        <ClientCaseAvatar
+                          clientAvatar={c.client_avatar} caseAvatar={c.case_avatar}
+                          clientName={c.client_display_name} unread={c.unread_count > 0}
+                        />
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-navy truncate group-hover:text-accent transition-colors">
                             {c.client_display_name} · {c.case_title}
@@ -298,8 +355,10 @@ export default function ProfessionalDashboardPage() {
                               it.unread ? 'border-accent bg-accent/[0.03]' : 'border-brand-border hover:border-accent/40'
                             }`}
                           >
-                            <span className="flex items-center gap-2 min-w-0">
-                              <span className="shrink-0">{ITEM_ICON[it.kind]}</span>
+                            <span className="flex items-center gap-2.5 min-w-0">
+                              <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full ${
+                                it.unread ? 'bg-accent/10 text-accent' : 'bg-brand-bg text-brand-muted'
+                              }`}>{ITEM_ICON[it.kind]}</span>
                               <span className="min-w-0">
                                 <span className={`block text-sm truncate text-navy ${it.unread ? 'font-semibold' : ''}`}>{it.title}</span>
                                 {it.at && <span className="block text-[11px] text-brand-muted">{fmtItem(it.at)}</span>}
@@ -313,7 +372,10 @@ export default function ProfessionalDashboardPage() {
                             to={`/professional/cases/${c.case_id}?tab=appointments`}
                             className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3 py-2 no-underline hover:border-accent/40"
                           >
-                            <span className="text-sm text-navy">📅 {c.next_appointment.title}</span>
+                            <span className="flex items-center gap-2 text-sm text-navy">
+                              <span className="text-accent"><IconCalendar /></span>
+                              {c.next_appointment.title}
+                            </span>
                             <span className="text-xs text-brand-muted">{fmtAppt(c.next_appointment.start_at)}</span>
                           </Link>
                         )}
