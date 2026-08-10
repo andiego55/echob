@@ -107,6 +107,7 @@ export default function ProfessionalProfilePage() {
     <ProfessionalShell>
       <div className="mx-auto max-w-[1000px] px-6 py-8">
         <header className="mb-6">
+          <span className="label">Verzeichnis</span>
           <h1 className="text-xl font-bold text-navy">Mein Verzeichnis-Profil</h1>
           <p className="mt-1 max-w-2xl text-sm text-brand-muted">
             So erscheinst du bei „Fachperson finden". Ein vollständiges Profil wird häufiger gefunden

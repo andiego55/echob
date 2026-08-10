@@ -99,6 +99,7 @@ export default function ProfessionalTemplatesPage() {
   return (
     <ProfessionalShell>
       <div className="mx-auto max-w-[1100px] px-6 py-10">
+        <span className="label">Praxis</span>
         <h1 className="text-2xl font-bold text-navy">Ressourcen-Bibliothek</h1>
         <p className="mt-1 text-sm text-brand-muted mb-8">
           Lege Vorlagen einmal an und teile sie bequem aus einem Fall heraus („Aus Bibliothek teilen").

@@ -9,6 +9,7 @@ import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi } from '@/api/professional'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import { IconEdit, IconPrinter } from '@/components/professional/ProfIcons'
 
 const SOURCE_LABELS: Record<string, string> = {
   'standard:verlauf': 'Verlaufsbericht',
@@ -127,12 +128,12 @@ export default function ProfessionalReportDetailPage() {
               <div className="no-print flex flex-col gap-2 flex-shrink-0">
                 <button onClick={() => window.print()}
                   className="flex items-center gap-1.5 text-xs font-medium text-brand-muted hover:text-navy border border-brand-border rounded-brand px-3 py-1.5 bg-white hover:bg-brand-bg transition-colors">
-                  <span>🖨</span> Als PDF speichern
+                  <IconPrinter className="h-3.5 w-3.5" /> Als PDF speichern
                 </button>
                 {!isEditing && sections.length > 0 && (
                   <button onClick={startEdit}
                     className="flex items-center gap-1.5 text-xs font-medium text-brand-muted hover:text-navy border border-brand-border rounded-brand px-3 py-1.5 bg-white hover:bg-brand-bg transition-colors">
-                    <span>✏️</span> Bearbeiten
+                    <IconEdit className="h-3.5 w-3.5" /> Bearbeiten
                   </button>
                 )}
                 <Link to={backTo}

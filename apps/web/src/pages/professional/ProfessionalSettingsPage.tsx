@@ -53,6 +53,7 @@ export default function ProfessionalSettingsPage() {
   return (
     <ProfessionalShell>
       <div className="mx-auto max-w-[680px] px-6 py-10">
+        <span className="label">Praxis</span>
         <h1 className="text-2xl font-bold text-navy">Einstellungen</h1>
         <p className="mt-1 text-sm text-brand-muted">
           Hier stimmst du Echo auf deine Arbeitsweise ab. Weitere Einstellungen folgen.

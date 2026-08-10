@@ -51,3 +51,12 @@ export const IconChart = ({ className }: P) => (
 export const IconUsers = ({ className }: P) => (
   <svg {...attrs(className)}><circle cx="9" cy="8" r="3.2" /><path d="M2.5 19a6.5 6.5 0 0 1 13 0" /><path d="M16 5.5a2.9 2.9 0 0 1 0 5.4" /><path d="M17.5 13a5.5 5.5 0 0 1 4 5.3" /></svg>
 )
+export const IconEdit = ({ className }: P) => (
+  <svg {...attrs(className)}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+)
+export const IconPrinter = ({ className }: P) => (
+  <svg {...attrs(className)}><path d="M6 9V4h12v5" /><rect x="4" y="9" width="16" height="8" rx="2" /><path d="M8 15h8v5H8z" /><path d="M17 12h.01" /></svg>
+)
+export const IconSparkles = ({ className }: P) => (
+  <svg {...attrs(className)}><path d="M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7z" /><path d="M18.5 13.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z" /></svg>
+)

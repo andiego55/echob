@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { professionalApi } from '@/api/professional'
 import type { ProReportTemplate } from '@/types'
+import { IconSparkles } from '@/components/professional/ProfIcons'
 
 export default function ProfessionalReportTemplatesPage() {
   const qc = useQueryClient()
@@ -52,6 +53,7 @@ export default function ProfessionalReportTemplatesPage() {
   return (
     <ProfessionalShell>
       <div className="mx-auto max-w-[820px] px-6 py-10">
+        <span className="label">Praxis</span>
         <h1 className="text-2xl font-bold text-navy">Berichtsvorlagen</h1>
         <p className="mt-1 text-sm text-brand-muted">
           Eine Vorlage ist eine Anweisung, mit der Echo aus den Falldaten einen Bericht erzeugt.
@@ -76,9 +78,9 @@ export default function ProfessionalReportTemplatesPage() {
             />
             <button
               onClick={() => assist.mutate()} disabled={!assistDesc.trim() || assist.isPending}
-              className="mt-2 text-sm font-medium px-3 py-1.5 rounded-brand border border-accent text-accent hover:bg-accent/5 disabled:opacity-40"
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-brand border border-accent text-accent hover:bg-accent/5 disabled:opacity-40"
             >
-              {assist.isPending ? 'Echo entwirft …' : '✨ Echo-Vorschlag erstellen'}
+              {assist.isPending ? 'Echo entwirft …' : <><IconSparkles className="h-4 w-4" />Echo-Vorschlag erstellen</>}
             </button>
             {assist.isError && (
               <p className="mt-2 text-xs text-red-600">Vorschlag fehlgeschlagen. Bitte erneut versuchen.</p>
