@@ -60,3 +60,9 @@ export const IconPrinter = ({ className }: P) => (
 export const IconSparkles = ({ className }: P) => (
   <svg {...attrs(className)}><path d="M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7z" /><path d="M18.5 13.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z" /></svg>
 )
+export const IconFolder = ({ className }: P) => (
+  <svg {...attrs(className)}><path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+)
+export const IconBook = ({ className }: P) => (
+  <svg {...attrs(className)}><path d="M12 6.5C9.8 5.1 6.4 5.1 4 6v12c2.4-.9 5.8-.9 8 .5 2.2-1.4 5.6-1.4 8-.5V6c-2.4-.9-5.8-.9-8 .5Z" /><path d="M12 6.5V19" /></svg>
+)

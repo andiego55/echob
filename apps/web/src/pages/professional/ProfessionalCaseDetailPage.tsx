@@ -16,7 +16,10 @@ import type { AssignmentType } from '@/api/collab'
 import AppointmentsPanel from '@/components/professional/AppointmentsPanel'
 import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
 import Avatar from '@/components/Avatar'
-import { IconChat, IconCheck, IconLink, IconLock } from '@/components/professional/ProfIcons'
+import {
+  IconBook, IconChart, IconChat, IconCheck, IconClipboard, IconDoc,
+  IconFolder, IconLink, IconLock, IconSparkles, IconUsers,
+} from '@/components/professional/ProfIcons'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
@@ -98,11 +101,13 @@ function CaseWorkspaceNav({ active, onSelect, clientName, clientAvatar }: {
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="card">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-navy">
-        <span className="h-4 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+      <h2 className="mb-4 flex items-center gap-2.5 text-[0.95rem] font-bold text-navy">
+        {icon
+          ? <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent">{icon}</span>
+          : <span className="h-4 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />}
         {title}
       </h2>
       {children}
@@ -531,9 +536,9 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 
       <CouplePanel caseId={bundle.case_id} />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         {has('case_info') && bundle.case && (
-          <Section title="Fallinformationen">
+          <Section title="Fallinformationen" icon={<IconFolder />}>
             <dl className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2">
               <Field label="Beziehungstyp"><InfoChip>{RELATIONSHIP_TYPE_LABELS[bundle.case.relationship_type]}</InfoChip></Field>
               <Field label="Status"><InfoChip>{RELATIONSHIP_STATUS_LABELS[bundle.case.relationship_status]}</InfoChip></Field>
@@ -544,7 +549,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         )}
 
         {has('onboarding') && bundle.onboarding && (
-          <Section title="Onboarding-Informationen">
+          <Section title="Onboarding-Informationen" icon={<IconClipboard />}>
             <dl className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2">
               {bundle.onboarding.person_name && <Field label="Fallperson (Pseudonym)">{bundle.onboarding.person_name}</Field>}
               {typeof bundle.onboarding.distress_score === 'number' && <Field label="Belastungswert"><DistressBadge score={bundle.onboarding.distress_score} /></Field>}
@@ -558,7 +563,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         )}
 
         {has('scales') && bundle.scales.length > 0 && (
-          <Section title="Skalen">
+          <Section title="Skalen" icon={<IconChart />}>
             <div className="space-y-2.5">
               {bundle.scales.filter(s => (Number(s.score) || 0) > 0).map(s => {
                 const score = Number(s.score) || 0
@@ -580,7 +585,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         )}
 
         {has('topic_summaries') && bundle.topic_summaries.length > 0 && (
-          <Section title="Themendialog-Zusammenfassungen">
+          <Section title="Themendialog-Zusammenfassungen" icon={<IconChat />}>
             <div className="space-y-2">
               {bundle.topic_summaries.map(t => (
                 <details key={t.topic} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
@@ -598,7 +603,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         )}
 
         {has('hypotheses') && bundle.hypotheses.length > 0 && (
-          <Section title="Hypothesen (tastend, keine Diagnose)">
+          <Section title="Hypothesen (tastend, keine Diagnose)" icon={<IconSparkles />}>
             <div className="space-y-2">
               {bundle.hypotheses.map(h => (
                 <details key={h.hypothesis_type} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
@@ -616,7 +621,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         )}
 
         {has('test_results') && bundle.test_results.length > 0 && (
-          <Section title="Selbsttest-Ergebnisse">
+          <Section title="Selbsttest-Ergebnisse" icon={<IconChart />}>
             <div className="space-y-2">
               {bundle.test_results.map(t => (
                 <details key={t.slug} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
@@ -634,12 +639,12 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         )}
 
         {has('person_profile') && bundle.person_profile && (
-          <Section title="Fragebogen zur Fallperson">
+          <Section title="Fragebogen zur Fallperson" icon={<IconClipboard />}>
             <ProfileAnswers modules={bundle.person_profile.modules} config={PERSON_PROFILE_MODULES} />
           </Section>
         )}
         {has('self_profile') && bundle.self_profile && (
-          <Section title="Selbstprofil der nutzenden Person">
+          <Section title="Selbstprofil der nutzenden Person" icon={<IconUsers />}>
             {bundle.self_profile.summary_text && (
               <div className="mb-3 text-sm text-brand-text leading-relaxed">
                 <MarkdownMessage content={bundle.self_profile.summary_text} />
@@ -652,7 +657,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 
       {(has('all_scenes') || has('scene')) && (
         <div className="mt-4">
-          <Section title={`Szenen (${bundle.scenes.length})`}>
+          <Section title={`Szenen (${bundle.scenes.length})`} icon={<IconBook />}>
             {bundle.scenes.length === 0
               ? <p className="text-sm text-brand-muted">Keine freigegebenen Szenen.</p>
               : (
@@ -682,7 +687,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 
       {has('reports') && bundle.reports.length > 0 && (
         <div className="mt-4">
-          <Section title={`Berichte (${bundle.reports.length})`}>
+          <Section title={`Berichte (${bundle.reports.length})`} icon={<IconDoc />}>
             <div className="space-y-4">
               {bundle.reports.map(r => (
                 <details key={r.id} className="group rounded-brand border border-brand-border bg-white px-4 py-3 open:border-accent/30">
