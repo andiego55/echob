@@ -74,6 +74,12 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   // Eifersucht & Trennung
   gruebeln: 'Grübeln',
   'retrospektive-eifersucht': 'Retrospektive Eifersucht',
+  // Coercive Control & Vernachlässigung (nur Umlaut-Overrides)
+  'sich-unsichtbar-fuehlen': 'Sich unsichtbar fühlen',
+  'fehlende-fuersorge': 'Fehlende Fürsorge',
+  'kind-im-elternkonflikt': 'Kind im Elternkonflikt',
+  loyalitaetsdruck: 'Loyalitätsdruck',
+  koerpergedaechtnis: 'Körpergedächtnis',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */

@@ -1069,6 +1069,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "als-waere-nichts-gewesen",
+    "title": "Als wäre nichts gewesen",
+    "description": "Eine fiktive Szene: Gestern der Satz „Ich gehe.\" Heute die Frage, ob noch Milch da ist. Kein Wort über gestern. Über Konflikte, die keine Reparatur bekommen – und die Einsamkeit, mit dem Geschehenen allein zu bleiben.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Davids Sicht",
+    "pull_quote": "Gestern hat sie gesagt, sie geht. Heute fragt sie, ob noch Milch da ist. Dazwischen liegt: nichts.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, mit einem Streit allein zurückzubleiben, während drumherum getan wird, als sei nichts gewesen? Magst du erzählen, wie sich das für dich anfühlt?"
+    },
+    "scene_tags": [
+      "fehlende-reparatur",
+      "emotionale-vernachlaessigung",
+      "konfliktnachsorge",
+      "wiederkehrendes-muster",
+      "einsamkeit-zu-zweit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/als-waere-nichts-gewesen"
+  },
+  {
+    "type": "scene",
     "slug": "am-ende-entschuldige-ich-mich",
     "title": "Am Ende entschuldige ich mich",
     "description": "Eine Szene über Schuldumkehr – du bringst ein Anliegen vor und verlässt das Gespräch als die, die sich entschuldigt. Aus der Ich-Perspektive, fiktiv.",
@@ -1208,6 +1237,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "bevor-sie-es-merkt",
+    "title": "Bevor sie es merkt",
+    "description": "Eine fiktive Szene: Er räumt Fehler weg, bevor sie auffallen, und entschärft Situationen, bevor sie entstehen. Über vorauseilende Anpassung und ein Leben, das sich um die Vermeidung des nächsten Vorwurfs organisiert.",
+    "cluster": "selbstreflexion",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Stefans Sicht",
+    "pull_quote": "Ich löse Probleme, die noch keine sind. Ich entschärfe Sätze, die noch niemand gesagt hat. Ich lebe im Konjunktiv ihrer Laune.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, ständig vorauszudenken, um dem nächsten Vorwurf zuvorzukommen? Magst du eine solche Situation genauer anschauen?"
+    },
+    "scene_tags": [
+      "anpassung",
+      "hypervigilanz",
+      "konfliktvermeidung",
+      "auf-eierschalen-gehen",
+      "erlerntes-verhalten"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/bevor-sie-es-merkt"
+  },
+  {
+    "type": "scene",
     "slug": "bis-hierhin-und-nicht-weiter",
     "title": "Bis hierhin und nicht weiter",
     "description": "Eine Szene über eine Grenze, die getestet wird – und den ruhigen Moment, in dem man sie zum ersten Mal wirklich hält. Aus der Ich-Perspektive, fiktiv.",
@@ -1233,6 +1291,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "klarheit"
     ],
     "url": "/szenen/bis-hierhin-und-nicht-weiter"
+  },
+  {
+    "type": "scene",
+    "slug": "darf-ich-erleichtert-sein",
+    "title": "Darf ich erleichtert sein?",
+    "description": "Eine fiktive Szene: Nach der Trennung erwartet er Trauer – und findet vor allem Erleichterung, die sich verboten anfühlt. Über die Schuldgefühle, wenn das Ende sich weniger nach Verlust anfühlt als nach Aufatmen.",
+    "cluster": "trennung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jonas' Sicht",
+    "pull_quote": "Alle fragen, wie ich das aushalte. Und ich traue mich nicht zu sagen: eigentlich ganz gut. Ich schäme mich für meine Erleichterung.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dich für deine Erleichterung nach einer Trennung schuldig zu fühlen? Magst du erzählen, was da in dir los ist?"
+    },
+    "scene_tags": [
+      "trennung",
+      "erleichterung",
+      "schuldgefuehle",
+      "ambivalenz",
+      "klarheit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/darf-ich-erleichtert-sein"
   },
   {
     "type": "scene",
@@ -1486,6 +1573,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-konflikt-ist-vorbei-in-mir-nicht",
+    "title": "Der Konflikt ist vorbei. In mir nicht.",
+    "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist.",
+    "cluster": "gefuehle",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Daniks Sicht",
+    "pull_quote": "Der Streit war Dienstag. Es ist Donnerstag, und ich sitze im Auto und kann nicht losfahren. Mein Körper führt Buch, auch wenn ich es nicht will.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass der Zusammenbruch erst Tage nach dem Konflikt kommt? Magst du erzählen, wie sich das bei dir zeigt?"
+    },
+    "scene_tags": [
+      "nachwirkung",
+      "emotionale-ueberflutung",
+      "erschoepfung",
+      "gruebeln",
+      "stressreaktion"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-konflikt-ist-vorbei-in-mir-nicht"
+  },
+  {
+    "type": "scene",
     "slug": "der-kruemel",
     "title": "Der Krümel",
     "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv.",
@@ -1567,6 +1683,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/der-perfekte-tag"
+  },
+  {
+    "type": "scene",
+    "slug": "der-schluessel-im-schloss",
+    "title": "Der Schlüssel im Schloss",
+    "description": "Eine fiktive Szene: Am Geräusch des Heimkommens liest er schon ab, welcher Abend es wird. Über Hypervigilanz, das ständige Lesen der Stimmung und einen Alltag auf Habachtstellung.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Florians Sicht",
+    "pull_quote": "Ich höre am Schlüssel, welcher Abend es wird. Zwei Umdrehungen und ein kurzes Innehalten – das ist kein gutes Zeichen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, die Stimmung des anderen schon vor dem ersten Wort zu lesen? Magst du erzählen, worauf du alles achtest?"
+    },
+    "scene_tags": [
+      "hypervigilanz",
+      "auf-eierschalen-gehen",
+      "anpassung",
+      "kontrolle",
+      "dauerstress"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-schluessel-im-schloss"
   },
   {
     "type": "scene",
@@ -1845,6 +1990,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ein-gespraech-mit-mir-selbst",
+    "title": "Ein Gespräch mit mir selbst",
+    "description": "Eine fiktive Szene: Er trägt beide Enden des Gesprächs, denkt sich ihre Antworten dazu, weil echte selten kommen. Über einseitige Kommunikation und die Einsamkeit, neben jemandem zu leben, der nicht zurückspricht.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Michaels Sicht",
+    "pull_quote": "Ich führe unsere Gespräche allein. Ich sage meinen Teil, und ihren denke ich mir dazu, weil er sonst fehlen würde.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, die Verbindung im Alleingang aufrechtzuerhalten? Magst du erzählen, wie sich das anfühlt?"
+    },
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "fehlende-gegenseitigkeit",
+      "einsamkeit-zu-zweit",
+      "desinteresse",
+      "resignation"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ein-gespraech-mit-mir-selbst"
+  },
+  {
+    "type": "scene",
     "slug": "eine-spur-besser",
     "title": "Eine Spur besser",
     "description": "Eine Szene über eine Freundschaft mit feinem Konkurrenzdruck – wenn gute Nachrichten beim Gegenüber immer klein werden. Aus der Ich-Perspektive, fiktiv.",
@@ -1873,6 +2047,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "entschuldigung-damit-es-aufhoert",
+    "title": "Entschuldigung, damit es aufhört",
+    "description": "Eine fiktive Szene: Er entschuldigt sich für etwas, das er nicht getan hat – nicht aus Einsicht, sondern damit der Druck endet. Über Fawning, Konfliktvermeidung und erlernte Unterwerfung.",
+    "cluster": "selbstreflexion",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Philipps Sicht",
+    "pull_quote": "Es tut mir leid. Ich weiß nicht mehr, wofür. Ich weiß nur, dass es aufhört, wenn ich es sage.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dich zu entschuldigen, nur damit es aufhört – nicht, weil du etwas falsch gemacht hast? Magst du eine solche Situation anschauen?"
+    },
+    "scene_tags": [
+      "fawning",
+      "konfliktvermeidung",
+      "anpassung",
+      "entschuldigung",
+      "erlerntes-verhalten"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/entschuldigung-damit-es-aufhoert"
+  },
+  {
+    "type": "scene",
     "slug": "erst-der-rausch-dann-die-kaelte",
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv.",
@@ -1898,6 +2101,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/erst-der-rausch-dann-die-kaelte"
+  },
+  {
+    "type": "scene",
+    "slug": "erst-wenn-ich-liefere",
+    "title": "Erst wenn ich liefere",
+    "description": "Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Matthias' Sicht",
+    "pull_quote": "An guten Tagen bin ich nützlich, und dann ist sie warm. An schlechten bin ich nur da – und dann bin ich Luft.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass Nähe an deine Leistung geknüpft ist? Magst du eine konkrete Situation dazu anschauen?"
+    },
+    "scene_tags": [
+      "bedingte-zuwendung",
+      "erwartungsdruck",
+      "entzug",
+      "anpassung",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/erst-wenn-ich-liefere"
   },
   {
     "type": "scene",
@@ -1985,6 +2217,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "fragst-du-gar-nicht",
+    "title": "Fragst du gar nicht?",
+    "description": "Eine fiktive Szene: zurück von einem Wochenende, voller Erlebnisse – und keine einzige Frage. Über Desinteresse ohne offene Aggression und das Gefühl, dass die eigene innere Welt beim Gegenüber kaum Neugier weckt.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tobias' Sicht",
+    "pull_quote": "Sie hat keine einzige Frage gestellt. Nicht, ob es schön war. Nicht einmal, ob es mir gefallen hat.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, dass dein Inneres beim Gegenüber kaum Neugier weckt? Magst du erzählen, woran dir das zuletzt aufgefallen ist?"
+    },
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "desinteresse",
+      "fehlende-gegenseitigkeit",
+      "einsamkeit-zu-zweit",
+      "sich-unsichtbar-fuehlen"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/fragst-du-gar-nicht"
+  },
+  {
+    "type": "scene",
     "slug": "ich-brauch-eine-pause",
     "title": "Ich brauch eine Pause",
     "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv.",
@@ -2038,6 +2299,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/ich-hab-mich-geaendert"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-wieder-musik-gehoert",
+    "title": "Ich habe wieder Musik gehört",
+    "description": "Eine fiktive Szene: Wochen nach dem Auszug ertappt er sich beim lauten Mitsingen im Auto – und merkt, wie lange das weg war. Über die stille Wiederentdeckung des eigenen Ich nach einer Trennung.",
+    "cluster": "trennung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Kais Sicht",
+    "pull_quote": "Ich habe im Auto laut mitgesungen. Und dann angehalten und geweint – nicht aus Trauer. Weil ich gemerkt habe, wie lange ich das nicht mehr getan hatte.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dich nach einer Trennung an kleinen Dingen wiederzufinden? Magst du erzählen, was zu dir zurückgekommen ist?"
+    },
+    "scene_tags": [
+      "trennung",
+      "wiederentdeckung",
+      "selbstverlust",
+      "klarheit",
+      "aufbruch"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-habe-wieder-musik-gehoert"
   },
   {
     "type": "scene",
@@ -2292,6 +2582,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "jede-stunde-muss-sich-rechnen",
+    "title": "Jede Stunde muss sich rechnen",
+    "description": "Eine fiktive Szene: Zehn Minuten zu spät, und schon muss er Rechenschaft ablegen, wo er war und mit wem. Über Kontrolle im Alltag und das Gefühl, über die eigene Zeit nicht mehr frei zu verfügen.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Roberts Sicht",
+    "pull_quote": "Ich sitze noch fünf Minuten im Auto vor der eigenen Haustür und überlege mir, wie ich die Verspätung erkläre. Für zehn Minuten.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dich für deine Zeit rechtfertigen zu müssen? Magst du eine konkrete Situation genauer anschauen?"
+    },
+    "scene_tags": [
+      "kontrolle",
+      "misstrauen",
+      "rechtfertigung",
+      "grenzverletzung",
+      "auf-eierschalen-gehen"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/jede-stunde-muss-sich-rechnen"
+  },
+  {
+    "type": "scene",
     "slug": "jeder-euro",
     "title": "Jeder Euro",
     "description": "Eine Szene über finanzielle Kontrolle – wenn man sich für die eigenen Ausgaben rechtfertigen muss und dabei kleiner wird. Aus der Ich-Perspektive, fiktiv.",
@@ -2457,6 +2776,122 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "mein-ja-das-ein-nein-war",
+    "title": "Mein Ja, das ein Nein war",
+    "description": "Eine fiktive Szene: Er sagt Ja zu einem Wochenende, das er nicht will, und spürt in sich das Nein, das er nicht ausspricht. Über Selbstaufgabe durch Nachgeben und die Frage, wo die eigenen Wünsche geblieben sind.",
+    "cluster": "selbstreflexion",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Niklas' Sicht",
+    "pull_quote": "Ich habe Ja gesagt. In mir war ein klares Nein. Und ich frage mich, seit wann mein Mund und mein Inneres verschiedene Sprachen sprechen.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, Ja zu sagen, während in dir ein Nein steht? Magst du eine solche Situation genauer anschauen?"
+    },
+    "scene_tags": [
+      "anpassung",
+      "selbstverlust",
+      "nein-sagen",
+      "konfliktvermeidung",
+      "erlerntes-verhalten"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/mein-ja-das-ein-nein-war"
+  },
+  {
+    "type": "scene",
+    "slug": "mein-koerper-erinnert-sich",
+    "title": "Mein Körper erinnert sich",
+    "description": "Eine fiktive Szene: Eine harmlose Bewegung, ein bestimmter Tonfall – und er zuckt zusammen, ohne dass etwas passiert wäre. Über konditionierte Anspannung und einen Körper, der in Habachtstellung geblieben ist.",
+    "cluster": "gefuehle",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Simons Sicht",
+    "pull_quote": "Sie hob nur die Hand, um sich das Haar aus dem Gesicht zu streichen. Ich habe zusammengezuckt. Mein Körper weiß Dinge, die ich mir nicht eingestehe.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass dein Körper auf Dinge reagiert, die harmlos aussehen? Magst du erzählen, in welchen Momenten sich das zeigt?"
+    },
+    "scene_tags": [
+      "stressreaktion",
+      "hypervigilanz",
+      "nachwirkung",
+      "koerpergedaechtnis",
+      "anpassung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/mein-koerper-erinnert-sich"
+  },
+  {
+    "type": "scene",
+    "slug": "mein-sohn-entschuldigt-sich",
+    "title": "Mein Sohn entschuldigt sich",
+    "description": "Eine fiktive Szene: Der kleine Junge sagt „Entschuldigung\", noch bevor klar ist, ob etwas passiert ist – genau wie sein Vater. Über weitergegebene Muster und den Moment, in dem man das eigene Verhalten im Kind wiedererkennt.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Thomas' Sicht",
+    "pull_quote": "Er hat sich entschuldigt, bevor überhaupt etwas passiert war. Ich habe mich in ihm gesehen, und es hat mir das Herz zerrissen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dein eigenes angepasstes Verhalten im Kind wiederzuerkennen? Magst du erzählen, was du beobachtet hast?"
+    },
+    "scene_tags": [
+      "kind-im-elternkonflikt",
+      "anpassung",
+      "fawning",
+      "weitergegebenes-muster",
+      "loyalitaetsdruck"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/mein-sohn-entschuldigt-sich"
+  },
+  {
+    "type": "scene",
+    "slug": "mein-zimmer-im-haus",
+    "title": "Mein Zimmer im Haus",
+    "description": "Eine fiktive Szene: Das Haus ist groß, doch sein ganzes Leben passt auf zehn Quadratmeter. Niemand hat es verboten – er hat sich selbst immer kleiner gemacht. Über Coercive Control und schleichenden Raumverlust.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jans Sicht",
+    "pull_quote": "Niemand hat gesagt, ich dürfe den Flur nicht benutzen. Ich benutze ihn trotzdem nicht mehr.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dich in der eigenen Wohnung immer kleiner zu machen, ohne dass es je jemand verboten hätte? Magst du erzählen, wo du dich zurückgezogen hast?"
+    },
+    "scene_tags": [
+      "coercive-control",
+      "anpassung",
+      "rueckzug",
+      "auf-eierschalen-gehen",
+      "raumverlust"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/mein-zimmer-im-haus"
+  },
+  {
+    "type": "scene",
     "slug": "mitten-im-satz",
     "title": "Mitten im Satz",
     "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv.",
@@ -2540,6 +2975,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "niemand-hat-gratuliert",
+    "title": "Niemand hat gratuliert",
+    "description": "Eine fiktive Szene: Ein guter Tag, ein kleiner Erfolg – und zu Hause niemand, der sich mitfreut. Über fehlende Mitfreude und die besondere Einsamkeit, eine gute Nachricht nicht teilen zu können.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Markus' Sicht",
+    "pull_quote": "Ich hatte gehofft, dass sich jemand mit mir freut. Nicht viel. Nur ein „Mensch, schön für dich\" hätte gereicht.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, eine gute Nachricht heimzubringen und sie nirgends ablegen zu können? Magst du erzählen, was dann in dir passiert?"
+    },
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "fehlende-gegenseitigkeit",
+      "mitfreude",
+      "einsamkeit-zu-zweit",
+      "sich-unsichtbar-fuehlen"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/niemand-hat-gratuliert"
+  },
+  {
+    "type": "scene",
     "slug": "ploetzlich-die-taeterin",
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv.",
@@ -2565,6 +3029,93 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "selbstzweifel"
     ],
     "url": "/szenen/ploetzlich-die-taeterin"
+  },
+  {
+    "type": "scene",
+    "slug": "sag-einfach-nichts-papa",
+    "title": "Sag einfach nichts, Papa",
+    "description": "Eine fiktive Szene: Ein Kind, das die Stimmung im Auto liest, bevor die Eltern es tun, und den Vater zum Schweigen bittet, um den Frieden zu retten. Über Kinder im Elternkonflikt und die Last, die sie tragen.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sebastians Sicht",
+    "pull_quote": "„Sag einfach nichts, Papa.\" Mein Sohn ist neun. Er sollte das nicht können. Er sollte nicht wissen, dass Schweigen sicherer ist.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass ein Kind die Anspannung zwischen den Erwachsenen mitträgt? Magst du erzählen, was du beobachtest?"
+    },
+    "scene_tags": [
+      "kind-im-elternkonflikt",
+      "hypervigilanz",
+      "konfliktregulation",
+      "loyalitaetsdruck",
+      "auf-eierschalen-gehen"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/sag-einfach-nichts-papa"
+  },
+  {
+    "type": "scene",
+    "slug": "sie-hat-es-gehoert",
+    "title": "Sie hat es gehört",
+    "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Andreas' Sicht",
+    "pull_quote": "Sie hat es gehört. Und ist nicht aufgestanden. Das Schlimmste ist, dass ich es nicht einmal mehr erwartet habe.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass du aufgehört hast, Fürsorge überhaupt noch zu erwarten? Magst du erzählen, wann dir das zuletzt aufgefallen ist?"
+    },
+    "scene_tags": [
+      "fehlende-fuersorge",
+      "emotionale-vernachlaessigung",
+      "fehlende-empathie",
+      "resignation",
+      "einsamkeit-zu-zweit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/sie-hat-es-gehoert"
+  },
+  {
+    "type": "scene",
+    "slug": "sie-uebersetzt-fuer-uns",
+    "title": "Sie übersetzt für uns",
+    "description": "Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Lukas' Sicht",
+    "pull_quote": "„Mama sagt, das Essen ist fertig.\" Meine Tochter ist acht und trägt unsere Sätze hin und her, weil wir sie einander nicht mehr direkt sagen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass ein Kind zwischen den Eltern vermittelt? Magst du erzählen, was dir dabei auffällt?"
+    },
+    "scene_tags": [
+      "kind-im-elternkonflikt",
+      "parentifizierung",
+      "loyalitaetsdruck",
+      "einsamkeit-zu-zweit",
+      "konfliktregulation"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/sie-uebersetzt-fuer-uns"
   },
   {
     "type": "scene",
@@ -2682,6 +3233,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "wenn-hausarbeit-liebe-beweisen-soll",
+    "title": "Wenn Hausarbeit Liebe beweisen soll",
+    "description": "Eine fiktive Szene: Er hat gekocht, eingekauft, geputzt – eine Sache blieb liegen, und daran entzündet sich alles. Über bedingte Zuwendung und Aufgaben, die zum Beweis der Liebe werden.",
+    "cluster": "dynamiken",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Martins Sicht",
+    "pull_quote": "Es geht nicht um den Müll. Es geht darum, ob ich sie liebe. Der Müll ist der Beweis, den ich nicht erbracht habe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass eine banale Aufgabe plötzlich zum Beweis deiner Liebe wird? Magst du eine solche Situation anschauen?"
+    },
+    "scene_tags": [
+      "bedingte-zuwendung",
+      "emotionale-erpressung",
+      "erwartungsdruck",
+      "haushalt",
+      "aufrechnen"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/wenn-hausarbeit-liebe-beweisen-soll"
+  },
+  {
+    "type": "scene",
     "slug": "wer-war-ich-nochmal",
     "title": "Wer war ich nochmal",
     "description": "Eine Szene über Selbstverlust – der Moment, in dem man merkt, dass man langsam zu dem geworden ist, was jemand anderes wollte. Aus der Ich-Perspektive, fiktiv.",
@@ -2735,6 +3315,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "auf-eierschalen-gehen"
     ],
     "url": "/szenen/wo-bist-du-gerade"
+  },
+  {
+    "type": "scene",
+    "slug": "zwei-wochen-ohne-sie",
+    "title": "Zwei Wochen ohne sie",
+    "description": "Eine fiktive Szene: Sie ist verreist, und in der Stille bemerkt er, wie sehr sein Körper sich entspannt. Die Erleichterung ist keine Laune – sie ist eine Information. Über Dauerstress, Ambivalenz und die Klarheit der Abwesenheit.",
+    "cluster": "trennung",
+    "updated": "2026-08-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Christophs Sicht",
+    "pull_quote": "Ich habe zwei Wochen lang nicht auf eine Tür gehorcht. Erst als es aufhörte, habe ich gemerkt, dass ich es immer tue.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass eine Abwesenheit dir mehr über die Beziehung sagt als jede Aussprache? Magst du erzählen, was du in der Stille bemerkt hast?"
+    },
+    "scene_tags": [
+      "trennung",
+      "erleichterung",
+      "dauerstress",
+      "klarheit",
+      "ambivalenz"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/zwei-wochen-ohne-sie"
   },
   {
     "type": "scene",
@@ -3934,6 +4543,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Als sie endlich zuhörte",
     "description": "Eine Szene über den seltenen Moment, wirklich gehört zu werden – und wie viel ein einziges echtes Zuhören verändern kann. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/als-waere-nichts-gewesen": {
+    "title": "Als wäre nichts gewesen",
+    "description": "Eine fiktive Szene: Gestern der Satz „Ich gehe.\" Heute die Frage, ob noch Milch da ist. Kein Wort über gestern. Über Konflikte, die keine Reparatur bekommen – und die Einsamkeit, mit dem Geschehenen allein zu bleiben."
+  },
   "/szenen/am-ende-entschuldige-ich-mich": {
     "title": "Am Ende entschuldige ich mich",
     "description": "Eine Szene über Schuldumkehr – du bringst ein Anliegen vor und verlässt das Gespräch als die, die sich entschuldigt. Aus der Ich-Perspektive, fiktiv."
@@ -3954,9 +4567,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Aus einer Mücke",
     "description": "Eine Szene über die Eskalationsspirale – wie aus einer Bemerkung über den Abwasch ein Streit über die ganze Beziehung wird. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/bevor-sie-es-merkt": {
+    "title": "Bevor sie es merkt",
+    "description": "Eine fiktive Szene: Er räumt Fehler weg, bevor sie auffallen, und entschärft Situationen, bevor sie entstehen. Über vorauseilende Anpassung und ein Leben, das sich um die Vermeidung des nächsten Vorwurfs organisiert."
+  },
   "/szenen/bis-hierhin-und-nicht-weiter": {
     "title": "Bis hierhin und nicht weiter",
     "description": "Eine Szene über eine Grenze, die getestet wird – und den ruhigen Moment, in dem man sie zum ersten Mal wirklich hält. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/darf-ich-erleichtert-sein": {
+    "title": "Darf ich erleichtert sein?",
+    "description": "Eine fiktive Szene: Nach der Trennung erwartet er Trauer – und findet vor allem Erleichterung, die sich verboten anfühlt. Über die Schuldgefühle, wenn das Ende sich weniger nach Verlust anfühlt als nach Aufatmen."
   },
   "/szenen/das-augenrollen": {
     "title": "Das Augenrollen",
@@ -3994,6 +4615,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Der Daumen über dem Profil",
     "description": "Eine fiktive Szene: entfolgt, stummgeschaltet – und trotzdem kennt der Daumen den Weg zu ihrem Profil auswendig. Über das Nicht-loslassen-Können nach einer Trennung."
   },
+  "/szenen/der-konflikt-ist-vorbei-in-mir-nicht": {
+    "title": "Der Konflikt ist vorbei. In mir nicht.",
+    "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist."
+  },
   "/szenen/der-kruemel": {
     "title": "Der Krümel",
     "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv."
@@ -4005,6 +4630,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/der-perfekte-tag": {
     "title": "Der perfekte Tag",
     "description": "Eine Szene über intermittierende Verstärkung – ein einziger wunderbarer Tag, der Monate der Kälte auslöscht und die Hoffnung zurücksetzt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/der-schluessel-im-schloss": {
+    "title": "Der Schlüssel im Schloss",
+    "description": "Eine fiktive Szene: Am Geräusch des Heimkommens liest er schon ab, welcher Abend es wird. Über Hypervigilanz, das ständige Lesen der Stimmung und einen Alltag auf Habachtstellung."
   },
   "/szenen/der-vorwurf": {
     "title": "Der Vorwurf",
@@ -4046,13 +4675,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Du machst das eh besser",
     "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/ein-gespraech-mit-mir-selbst": {
+    "title": "Ein Gespräch mit mir selbst",
+    "description": "Eine fiktive Szene: Er trägt beide Enden des Gesprächs, denkt sich ihre Antworten dazu, weil echte selten kommen. Über einseitige Kommunikation und die Einsamkeit, neben jemandem zu leben, der nicht zurückspricht."
+  },
   "/szenen/eine-spur-besser": {
     "title": "Eine Spur besser",
     "description": "Eine Szene über eine Freundschaft mit feinem Konkurrenzdruck – wenn gute Nachrichten beim Gegenüber immer klein werden. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/entschuldigung-damit-es-aufhoert": {
+    "title": "Entschuldigung, damit es aufhört",
+    "description": "Eine fiktive Szene: Er entschuldigt sich für etwas, das er nicht getan hat – nicht aus Einsicht, sondern damit der Druck endet. Über Fawning, Konfliktvermeidung und erlernte Unterwerfung."
+  },
   "/szenen/erst-der-rausch-dann-die-kaelte": {
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/erst-wenn-ich-liefere": {
+    "title": "Erst wenn ich liefere",
+    "description": "Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen."
   },
   "/szenen/es-tut-mir-leid-dass-du": {
     "title": "Es tut mir leid, dass du",
@@ -4066,6 +4707,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Es wird mir zu viel",
     "description": "Eine Szene über emotionale Überflutung – der Moment, in dem das Gefühl das Denken überrollt und man nur noch raus muss. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/fragst-du-gar-nicht": {
+    "title": "Fragst du gar nicht?",
+    "description": "Eine fiktive Szene: zurück von einem Wochenende, voller Erlebnisse – und keine einzige Frage. Über Desinteresse ohne offene Aggression und das Gefühl, dass die eigene innere Welt beim Gegenüber kaum Neugier weckt."
+  },
   "/szenen/ich-brauch-eine-pause": {
     "title": "Ich brauch eine Pause",
     "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv."
@@ -4073,6 +4718,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-hab-mich-geaendert": {
     "title": "Ich hab mich geändert",
     "description": "Eine Szene über Hoovering – die Nachricht Wochen nach der Trennung, in der plötzlich alles anders sein soll. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-habe-wieder-musik-gehoert": {
+    "title": "Ich habe wieder Musik gehört",
+    "description": "Eine fiktive Szene: Wochen nach dem Auszug ertappt er sich beim lauten Mitsingen im Auto – und merkt, wie lange das weg war. Über die stille Wiederentdeckung des eigenen Ich nach einer Trennung."
   },
   "/szenen/ich-muss-fragen": {
     "title": "Ich muss fragen",
@@ -4110,6 +4759,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Immer die Große",
     "description": "Eine Szene über Parentifizierung – wenn man als Kind zur Stütze der Eltern wurde und als Erwachsene die erste Grenze wie Verrat fühlt. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/jede-stunde-muss-sich-rechnen": {
+    "title": "Jede Stunde muss sich rechnen",
+    "description": "Eine fiktive Szene: Zehn Minuten zu spät, und schon muss er Rechenschaft ablegen, wo er war und mit wem. Über Kontrolle im Alltag und das Gefühl, über die eigene Zeit nicht mehr frei zu verfügen."
+  },
   "/szenen/jeder-euro": {
     "title": "Jeder Euro",
     "description": "Eine Szene über finanzielle Kontrolle – wenn man sich für die eigenen Ausgaben rechtfertigen muss und dabei kleiner wird. Aus der Ich-Perspektive, fiktiv."
@@ -4134,6 +4787,22 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Mein erstes Nein",
     "description": "Eine Szene über das erste echte Nein – die Angst davor, das Zittern dabei und das ungewohnte Gefühl danach. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/mein-ja-das-ein-nein-war": {
+    "title": "Mein Ja, das ein Nein war",
+    "description": "Eine fiktive Szene: Er sagt Ja zu einem Wochenende, das er nicht will, und spürt in sich das Nein, das er nicht ausspricht. Über Selbstaufgabe durch Nachgeben und die Frage, wo die eigenen Wünsche geblieben sind."
+  },
+  "/szenen/mein-koerper-erinnert-sich": {
+    "title": "Mein Körper erinnert sich",
+    "description": "Eine fiktive Szene: Eine harmlose Bewegung, ein bestimmter Tonfall – und er zuckt zusammen, ohne dass etwas passiert wäre. Über konditionierte Anspannung und einen Körper, der in Habachtstellung geblieben ist."
+  },
+  "/szenen/mein-sohn-entschuldigt-sich": {
+    "title": "Mein Sohn entschuldigt sich",
+    "description": "Eine fiktive Szene: Der kleine Junge sagt „Entschuldigung\", noch bevor klar ist, ob etwas passiert ist – genau wie sein Vater. Über weitergegebene Muster und den Moment, in dem man das eigene Verhalten im Kind wiedererkennt."
+  },
+  "/szenen/mein-zimmer-im-haus": {
+    "title": "Mein Zimmer im Haus",
+    "description": "Eine fiktive Szene: Das Haus ist groß, doch sein ganzes Leben passt auf zehn Quadratmeter. Niemand hat es verboten – er hat sich selbst immer kleiner gemacht. Über Coercive Control und schleichenden Raumverlust."
+  },
   "/szenen/mitten-im-satz": {
     "title": "Mitten im Satz",
     "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv."
@@ -4146,9 +4815,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Neben dir ruhig",
     "description": "Eine Szene über Co-Regulation – wie die ruhige Nähe eines Menschen ein aufgewühltes Inneres beruhigt, ganz ohne Worte. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/niemand-hat-gratuliert": {
+    "title": "Niemand hat gratuliert",
+    "description": "Eine fiktive Szene: Ein guter Tag, ein kleiner Erfolg – und zu Hause niemand, der sich mitfreut. Über fehlende Mitfreude und die besondere Einsamkeit, eine gute Nachricht nicht teilen zu können."
+  },
   "/szenen/ploetzlich-die-taeterin": {
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/sag-einfach-nichts-papa": {
+    "title": "Sag einfach nichts, Papa",
+    "description": "Eine fiktive Szene: Ein Kind, das die Stimmung im Auto liest, bevor die Eltern es tun, und den Vater zum Schweigen bittet, um den Frieden zu retten. Über Kinder im Elternkonflikt und die Last, die sie tragen."
+  },
+  "/szenen/sie-hat-es-gehoert": {
+    "title": "Sie hat es gehört",
+    "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation."
+  },
+  "/szenen/sie-uebersetzt-fuer-uns": {
+    "title": "Sie übersetzt für uns",
+    "description": "Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden."
   },
   "/szenen/und-wie-geht-es-dir": {
     "title": "Und wie geht es dir?",
@@ -4166,6 +4851,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Wenn du mich lieben würdest",
     "description": "Eine Szene über emotionale Erpressung – wenn Liebe zum Hebel wird und ein Nein plötzlich einen Preis hat. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/wenn-hausarbeit-liebe-beweisen-soll": {
+    "title": "Wenn Hausarbeit Liebe beweisen soll",
+    "description": "Eine fiktive Szene: Er hat gekocht, eingekauft, geputzt – eine Sache blieb liegen, und daran entzündet sich alles. Über bedingte Zuwendung und Aufgaben, die zum Beweis der Liebe werden."
+  },
   "/szenen/wer-war-ich-nochmal": {
     "title": "Wer war ich nochmal",
     "description": "Eine Szene über Selbstverlust – der Moment, in dem man merkt, dass man langsam zu dem geworden ist, was jemand anderes wollte. Aus der Ich-Perspektive, fiktiv."
@@ -4173,6 +4862,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/wo-bist-du-gerade": {
     "title": "Wo bist du gerade?",
     "description": "Eine Szene über Kontrolle und Eifersucht – wenn Fürsorge zur Überwachung wird und dein Radius Woche für Woche kleiner. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/zwei-wochen-ohne-sie": {
+    "title": "Zwei Wochen ohne sie",
+    "description": "Eine fiktive Szene: Sie ist verreist, und in der Stille bemerkt er, wie sehr sein Körper sich entspannt. Die Erleichterung ist keine Laune – sie ist eine Information. Über Dauerstress, Ambivalenz und die Klarheit der Abwesenheit."
   },
   "/szenen/zwischen-bleiben-und-gehen": {
     "title": "Zwischen Bleiben und Gehen",
