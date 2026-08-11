@@ -282,8 +282,8 @@ function ProfileAnswers({ modules, config }: {
   return (
     <div className="space-y-2">
       {sections.map(sec => (
-        <details key={sec.id} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
-          <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <details key={sec.id} className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
+          <summary className="flex items-center gap-2.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent/70 before:content-[''] [&>span:first-of-type]:min-w-0 [&>span:first-of-type]:flex-1">
             <span className="text-sm font-medium text-navy">{sec.label}</span>
             <Chevron />
           </summary>
@@ -568,13 +568,18 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
               {bundle.scales.filter(s => (Number(s.score) || 0) > 0).map(s => {
                 const score = Number(s.score) || 0
                 const label = SCALE_LABELS[s.scale_key as ScaleKey] ?? s.scale_key
+                const tone = score >= 3.6
+                  ? { bar: 'bg-red-500', text: 'text-red-600' }
+                  : score >= 2.4
+                    ? { bar: 'bg-amber-400', text: 'text-amber-600' }
+                    : { bar: 'bg-green-500', text: 'text-green-600' }
                 return (
                   <div key={s.scale_key} className="flex items-center gap-3">
                     <span className="w-36 shrink-0 truncate text-xs font-medium text-navy" title={label}>{label}</span>
                     <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-brand-border/70">
-                      <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${Math.min(100, Math.round((score / 5) * 100))}%` }} />
+                      <div className={`h-full rounded-full transition-all ${tone.bar}`} style={{ width: `${Math.min(100, Math.round((score / 5) * 100))}%` }} />
                     </div>
-                    <span className="w-12 shrink-0 text-right text-sm font-bold tabular-nums text-accent">
+                    <span className={`w-12 shrink-0 text-right text-sm font-bold tabular-nums ${tone.text}`}>
                       {score.toFixed(1)}<span className="text-[10px] font-normal text-brand-muted">/5</span>
                     </span>
                   </div>
@@ -588,8 +593,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           <Section title="Themendialog-Zusammenfassungen" icon={<IconChat />}>
             <div className="space-y-2">
               {bundle.topic_summaries.map(t => (
-                <details key={t.topic} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
-                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <details key={t.topic} className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
+                  <summary className="flex items-center gap-2.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent/70 before:content-[''] [&>span:first-of-type]:min-w-0 [&>span:first-of-type]:flex-1">
                     <span className="text-sm font-medium text-navy truncate">{TOPIC_LABELS[t.topic] ?? t.topic}</span>
                     <Chevron />
                   </summary>
@@ -606,8 +611,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           <Section title="Hypothesen (tastend, keine Diagnose)" icon={<IconSparkles />}>
             <div className="space-y-2">
               {bundle.hypotheses.map(h => (
-                <details key={h.hypothesis_type} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
-                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <details key={h.hypothesis_type} className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
+                  <summary className="flex items-center gap-2.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent/70 before:content-[''] [&>span:first-of-type]:min-w-0 [&>span:first-of-type]:flex-1">
                     <span className="text-sm font-medium text-navy truncate">{HYP_LABELS[h.hypothesis_type] ?? h.hypothesis_type}</span>
                     <Chevron />
                   </summary>
@@ -624,8 +629,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           <Section title="Selbsttest-Ergebnisse" icon={<IconChart />}>
             <div className="space-y-2">
               {bundle.test_results.map(t => (
-                <details key={t.slug} className="group rounded-brand border border-brand-border bg-white px-4 py-2.5 open:border-accent/30">
-                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <details key={t.slug} className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
+                  <summary className="flex items-center gap-2.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent/70 before:content-[''] [&>span:first-of-type]:min-w-0 [&>span:first-of-type]:flex-1">
                     <span className="text-sm font-medium text-navy truncate">{t.title}</span>
                     <Chevron />
                   </summary>
@@ -690,8 +695,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           <Section title={`Berichte (${bundle.reports.length})`} icon={<IconDoc />}>
             <div className="space-y-4">
               {bundle.reports.map(r => (
-                <details key={r.id} className="group rounded-brand border border-brand-border bg-white px-4 py-3 open:border-accent/30">
-                  <summary className="flex items-center justify-between gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <details key={r.id} className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
+                  <summary className="flex items-center gap-2.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent/70 before:content-[''] [&>span:first-of-type]:min-w-0 [&>span:first-of-type]:flex-1">
                     <span className="flex items-center gap-2 min-w-0">
                       <DocIcon />
                       <span className="text-sm font-medium text-navy truncate">{r.title || r.type_label || r.report_type}</span>
