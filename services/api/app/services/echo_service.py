@@ -46,6 +46,13 @@ def _load_prompt(filename: str) -> str:
 
 # ── Fallkontext-Builder ───────────────────────────────────────────────────────
 
+# Interim-Deckel für Szenen im Echo-Kontext (gilt für Nutzer UND Fachperson,
+# da build_shared_case_context denselben Builder nutzt). Vorher 20; auf 50
+# angehoben, damit relevante Szenen nicht wegfallen. Langfristig durch
+# relevanz-basiertes Retrieval (RAG) ersetzen statt „alle reinkippen".
+MAX_CONTEXT_SCENES = 50
+
+
 def build_case_context(
     case: dict[str, Any],
     onboarding: dict[str, Any] | None,
@@ -102,7 +109,7 @@ def build_case_context(
 
     if include_scene_section and scenes:
         lines.append(f"## Dokumentierte Szenen ({len(scenes)} gesamt, {len(confirmed)} bestätigt)\n")
-        for i, scene in enumerate(scenes[:20], 1):   # max 20 Szenen
+        for i, scene in enumerate(scenes[:MAX_CONTEXT_SCENES], 1):
             date_str = f" ({scene['scene_date']})" if scene.get("scene_date") else ""
             distress = f", Belastung: {scene['distress_score']}/5" if scene.get("distress_score") else ""
             confirmed_mark = "✓" if scene.get("confirmed_by_user") else "○ unbestätigt"
@@ -131,8 +138,8 @@ def build_case_context(
 
             lines.append("")
 
-        if len(scenes) > 20:
-            lines.append(f"_(+{len(scenes) - 20} weitere Szenen nicht angezeigt)_\n")
+        if len(scenes) > MAX_CONTEXT_SCENES:
+            lines.append(f"_(+{len(scenes) - MAX_CONTEXT_SCENES} weitere Szenen nicht angezeigt)_\n")
     elif include_scene_section:
         lines.append("## Szenen\nNoch keine Szenen dokumentiert.\n")
 
