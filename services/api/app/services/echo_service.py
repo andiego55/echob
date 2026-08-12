@@ -51,6 +51,11 @@ def _load_prompt(filename: str) -> str:
 # angehoben, damit relevante Szenen nicht wegfallen. Langfristig durch
 # relevanz-basiertes Retrieval (RAG) ersetzen statt „alle reinkippen".
 MAX_CONTEXT_SCENES = 50
+# Zeichen-Deckel je Szene im Kontext (nur Kontext-Kappung – die Speicherung
+# selbst ist ungekappt). Beschreibung ~halbe DIN-A4-Seite, eigene Reaktion
+# großzügig. Höhere Werte = mehr Token je Szene → verstärkt den Nutzen von RAG.
+MAX_SCENE_DESC_CHARS = 1500
+MAX_SCENE_REACTION_CHARS = 800
 
 
 def build_case_context(
@@ -126,14 +131,15 @@ def build_case_context(
                 lines.append(f"⚠ Sicherheitsstatus: {scene['safety_level']}")
 
             if scene.get("description"):
-                # Auf 400 Zeichen kürzen um Token-Budget zu schonen
-                desc = scene["description"][:400]
-                if len(scene["description"]) > 400:
+                desc = scene["description"][:MAX_SCENE_DESC_CHARS]
+                if len(scene["description"]) > MAX_SCENE_DESC_CHARS:
                     desc += "…"
                 lines.append(f"> {desc}")
 
             if scene.get("user_reaction"):
-                reaction = scene["user_reaction"][:200]
+                reaction = scene["user_reaction"][:MAX_SCENE_REACTION_CHARS]
+                if len(scene["user_reaction"]) > MAX_SCENE_REACTION_CHARS:
+                    reaction += "…"
                 lines.append(f"> Reaktion: {reaction}")
 
             lines.append("")
