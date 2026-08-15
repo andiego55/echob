@@ -7,7 +7,7 @@ import {
   type SelfTest, type TestQuestion, type TestAnswers, type TestBand,
 } from '@/selftests/types'
 import { scoreTest, isAnswered, requiredQuestions, type TestResult, type DimensionResult } from '@/selftests/scoring'
-import { saveTestResult } from '@/selftests/resultStore'
+import { saveTestResult, saveTestAnswers } from '@/selftests/resultStore'
 import { useAuth } from '@/contexts/AuthContext'
 import { testResultsApi } from '@/api/testResults'
 
@@ -82,6 +82,7 @@ function TestRunner({ test }: { test: SelfTest }) {
     }
     const res = scoreTest(test, answers)
     saveTestResult(res)
+    saveTestAnswers(test.slug, answers) // für den interaktiven Ergebnis-Dialog
     setResult(res)
     // Angemeldet → Ergebnis ins Profil speichern (nutzer-eigen). Fire-and-forget.
     if (session) {

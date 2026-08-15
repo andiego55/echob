@@ -46,6 +46,12 @@ export interface TestQuestion {
   /** scale-Frage: ab diesem Wert wird ``flag`` gesetzt (kritische Angabe). */
   flag?: string
   flagMin?: number
+  /**
+   * Optionaler Kurz-Erklärtext für den Ergebnis-Dialog: „Was will diese Frage erfassen?"
+   * Wird Echo als Erklärhilfe mitgegeben. Fehlt er, leitet Echo die Bedeutung aus der
+   * Dimension, der Richtung (reverse) und der Skala ab. Rein additiv – ohne Wirkung aufs Scoring.
+   */
+  intent?: string
 }
 
 /** Ergebnis-Band (min = inklusive Untergrenze in %, 0..100). Aufsteigend sortiert. */
@@ -67,6 +73,11 @@ export interface TestDimension {
   resultText?: string
   /** Typologie-Modus: kurze Kennzeichnung fürs Ergebnis-Label. */
   resultTagline?: string
+  /**
+   * Optionaler Erklärtext für den Ergebnis-Dialog: „Was misst diese Skala und wie sind
+   * hohe/niedrige Werte zu verstehen?" Ergänzt `description`. Rein additiv.
+   */
+  explain?: string
 }
 
 export interface SelfTest {

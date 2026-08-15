@@ -53,6 +53,7 @@ import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
 import PersonProfilePage     from '@/pages/app/PersonProfilePage'
 import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
 import TopicDialogPage       from '@/pages/app/TopicDialogPage'
+import SelfTestDialoguePage  from '@/pages/app/SelfTestDialoguePage'
 import HypothesesPage        from '@/pages/app/HypothesesPage'
 import HypothesisDialogPage  from '@/pages/app/HypothesisDialogPage'
 import UpgradePage           from '@/pages/app/UpgradePage'
@@ -236,6 +237,7 @@ export function AppRoutes() {
       <Route path="/app/cases/:caseId/reports/:reportId" element={<ProtectedRoute><ReportDetailPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/export" element={<ProtectedRoute><PrintSummaryPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/topics/:topicId" element={<ProtectedRoute><TopicDialogPageWrapper /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/selbsttest/:slug" element={<ProtectedRoute><SelfTestDialoguePage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/hypotheses" element={<ProtectedRoute><HypothesesPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/hypotheses/:hypothesisId" element={<ProtectedRoute><HypothesisDialogPageWrapper /></ProtectedRoute>} />
 

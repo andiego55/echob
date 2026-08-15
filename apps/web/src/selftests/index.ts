@@ -40,3 +40,4 @@ export const SELFTEST_ROUTE_META: Record<string, { title: string; description: s
 
 export * from './types'
 export * from './scoring'
+export * from './dialogue'
