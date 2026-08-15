@@ -72,8 +72,8 @@ export default function CaseDetailPage() {
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         {/* Fall-Header */}
         <div className="card mb-4">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="flex items-start gap-3.5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3.5 min-w-0">
               <Avatar value={c.avatar} size="lg" />
               <div>
                 <span className="label mb-2">{RELATIONSHIP_TYPE_LABELS[c.relationship_type]}</span>
@@ -86,7 +86,7 @@ export default function CaseDetailPage() {
                 </p>
               </div>
             </div>
-            <div className="flex gap-2 flex-wrap shrink-0">
+            <div className="flex flex-wrap gap-2 sm:shrink-0">
               <Link
                 to={`/app/cases/${caseId}/echo`}
                 className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm"
