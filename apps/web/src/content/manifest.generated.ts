@@ -139,6 +139,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "dissoziation",
+    "title": "Dissoziation – wenn der Kopf sich abkoppelt, um zu schützen",
+    "description": "Dissoziation ist ein innerlicher Rückzug: Man fühlt sich fern, taub oder wie abgeschnitten. Warum das ein Schutz ist, wie es sich zeigt und was zurück in den Körper hilft. Ohne Diagnose.",
+    "cluster": "trauma",
+    "search_intent": "Dissoziation Bedeutung Gefühl abgetrennt was tun",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Dissoziation gelesen. Kennst du das Gefühl, in einem Moment fern und wie betäubt zu sein? Magst du eine solche Situation anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Dissoziation gefährlich?",
+        "answer": "Dissoziation selbst ist ein Schutzmechanismus, kein Defekt. Sie kann aber belastend werden, wenn sie häufig auftritt oder den Alltag stört. Dann lohnt sich fachliche Begleitung – Dissoziation ist gut behandelbar."
+      },
+      {
+        "question": "Wie merke ich, dass ich dissoziiere?",
+        "answer": "Häufige Zeichen sind: sich wie hinter Glas oder neben sich fühlen, Taubheit, Zeit- oder Erinnerungslücken, das Gefühl, die Umgebung sei unwirklich. Oft passiert es in oder nach Stress, Konflikten oder bei Triggern."
+      }
+    ],
+    "url": "/glossar/dissoziation"
+  },
+  {
+    "type": "glossary",
     "slug": "double-bind",
     "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
     "description": "Ein Double Bind ist eine Zwickmühle aus zwei widersprüchlichen Botschaften, bei der jede Reaktion falsch ist – und das Benennen des Widerspruchs verboten scheint. Warum das so tief verunsichert. Ohne Diagnose.",
@@ -317,6 +351,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "flashback",
+    "title": "Flashback – wenn Vergangenes sich wie Gegenwart anfühlt",
+    "description": "Bei einem Flashback wird eine belastende Erinnerung so lebendig, dass sie sich anfühlt, als geschehe sie jetzt. Was dabei im Gehirn passiert und wie du dich zurück in die Gegenwart holst. Ohne Diagnose.",
+    "cluster": "trauma",
+    "search_intent": "Flashback Bedeutung Trauma was tun",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Flashbacks gelesen. Möchtest du behutsam anschauen, was dich zuletzt so überkommen hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist ein Flashback eine Erinnerung oder eine Einbildung?",
+        "answer": "Weder noch im üblichen Sinn. Ein Flashback ist eine sehr reale, aber fehlplatzierte Erinnerung: Das Gehirn spielt Gefühle und Körperempfindungen von damals ab, als wären sie jetzt. Du bildest dir nichts ein – dein System verwechselt nur Vergangenheit mit Gegenwart."
+      },
+      {
+        "question": "Was kann ich tun, wenn ein Flashback kommt?",
+        "answer": "Erinnere dich laut oder innerlich daran, wo und wann du wirklich bist. Spüre deinen Körper – Füße auf dem Boden, kaltes Wasser, ein fester Gegenstand in der Hand. Benenne, was du um dich siehst. Solche Erdungsübungen holen dich Schritt für Schritt in die Gegenwart zurück."
+      }
+    ],
+    "url": "/glossar/flashback"
+  },
+  {
+    "type": "glossary",
     "slug": "gaslighting",
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest.",
@@ -456,6 +524,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "idealisierung",
+    "title": "Idealisierung – wenn die Erinnerung schöner wird als die Beziehung war",
+    "description": "Nach einer Trennung erinnert man oft nur die guten Momente und vergisst die schlechten. Warum dein Kopf die Beziehung schönfärbt, wie das das Loslassen erschwert und wie du der Verzerrung begegnest.",
+    "cluster": "liebeskummer",
+    "search_intent": "Idealisierung Ex Erinnerung schönfärben Trennung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wird die Beziehung in deiner Erinnerung manchmal schöner, als sie war? Magst du das gemeinsam sortieren?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum erinnere ich nur die guten Zeiten mit meinem Ex?",
+        "answer": "Weil das Gedächtnis unter Sehnsucht selektiv wird: Es hebt die warmen Momente hervor und lässt die schlechten verblassen. Das ist ein normaler Effekt, kein Zeichen, dass die Trennung falsch war. Sehnsucht ist ein schlechter Zeuge für die Realität."
+      },
+      {
+        "question": "Wie komme ich aus der Idealisierung heraus?",
+        "answer": "Indem du die ganze Wahrheit sichtbar machst – zum Beispiel, indem du dir die konkreten Gründe und schwierigen Situationen aufschreibst und in schwachen Momenten liest. Konkrete Erinnerungen wirken der schönfärbenden Verzerrung entgegen."
+      }
+    ],
+    "url": "/glossar/idealisierung"
+  },
+  {
+    "type": "glossary",
     "slug": "intermittierende-verstaerkung",
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
     "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose.",
@@ -529,6 +631,42 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/kognitive-dissonanz"
+  },
+  {
+    "type": "glossary",
+    "slug": "komplextrauma",
+    "title": "Komplextrauma (komplexe PTBS) – wenn Belastung lange dauert",
+    "description": "Komplextrauma entsteht nicht durch ein einzelnes Ereignis, sondern durch wiederholte, lang anhaltende Belastung – oft in Beziehungen. Was es kennzeichnet und warum Selbstwert und Vertrauen betroffen sind. Ohne Diagnose.",
+    "cluster": "trauma",
+    "search_intent": "Komplextrauma komplexe PTBS Beziehung Bedeutung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Komplextrauma gelesen. Magst du anschauen, was sich über die Zeit in dir verändert hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [
+      "gewalt"
+    ],
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen PTBS und komplexer PTBS?",
+        "answer": "Eine klassische PTBS folgt meist auf ein einzelnes, klar umrissenes Ereignis. Von komplexer PTBS spricht man, wenn die Belastung wiederholt und lang anhaltend war – etwa Gewalt, Kontrolle oder ständige Angst in einer Beziehung. Zusätzlich zu den PTBS-Symptomen sind hier oft Selbstwert, Gefühlsregulation und Vertrauen tief betroffen."
+      },
+      {
+        "question": "Ist Komplextrauma heilbar?",
+        "answer": "Traumafolgen sind gut behandelbar. Heilung braucht meist Zeit, Sicherheit und fachliche Begleitung – aber der Weg ist möglich, und viele Menschen finden wieder zu Stabilität und Nähe."
+      }
+    ],
+    "url": "/glossar/komplextrauma"
   },
   {
     "type": "glossary",
@@ -736,6 +874,42 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "ptbs",
+    "title": "Posttraumatische Belastungsstörung (PTBS) – einfach erklärt",
+    "description": "Was eine posttraumatische Belastungsstörung ist, welche vier Symptomgruppen typisch sind und warum sie eine normale Reaktion auf eine unnormale Belastung ist. Ohne Ferndiagnose.",
+    "cluster": "trauma",
+    "search_intent": "PTBS Bedeutung Symptome einfach erklärt",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über die posttraumatische Belastung gelesen. Möchtest du eine Situation anschauen, in der dein Körper stärker reagiert hat, als es die Lage hergab?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [
+      "gewalt"
+    ],
+    "faq": [
+      {
+        "question": "Bekommt man PTBS nur nach einem einzelnen schlimmen Ereignis?",
+        "answer": "Nein. Eine PTBS kann nach einem einzelnen Ereignis entstehen, aber auch nach lang anhaltender Belastung wie Gewalt oder ständiger Angst in einer Beziehung. Für Letzteres wird oft der Begriff komplexe PTBS verwendet."
+      },
+      {
+        "question": "Kann ich mir selbst eine PTBS diagnostizieren?",
+        "answer": "Nein. Ob eine posttraumatische Belastungsstörung vorliegt, kann nur eine qualifizierte Fachperson im persönlichen Gespräch feststellen. Dieser Text hilft dir, dein Erleben einzuordnen – er ersetzt keine Diagnostik."
+      }
+    ],
+    "url": "/glossar/ptbs"
+  },
+  {
+    "type": "glossary",
     "slug": "reparaturversuch",
     "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
     "description": "Was ein Reparaturversuch ist, warum die Fähigkeit, ihn zu senden und anzunehmen, über die Zukunft einer Beziehung entscheidet, und wie man ihn erkennt. Ohne Diagnose.",
@@ -907,6 +1081,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/taeter-opfer-umkehr"
+  },
+  {
+    "type": "glossary",
+    "slug": "trennungsschmerz",
+    "title": "Trennungsschmerz – warum Liebeskummer wie Entzug wirkt",
+    "description": "Trennungsschmerz ist kein Selbstmitleid, sondern Biologie: Das Gehirn reagiert auf den Verlust einer Bindung ähnlich wie auf Entzug und körperlichen Schmerz. Warum das so ist – und was es leichter macht.",
+    "cluster": "liebeskummer",
+    "search_intent": "Trennungsschmerz warum körperlich Liebeskummer Entzug",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Trennungsschmerz gelesen. Magst du erzählen, wie er sich bei dir gerade anfühlt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum tut eine Trennung körperlich weh?",
+        "answer": "Weil das Gehirn Bindung wie ein Grundbedürfnis behandelt. Beim Verlust sind Regionen aktiv, die auch bei körperlichem Schmerz und bei Entzug eine Rolle spielen. Das Ziehen in der Brust, die Unruhe, der Appetitverlust sind reale körperliche Reaktionen."
+      },
+      {
+        "question": "Wie werde ich den Trennungsschmerz los?",
+        "answer": "Nicht durch Wegdrücken, sondern durch Durchfühlen plus Abstand. Kontaktsperre, Zeit, Menschen, Bewegung und das Zulassen der Gefühle helfen dem System, herunterzufahren. Der Schmerz kommt in Wellen und wird mit der Zeit leiser."
+      }
+    ],
+    "url": "/glossar/trennungsschmerz"
+  },
+  {
+    "type": "glossary",
+    "slug": "trigger",
+    "title": "Trigger – der Auslöser, der die Vergangenheit zurückholt",
+    "description": "Ein Trigger ist ein Reiz – ein Geruch, ein Ton, ein Satz –, der plötzlich alte, belastende Gefühle auslöst, als wäre die Gefahr wieder da. Warum das passiert und was im Moment hilft. Ohne Diagnose.",
+    "cluster": "trauma",
+    "search_intent": "Trigger Bedeutung Psychologie Beziehung Beispiel",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Trigger gelesen. Magst du eine Situation anschauen, in der dich etwas scheinbar Kleines plötzlich stark getroffen hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist ein Trigger einfach nur Sich-Aufregen?",
+        "answer": "Nein. Ein Trigger ist mehr als Ärger oder Unmut. Er aktiviert eine alte Stress- oder Überlebensreaktion: Herzrasen, Panik, Erstarren, das Gefühl, wieder mittendrin zu sein. Der Reiz selbst ist oft harmlos – die Reaktion stammt aus der Vergangenheit."
+      },
+      {
+        "question": "Kann man Trigger loswerden?",
+        "answer": "Man kann lernen, sie zu erkennen, ihre Wucht zu verringern und sich im Moment zu erden. Mit der Zeit – oft mit fachlicher Begleitung – verlieren viele Trigger ihre Macht. Vermeidung allein hält sie eher am Leben."
+      }
+    ],
+    "url": "/glossar/trigger"
   },
   {
     "type": "glossary",
@@ -1709,6 +1951,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-erste-gute-tag",
+    "title": "Der erste gute Tag",
+    "description": "Eine fiktive Szene: Zum ersten Mal seit der Trennung vergeht ein ganzer Tag, an dem sie kaum an ihn gedacht hat. Und abends kommt statt Erleichterung ein seltsames Schuldgefühl. Über die krummen Wege der Heilung.",
+    "cluster": "liebeskummer",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Miriams Sicht",
+    "pull_quote": "Ich hatte einen guten Tag. Und dann fühlte ich mich schuldig, als hätte ich etwas verraten.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Heilung verläuft selten gerade. Magst du erzählen, wo du gerade stehst – zwischen guten Tagen und Rückschlägen?"
+    },
+    "scene_tags": [
+      "hoffnung",
+      "schuldgefuehle",
+      "loslassen",
+      "trennungsschmerz"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-erste-gute-tag"
+  },
+  {
+    "type": "scene",
     "slug": "der-konflikt-ist-vorbei-in-mir-nicht",
     "title": "Der Konflikt ist vorbei. In mir nicht.",
     "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist.",
@@ -1905,6 +2175,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "die-leere-seite-vom-bett",
+    "title": "Die leere Seite vom Bett",
+    "description": "Eine fiktive Szene: Er wacht auf und greift automatisch nach rechts, wo sie immer lag. Da ist nur die kühle, glatte Decke. Über die kleinen Morgenmomente, in denen ein Verlust am lautesten ist.",
+    "cluster": "liebeskummer",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Simons Sicht",
+    "pull_quote": "Mein Arm wusste es noch nicht. Er suchte einfach nach ihr, wie jeden Morgen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Es sind oft die kleinen, stillen Momente, die am meisten wehtun. Magst du erzählen, welcher gerade deiner ist?"
+    },
+    "scene_tags": [
+      "sehnsucht",
+      "vermissen",
+      "trennungsschmerz",
+      "einsamkeit-zu-zweit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/die-leere-seite-vom-bett"
+  },
+  {
+    "type": "scene",
     "slug": "die-liste",
     "title": "Die Liste",
     "description": "Eine Szene über das Aufrechnen – wenn jeder alte Fehler aufbewahrt und im nächsten Streit wieder hervorgeholt wird. Aus der Ich-Perspektive, fiktiv.",
@@ -2012,6 +2310,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "rueckzug"
     ],
     "url": "/szenen/die-wand"
+  },
+  {
+    "type": "scene",
+    "slug": "die-zahnbuerste",
+    "title": "Die Zahnbürste, die noch da ist",
+    "description": "Eine fiktive Szene: Im Zahnputzbecher steht noch ihre Zahnbürste. So ein kleines Ding – und sie wegzuwerfen fühlt sich an wie das endgültige Ende. Über die Dinge, die bleiben, und was sie mit uns machen.",
+    "cluster": "liebeskummer",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Annas Sicht",
+    "pull_quote": "Es ist nur eine Zahnbürste. Warum fühlt es sich an, als würde ich sie ein zweites Mal verlieren?",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Manchmal sind es die kleinen Dinge, die bleiben, die am meisten wehtun. Gibt es so ein Ding bei dir? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "vermissen",
+      "loslassen",
+      "trennungsschmerz",
+      "sehnsucht"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/die-zahnbuerste"
   },
   {
     "type": "scene",
@@ -2212,6 +2538,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "entwurf-geloescht",
+    "title": "Entwurf gelöscht",
+    "description": "Eine fiktive Szene: Zum dritten Mal an diesem Abend tippt sie eine Nachricht an ihn, liest sie, und löscht sie wieder Buchstabe für Buchstabe. Über das Ringen mit dem Handy und den Drang, den Kontakt doch nicht zu lassen.",
+    "cluster": "liebeskummer",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ninas Sicht",
+    "pull_quote": "Mein Daumen schwebt über dem Senden-Knopf. Und ich weiß genau, dass es mir morgen leidtun würde.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Ringen mit dem Handy – schreiben wollen und wissen, dass man es besser lässt? Magst du erzählen, was dich gerade zieht?"
+    },
+    "scene_tags": [
+      "kontaktsperre",
+      "sehnsucht",
+      "gruebeln",
+      "trennungsschmerz"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/entwurf-geloescht"
+  },
+  {
+    "type": "scene",
     "slug": "erst-der-rausch-dann-die-kaelte",
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv.",
@@ -2266,6 +2620,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/erst-wenn-ich-liefere"
+  },
+  {
+    "type": "scene",
+    "slug": "es-riecht-nach-ihm",
+    "title": "Es riecht nach ihm",
+    "description": "Eine fiktive Szene: In der Bahn steigt ein Fremder ein, und sein Rasierwasser ist genau das – und plötzlich ist alles wieder da. Über Trigger, die den Körper in Sekunden zurück in die Vergangenheit reißen.",
+    "cluster": "trauma",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Melanies Sicht",
+    "pull_quote": "Ein Fremder, den ich nie zuvor gesehen habe. Und trotzdem stand mein ganzer Körper in Flammen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Manchmal reicht eine Kleinigkeit – ein Geruch, ein Ton –, und alles ist wieder da. Magst du so einen Moment behutsam anschauen?"
+    },
+    "scene_tags": [
+      "trigger",
+      "koerpererinnerung",
+      "angst",
+      "wiedererleben"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/es-riecht-nach-ihm"
   },
   {
     "type": "scene",
@@ -2379,6 +2761,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/fragst-du-gar-nicht"
+  },
+  {
+    "type": "scene",
+    "slug": "gemeinsame-freunde",
+    "title": "Wie geht es ihr?",
+    "description": "Eine fiktive Szene: Beim Grillen mit Freunden fällt beiläufig ihr Name – und wie es ihr angeblich schon wieder gut geht. Über die gemeinsame Welt, die nach einer Trennung bleibt, und den Stich, den ein harmloser Satz setzen kann.",
+    "cluster": "liebeskummer",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tims Sicht",
+    "pull_quote": "Ihr geht es gut, sagte er, ganz beiläufig – und ich lächelte und wollte nur noch nach Hause.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Die gemeinsame Welt bleibt oft, auch wenn die Beziehung geht. Magst du erzählen, was dich daran gerade am meisten belastet?"
+    },
+    "scene_tags": [
+      "gruebeln",
+      "sehnsucht",
+      "loslassen",
+      "vergleich"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/gemeinsame-freunde"
   },
   {
     "type": "scene",
@@ -2547,6 +2957,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/ich-vermisse-das-chaos"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-war-nicht-da",
+    "title": "Ich war nicht da",
+    "description": "Eine fiktive Szene: Als die Stimmen im Meeting lauter werden, wird alles um ihn herum leise und fern – wie hinter Glas. Über die Dissoziation, das Abkoppeln, das einmal Schutz war und jetzt mitten im Alltag passiert.",
+    "cluster": "trauma",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Kais Sicht",
+    "pull_quote": "Ich saß mitten im Raum und war doch nicht da. Als hätte sich jemand in mir leise ausgeschaltet.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, in einem angespannten Moment plötzlich fern und wie betäubt zu sein? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "dissoziation",
+      "betaeubung",
+      "selbstverlust",
+      "koerpererinnerung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-war-nicht-da"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-warte-auf-den-knall",
+    "title": "Ich warte auf den Knall",
+    "description": "Eine fiktive Szene: Der neue Partner ist ruhig, warm, verlässlich – und genau das macht ihr Angst. Über die Wachsamkeit, die nach einer belastenden Beziehung bleibt, selbst wenn endlich alles sicher ist.",
+    "cluster": "trauma",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Lauras Sicht",
+    "pull_quote": "Er ist gut zu mir. Und ich ertappe mich, wie ich darauf warte, dass es kippt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Fällt es dir schwer, Ruhe und Sicherheit zu glauben, wenn du sie bekommst? Magst du das behutsam anschauen?"
+    },
+    "scene_tags": [
+      "hypervigilanz",
+      "misstrauen",
+      "koerpererinnerung",
+      "naehe-distanz"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-warte-auf-den-knall"
   },
   {
     "type": "scene",
@@ -3057,6 +3523,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "mitten-am-tag",
+    "title": "Mitten am Tag",
+    "description": "Eine fiktive Szene: An der Supermarktkasse, zwischen Milch und Brot, ist plötzlich alles wieder da – so echt, als geschehe es jetzt. Über einen Flashback, der sich ungefragt in einen ganz normalen Moment drängt.",
+    "cluster": "trauma",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Robins Sicht",
+    "pull_quote": "Ich stand zwischen Milch und Brot – und war für einen Moment ganz woanders. Wieder dort.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Drängt sich manchmal etwas Altes in einen ganz normalen Moment? Magst du behutsam anschauen, was zuletzt hochkam?"
+    },
+    "scene_tags": [
+      "flashback",
+      "wiedererleben",
+      "trigger",
+      "koerpererinnerung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/mitten-am-tag"
+  },
+  {
+    "type": "scene",
     "slug": "mitten-im-satz",
     "title": "Mitten im Satz",
     "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv.",
@@ -3343,6 +3837,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "unser-lied",
+    "title": "Unser Lied",
+    "description": "Eine fiktive Szene: Im Café läuft plötzlich das Lied, zu dem sie in der Küche getanzt haben. Zwischen Latte macchiato und Wochenendplänen steht er mit einem Mal mitten in der Erinnerung. Über Sehnsucht, die einen ungefragt überkommt.",
+    "cluster": "liebeskummer",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Davids Sicht",
+    "pull_quote": "Drei Takte. Mehr brauchte es nicht, um mich mitten im Café zurück in unsere Küche zu holen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Gibt es ein Lied, einen Ort, einen Duft, der dich sofort zurückholt? Magst du erzählen, was er in dir auslöst?"
+    },
+    "scene_tags": [
+      "sehnsucht",
+      "trennungsschmerz",
+      "vermissen",
+      "gruebeln"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/unser-lied"
+  },
+  {
+    "type": "scene",
     "slug": "unter-der-wut",
     "title": "Unter der Wut",
     "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv.",
@@ -3513,6 +4035,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "wieder-dieser-traum",
+    "title": "Wieder dieser Traum",
+    "description": "Eine fiktive Szene: Um kurz nach vier wacht er auf, das Herz rast, das Kissen ist nass – schon wieder derselbe Traum. Über Albträume, die die Nacht zurückerobern, lange nachdem alles vorbei ist.",
+    "cluster": "trauma",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Deniz' Sicht",
+    "pull_quote": "Tagsüber komme ich zurecht. Aber die Nächte gehören noch nicht wieder mir.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Holt dich die Nacht manchmal zurück, obwohl der Tag ruhig ist? Magst du erzählen, was dich nicht schlafen lässt?"
+    },
+    "scene_tags": [
+      "albtraeume",
+      "wiedererleben",
+      "angst",
+      "koerpererinnerung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/wieder-dieser-traum"
+  },
+  {
+    "type": "scene",
     "slug": "wo-bist-du-gerade",
     "title": "Wo bist du gerade?",
     "description": "Eine Szene über Kontrolle und Eifersucht – wenn Fürsorge zur Überwachung wird und dein Radius Woche für Woche kleiner. Aus der Ich-Perspektive, fiktiv.",
@@ -3538,6 +4088,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "auf-eierschalen-gehen"
     ],
     "url": "/szenen/wo-bist-du-gerade"
+  },
+  {
+    "type": "scene",
+    "slug": "zusammenzucken",
+    "title": "Er hebt nur die Hand",
+    "description": "Eine fiktive Szene: Ein Kollege greift nach einem Buch im Regal über ihm – und er zuckt zusammen, als käme ein Schlag. Über den Schreck, der im Körper geblieben ist, obwohl die Gefahr vorbei ist.",
+    "cluster": "trauma",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jonas' Sicht",
+    "pull_quote": "Niemand wollte mir wehtun. Mein Körper hat es nur noch nicht verstanden.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass dein Körper schneller reagiert, als dein Kopf mitkommt? Magst du eine solche Situation anschauen?"
+    },
+    "scene_tags": [
+      "schreckreaktion",
+      "koerpererinnerung",
+      "hypervigilanz",
+      "angst"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/zusammenzucken"
   },
   {
     "type": "scene",
@@ -3741,6 +4319,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/beziehungsmuster"
+  },
+  {
+    "type": "topic",
+    "slug": "beziehungstrauma",
+    "title": "Beziehungstrauma & PTBS-Belastung: wenn die Beziehung im Körper bleibt",
+    "description": "Warum eine belastende Beziehung Spuren hinterlassen kann wie ein Trauma – Übererregung, Schreckhaftigkeit, Flashbacks, innere Taubheit. Was dahintersteckt und was hilft. Behutsam erklärt, ohne Ferndiagnose.",
+    "cluster": "trauma",
+    "search_intent": "beziehungstrauma ptbs symptome nach beziehung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Beziehungstrauma gelesen. Möchtest du behutsam eine Situation anschauen, in der dein Körper stärker reagiert hat, als die Lage es eigentlich hergab?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "koerpererinnerung",
+      "hypervigilanz",
+      "schreckreaktion",
+      "dissoziation"
+    ],
+    "safety_tags": [
+      "gewalt"
+    ],
+    "links": {
+      "children": [
+        "nach-toxischer-beziehung"
+      ],
+      "glossary": [
+        "ptbs",
+        "komplextrauma",
+        "trigger",
+        "flashback",
+        "dissoziation",
+        "hypervigilanz"
+      ],
+      "related": [
+        "emotionaler-missbrauch",
+        "sich-selbst-verlieren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Kann eine Beziehung wirklich ein Trauma auslösen?",
+        "answer": "Ja. Nicht nur einzelne, dramatische Ereignisse können traumatisieren, sondern auch anhaltende Angst, Entwertung und Unberechenbarkeit über lange Zeit. Fachleute sprechen dann oft von Beziehungs- oder Komplextrauma. Entscheidend ist nicht, wie schlimm es von außen wirkt, sondern wie sehr dein Nervensystem über längere Zeit im Alarm war."
+      },
+      {
+        "question": "Habe ich eine PTBS, wenn ich diese Symptome kenne?",
+        "answer": "Das kann und darf dir dieser Text nicht sagen. Schreckhaftigkeit, Wiedererleben oder innere Taubheit sind mögliche Belastungsreaktionen – ob eine posttraumatische Belastungsstörung vorliegt, kann nur eine qualifizierte Fachperson im persönlichen Gespräch feststellen. Hier geht es darum, dein Erleben ernst zu nehmen, nicht um eine Diagnose."
+      },
+      {
+        "question": "Bin ich zu schwach, wenn mein Körper so reagiert?",
+        "answer": "Nein. Diese Reaktionen sind kein Zeichen von Schwäche, sondern das Gegenteil: Dein Nervensystem hat gelernt, dich zu schützen. Was einmal überlebenswichtig war, läuft nur noch weiter, obwohl die Gefahr vorbei ist. Das ist eine normale Reaktion auf eine unnormale Belastung."
+      }
+    ],
+    "url": "/wissen/beziehungstrauma"
   },
   {
     "type": "topic",
@@ -4440,6 +5085,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "kontaktsperre",
+    "title": "Kontaktsperre (No Contact): warum sie hilft und wie sie gelingt",
+    "description": "Die Kontaktsperre ist das wirksamste Mittel gegen Liebeskummer – und das schwerste. Warum sie hilft, wie du sie durchhältst, wie du mit Rückfällen umgehst und wann Ausnahmen nötig sind. Kein Machtspiel, sondern Selbstschutz.",
+    "cluster": "liebeskummer",
+    "search_intent": "kontaktsperre no contact regeln durchhalten trennung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du überlegst, eine Kontaktsperre zu halten – oder tust dich schwer damit. Magst du anschauen, was es dir gerade so schwer macht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "kontaktsperre",
+      "sehnsucht",
+      "gruebeln",
+      "loslassen"
+    ],
+    "links": {
+      "parent": "liebeskummer",
+      "glossary": [
+        "trennungsschmerz",
+        "gruebeln",
+        "kontaktabbruch"
+      ],
+      "related": [
+        "loslassen-nach-trennung"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist eine Kontaktsperre nicht kindisch oder ein Machtspiel?",
+        "answer": "Nein. Die Kontaktsperre ist kein Liebesentzug, um den anderen zu bestrafen oder zurückzuholen, sondern Selbstschutz. Du hältst keinen Kontakt, damit deine Wunde heilen kann – nicht, um eine Reaktion zu erzwingen. Der Unterschied liegt in der Absicht: Heilung, nicht Strategie."
+      },
+      {
+        "question": "Wie lange sollte eine Kontaktsperre dauern?",
+        "answer": "So lange, bis der Gedanke an die Person dich nicht mehr aus der Bahn wirft. Oft spricht man von einigen Wochen bis Monaten. Es gibt keine magische Zahl – wichtig ist nicht der Kalender, sondern dass dein System zur Ruhe kommt."
+      }
+    ],
+    "url": "/wissen/kontaktsperre"
+  },
+  {
+    "type": "topic",
     "slug": "krisentelefone",
     "title": "Krisentelefone und Anlaufstellen (D/A/CH)",
     "description": "Kostenlose, anonyme Hilfsangebote in Deutschland, Österreich und der Schweiz – rund um die Uhr erreichbar. Bei akuter Gefahr: Notruf 112.",
@@ -4461,6 +5157,65 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "krise"
     ],
     "url": "/wissen/krisentelefone"
+  },
+  {
+    "type": "topic",
+    "slug": "liebeskummer",
+    "title": "Liebeskummer: warum er so weh tut – und wie du durchkommst",
+    "description": "Warum Liebeskummer körperlich wehtut, fast wie ein Entzug, und keine Schwäche ist. Was in dir passiert, warum die Erinnerung lügt und was dir wirklich durch die schwerste Zeit hilft. Warm und ehrlich, ohne Ratgeber-Floskeln.",
+    "cluster": "liebeskummer",
+    "search_intent": "liebeskummer was hilft warum tut es so weh",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du steckst gerade im Liebeskummer. Magst du erzählen, was dir im Moment am schwersten fällt?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sehnsucht",
+      "gruebeln",
+      "trennungsschmerz",
+      "vermissen"
+    ],
+    "links": {
+      "children": [
+        "kontaktsperre"
+      ],
+      "glossary": [
+        "trennungsschmerz",
+        "idealisierung",
+        "gruebeln",
+        "kontaktabbruch"
+      ],
+      "related": [
+        "loslassen-nach-trennung",
+        "sich-trennen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum tut Liebeskummer körperlich weh?",
+        "answer": "Weil dein Gehirn Bindung wie ein Grundbedürfnis behandelt. Fällt die Bindungsperson weg, reagiert es ähnlich wie bei Entzug: Dieselben Regionen, die für Schmerz und Belohnung zuständig sind, sind beteiligt. Der Schmerz in der Brust, die Unruhe, der Appetitverlust – das ist echte Biologie, keine Einbildung und keine Schwäche."
+      },
+      {
+        "question": "Wie lange dauert Liebeskummer?",
+        "answer": "Es gibt keine feste Zeit, und niemand kann sie dir seriös nennen. Er verläuft in Wellen, nicht auf einer geraden Linie: gute Tage, dann wieder Rückschläge. Mit der Zeit werden die Abstände zwischen den schweren Momenten größer. Wenn es nach Monaten gar nicht besser wird oder du dich ganz verlierst, hol dir Unterstützung."
+      },
+      {
+        "question": "Ist es schlimm, dass ich die Person noch vermisse, obwohl es nicht gut war?",
+        "answer": "Nein, das ist völlig normal. Du vermisst nicht unbedingt die Realität, sondern die guten Momente, die Vertrautheit und das, was hätte sein können. Vermissen ist kein Argument, zurückzugehen – es ist ein Zeichen, dass da etwas Echtes war."
+      }
+    ],
+    "url": "/wissen/liebeskummer"
   },
   {
     "type": "topic",
@@ -4500,6 +5255,59 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/loslassen-nach-trennung"
+  },
+  {
+    "type": "topic",
+    "slug": "nach-toxischer-beziehung",
+    "title": "Nach einer toxischen Beziehung: warum die Angst bleibt – und wie Heilung geht",
+    "description": "Die Beziehung ist vorbei, aber die Anspannung nicht: Wachsamkeit, Schreckhaftigkeit, Schuldgefühle, Misstrauen. Warum das Nervensystem nachhallt und wie Heilung Schritt für Schritt gelingt. Ohne Diagnose, ohne Druck.",
+    "cluster": "trauma",
+    "search_intent": "nach toxischer beziehung angst bleibt heilung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Die Beziehung liegt hinter dir, aber etwas hält dich noch fest. Möchtest du anschauen, was gerade am meisten nachhallt?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "koerpererinnerung",
+      "misstrauen",
+      "schuldgefuehle",
+      "selbstverlust"
+    ],
+    "links": {
+      "parent": "beziehungstrauma",
+      "glossary": [
+        "trigger",
+        "flashback",
+        "hypervigilanz",
+        "ptbs"
+      ],
+      "related": [
+        "loslassen-nach-trennung",
+        "emotionaler-missbrauch"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum geht es mir nach der Trennung schlechter statt besser?",
+        "answer": "Das ist häufiger, als du denkst. Solange du in der Beziehung warst, hast du funktioniert – dein System war im Überlebensmodus. Erst wenn die ständige Anspannung wegfällt, kommt oft das Nachbeben: Erschöpfung, Trauer, aufsteigende Erinnerungen. Das ist kein Rückschritt, sondern ein Zeichen, dass dein System endlich verarbeiten darf."
+      },
+      {
+        "question": "Wie lange dauert es, bis ich darüber hinweg bin?",
+        "answer": "Es gibt keine feste Zeit, und Heilung verläuft nicht gerade. Gute Tage und Rückschläge wechseln sich ab – das ist normal und kein Versagen. Mit Sicherheit, Zeit und, wo nötig, Unterstützung wird der Abstand zu den schweren Momenten mit der Zeit größer."
+      }
+    ],
+    "url": "/wissen/nach-toxischer-beziehung"
   },
   {
     "type": "topic",
@@ -4843,6 +5651,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose."
   },
+  "/glossar/dissoziation": {
+    "title": "Dissoziation – wenn der Kopf sich abkoppelt, um zu schützen",
+    "description": "Dissoziation ist ein innerlicher Rückzug: Man fühlt sich fern, taub oder wie abgeschnitten. Warum das ein Schutz ist, wie es sich zeigt und was zurück in den Körper hilft. Ohne Diagnose."
+  },
   "/glossar/double-bind": {
     "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
     "description": "Ein Double Bind ist eine Zwickmühle aus zwei widersprüchlichen Botschaften, bei der jede Reaktion falsch ist – und das Benennen des Widerspruchs verboten scheint. Warum das so tief verunsichert. Ohne Diagnose."
@@ -4863,6 +5675,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
     "description": "Fawning ist die vierte Stressreaktion neben Kampf, Flucht und Erstarren: beschwichtigen und gefallen, um Sicherheit herzustellen. Warum das kein Charakterfehler ist – ohne Diagnose."
   },
+  "/glossar/flashback": {
+    "title": "Flashback – wenn Vergangenes sich wie Gegenwart anfühlt",
+    "description": "Bei einem Flashback wird eine belastende Erinnerung so lebendig, dass sie sich anfühlt, als geschehe sie jetzt. Was dabei im Gehirn passiert und wie du dich zurück in die Gegenwart holst. Ohne Diagnose."
+  },
   "/glossar/gaslighting": {
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
@@ -4879,6 +5695,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich-Botschaft – sagen, was in mir ist, ohne anzuklagen",
     "description": "Was eine Ich-Botschaft ist, wie sie sich von der Du-Botschaft unterscheidet und warum sie Gespräche entschärft, ohne das Anliegen zu verkleinern. Ohne Diagnose."
   },
+  "/glossar/idealisierung": {
+    "title": "Idealisierung – wenn die Erinnerung schöner wird als die Beziehung war",
+    "description": "Nach einer Trennung erinnert man oft nur die guten Momente und vergisst die schlechten. Warum dein Kopf die Beziehung schönfärbt, wie das das Loslassen erschwert und wie du der Verzerrung begegnest."
+  },
   "/glossar/intermittierende-verstaerkung": {
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
     "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose."
@@ -4886,6 +5706,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/kognitive-dissonanz": {
     "title": "Kognitive Dissonanz – wenn zwei Wahrheiten nicht zusammenpassen",
     "description": "Warum der Kopf die Realität umschreibt, um in einer widersprüchlichen Beziehung bleiben zu können: das Spannungsprinzip hinter Ausreden, Beschönigen und Selbstzweifel. Ohne Diagnose."
+  },
+  "/glossar/komplextrauma": {
+    "title": "Komplextrauma (komplexe PTBS) – wenn Belastung lange dauert",
+    "description": "Komplextrauma entsteht nicht durch ein einzelnes Ereignis, sondern durch wiederholte, lang anhaltende Belastung – oft in Beziehungen. Was es kennzeichnet und warum Selbstwert und Vertrauen betroffen sind. Ohne Diagnose."
   },
   "/glossar/konsequenz": {
     "title": "Konsequenz – was eine Grenze von einem Wunsch unterscheidet",
@@ -4911,6 +5735,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Projektion – eigene Gefühle im anderen sehen",
     "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt."
   },
+  "/glossar/ptbs": {
+    "title": "Posttraumatische Belastungsstörung (PTBS) – einfach erklärt",
+    "description": "Was eine posttraumatische Belastungsstörung ist, welche vier Symptomgruppen typisch sind und warum sie eine normale Reaktion auf eine unnormale Belastung ist. Ohne Ferndiagnose."
+  },
   "/glossar/reparaturversuch": {
     "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
     "description": "Was ein Reparaturversuch ist, warum die Fähigkeit, ihn zu senden und anzunehmen, über die Zukunft einer Beziehung entscheidet, und wie man ihn erkennt. Ohne Diagnose."
@@ -4930,6 +5758,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/taeter-opfer-umkehr": {
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose."
+  },
+  "/glossar/trennungsschmerz": {
+    "title": "Trennungsschmerz – warum Liebeskummer wie Entzug wirkt",
+    "description": "Trennungsschmerz ist kein Selbstmitleid, sondern Biologie: Das Gehirn reagiert auf den Verlust einer Bindung ähnlich wie auf Entzug und körperlichen Schmerz. Warum das so ist – und was es leichter macht."
+  },
+  "/glossar/trigger": {
+    "title": "Trigger – der Auslöser, der die Vergangenheit zurückholt",
+    "description": "Ein Trigger ist ein Reiz – ein Geruch, ein Ton, ein Satz –, der plötzlich alte, belastende Gefühle auslöst, als wäre die Gefahr wieder da. Warum das passiert und was im Moment hilft. Ohne Diagnose."
   },
   "/glossar/verachtung": {
     "title": "Verachtung – das gefährlichste Gift für eine Beziehung",
@@ -5035,6 +5871,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Der Daumen über dem Profil",
     "description": "Eine fiktive Szene: entfolgt, stummgeschaltet – und trotzdem kennt der Daumen den Weg zu ihrem Profil auswendig. Über das Nicht-loslassen-Können nach einer Trennung."
   },
+  "/szenen/der-erste-gute-tag": {
+    "title": "Der erste gute Tag",
+    "description": "Eine fiktive Szene: Zum ersten Mal seit der Trennung vergeht ein ganzer Tag, an dem sie kaum an ihn gedacht hat. Und abends kommt statt Erleichterung ein seltsames Schuldgefühl. Über die krummen Wege der Heilung."
+  },
   "/szenen/der-konflikt-ist-vorbei-in-mir-nicht": {
     "title": "Der Konflikt ist vorbei. In mir nicht.",
     "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist."
@@ -5063,6 +5903,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Die eine Nachricht",
     "description": "Eine Szene über Breadcrumbing – genau so viel Aufmerksamkeit, dass die Hoffnung nicht stirbt, aber nie genug, dass etwas Echtes wird. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/die-leere-seite-vom-bett": {
+    "title": "Die leere Seite vom Bett",
+    "description": "Eine fiktive Szene: Er wacht auf und greift automatisch nach rechts, wo sie immer lag. Da ist nur die kühle, glatte Decke. Über die kleinen Morgenmomente, in denen ein Verlust am lautesten ist."
+  },
   "/szenen/die-liste": {
     "title": "Die Liste",
     "description": "Eine Szene über das Aufrechnen – wenn jeder alte Fehler aufbewahrt und im nächsten Streit wieder hervorgeholt wird. Aus der Ich-Perspektive, fiktiv."
@@ -5078,6 +5922,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-wand": {
     "title": "Die Wand",
     "description": "Eine Szene über Stonewalling – wenn das Gegenüber mitten im Gespräch dichtmacht und eine Wand steht, wo eben noch ein Mensch war. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-zahnbuerste": {
+    "title": "Die Zahnbürste, die noch da ist",
+    "description": "Eine fiktive Szene: Im Zahnputzbecher steht noch ihre Zahnbürste. So ein kleines Ding – und sie wegzuwerfen fühlt sich an wie das endgültige Ende. Über die Dinge, die bleiben, und was sie mit uns machen."
   },
   "/szenen/dieser-blick": {
     "title": "Dieser Blick",
@@ -5107,6 +5955,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Entschuldigung, damit es aufhört",
     "description": "Eine fiktive Szene: Er entschuldigt sich für etwas, das er nicht getan hat – nicht aus Einsicht, sondern damit der Druck endet. Über Fawning, Konfliktvermeidung und erlernte Unterwerfung."
   },
+  "/szenen/entwurf-geloescht": {
+    "title": "Entwurf gelöscht",
+    "description": "Eine fiktive Szene: Zum dritten Mal an diesem Abend tippt sie eine Nachricht an ihn, liest sie, und löscht sie wieder Buchstabe für Buchstabe. Über das Ringen mit dem Handy und den Drang, den Kontakt doch nicht zu lassen."
+  },
   "/szenen/erst-der-rausch-dann-die-kaelte": {
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv."
@@ -5114,6 +5966,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/erst-wenn-ich-liefere": {
     "title": "Erst wenn ich liefere",
     "description": "Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen."
+  },
+  "/szenen/es-riecht-nach-ihm": {
+    "title": "Es riecht nach ihm",
+    "description": "Eine fiktive Szene: In der Bahn steigt ein Fremder ein, und sein Rasierwasser ist genau das – und plötzlich ist alles wieder da. Über Trigger, die den Körper in Sekunden zurück in die Vergangenheit reißen."
   },
   "/szenen/es-tut-mir-leid-dass-du": {
     "title": "Es tut mir leid, dass du",
@@ -5130,6 +5986,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/fragst-du-gar-nicht": {
     "title": "Fragst du gar nicht?",
     "description": "Eine fiktive Szene: zurück von einem Wochenende, voller Erlebnisse – und keine einzige Frage. Über Desinteresse ohne offene Aggression und das Gefühl, dass die eigene innere Welt beim Gegenüber kaum Neugier weckt."
+  },
+  "/szenen/gemeinsame-freunde": {
+    "title": "Wie geht es ihr?",
+    "description": "Eine fiktive Szene: Beim Grillen mit Freunden fällt beiläufig ihr Name – und wie es ihr angeblich schon wieder gut geht. Über die gemeinsame Welt, die nach einer Trennung bleibt, und den Stich, den ein harmloser Satz setzen kann."
   },
   "/szenen/ich-brauch-eine-pause": {
     "title": "Ich brauch eine Pause",
@@ -5154,6 +6014,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-vermisse-das-chaos": {
     "title": "Ich vermisse das Chaos",
     "description": "Eine Szene über die Zeit nach der Trennung – frei, aber mit Sehnsucht nach der Intensität, und der Erkenntnis, dass Ruhe sich erst leer anfühlt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-war-nicht-da": {
+    "title": "Ich war nicht da",
+    "description": "Eine fiktive Szene: Als die Stimmen im Meeting lauter werden, wird alles um ihn herum leise und fern – wie hinter Glas. Über die Dissoziation, das Abkoppeln, das einmal Schutz war und jetzt mitten im Alltag passiert."
+  },
+  "/szenen/ich-warte-auf-den-knall": {
+    "title": "Ich warte auf den Knall",
+    "description": "Eine fiktive Szene: Der neue Partner ist ruhig, warm, verlässlich – und genau das macht ihr Angst. Über die Wachsamkeit, die nach einer belastenden Beziehung bleibt, selbst wenn endlich alles sicher ist."
   },
   "/szenen/ich-wollte-doch-nur-reden": {
     "title": "Ich wollte doch nur reden",
@@ -5227,6 +6095,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Mein Zimmer im Haus",
     "description": "Eine fiktive Szene: Das Haus ist groß, doch sein ganzes Leben passt auf zehn Quadratmeter. Niemand hat es verboten – er hat sich selbst immer kleiner gemacht. Über Coercive Control und schleichenden Raumverlust."
   },
+  "/szenen/mitten-am-tag": {
+    "title": "Mitten am Tag",
+    "description": "Eine fiktive Szene: An der Supermarktkasse, zwischen Milch und Brot, ist plötzlich alles wieder da – so echt, als geschehe es jetzt. Über einen Flashback, der sich ungefragt in einen ganz normalen Moment drängt."
+  },
   "/szenen/mitten-im-satz": {
     "title": "Mitten im Satz",
     "description": "Eine Szene über Stonewalling – wenn sich das Gegenüber mitten im Gespräch verschließt und den Raum verlässt. Aus der Ich-Perspektive, fiktiv."
@@ -5267,6 +6139,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Und wie geht es dir?",
     "description": "Eine fiktive Szene: Eine alte Freundin fragt „Wie geht es dir?\" – nicht euch, dir. Und zum ersten Mal seit Langem merkt sie, dass sie die Antwort nicht kennt. Über das leise Verschwinden in einer Beziehung."
   },
+  "/szenen/unser-lied": {
+    "title": "Unser Lied",
+    "description": "Eine fiktive Szene: Im Café läuft plötzlich das Lied, zu dem sie in der Küche getanzt haben. Zwischen Latte macchiato und Wochenendplänen steht er mit einem Mal mitten in der Erinnerung. Über Sehnsucht, die einen ungefragt überkommt."
+  },
   "/szenen/unter-der-wut": {
     "title": "Unter der Wut",
     "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv."
@@ -5291,9 +6167,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Wer war ich nochmal",
     "description": "Eine Szene über Selbstverlust – der Moment, in dem man merkt, dass man langsam zu dem geworden ist, was jemand anderes wollte. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/wieder-dieser-traum": {
+    "title": "Wieder dieser Traum",
+    "description": "Eine fiktive Szene: Um kurz nach vier wacht er auf, das Herz rast, das Kissen ist nass – schon wieder derselbe Traum. Über Albträume, die die Nacht zurückerobern, lange nachdem alles vorbei ist."
+  },
   "/szenen/wo-bist-du-gerade": {
     "title": "Wo bist du gerade?",
     "description": "Eine Szene über Kontrolle und Eifersucht – wenn Fürsorge zur Überwachung wird und dein Radius Woche für Woche kleiner. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/zusammenzucken": {
+    "title": "Er hebt nur die Hand",
+    "description": "Eine fiktive Szene: Ein Kollege greift nach einem Buch im Regal über ihm – und er zuckt zusammen, als käme ein Schlag. Über den Schreck, der im Körper geblieben ist, obwohl die Gefahr vorbei ist."
   },
   "/szenen/zwei-wochen-ohne-sie": {
     "title": "Zwei Wochen ohne sie",
@@ -5318,6 +6202,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
     "description": "Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose."
+  },
+  "/wissen/beziehungstrauma": {
+    "title": "Beziehungstrauma & PTBS-Belastung: wenn die Beziehung im Körper bleibt",
+    "description": "Warum eine belastende Beziehung Spuren hinterlassen kann wie ein Trauma – Übererregung, Schreckhaftigkeit, Flashbacks, innere Taubheit. Was dahintersteckt und was hilft. Behutsam erklärt, ohne Ferndiagnose."
   },
   "/wissen/bindungsstile": {
     "title": "Bindungsstile: sicher, ängstlich, vermeidend, desorganisiert",
@@ -5383,13 +6271,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
     "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft."
   },
+  "/wissen/kontaktsperre": {
+    "title": "Kontaktsperre (No Contact): warum sie hilft und wie sie gelingt",
+    "description": "Die Kontaktsperre ist das wirksamste Mittel gegen Liebeskummer – und das schwerste. Warum sie hilft, wie du sie durchhältst, wie du mit Rückfällen umgehst und wann Ausnahmen nötig sind. Kein Machtspiel, sondern Selbstschutz."
+  },
   "/wissen/krisentelefone": {
     "title": "Krisentelefone und Anlaufstellen (D/A/CH)",
     "description": "Kostenlose, anonyme Hilfsangebote in Deutschland, Österreich und der Schweiz – rund um die Uhr erreichbar. Bei akuter Gefahr: Notruf 112."
   },
+  "/wissen/liebeskummer": {
+    "title": "Liebeskummer: warum er so weh tut – und wie du durchkommst",
+    "description": "Warum Liebeskummer körperlich wehtut, fast wie ein Entzug, und keine Schwäche ist. Was in dir passiert, warum die Erinnerung lügt und was dir wirklich durch die schwerste Zeit hilft. Warm und ehrlich, ohne Ratgeber-Floskeln."
+  },
   "/wissen/loslassen-nach-trennung": {
     "title": "Loslassen lernen: über eine Trennung hinwegkommen",
     "description": "Warum Loslassen nach einer Trennung so schwerfällt, warum die Erinnerung dich täuscht und was wirklich hilft – von Kontaktabbruch über das Unterbrechen des Grübelns bis zurück zu dir selbst. Ohne Zeitdruck, ohne Diagnose."
+  },
+  "/wissen/nach-toxischer-beziehung": {
+    "title": "Nach einer toxischen Beziehung: warum die Angst bleibt – und wie Heilung geht",
+    "description": "Die Beziehung ist vorbei, aber die Anspannung nicht: Wachsamkeit, Schreckhaftigkeit, Schuldgefühle, Misstrauen. Warum das Nervensystem nachhallt und wie Heilung Schritt für Schritt gelingt. Ohne Diagnose, ohne Druck."
   },
   "/wissen/nein-sagen": {
     "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",

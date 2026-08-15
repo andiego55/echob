@@ -82,6 +82,11 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   koerpergedaechtnis: 'Körpergedächtnis',
   'emotionale-ueberforderung': 'Emotionale Überforderung',
   gespraechsabbruch: 'Gesprächsabbruch',
+  // Trauma & PTBS-Belastung (nur Umlaut-Overrides; der Rest leitet sich sauber ab)
+  koerpererinnerung: 'Körpererinnerung',
+  albtraeume: 'Albträume',
+  betaeubung: 'Betäubung',
+  uebererregung: 'Übererregung',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */
@@ -179,6 +184,24 @@ export const SCENE_TAG_ORDER: string[] = [
   'scham',
   'emotionale-ueberflutung',
   'co-regulation',
+  // Trauma & PTBS-Belastung
+  'schreckreaktion',
+  'hypervigilanz',
+  'wiedererleben',
+  'flashback',
+  'trigger',
+  'albtraeume',
+  'dissoziation',
+  'betaeubung',
+  'koerpererinnerung',
+  // Liebeskummer
+  'trennungsschmerz',
+  'sehnsucht',
+  'vermissen',
+  'idealisierung',
+  'kontaktsperre',
+  'loslassen',
+  'hoffnung',
 ]
 
 /** Anzeige-Label eines Tag-Slugs (Override oder abgeleitet aus dem Slug). */

@@ -83,7 +83,7 @@ export default function WissenPage() {
       </section>
 
       {/* Einladung: Szenen + Selbsttests */}
-      <section className="border-t border-brand-border px-6 pt-10">
+      <section className="border-t border-brand-border px-6 pt-10 pb-12">
         <div className="mx-auto grid max-w-[960px] gap-4 sm:grid-cols-2">
           <Link
             to="/szenen"

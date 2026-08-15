@@ -104,7 +104,8 @@ export default function Header() {
   const fachpersonenActive =
     location.pathname === '/fachpersonen' ||
     location.pathname.startsWith('/fachpersonen/') ||
-    location.pathname.startsWith('/fuer-fachpersonen')
+    location.pathname.startsWith('/fuer-fachpersonen') ||
+    location.pathname.startsWith('/forschung')
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-navy border-b border-white/[0.07]">
@@ -247,6 +248,15 @@ export default function Header() {
                   <span>
                     <p className="text-[0.9rem] font-bold text-navy">Für Fachpersonen</p>
                     <p className="mt-0.5 text-[0.75rem] leading-snug text-brand-muted">EchoB als Arbeitsplatz – oder kostenlos ins Verzeichnis eintragen.</p>
+                  </span>
+                </Link>
+                <Link to="/forschung" className="flex items-start gap-3 rounded-brand-sm p-3 no-underline transition-colors hover:bg-brand-bg">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]"><path d="M9 3h6M10 3v5.5L5.5 16A2 2 0 0 0 7.2 19h9.6a2 2 0 0 0 1.7-3L14 8.5V3" /><path d="M8.5 14h7" /></svg>
+                  </span>
+                  <span>
+                    <p className="text-[0.9rem] font-bold text-navy">Forschung &amp; Studie</p>
+                    <p className="mt-0.5 text-[0.75rem] leading-snug text-brand-muted">Bei der EchoB-Wirksamkeitsstudie mitforschen oder teilnehmen.</p>
                   </span>
                 </Link>
               </div>

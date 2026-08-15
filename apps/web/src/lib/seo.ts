@@ -36,6 +36,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'Wie Ausbildungsinstitute EchoB in der Lehre nutzen: viele Studierende üben den vollen Fallweg – Szenen, Hypothesen, Berichte – am selben, sicheren Fallmaterial. Preis je Studierenden-Platz, ohne echte Patient:innen, ohne Diagnosen.',
   },
+  '/forschung': {
+    title: 'Wirksamkeitsstudie – bei der EchoB-Forschung mitmachen',
+    description:
+      'EchoB wird wissenschaftlich auf seine Wirkung geprüft. Für die geplante Wirksamkeitsstudie suchen wir Fachpersonen zum Mitforschen und Nutzer:innen zur Teilnahme – freiwillig, pseudonym, jederzeit widerrufbar. Ohne Diagnosen.',
+  },
   '/coaching': {
     title: 'Coaching mit EchoB – Erstgespräch anfragen',
     description:

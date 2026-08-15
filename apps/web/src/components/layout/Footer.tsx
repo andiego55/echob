@@ -24,6 +24,7 @@ export default function Footer() {
               <Link to="/fachpersonen" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Fachperson finden</Link>
               <Link to="/fuer-fachpersonen" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Für Fachpersonen</Link>
               <Link to="/ausbildungsinstitute" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Ausbildungsinstitute</Link>
+              <Link to="/forschung" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Forschung</Link>
             </div>
             <div>
               <h4 className="text-[0.75rem] font-bold tracking-[0.08em] uppercase text-white/30 mb-3.5">

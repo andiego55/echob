@@ -19,6 +19,7 @@ import FachpersonenPage     from '@/pages/FachpersonenPage'
 import FachpersonenFindenPage from '@/pages/FachpersonenFindenPage'
 import FachpersonProfilePage from '@/pages/FachpersonProfilePage'
 import AusbildungPage       from '@/pages/AusbildungPage'
+import ForschungPage        from '@/pages/ForschungPage'
 import WissenPage                    from '@/pages/WissenPage'
 import ContentPage                   from '@/pages/content/ContentPage'
 import GlossarPage                   from '@/pages/GlossarPage'
@@ -192,6 +193,7 @@ export function AppRoutes() {
         <Route key={p.slug} path={`/${p.slug}/:city`} element={<RegionalPage professionSlug={p.slug} />} />
       ))}
       <Route path="/ausbildungsinstitute" element={<AusbildungPage />} />
+      <Route path="/forschung" element={<ForschungPage />} />
       <Route path="/wissen"                          element={<WissenPage />} />
       <Route path="/wissen/:slug"                    element={<ContentPage />} />
       <Route path="/hilfe/:slug"                     element={<ContentPage />} />

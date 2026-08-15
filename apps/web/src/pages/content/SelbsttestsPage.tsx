@@ -15,15 +15,6 @@ const CAT_BADGE: Record<TestCategory, { bg: string; fg: string }> = {
   therapie: { bg: '#E1F5EE', fg: '#085041' },
 }
 
-// Optimierte Themen-Roadmap (die 3 gebauten sind live, der Rest folgt).
-const PLANNED: { cat: TestCategory; items: string[] }[] = [
-  { cat: 'beziehung', items: ['Kommunikation', 'Vertrauen', 'Nähe', 'Konflikte'] },
-  { cat: 'trennung', items: ['Bin ich bereit für eine Trennung?', 'Trennung verarbeitet?', 'Ex loslassen?'] },
-  { cat: 'manipulation', items: ['Gaslighting-Deep-Dive', 'Love Bombing', 'Narzissmus in der Beziehung'] },
-  { cat: 'persoenlichkeit', items: ['Grenzen setzen', 'People Pleasing', 'Verlustangst', 'Selbstwert'] },
-  { cat: 'therapie', items: ['Therapievorbereitung', 'Beziehungsmuster', 'Stressbelastung', 'Trauma & PTBS-Belastung'] },
-]
-
 export default function SelbsttestsPage() {
   return (
     <PageLayout>
@@ -57,30 +48,6 @@ export default function SelbsttestsPage() {
         <div className="mx-auto max-w-[1040px]">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {SELF_TESTS.map((t) => <TestCard key={t.slug} test={t} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* Roadmap */}
-      <section className="border-t border-brand-border bg-white px-6 py-14">
-        <div className="mx-auto max-w-[1040px]">
-          <h2 className="text-[1.15rem] font-bold text-navy">In Vorbereitung</h2>
-          <p className="mt-1 text-sm text-brand-muted">Diese Tests kommen nach und nach dazu.</p>
-          <div className="mt-6 space-y-5">
-            {PLANNED.map(({ cat, items }) => (
-              <div key={cat}>
-                <p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brand-muted">
-                  {TEST_CATEGORY_LABELS[cat]}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {items.map((label) => (
-                    <span key={label} className="rounded-full border border-brand-border bg-brand-bg px-3 py-1 text-[0.82rem] text-brand-muted/70">
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
