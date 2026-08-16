@@ -14,6 +14,7 @@ from app.api.v1.routers import (
     contact,
     couple,
     couple_agreements,
+    couple_mediation,
     couple_private,
     couple_sessions,
     directory,
@@ -102,6 +103,7 @@ v1_router.include_router(couple.router)
 v1_router.include_router(couple_sessions.router)
 v1_router.include_router(couple_private.router)
 v1_router.include_router(couple_agreements.router)
+v1_router.include_router(couple_mediation.router)
 
 # ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
 v1_router.include_router(institute.router)

@@ -18,6 +18,7 @@ import pytest
 from fastapi import HTTPException
 
 from app.services import couple_agreement_service as cas
+from app.services import couple_mediation_service as cms
 from app.services import couple_private_service as cps
 from app.services import couple_session_service as css
 from app.services import couple_therapy_service as cts
@@ -303,6 +304,82 @@ async def test_both_members_share_one_transcript(db):
     assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
     assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
     assert history[2]["content"].startswith("Rio: ")
+
+
+# ── AI-Mediation (Caucus) ────────────────────────────────────────────────────
+
+async def test_confidential_perspective_never_reaches_the_partner(db):
+    """DIE Caucus-Zusage: der vertrauliche Beitrag verlässt die API nie Richtung Partner.
+
+    Die andere Person erfährt auch nicht, DASS es einen gibt.
+    """
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_perspective(db, topic["id"], user_a,
+                               open_text="OFFEN_ALEX", private_text="GEHEIM_ALEX")
+    await cms.save_perspective(db, topic["id"], user_b,
+                               open_text="OFFEN_RIO", private_text="GEHEIM_RIO")
+
+    perspectives = await cms.load_perspectives(db, topic["id"])
+    names = {str(user_a): "Alex", str(user_b): "Rio"}
+
+    for viewer, own_secret, foreign_secret in (
+        (user_a, "GEHEIM_ALEX", "GEHEIM_RIO"),
+        (user_b, "GEHEIM_RIO", "GEHEIM_ALEX"),
+    ):
+        view = [cms.public_perspective(p, viewer, names) for p in perspectives]
+        payload = str(view)
+        assert own_secret in payload           # den eigenen darf man sehen
+        assert foreign_secret not in payload   # den fremden nie
+        assert "OFFEN_ALEX" in payload and "OFFEN_RIO" in payload
+        # Auch die Existenz bleibt verborgen: fremd -> private_text ist schlicht None.
+        foreign = [v for v in view if not v["is_own"]][0]
+        assert foreign["private_text"] is None
+
+
+async def test_mediation_prompt_gets_both_sides(db):
+    """Echo bekommt beide Seiten — offen wie vertraulich — als Prompt-Kontext."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic, link = await cms.require_topic(
+        db, (await cms.create_topic(db, couple_id, user_a, title="Geld"))["id"], user_a,
+    )
+    await cms.save_perspective(db, topic["id"], user_a,
+                               open_text="OFFEN_ALEX", private_text="GEHEIM_ALEX")
+    await cms.save_perspective(db, topic["id"], user_b, open_text="OFFEN_RIO")
+
+    perspectives = await cms.load_perspectives(db, topic["id"])
+    context = await cms.build_mediation_input(db, topic, link, perspectives)
+    assert "OFFEN_ALEX" in context and "OFFEN_RIO" in context
+    assert "GEHEIM_ALEX" in context
+    assert "niemals zitieren" in context      # die Warnung steht im Kontext selbst
+
+
+async def test_mediation_needs_both_open_sides(db):
+    """Einseitige Mediation gibt es nicht — beide müssen offen etwas gesagt haben."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic, link = await cms.require_topic(
+        db, (await cms.create_topic(db, couple_id, user_a, title="Geld"))["id"], user_a,
+    )
+    await cms.save_perspective(db, topic["id"], user_a, open_text="OFFEN_ALEX")
+    assert cms.both_sides_ready(await cms.load_perspectives(db, topic["id"]), link) is False
+
+    # Ein rein vertraulicher Beitrag der anderen Seite reicht ausdrücklich NICHT.
+    await cms.save_perspective(db, topic["id"], user_b, private_text="GEHEIM_RIO")
+    assert cms.both_sides_ready(await cms.load_perspectives(db, topic["id"]), link) is False
+
+    await cms.save_perspective(db, topic["id"], user_b, open_text="OFFEN_RIO")
+    assert cms.both_sides_ready(await cms.load_perspectives(db, topic["id"]), link) is True
+
+
+async def test_topic_closed_to_outsiders(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    with pytest.raises(HTTPException) as exc:
+        await cms.require_topic(db, topic["id"], uuid.uuid4())
+    assert exc.value.status_code == 404
+    with pytest.raises(HTTPException) as exc:
+        await cms.save_perspective(db, topic["id"], uuid.uuid4(), open_text="X")
+    assert exc.value.status_code == 404
 
 
 # ── Abmachungen ──────────────────────────────────────────────────────────────
