@@ -64,6 +64,7 @@ import CoupleJoinPage         from '@/pages/couple/CoupleJoinPage'
 import CoupleRoomPage         from '@/pages/couple/CoupleRoomPage'
 import CoupleSessionPage      from '@/pages/couple/CoupleSessionPage'
 import CoupleMediationPage    from '@/pages/couple/CoupleMediationPage'
+import CoupleTestPage         from '@/pages/couple/CoupleTestPage'
 import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
 import SettingsPage           from '@/pages/app/SettingsPage'
 import { useParams }         from 'react-router-dom'
@@ -253,6 +254,7 @@ export function AppRoutes() {
       <Route path="/app/paar/beitreten/:code" element={<ProtectedRoute><CoupleJoinPage /></ProtectedRoute>} />
       <Route path="/app/paar/sitzung/:sessionId" element={<ProtectedRoute><CoupleSessionPage /></ProtectedRoute>} />
       <Route path="/app/paar/thema/:topicId" element={<ProtectedRoute><CoupleMediationPage /></ProtectedRoute>} />
+      <Route path="/app/paar/:coupleId/test/:slug" element={<ProtectedRoute><CoupleTestPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId" element={<ProtectedRoute><CoupleRoomPage /></ProtectedRoute>} />
 
       {/* ── Fachpersonenbereich (Login + Rolle erforderlich) ─────────────────── */}

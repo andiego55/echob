@@ -17,10 +17,12 @@ import asyncpg
 import pytest
 from fastapi import HTTPException
 
+from app.core import crypto
 from app.services import couple_agreement_service as cas
 from app.services import couple_mediation_service as cms
 from app.services import couple_private_service as cps
 from app.services import couple_session_service as css
+from app.services import couple_test_service as ctest
 from app.services import couple_therapy_service as cts
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
@@ -304,6 +306,77 @@ async def test_both_members_share_one_transcript(db):
     assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
     assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
     assert history[2]["content"].startswith("Rio: ")
+
+
+# ── Paar-Tests ───────────────────────────────────────────────────────────────
+
+async def test_partner_result_hidden_until_you_answered(db):
+    """Blindheitsregel: das Ergebnis der anderen Person färbt nicht auf deins ab."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await ctest.save_run(db, couple_id, user_b, slug="bindung", title="Bindung",
+                         answers={"q1": "a"}, result={"overall": {"score": 70}})
+
+    # Alex hat noch nicht geantwortet -> kein Blick auf Rios Ergebnis …
+    view = await ctest.load_runs(db, couple_id, "bindung", user_a)
+    assert view["own"] is None
+    assert view["partner"] is None
+    assert view["partner_answered"] is True   # … dass jemand fertig ist, darf man wissen
+    assert view["both_done"] is False
+
+    await ctest.save_run(db, couple_id, user_a, slug="bindung", title="Bindung",
+                         answers={"q1": "b"}, result={"overall": {"score": 40}})
+    view = await ctest.load_runs(db, couple_id, "bindung", user_a)
+    assert view["own"]["result"]["overall"]["score"] == 40
+    assert view["partner"]["result"]["overall"]["score"] == 70
+    assert view["both_done"] is True
+
+
+async def test_comparison_needs_both_runs(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await ctest.save_run(db, couple_id, user_a, slug="bindung", title="Bindung",
+                         answers={}, result={"overall": {"score": 40}})
+    view = await ctest.load_runs(db, couple_id, "bindung", user_a)
+    with pytest.raises(HTTPException) as exc:
+        ctest.build_comparison_input(view, "bindung")
+    assert exc.value.status_code == 400
+
+    await ctest.save_run(db, couple_id, user_b, slug="bindung", title="Bindung",
+                         answers={}, result={"overall": {"score": 70}})
+    view = await ctest.load_runs(db, couple_id, "bindung", user_a)
+    context = ctest.build_comparison_input(view, "bindung")
+    assert "40/100" in context and "70/100" in context
+
+
+async def test_couple_test_runs_stay_in_the_room(db):
+    """Fremde kommen an die Paar-Testläufe nicht heran."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await ctest.save_run(db, couple_id, user_a, slug="bindung", title="Bindung",
+                         answers={}, result={})
+    with pytest.raises(HTTPException) as exc:
+        await ctest.load_runs(db, couple_id, "bindung", uuid.uuid4())
+    assert exc.value.status_code == 404
+    with pytest.raises(HTTPException) as exc:
+        await ctest.save_run(db, couple_id, uuid.uuid4(), slug="x", title="X",
+                             answers={}, result={})
+    assert exc.value.status_code == 404
+
+
+async def test_free_text_in_results_is_encrypted_at_rest(db):
+    """Freitext-Antworten liegen verschlüsselt in der DB, kommen aber lesbar zurück."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await ctest.save_run(
+        db, couple_id, user_a, slug="bindung", title="Bindung",
+        answers={"frei": "GEHEIMER_FREITEXT"},
+        result={"freeText": [{"question": "Was noch?", "answer": "GEHEIMER_FREITEXT"}]},
+    )
+    raw = await db.fetchval(
+        "SELECT answers::text FROM couple_test_runs WHERE couple_id = $1 AND user_id = $2",
+        couple_id, user_a,
+    )
+    view = await ctest.load_runs(db, couple_id, "bindung", user_a)
+    assert view["own"]["answers"]["frei"] == "GEHEIMER_FREITEXT"
+    if crypto.encryption_enabled():
+        assert "GEHEIMER_FREITEXT" not in raw
 
 
 # ── AI-Mediation (Caucus) ────────────────────────────────────────────────────
