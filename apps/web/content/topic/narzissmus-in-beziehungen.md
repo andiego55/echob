@@ -19,7 +19,7 @@ scene_tags: [narzissmus, idealisierung-abwertung, love-bombing, selbstwert]
 safety_tags: [kontrolle]
 links:
   children: [verdeckter-narzissmus]
-  glossary: [love-bombing, hoovering, narzisstische-zufuhr, idealisierung-abwertung, intermittierende-verstaerkung, projektion, gaslighting]
+  glossary: [love-bombing, hoovering, narzisstische-zufuhr, idealisierung-abwertung, vulnerabler-narzissmus, spiritueller-narzissmus, kommunaler-narzissmus, intermittierende-verstaerkung, projektion, gaslighting]
   related: [emotionale-manipulation, gaslighting-erkennen]
 faq:
   - question: "Ist mein Partner ein Narzisst?"
@@ -38,7 +38,14 @@ Dieser Text hilft dir, solche Muster zu benennen. Er ist ausdrücklich **keine F
 
 Narzisstische Züge liegen auf einem **Spektrum**: von gesundem Selbstwert über ausgeprägte Ich-Bezogenheit bis hin zur narzisstischen Persönlichkeitsstörung. Ob wirklich eine Störung vorliegt, kann **nur eine Fachperson** im persönlichen Kontakt feststellen. Dieser Text spricht deshalb von **Mustern und Tendenzen**, nicht von Diagnosen.
 
-Grob unterscheidet man zwei Ausprägungen: den **grandiosen** Typ (laut, dominant, im Mittelpunkt) und den **verdeckten** Typ (leise, oft in der Opferrolle, aber ebenso ich-bezogen). Gerade der verdeckte ist schwer zu greifen – mehr dazu: [verdeckter Narzissmus](/wissen/verdeckter-narzissmus).
+Grob unterscheidet man zwei Grundrichtungen: den **grandiosen** Typ (laut, dominant, sichtbar im Mittelpunkt) und den **verdeckten** oder [vulnerablen](/glossar/vulnerabler-narzissmus) Typ (leise, empfindlich, oft in der Opferrolle, aber ebenso ich-bezogen). Gerade der verdeckte ist schwer zu greifen – mehr dazu: [verdeckter Narzissmus](/wissen/verdeckter-narzissmus).
+
+Daneben gibt es Spielarten, die besonders schwer zu erkennen sind, weil sie sich hinter etwas scheinbar Positivem verbergen:
+
+- **[Spiritueller Narzissmus](/glossar/spiritueller-narzissmus):** Überlegenheit über „Bewusstheit", Erleuchtung oder Spiritualität – deine Gefühle werden als „nur dein Ego" abgetan.
+- **[Kommunaler Narzissmus](/glossar/kommunaler-narzissmus):** Größe über Güte – der hilfsbereiteste, selbstloseste Mensch für alle, während zu Hause wenig von dieser Fürsorge ankommt.
+
+Allen gemeinsam ist ein zerbrechlicher Selbstwert, der ständig von außen gefüttert werden muss – nur die Bühne ist jeweils eine andere.
 
 ## Der Kreislauf: Rausch, Kälte, Zurückholen
 

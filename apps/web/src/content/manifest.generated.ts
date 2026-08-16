@@ -736,6 +736,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "kommunaler-narzissmus",
+    "title": "Kommunaler Narzissmus – Größe über Güte",
+    "description": "Der kommunale Narzissmus bezieht seine Größe nicht aus Macht, sondern aus Hilfsbereitschaft: der selbstloseste, gütigste Mensch für alle – während zu Hause wenig davon ankommt. Woran du das erkennst. Ohne Diagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "kommunaler narzissmus bedeutung helfer beziehung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über kommunalen Narzissmus gelesen. Kennst du einen Menschen, der für alle da ist – nur für dich nicht? Magst du das anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist kommunaler Narzissmus?",
+        "answer": "Eine Ausprägung, in der jemand seine Größe nicht aus Dominanz oder Erfolg zieht, sondern aus Güte und Hilfsbereitschaft. Die Person sieht und inszeniert sich als der hilfsbereiteste, großzügigste, moralischste Mensch – doch es geht weniger um echtes Mitgefühl als um Bewunderung dafür. Die Fürsorge gilt vor allem dem Publikum."
+      },
+      {
+        "question": "Wie unterscheidet sich das vom grandiosen Narzissmus?",
+        "answer": "Das Ziel ist dasselbe – Bewunderung und ein Gefühl von Überlegenheit –, nur der Weg ist ein anderer. Statt über Macht, Status oder Auftreten läuft er über das Bild vom guten, selbstlosen Menschen. Beide brauchen ihr Publikum; der kommunale Typ findet es in der Rolle des Helfers."
+      }
+    ],
+    "url": "/glossar/kommunaler-narzissmus"
+  },
+  {
+    "type": "glossary",
     "slug": "komplextrauma",
     "title": "Komplextrauma (komplexe PTBS) – wenn Belastung lange dauert",
     "description": "Komplextrauma entsteht nicht durch ein einzelnes Ereignis, sondern durch wiederholte, lang anhaltende Belastung – oft in Beziehungen. Was es kennzeichnet und warum Selbstwert und Vertrauen betroffen sind. Ohne Diagnose.",
@@ -1288,6 +1322,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "spiritueller-narzissmus",
+    "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
+    "description": "Beim spirituellen Narzissmus wird Spiritualität zum Podest: mehr Bewusstheit, höhere Schwingung, weiter entwickelt. Deine Gefühle werden als Ego abgetan. Woran du das erkennst und wie es verunsichert. Ohne Diagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "spiritueller narzissmus bedeutung spiritual bypassing beziehung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über spirituellen Narzissmus gelesen. Wurden deine Gefühle schon mal als bloßes Ego abgetan? Magst du so eine Situation anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist spiritueller Narzissmus?",
+        "answer": "Eine Form, in der Spiritualität, Achtsamkeit oder persönliche Entwicklung zur Quelle von Überlegenheit werden. Die Person stellt sich als bewusster, erleuchteter oder weiter entwickelt dar und wertet andere dadurch subtil ab. Deine berechtigten Gefühle werden dann gern als niederes Ego oder mangelnde Reife umgedeutet."
+      },
+      {
+        "question": "Was ist Spiritual Bypassing?",
+        "answer": "Das Umgehen echter Probleme und Gefühle mit spirituellen Floskeln: Alles geschieht aus einem Grund, du ziehst das an, lass einfach los, hebe deine Schwingung. So wird Verantwortung vermieden und dein Schmerz für ungültig erklärt – ein häufiges Werkzeug des spirituellen Narzissmus."
+      }
+    ],
+    "url": "/glossar/spiritueller-narzissmus"
+  },
+  {
+    "type": "glossary",
     "slug": "taeter-opfer-umkehr",
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose.",
@@ -1421,6 +1489,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/verachtung"
+  },
+  {
+    "type": "glossary",
+    "slug": "vulnerabler-narzissmus",
+    "title": "Vulnerabler Narzissmus – die verletzliche Seite",
+    "description": "Der vulnerable Narzissmus ist die leise, empfindliche Ausprägung: unsicher, kränkbar, oft in der Opferrolle – und dennoch stark ich-bezogen. Wie er sich vom grandiosen Typ unterscheidet. Ohne Diagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "vulnerabler narzissmus bedeutung unterschied grandios",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über vulnerablen Narzissmus gelesen. Magst du eine Situation anschauen, in der du dich schuldig gefühlt hast, ohne genau zu wissen, wofür?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist vulnerabler Narzissmus dasselbe wie verdeckter Narzissmus?",
+        "answer": "Weitgehend ja. In der Forschung meint vulnerabler (oder vulnerabel-fragiler) Narzissmus dieselbe leise, empfindliche Dimension, die im Alltag oft verdeckter oder verdeckt-narzisstisch genannt wird – im Gegensatz zum lauten, grandiosen Typ. Die Begriffe werden meist synonym verwendet."
+      },
+      {
+        "question": "Woran erkenne ich die vulnerable Ausprägung?",
+        "answer": "An leiser Kränkbarkeit statt lauter Dominanz: Überempfindlichkeit gegenüber Kritik, Rückzug und Schmollen, ständige Selbstzweifel im Wechsel mit einem heimlichen Überlegenheitsgefühl, und eine Opferrolle, in der am Ende du der Grund für ihr Leiden bist."
+      }
+    ],
+    "url": "/glossar/vulnerabler-narzissmus"
   },
   {
     "type": "glossary",
@@ -2243,6 +2345,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-beste-mensch-im-raum",
+    "title": "Der beste Mensch im Raum",
+    "description": "Eine fiktive Szene: Beim Benefiz sind alle hingerissen, wie großzügig und selbstlos sie ist. Nur er weiß, wie wenig von dieser Wärme zu Hause ankommt. Über kommunalen Narzissmus – Größe über Güte.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Julians Sicht",
+    "pull_quote": "Alle lieben, wie gut sie zu allen ist. Nur ich weiß, wie wenig davon bei mir ankommt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du einen Menschen, den alle für seine Güte bewundern – und der dir trotzdem fehlt? Magst du das anschauen?"
+    },
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "fassade",
+      "narzisstische-zufuhr",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-beste-mensch-im-raum"
+  },
+  {
+    "type": "scene",
     "slug": "der-daumen-ueber-dem-profil",
     "title": "Der Daumen über dem Profil",
     "description": "Eine fiktive Szene: entfolgt, stummgeschaltet – und trotzdem kennt der Daumen den Weg zu ihrem Profil auswendig. Über das Nicht-loslassen-Können nach einer Trennung.",
@@ -2802,6 +2932,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "du-bist-noch-nicht-so-weit",
+    "title": "Du bist da noch nicht so weit",
+    "description": "Eine fiktive Szene: Sie ist wütend, mit gutem Grund – und er begegnet ihr mit einem weisen Lächeln und der Feststellung, das sei nur ihr Ego. Über spirituellen Narzissmus, der Abwertung als höhere Einsicht verkleidet.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ninas Sicht",
+    "pull_quote": "Meine Wut sei nur mein Ego, sagt er. Und schon stehe ich als die Unerleuchtete da, während er weise lächelt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wurden deine Gefühle schon einmal als bloßes Ego oder mangelnde Reife abgetan? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "ueberlegenheit",
+      "entwertung",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/du-bist-noch-nicht-so-weit"
+  },
+  {
+    "type": "scene",
     "slug": "du-bist-zu-empfindlich",
     "title": "Du bist zu empfindlich",
     "description": "Eine fiktive Szene: Sie spricht an, was sie verletzt hat – und bekommt zur Antwort, sie sei einfach zu empfindlich. Über das Bagatellisieren, das aus deinem Gefühl das eigentliche Problem macht.",
@@ -2853,6 +3011,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "erschoepfung"
     ],
     "url": "/szenen/du-machst-das-eh-besser"
+  },
+  {
+    "type": "scene",
+    "slug": "du-ziehst-das-an",
+    "title": "Das hast du dir angezogen",
+    "description": "Eine fiktive Szene: Er verliert seinen Job und sucht Trost – und bekommt zu hören, er habe diese Energie eben angezogen. Über Spiritual Bypassing, das echten Schmerz mit spirituellen Floskeln für ungültig erklärt.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sebastians Sicht",
+    "pull_quote": "Ich habe meinen Job verloren – und höre, ich hätte es angezogen. Am Ende bin sogar dafür ich der Schuldige.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wurde dir echter Schmerz schon einmal mit spirituellen Sprüchen weggeredet? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "spiritual-bypassing",
+      "schuldumkehr",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/du-ziehst-das-an"
   },
   {
     "type": "scene",
@@ -3221,6 +3407,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/fragst-du-gar-nicht"
+  },
+  {
+    "type": "scene",
+    "slug": "fuer-alle-da",
+    "title": "Für alle da, nur nicht für mich",
+    "description": "Eine fiktive Szene: Er hilft jedem, springt für jeden ein, ist der Held des ganzen Freundeskreises – und wenn sie einmal etwas braucht, ist der Akku leer. Über kommunalen Narzissmus und das Gefühl, undankbar zu sein.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Hannahs Sicht",
+    "pull_quote": "Er ist der Held von allen. Und ich sitze daneben und bin die Undankbare, weil ich mir mehr wünsche.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, hinter der Hilfsbereitschaft eines Menschen für alle anderen selbst leer auszugehen? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "empathiemangel",
+      "einsamkeit-zu-zweit",
+      "schuldgefuehle"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/fuer-alle-da"
   },
   {
     "type": "scene",
@@ -6045,6 +6259,9 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
         "hoovering",
         "narzisstische-zufuhr",
         "idealisierung-abwertung",
+        "vulnerabler-narzissmus",
+        "spiritueller-narzissmus",
+        "kommunaler-narzissmus",
         "intermittierende-verstaerkung",
         "projektion",
         "gaslighting"
@@ -6532,6 +6749,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kognitive Dissonanz – wenn zwei Wahrheiten nicht zusammenpassen",
     "description": "Warum der Kopf die Realität umschreibt, um in einer widersprüchlichen Beziehung bleiben zu können: das Spannungsprinzip hinter Ausreden, Beschönigen und Selbstzweifel. Ohne Diagnose."
   },
+  "/glossar/kommunaler-narzissmus": {
+    "title": "Kommunaler Narzissmus – Größe über Güte",
+    "description": "Der kommunale Narzissmus bezieht seine Größe nicht aus Macht, sondern aus Hilfsbereitschaft: der selbstloseste, gütigste Mensch für alle – während zu Hause wenig davon ankommt. Woran du das erkennst. Ohne Diagnose."
+  },
   "/glossar/komplextrauma": {
     "title": "Komplextrauma (komplexe PTBS) – wenn Belastung lange dauert",
     "description": "Komplextrauma entsteht nicht durch ein einzelnes Ereignis, sondern durch wiederholte, lang anhaltende Belastung – oft in Beziehungen. Was es kennzeichnet und warum Selbstwert und Vertrauen betroffen sind. Ohne Diagnose."
@@ -6596,6 +6817,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
     "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose."
   },
+  "/glossar/spiritueller-narzissmus": {
+    "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
+    "description": "Beim spirituellen Narzissmus wird Spiritualität zum Podest: mehr Bewusstheit, höhere Schwingung, weiter entwickelt. Deine Gefühle werden als Ego abgetan. Woran du das erkennst und wie es verunsichert. Ohne Diagnose."
+  },
   "/glossar/taeter-opfer-umkehr": {
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose."
@@ -6611,6 +6836,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/verachtung": {
     "title": "Verachtung – das gefährlichste Gift für eine Beziehung",
     "description": "Warum Verachtung – Spott, Augenrollen, Herabsetzung – laut Paarforschung der stärkste Vorbote einer Trennung ist, und was ihr entgegenwirkt. Ohne Diagnose."
+  },
+  "/glossar/vulnerabler-narzissmus": {
+    "title": "Vulnerabler Narzissmus – die verletzliche Seite",
+    "description": "Der vulnerable Narzissmus ist die leise, empfindliche Ausprägung: unsicher, kränkbar, oft in der Opferrolle – und dennoch stark ich-bezogen. Wie er sich vom grandiosen Typ unterscheidet. Ohne Diagnose."
   },
   "/glossar/wut": {
     "title": "Wut – der missverstandene Bote",
@@ -6720,6 +6949,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Deine Ex hätte",
     "description": "Eine Szene über den ständigen Vergleich – wenn man an einem Menschen gemessen wird, gegen den man nicht gewinnen kann. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/der-beste-mensch-im-raum": {
+    "title": "Der beste Mensch im Raum",
+    "description": "Eine fiktive Szene: Beim Benefiz sind alle hingerissen, wie großzügig und selbstlos sie ist. Nur er weiß, wie wenig von dieser Wärme zu Hause ankommt. Über kommunalen Narzissmus – Größe über Güte."
+  },
   "/szenen/der-daumen-ueber-dem-profil": {
     "title": "Der Daumen über dem Profil",
     "description": "Eine fiktive Szene: entfolgt, stummgeschaltet – und trotzdem kennt der Daumen den Weg zu ihrem Profil auswendig. Über das Nicht-loslassen-Können nach einer Trennung."
@@ -6800,6 +7033,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Drei Uhr nachts",
     "description": "Eine fiktive Szene: die leere Seite des Betts, das Handy in der Hand, ein Chat, der offen ist. Über die Nächte nach einer Trennung, in denen die Sehnsucht am lautesten ist."
   },
+  "/szenen/du-bist-noch-nicht-so-weit": {
+    "title": "Du bist da noch nicht so weit",
+    "description": "Eine fiktive Szene: Sie ist wütend, mit gutem Grund – und er begegnet ihr mit einem weisen Lächeln und der Feststellung, das sei nur ihr Ego. Über spirituellen Narzissmus, der Abwertung als höhere Einsicht verkleidet."
+  },
   "/szenen/du-bist-zu-empfindlich": {
     "title": "Du bist zu empfindlich",
     "description": "Eine fiktive Szene: Sie spricht an, was sie verletzt hat – und bekommt zur Antwort, sie sei einfach zu empfindlich. Über das Bagatellisieren, das aus deinem Gefühl das eigentliche Problem macht."
@@ -6807,6 +7044,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/du-machst-das-eh-besser": {
     "title": "Du machst das eh besser",
     "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/du-ziehst-das-an": {
+    "title": "Das hast du dir angezogen",
+    "description": "Eine fiktive Szene: Er verliert seinen Job und sucht Trost – und bekommt zu hören, er habe diese Energie eben angezogen. Über Spiritual Bypassing, das echten Schmerz mit spirituellen Floskeln für ungültig erklärt."
   },
   "/szenen/egal-was-ich-tue": {
     "title": "Egal, was ich tue",
@@ -6859,6 +7100,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/fragst-du-gar-nicht": {
     "title": "Fragst du gar nicht?",
     "description": "Eine fiktive Szene: zurück von einem Wochenende, voller Erlebnisse – und keine einzige Frage. Über Desinteresse ohne offene Aggression und das Gefühl, dass die eigene innere Welt beim Gegenüber kaum Neugier weckt."
+  },
+  "/szenen/fuer-alle-da": {
+    "title": "Für alle da, nur nicht für mich",
+    "description": "Eine fiktive Szene: Er hilft jedem, springt für jeden ein, ist der Held des ganzen Freundeskreises – und wenn sie einmal etwas braucht, ist der Akku leer. Über kommunalen Narzissmus und das Gefühl, undankbar zu sein."
   },
   "/szenen/gemeinsame-freunde": {
     "title": "Wie geht es ihr?",

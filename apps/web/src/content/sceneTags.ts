@@ -91,6 +91,7 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   'gefuehle-abwerten': 'Gefühle abwerten',
   'gaslighting-by-proxy': 'Gaslighting durch Dritte',
   'selbst-gaslighting': 'Selbst-Gaslighting',
+  ueberlegenheit: 'Überlegenheit',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */
@@ -218,6 +219,12 @@ export const SCENE_TAG_ORDER: string[] = [
   'fassade',
   'discard',
   'empathiemangel',
+  // Narzissmus-Spielarten
+  'vulnerabler-narzissmus',
+  'spiritueller-narzissmus',
+  'spiritual-bypassing',
+  'kommunaler-narzissmus',
+  'ueberlegenheit',
 ]
 
 /** Anzeige-Label eines Tag-Slugs (Override oder abgeleitet aus dem Slug). */
