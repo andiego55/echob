@@ -3,7 +3,7 @@ type: scene
 slug: der-beste-mensch-im-raum
 title: "Der beste Mensch im Raum"
 description: "Eine fiktive Szene: Beim Benefiz sind alle hingerissen, wie großzügig und selbstlos sie ist. Nur er weiß, wie wenig von dieser Wärme zu Hause ankommt. Über kommunalen Narzissmus – Größe über Güte."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 updated: "2026-08-15"
 author:
   name: EchoB-Redaktion

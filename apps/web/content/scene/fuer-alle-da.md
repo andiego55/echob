@@ -3,7 +3,7 @@ type: scene
 slug: fuer-alle-da
 title: "Für alle da, nur nicht für mich"
 description: "Eine fiktive Szene: Er hilft jedem, springt für jeden ein, ist der Held des ganzen Freundeskreises – und wenn sie einmal etwas braucht, ist der Akku leer. Über kommunalen Narzissmus und das Gefühl, undankbar zu sein."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 updated: "2026-08-15"
 author:
   name: EchoB-Redaktion

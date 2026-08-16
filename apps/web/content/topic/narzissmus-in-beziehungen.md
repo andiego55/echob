@@ -18,9 +18,8 @@ profile_modules: [wahrnehmung, selbstwert]
 scene_tags: [narzissmus, idealisierung-abwertung, love-bombing, selbstwert]
 safety_tags: [kontrolle]
 links:
-  children: [verdeckter-narzissmus]
-  glossary: [love-bombing, hoovering, narzisstische-zufuhr, idealisierung-abwertung, vulnerabler-narzissmus, spiritueller-narzissmus, kommunaler-narzissmus, intermittierende-verstaerkung, projektion, gaslighting]
-  related: [emotionale-manipulation, gaslighting-erkennen]
+  glossary: [love-bombing, hoovering, narzisstische-zufuhr, idealisierung-abwertung, vulnerabler-narzissmus, spiritueller-narzissmus, kommunaler-narzissmus, grandioser-narzissmus, intermittierende-verstaerkung, projektion, gaslighting]
+  related: [narzisstische-spielarten, emotionale-manipulation, gaslighting-erkennen]
 faq:
   - question: "Ist mein Partner ein Narzisst?"
     answer: "Das kann und darf dir dieser Text nicht beantworten. Eine narzisstische Persönlichkeitsstörung kann nur eine qualifizierte Fachperson im persönlichen Kontakt feststellen – niemals per Ferndiagnose und nicht anhand einer Website. Worum es hier geht, sind beobachtbare Muster und vor allem ihre Wirkung auf dich. Du musst niemandem ein Etikett verpassen, um ernst zu nehmen, dass es dir schlecht geht."
@@ -45,7 +44,7 @@ Daneben gibt es Spielarten, die besonders schwer zu erkennen sind, weil sie sich
 - **[Spiritueller Narzissmus](/glossar/spiritueller-narzissmus):** Überlegenheit über „Bewusstheit", Erleuchtung oder Spiritualität – deine Gefühle werden als „nur dein Ego" abgetan.
 - **[Kommunaler Narzissmus](/glossar/kommunaler-narzissmus):** Größe über Güte – der hilfsbereiteste, selbstloseste Mensch für alle, während zu Hause wenig von dieser Fürsorge ankommt.
 
-Allen gemeinsam ist ein zerbrechlicher Selbstwert, der ständig von außen gefüttert werden muss – nur die Bühne ist jeweils eine andere.
+Allen gemeinsam ist ein zerbrechlicher Selbstwert, der ständig von außen gefüttert werden muss – nur die Bühne ist jeweils eine andere. Einen ausführlichen Überblick über alle Spielarten – auch den grandiosen Typ – findest du hier: [Die Spielarten des Narzissmus](/wissen/narzisstische-spielarten).
 
 ## Der Kreislauf: Rausch, Kälte, Zurückholen
 

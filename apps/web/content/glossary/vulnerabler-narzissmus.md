@@ -3,7 +3,7 @@ type: glossary
 slug: vulnerabler-narzissmus
 title: "Vulnerabler Narzissmus – die verletzliche Seite"
 description: "Der vulnerable Narzissmus ist die leise, empfindliche Ausprägung: unsicher, kränkbar, oft in der Opferrolle – und dennoch stark ich-bezogen. Wie er sich vom grandiosen Typ unterscheidet. Ohne Diagnose."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 search_intent: "vulnerabler narzissmus bedeutung unterschied grandios"
 updated: "2026-08-15"
 author:

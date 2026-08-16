@@ -23,6 +23,7 @@ export const CLUSTERS = [
   'emotionaler-missbrauch', // Emotionaler Missbrauch (Coercive Control, Vernachlässigung, subtile Gewalt)
   'gaslighting', // Gaslighting Deep Dive (Realitätsverdrehung)
   'narzissmus', // Narzissmus in Beziehungen (narzisstische Missbrauchsdynamik)
+  'narzissmus-spielarten', // Spielarten des Narzissmus (grandios, verdeckt/vulnerabel, spirituell, kommunal)
   'trauma', // Trauma & PTBS-Belastung durch Beziehungen
   'bindung', // Bindung & Nähe
   'trennung', // Trennung
@@ -127,6 +128,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   'emotionaler-missbrauch': 'Emotionaler Missbrauch',
   gaslighting: 'Gaslighting',
   narzissmus: 'Narzissmus',
+  'narzissmus-spielarten': 'Narzissmus-Spielarten',
   trauma: 'Trauma & PTBS',
   bindung: 'Bindung & Nähe',
   trennung: 'Trennung',

@@ -3,7 +3,7 @@ type: glossary
 slug: spiritueller-narzissmus
 title: "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung"
 description: "Beim spirituellen Narzissmus wird Spiritualität zum Podest: mehr Bewusstheit, höhere Schwingung, weiter entwickelt. Deine Gefühle werden als Ego abgetan. Woran du das erkennst und wie es verunsichert. Ohne Diagnose."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 search_intent: "spiritueller narzissmus bedeutung spiritual bypassing beziehung"
 updated: "2026-08-15"
 author:

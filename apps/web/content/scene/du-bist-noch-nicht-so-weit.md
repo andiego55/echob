@@ -3,7 +3,7 @@ type: scene
 slug: du-bist-noch-nicht-so-weit
 title: "Du bist da noch nicht so weit"
 description: "Eine fiktive Szene: Sie ist wütend, mit gutem Grund – und er begegnet ihr mit einem weisen Lächeln und der Feststellung, das sei nur ihr Ego. Über spirituellen Narzissmus, der Abwertung als höhere Einsicht verkleidet."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 updated: "2026-08-15"
 author:
   name: EchoB-Redaktion

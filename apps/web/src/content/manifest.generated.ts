@@ -452,6 +452,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "grandioser-narzissmus",
+    "title": "Grandioser Narzissmus – die laute, dominante Form",
+    "description": "Der grandiose Narzissmus ist die offene, selbstsichere Ausprägung: Bewunderung als Bedürfnis, wenig Mitgefühl, alles dreht sich um die eigene Größe. Woran du das erkennst und wie es sich anfühlt. Ohne Diagnose.",
+    "cluster": "narzissmus-spielarten",
+    "search_intent": "grandioser narzissmus bedeutung anzeichen beziehung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über grandiosen Narzissmus gelesen. Kennst du das Gefühl, in einer Beziehung nur die Nebenrolle zu spielen? Magst du das anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist grandioser Narzissmus?",
+        "answer": "Die offene, selbstsichere Ausprägung narzisstischer Züge: ein starkes Bedürfnis nach Bewunderung, ein Gefühl von Besonderheit und Anspruch, wenig echtes Mitgefühl und die Neigung, andere abzuwerten, um sich selbst zu erhöhen. Diese Person sucht sichtbar den Mittelpunkt."
+      },
+      {
+        "question": "Wie unterscheidet er sich vom verdeckten Typ?",
+        "answer": "Der Kern ist ähnlich – ein zerbrechlicher Selbstwert, der ständig gefüttert werden muss –, aber die Bühne ist anders. Der grandiose Typ tritt laut und dominant auf, der verdeckte oder vulnerable leise und in der Opferrolle. Beide brauchen Bewunderung, holen sie sich aber gegensätzlich."
+      }
+    ],
+    "url": "/glossar/grandioser-narzissmus"
+  },
+  {
+    "type": "glossary",
     "slug": "gruebeln",
     "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
     "description": "Grübeln (Rumination) ist das kreisende Wiederholen derselben Gedanken ohne Lösung. Warum es sich nach Nachdenken anfühlt, aber die Wunde offen hält – und wie du den Kreis unterbrichst. Ohne Diagnose.",
@@ -739,7 +773,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "kommunaler-narzissmus",
     "title": "Kommunaler Narzissmus – Größe über Güte",
     "description": "Der kommunale Narzissmus bezieht seine Größe nicht aus Macht, sondern aus Hilfsbereitschaft: der selbstloseste, gütigste Mensch für alle – während zu Hause wenig davon ankommt. Woran du das erkennst. Ohne Diagnose.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "search_intent": "kommunaler narzissmus bedeutung helfer beziehung",
     "updated": "2026-08-15",
     "author": {
@@ -1325,7 +1359,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "spiritueller-narzissmus",
     "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
     "description": "Beim spirituellen Narzissmus wird Spiritualität zum Podest: mehr Bewusstheit, höhere Schwingung, weiter entwickelt. Deine Gefühle werden als Ego abgetan. Woran du das erkennst und wie es verunsichert. Ohne Diagnose.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "search_intent": "spiritueller narzissmus bedeutung spiritual bypassing beziehung",
     "updated": "2026-08-15",
     "author": {
@@ -1495,7 +1529,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "vulnerabler-narzissmus",
     "title": "Vulnerabler Narzissmus – die verletzliche Seite",
     "description": "Der vulnerable Narzissmus ist die leise, empfindliche Ausprägung: unsicher, kränkbar, oft in der Opferrolle – und dennoch stark ich-bezogen. Wie er sich vom grandiosen Typ unterscheidet. Ohne Diagnose.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "search_intent": "vulnerabler narzissmus bedeutung unterschied grandios",
     "updated": "2026-08-15",
     "author": {
@@ -2261,6 +2295,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-ist-deine-alte-wunde",
+    "title": "Das ist nur deine alte Wunde",
+    "description": "Eine fiktive Szene: Er spricht an, dass sie eine Verabredung vergessen hat – und hört, das sei bloß seine Bindungswunde aus der Kindheit. Über Therapie-Sprache, die als Waffe dient und jede Verantwortung abwehrt.",
+    "cluster": "narzissmus-spielarten",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Michaels Sicht",
+    "pull_quote": "Sage ich, dass mich etwas verletzt, höre ich, das sei nur meine alte Wunde. Am Ende therapiere ich mich – und sie ist fein raus.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wurde dein berechtigter Einwand schon einmal in ein Problem von dir umgedeutet – mit psychologischen Begriffen? Magst du das anschauen?"
+    },
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "spiritual-bypassing",
+      "schuldumkehr",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/das-ist-deine-alte-wunde"
+  },
+  {
+    "type": "scene",
     "slug": "das-schlechte-gewissen",
     "title": "Das schlechte Gewissen",
     "description": "Eine Szene über die Schuldwelle, die nach einer gehaltenen Grenze kommt – und die Erkenntnis, dass sie ein alter Reflex ist, kein Urteil. Aus der Ich-Perspektive, fiktiv.",
@@ -2348,7 +2410,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "der-beste-mensch-im-raum",
     "title": "Der beste Mensch im Raum",
     "description": "Eine fiktive Szene: Beim Benefiz sind alle hingerissen, wie großzügig und selbstlos sie ist. Nur er weiß, wie wenig von dieser Wärme zu Hause ankommt. Über kommunalen Narzissmus – Größe über Güte.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "updated": "2026-08-15",
     "author": {
       "name": "EchoB-Redaktion"
@@ -2653,6 +2715,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "die-gekraenkte-stille",
+    "title": "Die gekränkte Stille",
+    "description": "Eine fiktive Szene: Eine harmlose Bemerkung, und sie zieht sich tagelang beleidigt zurück – bis er hinterherläuft und sich für ihre Kränkung entschuldigt. Über den verdeckt-vulnerablen Typ, der über Rückzug und Opferrolle bestraft.",
+    "cluster": "narzissmus-spielarten",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Pauls Sicht",
+    "pull_quote": "Ein falsches Wort, und drei Tage Eiszeit. Am Ende bin ich es, der um Verzeihung bittet – für ihre Kränkung.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, jemanden nach einer Kleinigkeit tagelang zu besänftigen? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "vulnerabler-narzissmus",
+      "schweigen-als-strafe",
+      "schuldgefuehle",
+      "auf-eierschalen-gehen"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/die-gekraenkte-stille"
+  },
+  {
+    "type": "scene",
     "slug": "die-leere-seite-vom-bett",
     "title": "Die leere Seite vom Bett",
     "description": "Eine fiktive Szene: Er wacht auf und greift automatisch nach rechts, wo sie immer lag. Da ist nur die kühle, glatte Decke. Über die kleinen Morgenmomente, in denen ein Verlust am lautesten ist.",
@@ -2935,7 +3025,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "du-bist-noch-nicht-so-weit",
     "title": "Du bist da noch nicht so weit",
     "description": "Eine fiktive Szene: Sie ist wütend, mit gutem Grund – und er begegnet ihr mit einem weisen Lächeln und der Feststellung, das sei nur ihr Ego. Über spirituellen Narzissmus, der Abwertung als höhere Einsicht verkleidet.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "updated": "2026-08-15",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3017,7 +3107,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "du-ziehst-das-an",
     "title": "Das hast du dir angezogen",
     "description": "Eine fiktive Szene: Er verliert seinen Job und sucht Trost – und bekommt zu hören, er habe diese Energie eben angezogen. Über Spiritual Bypassing, das echten Schmerz mit spirituellen Floskeln für ungültig erklärt.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "updated": "2026-08-15",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3413,7 +3503,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "fuer-alle-da",
     "title": "Für alle da, nur nicht für mich",
     "description": "Eine fiktive Szene: Er hilft jedem, springt für jeden ein, ist der Held des ganzen Freundeskreises – und wenn sie einmal etwas braucht, ist der Akku leer. Über kommunalen Narzissmus und das Gefühl, undankbar zu sein.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "updated": "2026-08-15",
     "author": {
       "name": "EchoB-Redaktion"
@@ -3463,6 +3553,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/gemeinsame-freunde"
+  },
+  {
+    "type": "scene",
+    "slug": "hauptsache-alle-sehen-es",
+    "title": "Hauptsache, alle sehen es",
+    "description": "Eine fiktive Szene: Er postet jede gute Tat, spendet nur mit Publikum – und zählt zu Hause die Cent. Über kommunalen Narzissmus, bei dem Großzügigkeit vor allem eine Bühne braucht.",
+    "cluster": "narzissmus-spielarten",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Lisas Sicht",
+    "pull_quote": "Er spendet großzügig, aber nur, wenn eine Kamera dabei ist. Zu Hause zählt er die Cent.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du Großzügigkeit, die vor allem ein Publikum braucht? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "fassade",
+      "narzisstische-zufuhr",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/hauptsache-alle-sehen-es"
   },
   {
     "type": "scene",
@@ -3883,6 +4001,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/immer-die-grosse"
+  },
+  {
+    "type": "scene",
+    "slug": "immer-die-hauptrolle",
+    "title": "Immer die Hauptrolle",
+    "description": "Eine fiktive Szene: Sie erzählt von ihrer Beförderung – und binnen zwei Sätzen ist er wieder beim Thema seiner eigenen Erfolge. Über grandiosen Narzissmus und das Gefühl, in der eigenen Beziehung nur Publikum zu sein.",
+    "cluster": "narzissmus-spielarten",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Elenas Sicht",
+    "pull_quote": "Jedes Gespräch landet bei ihm. Ich bin das Publikum in meiner eigenen Beziehung.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, in der eigenen Beziehung nur die Nebenrolle zu spielen? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "grandioser-narzissmus",
+      "empathiemangel",
+      "einsamkeit-zu-zweit",
+      "selbstverlust"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/immer-die-hauptrolle"
   },
   {
     "type": "scene",
@@ -4478,6 +4624,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "schau-wie-geduldig-ich-mit-dir-bin",
+    "title": "Schau, wie geduldig ich mit dir bin",
+    "description": "Eine fiktive Szene: Vor Freunden lobt sie sich selbst dafür, wie viel sie mit ihm aushält – und macht ihn so zum schwierigen Fall, den sie großmütig erträgt. Über kommunalen Narzissmus als moralische Überlegenheit.",
+    "cluster": "narzissmus-spielarten",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Fabians Sicht",
+    "pull_quote": "Vor allen ist sie die Geduldige, die es mit mir aushält. Und ich bin der schwierige Fall, für den sie Applaus bekommt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wurdest du schon einmal öffentlich zum schwierigen Menschen gemacht, den jemand großmütig erträgt? Magst du das anschauen?"
+    },
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "ueberlegenheit",
+      "schuldumkehr",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/schau-wie-geduldig-ich-mit-dir-bin"
+  },
+  {
+    "type": "scene",
     "slug": "sie-hat-es-gehoert",
     "title": "Sie hat es gehört",
     "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation.",
@@ -4845,6 +5019,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/wieder-dieser-traum"
+  },
+  {
+    "type": "scene",
+    "slug": "wir-sind-seelenverwandt",
+    "title": "Wir sind Seelenverwandte",
+    "description": "Eine fiktive Szene: Vom ersten Tag an spricht er von Schicksal, Seelenverwandtschaft und einem Band über Leben hinweg. Erst später spürt sie, wie dieses große Versprechen sie auch festhält. Über spirituelles Love Bombing.",
+    "cluster": "narzissmus-spielarten",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Katharinas Sicht",
+    "pull_quote": "Vom ersten Tag an waren wir angeblich Seelenverwandte. Erst später verstand ich, dass so ein großes Versprechen auch eine Kette sein kann.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du einen überwältigenden Anfang, der sich später wie eine Verpflichtung anfühlte? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "love-bombing",
+      "zukunftsversprechen",
+      "idealisierung-abwertung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/wir-sind-seelenverwandt"
   },
   {
     "type": "scene",
@@ -6251,9 +6453,6 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "kontrolle"
     ],
     "links": {
-      "children": [
-        "verdeckter-narzissmus"
-      ],
       "glossary": [
         "love-bombing",
         "hoovering",
@@ -6262,11 +6461,13 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
         "vulnerabler-narzissmus",
         "spiritueller-narzissmus",
         "kommunaler-narzissmus",
+        "grandioser-narzissmus",
         "intermittierende-verstaerkung",
         "projektion",
         "gaslighting"
       ],
       "related": [
+        "narzisstische-spielarten",
         "emotionale-manipulation",
         "gaslighting-erkennen"
       ]
@@ -6286,6 +6487,69 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/narzissmus-in-beziehungen"
+  },
+  {
+    "type": "topic",
+    "slug": "narzisstische-spielarten",
+    "title": "Die Spielarten des Narzissmus: grandios, verdeckt, spirituell, kommunal",
+    "description": "Narzissmus tritt in sehr verschiedenen Gewändern auf – laut und dominant oder leise und verletzlich, spirituell überhöht oder als selbstloser Helfer getarnt. Ein Überblick über die Spielarten und wie sie sich anfühlen. Ohne Ferndiagnose.",
+    "cluster": "narzissmus-spielarten",
+    "search_intent": "arten von narzissmus spielarten grandios verdeckt spirituell kommunal",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über die Spielarten des Narzissmus gelesen. Welche davon erinnert dich am meisten an eine Situation, die du selbst erlebt hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "narzissmus",
+      "ueberlegenheit",
+      "fassade",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "children": [
+        "verdeckter-narzissmus"
+      ],
+      "glossary": [
+        "grandioser-narzissmus",
+        "vulnerabler-narzissmus",
+        "spiritueller-narzissmus",
+        "kommunaler-narzissmus",
+        "narzisstische-zufuhr"
+      ],
+      "related": [
+        "narzissmus-in-beziehungen",
+        "gaslighting-erkennen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Welche Arten von Narzissmus gibt es?",
+        "answer": "Die Forschung unterscheidet vor allem zwei Grunddimensionen: den grandiosen (offen, dominant, im Mittelpunkt) und den vulnerablen bzw. verdeckten (leise, empfindlich, oft in der Opferrolle). Innerhalb davon gibt es feinere Spielarten, die sich hinter etwas Positivem verstecken – etwa der spirituelle (Überlegenheit über Bewusstheit) und der kommunale Narzissmus (Größe über Güte). Der Kern ist überall ähnlich, nur die Bühne ist eine andere."
+      },
+      {
+        "question": "Kann ich damit erkennen, welcher Typ mein Partner ist?",
+        "answer": "Nein, und darum geht es auch nicht. Menschen lassen sich nicht per Website in Schubladen sortieren, und eine narzisstische Persönlichkeitsstörung stellt nur eine Fachperson fest. Die Spielarten sind eine Landkarte für dein eigenes Erleben – damit du besser benennen kannst, was dir begegnet und was es mit dir macht."
+      }
+    ],
+    "url": "/wissen/narzisstische-spielarten"
   },
   {
     "type": "topic",
@@ -6572,7 +6836,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "verdeckter-narzissmus",
     "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
     "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose.",
-    "cluster": "narzissmus",
+    "cluster": "narzissmus-spielarten",
     "search_intent": "verdeckter narzissmus anzeichen vulnerabler narzissmus beziehung",
     "updated": "2026-08-15",
     "author": {
@@ -6596,13 +6860,15 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wahrnehmungszweifel"
     ],
     "links": {
-      "parent": "narzissmus-in-beziehungen",
+      "parent": "narzisstische-spielarten",
       "glossary": [
+        "vulnerabler-narzissmus",
         "narzisstische-zufuhr",
         "projektion",
         "emotionale-erpressung"
       ],
       "related": [
+        "narzissmus-in-beziehungen",
         "emotionaler-missbrauch",
         "gaslighting-erkennen"
       ]
@@ -6716,6 +6982,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/gaslighting-by-proxy": {
     "title": "Gaslighting durch Dritte (Gaslighting by Proxy)",
     "description": "Beim Gaslighting durch Dritte werden andere Menschen benutzt, um deine Wahrnehmung zu untergraben. Warum das so verunsichert und wie du dich davon löst. Ohne Diagnose."
+  },
+  "/glossar/grandioser-narzissmus": {
+    "title": "Grandioser Narzissmus – die laute, dominante Form",
+    "description": "Der grandiose Narzissmus ist die offene, selbstsichere Ausprägung: Bewunderung als Bedürfnis, wenig Mitgefühl, alles dreht sich um die eigene Größe. Woran du das erkennst und wie es sich anfühlt. Ohne Diagnose."
   },
   "/glossar/gruebeln": {
     "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
@@ -6937,6 +7207,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/das-ist-deine-alte-wunde": {
+    "title": "Das ist nur deine alte Wunde",
+    "description": "Eine fiktive Szene: Er spricht an, dass sie eine Verabredung vergessen hat – und hört, das sei bloß seine Bindungswunde aus der Kindheit. Über Therapie-Sprache, die als Waffe dient und jede Verantwortung abwehrt."
+  },
   "/szenen/das-schlechte-gewissen": {
     "title": "Das schlechte Gewissen",
     "description": "Eine Szene über die Schuldwelle, die nach einer gehaltenen Grenze kommt – und die Erkenntnis, dass sie ein alter Reflex ist, kein Urteil. Aus der Ich-Perspektive, fiktiv."
@@ -6992,6 +7266,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-eine-nachricht": {
     "title": "Die eine Nachricht",
     "description": "Eine Szene über Breadcrumbing – genau so viel Aufmerksamkeit, dass die Hoffnung nicht stirbt, aber nie genug, dass etwas Echtes wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-gekraenkte-stille": {
+    "title": "Die gekränkte Stille",
+    "description": "Eine fiktive Szene: Eine harmlose Bemerkung, und sie zieht sich tagelang beleidigt zurück – bis er hinterherläuft und sich für ihre Kränkung entschuldigt. Über den verdeckt-vulnerablen Typ, der über Rückzug und Opferrolle bestraft."
   },
   "/szenen/die-leere-seite-vom-bett": {
     "title": "Die leere Seite vom Bett",
@@ -7109,6 +7387,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Wie geht es ihr?",
     "description": "Eine fiktive Szene: Beim Grillen mit Freunden fällt beiläufig ihr Name – und wie es ihr angeblich schon wieder gut geht. Über die gemeinsame Welt, die nach einer Trennung bleibt, und den Stich, den ein harmloser Satz setzen kann."
   },
+  "/szenen/hauptsache-alle-sehen-es": {
+    "title": "Hauptsache, alle sehen es",
+    "description": "Eine fiktive Szene: Er postet jede gute Tat, spendet nur mit Publikum – und zählt zu Hause die Cent. Über kommunalen Narzissmus, bei dem Großzügigkeit vor allem eine Bühne braucht."
+  },
   "/szenen/ich-brauch-eine-pause": {
     "title": "Ich brauch eine Pause",
     "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv."
@@ -7168,6 +7450,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/immer-die-grosse": {
     "title": "Immer die Große",
     "description": "Eine Szene über Parentifizierung – wenn man als Kind zur Stütze der Eltern wurde und als Erwachsene die erste Grenze wie Verrat fühlt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/immer-die-hauptrolle": {
+    "title": "Immer die Hauptrolle",
+    "description": "Eine fiktive Szene: Sie erzählt von ihrer Beförderung – und binnen zwei Sätzen ist er wieder beim Thema seiner eigenen Erfolge. Über grandiosen Narzissmus und das Gefühl, in der eigenen Beziehung nur Publikum zu sein."
   },
   "/szenen/in-der-therapie-war-ich-sicher": {
     "title": "In der Therapie war ich plötzlich sicher",
@@ -7253,6 +7539,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sag einfach nichts, Papa",
     "description": "Eine fiktive Szene: Ein Kind, das die Stimmung im Auto liest, bevor die Eltern es tun, und den Vater zum Schweigen bittet, um den Frieden zu retten. Über Kinder im Elternkonflikt und die Last, die sie tragen."
   },
+  "/szenen/schau-wie-geduldig-ich-mit-dir-bin": {
+    "title": "Schau, wie geduldig ich mit dir bin",
+    "description": "Eine fiktive Szene: Vor Freunden lobt sie sich selbst dafür, wie viel sie mit ihm aushält – und macht ihn so zum schwierigen Fall, den sie großmütig erträgt. Über kommunalen Narzissmus als moralische Überlegenheit."
+  },
   "/szenen/sie-hat-es-gehoert": {
     "title": "Sie hat es gehört",
     "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation."
@@ -7304,6 +7594,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/wieder-dieser-traum": {
     "title": "Wieder dieser Traum",
     "description": "Eine fiktive Szene: Um kurz nach vier wacht er auf, das Herz rast, das Kissen ist nass – schon wieder derselbe Traum. Über Albträume, die die Nacht zurückerobern, lange nachdem alles vorbei ist."
+  },
+  "/szenen/wir-sind-seelenverwandt": {
+    "title": "Wir sind Seelenverwandte",
+    "description": "Eine fiktive Szene: Vom ersten Tag an spricht er von Schicksal, Seelenverwandtschaft und einem Band über Leben hinweg. Erst später spürt sie, wie dieses große Versprechen sie auch festhält. Über spirituelles Love Bombing."
   },
   "/szenen/wo-bist-du-gerade": {
     "title": "Wo bist du gerade?",
@@ -7436,6 +7730,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/narzissmus-in-beziehungen": {
     "title": "Narzissmus in Beziehungen: Muster erkennen, ohne zu diagnostizieren",
     "description": "Woran du narzisstische Beziehungsdynamiken erkennst – vom Liebesrausch über die Abwertung bis zum Zurückholen –, warum sie so binden und wie du wieder zu dir findest. Behutsam, geschlechtsoffen, ohne Ferndiagnose."
+  },
+  "/wissen/narzisstische-spielarten": {
+    "title": "Die Spielarten des Narzissmus: grandios, verdeckt, spirituell, kommunal",
+    "description": "Narzissmus tritt in sehr verschiedenen Gewändern auf – laut und dominant oder leise und verletzlich, spirituell überhöht oder als selbstloser Helfer getarnt. Ein Überblick über die Spielarten und wie sie sich anfühlen. Ohne Ferndiagnose."
   },
   "/wissen/nein-sagen": {
     "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",

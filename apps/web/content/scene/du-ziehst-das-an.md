@@ -3,7 +3,7 @@ type: scene
 slug: du-ziehst-das-an
 title: "Das hast du dir angezogen"
 description: "Eine fiktive Szene: Er verliert seinen Job und sucht Trost – und bekommt zu hören, er habe diese Energie eben angezogen. Über Spiritual Bypassing, das echten Schmerz mit spirituellen Floskeln für ungültig erklärt."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 updated: "2026-08-15"
 author:
   name: EchoB-Redaktion

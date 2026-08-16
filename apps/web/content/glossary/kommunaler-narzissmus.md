@@ -3,7 +3,7 @@ type: glossary
 slug: kommunaler-narzissmus
 title: "Kommunaler Narzissmus – Größe über Güte"
 description: "Der kommunale Narzissmus bezieht seine Größe nicht aus Macht, sondern aus Hilfsbereitschaft: der selbstloseste, gütigste Mensch für alle – während zu Hause wenig davon ankommt. Woran du das erkennst. Ohne Diagnose."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 search_intent: "kommunaler narzissmus bedeutung helfer beziehung"
 updated: "2026-08-15"
 author:

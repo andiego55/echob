@@ -3,7 +3,7 @@ type: topic
 slug: verdeckter-narzissmus
 title: "Verdeckter Narzissmus: der leise, schwer greifbare Typ"
 description: "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose."
-cluster: narzissmus
+cluster: narzissmus-spielarten
 search_intent: "verdeckter narzissmus anzeichen vulnerabler narzissmus beziehung"
 updated: "2026-08-15"
 author:
@@ -16,9 +16,9 @@ echo:
   cta_positions: [after-intro, end]
 scene_tags: [verdeckter-narzissmus, schuldgefuehle, passiv-aggressiv, wahrnehmungszweifel]
 links:
-  parent: narzissmus-in-beziehungen
-  glossary: [narzisstische-zufuhr, projektion, emotionale-erpressung]
-  related: [emotionaler-missbrauch, gaslighting-erkennen]
+  parent: narzisstische-spielarten
+  glossary: [vulnerabler-narzissmus, narzisstische-zufuhr, projektion, emotionale-erpressung]
+  related: [narzissmus-in-beziehungen, emotionaler-missbrauch, gaslighting-erkennen]
 faq:
   - question: "Was ist der Unterschied zwischen grandiosem und verdecktem Narzissmus?"
     answer: "Der grandiose Typ tritt laut, dominant und selbstsicher auf und will sichtbar im Mittelpunkt stehen. Der verdeckte (auch vulnerable) Typ wirkt nach außen eher scheu, empfindlich oder leidend – oft in der Opferrolle. Der Kern ist aber ähnlich: eine starke Ich-Bezogenheit, ein zerbrechlicher Selbstwert und wenig echtes Mitgefühl für andere."
