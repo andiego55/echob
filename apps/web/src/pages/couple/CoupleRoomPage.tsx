@@ -11,6 +11,7 @@ import AppShell from '@/components/app/AppShell'
 import { coupleApi } from '@/api/couple'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import IsolationNotice from '@/components/couple/IsolationNotice'
+import AgreementsCard from '@/components/couple/AgreementsCard'
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'In Vorbereitung',
@@ -76,6 +77,8 @@ export default function CoupleRoomPage() {
         </div>
 
         <SessionsCard coupleId={coupleId} />
+
+        <AgreementsCard coupleId={coupleId} />
 
         <IsolationNotice />
 

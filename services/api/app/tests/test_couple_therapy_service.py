@@ -17,6 +17,7 @@ import asyncpg
 import pytest
 from fastapi import HTTPException
 
+from app.services import couple_agreement_service as cas
 from app.services import couple_private_service as cps
 from app.services import couple_session_service as css
 from app.services import couple_therapy_service as cts
@@ -302,6 +303,59 @@ async def test_both_members_share_one_transcript(db):
     assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
     assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
     assert history[2]["content"].startswith("Rio: ")
+
+
+# ── Abmachungen ──────────────────────────────────────────────────────────────
+
+async def test_agreement_needs_the_other_person(db):
+    """Eine Abmachung gilt erst, wenn die ANDERE Person zustimmt — nie im Alleingang."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    ag = await cas.propose(db, couple_id, user_a, body="Sonntags 20 Minuten reden.")
+    assert ag["status"] == "proposed"
+
+    with pytest.raises(HTTPException) as exc:
+        await cas.accept(db, ag["id"], user_a)      # sich selbst bestätigen
+    assert exc.value.status_code == 400
+
+    with pytest.raises(HTTPException) as exc:
+        await cas.accept(db, ag["id"], uuid.uuid4())  # Fremde
+    assert exc.value.status_code == 404
+
+    accepted = await cas.accept(db, ag["id"], user_b)
+    assert accepted["status"] == "active"
+    assert str(accepted["accepted_by"]) == str(user_b)
+
+
+async def test_agreement_lifecycle_and_context(db):
+    """Gehalten markieren geht nur bei geltenden Abmachungen; Echo sieht nur geltende."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    ag = await cas.propose(db, couple_id, user_a, body="Pause-Wort vereinbaren.")
+
+    with pytest.raises(HTTPException) as exc:
+        await cas.set_status(db, ag["id"], user_a, "kept")   # noch nicht angenommen
+    assert exc.value.status_code == 400
+
+    await cas.accept(db, ag["id"], user_b)
+    assert await cas.list_active_for_context(db, couple_id) == ["Pause-Wort vereinbaren."]
+
+    kept = await cas.set_status(db, ag["id"], user_b, "kept")
+    assert kept["status"] == "kept"
+    assert await cas.list_active_for_context(db, couple_id) == []
+    assert len(await cas.list_agreements(db, couple_id, user_a)) == 1
+
+
+async def test_summaries_belong_to_both(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    await cas.save_summary(db, session["id"], user_a, "Wir sind uns nähergekommen.")
+
+    for viewer in (user_a, user_b):
+        rows = await cas.list_summaries(db, session["id"], viewer)
+        assert [r["summary_text"] for r in rows] == ["Wir sind uns nähergekommen."]
+
+    with pytest.raises(HTTPException) as exc:
+        await cas.list_summaries(db, session["id"], uuid.uuid4())
+    assert exc.value.status_code == 404
 
 
 # ── Privater flankierender Echo ──────────────────────────────────────────────

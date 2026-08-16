@@ -14,6 +14,8 @@ import { coupleSessionsApi } from '@/api/coupleSessions'
 import type { CoupleSessionDetail } from '@/api/coupleSessions'
 import ContextComposer from '@/components/couple/ContextComposer'
 import PrivateEchoPanel from '@/components/couple/PrivateEchoPanel'
+import AgreementsCard from '@/components/couple/AgreementsCard'
+import { coupleAgreementsApi } from '@/api/coupleAgreements'
 
 export default function CoupleSessionPage() {
   const { sessionId = '' } = useParams<{ sessionId: string }>()
@@ -180,6 +182,8 @@ export default function CoupleSessionPage() {
 
             {panel === 'private' && <PrivateEchoPanel sessionId={sessionId} />}
 
+            {panel === 'prep' && <SummaryCard sessionId={sessionId} hasMessages={messages.length > 0} />}
+
             {panel === 'prep' && <>
             <ContextComposer sessionId={sessionId} disabled={closed} />
 
@@ -203,7 +207,57 @@ export default function CoupleSessionPage() {
             </>}
           </div>
         </div>
+
+        {panel === 'prep' && <div className="mt-6"><AgreementsCard coupleId={session.couple_id} sessionId={sessionId} /></div>}
       </div>
     </AppShell>
+  )
+}
+
+// ── Zusammenfassung ───────────────────────────────────────────────────────────
+
+function SummaryCard({ sessionId, hasMessages }: { sessionId: string; hasMessages: boolean }) {
+  const qc = useQueryClient()
+  const { data: summaries = [] } = useQuery({
+    queryKey: ['couple-summaries', sessionId],
+    queryFn: () => coupleAgreementsApi.listSummaries(sessionId),
+    enabled: !!sessionId,
+  })
+  const create = useMutation({
+    mutationFn: () => coupleAgreementsApi.createSummary(sessionId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-summaries', sessionId] }),
+  })
+
+  return (
+    <div className="card">
+      <h2 className="text-sm font-bold text-navy">Zusammenfassung</h2>
+      <p className="mt-1 text-xs text-brand-muted">
+        Echo hält fest, worum es ging, was deutlich wurde, was offen blieb – und schlägt
+        Abmachungen vor.
+      </p>
+
+      <button
+        onClick={() => create.mutate()}
+        disabled={!hasMessages || create.isPending}
+        className="btn-outline !py-1.5 !px-3.5 !text-xs mt-3 disabled:opacity-50"
+      >
+        {create.isPending ? 'Fasse zusammen …' : 'Sitzung zusammenfassen'}
+      </button>
+
+      {summaries.length > 0 && (
+        <div className="mt-4 space-y-3">
+          {summaries.map(s => (
+            <div key={s.id} className="rounded-brand border border-brand-border px-3.5 py-3">
+              <p className="text-[0.65rem] text-brand-muted">
+                {new Date(s.created_at).toLocaleString('de-DE')}
+              </p>
+              <div className="mt-1.5 text-xs text-brand-text">
+                <MarkdownMessage content={s.summary_text} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

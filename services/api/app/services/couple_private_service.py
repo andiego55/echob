@@ -20,6 +20,7 @@ from app.core import crypto
 from app.services.couple_session_service import (
     HISTORY_LIMIT,
     build_session_context,
+    build_transcript,
     load_confirmed_contexts,
     load_member_names,
     load_messages,
@@ -99,13 +100,7 @@ async def load_transcript(conn, session, link) -> str:
     """Der gemeinsame Gesprächsverlauf als lesbarer Text (Grundlage fürs Feedback)."""
     names = await load_member_names(conn, link)
     messages = await load_messages(conn, session["id"])
-    if not messages:
-        return ""
-    return "\n".join(
-        f"{'Echo' if m['role'] == 'echo' else names.get(str(m['user_id']), 'Person')}: "
-        f"{m['content']}"
-        for m in messages
-    )
+    return build_transcript(messages, names) if messages else ""
 
 
 # ── Privater Verlauf (immer auf die eigene Person eingeschränkt) ─────────────

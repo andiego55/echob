@@ -195,6 +195,15 @@ async def load_messages(conn, session_id, limit: int | None = None) -> list[dict
     return msgs[-limit:] if limit else msgs
 
 
+def build_transcript(messages: list[dict], names: dict[str, str]) -> str:
+    """Der gemeinsame Verlauf als lesbarer Text (für Zusammenfassung und Feedback)."""
+    return "\n".join(
+        f"{'Echo' if m['role'] == 'echo' else names.get(str(m['user_id']), 'Person')}: "
+        f"{m['content']}"
+        for m in messages
+    )
+
+
 def build_history(messages: list[dict], names: dict[str, str]) -> list[dict[str, str]]:
     """Verlauf für das LLM. Wer spricht, steckt im Text — es sind drei Stimmen im Raum."""
     history: list[dict[str, str]] = []
