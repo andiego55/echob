@@ -87,6 +87,10 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   albtraeume: 'Albträume',
   betaeubung: 'Betäubung',
   uebererregung: 'Übererregung',
+  // Gaslighting & Narzissmus (nur Umlaut-/Sonderfall-Overrides)
+  'gefuehle-abwerten': 'Gefühle abwerten',
+  'gaslighting-by-proxy': 'Gaslighting durch Dritte',
+  'selbst-gaslighting': 'Selbst-Gaslighting',
 }
 
 /** Kuratierte Reihenfolge der Filter-Chips (wichtigste zuerst). */
@@ -202,6 +206,18 @@ export const SCENE_TAG_ORDER: string[] = [
   'kontaktsperre',
   'loslassen',
   'hoffnung',
+  // Gaslighting
+  'realitaetsverdrehung',
+  'gaslighting-by-proxy',
+  'selbst-gaslighting',
+  'bagatellisieren',
+  'gefuehle-abwerten',
+  'verdeckte-abwertung',
+  // Narzissmus
+  'narzisstische-zufuhr',
+  'fassade',
+  'discard',
+  'empathiemangel',
 ]
 
 /** Anzeige-Label eines Tag-Slugs (Override oder abgeleitet aus dem Slug). */

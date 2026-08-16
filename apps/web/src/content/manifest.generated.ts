@@ -418,6 +418,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "gaslighting-by-proxy",
+    "title": "Gaslighting durch Dritte (Gaslighting by Proxy)",
+    "description": "Beim Gaslighting durch Dritte werden andere Menschen benutzt, um deine Wahrnehmung zu untergraben. Warum das so verunsichert und wie du dich davon löst. Ohne Diagnose.",
+    "cluster": "gaslighting",
+    "search_intent": "Gaslighting durch Dritte Flying Monkeys Bedeutung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Gaslighting durch Dritte gelesen. Kennst du das Gefühl, dass sich plötzlich alle gegen dich zu stellen scheinen? Magst du das anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was bedeutet Gaslighting by Proxy?",
+        "answer": "Eine Person untergräbt deine Wahrnehmung nicht nur selbst, sondern zieht andere hinzu – Freunde, Familie, Kollegen –, die ihre Sicht bestätigen oder Druck auf dich ausüben. Oft mit Sätzen wie: Das sagen alle. Frag doch die anderen. Umgangssprachlich heißen diese eingespannten Dritten manchmal Flying Monkeys."
+      },
+      {
+        "question": "Warum wirkt das so stark?",
+        "answer": "Weil es deine letzte Sicherheit angreift: die Rückversicherung bei anderen. Wenn scheinbar alle dieselbe Sicht teilen, zweifelst du noch mehr an dir. Häufig ist das Bild aber verzerrt – die Dritten haben nur eine Seite gehört."
+      }
+    ],
+    "url": "/glossar/gaslighting-by-proxy"
+  },
+  {
+    "type": "glossary",
     "slug": "gruebeln",
     "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
     "description": "Grübeln (Rumination) ist das kreisende Wiederholen derselben Gedanken ohne Lösung. Warum es sich nach Nachdenken anfühlt, aber die Wunde offen hält – und wie du den Kreis unterbrichst. Ohne Diagnose.",
@@ -453,6 +487,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/gruebeln"
+  },
+  {
+    "type": "glossary",
+    "slug": "hoovering",
+    "title": "Hoovering – das Zurückholen, wenn du gehen willst",
+    "description": "Hoovering ist der Versuch, dich wieder einzusaugen, sobald du auf Abstand gehst – mit plötzlicher Wärme, Versprechen oder Krisen. Warum es so schwer zu widerstehen ist und was hilft. Ohne Diagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "Hoovering Bedeutung zurückholen nach Trennung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Hoovering gelesen. Kennst du das, dass die Zuwendung genau dann zurückkommt, wenn du gehen willst? Magst du das anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist Hoovering?",
+        "answer": "Der Begriff kommt vom englischen to hoover, also staubsaugen: das Wiedereinsaugen. Sobald du auf Abstand gehst oder dich trennst, kommt plötzlich Zuwendung zurück – liebevolle Nachrichten, Versprechen, Reue, manchmal auch Krisen oder Drohungen. Ziel ist, dich zurückzuholen, gerade wenn du dich lösen willst."
+      },
+      {
+        "question": "Wie gehe ich mit Hoovering um?",
+        "answer": "Mit klarem, möglichst geringem Kontakt und einem festen eigenen Warum für deinen Abstand. Hilfreich ist, dir vorher aufzuschreiben, warum du gehst – damit die plötzliche Wärme dich nicht die Gründe vergessen lässt. Prüfe, ob echte, dauerhafte Veränderung kommt oder nur ein Köder, bis du wieder da bist."
+      }
+    ],
+    "url": "/glossar/hoovering"
   },
   {
     "type": "glossary",
@@ -555,6 +623,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/idealisierung"
+  },
+  {
+    "type": "glossary",
+    "slug": "idealisierung-abwertung",
+    "title": "Idealisierung und Abwertung – von der Wolke in den Keller",
+    "description": "Der Wechsel von überschwänglicher Idealisierung zu plötzlicher Abwertung ist ein Kernmuster narzisstischer Dynamiken. Warum dieses Auf und Ab so stark bindet und was hilft. Ohne Diagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "Idealisierung Abwertung Zyklus Narzissmus Bedeutung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Idealisierung und Abwertung gelesen. Kennst du dieses Auf und Ab zwischen überschwänglicher Nähe und plötzlicher Kälte? Magst du das anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was bedeutet Idealisierung und Abwertung?",
+        "answer": "Ein wiederkehrender Wechsel: Erst wirst du überschwänglich auf ein Podest gehoben (idealisiert), dann fällst du – oft ohne klaren Grund – in Kritik, Kälte und Entzug (Abwertung). Mal bist du der wundervollste Mensch, mal grundlos das Problem."
+      },
+      {
+        "question": "Warum bindet dieses Auf und Ab so stark?",
+        "answer": "Weil unregelmäßige Belohnung stärker bindet als beständige. Wenn auf Kälte immer wieder Momente von Wärme folgen, hofft dein System auf die nächste gute Phase und hält fest. Dieses Muster nennt man intermittierende Verstärkung – es kann sich anfühlen wie eine Sucht."
+      }
+    ],
+    "url": "/glossar/idealisierung-abwertung"
   },
   {
     "type": "glossary",
@@ -742,6 +844,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "love-bombing",
+    "title": "Love Bombing – der überwältigende Anfang",
+    "description": "Love Bombing ist eine Flut aus Zuneigung, Aufmerksamkeit und Zukunftsversprechen ganz am Anfang – so intensiv, dass sie schnell bindet und später als Druckmittel dient. Woran du es erkennst. Ohne Diagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "Love Bombing Bedeutung Anzeichen Beziehung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Love Bombing gelesen. War der Anfang deiner Beziehung überwältigend intensiv? Magst du das anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Love Bombing dasselbe wie frisch verliebt sein?",
+        "answer": "Nicht ganz. Frische Verliebtheit ist intensiv, lässt dir aber Raum und Tempo. Love Bombing überrollt dich: sehr schnell sehr viel Nähe, große Zukunftsversprechen, das Gefühl, endlich der besondere eine Mensch zu sein – oft, bevor ihr euch wirklich kennt. Belastend wird es rückblickend, wenn dieselbe Intensität später in Entzug und Kontrolle kippt."
+      },
+      {
+        "question": "Ist Love Bombing immer Absicht?",
+        "answer": "Nicht unbedingt. Manche Menschen überschütten aus eigener Bindungsnot, ohne Plan. Zum Muster wird es, wenn auf den Rausch verlässlich Abwertung folgt und die anfängliche Nähe später gegen dich verwendet wird – etwa mit dem Vorwurf, du seist undankbar geworden."
+      }
+    ],
+    "url": "/glossar/love-bombing"
+  },
+  {
+    "type": "glossary",
     "slug": "metakommunikation",
     "title": "Metakommunikation – über das Reden reden",
     "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose.",
@@ -773,6 +909,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/metakommunikation"
+  },
+  {
+    "type": "glossary",
+    "slug": "narzisstische-zufuhr",
+    "title": "Narzisstische Zufuhr (Narcissistic Supply)",
+    "description": "Narzisstische Zufuhr ist die ständige Bestätigung von außen, die ein zerbrechlicher Selbstwert zu brauchen scheint – Bewunderung, Aufmerksamkeit, manchmal auch dein schlechtes Gewissen. Warum das die Dynamik erklärt. Ohne Diagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "narzisstische Zufuhr Narcissistic Supply Bedeutung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über narzisstische Zufuhr gelesen. Hast du das Gefühl, vor allem als Quelle von Bestätigung gebraucht zu werden? Magst du das anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist narzisstische Zufuhr einfach erklärt?",
+        "answer": "Die ständige Bestätigung von außen, die ein instabiler Selbstwert zu brauchen scheint, um sich groß und wertvoll zu fühlen: Bewunderung, Aufmerksamkeit, Anerkennung. Auch negative Reaktionen – Streit, Eifersucht, dein schlechtes Gewissen – können als Zufuhr dienen, weil sie Aufmerksamkeit bedeuten."
+      },
+      {
+        "question": "Warum ist das für Betroffene wichtig zu wissen?",
+        "answer": "Weil es vieles erklärt: warum du vor allem gebraucht wirst, wenn du bewunderst oder funktionierst, warum Nähe kommt und geht, und warum sogar Streit auf seine Weise belohnt wird. Zu verstehen, dass es um Zufuhr geht und nicht um dich als Mensch, kann entlasten – es liegt nicht an deinem Wert."
+      }
+    ],
+    "url": "/glossar/narzisstische-zufuhr"
   },
   {
     "type": "glossary",
@@ -910,6 +1080,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "realitaetsverdrehung",
+    "title": "Realitätsverdrehung – wenn deine Erinnerung zum Streitpunkt wird",
+    "description": "Realitätsverdrehung ist der Kern von Gaslighting: Fakten, Erinnerungen und Gefühle werden umgedeutet oder geleugnet, bis du an dir selbst zweifelst. Wie sie funktioniert und was hilft. Ohne Diagnose.",
+    "cluster": "gaslighting",
+    "search_intent": "Realitätsverdrehung Gaslighting Bedeutung Beispiel",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Realitätsverdrehung gelesen. Magst du eine Situation anschauen, in der deine Erinnerung plötzlich zum Streitpunkt wurde?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist Realitätsverdrehung?",
+        "answer": "Die gezielte oder ungewollte Umdeutung von Tatsachen: Etwas, das passiert ist, wird geleugnet, umgedreht oder so lange umerzählt, bis die eigene Erinnerung unsicher wird. Sie ist das Kernwerkzeug von Gaslighting."
+      },
+      {
+        "question": "Wie wehre ich mich gegen Realitätsverdrehung?",
+        "answer": "Indem du dir einen festen Bezugspunkt außerhalb des Gesprächs schaffst: Situationen zeitnah aufschreiben, Nachrichten aufheben, mit einer Vertrauensperson gegenprüfen. Diskutiere nicht endlos um die Fakten – halte innerlich an dem fest, was du erlebt hast."
+      }
+    ],
+    "url": "/glossar/realitaetsverdrehung"
+  },
+  {
+    "type": "glossary",
     "slug": "reparaturversuch",
     "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
     "description": "Was ein Reparaturversuch ist, warum die Fähigkeit, ihn zu senden und anzunehmen, über die Zukunft einer Beziehung entscheidet, und wie man ihn erkennt. Ohne Diagnose.",
@@ -1013,6 +1217,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/scham"
+  },
+  {
+    "type": "glossary",
+    "slug": "selbst-gaslighting",
+    "title": "Selbst-Gaslighting – wenn du dir selbst nicht mehr glaubst",
+    "description": "Selbst-Gaslighting ist die verinnerlichte Stimme des Zweifels: Du redest dir dein eigenes Erleben klein, noch bevor es jemand tut. Woher es kommt und wie du dir wieder glaubst. Ohne Diagnose.",
+    "cluster": "gaslighting",
+    "search_intent": "Selbst-Gaslighting Bedeutung sich selbst kleinreden",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Selbst-Gaslighting gelesen. Ertappst du dich dabei, dein eigenes Erleben kleinzureden? Magst du so einen Moment anschauen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was ist Selbst-Gaslighting?",
+        "answer": "Die verinnerlichte Form von Gaslighting: Du übernimmst die zweifelnde, abwertende Stimme des Gegenübers und wendest sie gegen dich selbst: Ich übertreibe bestimmt, so schlimm war es nicht, ich bin einfach zu empfindlich. Du machst die Arbeit des Kleinredens jetzt selbst."
+      },
+      {
+        "question": "Wie höre ich mit Selbst-Gaslighting auf?",
+        "answer": "Zuerst, indem du es bemerkst: Achte auf Sätze, mit denen du dein Gefühl sofort entwertest. Dann prüfe, wessen Stimme das eigentlich ist. Und übe, deine Wahrnehmung stehen zu lassen, ohne sie sofort zu widerrufen – am Anfang nur für ein paar Minuten."
+      }
+    ],
+    "url": "/glossar/selbst-gaslighting"
   },
   {
     "type": "glossary",
@@ -1393,6 +1631,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "alle-finden-dich-schwierig",
+    "title": "Das sagen alle, nicht nur ich",
+    "description": "Eine fiktive Szene: Immer wenn sie etwas kritisiert, sind es plötzlich alle, die so über ihn denken. Über Gaslighting durch Dritte – und das Gefühl, dass sich die ganze Welt gegen die eigene Wahrnehmung stellt.",
+    "cluster": "gaslighting",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sophies Sicht",
+    "pull_quote": "Auf einmal war es nicht mehr ihre Meinung gegen meine. Es war die ganze Welt gegen mich.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, dass sich plötzlich alle gegen deine Sicht zu stellen scheinen? Magst du behutsam anschauen, wie das entstanden ist?"
+    },
+    "scene_tags": [
+      "gaslighting-by-proxy",
+      "isolation",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/alle-finden-dich-schwierig"
+  },
+  {
+    "type": "scene",
     "slug": "allein-zu-zweit",
     "title": "Allein zu zweit",
     "description": "Eine Szene über emotionale Vernachlässigung – dieselbe Wohnung, dasselbe Sofa, und trotzdem eine Einsamkeit, die man niemandem erklären kann. Ich-Perspektive, fiktiv.",
@@ -1416,6 +1681,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "rueckzug"
     ],
     "url": "/szenen/allein-zu-zweit"
+  },
+  {
+    "type": "scene",
+    "slug": "als-ich-endlich-weg-war",
+    "title": "Als ich endlich weg war",
+    "description": "Eine fiktive Szene: Kaum hat er sich getrennt, kommt die alte Wärme zurück – die langen Nachrichten, die Reue, die Versprechen. Genau in dem Moment, in dem er zur Ruhe kommt. Über das Hoovering, das einen zurückholt.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Philipps Sicht",
+    "pull_quote": "Solange ich blieb, war ich zu viel. Kaum war ich weg, war ich plötzlich wieder alles. Der Zeitpunkt ist kein Zufall.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass die Wärme genau dann zurückkommt, wenn du dich löst? Magst du anschauen, was dieser Sog mit dir macht?"
+    },
+    "scene_tags": [
+      "hoovering",
+      "love-bombing",
+      "sehnsucht",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/als-ich-endlich-weg-war"
   },
   {
     "type": "scene",
@@ -1812,6 +2105,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-hast-du-dir-eingebildet",
+    "title": "Das hast du dir eingebildet",
+    "description": "Eine fiktive Szene: Er erinnert sich genau an das Versprechen – sie sagt, es habe dieses Gespräch nie gegeben. Über das Leugnen, das die eigene Erinnerung zum wackligen Boden macht.",
+    "cluster": "gaslighting",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tobias' Sicht",
+    "pull_quote": "Ich weiß, dass wir darüber geredet haben. Und langsam ist das das Einzige, was ich noch weiß.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dir bei etwas ganz sicher zu sein – bis dein Gegenüber es einfach abstreitet? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "gaslighting",
+      "realitaetsverdrehung",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/das-hast-du-dir-eingebildet"
+  },
+  {
+    "type": "scene",
     "slug": "das-haus-das-nie-kommt",
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv.",
@@ -2036,6 +2356,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-mann-den-alle-lieben",
+    "title": "Der Mann, den alle lieben",
+    "description": "Eine fiktive Szene: Nach außen ist er charmant, großzügig, der Liebling jeder Runde. Zu Hause, hinter der Tür, wird er ein anderer. Über die Fassade – und wie einsam es macht, wenn niemand die zweite Seite sieht.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Katjas Sicht",
+    "pull_quote": "Sie sagen, ich hätte so einen tollen Mann. Und ich lächle und weiß nicht, wie ich erklären soll, dass sie einen anderen meinen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du den Unterschied zwischen dem Bild, das andere sehen, und dem, was hinter der Tür passiert? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "narzissmus",
+      "fassade",
+      "wahrnehmungszweifel",
+      "isolation"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-mann-den-alle-lieben"
+  },
+  {
+    "type": "scene",
     "slug": "der-morgen-danach",
     "title": "Der Morgen danach",
     "description": "Eine Szene über die kalte Stille nach einem großen Streit – und die Frage, wer den ersten Schritt zurück zueinander macht. Aus der Ich-Perspektive, fiktiv.",
@@ -2228,6 +2576,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "sich-klein-fuehlen"
     ],
     "url": "/szenen/die-liste"
+  },
+  {
+    "type": "scene",
+    "slug": "die-neue-ist-schon-da",
+    "title": "Die Neue ist schon da",
+    "description": "Eine fiktive Szene: Kaum ist die Beziehung vorbei, taucht wie aus dem Nichts eine Nachfolgerin auf – und wird als das strahlende Gegenteil von ihr inszeniert. Über Triangulierung und den Vergleich, der klein macht.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sarahs Sicht",
+    "pull_quote": "So schnell ersetzt zu werden, fühlt sich an, als hätte ich nie zählt. Als wäre ich nur eine Rolle gewesen, die jetzt neu besetzt ist.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, ausgetauscht statt vermisst zu werden? Magst du anschauen, was das mit dir macht?"
+    },
+    "scene_tags": [
+      "triangulierung",
+      "vergleich",
+      "narzisstische-zufuhr",
+      "selbstwert"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/die-neue-ist-schon-da"
   },
   {
     "type": "scene",
@@ -2426,6 +2802,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "du-bist-zu-empfindlich",
+    "title": "Du bist zu empfindlich",
+    "description": "Eine fiktive Szene: Sie spricht an, was sie verletzt hat – und bekommt zur Antwort, sie sei einfach zu empfindlich. Über das Bagatellisieren, das aus deinem Gefühl das eigentliche Problem macht.",
+    "cluster": "gaslighting",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Miras Sicht",
+    "pull_quote": "Nicht das, was er gesagt hat, war plötzlich das Problem. Sondern dass es mir wehtat.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass am Ende nicht die Verletzung zählt, sondern dass du dich verletzt fühlst? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "gaslighting",
+      "bagatellisieren",
+      "wahrnehmungszweifel",
+      "gefuehle-abwerten"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/du-bist-zu-empfindlich"
+  },
+  {
+    "type": "scene",
     "slug": "du-machst-das-eh-besser",
     "title": "Du machst das eh besser",
     "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv.",
@@ -2449,6 +2853,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "erschoepfung"
     ],
     "url": "/szenen/du-machst-das-eh-besser"
+  },
+  {
+    "type": "scene",
+    "slug": "egal-was-ich-tue",
+    "title": "Egal, was ich tue",
+    "description": "Eine fiktive Szene: Er hat das ganze Wochenende geplant, gekocht, an alles gedacht – und wieder findet sie den einen Haken, der alles entwertet. Über die chronische Abwertung, bei der man nie ankommt.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Davids Sicht",
+    "pull_quote": "Ich renne einem Lob hinterher, das nie kommt. Und ich renne immer schneller.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, es niemandem recht machen zu können, egal wie sehr du dich anstrengst? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "idealisierung-abwertung",
+      "entwertung",
+      "erschoepfung",
+      "selbstwert"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/egal-was-ich-tue"
   },
   {
     "type": "scene",
@@ -2620,6 +3052,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/erst-wenn-ich-liefere"
+  },
+  {
+    "type": "scene",
+    "slug": "es-ging-nie-um-mich",
+    "title": "Es ging nie um mich",
+    "description": "Eine fiktive Szene: Sie kommt mit einer schlimmen Nachricht nach Hause – und binnen Minuten geht es nur noch darum, wie es ihm damit geht. Über die Empathielücke, die einen zutiefst allein lässt.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Marleens Sicht",
+    "pull_quote": "Ich kam mit meinem Kummer nach Hause – und tröstete am Ende ihn. So ist es immer. Am Ende bin ich die, die sich um seine Gefühle kümmert.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass am Ende immer die Gefühle des anderen im Mittelpunkt stehen und deine leer ausgehen? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "narzissmus",
+      "empathiemangel",
+      "einsamkeit-zu-zweit",
+      "selbstverlust"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/es-ging-nie-um-mich"
   },
   {
     "type": "scene",
@@ -2929,6 +3389,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "erschoepfung"
     ],
     "url": "/szenen/ich-muss-nicht-sofort"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-schreibe-es-jetzt-auf",
+    "title": "Ich schreibe es jetzt auf",
+    "description": "Eine fiktive Szene: Nach dem hundertsten geleugneten Versprechen beginnt sie, Gespräche mitzuschreiben – nicht um zu gewinnen, sondern um sich selbst wieder glauben zu können. Über den ersten Schritt zurück zum eigenen Boden.",
+    "cluster": "gaslighting",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Lenas Sicht",
+    "pull_quote": "Ich schreibe es nicht auf, um ihm etwas zu beweisen. Ich schreibe es auf, um mir selbst wieder zu glauben.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was gibt dir einen festen Bezugspunkt, wenn deine Erinnerung wackelig wird? Magst du davon erzählen?"
+    },
+    "scene_tags": [
+      "selbst-gaslighting",
+      "wahrnehmungszweifel",
+      "klarheit",
+      "selbstfuersorge"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-schreibe-es-jetzt-auf"
   },
   {
     "type": "scene",
@@ -3663,6 +4151,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "nur-aus-sorge",
+    "title": "Ich mach mir doch nur Sorgen um dich",
+    "description": "Eine fiktive Szene: Sie zweifelt jede seiner Entscheidungen an – aber immer als Fürsorge verpackt. Über das leise Gaslighting, das dich an deiner eigenen Urteilskraft zweifeln lässt, während es sich wie Liebe anfühlt.",
+    "cluster": "gaslighting",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Bens Sicht",
+    "pull_quote": "Sie sagt nie, dass ich es nicht kann. Sie fragt nur so lange nach, bis ich es selbst glaube.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du eine Sorge, die dich am Ende kleiner macht statt sicherer? Magst du so eine Situation anschauen?"
+    },
+    "scene_tags": [
+      "gaslighting",
+      "kontrolle",
+      "verdeckte-abwertung",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/nur-aus-sorge"
+  },
+  {
+    "type": "scene",
     "slug": "ploetzlich-die-taeterin",
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv.",
@@ -3688,6 +4204,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "selbstzweifel"
     ],
     "url": "/szenen/ploetzlich-die-taeterin"
+  },
+  {
+    "type": "scene",
+    "slug": "ploetzlich-war-ich-nichts-mehr",
+    "title": "Plötzlich war ich nichts mehr",
+    "description": "Eine fiktive Szene: Monatelang war sie sein größtes Glück – bis er sie von einem Tag auf den anderen fallen ließ, kühl und ohne Erklärung. Über den Absturz von der Idealisierung in die Verwerfung.",
+    "cluster": "narzissmus",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tims Sicht",
+    "pull_quote": "Gestern war ich das Beste, was ihr je passiert ist. Heute redet sie mit mir, als wäre ich ein Fremder, der ihr etwas schuldet.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diesen Sturz von grenzenloser Nähe zu plötzlicher Kälte? Magst du behutsam anschauen, wie sich das angefühlt hat?"
+    },
+    "scene_tags": [
+      "idealisierung-abwertung",
+      "discard",
+      "selbstwert",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ploetzlich-war-ich-nichts-mehr"
   },
   {
     "type": "scene",
@@ -3890,6 +4434,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "klarheit"
     ],
     "url": "/szenen/unter-der-wut"
+  },
+  {
+    "type": "scene",
+    "slug": "war-das-wirklich-so",
+    "title": "War das wirklich so?",
+    "description": "Eine fiktive Szene: Die Beziehung ist vorbei, aber die zweifelnde Stimme bleibt. Er redet sich selbst klein, bevor es jemand tut. Über Selbst-Gaslighting – die fremde Stimme, die sich inzwischen wie die eigene anhört.",
+    "cluster": "gaslighting",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jans Sicht",
+    "pull_quote": "Sie ist längst weg. Aber die Stimme, die mir sagt, ich übertreibe, ist geblieben – und klingt wie meine.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Ertappst du dich, dein eigenes Erleben kleinzureden, obwohl niemand mehr widerspricht? Magst du das anschauen?"
+    },
+    "scene_tags": [
+      "selbst-gaslighting",
+      "wahrnehmungszweifel",
+      "gruebeln"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/war-das-wirklich-so"
   },
   {
     "type": "scene",
@@ -4932,6 +5503,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/fair-streiten"
   },
   {
+    "type": "topic",
+    "slug": "gaslighting-erkennen",
+    "title": "Gaslighting erkennen: wenn deine Wahrnehmung zum Streitpunkt wird",
+    "description": "Was Gaslighting wirklich ist, an welchen Sätzen und Mustern du es erkennst, warum es deine Wahrnehmung so tief erschüttert – und wie du deinen Boden zurückgewinnst. Ein Deep Dive, behutsam und ohne Ferndiagnose.",
+    "cluster": "gaslighting",
+    "search_intent": "gaslighting erkennen anzeichen beziehung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Gaslighting gelesen. Möchtest du behutsam eine Situation anschauen, nach der du an deiner eigenen Erinnerung gezweifelt hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "gaslighting",
+      "realitaetsverdrehung",
+      "wahrnehmungszweifel",
+      "schuldumkehr"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "children": [
+        "nach-dem-gaslighting"
+      ],
+      "glossary": [
+        "gaslighting",
+        "realitaetsverdrehung",
+        "selbst-gaslighting",
+        "gaslighting-by-proxy",
+        "double-bind",
+        "taeter-opfer-umkehr",
+        "kognitive-dissonanz"
+      ],
+      "related": [
+        "emotionaler-missbrauch",
+        "narzissmus-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist Gaslighting einfach erklärt?",
+        "answer": "Gaslighting ist eine Form psychischer Manipulation, bei der ein Mensch systematisch deine Wahrnehmung, deine Erinnerung und dein Urteilsvermögen infrage stellt, bis du an dir selbst zweifelst. Nicht eine einzelne Lüge, sondern ein Muster aus Leugnen, Bagatellisieren und Umdeuten – so lange, bis du deiner eigenen Realität nicht mehr traust."
+      },
+      {
+        "question": "Ist Gaslighting immer Absicht?",
+        "answer": "Nicht unbedingt. Manche Menschen verdrehen die Wirklichkeit gezielt, andere tun es aus eigener Abwehr oder Unsicherheit, ohne es zu planen. Für dich ist die Wirkung entscheidender als die Absicht: Wenn du nach Gesprächen regelmäßig an deiner Wahrnehmung zweifelst, ist das ernst zu nehmen – unabhängig davon, ob ein Plan dahintersteht."
+      },
+      {
+        "question": "Woran merke ich, dass ich gegaslightet werde?",
+        "answer": "Typische Zeichen: Du entschuldigst dich ständig, zweifelst an deiner Erinnerung, fühlst dich nach Gesprächen kleiner und verwirrter, beginnst Dinge zu dokumentieren, um dir selbst zu glauben, und fragst dich oft, ob du überreagierst. Wenn das zum Dauerzustand wird, lohnt sich ein ehrlicher, geschützter Blick darauf."
+      }
+    ],
+    "url": "/wissen/gaslighting-erkennen"
+  },
+  {
     "type": "comparison",
     "slug": "gaslighting-oder-missverstaendnis",
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
@@ -5258,6 +5898,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "nach-dem-gaslighting",
+    "title": "Nach dem Gaslighting: der Wahrnehmung wieder vertrauen",
+    "description": "Wenn das Gaslighting vorbei ist, bleibt oft der Zweifel: Stimmt, was ich fühle? Warum das eigene Urteil so lange nachhallt und wie du deinen Realitätssinn Schritt für Schritt zurückgewinnst. Behutsam, ohne Diagnose.",
+    "cluster": "gaslighting",
+    "search_intent": "nach gaslighting selbstvertrauen wahrnehmung zurückgewinnen",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Das Gaslighting liegt hinter dir, aber der Zweifel ist geblieben. Magst du anschauen, wo du deinem eigenen Urteil gerade am wenigsten traust?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "wahrnehmungszweifel",
+      "selbst-gaslighting",
+      "hypervigilanz",
+      "selbstverlust"
+    ],
+    "links": {
+      "parent": "gaslighting-erkennen",
+      "glossary": [
+        "selbst-gaslighting",
+        "realitaetsverdrehung",
+        "hypervigilanz"
+      ],
+      "related": [
+        "nach-toxischer-beziehung",
+        "beziehungstrauma"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum zweifle ich nach dem Gaslighting immer noch an mir?",
+        "answer": "Weil Gaslighting nicht nur einzelne Erinnerungen angreift, sondern das Vertrauen in dein eigenes Urteil. Dieses Vertrauen baut sich nicht auf Knopfdruck wieder auf. Der Zweifel ist eine erlernte Reaktion – und erlernte Reaktionen kann man Schritt für Schritt wieder verlernen."
+      },
+      {
+        "question": "Wie gewinne ich mein Selbstvertrauen zurück?",
+        "answer": "Durch viele kleine Erfahrungen, dass deine Wahrnehmung stimmt: Situationen aufschreiben und später abgleichen, Menschen um dich, die dir Realität zurückspiegeln, und das bewusste Bemerken, wann du dich selbst kleinredest. Mit der Zeit wird deine innere Stimme wieder lauter als die fremde."
+      }
+    ],
+    "url": "/wissen/nach-dem-gaslighting"
+  },
+  {
+    "type": "topic",
     "slug": "nach-toxischer-beziehung",
     "title": "Nach einer toxischen Beziehung: warum die Angst bleibt – und wie Heilung geht",
     "description": "Die Beziehung ist vorbei, aber die Anspannung nicht: Wachsamkeit, Schreckhaftigkeit, Schuldgefühle, Misstrauen. Warum das Nervensystem nachhallt und wie Heilung Schritt für Schritt gelingt. Ohne Diagnose, ohne Druck.",
@@ -5308,6 +6000,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/nach-toxischer-beziehung"
+  },
+  {
+    "type": "topic",
+    "slug": "narzissmus-in-beziehungen",
+    "title": "Narzissmus in Beziehungen: Muster erkennen, ohne zu diagnostizieren",
+    "description": "Woran du narzisstische Beziehungsdynamiken erkennst – vom Liebesrausch über die Abwertung bis zum Zurückholen –, warum sie so binden und wie du wieder zu dir findest. Behutsam, geschlechtsoffen, ohne Ferndiagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "narzissmus beziehung erkennen anzeichen narzisstischer partner",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über narzisstische Beziehungsmuster gelesen. Möchtest du behutsam eine Situation anschauen, in der du dich klein oder austauschbar gefühlt hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "narzissmus",
+      "idealisierung-abwertung",
+      "love-bombing",
+      "selbstwert"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "children": [
+        "verdeckter-narzissmus"
+      ],
+      "glossary": [
+        "love-bombing",
+        "hoovering",
+        "narzisstische-zufuhr",
+        "idealisierung-abwertung",
+        "intermittierende-verstaerkung",
+        "projektion",
+        "gaslighting"
+      ],
+      "related": [
+        "emotionale-manipulation",
+        "gaslighting-erkennen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist mein Partner ein Narzisst?",
+        "answer": "Das kann und darf dir dieser Text nicht beantworten. Eine narzisstische Persönlichkeitsstörung kann nur eine qualifizierte Fachperson im persönlichen Kontakt feststellen – niemals per Ferndiagnose und nicht anhand einer Website. Worum es hier geht, sind beobachtbare Muster und vor allem ihre Wirkung auf dich. Du musst niemandem ein Etikett verpassen, um ernst zu nehmen, dass es dir schlecht geht."
+      },
+      {
+        "question": "Warum kann ich mich so schwer lösen?",
+        "answer": "Weil narzisstische Beziehungen oft nach dem Muster von Rausch und Kälte im Wechsel funktionieren. Diese unregelmäßige Belohnung bindet stärker als beständige Zuwendung – ähnlich wie beim Glücksspiel. Dass du bleibst und hoffst, ist keine Schwäche, sondern eine nachvollziehbare Folge dieser Dynamik."
+      },
+      {
+        "question": "Sind narzisstische Partner immer Männer?",
+        "answer": "Nein. Narzisstische Muster treten bei Menschen jeden Geschlechts auf. Auch die leisere, verdeckte Form ist bei allen Geschlechtern zu finden. Betroffen sein können ebenfalls Menschen jeden Geschlechts."
+      }
+    ],
+    "url": "/wissen/narzissmus-in-beziehungen"
   },
   {
     "type": "topic",
@@ -5591,6 +6352,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "verdeckter-narzissmus",
+    "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
+    "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose.",
+    "cluster": "narzissmus",
+    "search_intent": "verdeckter narzissmus anzeichen vulnerabler narzissmus beziehung",
+    "updated": "2026-08-15",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über verdeckten Narzissmus gelesen. Magst du eine Situation anschauen, in der du dich schuldig gefühlt hast, ohne genau zu wissen, wofür?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "verdeckter-narzissmus",
+      "schuldgefuehle",
+      "passiv-aggressiv",
+      "wahrnehmungszweifel"
+    ],
+    "links": {
+      "parent": "narzissmus-in-beziehungen",
+      "glossary": [
+        "narzisstische-zufuhr",
+        "projektion",
+        "emotionale-erpressung"
+      ],
+      "related": [
+        "emotionaler-missbrauch",
+        "gaslighting-erkennen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen grandiosem und verdecktem Narzissmus?",
+        "answer": "Der grandiose Typ tritt laut, dominant und selbstsicher auf und will sichtbar im Mittelpunkt stehen. Der verdeckte (auch vulnerable) Typ wirkt nach außen eher scheu, empfindlich oder leidend – oft in der Opferrolle. Der Kern ist aber ähnlich: eine starke Ich-Bezogenheit, ein zerbrechlicher Selbstwert und wenig echtes Mitgefühl für andere."
+      },
+      {
+        "question": "Warum ist verdeckter Narzissmus so schwer zu erkennen?",
+        "answer": "Weil die Person oft wie das Opfer wirkt, nicht wie der Verursacher. Statt offener Dominanz gibt es leise Vorwürfe, Rückzug, Schweigen und Schuldgefühle, die sie in dir auslöst. Du fühlst dich ständig schuldig, ohne genau sagen zu können, wofür – und zweifelst eher an dir als an ihr."
+      }
+    ],
+    "url": "/wissen/verdeckter-narzissmus"
+  },
+  {
+    "type": "topic",
     "slug": "verlustangst",
     "title": "Verlustangst in Beziehungen verstehen",
     "description": "Woher die Angst kommt, verlassen zu werden, wie sie sich in Beziehungen zeigt und was dir hilft, ihr weniger ausgeliefert zu sein – ohne Selbstverurteilung.",
@@ -5683,9 +6496,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Gaslighting – Definition und Beispiele",
     "description": "Was Gaslighting genau bedeutet: eine klare Definition, typische Sätze und woran du es von einer normalen Meinungsverschiedenheit unterscheidest."
   },
+  "/glossar/gaslighting-by-proxy": {
+    "title": "Gaslighting durch Dritte (Gaslighting by Proxy)",
+    "description": "Beim Gaslighting durch Dritte werden andere Menschen benutzt, um deine Wahrnehmung zu untergraben. Warum das so verunsichert und wie du dich davon löst. Ohne Diagnose."
+  },
   "/glossar/gruebeln": {
     "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
     "description": "Grübeln (Rumination) ist das kreisende Wiederholen derselben Gedanken ohne Lösung. Warum es sich nach Nachdenken anfühlt, aber die Wunde offen hält – und wie du den Kreis unterbrichst. Ohne Diagnose."
+  },
+  "/glossar/hoovering": {
+    "title": "Hoovering – das Zurückholen, wenn du gehen willst",
+    "description": "Hoovering ist der Versuch, dich wieder einzusaugen, sobald du auf Abstand gehst – mit plötzlicher Wärme, Versprechen oder Krisen. Warum es so schwer zu widerstehen ist und was hilft. Ohne Diagnose."
   },
   "/glossar/hypervigilanz": {
     "title": "Hypervigilanz – ständig in Alarmbereitschaft",
@@ -5698,6 +6519,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/idealisierung": {
     "title": "Idealisierung – wenn die Erinnerung schöner wird als die Beziehung war",
     "description": "Nach einer Trennung erinnert man oft nur die guten Momente und vergisst die schlechten. Warum dein Kopf die Beziehung schönfärbt, wie das das Loslassen erschwert und wie du der Verzerrung begegnest."
+  },
+  "/glossar/idealisierung-abwertung": {
+    "title": "Idealisierung und Abwertung – von der Wolke in den Keller",
+    "description": "Der Wechsel von überschwänglicher Idealisierung zu plötzlicher Abwertung ist ein Kernmuster narzisstischer Dynamiken. Warum dieses Auf und Ab so stark bindet und was hilft. Ohne Diagnose."
   },
   "/glossar/intermittierende-verstaerkung": {
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
@@ -5719,9 +6544,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kontaktabbruch (No Contact) – warum Abstand nach der Trennung hilft",
     "description": "Kontaktabbruch bedeutet, nach einer Trennung bewusst keinen Kontakt zu halten. Warum das keine Strafe ist, sondern hilft zu heilen – und wie man es mit gemeinsamen Kindern handhabt. Ohne Diagnose."
   },
+  "/glossar/love-bombing": {
+    "title": "Love Bombing – der überwältigende Anfang",
+    "description": "Love Bombing ist eine Flut aus Zuneigung, Aufmerksamkeit und Zukunftsversprechen ganz am Anfang – so intensiv, dass sie schnell bindet und später als Druckmittel dient. Woran du es erkennst. Ohne Diagnose."
+  },
   "/glossar/metakommunikation": {
     "title": "Metakommunikation – über das Reden reden",
     "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose."
+  },
+  "/glossar/narzisstische-zufuhr": {
+    "title": "Narzisstische Zufuhr (Narcissistic Supply)",
+    "description": "Narzisstische Zufuhr ist die ständige Bestätigung von außen, die ein zerbrechlicher Selbstwert zu brauchen scheint – Bewunderung, Aufmerksamkeit, manchmal auch dein schlechtes Gewissen. Warum das die Dynamik erklärt. Ohne Diagnose."
   },
   "/glossar/parentifizierung": {
     "title": "Parentifizierung – wenn Kinder die Erwachsenen tragen",
@@ -5739,6 +6572,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Posttraumatische Belastungsstörung (PTBS) – einfach erklärt",
     "description": "Was eine posttraumatische Belastungsstörung ist, welche vier Symptomgruppen typisch sind und warum sie eine normale Reaktion auf eine unnormale Belastung ist. Ohne Ferndiagnose."
   },
+  "/glossar/realitaetsverdrehung": {
+    "title": "Realitätsverdrehung – wenn deine Erinnerung zum Streitpunkt wird",
+    "description": "Realitätsverdrehung ist der Kern von Gaslighting: Fakten, Erinnerungen und Gefühle werden umgedeutet oder geleugnet, bis du an dir selbst zweifelst. Wie sie funktioniert und was hilft. Ohne Diagnose."
+  },
   "/glossar/reparaturversuch": {
     "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
     "description": "Was ein Reparaturversuch ist, warum die Fähigkeit, ihn zu senden und anzunehmen, über die Zukunft einer Beziehung entscheidet, und wie man ihn erkennt. Ohne Diagnose."
@@ -5750,6 +6587,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/scham": {
     "title": "Scham – das Gefühl, nicht zu genügen",
     "description": "Was Scham von Schuld unterscheidet, warum sie so isoliert und lähmt und wie man ihr begegnen kann, ohne sich in ihr zu verlieren. Ohne Diagnose."
+  },
+  "/glossar/selbst-gaslighting": {
+    "title": "Selbst-Gaslighting – wenn du dir selbst nicht mehr glaubst",
+    "description": "Selbst-Gaslighting ist die verinnerlichte Stimme des Zweifels: Du redest dir dein eigenes Erleben klein, noch bevor es jemand tut. Woher es kommt und wie du dir wieder glaubst. Ohne Diagnose."
   },
   "/glossar/selbstfuersorge": {
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
@@ -5791,9 +6632,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ständige Eifersucht – wenn Misstrauen euch beide erschöpft",
     "description": "Wenn Eifersucht dein Denken bestimmt und die Beziehung zermürbt: was dahinter stecken kann und was im Moment des Misstrauens konkret hilft."
   },
+  "/szenen/alle-finden-dich-schwierig": {
+    "title": "Das sagen alle, nicht nur ich",
+    "description": "Eine fiktive Szene: Immer wenn sie etwas kritisiert, sind es plötzlich alle, die so über ihn denken. Über Gaslighting durch Dritte – und das Gefühl, dass sich die ganze Welt gegen die eigene Wahrnehmung stellt."
+  },
   "/szenen/allein-zu-zweit": {
     "title": "Allein zu zweit",
     "description": "Eine Szene über emotionale Vernachlässigung – dieselbe Wohnung, dasselbe Sofa, und trotzdem eine Einsamkeit, die man niemandem erklären kann. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/als-ich-endlich-weg-war": {
+    "title": "Als ich endlich weg war",
+    "description": "Eine fiktive Szene: Kaum hat er sich getrennt, kommt die alte Wärme zurück – die langen Nachrichten, die Reue, die Versprechen. Genau in dem Moment, in dem er zur Ruhe kommt. Über das Hoovering, das einen zurückholt."
   },
   "/szenen/als-sie-endlich-zuhoerte": {
     "title": "Als sie endlich zuhörte",
@@ -5851,6 +6700,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das Handy auf dem Küchentisch",
     "description": "Eine fiktive Szene: Sein Handy leuchtet auf, er ist unter der Dusche – und in mir beginnt der Kampf zwischen „schau nach\" und „lass es\". Über den Sog der Eifersucht."
   },
+  "/szenen/das-hast-du-dir-eingebildet": {
+    "title": "Das hast du dir eingebildet",
+    "description": "Eine fiktive Szene: Er erinnert sich genau an das Versprechen – sie sagt, es habe dieses Gespräch nie gegeben. Über das Leugnen, das die eigene Erinnerung zum wackligen Boden macht."
+  },
   "/szenen/das-haus-das-nie-kommt": {
     "title": "Das Haus, das nie kommt",
     "description": "Eine Szene über Future Faking – große Zukunftsversprechen, die schön klingen und nie eingelöst werden. Aus der Ich-Perspektive, fiktiv."
@@ -5883,6 +6736,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Der Krümel",
     "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/der-mann-den-alle-lieben": {
+    "title": "Der Mann, den alle lieben",
+    "description": "Eine fiktive Szene: Nach außen ist er charmant, großzügig, der Liebling jeder Runde. Zu Hause, hinter der Tür, wird er ein anderer. Über die Fassade – und wie einsam es macht, wenn niemand die zweite Seite sieht."
+  },
   "/szenen/der-morgen-danach": {
     "title": "Der Morgen danach",
     "description": "Eine Szene über die kalte Stille nach einem großen Streit – und die Frage, wer den ersten Schritt zurück zueinander macht. Aus der Ich-Perspektive, fiktiv."
@@ -5910,6 +6767,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-liste": {
     "title": "Die Liste",
     "description": "Eine Szene über das Aufrechnen – wenn jeder alte Fehler aufbewahrt und im nächsten Streit wieder hervorgeholt wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-neue-ist-schon-da": {
+    "title": "Die Neue ist schon da",
+    "description": "Eine fiktive Szene: Kaum ist die Beziehung vorbei, taucht wie aus dem Nichts eine Nachfolgerin auf – und wird als das strahlende Gegenteil von ihr inszeniert. Über Triangulierung und den Vergleich, der klein macht."
   },
   "/szenen/die-scham-danach": {
     "title": "Die Scham danach",
@@ -5939,9 +6800,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Drei Uhr nachts",
     "description": "Eine fiktive Szene: die leere Seite des Betts, das Handy in der Hand, ein Chat, der offen ist. Über die Nächte nach einer Trennung, in denen die Sehnsucht am lautesten ist."
   },
+  "/szenen/du-bist-zu-empfindlich": {
+    "title": "Du bist zu empfindlich",
+    "description": "Eine fiktive Szene: Sie spricht an, was sie verletzt hat – und bekommt zur Antwort, sie sei einfach zu empfindlich. Über das Bagatellisieren, das aus deinem Gefühl das eigentliche Problem macht."
+  },
   "/szenen/du-machst-das-eh-besser": {
     "title": "Du machst das eh besser",
     "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/egal-was-ich-tue": {
+    "title": "Egal, was ich tue",
+    "description": "Eine fiktive Szene: Er hat das ganze Wochenende geplant, gekocht, an alles gedacht – und wieder findet sie den einen Haken, der alles entwertet. Über die chronische Abwertung, bei der man nie ankommt."
   },
   "/szenen/ein-gespraech-mit-mir-selbst": {
     "title": "Ein Gespräch mit mir selbst",
@@ -5966,6 +6835,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/erst-wenn-ich-liefere": {
     "title": "Erst wenn ich liefere",
     "description": "Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen."
+  },
+  "/szenen/es-ging-nie-um-mich": {
+    "title": "Es ging nie um mich",
+    "description": "Eine fiktive Szene: Sie kommt mit einer schlimmen Nachricht nach Hause – und binnen Minuten geht es nur noch darum, wie es ihm damit geht. Über die Empathielücke, die einen zutiefst allein lässt."
   },
   "/szenen/es-riecht-nach-ihm": {
     "title": "Es riecht nach ihm",
@@ -6010,6 +6883,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-muss-nicht-sofort": {
     "title": "Ich muss nicht sofort",
     "description": "Eine Szene über eine kleine, große Grenze – nicht mehr auf jede Nachricht sofort zu reagieren und die eigene Zeit zurückzuerobern. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-schreibe-es-jetzt-auf": {
+    "title": "Ich schreibe es jetzt auf",
+    "description": "Eine fiktive Szene: Nach dem hundertsten geleugneten Versprechen beginnt sie, Gespräche mitzuschreiben – nicht um zu gewinnen, sondern um sich selbst wieder glauben zu können. Über den ersten Schritt zurück zum eigenen Boden."
   },
   "/szenen/ich-vermisse-das-chaos": {
     "title": "Ich vermisse das Chaos",
@@ -6115,9 +6992,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Niemand hat gratuliert",
     "description": "Eine fiktive Szene: Ein guter Tag, ein kleiner Erfolg – und zu Hause niemand, der sich mitfreut. Über fehlende Mitfreude und die besondere Einsamkeit, eine gute Nachricht nicht teilen zu können."
   },
+  "/szenen/nur-aus-sorge": {
+    "title": "Ich mach mir doch nur Sorgen um dich",
+    "description": "Eine fiktive Szene: Sie zweifelt jede seiner Entscheidungen an – aber immer als Fürsorge verpackt. Über das leise Gaslighting, das dich an deiner eigenen Urteilskraft zweifeln lässt, während es sich wie Liebe anfühlt."
+  },
   "/szenen/ploetzlich-die-taeterin": {
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ploetzlich-war-ich-nichts-mehr": {
+    "title": "Plötzlich war ich nichts mehr",
+    "description": "Eine fiktive Szene: Monatelang war sie sein größtes Glück – bis er sie von einem Tag auf den anderen fallen ließ, kühl und ohne Erklärung. Über den Absturz von der Idealisierung in die Verwerfung."
   },
   "/szenen/sag-einfach-nichts-papa": {
     "title": "Sag einfach nichts, Papa",
@@ -6146,6 +7031,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/unter-der-wut": {
     "title": "Unter der Wut",
     "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/war-das-wirklich-so": {
+    "title": "War das wirklich so?",
+    "description": "Eine fiktive Szene: Die Beziehung ist vorbei, aber die zweifelnde Stimme bleibt. Er redet sich selbst klein, bevor es jemand tut. Über Selbst-Gaslighting – die fremde Stimme, die sich inzwischen wie die eigene anhört."
   },
   "/szenen/warum-ich-bleibe": {
     "title": "Warum ich bleibe",
@@ -6255,6 +7144,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Fair streiten: wie Konflikte verbinden statt verletzen",
     "description": "Warum Streiten nicht das Problem ist, sondern die Art zu streiten – mit Regeln für faire Konflikte, dem Unterschied zwischen Klärung und Verletzung und Wegen aus der Eskalation. Ohne Diagnose."
   },
+  "/wissen/gaslighting-erkennen": {
+    "title": "Gaslighting erkennen: wenn deine Wahrnehmung zum Streitpunkt wird",
+    "description": "Was Gaslighting wirklich ist, an welchen Sätzen und Mustern du es erkennst, warum es deine Wahrnehmung so tief erschüttert – und wie du deinen Boden zurückgewinnst. Ein Deep Dive, behutsam und ohne Ferndiagnose."
+  },
   "/wissen/gaslighting-oder-missverstaendnis": {
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
     "description": "Nicht jeder Streit ist Manipulation. Diese Merkmale helfen dir, ein echtes Missverständnis von systematischem Gaslighting zu unterscheiden – ohne vorschnelles Urteil."
@@ -6287,9 +7180,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Loslassen lernen: über eine Trennung hinwegkommen",
     "description": "Warum Loslassen nach einer Trennung so schwerfällt, warum die Erinnerung dich täuscht und was wirklich hilft – von Kontaktabbruch über das Unterbrechen des Grübelns bis zurück zu dir selbst. Ohne Zeitdruck, ohne Diagnose."
   },
+  "/wissen/nach-dem-gaslighting": {
+    "title": "Nach dem Gaslighting: der Wahrnehmung wieder vertrauen",
+    "description": "Wenn das Gaslighting vorbei ist, bleibt oft der Zweifel: Stimmt, was ich fühle? Warum das eigene Urteil so lange nachhallt und wie du deinen Realitätssinn Schritt für Schritt zurückgewinnst. Behutsam, ohne Diagnose."
+  },
   "/wissen/nach-toxischer-beziehung": {
     "title": "Nach einer toxischen Beziehung: warum die Angst bleibt – und wie Heilung geht",
     "description": "Die Beziehung ist vorbei, aber die Anspannung nicht: Wachsamkeit, Schreckhaftigkeit, Schuldgefühle, Misstrauen. Warum das Nervensystem nachhallt und wie Heilung Schritt für Schritt gelingt. Ohne Diagnose, ohne Druck."
+  },
+  "/wissen/narzissmus-in-beziehungen": {
+    "title": "Narzissmus in Beziehungen: Muster erkennen, ohne zu diagnostizieren",
+    "description": "Woran du narzisstische Beziehungsdynamiken erkennst – vom Liebesrausch über die Abwertung bis zum Zurückholen –, warum sie so binden und wie du wieder zu dir findest. Behutsam, geschlechtsoffen, ohne Ferndiagnose."
   },
   "/wissen/nein-sagen": {
     "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",
@@ -6318,6 +7219,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/trennen-oder-bleiben": {
     "title": "Trennen oder bleiben? Woran du Orientierung findest",
     "description": "Kein Test entscheidet für dich – aber diese Fragen und Merkmale helfen dir, ehrlicher hinzuschauen, ob Bleiben oder Gehen deiner Wahrheit näherkommt."
+  },
+  "/wissen/verdeckter-narzissmus": {
+    "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
+    "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose."
   },
   "/wissen/verlustangst": {
     "title": "Verlustangst in Beziehungen verstehen",

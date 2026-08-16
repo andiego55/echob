@@ -12,10 +12,14 @@ import { loslassenNachTrennung } from './tests/loslassen-nach-trennung'
 import { emotionalerMissbrauch } from './tests/emotionaler-missbrauch'
 import { beziehungstrauma } from './tests/beziehungstrauma'
 import { liebeskummer } from './tests/liebeskummer'
+import { erlebeIchGaslighting } from './tests/erlebe-ich-gaslighting'
+import { narzisstischeMuster } from './tests/narzisstische-muster'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
   emotionalerMissbrauch,
+  erlebeIchGaslighting,
+  narzisstischeMuster,
   beziehungstrauma,
   bleibenOderGehen,
   loslassenNachTrennung,

@@ -21,6 +21,8 @@ export type ContentType = (typeof CONTENT_TYPES)[number]
 export const CLUSTERS = [
   'dynamiken', // Belastende Dynamiken
   'emotionaler-missbrauch', // Emotionaler Missbrauch (Coercive Control, Vernachlässigung, subtile Gewalt)
+  'gaslighting', // Gaslighting Deep Dive (Realitätsverdrehung)
+  'narzissmus', // Narzissmus in Beziehungen (narzisstische Missbrauchsdynamik)
   'trauma', // Trauma & PTBS-Belastung durch Beziehungen
   'bindung', // Bindung & Nähe
   'trennung', // Trennung
@@ -123,6 +125,8 @@ export function contentUrl(type: ContentType, slug: string): string {
 export const CLUSTER_LABELS: Record<Cluster, string> = {
   dynamiken: 'Belastende Dynamiken',
   'emotionaler-missbrauch': 'Emotionaler Missbrauch',
+  gaslighting: 'Gaslighting',
+  narzissmus: 'Narzissmus',
   trauma: 'Trauma & PTBS',
   bindung: 'Bindung & Nähe',
   trennung: 'Trennung',
