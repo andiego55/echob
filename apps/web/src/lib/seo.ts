@@ -41,6 +41,11 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'EchoB wird wissenschaftlich auf seine Wirkung geprüft. Für die geplante Wirksamkeitsstudie suchen wir Fachpersonen zum Mitforschen und Nutzer:innen zur Teilnahme – freiwillig, pseudonym, jederzeit widerrufbar. Ohne Diagnosen.',
   },
+  '/zu-zweit': {
+    title: 'Paartherapie mit EchoB – zu zweit moderiert sprechen',
+    description:
+      'EchoB zu zweit nutzen: Verbindet euch zu einem gemeinsamen Raum, in dem Echo eure Gespräche allparteilich moderiert – vorbereitet, mit klarem Ziel. Der eigene Fall bleibt dabei privat.',
+  },
   '/coaching': {
     title: 'Coaching mit EchoB – Erstgespräch anfragen',
     description:

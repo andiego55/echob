@@ -12,6 +12,7 @@ from app.api.v1.routers import (
     cases,
     client_invites,
     contact,
+    couple,
     directory,
     directory_admin,
     directory_profile,
@@ -92,6 +93,9 @@ v1_router.include_router(professional_collab.router)
 v1_router.include_router(professional_notes.router)
 v1_router.include_router(professional_reports.router)
 v1_router.include_router(professional_templates.router)
+
+# ── Paartherapie (peer-to-peer, zwei Nutzer:innen) ────────────────────────────
+v1_router.include_router(couple.router)
 
 # ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
 v1_router.include_router(institute.router)
