@@ -62,6 +62,7 @@ import ZuZweitPage            from '@/pages/ZuZweitPage'
 import CoupleOverviewPage     from '@/pages/couple/CoupleOverviewPage'
 import CoupleJoinPage         from '@/pages/couple/CoupleJoinPage'
 import CoupleRoomPage         from '@/pages/couple/CoupleRoomPage'
+import CoupleSessionPage      from '@/pages/couple/CoupleSessionPage'
 import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
 import SettingsPage           from '@/pages/app/SettingsPage'
 import { useParams }         from 'react-router-dom'
@@ -249,6 +250,7 @@ export function AppRoutes() {
       {/* ── Paartherapie (zwei Nutzer:innen, eigener Funktionsbereich) ───────── */}
       <Route path="/app/paar" element={<ProtectedRoute><CoupleOverviewPage /></ProtectedRoute>} />
       <Route path="/app/paar/beitreten/:code" element={<ProtectedRoute><CoupleJoinPage /></ProtectedRoute>} />
+      <Route path="/app/paar/sitzung/:sessionId" element={<ProtectedRoute><CoupleSessionPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId" element={<ProtectedRoute><CoupleRoomPage /></ProtectedRoute>} />
 
       {/* ── Fachpersonenbereich (Login + Rolle erforderlich) ─────────────────── */}

@@ -17,6 +17,7 @@ import asyncpg
 import pytest
 from fastapi import HTTPException
 
+from app.services import couple_session_service as css
 from app.services import couple_therapy_service as cts
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
@@ -87,15 +88,19 @@ async def test_link_grants_no_case_access(db):
         assert f"CONCERN_{foreign}" not in payload   # Anliegen der anderen Person
 
 
-async def test_service_never_touches_case_content():
-    """Struktur-Wächter: der Service zieht bewusst keine Fall-Inhalte heran.
+@pytest.mark.parametrize("modul", [cts, css])
+async def test_service_never_touches_case_content(modul):
+    """Struktur-Wächter: Kopplung UND Sitzung ziehen bewusst keine Fall-Inhalte heran.
 
-    Der Paarraum-Kontext wird ausschließlich vom Nutzer explizit erstellt — dieser
-    Service darf deshalb weder das Freigabe-Bundle noch den Fall-Kontext-Builder nutzen
+    Der Paarraum-Kontext wird ausschließlich vom Nutzer explizit erstellt — diese
+    Services dürfen weder das Freigabe-Bundle noch den Fall-Kontext-Builder nutzen
     und keine Fall-Tabellen abfragen. Geprüft am Syntaxbaum (Prosa in Docstrings zählt
     nicht mit), damit der Test nicht an Formulierungen hängt.
+
+    (``couple_context_service`` ist bewusst ausgenommen: es liest den EIGENEN Fall der
+    anfragenden Person, um daraus einen privaten Entwurf zu bauen.)
     """
-    tree = ast.parse(inspect.getsource(cts))
+    tree = ast.parse(inspect.getsource(modul))
 
     imported: set[str] = set()
     for node in ast.walk(tree):
@@ -233,3 +238,93 @@ async def test_unknown_code(db):
     status, _ = await cts.accept_link(db, "ZZZZZZZZ", user_b)
     assert status == "not_found"
     assert await cts.get_public_link(db, "ZZZZZZZZ") is None
+
+
+# ── Sitzungen: nur ausdrücklich Bestätigtes geht an Echo ─────────────────────
+
+async def test_echo_context_ignores_unconfirmed_draft(db):
+    """DIE Zusicherung der Sitzung: der KI-Entwurf erreicht Echo NICHT.
+
+    Erst das ausdrückliche Bestätigen macht Text zum Sitzungs-Kontext.
+    """
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Wochenenden",
+                                       topic="Wir streiten sonntags", goal="Ruhiger reden")
+
+    await css.save_context(db, session["id"], user_a, draft_text="ENTWURF_GEHEIM")
+    contexts = await css.load_confirmed_contexts(db, session["id"])
+    names = {str(user_a): "Alex", str(user_b): "Rio"}
+    assert contexts == []
+    assert "ENTWURF_GEHEIM" not in css.build_session_context(session, contexts, names)
+
+    await css.save_context(db, session["id"], user_a, confirmed_text="BESTAETIGT_OK")
+    contexts = await css.load_confirmed_contexts(db, session["id"])
+    ctx = css.build_session_context(session, contexts, names)
+    assert "BESTAETIGT_OK" in ctx and "ENTWURF_GEHEIM" not in ctx
+    assert "Wir streiten sonntags" in ctx and "Ruhiger reden" in ctx
+
+
+async def test_draft_stays_with_its_author(db):
+    """Den eigenen Entwurf sieht nur, wer ihn verfasst hat."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    await css.save_context(db, session["id"], user_a, draft_text="NUR_FUER_ALEX")
+
+    own = await css.get_own_context(db, session["id"], user_a)
+    partner_view = await css.get_own_context(db, session["id"], user_b)
+    assert own["draft_text"] == "NUR_FUER_ALEX"
+    assert partner_view is None
+
+
+async def test_session_closed_to_outsiders(db):
+    """Sitzungen fremder Paarräume sind nicht erreichbar (404)."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    with pytest.raises(HTTPException) as exc:
+        await css.require_session(db, session["id"], uuid.uuid4())
+    assert exc.value.status_code == 404
+
+
+async def test_both_members_share_one_transcript(db):
+    """Beide sprechen in denselben Verlauf; die Sprecher bleiben unterscheidbar."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    await css.add_message(db, session["id"], user_id=user_a, role="partner", content="Ich fange an.")
+    await css.add_message(db, session["id"], user_id=None, role="echo", content="Danke, Alex.")
+    await css.add_message(db, session["id"], user_id=user_b, role="partner", content="Ich auch.")
+
+    messages = await css.load_messages(db, session["id"])
+    names = {str(user_a): "Alex", str(user_b): "Rio"}
+    assert [css.public_message(m, names)["speaker"] for m in messages] == ["Alex", "Echo", "Rio"]
+
+    history = css.build_history(messages, names)
+    assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
+    assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
+    assert history[2]["content"].startswith("Rio: ")
+
+
+async def test_session_edit_and_status_flow(db):
+    """Bearbeiten und Statuswechsel laufen durch (deckt die SQL-Pfade ab)."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Alt", goal="Altes Ziel")
+
+    edited = await css.update_session(db, session["id"], user_a, title="Neu", topic="Worum es geht")
+    assert edited["title"] == "Neu" and edited["topic"] == "Worum es geht"
+    assert edited["goal"] == "Altes Ziel"   # nicht mitgeschickt → bleibt stehen
+
+    opened = await css.set_status(db, session["id"], user_a, "open")
+    assert opened["status"] == "open" and opened["opened_at"] is not None
+    closed = await css.set_status(db, session["id"], user_a, "closed")
+    assert closed["status"] == "closed" and closed["closed_at"] is not None
+
+    listed = await css.list_sessions(db, couple_id, user_a)
+    assert [s["id"] for s in listed] == [session["id"]]
+
+
+async def test_context_length_is_capped(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    with pytest.raises(HTTPException) as exc:
+        await css.save_context(db, session["id"], user_a,
+                               confirmed_text="x" * (css.MAX_CONTEXT_CHARS + 1))
+    assert exc.value.status_code == 400
