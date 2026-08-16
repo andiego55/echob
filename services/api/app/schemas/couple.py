@@ -48,6 +48,44 @@ class CoupleLinkAcceptResponse(BaseModel):
     couple_id: UUID | None = None
 
 
+class CoupleMemberPoints(BaseModel):
+    user_id: UUID
+    name: str
+    points: int
+
+
+class CoupleMilestone(BaseModel):
+    key: str
+    title: str
+    description: str
+    reached: bool
+
+
+class CoupleProgressEvent(BaseModel):
+    kind: str
+    label: str
+    points: int
+    name: str
+    created_at: datetime
+
+
+class CoupleLevel(BaseModel):
+    name: str
+    next_at: int | None = None
+    next_name: str | None = None
+
+
+class CoupleProgress(BaseModel):
+    """Fortschritt eines Paarraums — eigene UND gemeinsame Punkte, bewusst ohne Rangliste."""
+    total_points: int
+    own_points: int
+    members: list[CoupleMemberPoints]
+    streak_weeks: int
+    level: CoupleLevel
+    milestones: list[CoupleMilestone]
+    recent: list[CoupleProgressEvent]
+
+
 class CoupleInvitePublic(BaseModel):
     """Minimal-Sicht auf einen Kopplungscode — bewusst ohne Namen oder Inhalte."""
     valid: bool

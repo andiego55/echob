@@ -25,7 +25,9 @@ from app.schemas.couple import (
     CoupleLinkAcceptResponse,
     CoupleLinkCreate,
     CoupleLinkResponse,
+    CoupleProgress,
 )
+from app.services import couple_progress_service as progress
 from app.services import couple_therapy_service as cts
 
 router = APIRouter(prefix="/couple", tags=["couple"])
@@ -138,6 +140,18 @@ async def end_link(
     if not ok:
         raise HTTPException(status_code=404, detail="Paarraum nicht gefunden.")
     return {"ended": True}
+
+
+@router.get("/links/{couple_id}/progress", response_model=CoupleProgress)
+async def get_progress(
+    couple_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CoupleProgress:
+    """Punkte, Streak und Meilensteine des Paarraums — kooperativ, ohne Rangliste."""
+    async with pool.acquire() as conn:
+        data = await progress.load_progress(conn, couple_id, current["user_id"])
+    return CoupleProgress(**data)
 
 
 @router.get("/invites/{code}", response_model=CoupleInvitePublic)

@@ -12,6 +12,7 @@ import { coupleApi } from '@/api/couple'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import AgreementsCard from '@/components/couple/AgreementsCard'
+import ProgressCard from '@/components/couple/ProgressCard'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import { coupleTestsApi } from '@/api/coupleTests'
 import { SELF_TESTS } from '@/selftests'
@@ -79,6 +80,8 @@ export default function CoupleRoomPage() {
             allparteilicher Moderation.
           </p>
         </div>
+
+        <ProgressCard coupleId={coupleId} />
 
         <SessionsCard coupleId={coupleId} />
 

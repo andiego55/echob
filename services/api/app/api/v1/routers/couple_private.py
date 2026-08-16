@@ -20,6 +20,7 @@ from app.schemas.couple_private import (
     CouplePrivateThread,
 )
 from app.services import couple_private_service as cps
+from app.services import couple_progress_service as progress
 from app.services.subscription_service import enforce_echo_prompt_limit
 
 router = APIRouter(prefix="/couple/sessions", tags=["couple-private"])
@@ -108,5 +109,7 @@ async def private_feedback(
         await cps.add_private_message(
             conn, session_id, user_id, role="echo", content=reply, kind="feedback",
         )
+        # Punkte fürs Hinschauen — der Inhalt bleibt selbstverständlich privat.
+        await progress.award(conn, session["couple_id"], user_id, "self_feedback", session_id)
         messages = await cps.load_private_messages(conn, session_id, user_id)
     return CouplePrivateThread(messages=[cps.public_private_message(m) for m in messages])

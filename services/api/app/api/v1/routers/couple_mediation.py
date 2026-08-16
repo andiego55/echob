@@ -26,6 +26,7 @@ from app.schemas.couple_mediation import (
     CoupleTopicStatus,
 )
 from app.services import couple_mediation_service as cms
+from app.services import couple_progress_service as progress
 from app.services.couple_session_service import load_member_names
 from app.services.subscription_service import enforce_echo_prompt_limit
 
@@ -96,6 +97,9 @@ async def save_perspective(
             open_text=body.open_text, private_text=body.private_text,
         )
         topic, link = await cms.require_topic(conn, topic_id, user_id)
+        if body.open_text:
+            await progress.award(conn, topic["couple_id"], user_id,
+                                 "perspective_shared", topic_id)
         return await _detail(conn, topic, link, user_id)
 
 
@@ -128,6 +132,7 @@ async def mediate(
             prompt_file=_MEDIATION_PROMPT,
         )
         await cms.save_mediation(conn, topic_id, user_id, body)
+        await progress.award(conn, topic["couple_id"], user_id, "mediation_done", topic_id)
         return await _detail(conn, topic, link, user_id)
 
 

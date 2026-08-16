@@ -20,6 +20,7 @@ from app.schemas.couple_test import (
     CoupleTestState,
     CoupleTestSummary,
 )
+from app.services import couple_progress_service as progress
 from app.services import couple_test_service as cts_test
 from app.services.subscription_service import enforce_echo_prompt_limit
 
@@ -73,6 +74,7 @@ async def save_test(
             conn, couple_id, user_id,
             slug=slug, title=body.title, answers=body.answers, result=body.result,
         )
+        await progress.award(conn, couple_id, user_id, "test_taken", slug)
         return await _state(conn, couple_id, slug, user_id)
 
 
@@ -98,4 +100,5 @@ async def compare(
             prompt_file=_TEST_PROMPT,
         )
         await cts_test.save_comparison(conn, couple_id, user_id, slug, body)
+        await progress.award(conn, couple_id, user_id, "test_compared", slug)
         return await _state(conn, couple_id, slug, user_id)

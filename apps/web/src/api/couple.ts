@@ -32,7 +32,24 @@ export interface CoupleAcceptResult {
   couple_id: string | null
 }
 
+/**
+ * Fortschritt des Paarraums. Bewusst ohne Rangliste: eigene Punkte, gemeinsame Punkte,
+ * Meilensteine – aber kein Sieger zwischen euch beiden.
+ */
+export interface CoupleProgress {
+  total_points: number
+  own_points: number
+  members: { user_id: string; name: string; points: number }[]
+  streak_weeks: number
+  level: { name: string; next_at: number | null; next_name: string | null }
+  milestones: { key: string; title: string; description: string; reached: boolean }[]
+  recent: { kind: string; label: string; points: number; name: string; created_at: string }[]
+}
+
 export const coupleApi = {
+  progress: (coupleId: string) =>
+    apiClient.get<CoupleProgress>(`/couple/links/${coupleId}/progress`).then(r => r.data),
+
   list: () => apiClient.get<CoupleLink[]>('/couple/links').then(r => r.data),
   get: (coupleId: string) =>
     apiClient.get<CoupleLink>(`/couple/links/${coupleId}`).then(r => r.data),

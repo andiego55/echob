@@ -21,6 +21,7 @@ from app.core import crypto
 from app.services import couple_agreement_service as cas
 from app.services import couple_mediation_service as cms
 from app.services import couple_private_service as cps
+from app.services import couple_progress_service as prog
 from app.services import couple_session_service as css
 from app.services import couple_test_service as ctest
 from app.services import couple_therapy_service as cts
@@ -306,6 +307,70 @@ async def test_both_members_share_one_transcript(db):
     assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
     assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
     assert history[2]["content"].startswith("Rio: ")
+
+
+# ── Punkte & Fortschritt ─────────────────────────────────────────────────────
+
+async def test_points_count_once_per_action(db):
+    """Dieselbe Handlung bringt keine zweiten Punkte — sonst wäre Klicken die Strategie."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    for _ in range(3):
+        await prog.award(db, couple_id, user_a, "session_started", session["id"])
+
+    data = await prog.load_progress(db, couple_id, user_a)
+    assert data["own_points"] == prog.POINTS["session_started"][0]
+    assert data["total_points"] == data["own_points"]
+
+
+async def test_points_are_shared_but_not_a_ranking(db):
+    """Beide Beiträge zählen einzeln UND gemeinsam — ohne Sieger."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await prog.award(db, couple_id, user_a, "test_taken", "bindung")
+    await prog.award(db, couple_id, user_b, "test_taken", "bindung")
+    await prog.award(db, couple_id, user_b, "agreement_kept", uuid.uuid4())
+
+    data = await prog.load_progress(db, couple_id, user_a)
+    punkte = {m["name"]: m["points"] for m in data["members"]}
+    assert punkte["Alex"] == 15
+    assert punkte["Rio"] == 45
+    assert data["total_points"] == 60
+    assert data["own_points"] == 15
+    # Kooperativ: es gibt keinen Platz, keinen Rang, keinen Gewinner im Ergebnis.
+    assert not any(k in data for k in ("rank", "winner", "leader"))
+
+
+async def test_milestones_and_recent_reflect_activity(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    reached = lambda d, key: next(m["reached"] for m in d["milestones"] if m["key"] == key)  # noqa: E731
+
+    data = await prog.load_progress(db, couple_id, user_a)
+    assert reached(data, "erster_schritt") is False
+    assert data["streak_weeks"] == 0
+
+    await prog.award(db, couple_id, user_a, "agreement_kept", uuid.uuid4())
+    data = await prog.load_progress(db, couple_id, user_b)
+    assert reached(data, "erster_schritt") is True
+    assert reached(data, "wort_gehalten") is True
+    assert reached(data, "erstes_gespraech") is False
+    assert data["streak_weeks"] == 1
+    assert data["recent"][0]["label"] == prog.POINTS["agreement_kept"][1]
+    assert data["recent"][0]["name"] == "Alex"
+
+
+async def test_progress_closed_to_outsiders(db):
+    *_, couple_id = await _linked_pair(db)
+    with pytest.raises(HTTPException) as exc:
+        await prog.load_progress(db, couple_id, uuid.uuid4())
+    assert exc.value.status_code == 404
+
+
+async def test_unknown_point_kind_is_ignored(db):
+    """Ein Tippfehler im Ereignisnamen vergibt keine Punkte und wirft nicht."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await prog.award(db, couple_id, user_a, "gibt_es_nicht", "x")
+    data = await prog.load_progress(db, couple_id, user_a)
+    assert data["total_points"] == 0
 
 
 # ── Paar-Tests ───────────────────────────────────────────────────────────────

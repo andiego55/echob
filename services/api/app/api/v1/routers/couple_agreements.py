@@ -24,6 +24,7 @@ from app.schemas.couple_agreement import (
     CoupleSummary,
 )
 from app.services import couple_agreement_service as cas
+from app.services import couple_progress_service as progress
 from app.services import couple_session_service as css
 from app.services.subscription_service import enforce_echo_prompt_limit
 
@@ -71,6 +72,8 @@ async def create_summary(
             prompt_file=_SUMMARY_PROMPT,
         )
         summary = await cas.save_summary(conn, session_id, user_id, text)
+        await progress.award(conn, session["couple_id"], user_id,
+                             "session_summarized", session_id)
     return CoupleSummary(**summary)
 
 
@@ -99,11 +102,13 @@ async def propose_agreement(
     couple_id: UUID, body: CoupleAgreementCreate,
     current=Depends(get_current_user), pool=Depends(get_pool),
 ) -> CoupleAgreement:
+    user_id = current["user_id"]
     async with pool.acquire() as conn:
         row = await cas.propose(
-            conn, couple_id, current["user_id"],
+            conn, couple_id, user_id,
             body=body.body, session_id=body.session_id, due_at=body.due_at,
         )
+        await progress.award(conn, couple_id, user_id, "agreement_proposed", row["id"])
     return CoupleAgreement(**row)
 
 
@@ -111,8 +116,10 @@ async def propose_agreement(
 async def accept_agreement(
     agreement_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
 ) -> CoupleAgreement:
+    user_id = current["user_id"]
     async with pool.acquire() as conn:
-        row = await cas.accept(conn, agreement_id, current["user_id"])
+        row = await cas.accept(conn, agreement_id, user_id)
+        await progress.award(conn, row["couple_id"], user_id, "agreement_accepted", agreement_id)
     return CoupleAgreement(**row)
 
 
@@ -121,6 +128,9 @@ async def set_agreement_status(
     agreement_id: UUID, body: CoupleAgreementStatus,
     current=Depends(get_current_user), pool=Depends(get_pool),
 ) -> CoupleAgreement:
+    user_id = current["user_id"]
     async with pool.acquire() as conn:
-        row = await cas.set_status(conn, agreement_id, current["user_id"], body.status)
+        row = await cas.set_status(conn, agreement_id, user_id, body.status)
+        if body.status == "kept":
+            await progress.award(conn, row["couple_id"], user_id, "agreement_kept", agreement_id)
     return CoupleAgreement(**row)

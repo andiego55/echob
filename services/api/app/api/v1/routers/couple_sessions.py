@@ -32,6 +32,7 @@ from app.schemas.couple_session import (
     CoupleSessionUpdate,
 )
 from app.services import couple_context_service as ccs
+from app.services import couple_progress_service as progress
 from app.services import couple_session_service as css
 from app.services.subscription_service import enforce_echo_prompt_limit
 
@@ -189,12 +190,17 @@ async def save_context(
     session_id: UUID, body: CoupleContextSave,
     current=Depends(get_current_user), pool=Depends(get_pool),
 ) -> CoupleContextResponse:
+    user_id = current["user_id"]
     async with pool.acquire() as conn:
         ctx = await css.save_context(
-            conn, session_id, current["user_id"],
+            conn, session_id, user_id,
             draft_text=body.draft_text, confirmed_text=body.confirmed_text,
             instruction=body.instruction,
         )
+        if body.confirmed_text:
+            session, _ = await css.require_session(conn, session_id, user_id)
+            await progress.award(conn, session["couple_id"], user_id,
+                                 "context_shared", session_id)
     return CoupleContextResponse(
         draft_text=ctx.get("draft_text"), confirmed_text=ctx.get("confirmed_text"),
         instruction=ctx.get("instruction"),
@@ -272,6 +278,7 @@ async def moderate(
 
         if session["status"] == "draft":
             session = await css.set_status(conn, session_id, user_id, "open")
+        await progress.award(conn, session["couple_id"], user_id, "session_started", session_id)
         messages = await css.load_messages(conn, session_id)
 
     return CoupleSessionDetail(
