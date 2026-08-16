@@ -17,6 +17,7 @@ import asyncpg
 import pytest
 from fastapi import HTTPException
 
+from app.services import couple_private_service as cps
 from app.services import couple_session_service as css
 from app.services import couple_therapy_service as cts
 
@@ -301,6 +302,59 @@ async def test_both_members_share_one_transcript(db):
     assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
     assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
     assert history[2]["content"].startswith("Rio: ")
+
+
+# ── Privater flankierender Echo ──────────────────────────────────────────────
+
+async def test_private_thread_is_never_shared(db):
+    """DIE Zusicherung des privaten Dialogs: die andere Person sieht ihn nicht."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+
+    await cps.add_private_message(db, session["id"], user_a, role="user",
+                                  content="PRIVAT_VON_ALEX")
+    await cps.add_private_message(db, session["id"], user_b, role="user",
+                                  content="PRIVAT_VON_RIO")
+
+    alex = await cps.load_private_messages(db, session["id"], user_a)
+    rio = await cps.load_private_messages(db, session["id"], user_b)
+    assert [m["content"] for m in alex] == ["PRIVAT_VON_ALEX"]
+    assert [m["content"] for m in rio] == ["PRIVAT_VON_RIO"]
+
+    # Und er sickert auch nicht in den gemeinsamen Raum.
+    shared = css.build_session_context(
+        session, await css.load_confirmed_contexts(db, session["id"]),
+        {str(user_a): "Alex", str(user_b): "Rio"},
+    )
+    assert "PRIVAT_VON_ALEX" not in shared and "PRIVAT_VON_RIO" not in shared
+    room = await css.load_messages(db, session["id"])
+    assert room == []
+
+
+async def test_private_echo_sees_only_own_case(db):
+    """Der private Echo kennt den EIGENEN Fall — nie den der anderen Person."""
+    user_a, case_a, user_b, case_b, couple_id = await _linked_pair(db)
+    session, link = await css.require_session(
+        db, (await css.create_session(db, couple_id, user_a, title="Thema"))["id"], user_a,
+    )
+
+    ctx_a = await cps.build_private_context(db, session, link, user_a)
+    assert "DESC_AAA" in ctx_a          # eigener Fall ist da
+    assert "DESC_BBB" not in ctx_a      # der der anderen Person nicht
+
+    ctx_b = await cps.build_private_context(db, session, link, user_b)
+    assert "DESC_BBB" in ctx_b and "DESC_AAA" not in ctx_b
+
+    assert str(cps.own_case_id(link, user_a)) == str(case_a)
+    assert str(cps.own_case_id(link, user_b)) == str(case_b)
+
+
+async def test_private_access_denied_to_outsiders(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    with pytest.raises(HTTPException) as exc:
+        await cps.require_private_access(db, session["id"], uuid.uuid4())
+    assert exc.value.status_code == 404
 
 
 async def test_session_edit_and_status_flow(db):

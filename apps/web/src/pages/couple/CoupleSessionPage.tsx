@@ -13,11 +13,13 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import type { CoupleSessionDetail } from '@/api/coupleSessions'
 import ContextComposer from '@/components/couple/ContextComposer'
+import PrivateEchoPanel from '@/components/couple/PrivateEchoPanel'
 
 export default function CoupleSessionPage() {
   const { sessionId = '' } = useParams<{ sessionId: string }>()
   const qc = useQueryClient()
   const [text, setText] = useState('')
+  const [panel, setPanel] = useState<'prep' | 'private'>('prep')
   const endRef = useRef<HTMLDivElement>(null)
 
   const { data, isLoading, isError } = useQuery({
@@ -160,8 +162,25 @@ export default function CoupleSessionPage() {
             )}
           </div>
 
-          {/* ── Vorbereitung ─────────────────────────────────────── */}
+          {/* ── Vorbereitung / privater Echo ─────────────────────── */}
           <div className="space-y-5">
+            <div className="flex gap-1 rounded-brand border border-brand-border p-1">
+              {([['prep', 'Vorbereitung'], ['private', 'Nur für dich']] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => setPanel(key)}
+                  className={`flex-1 rounded-brand-sm px-3 py-1.5 text-xs font-medium transition ${
+                    panel === key ? 'bg-navy text-white' : 'text-brand-muted hover:text-navy'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {panel === 'private' && <PrivateEchoPanel sessionId={sessionId} />}
+
+            {panel === 'prep' && <>
             <ContextComposer sessionId={sessionId} disabled={closed} />
 
             <div className="card">
@@ -181,6 +200,7 @@ export default function CoupleSessionPage() {
                 </div>
               )}
             </div>
+            </>}
           </div>
         </div>
       </div>

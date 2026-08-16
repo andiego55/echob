@@ -105,7 +105,8 @@ export default function Header() {
     location.pathname === '/fachpersonen' ||
     location.pathname.startsWith('/fachpersonen/') ||
     location.pathname.startsWith('/fuer-fachpersonen') ||
-    location.pathname.startsWith('/forschung')
+    location.pathname.startsWith('/forschung') ||
+    location.pathname.startsWith('/ausbildungsinstitute')
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-navy border-b border-white/[0.07]">
@@ -260,14 +261,18 @@ export default function Header() {
                     <p className="mt-0.5 text-[0.75rem] leading-snug text-brand-muted">Bei der EchoB-Wirksamkeitsstudie mitforschen oder teilnehmen.</p>
                   </span>
                 </Link>
+                <Link to="/ausbildungsinstitute" className="flex items-start gap-3 rounded-brand-sm p-3 no-underline transition-colors hover:bg-brand-bg">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]"><path d="M12 4 2.5 8.5 12 13l9.5-4.5L12 4Z" /><path d="M6.5 10.8V16c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-5.2" /></svg>
+                  </span>
+                  <span>
+                    <p className="text-[0.9rem] font-bold text-navy">Ausbildungsinstitute</p>
+                    <p className="mt-0.5 text-[0.75rem] leading-snug text-brand-muted">Am echten Fall ausbilden – mit eigenem Bereich für Studierende.</p>
+                  </span>
+                </Link>
               </div>
             </div>
           </div>
-
-          {/* Ausbildung */}
-          <NavLink to="/ausbildungsinstitute" end className={({ isActive }) => LINK_CLS(isActive)}>
-            Ausbildung
-          </NavLink>
 
           {/* Über mit Dropdown */}
           <div className="relative group">
