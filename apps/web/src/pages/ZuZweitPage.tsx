@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
+import CoupleExplainer from '@/components/couple/CoupleExplainer'
 import { useAuth } from '@/contexts/AuthContext'
 
 /**
- * /zu-zweit — öffentliche Seite zur Paartherapie mit EchoB (Nav-Reiter „Paartherapie").
+ * /paartherapie — öffentliche Seite zum Paartherapie-Modul.
  *
- * Erklärt, dass EchoB auch zu zweit genutzt werden kann: zwei Konten verbinden sich zu
- * einem gemeinsamen Raum, in dem Echo Gespräche moderiert. Kernversprechen und größter
- * Unterschied zu allem anderen: Der eigene Fall bleibt privat – was Echo im gemeinsamen
- * Raum weiß, schreibt jede Person ausdrücklich selbst.
+ * Sie muss zwei Dinge gleichzeitig können: das Modul ehrlich erklären und für Menschen
+ * auffindbar sein, die nach „Paartherapie online", „Paarberatung mit KI" oder schlicht
+ * nach einem Ausweg aus demselben Streit suchen.
+ *
+ * Fürs Auffindbarwerden — auch in KI-Antworten — tragen vor allem drei Dinge bei:
+ * eine klare Definition weit oben, eine ehrliche Abgrenzung zu echter Paartherapie und
+ * die FAQ, die zusätzlich als strukturierte Daten ausgeliefert wird.
  */
 
 const iconCls = 'h-6 w-6'
@@ -37,7 +41,7 @@ const TOOLS = [
     text: 'In fünf Schritten von „ich bin sauer“ zu einem Satz, der ankommt: Stimmungs-Check, eine Wertschätzung, dein Anliegen als Ich-Botschaft, eine konkrete Bitte.',
   },
   {
-    title: 'Mediation für Festgefahrenes',
+    title: 'KI-Mediation für Festgefahrenes',
     text: 'Bei Themen, bei denen ihr feststeckt, schreibt jede:r eine offene und eine vertrauliche Sicht. Echo erarbeitet daraus drei konkrete Brücken – ohne das Vertrauliche preiszugeben.',
   },
   {
@@ -53,8 +57,8 @@ const TOOLS = [
     text: 'Echo hält fest, worum es ging, was deutlich wurde und was offen blieb. Zum Nachlesen, wenn die Erinnerung auseinandergeht.',
   },
   {
-    title: 'Sichtbarer Fortschritt',
-    text: 'Punkte, Serien und Meilensteine für das Dranbleiben – gemeinsam, ohne Rangliste. Am meisten zählt, eine Abmachung einzuhalten.',
+    title: 'Ein eigener Begleiter für jede:n',
+    text: 'Neben dem gemeinsamen Raum hast du einen privaten Echo-Dialog, den die andere Person nie sieht – zum Sortieren vorher und zum Nachspüren danach.',
   },
 ]
 
@@ -96,8 +100,70 @@ const PRIVACY = [
       </svg>
     ),
     title: 'Jederzeit beendbar',
-    text: 'Beendet eine Seite die Verbindung, ist der gemeinsame Raum sofort für beide geschlossen. Ohne Begründung, ohne Nachfrage.',
+    text: 'Beendet eine Seite die Verbindung, ist der gemeinsame Raum sofort für beide geschlossen – auf Wunsch samt aller Inhalte.',
   },
+]
+
+/** Abgrenzung – danach wird tatsächlich gesucht, und KI-Antworten zitieren so etwas gern. */
+const VERGLEICH = [
+  {
+    was: 'Paartherapie',
+    wer: 'Approbierte oder qualifizierte Fachperson',
+    wie: 'Sitzungen vor Ort oder per Video, Diagnostik möglich, Behandlung im engeren Sinn',
+    wann: 'Bei psychischer Erkrankung, tiefer Krise, wenn es allein nicht mehr geht',
+  },
+  {
+    was: 'Paarberatung',
+    wer: 'Beraterin, Coach, Eheberatungsstelle',
+    wie: 'Begleitete Gespräche, oft lösungsorientiert, meist ohne Diagnostik',
+    wann: 'Bei konkreten Konflikten, Entscheidungen, Übergängen',
+  },
+  {
+    was: 'EchoB zu zweit',
+    wer: 'Ihr beide, moderiert von Echo',
+    wie: 'Vorbereitete, moderierte Gespräche im eigenen Tempo – schriftlich, jederzeit',
+    wann: 'Zwischen den Terminen, vor dem ersten Termin, oder für wiederkehrende Alltagsthemen',
+  },
+]
+
+const FAQ = [
+  {
+    q: 'Ist das eine echte Paartherapie?',
+    a: 'Nein. EchoB ersetzt keine Paartherapie und keine Behandlung. Echo moderiert eure Gespräche, stellt keine Diagnosen und spricht keine Schuld zu. Es ist ein Werkzeug, das euch hilft, besser miteinander zu reden – und das euch den Weg zu einer Fachperson erleichtert, wenn das sinnvoll ist.',
+  },
+  {
+    q: 'Wie funktioniert Paartherapie mit KI überhaupt?',
+    a: 'Ihr verbindet zwei Konten zu einem gemeinsamen Raum. Vor einem Gespräch bereitet jede:r für sich vor, welches Thema ansteht und was er oder sie sich wünscht. Im Gespräch selbst moderiert Echo: erinnert an das Ziel, sorgt für faire Redeanteile, übersetzt Vorwürfe in Bedürfnisse und bittet darum, das Gehörte zu spiegeln, bevor geantwortet wird. Am Ende fasst Echo zusammen und schlägt konkrete Abmachungen vor.',
+  },
+  {
+    q: 'Sieht mein Partner alles, was ich in EchoB aufgeschrieben habe?',
+    a: 'Nein. Die Verbindung zu einem Paarraum ist keine Freigabe: Sie gewährt keinen Zugriff auf deine Fälle, Szenen, Skalen, Berichte oder deine privaten Dialoge mit Echo. Was Echo im gemeinsamen Raum weiß, stellst du vorher selbst zusammen und gibst es ausdrücklich frei.',
+  },
+  {
+    q: 'Was ist die vertrauliche Perspektive in der Mediation?',
+    a: 'Wie das Einzelgespräch in einer echten Mediation: Zu einem strittigen Thema schreibt jede:r eine offene Sicht, die beide lesen, und optional eine vertrauliche, die nur Echo kennt. Echo nutzt sie als Hintergrund für den Lösungsvorschlag, gibt sie aber nicht an die andere Person weiter – die erfährt nicht einmal, ob es sie gibt.',
+  },
+  {
+    q: 'Müssen wir gleichzeitig online sein?',
+    a: 'Nein. Ihr könnt ein Gespräch vorschlagen, vorbereiten und in eurem Tempo führen – jede:r, wenn es gerade passt. Wer möchte, verabredet sich zusätzlich auf einen Zeitpunkt.',
+  },
+  {
+    q: 'Was kostet das?',
+    a: 'Ihr braucht beide ein eigenes EchoB-Konto. Die Testphase ist kostenlos; danach gelten die regulären Preise. Das Paartherapie-Modul ist im Zugang enthalten und kostet nichts zusätzlich.',
+  },
+  {
+    q: 'Wann ist ein gemeinsames Gespräch nicht das Richtige?',
+    a: 'Wo Gewalt, Drohungen, Zwang oder Kontrolle im Spiel sind. Ein Paarsetting setzt Augenhöhe voraus und kann dort den Druck erhöhen, statt ihn zu nehmen. Echo bricht in solchen Fällen ab und verweist auf Hilfe. Bei akuter Gefahr: Notruf 110 oder 112.',
+  },
+]
+
+const WEITERLESEN = [
+  { to: '/wissen/kommunikation-konflikte', label: 'Kommunikation & Konflikte' },
+  { to: '/wissen/beobachtung-gefuehl', label: 'Beobachtung und Gefühl trennen' },
+  { to: '/wissen/beziehungsmuster', label: 'Beziehungsmuster erkennen' },
+  { to: '/wissen/grenzen-setzen', label: 'Grenzen setzen' },
+  { to: '/wissen/bindungsstile', label: 'Bindungsstile' },
+  { to: '/wissen/professionelle-hilfe', label: 'Wann professionelle Hilfe sinnvoll ist' },
 ]
 
 export default function ZuZweitPage() {
@@ -135,6 +201,31 @@ export default function ZuZweitPage() {
         </div>
       </section>
 
+      {/* ── Definition: kurz, klar, weit oben ─────────────────────── */}
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-[760px]">
+          <h2 className="text-[1.7rem] font-extrabold tracking-[-0.01em] text-navy">
+            Was ist Paartherapie mit KI-Moderation?
+          </h2>
+          <p className="mt-4 text-[1.02rem] leading-relaxed text-brand-text">
+            Zwei Menschen verbinden ihre Konten zu einem gemeinsamen, geschützten Raum. Vor
+            einem Gespräch bereitet jede:r für sich vor, worum es gehen soll. Im Gespräch
+            selbst übernimmt Echo die Rolle einer <strong className="text-navy">allparteilichen
+            Moderation</strong>: Es hält das Ziel, sorgt für faire Redeanteile, übersetzt
+            Vorwürfe in Bedürfnisse und bittet darum, das Gehörte zu spiegeln, bevor geantwortet
+            wird. Am Ende fasst es zusammen und schlägt konkrete Abmachungen vor.
+          </p>
+          <p className="mt-4 text-[0.95rem] leading-relaxed text-brand-muted">
+            Das ist ausdrücklich <strong className="text-navy">keine Behandlung und kein Ersatz
+            für eine Paartherapie</strong>. Es ist ein Werkzeug für die Gespräche dazwischen –
+            und für die, die man immer wieder aufschiebt, weil sie jedes Mal eskalieren.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Slider ────────────────────────────────────────────────── */}
+      <CoupleExplainer />
+
       {/* ── So geht's ─────────────────────────────────────────────── */}
       <section id="so-gehts" className="px-6 py-20">
         <div className="mx-auto max-w-[860px]">
@@ -161,7 +252,7 @@ export default function ZuZweitPage() {
         </div>
       </section>
 
-      {/* ── Werkzeuge im Paarraum ─────────────────────────────────── */}
+      {/* ── Werkzeuge ─────────────────────────────────────────────── */}
       <section className="bg-brand-bg px-6 py-20">
         <div className="mx-auto max-w-[860px]">
           <span className="label">Im Paarraum</span>
@@ -177,6 +268,51 @@ export default function ZuZweitPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Abgrenzung ────────────────────────────────────────────── */}
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-[900px]">
+          <span className="label">Einordnung</span>
+          <h2 className="mt-2 text-[1.7rem] font-extrabold tracking-[-0.01em] text-navy">
+            Paartherapie, Paarberatung – oder das hier?
+          </h2>
+          <p className="mt-3 max-w-[640px] text-[0.95rem] leading-relaxed text-brand-muted">
+            Die drei werden oft in einen Topf geworfen. Sie lösen aber verschiedene Probleme,
+            und es hilft, das vorher zu wissen.
+          </p>
+
+          <div className="mt-8 overflow-x-auto">
+            <table className="w-full min-w-[640px] border-collapse text-left text-[0.86rem]">
+              <thead>
+                <tr className="border-b border-brand-border">
+                  <th className="py-3 pr-4 font-bold text-navy">Was</th>
+                  <th className="py-3 pr-4 font-bold text-navy">Wer begleitet</th>
+                  <th className="py-3 pr-4 font-bold text-navy">Wie es abläuft</th>
+                  <th className="py-3 font-bold text-navy">Wofür es taugt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {VERGLEICH.map((z) => (
+                  <tr key={z.was} className="border-b border-brand-border align-top">
+                    <td className="py-3.5 pr-4 font-semibold text-navy">{z.was}</td>
+                    <td className="py-3.5 pr-4 text-brand-muted">{z.wer}</td>
+                    <td className="py-3.5 pr-4 text-brand-muted">{z.wie}</td>
+                    <td className="py-3.5 text-brand-muted">{z.wann}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-6 max-w-[640px] text-[0.9rem] leading-relaxed text-brand-muted">
+            Sucht ihr eine Fachperson in eurer Nähe? Im{' '}
+            <Link to="/fachpersonen" className="font-medium text-accent hover:underline">
+              EchoB-Verzeichnis
+            </Link>{' '}
+            findet ihr Therapeut:innen, Berater:innen und Coaches – auch ganz ohne unser Modul.
+          </p>
         </div>
       </section>
 
@@ -234,6 +370,45 @@ export default function ZuZweitPage() {
         </div>
       </section>
 
+      {/* ── FAQ ───────────────────────────────────────────────────── */}
+      <section className="bg-brand-bg px-6 py-20">
+        <div className="mx-auto max-w-[760px]">
+          <span className="label">Häufige Fragen</span>
+          <h2 className="mt-2 text-[1.7rem] font-extrabold tracking-[-0.01em] text-navy">
+            Was Paare vorher wissen wollen
+          </h2>
+
+          <div className="mt-8 space-y-3">
+            {FAQ.map(({ q, a }) => (
+              <details key={q} className="rounded-brand-lg border border-brand-border bg-white px-5 py-4">
+                <summary className="cursor-pointer text-[0.95rem] font-semibold text-navy">{q}</summary>
+                <p className="mt-2.5 text-[0.9rem] leading-relaxed text-brand-muted">{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Weiterlesen ───────────────────────────────────────────── */}
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-[760px]">
+          <h2 className="text-[1.3rem] font-extrabold tracking-[-0.01em] text-navy">
+            Passend dazu aus unserem Wissensbereich
+          </h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {WEITERLESEN.map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className="rounded-full border border-brand-border px-3.5 py-1.5 text-[0.82rem] text-brand-muted no-underline transition hover:border-accent hover:text-accent"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="bg-navy px-6 py-16 text-white">
         <div className="mx-auto max-w-[700px] text-center">
@@ -249,6 +424,44 @@ export default function ZuZweitPage() {
           </Link>
         </div>
       </section>
+
+      {/* Strukturierte Daten: hilft bei Rich Results und in KI-Antworten */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'FAQPage',
+                mainEntity: FAQ.map(({ q, a }) => ({
+                  '@type': 'Question',
+                  name: q,
+                  acceptedAnswer: { '@type': 'Answer', text: a },
+                })),
+              },
+              {
+                '@type': 'SoftwareApplication',
+                name: 'EchoB – Paartherapie zu zweit',
+                applicationCategory: 'HealthApplication',
+                operatingSystem: 'Web',
+                url: 'https://echo-b.de/paartherapie',
+                inLanguage: 'de',
+                description:
+                  'Moderierte Paargespräche mit KI: Zwei Konten verbinden sich zu einem '
+                  + 'gemeinsamen Raum, in dem Echo allparteilich moderiert – mit Vorbereitung, '
+                  + 'Mediation, Abmachungen und getrennten privaten Bereichen.',
+                offers: {
+                  '@type': 'Offer',
+                  price: '0',
+                  priceCurrency: 'EUR',
+                  description: 'Kostenlose Testphase, danach im EchoB-Zugang enthalten.',
+                },
+              },
+            ],
+          }),
+        }}
+      />
     </PageLayout>
   )
 }

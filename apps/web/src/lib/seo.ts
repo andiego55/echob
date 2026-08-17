@@ -41,10 +41,10 @@ export const ROUTE_META: Record<string, PageMeta> = {
     description:
       'EchoB wird wissenschaftlich auf seine Wirkung geprüft. Für die geplante Wirksamkeitsstudie suchen wir Fachpersonen zum Mitforschen und Nutzer:innen zur Teilnahme – freiwillig, pseudonym, jederzeit widerrufbar. Ohne Diagnosen.',
   },
-  '/zu-zweit': {
-    title: 'Paartherapie mit EchoB – zu zweit moderiert sprechen',
+  '/paartherapie': {
+    title: 'Paartherapie mit KI-Moderation – zu zweit reden, ohne dass es eskaliert',
     description:
-      'EchoB zu zweit nutzen: Verbindet euch zu einem gemeinsamen Raum, in dem Echo eure Gespräche allparteilich moderiert – vorbereitet, mit klarem Ziel. Der eigene Fall bleibt dabei privat.',
+      'Moderierte Paargespräche online: Ihr verbindet euch zu einem gemeinsamen Raum, in dem Echo allparteilich moderiert – mit Vorbereitung, KI-Mediation für Festgefahrenes und Abmachungen, die halten. Kein Ersatz für Paartherapie; euer eigener Bereich bleibt privat.',
   },
   '/coaching': {
     title: 'Coaching mit EchoB – Erstgespräch anfragen',

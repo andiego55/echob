@@ -124,7 +124,7 @@ export default function Header() {
           {/* Start */}
           <NavLink to="/" end className={({ isActive }) => LINK_CLS(isActive)}>Start</NavLink>
           <NavLink to="/coaching" end className={({ isActive }) => LINK_CLS(isActive)}>Coaching</NavLink>
-          <NavLink to="/zu-zweit" end className={({ isActive }) => LINK_CLS(isActive)}>Paartherapie</NavLink>
+          <NavLink to="/paartherapie" end className={({ isActive }) => LINK_CLS(isActive)}>Paartherapie</NavLink>
 
           {/* Wissen mit Dropdown */}
           <div className="relative group">

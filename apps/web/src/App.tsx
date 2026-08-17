@@ -195,7 +195,7 @@ export function AppRoutes() {
       <Route path="/pseudonym"   element={<PseudonymAuthPage />} />
       <Route path="/einladung/:token" element={<ClientInvitePage />} />
       <Route path="/coaching"    element={<CoachingPage />} />
-      <Route path="/zu-zweit"    element={<ZuZweitPage />} />
+      <Route path="/paartherapie" element={<ZuZweitPage />} />
       <Route path="/ueber"       element={<UeberPage />} />
       <Route path="/ueber/mission" element={<UeberMissionPage />} />
       <Route path="/ueber/gruender" element={<GruenderInterviewPage />} />
