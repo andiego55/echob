@@ -20,6 +20,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.couple import (
+    CoupleDashboard,
     CoupleInvitePublic,
     CoupleLinkAccept,
     CoupleLinkAcceptResponse,
@@ -27,6 +28,7 @@ from app.schemas.couple import (
     CoupleLinkResponse,
     CoupleProgress,
 )
+from app.services import couple_dashboard_service as dashboard
 from app.services import couple_privacy_service as privacy
 from app.services import couple_progress_service as progress
 from app.services import couple_therapy_service as cts
@@ -179,6 +181,18 @@ async def get_progress(
     async with pool.acquire() as conn:
         data = await progress.load_progress(conn, couple_id, current["user_id"])
     return CoupleProgress(**data)
+
+
+@router.get("/links/{couple_id}/dashboard", response_model=CoupleDashboard)
+async def get_dashboard(
+    couple_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CoupleDashboard:
+    """Was gerade dran ist — getrennt nach „liegt bei dir“ und „liegt bei der anderen“."""
+    async with pool.acquire() as conn:
+        data = await dashboard.load_dashboard(conn, couple_id, current["user_id"])
+    return CoupleDashboard(**data)
 
 
 @router.get("/invites/{code}", response_model=CoupleInvitePublic)

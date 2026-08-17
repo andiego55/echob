@@ -86,6 +86,57 @@ class CoupleProgress(BaseModel):
     recent: list[CoupleProgressEvent]
 
 
+class CoupleDashboardItem(BaseModel):
+    """Ein Eintrag im Dashboard — entweder wartet er auf dich oder auf die andere Person."""
+    kind: str
+    title: str
+    detail: str
+    target: str | None = None
+
+
+class CoupleDashboardSession(BaseModel):
+    id: UUID
+    title: str
+    status: str
+    scheduled_for: datetime | None = None
+    message_count: int
+    has_summary: bool
+    from_topic: bool = False
+
+
+class CoupleDashboardTopic(BaseModel):
+    id: UUID
+    title: str
+    status: str
+    message_count: int
+    has_mediation: bool
+    open_bridges: int
+
+
+class CoupleAgreementSnippet(BaseModel):
+    id: UUID
+    body: str
+    status: str
+
+
+class CoupleAgreementSummary(BaseModel):
+    proposed: int
+    active: int
+    kept: int
+    recent: list[CoupleAgreementSnippet] = []
+
+
+class CoupleDashboard(BaseModel):
+    """Was im Paarraum gerade dran ist — serverseitig sortiert nach „wer ist am Zug“."""
+    partner_name: str | None = None
+    attention: list[CoupleDashboardItem] = []
+    waiting_for_partner: list[CoupleDashboardItem] = []
+    sessions: list[CoupleDashboardSession] = []
+    topics: list[CoupleDashboardTopic] = []
+    agreements: CoupleAgreementSummary
+    progress: CoupleProgress
+
+
 class CoupleInvitePublic(BaseModel):
     """Minimal-Sicht auf einen Kopplungscode — bewusst ohne Namen oder Inhalte."""
     valid: bool

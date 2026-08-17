@@ -14,6 +14,7 @@ import { coupleApi, coupleInviteLink, formatCoupleCode } from '@/api/couple'
 import { apiErrorMessage } from '@/api/errors'
 import type { CoupleLink } from '@/api/couple'
 import IsolationNotice from '@/components/couple/IsolationNotice'
+import CoupleDashboard from '@/components/couple/CoupleDashboard'
 
 export default function CoupleOverviewPage() {
   const { data: links = [], isLoading, isError, error } = useQuery({
@@ -34,15 +35,22 @@ export default function CoupleOverviewPage() {
       <div className="mx-auto max-w-[900px] px-6 py-8 space-y-6">
         <div>
           <span className="label">Zu zweit</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">Paartherapie</h1>
+          <h1 className="mt-1 text-2xl font-bold text-navy">
+            {rooms.length === 1 && rooms[0].partner_display_name
+              ? `Mit ${rooms[0].partner_display_name}`
+              : 'Paartherapie'}
+          </h1>
           <p className="mt-2 text-sm text-brand-muted max-w-2xl">
-            Verbinde dich mit deiner Partnerin oder deinem Partner zu einem gemeinsamen Raum.
-            Dort begleitet Echo eure Gespräche als allparteiliche Moderation – vorbereitet,
-            strukturiert und in eurem Tempo.
+            {rooms.length > 0
+              ? 'Was gerade dran ist – und was warten kann.'
+              : 'Verbinde dich mit deiner Partnerin oder deinem Partner zu einem gemeinsamen Raum. '
+                + 'Dort begleitet Echo eure Gespräche als allparteiliche Moderation – vorbereitet, '
+                + 'strukturiert und in eurem Tempo.'}
           </p>
         </div>
 
-        <IsolationNotice />
+        {/* Der Vertrauens-Hinweis gehört an den Anfang, nicht über jedes Dashboard. */}
+        {rooms.length === 0 && <IsolationNotice />}
 
         {isLoading ? (
           <div className="card text-sm text-brand-muted">Lade …</div>
@@ -50,7 +58,20 @@ export default function CoupleOverviewPage() {
           <LoadError error={error} />
         ) : (
           <>
-            {rooms.length > 0 && (
+            {/* Genau ein Raum? Dann direkt hinein – eine Liste mit einem Eintrag hilft niemandem. */}
+            {rooms.length === 1 && (
+              <>
+                <CoupleDashboard coupleId={rooms[0].id} />
+                <Link
+                  to={`/app/paar/${rooms[0].id}`}
+                  className="btn-outline !py-2 !px-4 !text-sm inline-block"
+                >
+                  Alles im Paarraum ansehen
+                </Link>
+              </>
+            )}
+
+            {rooms.length > 1 && (
               <div className="space-y-3">
                 <h2 className="text-sm font-bold text-navy">Eure Paarräume</h2>
                 {rooms.map(room => <RoomCard key={room.id} room={room} />)}

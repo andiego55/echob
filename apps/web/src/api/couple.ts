@@ -46,7 +46,38 @@ export interface CoupleProgress {
   recent: { kind: string; label: string; points: number; name: string; created_at: string }[]
 }
 
+export interface CoupleDashboardItem {
+  kind: string
+  title: string
+  detail: string
+  target: string | null
+}
+
+export interface CoupleDashboard {
+  partner_name: string | null
+  /** Liegt bei dir. */
+  attention: CoupleDashboardItem[]
+  /** Liegt bei der anderen Person. */
+  waiting_for_partner: CoupleDashboardItem[]
+  sessions: {
+    id: string; title: string; status: string; scheduled_for: string | null
+    message_count: number; has_summary: boolean; from_topic: boolean
+  }[]
+  topics: {
+    id: string; title: string; status: string
+    message_count: number; has_mediation: boolean; open_bridges: number
+  }[]
+  agreements: {
+    proposed: number; active: number; kept: number
+    recent: { id: string; body: string; status: string }[]
+  }
+  progress: CoupleProgress
+}
+
 export const coupleApi = {
+  dashboard: (coupleId: string) =>
+    apiClient.get<CoupleDashboard>(`/couple/links/${coupleId}/dashboard`).then(r => r.data),
+
   progress: (coupleId: string) =>
     apiClient.get<CoupleProgress>(`/couple/links/${coupleId}/progress`).then(r => r.data),
 

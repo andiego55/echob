@@ -19,6 +19,7 @@ from fastapi import HTTPException
 
 from app.core import crypto
 from app.services import couple_agreement_service as cas
+from app.services import couple_dashboard_service as dash
 from app.services import couple_mediation_service as cms
 from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
@@ -308,6 +309,60 @@ async def test_both_members_share_one_transcript(db):
     assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
     assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
     assert history[2]["content"].startswith("Rio: ")
+
+
+# ── Dashboard: wer ist am Zug? ───────────────────────────────────────────────
+
+async def test_dashboard_sorts_by_who_has_to_act(db):
+    """Dieselbe Lage sieht für beide anders aus — genau das macht ein Dashboard nützlich."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+
+    # Alex schlägt ein Gespräch vor und eine Abmachung.
+    session = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    await css.propose(db, session["id"], user_a)
+    await cas.propose(db, couple_id, user_a, body="Sonntags 20 Minuten reden.")
+
+    fuer_alex = await dash.load_dashboard(db, couple_id, user_a)
+    fuer_rio = await dash.load_dashboard(db, couple_id, user_b)
+
+    # Bei Alex liegt der Ball nicht — er wartet.
+    assert {i["kind"] for i in fuer_alex["waiting_for_partner"]} == {
+        "session_proposed", "agreement_proposed",
+    }
+    assert fuer_alex["attention"] == []
+
+    # Bei Rio liegt er sehr wohl.
+    assert {i["kind"] for i in fuer_rio["attention"]} == {
+        "session_invite", "agreement_open",
+    }
+    assert fuer_rio["waiting_for_partner"] == []
+    assert fuer_rio["partner_name"] == "Alex"
+
+
+async def test_dashboard_counts_the_room(db):
+    """Zahlen und Listen des Raums stimmen — und Fremde kommen nicht heran."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_bridges(db, topic["id"], [{"title": "A", "body": "Erster Vorschlag"}])
+    await cms.add_topic_message(db, topic["id"], user_id=user_a, role="partner", content="Hm.")
+    ag = await cas.propose(db, couple_id, user_a, body="Abmachung")
+    await cas.accept(db, ag["id"], user_b)
+
+    data = await dash.load_dashboard(db, couple_id, user_a)
+    assert data["agreements"]["active"] == 1 and data["agreements"]["proposed"] == 0
+    assert data["topics"][0]["open_bridges"] == 1
+    assert data["topics"][0]["message_count"] == 1
+    assert data["topics"][0]["has_mediation"] is False
+
+    # Der Fortschritt hängt mit drin (Punkte vergeben die Router, nicht die Services).
+    assert data["progress"]["total_points"] == 0
+    await prog.award(db, couple_id, user_a, "agreement_kept", ag["id"])
+    frisch = await dash.load_dashboard(db, couple_id, user_a)
+    assert frisch["progress"]["total_points"] == prog.POINTS["agreement_kept"][0]
+
+    with pytest.raises(HTTPException) as exc:
+        await dash.load_dashboard(db, couple_id, uuid.uuid4())
+    assert exc.value.status_code == 404
 
 
 # ── Brücken: aus dem Vorschlag wird etwas Verhandelbares ─────────────────────
