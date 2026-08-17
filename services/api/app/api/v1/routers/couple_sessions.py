@@ -287,11 +287,26 @@ async def schedule_session(
 
 # ── Gespräch ─────────────────────────────────────────────────────────────────
 
+async def _echo_turn(conn, echo_svc, session, link, opener: str) -> None:
+    """Ein Moderationsbeitrag von Echo — geteilt von Knopf und Ansprache im Chat."""
+    names = await css.load_member_names(conn, link)
+    contexts = await css.load_confirmed_contexts(conn, session["id"])
+    messages = await css.load_messages(conn, session["id"])
+    reply = await echo_svc.professional_chat(
+        user_message=opener,
+        shared_context=css.build_session_context(session, contexts, names),
+        history=css.build_history(messages, names),
+        prompt_file=_MODERATION_PROMPT,
+    )
+    await css.add_message(conn, session["id"], user_id=None, role="echo", content=reply)
+
+
 @router.post("/sessions/{session_id}/messages", response_model=CoupleSessionDetail)
 async def post_message(
-    session_id: UUID, body: CoupleMessageCreate,
+    session_id: UUID, body: CoupleMessageCreate, request: Request,
     current=Depends(get_current_user), pool=Depends(get_pool),
 ) -> CoupleSessionDetail:
+    """Schreibt in den Raum. Wird Echo dabei direkt angesprochen, antwortet es gleich mit."""
     user_id = current["user_id"]
     async with pool.acquire() as conn:
         session, link = await css.require_session(conn, session_id, user_id)
@@ -299,6 +314,21 @@ async def post_message(
             raise HTTPException(status_code=400, detail="Diese Sitzung ist abgeschlossen.")
         await css.add_message(conn, session_id, user_id=user_id, role="partner",
                               content=body.content)
+
+        # »Echo, was meinst du?« soll wirken wie ein Zuruf im Raum — nicht ins Leere gehen.
+        if css.addresses_echo(body.content):
+            await enforce_echo_prompt_limit(user_id, conn)
+            await _echo_turn(
+                conn, _echo(request), session, link,
+                "Du wurdest gerade im Raum direkt angesprochen. Antworte kurz und "
+                "allparteilich auf das, was zuletzt gesagt wurde, und gib das Gespräch "
+                "danach an die beiden zurück.",
+            )
+            if session["status"] == "draft":
+                session = await css.set_status(conn, session_id, user_id, "open")
+            await progress.award(conn, session["couple_id"], user_id,
+                                 "session_started", session_id)
+
         names = await css.load_member_names(conn, link)
         messages = await css.load_messages(conn, session_id)
         contexts = await css.load_confirmed_contexts(conn, session_id)
@@ -324,28 +354,18 @@ async def moderate(
         if session["status"] == "closed":
             raise HTTPException(status_code=400, detail="Diese Sitzung ist abgeschlossen.")
 
-        names = await css.load_member_names(conn, link)
-        contexts = await css.load_confirmed_contexts(conn, session_id)
-        messages = await css.load_messages(conn, session_id)
-
-        shared_context = css.build_session_context(session, contexts, names)
-        history = css.build_history(messages, names)
         opener = (
             "Eröffne die Sitzung: begrüße beide, fasse in ein, zwei Sätzen zusammen, worum es "
             "geht und was das Ziel ist, nenne kurz die Gesprächsregeln und stelle eine erste "
             "Frage."
-            if not history else
+            if not await css.load_messages(conn, session_id) else
             "Melde dich jetzt als Moderation zu Wort — kurz, allparteilich, mit einer "
-            "Beobachtung oder einer Frage."
+            "Beobachtung oder einer Frage. Gib das Gespräch danach an die beiden zurück."
         )
+        await _echo_turn(conn, echo_svc, session, link, opener)
 
-        reply = await echo_svc.professional_chat(
-            user_message=opener,
-            shared_context=shared_context,
-            history=history,
-            prompt_file=_MODERATION_PROMPT,
-        )
-        await css.add_message(conn, session_id, user_id=None, role="echo", content=reply)
+        names = await css.load_member_names(conn, link)
+        contexts = await css.load_confirmed_contexts(conn, session_id)
 
         if session["status"] == "draft":
             session = await css.set_status(conn, session_id, user_id, "open")

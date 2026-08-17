@@ -310,7 +310,28 @@ async def test_both_members_share_one_transcript(db):
     assert history[2]["content"].startswith("Rio: ")
 
 
-# ── Löschen (Art. 17) ────────────────────────────────────────────────────────
+# ── Echo im Gespräch ansprechen ──────────────────────────────────────────────
+
+async def test_echo_is_called_only_when_actually_addressed():
+    """»Echo, …« ruft die Moderation. Über Echo reden tut es nicht."""
+    ruft = [
+        "Echo, was meinst du dazu?",
+        "echo was denkst du",
+        "@Echo bitte einmal einhaken",
+        "  Echo: kannst du das spiegeln?",
+        "Und was sagst du, @echo?",
+    ]
+    ruft_nicht = [
+        "Das hat Echo vorhin schon gesagt.",
+        "Ich fand die Zusammenfassung von Echo gut.",
+        "Echos Frage hat mich getroffen.",       # kein eigenständiges Wort
+        "Mir ging es gestern schlecht.",
+        "",
+    ]
+    for text in ruft:
+        assert css.addresses_echo(text) is True, text
+    for text in ruft_nicht:
+        assert css.addresses_echo(text) is False, text
 
 async def _fill_room(db, user_a, user_b, couple_id):
     """Ein Raum mit Inhalt in allen Zweigen — Grundlage für die Löschtests."""

@@ -174,7 +174,7 @@ export default function CoupleSessionPage() {
                     }
                   }}
                   rows={3}
-                  placeholder="Schreib, was du sagen möchtest …"
+                  placeholder="Schreib, was du sagen möchtest … – oder beginne mit „Echo, …“, um die Moderation dazuzuholen."
                   className="input w-full resize-y"
                 />
                 <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -186,9 +186,10 @@ export default function CoupleSessionPage() {
                       type="button"
                       onClick={() => moderate.mutate()}
                       disabled={busy}
-                      className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50"
+                      className="btn !py-2 !px-4 !text-sm border-2 border-accent text-accent hover:bg-accent hover:text-white disabled:opacity-50"
+                      title="Echo meldet sich einmal zu Wort und gibt das Gespräch dann zurück."
                     >
-                      {moderate.isPending ? 'Echo denkt nach …' : 'Echo einbeziehen'}
+                      {moderate.isPending ? 'Echo denkt nach …' : 'Echo dazuholen'}
                     </button>
                   )}
                   <button
@@ -204,7 +205,9 @@ export default function CoupleSessionPage() {
                   >
                     Pause
                   </button>
-                  <span className="text-xs text-brand-muted">Beide sehen alles hier.</span>
+                  <span className="text-xs text-brand-muted">
+                    Beide sehen alles hier. Echo hört mit und meldet sich, wenn ihr es ruft.
+                  </span>
                 </div>
                 {(send.isError || moderate.isError) && (
                   <p className="mt-2 text-sm text-red-600">

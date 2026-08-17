@@ -13,6 +13,7 @@ Jeder Zugriff geht über ``require_session`` → ``require_couple_member`` (404 
 """
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from fastapi import HTTPException
@@ -266,6 +267,17 @@ async def load_messages(conn, session_id, limit: int | None = None) -> list[dict
     return msgs[-limit:] if limit else msgs
 
 
+def addresses_echo(text: str) -> bool:
+    """Spricht dieser Beitrag Echo direkt an?
+
+    Bewusst eng gefasst: nur am Satzanfang (»Echo, was meinst du?«) oder per »@Echo«.
+    Wer über Echo redet (»…, das hat Echo vorhin gesagt«), ruft es damit nicht herbei —
+    sonst würde die Moderation ungefragt in jedes zweite Wort platzen.
+    """
+    t = (text or "").strip().lower()
+    return bool(re.match(r"^@?echo\b", t)) or "@echo" in t
+
+
 def build_transcript(messages: list[dict], names: dict[str, str]) -> str:
     """Der gemeinsame Verlauf als lesbarer Text (für Zusammenfassung und Feedback)."""
     return "\n".join(
@@ -332,6 +344,7 @@ async def load_member_names(conn, link: dict) -> dict[str, str]:
 __all__ = [
     "MAX_CONTEXT_CHARS",
     "add_message",
+    "addresses_echo",
     "build_history",
     "build_session_context",
     "create_session",
