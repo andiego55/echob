@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import type { CouplePrivateThread } from './couplePrivate'
 
 /**
  * AI-Mediation nach dem Caucus-Modell.
@@ -60,4 +61,27 @@ export const coupleMediationApi = {
 
   setStatus: (topicId: string, status: CoupleTopic['status']) =>
     apiClient.post<CoupleTopic>(`/couple/topics/${topicId}/status`, { status }).then(r => r.data),
+
+  // ── Nach der Mediation ─────────────────────────────────────────────────────
+
+  /** Dein privater Dialog über dieses Thema – die andere Person sieht ihn nie. */
+  getPrivate: (topicId: string) =>
+    apiClient.get<CouplePrivateThread>(`/couple/topics/${topicId}/private`).then(r => r.data),
+
+  sendPrivate: (topicId: string, content: string) =>
+    apiClient.post<CouplePrivateThread>(`/couple/topics/${topicId}/private`, { content })
+      .then(r => r.data),
+
+  /** Entwurf einer Zusammenfassung – wird nicht gespeichert und nicht geteilt. */
+  summarizePrivate: (topicId: string) =>
+    apiClient.post<{ text: string }>(`/couple/topics/${topicId}/private/summary`)
+      .then(r => r.data.text),
+
+  /** Hängt den Text an deine offene Sicht an – ab dann sieht die andere Person ihn. */
+  share: (topicId: string, text: string) =>
+    apiClient.post<CoupleTopicDetail>(`/couple/topics/${topicId}/share`, { text }).then(r => r.data),
+
+  createSession: (topicId: string) =>
+    apiClient.post<{ session_id: string; created: boolean }>(`/couple/topics/${topicId}/session`)
+      .then(r => r.data),
 }

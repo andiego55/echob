@@ -216,7 +216,9 @@ async def load_confirmed_contexts(conn, session_id) -> list[dict]:
     return [_decrypt_context(dict(r)) for r in rows]
 
 
-def build_session_context(session: dict, contexts: list[dict], names: dict[str, str]) -> str:
+def build_session_context(
+    session: dict, contexts: list[dict], names: dict[str, str], mediation: str | None = None,
+) -> str:
     """DER Kontext für den Moderations-Echo — nichts als ausdrücklich Bestätigtes.
 
     Bewusst ein reiner String-Bau ohne DB-Zugriff: es gibt hier keine Stelle, an der
@@ -227,6 +229,14 @@ def build_session_context(session: dict, contexts: list[dict], names: dict[str, 
         parts.append(f"## Worum es geht\n{session['topic']}")
     if session.get("goal"):
         parts.append(f"## Ziel der beiden\n{session['goal']}")
+    if mediation:
+        # Stammt die Sitzung aus einer Mediation, liegt der Vorschlag mit auf dem Tisch —
+        # beide kennen ihn ohnehin.
+        parts.append(
+            "## Dein früherer Mediationsvorschlag zu diesem Thema\n"
+            "Beide haben ihn gelesen. Ihr sprecht jetzt darüber, was davon trägt.\n\n"
+            + mediation
+        )
 
     if contexts:
         parts.append("## Was die beiden für diese Sitzung mitgeteilt haben")

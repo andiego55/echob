@@ -310,6 +310,77 @@ async def test_both_members_share_one_transcript(db):
     assert history[2]["content"].startswith("Rio: ")
 
 
+# ── Nach der Mediation: privat sortieren, teilen, gemeinsam besprechen ───────
+
+async def test_topic_private_thread_stays_private(db):
+    """Der private Dialog ZUM THEMA gehört genauso nur einer Person."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+
+    await cps.add_topic_private_message(db, topic["id"], user_a, role="user",
+                                        content="NUR_ALEX")
+    await cps.add_topic_private_message(db, topic["id"], user_b, role="user", content="NUR_RIO")
+
+    alex = await cps.load_topic_private_messages(db, topic["id"], user_a)
+    rio = await cps.load_topic_private_messages(db, topic["id"], user_b)
+    assert [m["content"] for m in alex] == ["NUR_ALEX"]
+    assert [m["content"] for m in rio] == ["NUR_RIO"]
+
+
+async def test_topic_private_context_spares_the_partners_secret(db):
+    """Auch im Nachgang sieht Echo für mich nie den vertraulichen Beitrag der anderen."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic, link = await cms.require_topic(
+        db, (await cms.create_topic(db, couple_id, user_a, title="Geld"))["id"], user_a,
+    )
+    await cms.save_perspective(db, topic["id"], user_a, open_text="OFFEN_ALEX",
+                               private_text="GEHEIM_ALEX")
+    await cms.save_perspective(db, topic["id"], user_b, open_text="OFFEN_RIO",
+                               private_text="GEHEIM_RIO")
+    await cms.save_mediation(db, topic["id"], user_a, "VORSCHLAG")
+
+    ctx = await cps.build_topic_private_context(db, topic, link, user_a)
+    assert "OFFEN_ALEX" in ctx and "OFFEN_RIO" in ctx     # Offenes von beiden
+    assert "GEHEIM_ALEX" in ctx                            # das Eigene
+    assert "GEHEIM_RIO" not in ctx                         # nie das der anderen
+    assert "VORSCHLAG" in ctx                              # der Vorschlag liegt bei
+    assert "DESC_AAA" in ctx and "DESC_BBB" not in ctx     # eigener Fall, nicht der fremde
+
+
+async def test_sharing_appends_to_the_own_open_view(db):
+    """Teilen hängt an die EIGENE offene Sicht an — es überschreibt nichts."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_perspective(db, topic["id"], user_a, open_text="ERSTE_SICHT")
+
+    perspectives = await cms.load_perspectives(db, topic["id"])
+    own = perspectives[0]
+    neu = (own["open_text"] + "\n\n" + "NACH_DEM_NACHDENKEN").strip()
+    await cms.save_perspective(db, topic["id"], user_a, open_text=neu)
+
+    aktuell = (await cms.load_perspectives(db, topic["id"]))[0]
+    assert "ERSTE_SICHT" in aktuell["open_text"]
+    assert "NACH_DEM_NACHDENKEN" in aktuell["open_text"]
+
+
+async def test_session_from_topic_carries_the_proposal(db):
+    """Die Sitzung aus einem Thema legt Echo den Vorschlag mit auf den Tisch."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_mediation(db, topic["id"], user_a, "DREI_BRUECKEN")
+
+    session = await css.create_session(db, couple_id, user_a, title=topic["title"])
+    await db.execute("UPDATE couple_sessions SET topic_id = $2 WHERE id = $1",
+                     session["id"], topic["id"])
+
+    vorschlag = (await cms.list_mediations(db, topic["id"]))[0]["body"]
+    ctx = css.build_session_context(session, [], {str(user_a): "Alex"}, vorschlag)
+    assert "DREI_BRUECKEN" in ctx
+    # Ohne Mediation bleibt der Abschnitt weg.
+    assert "Mediationsvorschlag" not in css.build_session_context(
+        session, [], {str(user_a): "Alex"})
+
+
 # ── Echo im Gespräch ansprechen ──────────────────────────────────────────────
 
 async def test_echo_is_called_only_when_actually_addressed():

@@ -56,6 +56,16 @@ class CoupleMediation(BaseModel):
     created_at: datetime
 
 
+class CoupleShareDraft(BaseModel):
+    """Ein Text, der geteilt werden KANN — erst das Absenden macht ihn sichtbar."""
+    text: str = Field(..., min_length=1, max_length=4000)
+
+
+class CoupleSessionFromTopic(BaseModel):
+    session_id: UUID
+    created: bool
+
+
 class CoupleTopicDetail(BaseModel):
     topic: CoupleTopic
     perspectives: list[CouplePerspective]

@@ -12,6 +12,7 @@ import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import { apiErrorMessage } from '@/api/errors'
+import MediationFollowUp from '@/components/couple/MediationFollowUp'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
 
 export default function CoupleMediationPage() {
@@ -205,6 +206,8 @@ export default function CoupleMediationPage() {
             </div>
           )}
         </div>
+
+        {mediations.length > 0 && <MediationFollowUp topicId={topicId} />}
       </div>
     </AppShell>
   )

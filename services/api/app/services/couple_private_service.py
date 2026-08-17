@@ -123,6 +123,69 @@ async def add_private_message(conn, session_id, user_id, *, role, content, kind=
     return crypto.decrypt_fields(dict(row), "content")
 
 
+# ── Derselbe private Raum, aber zu einem Mediations-Thema ────────────────────
+
+async def load_topic_private_messages(conn, topic_id, user_id) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT * FROM couple_private_messages "
+        "WHERE topic_id = $1 AND user_id = $2 ORDER BY created_at",
+        topic_id, user_id,
+    )
+    return [crypto.decrypt_fields(dict(r), "content") for r in rows]
+
+
+async def add_topic_private_message(conn, topic_id, user_id, *, role, content, kind="chat") -> dict:
+    row = await conn.fetchrow(
+        "INSERT INTO couple_private_messages (topic_id, user_id, role, kind, content) "
+        "VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        topic_id, user_id, role, kind, crypto.encrypt(content),
+    )
+    return crypto.decrypt_fields(dict(row), "content")
+
+
+async def build_topic_private_context(conn, topic, link, user_id) -> str:
+    """Kontext des privaten Dialogs zu einem Thema.
+
+    Enthält: den eigenen Fallzusammenhang, das Thema, die OFFENEN Beiträge beider, den
+    EIGENEN vertraulichen Beitrag und Echos Mediationsvorschläge (die beide kennen).
+    Der vertrauliche Beitrag der anderen Person bleibt auch hier außen vor.
+    """
+    from app.services.couple_mediation_service import list_mediations, load_perspectives
+
+    names = await load_member_names(conn, link)
+    perspectives = await load_perspectives(conn, topic["id"])
+
+    parts = [f"# Thema der Mediation: {topic['title']}"]
+    if topic.get("description"):
+        parts.append(topic["description"])
+
+    parts.append("## Was offen gesagt wurde (beide kennen es)")
+    for p in perspectives:
+        if (p.get("open_text") or "").strip():
+            parts.append(f"### {names.get(str(p['user_id']), 'Person')}\n{p['open_text']}")
+
+    own = next((p for p in perspectives if str(p["user_id"]) == str(user_id)), None)
+    if own and (own.get("private_text") or "").strip():
+        parts.append(
+            "## Dein eigener vertraulicher Beitrag (nur du und ich kennen ihn)\n"
+            + own["private_text"]
+        )
+
+    mediations = await list_mediations(conn, topic["id"])
+    if mediations:
+        parts.append("## Echos Mediationsvorschlag (beide kennen ihn)\n" + mediations[0]["body"])
+
+    eigen = await load_own_case_context(conn, own_case_id(link, user_id), user_id)
+    if eigen:
+        parts += [
+            "# Dein eigener Zusammenhang (vertraulich, nur in diesem Dialog)",
+            "Nutze es zum Verstehen — gib es nicht als Zitat zurück, als wäre es im Raum "
+            "gesagt worden.",
+            eigen,
+        ]
+    return "\n\n".join(parts)
+
+
 def build_private_history(messages: list[dict]) -> list[dict[str, str]]:
     return [
         {"role": "assistant" if m["role"] == "echo" else "user", "content": m["content"]}

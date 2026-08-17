@@ -292,9 +292,17 @@ async def _echo_turn(conn, echo_svc, session, link, opener: str) -> None:
     names = await css.load_member_names(conn, link)
     contexts = await css.load_confirmed_contexts(conn, session["id"])
     messages = await css.load_messages(conn, session["id"])
+
+    # Stammt die Sitzung aus einer Mediation, gehört der Vorschlag in den Kontext.
+    mediation = None
+    if session.get("topic_id"):
+        from app.services.couple_mediation_service import list_mediations
+        vorschlaege = await list_mediations(conn, session["topic_id"])
+        mediation = vorschlaege[0]["body"] if vorschlaege else None
+
     reply = await echo_svc.professional_chat(
         user_message=opener,
-        shared_context=css.build_session_context(session, contexts, names),
+        shared_context=css.build_session_context(session, contexts, names, mediation),
         history=css.build_history(messages, names),
         prompt_file=_MODERATION_PROMPT,
     )

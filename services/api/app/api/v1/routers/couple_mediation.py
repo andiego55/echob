@@ -20,12 +20,16 @@ from app.core.dependencies import get_current_user, get_pool
 from app.schemas.couple_mediation import (
     CoupleMediation,
     CouplePerspectiveSave,
+    CoupleSessionFromTopic,
+    CoupleShareDraft,
     CoupleTopic,
     CoupleTopicCreate,
     CoupleTopicDetail,
     CoupleTopicStatus,
 )
+from app.schemas.couple_private import CouplePrivateMessageCreate, CouplePrivateThread
 from app.services import couple_mediation_service as cms
+from app.services import couple_private_service as cps
 from app.services import couple_progress_service as progress
 from app.services.couple_session_service import load_member_names
 from app.services.subscription_service import enforce_echo_prompt_limit
@@ -33,6 +37,8 @@ from app.services.subscription_service import enforce_echo_prompt_limit
 router = APIRouter(prefix="/couple", tags=["couple-mediation"])
 
 _MEDIATION_PROMPT = "echo_couple_mediation_prompt.md"
+# Der Nachgang zur Mediation laeuft im privaten Begleit-Modus.
+_PRIVATE_PROMPT = "echo_couple_private_prompt.md"
 
 
 def _echo(request: Request):
@@ -134,6 +140,129 @@ async def mediate(
         await cms.save_mediation(conn, topic_id, user_id, body)
         await progress.award(conn, topic["couple_id"], user_id, "mediation_done", topic_id)
         return await _detail(conn, topic, link, user_id)
+
+
+# ── Wie weiter? Drei Wege aus dem Vorschlag heraus ───────────────────────────
+
+@router.get("/topics/{topic_id}/private", response_model=CouplePrivateThread)
+async def get_topic_private(
+    topic_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CouplePrivateThread:
+    """Dein privater Dialog über dieses Thema. Die andere Person sieht ihn nie."""
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        await cms.require_topic(conn, topic_id, user_id)
+        msgs = await cps.load_topic_private_messages(conn, topic_id, user_id)
+    return CouplePrivateThread(messages=[cps.public_private_message(m) for m in msgs])
+
+
+@router.post("/topics/{topic_id}/private", response_model=CouplePrivateThread)
+async def post_topic_private(
+    topic_id: UUID, body: CouplePrivateMessageCreate, request: Request,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CouplePrivateThread:
+    """Den Vorschlag erst einmal für dich sortieren — mit deinem eigenen Zusammenhang."""
+    user_id = current["user_id"]
+    echo_svc = _echo(request)
+    async with pool.acquire() as conn:
+        await enforce_echo_prompt_limit(user_id, conn)
+        topic, link = await cms.require_topic(conn, topic_id, user_id)
+
+        await cps.add_topic_private_message(conn, topic_id, user_id, role="user",
+                                            content=body.content)
+        history = cps.build_private_history(
+            await cps.load_topic_private_messages(conn, topic_id, user_id)
+        )
+        context = await cps.build_topic_private_context(conn, topic, link, user_id)
+        reply = await echo_svc.professional_chat(
+            user_message=body.content, shared_context=context,
+            history=history[:-1], prompt_file=_PRIVATE_PROMPT,
+        )
+        await cps.add_topic_private_message(conn, topic_id, user_id, role="echo", content=reply)
+        msgs = await cps.load_topic_private_messages(conn, topic_id, user_id)
+    return CouplePrivateThread(messages=[cps.public_private_message(m) for m in msgs])
+
+
+@router.post("/topics/{topic_id}/private/summary", response_model=CoupleShareDraft)
+async def summarize_topic_private(
+    topic_id: UUID, request: Request,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleShareDraft:
+    """Fasst deinen privaten Dialog zu einem Text zusammen, den du teilen KÖNNTEST.
+
+    Der Entwurf wird nicht gespeichert und geht nirgendwohin — erst dein ausdrückliches
+    Teilen macht daraus etwas, das die andere Person sieht.
+    """
+    user_id = current["user_id"]
+    echo_svc = _echo(request)
+    async with pool.acquire() as conn:
+        await enforce_echo_prompt_limit(user_id, conn)
+        topic, _ = await cms.require_topic(conn, topic_id, user_id)
+        msgs = await cps.load_topic_private_messages(conn, topic_id, user_id)
+        if not msgs:
+            raise HTTPException(
+                status_code=400, detail="Sprich erst mit Echo, dann gibt es etwas zusammenzufassen.",
+            )
+        verlauf = "\n".join(
+            f"{'Echo' if m['role'] == 'echo' else 'Ich'}: {m['content']}" for m in msgs
+        )
+        draft = await echo_svc.professional_chat(
+            user_message=(
+                f"Thema: {topic['title']}\n\nMein privater Verlauf mit dir:\n{verlauf}\n\n"
+                "Fasse daraus in höchstens 150 Wörtern zusammen, was ich meiner Partnerperson "
+                "sagen möchte — in Ich-Botschaften, ohne Vorwürfe und ohne etwas aus diesem "
+                "Dialog preiszugeben, das ich für mich behalten will. Nur der Text, keine "
+                "Einleitung."
+            ),
+            shared_context="", history=[], prompt_file=_PRIVATE_PROMPT,
+        )
+    return CoupleShareDraft(text=draft)
+
+
+@router.post("/topics/{topic_id}/share", response_model=CoupleTopicDetail)
+async def share_to_topic(
+    topic_id: UUID, body: CoupleShareDraft,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleTopicDetail:
+    """Hängt deinen Text an deine OFFENE Sicht an — ab jetzt sieht die andere Person ihn."""
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        topic, link = await cms.require_topic(conn, topic_id, user_id)
+        perspectives = await cms.load_perspectives(conn, topic_id)
+        own = next((p for p in perspectives if str(p["user_id"]) == str(user_id)), None)
+        bisher = (own or {}).get("open_text") or ""
+        neu = (bisher + "\n\n" + body.text.strip()).strip() if bisher else body.text.strip()
+        await cms.save_perspective(conn, topic_id, user_id, open_text=neu)
+        return await _detail(conn, topic, link, user_id)
+
+
+@router.post("/topics/{topic_id}/session", response_model=CoupleSessionFromTopic, status_code=201)
+async def session_from_topic(
+    topic_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleSessionFromTopic:
+    """Macht aus dem Thema ein moderiertes Gespräch — mit dem Vorschlag auf dem Tisch."""
+    from app.services import couple_session_service as css
+
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        topic, _ = await cms.require_topic(conn, topic_id, user_id)
+        vorhanden = await conn.fetchval(
+            "SELECT id FROM couple_sessions WHERE topic_id = $1 ORDER BY created_at LIMIT 1",
+            topic_id,
+        )
+        if vorhanden:
+            return CoupleSessionFromTopic(session_id=vorhanden, created=False)
+
+        session = await css.create_session(
+            conn, topic["couple_id"], user_id,
+            title=topic["title"],
+            topic=topic.get("description"),
+            goal="Aus Echos Vorschlag etwas machen, das für uns beide trägt.",
+        )
+        await conn.execute(
+            "UPDATE couple_sessions SET topic_id = $2 WHERE id = $1", session["id"], topic_id,
+        )
+    return CoupleSessionFromTopic(session_id=session["id"], created=True)
 
 
 @router.post("/topics/{topic_id}/status", response_model=CoupleTopic)
