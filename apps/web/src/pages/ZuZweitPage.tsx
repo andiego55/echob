@@ -31,6 +31,33 @@ const STEPS = [
   },
 ]
 
+const TOOLS = [
+  {
+    title: 'Geführte Vorbereitung',
+    text: 'In fünf Schritten von „ich bin sauer“ zu einem Satz, der ankommt: Stimmungs-Check, eine Wertschätzung, dein Anliegen als Ich-Botschaft, eine konkrete Bitte.',
+  },
+  {
+    title: 'Mediation für Festgefahrenes',
+    text: 'Bei Themen, bei denen ihr feststeckt, schreibt jede:r eine offene und eine vertrauliche Sicht. Echo erarbeitet daraus drei konkrete Brücken – ohne das Vertrauliche preiszugeben.',
+  },
+  {
+    title: 'Tests, die ihr vergleicht',
+    text: 'Beide füllen denselben Test aus und legen die Ergebnisse nebeneinander. Kein Zeugnis: Unterschiede zeigen, wo ihr aneinander vorbeiredet.',
+  },
+  {
+    title: 'Abmachungen, die bleiben',
+    text: 'Was ihr vereinbart, haltet ihr fest – gültig erst, wenn beide zugestimmt haben. Später seht ihr, was gehalten hat.',
+  },
+  {
+    title: 'Zusammenfassung nach jedem Gespräch',
+    text: 'Echo hält fest, worum es ging, was deutlich wurde und was offen blieb. Zum Nachlesen, wenn die Erinnerung auseinandergeht.',
+  },
+  {
+    title: 'Sichtbarer Fortschritt',
+    text: 'Punkte, Serien und Meilensteine für das Dranbleiben – gemeinsam, ohne Rangliste. Am meisten zählt, eine Abmachung einzuhalten.',
+  },
+]
+
 const PRIVACY = [
   {
     icon: (
@@ -128,6 +155,25 @@ export default function ZuZweitPage() {
                 </span>
                 <p className="mt-3 text-[1rem] font-bold text-navy">{s.title}</p>
                 <p className="mt-1.5 text-[0.86rem] leading-relaxed text-brand-muted">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Werkzeuge im Paarraum ─────────────────────────────────── */}
+      <section className="bg-brand-bg px-6 py-20">
+        <div className="mx-auto max-w-[860px]">
+          <span className="label">Im Paarraum</span>
+          <h2 className="mt-2 text-[1.7rem] font-extrabold tracking-[-0.01em] text-navy">
+            Mehr als ein Chatfenster
+          </h2>
+
+          <div className="mt-9 grid gap-5 sm:grid-cols-2">
+            {TOOLS.map((t) => (
+              <div key={t.title} className="rounded-brand-lg border border-brand-border bg-white p-5 shadow-brand-sm">
+                <p className="text-[1rem] font-bold text-navy">{t.title}</p>
+                <p className="mt-1.5 text-[0.86rem] leading-relaxed text-brand-muted">{t.text}</p>
               </div>
             ))}
           </div>

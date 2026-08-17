@@ -13,6 +13,8 @@ import { coupleSessionsApi } from '@/api/coupleSessions'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import ProgressCard from '@/components/couple/ProgressCard'
+import CoupleOnboarding from '@/components/couple/CoupleOnboarding'
+import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import { coupleTestsApi } from '@/api/coupleTests'
 import { SELF_TESTS } from '@/selftests'
@@ -82,6 +84,8 @@ export default function CoupleRoomPage() {
           </p>
         </div>
 
+        <CoupleOnboarding coupleId={coupleId} />
+
         <ProgressCard coupleId={coupleId} />
 
         <SessionsCard coupleId={coupleId} />
@@ -109,6 +113,13 @@ export default function CoupleRoomPage() {
             {end.isPending ? 'Beende …' : 'Verbindung beenden'}
           </button>
         </div>
+
+        <CoupleSafetyNote />
+
+        <p className="text-center text-[0.7rem] leading-relaxed text-brand-muted">
+          EchoB ersetzt keine Paartherapie und keine Behandlung. Echo moderiert,
+          stellt keine Diagnosen und spricht keine Schuld zu.
+        </p>
       </div>
     </AppShell>
   )

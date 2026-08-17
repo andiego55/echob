@@ -170,6 +170,19 @@ export default function CoupleSessionPage() {
                       ? 'Echo denkt nach …'
                       : messages.length === 0 ? 'Echo eröffnen lassen' : 'Echo einbeziehen'}
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm('Kurze Pause einlegen? Beide sehen den Hinweis, und Echo greift auf.')) {
+                        send.mutate('Ich brauche eine kurze Pause.')
+                      }
+                    }}
+                    disabled={busy}
+                    className="text-xs text-brand-muted hover:text-navy disabled:opacity-50"
+                    title="Wenn es zu viel wird – weitermachen hilft dann niemandem."
+                  >
+                    Pause
+                  </button>
                   <span className="text-xs text-brand-muted">Beide sehen alles hier.</span>
                 </div>
               </form>
