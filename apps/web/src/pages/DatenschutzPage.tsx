@@ -128,7 +128,7 @@ export default function DatenschutzPage() {
             </p>
             <p className="text-brand-muted text-sm mb-3">
               Die dauerhafte Speicherung deiner Fallinhalte erfolgt verschlüsselt auf Servern in der EU
-              (Abschnitt 16). Für die KI-Verarbeitung werden die jeweils benötigten Inhalte in die USA
+              (Abschnitt 17). Für die KI-Verarbeitung werden die jeweils benötigten Inhalte in die USA
               übermittelt und dort in <strong className="text-navy">unverschlüsselter Form</strong> verarbeitet –
               sie müssen für das KI-Modell lesbar sein. Die Übertragung selbst erfolgt stets über
               transportverschlüsselte (TLS) Verbindungen. Wir setzen bewusst leistungsfähige, aktuelle
@@ -313,24 +313,75 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 12. Nutzung nur durch Volljährige */}
+          {/* 12. Paartherapie */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">12. Nutzung nur durch Volljährige</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">12. Paartherapie: der gemeinsame Raum zu zweit</h2>
+            <p className="text-brand-muted text-sm mb-3">
+              Du kannst dich mit einer anderen Person, die ebenfalls ein Konto hat, freiwillig zu einem
+              gemeinsamen <strong className="text-navy">Paarraum</strong> verbinden. Dazu erzeugt eine Seite
+              einen Kopplungscode, den die andere einlöst – die Verbindung entsteht also nur, wenn{' '}
+              <strong className="text-navy">beide aktiv zustimmen</strong>. Rechtsgrundlage: Art. 6 Abs. 1
+              lit. a / Art. 9 Abs. 2 lit. a DSGVO (Einwilligung).
+            </p>
+            <p className="text-brand-muted text-sm mb-3">
+              <strong className="text-navy">Eine Kopplung ist keine Freigabe.</strong> Sie gibt der anderen
+              Person keinen Zugriff auf deine Fälle, Szenen, Skalen, Berichte oder deine sonstigen Dialoge mit
+              Echo. Was Echo im Paarraum weiß, stellst du vorher selbst zusammen und gibst es ausdrücklich
+              frei.
+            </p>
+            <p className="text-brand-muted text-sm mb-2">Im Paarraum gibt es zwei Arten von Inhalten:</p>
+            <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5 mb-3">
+              <li>
+                <strong className="text-navy">Gemeinsame Inhalte</strong> – Gesprächsverläufe, freigegebene
+                Kontexte, Zusammenfassungen, Abmachungen, offene Perspektiven, gemeinsam ausgefüllte Tests.
+                Beide Personen sehen sie.
+              </li>
+              <li>
+                <strong className="text-navy">Vertrauliche Inhalte</strong> – dein privater Echo-Dialog, deine
+                vertrauliche Perspektive in der Mediation und deine Entwürfe vor der Freigabe. Die andere
+                Person sieht sie nicht und erfährt auch nicht, ob es sie gibt.
+              </li>
+            </ul>
+            <p className="text-brand-muted text-sm mb-3">
+              Beide Arten werden für die Erzeugung von Moderation, Mediation und Zusammenfassungen an unseren
+              KI-Anbieter übermittelt (Abschnitt 5). Vertraulich heißt also: vertraulich gegenüber der anderen
+              Person – nicht gegenüber dem KI-Anbieter. In der Mediation nutzt Echo deine vertrauliche
+              Perspektive als Hintergrund und ist angewiesen, sie im gemeinsamen Vorschlag nicht wiederzugeben.
+              Eine technische Garantie dafür können wir nicht geben; schreibe dort deshalb nichts hinein, dessen
+              Bekanntwerden für dich untragbar wäre.
+            </p>
+            <p className="text-brand-muted text-sm">
+              <strong className="text-navy">Beenden und Löschen:</strong> Jede Seite kann die Verbindung
+              jederzeit beenden – der Raum ist dann für beide geschlossen, die Inhalte bleiben zunächst
+              gespeichert. Zusätzlich kannst du die Inhalte des Raums endgültig löschen. Weil
+              Gesprächsverläufe, Abmachungen und Mediationen{' '}
+              <strong className="text-navy">euch beiden gemeinsam gehören</strong> und sich nicht nach Person
+              auftrennen lassen, wirkt diese Löschung{' '}
+              <strong className="text-navy">für beide Seiten</strong>; dasselbe gilt, wenn eine von euch ihr
+              Konto löscht. Willst du nur dein Eigenes entfernen, kannst du gezielt deine vertraulichen Inhalte
+              löschen – ausdrücklich Geteiltes bleibt dann bestehen.
+            </p>
+          </div>
+
+          {/* 13. Nutzung nur durch Volljährige */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">13. Nutzung nur durch Volljährige</h2>
             <p className="text-brand-muted text-sm">
               EchoB richtet sich ausschließlich an volljährige Personen (ab 18 Jahren). Mit der Nutzung
               bestätigst du, dass du volljährig bist.
             </p>
           </div>
 
-          {/* 13. Speicherdauer, Widerruf & Löschung */}
+          {/* 14. Speicherdauer, Widerruf & Löschung */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">13. Speicherdauer, Widerruf und Löschung</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">14. Speicherdauer, Widerruf und Löschung</h2>
             <p className="text-brand-muted text-sm mb-2">
               Wir speichern Daten nur so lange, wie es für den jeweiligen Zweck erforderlich ist:
             </p>
             <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5">
               <li><strong className="text-navy">Fall- und Reflexionsinhalte:</strong> bis zu deiner Löschung (einzelner Fall oder Konto).</li>
               <li><strong className="text-navy">Konto- und Anmeldedaten:</strong> für die Dauer des Kontos.</li>
+              <li><strong className="text-navy">Paarraum-Inhalte:</strong> bis eine der beiden Personen den Raum löscht oder ihr Konto löscht (Abschnitt 12).</li>
               <li><strong className="text-navy">KI-Übermittlungen:</strong> beim Anbieter bis zu 30 Tage (Missbrauchserkennung), danach Löschung (Abschnitt 5).</li>
               <li><strong className="text-navy">Audioaufnahmen:</strong> nur zur Transkription verarbeitet und nicht dauerhaft gespeichert.</li>
               <li><strong className="text-navy">Server- und Sicherheitsprotokolle:</strong> kurzfristig (in der Regel wenige Tage bis Wochen).</li>
@@ -351,9 +402,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 14. Cookies und Tracking */}
+          {/* 15. Cookies und Tracking */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">14. Cookies und Tracking</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">15. Cookies und Tracking</h2>
             <p className="text-brand-muted text-sm">
               EchoB verwendet <strong className="text-navy">keine Tracking-Cookies</strong>, kein Google Analytics
               und keine Werbedienste. Es werden nur technisch notwendige Daten verarbeitet (z. B. für die
@@ -362,9 +413,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 15. Deine Rechte */}
+          {/* 16. Deine Rechte */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">15. Deine Rechte</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">16. Deine Rechte</h2>
             <p className="text-brand-muted text-sm mb-3">
               Du hast hinsichtlich deiner personenbezogenen Daten folgende Rechte:
             </p>
@@ -384,9 +435,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 16. Datensicherheit */}
+          {/* 17. Datensicherheit */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">16. Datensicherheit</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">17. Datensicherheit</h2>
             <p className="text-brand-muted text-sm">
               Wir setzen technische und organisatorische Maßnahmen ein, um deine Daten gegen Verlust,
               Manipulation und unberechtigten Zugriff zu schützen. Dazu gehören:
@@ -405,9 +456,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 17. Änderungen */}
+          {/* 18. Änderungen */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">17. Änderungen dieser Erklärung</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">18. Änderungen dieser Erklärung</h2>
             <p className="text-brand-muted text-sm">
               Wir passen diese Datenschutzerklärung an, sobald sich die Rechtslage oder unsere Verarbeitungen
               ändern. Die jeweils aktuelle Version ist stets auf dieser Seite abrufbar.
