@@ -7,6 +7,12 @@ import { AxiosError } from 'axios'
  * sieht, hält die App für kaputt. Wenn der Server eine eigene Begründung mitschickt
  * (`detail`), gewinnt sie; sonst gibt es eine verständliche Erklärung nach Statuscode.
  */
+/** Standardtexte des Frameworks – tragen keine Information, die wir zeigen wollen. */
+const GENERIC_DETAILS = new Set([
+  'Not Found', 'Internal Server Error', 'Method Not Allowed',
+  'Unauthorized', 'Forbidden', 'Unprocessable Entity', 'Bad Request',
+])
+
 export function apiErrorMessage(err: unknown, fallback = 'Das hat leider nicht geklappt.'): string {
   const ax = err as AxiosError<{ detail?: string }> | undefined
 
@@ -17,7 +23,11 @@ export function apiErrorMessage(err: unknown, fallback = 'Das hat leider nicht g
   const status = ax?.response?.status
   const detail = ax?.response?.data?.detail
 
-  if (typeof detail === 'string' && detail.trim()) return detail
+  // Nur eine ECHTE Begründung gewinnt. FastAPIs Standardtexte („Not Found“ bei einer
+  // unbekannten Route) sagen der lesenden Person nichts – da ist unsere Erklärung besser.
+  if (typeof detail === 'string' && detail.trim() && !GENERIC_DETAILS.has(detail.trim())) {
+    return detail
+  }
 
   switch (status) {
     case 400: return 'Die Eingabe passt so nicht.'
