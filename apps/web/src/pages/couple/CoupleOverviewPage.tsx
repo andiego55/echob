@@ -6,7 +6,7 @@
  * Raum und gibt keinen Blick in den eigenen Fall frei.
  */
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
@@ -14,7 +14,6 @@ import { coupleApi, coupleInviteLink, formatCoupleCode } from '@/api/couple'
 import { apiErrorMessage } from '@/api/errors'
 import type { CoupleLink } from '@/api/couple'
 import IsolationNotice from '@/components/couple/IsolationNotice'
-import CoupleDashboard from '@/components/couple/CoupleDashboard'
 
 export default function CoupleOverviewPage() {
   const { data: links = [], isLoading, isError, error } = useQuery({
@@ -30,19 +29,23 @@ export default function CoupleOverviewPage() {
   const rooms = links.filter(l => l.status === 'active')
   const pending = links.filter(l => l.status === 'pending')
 
+  // Genau ein Raum? Dann führt „Zu zweit“ direkt hinein – samt Reiter-Navigation.
+  // Eine Zwischenseite mit einer einelementigen Liste kostet nur einen Klick.
+  if (rooms.length === 1) {
+    return <Navigate to={`/app/paar/${rooms[0].id}`} replace />
+  }
+
   return (
     <AppShell>
       <div className="mx-auto max-w-[900px] px-6 py-8 space-y-6">
         <div>
           <span className="label">Zu zweit</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">
-            {rooms.length === 1 && rooms[0].partner_display_name
-              ? `Mit ${rooms[0].partner_display_name}`
-              : 'Paartherapie'}
-          </h1>
+          <h1 className="mt-1 text-2xl font-bold text-navy">Paartherapie</h1>
+          {/* Ab hier gibt es keinen oder mehrere Räume – bei genau einem wurde oben
+              weitergeleitet. */}
           <p className="mt-2 text-sm text-brand-muted max-w-2xl">
-            {rooms.length > 0
-              ? 'Was gerade dran ist – und was warten kann.'
+            {rooms.length > 1
+              ? 'Wähle den Raum, in dem du weitermachen möchtest.'
               : 'Verbinde dich mit deiner Partnerin oder deinem Partner zu einem gemeinsamen Raum. '
                 + 'Dort begleitet Echo eure Gespräche als allparteiliche Moderation – vorbereitet, '
                 + 'strukturiert und in eurem Tempo.'}
@@ -58,19 +61,6 @@ export default function CoupleOverviewPage() {
           <LoadError error={error} />
         ) : (
           <>
-            {/* Genau ein Raum? Dann direkt hinein – eine Liste mit einem Eintrag hilft niemandem. */}
-            {rooms.length === 1 && (
-              <>
-                <CoupleDashboard coupleId={rooms[0].id} />
-                <Link
-                  to={`/app/paar/${rooms[0].id}`}
-                  className="btn-outline !py-2 !px-4 !text-sm inline-block"
-                >
-                  Alles im Paarraum ansehen
-                </Link>
-              </>
-            )}
-
             {rooms.length > 1 && (
               <div className="space-y-3">
                 <h2 className="text-sm font-bold text-navy">Eure Paarräume</h2>

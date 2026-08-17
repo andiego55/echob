@@ -71,23 +71,24 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         </div>
       )}
 
-      {/* ── Dein persönlicher Begleiter ───────────────────────────── */}
-      <Link
-        to={`/app/paar/${coupleId}/echo`}
-        className="card block border-l-4 border-l-navy/30 no-underline transition hover:shadow-brand"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-sm font-bold text-navy">Mit Echo sprechen</h2>
-            <p className="mt-1 text-xs text-brand-muted">
-              Nur für dich. Echo kennt hier deinen eigenen Zusammenhang und was in eurem
-              Raum läuft – und hilft dir, das nächste Thema zu finden oder die richtigen
-              Worte dafür.
-            </p>
-          </div>
-          <span className="shrink-0 text-sm text-accent">Öffnen →</span>
-        </div>
-      </Link>
+      {/* ── Womit weitermachen ────────────────────────────────────── */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        <QuickAction
+          to={`/app/paar/${coupleId}/echo`}
+          title="Mit Echo sprechen"
+          text="Nur für dich – findet das nächste Thema und die richtigen Worte."
+        />
+        <QuickAction
+          to={`/app/paar/${coupleId}/gespraeche`}
+          title="Gespräch beginnen"
+          text="Ein Thema, ein Ziel, moderiert von Echo."
+        />
+        <QuickAction
+          to={`/app/paar/${coupleId}/mediation`}
+          title="Thema klären"
+          text="Für alles, bei dem ihr feststeckt."
+        />
+      </div>
 
       {/* ── Zahlen auf einen Blick ────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -192,6 +193,21 @@ function ItemRow({ item, highlight = false }: { item: CoupleDashboardItem; highl
   return item.target
     ? <Link to={item.target} className={cls}>{inner}</Link>
     : <div className={cls}>{inner}</div>
+}
+
+function QuickAction({ to, title, text }: { to: string; title: string; text: string }) {
+  return (
+    <Link
+      to={to}
+      className="group rounded-brand-lg border border-brand-border bg-white p-4 no-underline shadow-brand-sm transition-all hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-brand"
+    >
+      <p className="text-sm font-bold text-navy">{title}</p>
+      <p className="mt-1 text-[0.72rem] leading-snug text-brand-muted">{text}</p>
+      <span className="mt-2 inline-flex items-center gap-1 text-[0.72rem] font-semibold text-accent">
+        Öffnen<span className="transition-transform group-hover:translate-x-0.5">→</span>
+      </span>
+    </Link>
+  )
 }
 
 function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
