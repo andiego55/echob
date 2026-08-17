@@ -42,16 +42,17 @@ async def list_summaries(conn, session_id, user_id) -> list[dict]:
 
 # ── Abmachungen ──────────────────────────────────────────────────────────────
 
-async def propose(conn, couple_id, user_id, *, body: str, session_id=None, due_at=None) -> dict:
+async def propose(conn, couple_id, user_id, *, body: str, session_id=None, due_at=None,
+                  topic_id=None) -> dict:
     """Schlägt eine Abmachung vor. Sie gilt erst, wenn die andere Person zustimmt."""
     await require_couple_member(conn, couple_id, user_id)
     text = body.strip()
     if not text:
         raise HTTPException(status_code=400, detail="Die Abmachung braucht einen Text.")
     row = await conn.fetchrow(
-        "INSERT INTO couple_agreements (couple_id, session_id, body, proposed_by, due_at) "
-        "VALUES ($1, $2, $3, $4, $5) RETURNING *",
-        couple_id, session_id, crypto.encrypt(text), user_id, due_at,
+        "INSERT INTO couple_agreements (couple_id, session_id, topic_id, body, proposed_by, "
+        "due_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+        couple_id, session_id, topic_id, crypto.encrypt(text), user_id, due_at,
     )
     return crypto.decrypt_fields(dict(row), "body")
 

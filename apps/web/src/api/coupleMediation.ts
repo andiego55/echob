@@ -36,11 +36,36 @@ export interface CoupleMediation {
   created_at: string
 }
 
+/** Ein verhandelbarer Vorschlag aus Echos Mediation. */
+export interface CoupleBridge {
+  id: string
+  position: number
+  title: string | null
+  body: string
+  status: 'open' | 'accepted' | 'dropped'
+  /** null = noch im Original von Echo, sonst wer zuletzt geändert hat. */
+  updated_by: string | null
+  note: string | null
+  agreement_id: string | null
+  updated_at: string
+}
+
+export interface CoupleTopicMessage {
+  id: string
+  role: 'partner' | 'echo'
+  user_id: string | null
+  speaker: string
+  content: string
+  created_at: string
+}
+
 export interface CoupleTopicDetail {
   topic: CoupleTopic
   perspectives: CouplePerspective[]
   mediations: CoupleMediation[]
   both_sides_ready: boolean
+  bridges: CoupleBridge[]
+  messages: CoupleTopicMessage[]
 }
 
 export const coupleMediationApi = {
@@ -61,6 +86,27 @@ export const coupleMediationApi = {
 
   setStatus: (topicId: string, status: CoupleTopic['status']) =>
     apiClient.post<CoupleTopic>(`/couple/topics/${topicId}/status`, { status }).then(r => r.data),
+
+  // ── Brücken verhandeln ─────────────────────────────────────────────────────
+
+  updateBridge: (bridgeId: string, body: { title?: string | null; body?: string }) =>
+    apiClient.patch<CoupleTopicDetail>(`/couple/bridges/${bridgeId}`, body).then(r => r.data),
+
+  acceptBridge: (bridgeId: string) =>
+    apiClient.post<CoupleTopicDetail>(`/couple/bridges/${bridgeId}/accept`).then(r => r.data),
+
+  dropBridge: (bridgeId: string, note?: string | null) =>
+    apiClient.post<CoupleTopicDetail>(`/couple/bridges/${bridgeId}/drop`, { note: note ?? null })
+      .then(r => r.data),
+
+  // ── Gemeinsame Diskussion am Thema ─────────────────────────────────────────
+
+  postMessage: (topicId: string, content: string) =>
+    apiClient.post<CoupleTopicDetail>(`/couple/topics/${topicId}/messages`, { content })
+      .then(r => r.data),
+
+  callEcho: (topicId: string) =>
+    apiClient.post<CoupleTopicDetail>(`/couple/topics/${topicId}/messages/echo`).then(r => r.data),
 
   // ── Nach der Mediation ─────────────────────────────────────────────────────
 

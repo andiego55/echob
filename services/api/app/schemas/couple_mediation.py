@@ -66,8 +66,41 @@ class CoupleSessionFromTopic(BaseModel):
     created: bool
 
 
+class CoupleBridge(BaseModel):
+    """Ein verhandelbarer Vorschlag aus Echos Mediation."""
+    id: UUID
+    position: int
+    title: str | None = None
+    body: str
+    status: str                       # open | accepted | dropped
+    updated_by: UUID | None = None    # None = noch im Original von Echo
+    note: str | None = None
+    agreement_id: UUID | None = None
+    updated_at: datetime
+
+
+class CoupleBridgeUpdate(BaseModel):
+    title: str | None = Field(None, max_length=120)
+    body: str | None = Field(None, min_length=1, max_length=1500)
+
+
+class CoupleBridgeDrop(BaseModel):
+    note: str | None = Field(None, max_length=500)
+
+
+class CoupleTopicMessage(BaseModel):
+    id: UUID
+    role: str                         # partner | echo
+    user_id: UUID | None = None
+    speaker: str
+    content: str
+    created_at: datetime
+
+
 class CoupleTopicDetail(BaseModel):
     topic: CoupleTopic
     perspectives: list[CouplePerspective]
     mediations: list[CoupleMediation]
     both_sides_ready: bool
+    bridges: list[CoupleBridge] = []
+    messages: list[CoupleTopicMessage] = []

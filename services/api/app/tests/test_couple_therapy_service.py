@@ -310,6 +310,83 @@ async def test_both_members_share_one_transcript(db):
     assert history[2]["content"].startswith("Rio: ")
 
 
+# ── Brücken: aus dem Vorschlag wird etwas Verhandelbares ─────────────────────
+
+async def test_bridges_are_read_out_of_echos_answer():
+    """Die Brücken werden robust gelesen — auch mit Rahmentext und Codeblock."""
+    sauber = '[{"title": "Sonntagsritual", "body": "Wir reden sonntags 20 Minuten."}]'
+    mit_rahmen = 'Klar, hier:\n```json\n' + sauber + '\n```\nViel Erfolg!'
+    for raw in (sauber, mit_rahmen):
+        bruecken = cms.parse_bridges(raw)
+        assert len(bruecken) == 1
+        assert bruecken[0]["title"] == "Sonntagsritual"
+        assert "20 Minuten" in bruecken[0]["body"]
+
+    # Unbrauchbares ergibt keine Brücken statt einen Absturz.
+    for raw in ("", "Dafür braucht es Hilfe.", "[]", "{kaputt", None):
+        assert cms.parse_bridges(raw) == []
+
+    # Einträge ohne Text fallen raus, ein fehlender Titel bekommt einen Ersatz.
+    gemischt = '[{"body": "Ohne Titel."}, {"title": "Leer", "body": "  "}]'
+    bruecken = cms.parse_bridges(gemischt)
+    assert len(bruecken) == 1 and bruecken[0]["title"] == "Vorschlag"
+
+
+async def test_new_mediation_spares_bridges_the_couple_worked_on(db):
+    """Ein neuer Vorschlag ersetzt nur Unangetastetes — Verhandeltes bleibt stehen."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+
+    await cms.save_bridges(db, topic["id"], [
+        {"title": "A", "body": "Original A"}, {"title": "B", "body": "Original B"},
+    ])
+    bruecken = await cms.list_bridges(db, topic["id"])
+    await cms.update_bridge(db, bruecken[0]["id"], user_a, body="Von mir geändert")
+
+    await cms.save_bridges(db, topic["id"], [{"title": "C", "body": "Neu aus Vorschlag 2"}])
+    jetzt = await cms.list_bridges(db, topic["id"])
+    texte = [b["body"] for b in jetzt]
+    assert "Von mir geändert" in texte      # bearbeitete Brücke überlebt
+    assert "Original B" not in texte        # unangetastete weicht
+    assert "Neu aus Vorschlag 2" in texte
+
+
+async def test_editing_a_bridge_records_who_did_it(db):
+    """Ändern ist ein Gegenvorschlag — man sieht, wer zuletzt daran war."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_bridges(db, topic["id"], [{"title": "A", "body": "Original"}])
+    bridge = (await cms.list_bridges(db, topic["id"]))[0]
+    assert bridge["updated_by"] is None       # Original von Echo
+
+    geaendert = await cms.update_bridge(db, bridge["id"], user_b, body="Rios Gegenvorschlag")
+    assert geaendert["body"] == "Rios Gegenvorschlag"
+    assert str(geaendert["updated_by"]) == str(user_b)
+
+
+async def test_bridges_are_closed_to_outsiders(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_bridges(db, topic["id"], [{"title": "A", "body": "Original"}])
+    bridge = (await cms.list_bridges(db, topic["id"]))[0]
+    with pytest.raises(HTTPException) as exc:
+        await cms.update_bridge(db, bridge["id"], uuid.uuid4(), body="fremd")
+    assert exc.value.status_code == 404
+
+
+async def test_topic_discussion_is_shared(db):
+    """Der Diskussionsfaden am Thema gehört beiden — anders als der private Dialog."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.add_topic_message(db, topic["id"], user_id=user_a, role="partner", content="Ich finde B gut.")
+    await cms.add_topic_message(db, topic["id"], user_id=None, role="echo", content="Was fehlt dir an A?")
+    await cms.add_topic_message(db, topic["id"], user_id=user_b, role="partner", content="Mir auch.")
+
+    msgs = await cms.load_topic_messages(db, topic["id"])
+    assert [m["role"] for m in msgs] == ["partner", "echo", "partner"]
+    assert msgs[1]["user_id"] is None
+
+
 # ── Nach der Mediation: privat sortieren, teilen, gemeinsam besprechen ───────
 
 async def test_topic_private_thread_stays_private(db):
