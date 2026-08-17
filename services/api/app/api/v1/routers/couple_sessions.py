@@ -25,9 +25,13 @@ from app.schemas.couple_session import (
     CoupleContextResponse,
     CoupleContextSave,
     CoupleMessageCreate,
+    CoupleRephraseRequest,
+    CoupleRephraseResponse,
     CoupleSessionCreate,
     CoupleSessionDetail,
+    CoupleSessionRespond,
     CoupleSessionResponse,
+    CoupleSessionSchedule,
     CoupleSessionStatus,
     CoupleSessionUpdate,
 )
@@ -41,6 +45,8 @@ router = APIRouter(prefix="/couple", tags=["couple-sessions"])
 _MODERATION_PROMPT = "echo_couple_session_prompt.md"
 # Der Entwurf ist eine PRIVATE Schreibhilfe für eine Person — nicht die Moderation im Raum.
 _CONTEXT_PROMPT = "echo_couple_context_prompt.md"
+# Formulierhilfe im Vorbereitungs-Assistenten — privat, nichts wird gespeichert.
+_REPHRASE_PROMPT = "echo_couple_rephrase_prompt.md"
 
 
 def _echo(request: Request):
@@ -50,12 +56,26 @@ def _echo(request: Request):
     return svc
 
 
+def _context_out(c: dict, names: dict[str, str]) -> dict:
+    """Ein bestätigter Beitrag, wie ihn beide im Raum sehen."""
+    return {
+        "user_id": c["user_id"],
+        "name": names.get(str(c["user_id"]), "Person"),
+        "text": c["confirmed_text"],
+        "mood": c.get("mood"),
+        "appreciation": c.get("appreciation"),
+    }
+
+
 def _session_out(session: dict) -> CoupleSessionResponse:
     return CoupleSessionResponse(
         id=session["id"], couple_id=session["couple_id"], created_by=session["created_by"],
         title=session["title"], topic=session.get("topic"), goal=session.get("goal"),
         status=session["status"], created_at=session["created_at"],
         opened_at=session.get("opened_at"), closed_at=session.get("closed_at"),
+        proposed_at=session.get("proposed_at"), accepted_by=session.get("accepted_by"),
+        accepted_at=session.get("accepted_at"), declined_at=session.get("declined_at"),
+        scheduled_for=session.get("scheduled_for"),
     )
 
 
@@ -98,11 +118,7 @@ async def get_session(
         members=[{"user_id": uid, "name": name} for uid, name in names.items()],
         messages=[css.public_message(m, names) for m in messages],
         # Bestätigte Beiträge sind im Raum bewusst für beide sichtbar.
-        contexts=[
-            {"user_id": c["user_id"], "name": names.get(str(c["user_id"]), "Person"),
-             "text": c["confirmed_text"]}
-            for c in contexts
-        ],
+        contexts=[_context_out(c, names) for c in contexts],
     )
 
 
@@ -145,6 +161,9 @@ async def get_context(
         confirmed_at=(ctx or {}).get("confirmed_at"),
         available_elements=ccs.ELEMENT_LABELS,
         max_chars=css.MAX_CONTEXT_CHARS,
+        mood=(ctx or {}).get("mood"),
+        appreciation=(ctx or {}).get("appreciation"),
+        moods=css.MOOD_LABELS,
     )
 
 
@@ -182,6 +201,7 @@ async def draft_context(
         source_elements=list(ctx.get("source_elements") or []),
         confirmed_at=ctx.get("confirmed_at"),
         available_elements=ccs.ELEMENT_LABELS, max_chars=css.MAX_CONTEXT_CHARS,
+        mood=ctx.get("mood"), appreciation=ctx.get("appreciation"), moods=css.MOOD_LABELS,
     )
 
 
@@ -195,7 +215,7 @@ async def save_context(
         ctx = await css.save_context(
             conn, session_id, user_id,
             draft_text=body.draft_text, confirmed_text=body.confirmed_text,
-            instruction=body.instruction,
+            instruction=body.instruction, mood=body.mood, appreciation=body.appreciation,
         )
         if body.confirmed_text:
             session, _ = await css.require_session(conn, session_id, user_id)
@@ -207,7 +227,62 @@ async def save_context(
         source_elements=list(ctx.get("source_elements") or []),
         confirmed_at=ctx.get("confirmed_at"),
         available_elements=ccs.ELEMENT_LABELS, max_chars=css.MAX_CONTEXT_CHARS,
+        mood=ctx.get("mood"), appreciation=ctx.get("appreciation"), moods=css.MOOD_LABELS,
     )
+
+
+@router.post("/sessions/{session_id}/rephrase", response_model=CoupleRephraseResponse)
+async def rephrase(
+    session_id: UUID, body: CoupleRephraseRequest, request: Request,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleRephraseResponse:
+    """Ich-Botschaften-Coach: formt einen Vorwurf um. Nur für dich, wird nicht gespeichert."""
+    user_id = current["user_id"]
+    echo_svc = _echo(request)
+    async with pool.acquire() as conn:
+        await enforce_echo_prompt_limit(user_id, conn)
+        await css.require_session(conn, session_id, user_id)
+        suggestion = await echo_svc.professional_chat(
+            user_message=body.text,
+            shared_context="",
+            history=[],
+            prompt_file=_REPHRASE_PROMPT,
+        )
+    return CoupleRephraseResponse(suggestion=suggestion)
+
+
+# ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────
+
+@router.post("/sessions/{session_id}/propose", response_model=CoupleSessionResponse)
+async def propose_session(
+    session_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleSessionResponse:
+    """Schlägt der anderen Person das vorbereitete Gespräch vor."""
+    async with pool.acquire() as conn:
+        session = await css.propose(conn, session_id, current["user_id"])
+    return _session_out(session)
+
+
+@router.post("/sessions/{session_id}/respond", response_model=CoupleSessionResponse)
+async def respond_session(
+    session_id: UUID, body: CoupleSessionRespond,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleSessionResponse:
+    """Nimmt einen Vorschlag an oder lehnt ihn ab — nur die jeweils andere Person."""
+    async with pool.acquire() as conn:
+        session = await css.respond(conn, session_id, current["user_id"], body.accept)
+    return _session_out(session)
+
+
+@router.post("/sessions/{session_id}/schedule", response_model=CoupleSessionResponse)
+async def schedule_session(
+    session_id: UUID, body: CoupleSessionSchedule,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleSessionResponse:
+    """Die Dialogeinladung: setzt einen Zeitpunkt (oder hebt ihn auf)."""
+    async with pool.acquire() as conn:
+        session = await css.schedule(conn, session_id, current["user_id"], body.scheduled_for)
+    return _session_out(session)
 
 
 # ── Gespräch ─────────────────────────────────────────────────────────────────
@@ -231,11 +306,7 @@ async def post_message(
         session=_session_out(session),
         members=[{"user_id": uid, "name": name} for uid, name in names.items()],
         messages=[css.public_message(m, names) for m in messages],
-        contexts=[
-            {"user_id": c["user_id"], "name": names.get(str(c["user_id"]), "Person"),
-             "text": c["confirmed_text"]}
-            for c in contexts
-        ],
+        contexts=[_context_out(c, names) for c in contexts],
     )
 
 
@@ -285,9 +356,5 @@ async def moderate(
         session=_session_out(session),
         members=[{"user_id": uid, "name": name} for uid, name in names.items()],
         messages=[css.public_message(m, names) for m in messages],
-        contexts=[
-            {"user_id": c["user_id"], "name": names.get(str(c["user_id"]), "Person"),
-             "text": c["confirmed_text"]}
-            for c in contexts
-        ],
+        contexts=[_context_out(c, names) for c in contexts],
     )

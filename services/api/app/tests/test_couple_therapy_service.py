@@ -309,6 +309,84 @@ async def test_both_members_share_one_transcript(db):
     assert history[2]["content"].startswith("Rio: ")
 
 
+# ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────
+
+async def test_only_the_other_person_answers_a_proposal(db):
+    """Auf den eigenen Vorschlag antwortet man nicht selbst."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    proposed = await css.propose(db, session["id"], user_a)
+    assert proposed["status"] == "proposed" and proposed["proposed_at"] is not None
+
+    with pytest.raises(HTTPException) as exc:
+        await css.respond(db, session["id"], user_a, True)
+    assert exc.value.status_code == 400
+
+    accepted = await css.respond(db, session["id"], user_b, True)
+    assert str(accepted["accepted_by"]) == str(user_b)
+    assert accepted["accepted_at"] is not None
+
+
+async def test_declined_proposal_returns_to_preparation(db):
+    """Ein abgelehnter Vorschlag verschwindet nicht, er geht zurück in die Vorbereitung."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    await css.propose(db, session["id"], user_a)
+    declined = await css.respond(db, session["id"], user_b, False)
+    assert declined["status"] == "draft"
+    assert declined["declined_at"] is not None and declined["accepted_by"] is None
+
+    # Erneut vorschlagen ist möglich; die Ablehnung wird dabei zurückgesetzt.
+    again = await css.propose(db, session["id"], user_a)
+    assert again["status"] == "proposed" and again["declined_at"] is None
+
+
+async def test_respond_needs_an_open_proposal(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    with pytest.raises(HTTPException) as exc:
+        await css.respond(db, session["id"], user_b, True)
+    assert exc.value.status_code == 400
+
+
+async def test_schedule_sets_and_clears_the_date(db):
+    from datetime import UTC, datetime, timedelta
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    when = datetime.now(UTC) + timedelta(days=2)
+
+    booked = await css.schedule(db, session["id"], user_a, when)
+    assert booked["scheduled_for"] is not None
+    cleared = await css.schedule(db, session["id"], user_a, None)
+    assert cleared["scheduled_for"] is None
+
+
+async def test_checkin_reaches_echo_but_stays_optional(db):
+    """Stimmung und Wertschätzung landen im Sitzungs-Kontext — beide sehen sie."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    await css.save_context(
+        db, session["id"], user_a,
+        confirmed_text="Mir geht es um gemeinsame Zeit.",
+        mood="angespannt", appreciation="Du hörst mir zu, wenn ich müde bin.",
+    )
+    contexts = await css.load_confirmed_contexts(db, session["id"])
+    ctx = css.build_session_context(
+        session, contexts, {str(user_a): "Alex", str(user_b): "Rio"},
+    )
+    assert "angespannt" in ctx
+    assert "Du hörst mir zu, wenn ich müde bin." in ctx
+
+    # Ohne Check-in bleibt der Kontext schlicht — nichts wird erzwungen.
+    session2 = await css.create_session(db, couple_id, user_a, title="Anderes")
+    await css.save_context(db, session2["id"], user_a, confirmed_text="Nur Text.")
+    ctx2 = css.build_session_context(
+        session2, await css.load_confirmed_contexts(db, session2["id"]),
+        {str(user_a): "Alex"},
+    )
+    assert "Stimmung" not in ctx2 and "schätzt an" not in ctx2
+
+
 # ── Punkte & Fortschritt ─────────────────────────────────────────────────────
 
 async def test_points_count_once_per_action(db):

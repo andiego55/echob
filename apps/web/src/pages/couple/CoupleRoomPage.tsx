@@ -20,6 +20,7 @@ import { isCoupleSafe } from '@/selftests/couple'
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'In Vorbereitung',
+  proposed: 'Vorgeschlagen',
   open: 'Läuft',
   closed: 'Abgeschlossen',
 }
@@ -315,10 +316,18 @@ function SessionsCard({ coupleId }: { coupleId: string }) {
             >
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-navy">{s.title}</p>
-                {s.goal && <p className="mt-0.5 truncate text-xs text-brand-muted">Ziel: {s.goal}</p>}
+                {s.scheduled_for
+                  ? <p className="mt-0.5 truncate text-xs text-accent">
+                      Verabredet: {new Date(s.scheduled_for).toLocaleString('de-DE')}
+                    </p>
+                  : s.goal && <p className="mt-0.5 truncate text-xs text-brand-muted">Ziel: {s.goal}</p>}
               </div>
-              <span className="shrink-0 rounded-full bg-brand-bg px-2.5 py-0.5 text-[0.65rem] font-semibold text-brand-muted">
-                {STATUS_LABELS[s.status] ?? s.status}
+              <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold ${
+                s.status === 'proposed' && !s.accepted_at
+                  ? 'bg-accent/10 text-accent'
+                  : 'bg-brand-bg text-brand-muted'
+              }`}>
+                {s.accepted_at && s.status === 'proposed' ? 'Zugesagt' : STATUS_LABELS[s.status] ?? s.status}
               </span>
             </Link>
           ))}

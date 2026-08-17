@@ -25,6 +25,16 @@ MAX_CONTEXT_CHARS = 6000
 # So viele Beiträge bekommt Echo als Verlauf mit.
 HISTORY_LIMIT = 40
 
+# Stimmungs-Check vor dem Gespräch (Kürzel → Klartext für Echo und Anzeige).
+MOOD_LABELS: dict[str, str] = {
+    "ruhig":       "ruhig und offen",
+    "angespannt":  "angespannt",
+    "traurig":     "traurig",
+    "wuetend":     "wütend",
+    "erschoepft":  "erschöpft",
+    "hoffnungsvoll": "hoffnungsvoll",
+}
+
 
 async def create_session(conn, couple_id, user_id, *, title, topic=None, goal=None) -> dict:
     """Legt eine Sitzung im Paarraum an (Status ``draft`` = in Vorbereitung)."""
@@ -72,7 +82,7 @@ async def update_session(conn, session_id, user_id, *, title=None, topic=None, g
 
 async def set_status(conn, session_id, user_id, status: str) -> dict:
     """``open`` startet die Sitzung, ``closed`` schließt sie ab."""
-    if status not in ("draft", "open", "closed"):
+    if status not in ("draft", "proposed", "open", "closed"):
         raise HTTPException(status_code=400, detail="Unbekannter Status.")
     await require_session(conn, session_id, user_id)
     row = await conn.fetchrow(
@@ -81,6 +91,56 @@ async def set_status(conn, session_id, user_id, status: str) -> dict:
         "closed_at = CASE WHEN $2 = 'closed' THEN NOW() ELSE NULL END "
         "WHERE id = $1 RETURNING *",
         session_id, status,
+    )
+    return _decrypt_session(dict(row))
+
+
+# ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────
+
+async def propose(conn, session_id, user_id) -> dict:
+    """Schlägt der anderen Person das Gespräch vor (aus der eigenen Vorbereitung heraus)."""
+    session, _ = await require_session(conn, session_id, user_id)
+    if session["status"] not in ("draft", "proposed"):
+        raise HTTPException(status_code=400, detail="Dieses Gespräch läuft schon.")
+    row = await conn.fetchrow(
+        "UPDATE couple_sessions SET status = 'proposed', proposed_at = NOW(), "
+        "declined_at = NULL WHERE id = $1 RETURNING *",
+        session_id,
+    )
+    return _decrypt_session(dict(row))
+
+
+async def respond(conn, session_id, user_id, accept: bool) -> dict:
+    """Annehmen oder ablehnen — bewusst nur durch die jeweils ANDERE Person."""
+    session, link = await require_session(conn, session_id, user_id)
+    if session["status"] != "proposed":
+        raise HTTPException(status_code=400, detail="Hier steht gerade kein Vorschlag offen.")
+    if str(session["created_by"]) == str(user_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Auf deinen eigenen Vorschlag antwortet die andere Person.",
+        )
+    if accept:
+        row = await conn.fetchrow(
+            "UPDATE couple_sessions SET accepted_by = $2, accepted_at = NOW(), "
+            "declined_at = NULL WHERE id = $1 RETURNING *",
+            session_id, user_id,
+        )
+    else:
+        row = await conn.fetchrow(
+            "UPDATE couple_sessions SET status = 'draft', declined_at = NOW(), "
+            "accepted_by = NULL, accepted_at = NULL WHERE id = $1 RETURNING *",
+            session_id,
+        )
+    return _decrypt_session(dict(row))
+
+
+async def schedule(conn, session_id, user_id, when) -> dict:
+    """Setzt (oder löscht) die Verabredung — die Dialogeinladung mit Zeitpunkt."""
+    await require_session(conn, session_id, user_id)
+    row = await conn.fetchrow(
+        "UPDATE couple_sessions SET scheduled_for = $2 WHERE id = $1 RETURNING *",
+        session_id, when,
     )
     return _decrypt_session(dict(row))
 
@@ -100,6 +160,7 @@ async def get_own_context(conn, session_id, user_id) -> dict | None:
 async def save_context(
     conn, session_id, user_id, *,
     draft_text=None, confirmed_text=None, instruction=None, source_elements=None,
+    mood=None, appreciation=None,
 ) -> dict:
     """Legt den eigenen Beitrag an oder aktualisiert ihn.
 
@@ -116,14 +177,17 @@ async def save_context(
         """
         INSERT INTO couple_session_contexts
             (session_id, user_id, draft_text, confirmed_text, instruction, source_elements,
-             confirmed_at)
+             mood, appreciation, confirmed_at)
         VALUES ($1, $2, $3::text, $4::text, $5::text, COALESCE($6::text[], '{}'::text[]),
+                $7::text, $8::text,
                 CASE WHEN $4::text IS NULL THEN NULL ELSE NOW() END)
         ON CONFLICT (session_id, user_id) DO UPDATE SET
             draft_text      = COALESCE(EXCLUDED.draft_text, couple_session_contexts.draft_text),
             confirmed_text  = COALESCE(EXCLUDED.confirmed_text, couple_session_contexts.confirmed_text),
             instruction     = COALESCE(EXCLUDED.instruction, couple_session_contexts.instruction),
             source_elements = COALESCE($6::text[], couple_session_contexts.source_elements),
+            mood            = COALESCE(EXCLUDED.mood, couple_session_contexts.mood),
+            appreciation    = COALESCE(EXCLUDED.appreciation, couple_session_contexts.appreciation),
             confirmed_at    = CASE WHEN EXCLUDED.confirmed_text IS NULL
                                    THEN couple_session_contexts.confirmed_at ELSE NOW() END,
             updated_at      = NOW()
@@ -134,6 +198,8 @@ async def save_context(
         crypto.encrypt(confirmed_text),
         crypto.encrypt(instruction),
         source_elements,
+        mood,
+        crypto.encrypt(appreciation),
     )
     return _decrypt_context(dict(row))
 
@@ -141,7 +207,8 @@ async def save_context(
 async def load_confirmed_contexts(conn, session_id) -> list[dict]:
     """Alle BESTÄTIGTEN Beiträge — die einzige Kontextquelle der Moderation."""
     rows = await conn.fetch(
-        "SELECT user_id, confirmed_text, instruction FROM couple_session_contexts "
+        "SELECT user_id, confirmed_text, instruction, mood, appreciation "
+        "FROM couple_session_contexts "
         "WHERE session_id = $1 AND confirmed_text IS NOT NULL ORDER BY confirmed_at",
         session_id,
     )
@@ -165,6 +232,10 @@ def build_session_context(session: dict, contexts: list[dict], names: dict[str, 
         for c in contexts:
             name = names.get(str(c["user_id"]), "Eine Person")
             parts.append(f"### Von {name}\n{c['confirmed_text']}")
+            if c.get("mood"):
+                parts.append(f"Stimmung von {name} vor dem Gespräch: {MOOD_LABELS.get(c['mood'], c['mood'])}")
+            if c.get("appreciation"):
+                parts.append(f"{name} schätzt an der anderen Person: {c['appreciation']}")
             if c.get("instruction"):
                 parts.append(f"Ausdrücklicher Hinweis von {name} an dich: {c['instruction']}")
     else:
@@ -223,7 +294,9 @@ def _decrypt_session(row: dict) -> dict:
 
 
 def _decrypt_context(row: dict) -> dict:
-    return crypto.decrypt_fields(row, "draft_text", "confirmed_text", "instruction")
+    return crypto.decrypt_fields(
+        row, "draft_text", "confirmed_text", "instruction", "appreciation",
+    )
 
 
 def _decrypt_message(row: dict) -> dict:

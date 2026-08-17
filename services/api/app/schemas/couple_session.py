@@ -25,7 +25,26 @@ class CoupleSessionUpdate(BaseModel):
 
 
 class CoupleSessionStatus(BaseModel):
-    status: str = Field(..., pattern="^(draft|open|closed)$")
+    status: str = Field(..., pattern="^(draft|proposed|open|closed)$")
+
+
+class CoupleSessionRespond(BaseModel):
+    """Antwort auf einen Dialogvorschlag — nur durch die jeweils andere Person."""
+    accept: bool
+
+
+class CoupleSessionSchedule(BaseModel):
+    """Die Dialogeinladung: ein Zeitpunkt (oder null, um sie wieder aufzuheben)."""
+    scheduled_for: datetime | None = None
+
+
+class CoupleRephraseRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=1500)
+
+
+class CoupleRephraseResponse(BaseModel):
+    """Nur für die anfragende Person — wird nicht gespeichert."""
+    suggestion: str
 
 
 class CoupleSessionResponse(BaseModel):
@@ -39,6 +58,11 @@ class CoupleSessionResponse(BaseModel):
     created_at: datetime
     opened_at: datetime | None = None
     closed_at: datetime | None = None
+    proposed_at: datetime | None = None
+    accepted_by: UUID | None = None
+    accepted_at: datetime | None = None
+    declined_at: datetime | None = None
+    scheduled_for: datetime | None = None
 
 
 class CoupleMember(BaseModel):
@@ -65,6 +89,8 @@ class CoupleSharedContext(BaseModel):
     user_id: UUID
     name: str
     text: str
+    mood: str | None = None
+    appreciation: str | None = None
 
 
 class CoupleSessionDetail(BaseModel):
@@ -85,6 +111,8 @@ class CoupleContextSave(BaseModel):
     draft_text: str | None = None
     confirmed_text: str | None = None
     instruction: str | None = Field(None, max_length=1000)
+    mood: str | None = Field(None, max_length=40)
+    appreciation: str | None = Field(None, max_length=600)
 
 
 class CoupleContextResponse(BaseModel):
@@ -95,3 +123,6 @@ class CoupleContextResponse(BaseModel):
     confirmed_at: datetime | None = None
     available_elements: dict[str, str] = {}
     max_chars: int
+    mood: str | None = None
+    appreciation: str | None = None
+    moods: dict[str, str] = {}

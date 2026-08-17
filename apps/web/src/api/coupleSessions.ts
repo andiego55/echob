@@ -13,10 +13,15 @@ export interface CoupleSession {
   title: string
   topic: string | null
   goal: string | null
-  status: 'draft' | 'open' | 'closed'
+  status: 'draft' | 'proposed' | 'open' | 'closed'
   created_at: string
   opened_at: string | null
   closed_at: string | null
+  proposed_at: string | null
+  accepted_by: string | null
+  accepted_at: string | null
+  declined_at: string | null
+  scheduled_for: string | null
 }
 
 export interface CoupleSessionMessage {
@@ -32,6 +37,8 @@ export interface CoupleSharedContext {
   user_id: string
   name: string
   text: string
+  mood: string | null
+  appreciation: string | null
 }
 
 export interface CoupleSessionDetail {
@@ -49,6 +56,10 @@ export interface CoupleContext {
   confirmed_at: string | null
   available_elements: Record<string, string>
   max_chars: number
+  mood: string | null
+  appreciation: string | null
+  /** Kürzel → Klartext für den Stimmungs-Check. */
+  moods: Record<string, string>
 }
 
 export const coupleSessionsApi = {
@@ -75,8 +86,26 @@ export const coupleSessionsApi = {
 
   saveContext: (
     sessionId: string,
-    body: { draft_text?: string | null; confirmed_text?: string | null; instruction?: string | null },
+    body: {
+      draft_text?: string | null; confirmed_text?: string | null; instruction?: string | null
+      mood?: string | null; appreciation?: string | null
+    },
   ) => apiClient.put<CoupleContext>(`/couple/sessions/${sessionId}/context`, body).then(r => r.data),
+
+  /** Ich-Botschaften-Coach – nur für dich, wird nicht gespeichert. */
+  rephrase: (sessionId: string, text: string) =>
+    apiClient.post<{ suggestion: string }>(`/couple/sessions/${sessionId}/rephrase`, { text })
+      .then(r => r.data.suggestion),
+
+  propose: (sessionId: string) =>
+    apiClient.post<CoupleSession>(`/couple/sessions/${sessionId}/propose`).then(r => r.data),
+
+  respond: (sessionId: string, accept: boolean) =>
+    apiClient.post<CoupleSession>(`/couple/sessions/${sessionId}/respond`, { accept }).then(r => r.data),
+
+  schedule: (sessionId: string, scheduledFor: string | null) =>
+    apiClient.post<CoupleSession>(`/couple/sessions/${sessionId}/schedule`, { scheduled_for: scheduledFor })
+      .then(r => r.data),
 
   send: (sessionId: string, content: string) =>
     apiClient.post<CoupleSessionDetail>(`/couple/sessions/${sessionId}/messages`, { content }).then(r => r.data),

@@ -13,7 +13,14 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import type { CoupleSessionDetail } from '@/api/coupleSessions'
 import ContextComposer from '@/components/couple/ContextComposer'
+import PreparationWizard from '@/components/couple/PreparationWizard'
 import PrivateEchoPanel from '@/components/couple/PrivateEchoPanel'
+import ProposalBar from '@/components/couple/ProposalBar'
+
+const MOOD_EMOJI: Record<string, string> = {
+  ruhig: '🌤', hoffnungsvoll: '🌱', angespannt: '⚡',
+  traurig: '🌧', wuetend: '🔥', erschoepft: '🌙',
+}
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
 
@@ -22,6 +29,7 @@ export default function CoupleSessionPage() {
   const qc = useQueryClient()
   const [text, setText] = useState('')
   const [panel, setPanel] = useState<'prep' | 'private'>('prep')
+  const [prepMode, setPrepMode] = useState<'wizard' | 'manual'>('wizard')
   const endRef = useRef<HTMLDivElement>(null)
 
   const { data, isLoading, isError } = useQuery({
@@ -96,6 +104,10 @@ export default function CoupleSessionPage() {
               </button>
             )}
           </div>
+        </div>
+
+        <div className="mb-5">
+          <ProposalBar session={session} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
@@ -185,7 +197,23 @@ export default function CoupleSessionPage() {
             {panel === 'prep' && <SummaryCard sessionId={sessionId} hasMessages={messages.length > 0} />}
 
             {panel === 'prep' && <>
-            <ContextComposer sessionId={sessionId} disabled={closed} />
+            <div className="flex gap-1 rounded-brand border border-brand-border p-1">
+              {([['wizard', 'Geführt'], ['manual', 'Selbst schreiben']] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => setPrepMode(key)}
+                  className={`flex-1 rounded-brand-sm px-3 py-1.5 text-[0.7rem] font-medium transition ${
+                    prepMode === key ? 'bg-accent/10 text-accent' : 'text-brand-muted hover:text-navy'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {prepMode === 'wizard'
+              ? <PreparationWizard sessionId={sessionId} />
+              : <ContextComposer sessionId={sessionId} disabled={closed} />}
 
             <div className="card">
               <h2 className="text-sm font-bold text-navy">Was Echo weiß</h2>
@@ -198,7 +226,17 @@ export default function CoupleSessionPage() {
                   {contexts.map(c => (
                     <div key={c.user_id} className="rounded-brand border border-brand-border px-3.5 py-3">
                       <p className="text-xs font-semibold text-navy">Von {c.name}</p>
+                      {c.mood && (
+                        <p className="mt-0.5 text-[0.7rem] text-brand-muted">
+                          Kommt {MOOD_EMOJI[c.mood] ?? ''} {c.mood} herein
+                        </p>
+                      )}
                       <p className="mt-1 whitespace-pre-wrap text-sm text-brand-muted">{c.text}</p>
+                      {c.appreciation && (
+                        <p className="mt-2 rounded-brand bg-accent/[0.06] px-2.5 py-1.5 text-xs text-brand-text">
+                          <span className="font-medium text-navy">Schätzt an dir:</span> {c.appreciation}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
