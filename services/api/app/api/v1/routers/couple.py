@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.couple import (
@@ -28,10 +28,13 @@ from app.schemas.couple import (
     CoupleLinkResponse,
     CoupleProgress,
 )
+from app.schemas.couple_private import CouplePrivateMessageCreate, CouplePrivateThread
 from app.services import couple_dashboard_service as dashboard
 from app.services import couple_privacy_service as privacy
+from app.services import couple_private_service as cps
 from app.services import couple_progress_service as progress
 from app.services import couple_therapy_service as cts
+from app.services.subscription_service import enforce_echo_prompt_limit
 
 router = APIRouter(prefix="/couple", tags=["couple"])
 
@@ -193,6 +196,56 @@ async def get_dashboard(
     async with pool.acquire() as conn:
         data = await dashboard.load_dashboard(conn, couple_id, current["user_id"])
     return CoupleDashboard(**data)
+
+
+@router.get("/links/{couple_id}/echo", response_model=CouplePrivateThread)
+async def get_companion(
+    couple_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CouplePrivateThread:
+    """Dein persönlicher Paar-Begleiter. Die andere Person sieht diesen Dialog nie."""
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        await cts.require_couple_member(conn, couple_id, user_id)
+        msgs = await cps.load_room_private_messages(conn, couple_id, user_id)
+    return CouplePrivateThread(messages=[cps.public_private_message(m) for m in msgs])
+
+
+@router.post("/links/{couple_id}/echo", response_model=CouplePrivateThread)
+async def talk_to_companion(
+    couple_id: UUID,
+    body: CouplePrivateMessageCreate,
+    request: Request,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CouplePrivateThread:
+    """Echo kennt hier BEIDE Welten: deinen eigenen Fall und den Stand eures Raums."""
+    user_id = current["user_id"]
+    svc = request.app.state.echo_service
+    if svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+
+    async with pool.acquire() as conn:
+        await enforce_echo_prompt_limit(user_id, conn)
+        link = await cts.require_couple_member(conn, couple_id, user_id)
+
+        await cps.add_room_private_message(conn, couple_id, user_id, role="user",
+                                           content=body.content)
+        history = cps.build_private_history(
+            await cps.load_room_private_messages(conn, couple_id, user_id)
+        )
+        context = await cps.build_companion_context(conn, link, user_id)
+        reply = await svc.professional_chat(
+            user_message=body.content,
+            shared_context=context,
+            history=history[:-1],
+            prompt_file="echo_couple_companion_prompt.md",
+        )
+        await cps.add_room_private_message(conn, couple_id, user_id, role="echo",
+                                           content=reply)
+        msgs = await cps.load_room_private_messages(conn, couple_id, user_id)
+    return CouplePrivateThread(messages=[cps.public_private_message(m) for m in msgs])
 
 
 @router.get("/invites/{code}", response_model=CoupleInvitePublic)

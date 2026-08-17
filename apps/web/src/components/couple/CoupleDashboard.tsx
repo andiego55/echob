@@ -71,6 +71,24 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         </div>
       )}
 
+      {/* ── Dein persönlicher Begleiter ───────────────────────────── */}
+      <Link
+        to={`/app/paar/${coupleId}/echo`}
+        className="card block border-l-4 border-l-navy/30 no-underline transition hover:shadow-brand"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-navy">Mit Echo sprechen</h2>
+            <p className="mt-1 text-xs text-brand-muted">
+              Nur für dich. Echo kennt hier deinen eigenen Zusammenhang und was in eurem
+              Raum läuft – und hilft dir, das nächste Thema zu finden oder die richtigen
+              Worte dafür.
+            </p>
+          </div>
+          <span className="shrink-0 text-sm text-accent">Öffnen →</span>
+        </div>
+      </Link>
+
       {/* ── Zahlen auf einen Blick ────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile label="Stufe" value={progress.level.name} />

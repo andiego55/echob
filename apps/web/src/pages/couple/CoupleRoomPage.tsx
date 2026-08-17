@@ -77,6 +77,21 @@ export default function CoupleRoomPage() {
 
         <CoupleOnboarding coupleId={coupleId} />
 
+        <Link
+          to={`/app/paar/${coupleId}/echo`}
+          className="card block border-l-4 border-l-navy/30 no-underline transition hover:shadow-brand"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold text-navy">Mit Echo sprechen</h2>
+              <p className="mt-1 text-xs text-brand-muted">
+                Dein persönlicher Begleiter – vertraulich, kennt deinen Fall und euren Raum.
+              </p>
+            </div>
+            <span className="shrink-0 text-sm text-accent">Öffnen →</span>
+          </div>
+        </Link>
+
         <ProgressCard coupleId={coupleId} />
 
         <SessionsCard coupleId={coupleId} />

@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import type { CouplePrivateThread } from './couplePrivate'
 
 /**
  * Paartherapie (peer-to-peer): zwei Nutzer:innen verbinden sich zu einem Paarraum.
@@ -75,6 +76,14 @@ export interface CoupleDashboard {
 }
 
 export const coupleApi = {
+  /** Dein persönlicher Paar-Begleiter – kennt eigenen Fall UND Raum-Stand, bleibt privat. */
+  companion: (coupleId: string) =>
+    apiClient.get<CouplePrivateThread>(`/couple/links/${coupleId}/echo`).then(r => r.data),
+
+  talkToCompanion: (coupleId: string, content: string) =>
+    apiClient.post<CouplePrivateThread>(`/couple/links/${coupleId}/echo`, { content })
+      .then(r => r.data),
+
   dashboard: (coupleId: string) =>
     apiClient.get<CoupleDashboard>(`/couple/links/${coupleId}/dashboard`).then(r => r.data),
 

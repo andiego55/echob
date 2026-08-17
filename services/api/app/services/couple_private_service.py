@@ -123,6 +123,77 @@ async def add_private_message(conn, session_id, user_id, *, role, content, kind=
     return crypto.decrypt_fields(dict(row), "content")
 
 
+# ── Der Begleiter zum ganzen Paarraum ────────────────────────────────────────
+
+async def load_room_private_messages(conn, couple_id, user_id) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT * FROM couple_private_messages "
+        "WHERE couple_id = $1 AND user_id = $2 ORDER BY created_at",
+        couple_id, user_id,
+    )
+    return [crypto.decrypt_fields(dict(r), "content") for r in rows]
+
+
+async def add_room_private_message(conn, couple_id, user_id, *, role, content,
+                                   kind="chat") -> dict:
+    row = await conn.fetchrow(
+        "INSERT INTO couple_private_messages (couple_id, user_id, role, kind, content) "
+        "VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        couple_id, user_id, role, kind, crypto.encrypt(content),
+    )
+    return crypto.decrypt_fields(dict(row), "content")
+
+
+async def build_companion_context(conn, link, user_id) -> str:
+    """Beide Welten: der eigene Fall UND der Stand des Paarraums.
+
+    Genau deshalb ist dieser Dialog privat — Fallinhalte dürfen nie in einen Raum, den
+    beide lesen. Vom Paarraum fließt nur ein, was ohnehin für beide sichtbar ist.
+    """
+    from app.services.couple_dashboard_service import load_dashboard
+
+    couple_id = link["id"]
+    board = await load_dashboard(conn, couple_id, user_id)
+
+    teile = ["# Stand eures gemeinsamen Raums (das sehen beide)"]
+    if board["sessions"]:
+        teile.append("## Gespräche\n" + "\n".join(
+            f"- {s['title']} ({s['status']}, {s['message_count']} Beiträge"
+            + (", zusammengefasst" if s["has_summary"] else "") + ")"
+            for s in board["sessions"][:10]
+        ))
+    if board["topics"]:
+        teile.append("## Themen in Mediation\n" + "\n".join(
+            f"- {t['title']} ({t['status']}"
+            + (f", {t['open_bridges']} offene Vorschläge" if t["open_bridges"] else "")
+            + (", noch keine Mediation" if not t["has_mediation"] else "") + ")"
+            for t in board["topics"][:10]
+        ))
+    ag = board["agreements"]
+    if ag["recent"]:
+        teile.append(
+            f"## Abmachungen ({ag['active']} gelten, {ag['kept']} gehalten, "
+            f"{ag['proposed']} warten)\n"
+            + "\n".join(f"- [{a['status']}] {a['body']}" for a in ag["recent"])
+        )
+    if board["attention"]:
+        teile.append("## Was gerade auf diese Person wartet\n" + "\n".join(
+            f"- {i['title']}: {i['detail']}" for i in board["attention"][:6]
+        ))
+    if len(teile) == 1:
+        teile.append("Im Paarraum ist noch nichts passiert — die beiden fangen gerade an.")
+
+    eigen = await load_own_case_context(conn, own_case_id(link, user_id), user_id)
+    if eigen:
+        teile += [
+            "# Der eigene Zusammenhang dieser Person (vertraulich, nur in diesem Dialog)",
+            "Die Partnerperson kennt davon nichts. Nutze es zum Verstehen — gib es nicht als "
+            "Zitat zurück, als wäre es im gemeinsamen Raum gesagt worden.",
+            eigen,
+        ]
+    return "\n\n".join(teile)
+
+
 # ── Derselbe private Raum, aber zu einem Mediations-Thema ────────────────────
 
 async def load_topic_private_messages(conn, topic_id, user_id) -> list[dict]:
