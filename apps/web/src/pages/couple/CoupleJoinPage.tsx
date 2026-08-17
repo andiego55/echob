@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
 import { coupleApi, formatCoupleCode } from '@/api/couple'
+import { apiErrorMessage } from '@/api/errors'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 
 export default function CoupleJoinPage() {
@@ -93,9 +94,7 @@ export default function CoupleJoinPage() {
                 {accept.isPending ? 'Verbinde …' : 'Verbindung annehmen'}
               </button>
               {accept.isError && (
-                <p className="mt-3 text-sm text-red-600">
-                  Das hat nicht geklappt. Vielleicht wurde der Code inzwischen verwendet.
-                </p>
+                <p className="mt-3 text-sm text-red-600">{apiErrorMessage(accept.error)}</p>
               )}
             </div>
           </>

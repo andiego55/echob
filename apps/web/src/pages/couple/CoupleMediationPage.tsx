@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleMediationApi } from '@/api/coupleMediation'
+import { apiErrorMessage } from '@/api/errors'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
 
 export default function CoupleMediationPage() {
@@ -124,6 +125,9 @@ export default function CoupleMediationPage() {
             >
               {save.isPending ? 'Speichere …' : 'Speichern'}
             </button>
+            {save.isError && (
+              <p className="mt-3 text-sm text-red-600">{apiErrorMessage(save.error)}</p>
+            )}
           </div>
 
           {/* ── Sicht der anderen Person ─────────────────────────── */}
@@ -173,6 +177,10 @@ export default function CoupleMediationPage() {
               )}
             </div>
           </div>
+
+          {mediate.isError && (
+            <p className="mt-3 text-sm text-red-600">{apiErrorMessage(mediate.error)}</p>
+          )}
 
           {!both_sides_ready && (
             <p className="mt-3 rounded-brand bg-brand-bg px-3.5 py-2.5 text-xs text-brand-muted">

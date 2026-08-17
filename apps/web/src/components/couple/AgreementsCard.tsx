@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
+import { apiErrorMessage } from '@/api/errors'
 import type { CoupleAgreement } from '@/api/coupleAgreements'
 
 const STATUS_CHIP: Record<CoupleAgreement['status'], { label: string; cls: string }> = {
@@ -70,6 +71,12 @@ export default function AgreementsCard({
           {propose.isPending ? 'Schlage vor …' : 'Vorschlagen'}
         </button>
       </form>
+
+      {(propose.isError || accept.isError || setStatus.isError) && (
+        <p className="mt-3 text-sm text-red-600">
+          {apiErrorMessage(propose.error ?? accept.error ?? setStatus.error)}
+        </p>
+      )}
 
       {agreements.length === 0 ? (
         <p className="mt-4 text-sm text-brand-muted">Noch keine Abmachung.</p>

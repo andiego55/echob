@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleSessionsApi } from '@/api/coupleSessions'
+import { apiErrorMessage } from '@/api/errors'
 
 const MOOD_EMOJI: Record<string, string> = {
   ruhig: '🌤', hoffnungsvoll: '🌱', angespannt: '⚡',
@@ -141,6 +142,10 @@ export default function PreparationWizard({
               {coach.isPending ? 'Echo formuliert …' : 'Als Ich-Botschaft formulieren'}
             </button>
 
+            {coach.isError && (
+              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(coach.error)}</p>
+            )}
+
             {coached && (
               <div className="mt-3 rounded-brand border border-accent/40 bg-accent/[0.05] px-3.5 py-3">
                 <p className="text-[0.65rem] font-bold uppercase tracking-wide text-accent">Vorschlag</p>
@@ -196,6 +201,9 @@ export default function PreparationWizard({
             >
               {finish.isPending ? 'Gebe frei …' : 'Für die Sitzung freigeben'}
             </button>
+            {finish.isError && (
+              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(finish.error)}</p>
+            )}
           </div>
         )}
       </div>

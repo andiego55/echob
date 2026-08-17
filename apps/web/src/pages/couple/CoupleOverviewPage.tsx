@@ -11,11 +11,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { casesApi } from '@/api/cases'
 import { coupleApi, coupleInviteLink, formatCoupleCode } from '@/api/couple'
+import { apiErrorMessage } from '@/api/errors'
 import type { CoupleLink } from '@/api/couple'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 
 export default function CoupleOverviewPage() {
-  const { data: links = [], isLoading } = useQuery({ queryKey: ['couple-links'], queryFn: coupleApi.list })
+  const { data: links = [], isLoading, isError, error } = useQuery({
+    queryKey: ['couple-links'],
+    queryFn: coupleApi.list,
+    retry: false,
+  })
 
   const rooms = links.filter(l => l.status === 'active')
   const pending = links.filter(l => l.status === 'pending')
@@ -37,6 +42,8 @@ export default function CoupleOverviewPage() {
 
         {isLoading ? (
           <div className="card text-sm text-brand-muted">Lade …</div>
+        ) : isError ? (
+          <LoadError error={error} />
         ) : (
           <>
             {rooms.length > 0 && (
@@ -192,6 +199,10 @@ function InviteCard({ hasPending }: { hasPending: boolean }) {
       >
         {create.isPending ? 'Erstelle …' : 'Kopplungscode erstellen'}
       </button>
+
+      {create.isError && (
+        <p className="mt-3 text-sm text-red-600">{apiErrorMessage(create.error)}</p>
+      )}
     </div>
   )
 }
@@ -220,6 +231,15 @@ function JoinCard() {
           Weiter
         </button>
       </form>
+    </div>
+  )
+}
+
+function LoadError({ error }: { error: unknown }) {
+  return (
+    <div className="card border-l-4 border-l-red-400">
+      <h2 className="text-sm font-bold text-navy">Paarräume konnten nicht geladen werden</h2>
+      <p className="mt-2 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
     </div>
   )
 }

@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleSessionsApi } from '@/api/coupleSessions'
+import { apiErrorMessage } from '@/api/errors'
 import type { CoupleSessionDetail } from '@/api/coupleSessions'
 import ContextComposer from '@/components/couple/ContextComposer'
 import PreparationWizard from '@/components/couple/PreparationWizard'
@@ -185,6 +186,11 @@ export default function CoupleSessionPage() {
                   </button>
                   <span className="text-xs text-brand-muted">Beide sehen alles hier.</span>
                 </div>
+                {(send.isError || moderate.isError) && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {apiErrorMessage(send.error ?? moderate.error)}
+                  </p>
+                )}
               </form>
             )}
           </div>

@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { casesApi } from '@/api/cases'
 import { coupleSessionsApi } from '@/api/coupleSessions'
+import { apiErrorMessage } from '@/api/errors'
 
 interface Props {
   sessionId: string
@@ -129,9 +130,7 @@ export default function ContextComposer({ sessionId, disabled = false }: Props) 
               {draft.isPending ? 'Echo schreibt …' : 'Entwurf erzeugen'}
             </button>
             {draft.isError && (
-              <p className="mt-2 text-xs text-red-600">
-                Zu den gewählten Elementen gibt es noch nichts, oder es hat nicht geklappt.
-              </p>
+              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(draft.error)}</p>
             )}
           </div>
 
@@ -163,6 +162,9 @@ export default function ContextComposer({ sessionId, disabled = false }: Props) 
             >
               {confirm.isPending ? 'Gebe frei …' : 'Für die Sitzung freigeben'}
             </button>
+            {confirm.isError && (
+              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(confirm.error)}</p>
+            )}
             <p className="mt-2 text-[0.68rem] leading-relaxed text-brand-muted">
               Freigegeben heißt: Echo kennt diesen Text – und deine Partnerperson sieht ihn
               im Raum. Alles andere aus deinem Fall bleibt privat.
