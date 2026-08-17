@@ -19,6 +19,12 @@ class SubscriptionStatus(BaseModel):
     subscription_ends_at: str | None
     # True solange Zugriff besteht (Trial aktiv ODER bezahlter Plan nicht abgelaufen)
     is_active: bool = True
+    # Woher der Zugang stammt: stripe, google_play, invoice, manual … (Registry im Code)
+    billing_source: str | None = None
+    billing_label: str | None = None
+    # Kann die Person das Abo bei uns verwalten? Bei App-Store-Abos nicht — die
+    # laufen dort und dürfen von uns aus auch nicht gekündigt werden.
+    manageable_by_user: bool = False
 
 
 class AiUsageQuota(BaseModel):

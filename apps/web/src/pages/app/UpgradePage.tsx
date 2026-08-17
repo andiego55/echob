@@ -7,6 +7,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { subscriptionApi } from '@/api/subscription'
+import { mayOfferPurchase } from '@/lib/appContext'
 import type { ProductType } from '@/types'
 
 const PLAN_LABELS: Record<string, string> = {
@@ -133,6 +134,30 @@ export default function UpgradePage() {
 
   const isPaid = subscription && subscription.plan !== 'trial'
   const paidActive = isPaid && subscription.is_active
+
+  // In der Store-Hülle werden keine Abos verkauft: Die Stores verlangen für digitale
+  // Käufe ihre eigene Bezahlung, die wir (noch) nicht angebunden haben. Statt einer
+  // Bezahlwand, die ins Leere führt, sagen wir hier ehrlich, wo es weitergeht.
+  if (!mayOfferPurchase()) {
+    return (
+      <AppShell>
+        <div className="mx-auto max-w-[700px] px-6 py-10">
+          <Link to="/app" className="text-sm text-brand-muted hover:text-navy">← Zurück</Link>
+          <h1 className="mt-4 text-2xl font-bold text-navy">Dein Zugang</h1>
+          <div className="card mt-6">
+            <p className="text-sm text-brand-muted">
+              Deinen Zugang verwaltest du in deinem Konto auf{' '}
+              <span className="font-medium text-navy">echo-b.de</span> – melde dich dort
+              mit denselben Daten an. In der App selbst wird nichts verkauft.
+            </p>
+            <p className="mt-3 text-sm text-brand-muted">
+              Alles, was du schon freigeschaltet hast, funktioniert hier ganz normal weiter.
+            </p>
+          </div>
+        </div>
+      </AppShell>
+    )
+  }
 
   return (
     <AppShell>

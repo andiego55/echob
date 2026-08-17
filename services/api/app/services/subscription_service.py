@@ -193,7 +193,8 @@ async def get_ai_usage_status(user_id: str, conn) -> dict:
 
 async def get_subscription_status(user_id: str, conn) -> dict:
     row = await conn.fetchrow(
-        "SELECT plan, trial_started_at, subscription_ends_at FROM user_profiles WHERE user_id = $1",
+        "SELECT plan, trial_started_at, subscription_ends_at, billing_source "
+        "FROM user_profiles WHERE user_id = $1",
         user_id,
     )
     now = datetime.now(UTC)
@@ -206,6 +207,9 @@ async def get_subscription_status(user_id: str, conn) -> dict:
             "trial_ends_at": (now + timedelta(days=TRIAL_DAYS)).isoformat(),
             "subscription_ends_at": None,
             "is_active": True,
+            "billing_source": None,
+            "billing_label": None,
+            "manageable_by_user": False,
         }
 
     plan = row["plan"]
@@ -231,6 +235,11 @@ async def get_subscription_status(user_id: str, conn) -> dict:
     is_paid_active = plan != "trial" and (sub_ends is None or sub_ends > now)
     is_active = is_trial_active or is_paid_active
 
+    # Woher der Zugang stammt, entscheidet, was die Oberfläche anbieten darf: Ein Abo
+    # aus einem App-Store kündigt man dort, nicht bei uns.
+    from app.services.billing_entitlement import PROVIDERS, provider_label
+    source = row["billing_source"]
+
     return {
         "plan": plan,
         "is_trial_active": is_trial_active,
@@ -238,6 +247,11 @@ async def get_subscription_status(user_id: str, conn) -> dict:
         "trial_ends_at": trial_ends_at.isoformat() if trial_ends_at else None,
         "subscription_ends_at": sub_ends.isoformat() if sub_ends else None,
         "is_active": is_active,
+        "billing_source": source,
+        "billing_label": provider_label(source) if source else None,
+        "manageable_by_user": bool(
+            is_paid_active and PROVIDERS.get(source or "", {}).get("manageable_by_user")
+        ),
     }
 
 

@@ -17,6 +17,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.config import settings
+from app.services import billing_entitlement as entitlement
 
 logger = logging.getLogger(__name__)
 
@@ -174,18 +175,20 @@ async def _upsert_profile_plan(
     customer_id: str | None,
     subscription_id: str | None,
 ) -> None:
-    await conn.execute(
-        """
-        INSERT INTO user_profiles (user_id, plan, subscription_ends_at, stripe_customer_id, stripe_subscription_id)
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (user_id) DO UPDATE SET
-            plan = EXCLUDED.plan,
-            subscription_ends_at = EXCLUDED.subscription_ends_at,
-            stripe_customer_id = COALESCE(EXCLUDED.stripe_customer_id, user_profiles.stripe_customer_id),
-            stripe_subscription_id = COALESCE(EXCLUDED.stripe_subscription_id, user_profiles.stripe_subscription_id),
-            updated_at = NOW()
-        """,
-        user_id, plan, ends_at, customer_id, subscription_id,
+    """Stripe-Sicht auf die Vergabe — geschrieben wird über die eine gemeinsame Stelle.
+
+    Die Berechtigung selbst kennt keinen Anbieter mehr; Stripe ist nur eine Quelle von
+    mehreren (siehe billing_entitlement).
+    """
+    await entitlement.grant_plan(
+        conn,
+        user_id=user_id,
+        plan=plan,
+        source="stripe",
+        ends_at=ends_at,
+        external_id=subscription_id,
+        stripe_customer_id=customer_id,
+        stripe_subscription_id=subscription_id,
     )
 
 
@@ -222,14 +225,12 @@ async def fulfill_checkout_session(obj, pool) -> str | None:
             conn, user_id=user_id, plan=product_key, ends_at=ends_at,
             customer_id=customer_id, subscription_id=subscription_id,
         )
-        await conn.execute(
-            """
-            INSERT INTO payments (user_id, product, stripe_session_id, stripe_customer_id, amount_cents, currency, status)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            ON CONFLICT (stripe_session_id) DO NOTHING
-            """,
-            user_id, product_key, obj.get("id"), customer_id,
-            obj.get("amount_total"), obj.get("currency"), obj.get("payment_status"),
+        await entitlement.record_payment(
+            conn,
+            user_id=user_id, product=product_key, provider="stripe",
+            external_id=obj.get("id"), stripe_customer_id=customer_id,
+            amount_cents=obj.get("amount_total"), currency=obj.get("currency"),
+            status=obj.get("payment_status"),
         )
     logger.info("Zahlung verarbeitet: user=%s product=%s", user_id, product_key)
     return product_key

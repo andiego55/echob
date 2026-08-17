@@ -826,6 +826,11 @@ export interface SubscriptionStatus {
   trial_ends_at: string | null
   subscription_ends_at: string | null
   is_active: boolean
+  /** Woher der Zugang stammt: stripe, google_play, invoice, manual … (Registry im Backend). */
+  billing_source: string | null
+  billing_label: string | null
+  /** Falsch bei Store-Abos und Rechnungen – die verwaltet man nicht bei uns. */
+  manageable_by_user: boolean
 }
 
 export interface AiUsageQuota {

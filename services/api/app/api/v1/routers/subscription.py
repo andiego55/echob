@@ -16,6 +16,7 @@ from app.schemas.subscription import (
     PortalResponse,
     SubscriptionStatus,
 )
+from app.services import billing_entitlement as entitlement
 from app.services import billing_service
 from app.services.subscription_service import get_ai_usage_status, get_subscription_status
 
@@ -60,6 +61,19 @@ async def create_checkout(
 
     user_id = current_user["user_id"]
     async with pool.acquire() as conn:
+        # Doppelabo verhindern: Wer schon über einen anderen Weg zahlt (App-Store,
+        # Rechnung ...), würde hier ein zweites Mal belastet — und könnte das eine
+        # davon bei uns nicht einmal kündigen.
+        blocker = await entitlement.blocking_subscription(conn, user_id, "stripe")
+        if blocker:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "Du hast bereits einen aktiven Zugang über "
+                    f"{entitlement.provider_label(blocker['billing_source'])}. "
+                    "Beende ihn dort, bevor du hier ein neues Abo abschließt."
+                ),
+            )
         row = await conn.fetchrow(
             "SELECT stripe_customer_id FROM user_profiles WHERE user_id = $1", user_id
         )
