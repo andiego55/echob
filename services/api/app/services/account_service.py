@@ -101,6 +101,10 @@ async def export_user_data(
             if isinstance(r, dict) and isinstance(r.get("payload"), (dict, list)):
                 r["payload"] = crypto.decrypt_json_strings(r["payload"])
 
+    # Paartherapie: eigene Beiträge + die gemeinsamen Inhalte der eigenen Räume.
+    from app.services import couple_privacy_service
+    data.update(await couple_privacy_service.export_for_user(conn, user_id))
+
     return data
 
 
@@ -151,6 +155,12 @@ _DELETE_STEPS = (
     ("ai_usage_log", "user_id = $1"),
     ("user_profiles", "user_id = $1"),
     ("user_consents", "user_id = $1"),
+    # Paartherapie: Die couple_links-Zeile reicht — ON DELETE CASCADE räumt Sitzungen,
+    # Nachrichten, Kontexte, private Dialoge, Zusammenfassungen, Abmachungen, Themen,
+    # Perspektiven, Mediationen, Testläufe und Punkte ab. Der gemeinsame Raum fällt dabei
+    # ganz: Sitzungsverläufe gehören zwei Menschen, der eigene Anteil lässt sich nicht
+    # herausschneiden. Siehe couple_privacy_service.
+    ("couple_links", "initiator_user_id = $1 OR partner_user_id = $1"),
 )
 
 

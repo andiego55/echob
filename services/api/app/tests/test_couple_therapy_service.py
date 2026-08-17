@@ -20,6 +20,7 @@ from fastapi import HTTPException
 from app.core import crypto
 from app.services import couple_agreement_service as cas
 from app.services import couple_mediation_service as cms
+from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
 from app.services import couple_progress_service as prog
 from app.services import couple_session_service as css
@@ -307,6 +308,136 @@ async def test_both_members_share_one_transcript(db):
     assert history[0] == {"role": "user", "content": "Alex: Ich fange an."}
     assert history[1] == {"role": "assistant", "content": "Danke, Alex."}
     assert history[2]["content"].startswith("Rio: ")
+
+
+# ── Löschen (Art. 17) ────────────────────────────────────────────────────────
+
+async def _fill_room(db, user_a, user_b, couple_id):
+    """Ein Raum mit Inhalt in allen Zweigen — Grundlage für die Löschtests."""
+    session = await css.create_session(db, couple_id, user_a, title="Thema")
+    await css.save_context(db, session["id"], user_a, confirmed_text="GETEILT",
+                           draft_text="ENTWURF")
+    await css.add_message(db, session["id"], user_id=user_a, role="partner", content="Hallo")
+    await cas.save_summary(db, session["id"], user_a, "Zusammenfassung")
+    await cas.propose(db, couple_id, user_a, body="Abmachung")
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_perspective(db, topic["id"], user_a, open_text="OFFEN",
+                               private_text="GEHEIM")
+    await cms.save_mediation(db, topic["id"], user_a, "Vorschlag")
+    await ctest.save_run(db, couple_id, user_a, slug="bindung", title="B",
+                         answers={}, result={})
+    await cps.add_private_message(db, session["id"], user_a, role="user", content="PRIVAT")
+    await prog.award(db, couple_id, user_a, "session_started", session["id"])
+    return session, topic
+
+
+async def _room_row_counts(db, couple_id, session_id, topic_id) -> dict[str, int]:
+    return {
+        "sessions": await db.fetchval(
+            "SELECT count(*) FROM couple_sessions WHERE couple_id=$1", couple_id),
+        "messages": await db.fetchval(
+            "SELECT count(*) FROM couple_session_messages WHERE session_id=$1", session_id),
+        "contexts": await db.fetchval(
+            "SELECT count(*) FROM couple_session_contexts WHERE session_id=$1", session_id),
+        "private": await db.fetchval(
+            "SELECT count(*) FROM couple_private_messages WHERE session_id=$1", session_id),
+        "summaries": await db.fetchval(
+            "SELECT count(*) FROM couple_session_summaries WHERE session_id=$1", session_id),
+        "agreements": await db.fetchval(
+            "SELECT count(*) FROM couple_agreements WHERE couple_id=$1", couple_id),
+        "topics": await db.fetchval(
+            "SELECT count(*) FROM couple_topics WHERE couple_id=$1", couple_id),
+        "perspectives": await db.fetchval(
+            "SELECT count(*) FROM couple_perspectives WHERE topic_id=$1", topic_id),
+        "mediations": await db.fetchval(
+            "SELECT count(*) FROM couple_mediations WHERE topic_id=$1", topic_id),
+        "tests": await db.fetchval(
+            "SELECT count(*) FROM couple_test_runs WHERE couple_id=$1", couple_id),
+        "points": await db.fetchval(
+            "SELECT count(*) FROM couple_point_events WHERE couple_id=$1", couple_id),
+    }
+
+
+async def test_ending_a_room_keeps_the_content(db):
+    """Beenden ist ein Riegel, kein Löschen — das ist der Unterschied zu purge."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session, topic = await _fill_room(db, user_a, user_b, couple_id)
+
+    await cts.end_link(db, couple_id, user_a)
+    counts = await _room_row_counts(db, couple_id, session["id"], topic["id"])
+    assert all(v > 0 for v in counts.values()), counts
+
+
+async def test_purge_removes_everything_in_the_room(db):
+    """Löschen räumt über die Cascade wirklich alle zwölf abhängigen Tabellen ab."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session, topic = await _fill_room(db, user_a, user_b, couple_id)
+
+    assert await privacy.purge_couple(db, couple_id, user_b) is True
+    counts = await _room_row_counts(db, couple_id, session["id"], topic["id"])
+    assert all(v == 0 for v in counts.values()), counts
+    assert await db.fetchval(
+        "SELECT count(*) FROM couple_links WHERE id=$1", couple_id) == 0
+
+
+async def test_purge_works_after_ending(db):
+    """Auch im geschlossenen Raum kommt man noch an die eigenen Betroffenenrechte."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await _fill_room(db, user_a, user_b, couple_id)
+    await cts.end_link(db, couple_id, user_a)
+    assert await privacy.purge_couple(db, couple_id, user_a) is True
+
+
+async def test_purge_denied_to_outsiders(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await _fill_room(db, user_a, user_b, couple_id)
+    with pytest.raises(HTTPException) as exc:
+        await privacy.purge_couple(db, couple_id, uuid.uuid4())
+    assert exc.value.status_code == 404
+
+
+async def test_deleting_own_private_content_spares_the_shared_parts(db):
+    """Privates verschwindet, ausdrücklich Geteiltes bleibt stehen."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session, topic = await _fill_room(db, user_a, user_b, couple_id)
+
+    await privacy.delete_own_private_content(db, couple_id, user_a)
+
+    assert await cps.load_private_messages(db, session["id"], user_a) == []
+    own_ctx = await css.get_own_context(db, session["id"], user_a)
+    assert own_ctx["draft_text"] is None
+    assert own_ctx["confirmed_text"] == "GETEILT"          # geteilt bleibt geteilt
+    persp = (await cms.load_perspectives(db, topic["id"]))[0]
+    assert persp["private_text"] is None
+    assert persp["open_text"] == "OFFEN"
+    # Der gemeinsame Verlauf bleibt vollständig.
+    assert len(await css.load_messages(db, session["id"])) == 1
+
+
+async def test_account_deletion_takes_the_rooms_with_it(db):
+    """Konto weg → Paarräume weg. Gemeinsames lässt sich nicht nach Person auftrennen."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session, topic = await _fill_room(db, user_a, user_b, couple_id)
+
+    assert await privacy.delete_all_for_user(db, user_b) == 1
+    counts = await _room_row_counts(db, couple_id, session["id"], topic["id"])
+    assert all(v == 0 for v in counts.values()), counts
+
+
+async def test_export_holds_own_data_but_not_the_partners_secrets(db):
+    """Auskunft: eigene Beiträge und Gemeinsames — nie das Vertrauliche der anderen Person."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    session, topic = await _fill_room(db, user_a, user_b, couple_id)
+    await cps.add_private_message(db, session["id"], user_b, role="user",
+                                  content="PRIVAT_VON_RIO")
+    await cms.save_perspective(db, topic["id"], user_b, private_text="GEHEIM_VON_RIO")
+
+    export = await privacy.export_for_user(db, user_a)
+    blob = str(export)
+    assert "PRIVAT" in blob and "GEHEIM" in blob        # eigene Inhalte sind drin
+    assert "PRIVAT_VON_RIO" not in blob                 # fremder privater Dialog nicht
+    assert "GEHEIM_VON_RIO" not in blob                 # fremder vertraulicher Beitrag nicht
+    assert "Zusammenfassung" in blob and "Abmachung" in blob   # Gemeinsames schon
 
 
 # ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────

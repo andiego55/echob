@@ -59,7 +59,13 @@ export const coupleApi = {
     apiClient
       .post<CoupleAcceptResult>('/couple/links/accept', { code, case_id: caseId ?? null })
       .then(r => r.data),
-  end: (coupleId: string) => apiClient.delete(`/couple/links/${coupleId}`),
+  /** Ohne purge nur schließen; mit purge werden die Inhalte wirklich gelöscht. */
+  end: (coupleId: string, purge = false) =>
+    apiClient.delete(`/couple/links/${coupleId}`, { params: { purge } }),
+
+  /** Löscht nur, was allein dir gehört – Geteiltes bleibt. */
+  deleteMyPrivateContent: (coupleId: string) =>
+    apiClient.delete(`/couple/links/${coupleId}/my-private-content`),
   checkCode: (code: string) =>
     apiClient
       .get<CoupleInvitePublic>(`/couple/invites/${encodeURIComponent(code)}`)

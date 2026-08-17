@@ -5,7 +5,7 @@
  * die Vorbereitung und die Moderation durch Echo bauen in den Folgephasen darauf auf.
  */
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { coupleApi } from '@/api/couple'
@@ -15,6 +15,7 @@ import AgreementsCard from '@/components/couple/AgreementsCard'
 import ProgressCard from '@/components/couple/ProgressCard'
 import CoupleOnboarding from '@/components/couple/CoupleOnboarding'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
+import EndRoomPanel from '@/components/couple/EndRoomPanel'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import { coupleTestsApi } from '@/api/coupleTests'
 import { SELF_TESTS } from '@/selftests'
@@ -29,22 +30,12 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function CoupleRoomPage() {
   const { coupleId = '' } = useParams<{ coupleId: string }>()
-  const navigate = useNavigate()
-  const qc = useQueryClient()
 
   const { data: room, isLoading, isError } = useQuery({
     queryKey: ['couple-link', coupleId],
     queryFn: () => coupleApi.get(coupleId),
     enabled: !!coupleId,
     retry: false,
-  })
-
-  const end = useMutation({
-    mutationFn: () => coupleApi.end(coupleId),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['couple-links'] })
-      navigate('/app/paar')
-    },
   })
 
   if (isLoading) {
@@ -98,21 +89,7 @@ export default function CoupleRoomPage() {
 
         <IsolationNotice />
 
-        <div className="card">
-          <h2 className="text-sm font-bold text-navy">Verbindung</h2>
-          <p className="mt-2 text-sm text-brand-muted">
-            Ihr seid seit {new Date(room.accepted_at ?? room.created_at).toLocaleDateString('de-DE')} verbunden.
-          </p>
-          <button
-            onClick={() => {
-              if (confirm('Verbindung wirklich beenden? Der gemeinsame Raum wird für euch beide geschlossen.')) end.mutate()
-            }}
-            disabled={end.isPending}
-            className="mt-3 text-xs text-red-600 hover:underline disabled:opacity-50"
-          >
-            {end.isPending ? 'Beende …' : 'Verbindung beenden'}
-          </button>
-        </div>
+        <EndRoomPanel coupleId={coupleId} since={room.accepted_at ?? room.created_at} />
 
         <CoupleSafetyNote />
 

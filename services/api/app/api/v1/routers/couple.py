@@ -27,6 +27,7 @@ from app.schemas.couple import (
     CoupleLinkResponse,
     CoupleProgress,
 )
+from app.services import couple_privacy_service as privacy
 from app.services import couple_progress_service as progress
 from app.services import couple_therapy_service as cts
 
@@ -132,14 +133,40 @@ async def accept_link(
 @router.delete("/links/{couple_id}")
 async def end_link(
     couple_id: UUID,
+    purge: bool = False,
     current=Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> dict:
+    """Beendet den Paarraum. Mit ``purge=true`` werden die Inhalte auch wirklich gelöscht.
+
+    Ohne ``purge`` ist der Raum nur geschlossen — die gemeinsamen Inhalte bleiben, falls ihr
+    es euch anders überlegt. Mit ``purge`` fällt alles, für beide Seiten: gemeinsame Inhalte
+    lassen sich nicht nach Person auftrennen.
+    """
+    user_id = current["user_id"]
     async with pool.acquire() as conn:
-        ok = await cts.end_link(conn, couple_id, current["user_id"])
+        if purge:
+            ok = await privacy.purge_couple(conn, couple_id, user_id)
+            return {"ended": True, "purged": ok}
+        ok = await cts.end_link(conn, couple_id, user_id)
     if not ok:
         raise HTTPException(status_code=404, detail="Paarraum nicht gefunden.")
-    return {"ended": True}
+    return {"ended": True, "purged": False}
+
+
+@router.delete("/links/{couple_id}/my-private-content")
+async def delete_my_private_content(
+    couple_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Löscht nur, was allein dir gehört: privater Echo-Dialog, vertrauliche Beiträge, Entwürfe.
+
+    Was du ausdrücklich geteilt hast, bleibt — die andere Person hat es gelesen.
+    """
+    async with pool.acquire() as conn:
+        counts = await privacy.delete_own_private_content(conn, couple_id, current["user_id"])
+    return {"deleted": counts}
 
 
 @router.get("/links/{couple_id}/progress", response_model=CoupleProgress)
