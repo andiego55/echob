@@ -9,9 +9,9 @@
  * was man fragen soll – vor einem Vorschlag schon.
  */
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import AppShell from '@/components/app/AppShell'
+import CoupleShell from '@/components/couple/CoupleShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleApi } from '@/api/couple'
 import type { CouplePrivateThread } from '@/api/couplePrivate'
@@ -113,18 +113,8 @@ export default function CoupleEchoPage() {
   }
 
   return (
-    <AppShell>
-      <div className="mx-auto max-w-[1100px] px-6 py-8">
-        <div className="mb-5">
-          <Link to="/app/paar" className="text-xs text-brand-muted hover:text-navy">← Zu zweit</Link>
-          <span className="label mt-2 block">Nur für dich</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">Dein Paar-Begleiter</h1>
-          <p className="mt-2 max-w-2xl text-sm text-brand-muted">
-            Echo kennt hier beides: was du für dich festgehalten hast und was in eurem
-            gemeinsamen Raum läuft. Deine Partnerperson sieht diesen Dialog nicht.
-          </p>
-        </div>
-
+    <CoupleShell subtitle="Nur für dich – Echo kennt deinen Fall und euren Raum.">
+      <div>
         <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
           {/* ── Startpunkte ──────────────────────────────────────── */}
           <div className="space-y-4 lg:order-1">
@@ -236,6 +226,6 @@ export default function CoupleEchoPage() {
           </div>
         </div>
       </div>
-    </AppShell>
+    </CoupleShell>
   )
 }
