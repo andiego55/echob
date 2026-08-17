@@ -115,11 +115,31 @@ export default function CoupleSessionPage() {
           {/* ── Gespräch ─────────────────────────────────────────── */}
           <div className="card flex flex-col">
             <div className="flex-1 space-y-4 overflow-y-auto pr-1" style={{ maxHeight: '58vh' }}>
-              {messages.length === 0 && (
-                <p className="text-sm text-brand-muted">
-                  Noch ist es still. Bereitet rechts euren Kontext vor – und lasst Echo dann
-                  die Sitzung eröffnen.
-                </p>
+              {messages.length === 0 && !closed && (
+                <div className="rounded-brand border border-accent/30 bg-accent/[0.04] px-5 py-6 text-center">
+                  <p className="text-[1rem] font-bold text-navy">Bereit für euer Gespräch?</p>
+                  <p className="mx-auto mt-2 max-w-[460px] text-sm leading-relaxed text-brand-muted">
+                    Echo begrüßt euch, fasst Thema und Ziel zusammen, nennt kurz die
+                    Gesprächsregeln und stellt die erste Frage. Danach redet ihr miteinander –
+                    Echo meldet sich, wenn ihr es dazuholt.
+                  </p>
+
+                  <button
+                    onClick={() => moderate.mutate()}
+                    disabled={busy}
+                    className="btn-primary !px-6 !py-3 mt-5 disabled:opacity-50"
+                  >
+                    {moderate.isPending ? 'Echo eröffnet …' : 'Sitzung starten'}
+                  </button>
+
+                  {contexts.length === 0 && (
+                    <p className="mx-auto mt-4 max-w-[460px] text-xs text-brand-muted">
+                      Hinweis: Bisher hat niemand einen Kontext freigegeben. Echo kennt dann nur
+                      Titel und Ziel und wird im Raum nachfragen. Rechts unter
+                      „Vorbereitung“ könnt ihr vorher noch etwas mitgeben.
+                    </p>
+                  )}
+                </div>
               )}
               {messages.map(m => (
                 <div key={m.id} className={m.role === 'echo' ? '' : 'rounded-brand bg-brand-bg px-3.5 py-2.5'}>
@@ -161,16 +181,16 @@ export default function CoupleSessionPage() {
                   <button type="submit" disabled={!text.trim() || busy} className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50">
                     {send.isPending ? 'Sende …' : 'Senden'}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => moderate.mutate()}
-                    disabled={busy}
-                    className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50"
-                  >
-                    {moderate.isPending
-                      ? 'Echo denkt nach …'
-                      : messages.length === 0 ? 'Echo eröffnen lassen' : 'Echo einbeziehen'}
-                  </button>
+                  {messages.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => moderate.mutate()}
+                      disabled={busy}
+                      className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50"
+                    >
+                      {moderate.isPending ? 'Echo denkt nach …' : 'Echo einbeziehen'}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
