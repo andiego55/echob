@@ -20,6 +20,10 @@ export default function CoupleOverviewPage() {
     queryKey: ['couple-links'],
     queryFn: coupleApi.list,
     retry: false,
+    // Solange eine Einladung offen ist, nachfragen – dann steht der Raum sofort da,
+    // wenn die andere Person den Code einlöst. Ist nichts offen, wird nicht gepollt.
+    refetchInterval: query =>
+      (query.state.data ?? []).some(l => l.status === 'pending') ? 4000 : false,
   })
 
   const rooms = links.filter(l => l.status === 'active')
