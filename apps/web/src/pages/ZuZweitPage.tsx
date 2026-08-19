@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
 import CoupleExplainer from '@/components/couple/CoupleExplainer'
+import FaqCard from '@/components/landing/FaqCard'
 import { useAuth } from '@/contexts/AuthContext'
 
 /**
@@ -104,25 +105,36 @@ const PRIVACY = [
   },
 ]
 
-/** Abgrenzung – danach wird tatsächlich gesucht, und KI-Antworten zitieren so etwas gern. */
+/**
+ * Abgrenzung – danach wird tatsächlich gesucht, und Antwortmaschinen greifen so etwas gern
+ * auf. Die Kostenzeile fehlt auf den meisten Seiten und ist genau das, was Paare wissen
+ * wollen, bevor sie sich entscheiden.
+ */
 const VERGLEICH = [
   {
     was: 'Paartherapie',
-    wer: 'Approbierte oder qualifizierte Fachperson',
-    wie: 'Sitzungen vor Ort oder per Video, Diagnostik möglich, Behandlung im engeren Sinn',
-    wann: 'Bei psychischer Erkrankung, tiefer Krise, wenn es allein nicht mehr geht',
+    kicker: 'Behandlung',
+    wer: 'Approbierte Psychotherapeut:innen oder qualifizierte Paartherapeut:innen',
+    wie: 'Regelmäßige Sitzungen vor Ort oder per Video. Diagnostik möglich, Behandlung im engeren Sinn.',
+    wann: 'Wenn eine psychische Erkrankung im Spiel ist, nach einem Vertrauensbruch oder in einer tiefen Krise.',
+    kosten: 'Meist Selbstzahlung – Paartherapie ist in Deutschland keine Kassenleistung.',
   },
   {
     was: 'Paarberatung',
-    wer: 'Beraterin, Coach, Eheberatungsstelle',
-    wie: 'Begleitete Gespräche, oft lösungsorientiert, meist ohne Diagnostik',
-    wann: 'Bei konkreten Konflikten, Entscheidungen, Übergängen',
+    kicker: 'Begleitung',
+    wer: 'Berater:innen, Coaches, kirchliche und kommunale Beratungsstellen',
+    wie: 'Begleitete Gespräche, lösungsorientiert, in der Regel ohne Diagnostik.',
+    wann: 'Bei konkreten Konflikten, anstehenden Entscheidungen und Übergängen – Umzug, Kind, Trennungsfrage.',
+    kosten: 'Bei Beratungsstellen oft kostenlos oder nach Einkommen gestaffelt.',
   },
   {
     was: 'EchoB zu zweit',
-    wer: 'Ihr beide, moderiert von Echo',
-    wie: 'Vorbereitete, moderierte Gespräche im eigenen Tempo – schriftlich, jederzeit',
-    wann: 'Zwischen den Terminen, vor dem ersten Termin, oder für wiederkehrende Alltagsthemen',
+    kicker: 'Werkzeug',
+    wer: 'Ihr beide – moderiert von Echo, ohne dass eine dritte Person mit im Raum sitzt',
+    wie: 'Schriftlich, vorbereitet, im eigenen Tempo. Jederzeit, auch wenn ihr nicht gleichzeitig Zeit habt.',
+    wann: 'Für wiederkehrende Alltagsthemen, für die Zeit zwischen Terminen und als Vorbereitung auf ein Erstgespräch.',
+    kosten: 'Im EchoB-Zugang enthalten, keine zusätzlichen Kosten.',
+    eigen: true,
   },
 ]
 
@@ -283,27 +295,59 @@ export default function ZuZweitPage() {
             und es hilft, das vorher zu wissen.
           </p>
 
-          <div className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse text-left text-[0.86rem]">
-              <thead>
-                <tr className="border-b border-brand-border">
-                  <th className="py-3 pr-4 font-bold text-navy">Was</th>
-                  <th className="py-3 pr-4 font-bold text-navy">Wer begleitet</th>
-                  <th className="py-3 pr-4 font-bold text-navy">Wie es abläuft</th>
-                  <th className="py-3 font-bold text-navy">Wofür es taugt</th>
-                </tr>
-              </thead>
-              <tbody>
-                {VERGLEICH.map((z) => (
-                  <tr key={z.was} className="border-b border-brand-border align-top">
-                    <td className="py-3.5 pr-4 font-semibold text-navy">{z.was}</td>
-                    <td className="py-3.5 pr-4 text-brand-muted">{z.wer}</td>
-                    <td className="py-3.5 pr-4 text-brand-muted">{z.wie}</td>
-                    <td className="py-3.5 text-brand-muted">{z.wann}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-9 grid gap-5 lg:grid-cols-3">
+            {VERGLEICH.map((v) => (
+              <div
+                key={v.was}
+                className={`flex flex-col rounded-brand-lg border p-5 shadow-brand-sm ${
+                  v.eigen ? 'border-accent/50 bg-accent/[0.05]' : 'border-brand-border bg-white'
+                }`}
+              >
+                <span className={`text-[0.62rem] font-bold uppercase tracking-[0.14em] ${
+                  v.eigen ? 'text-accent' : 'text-brand-muted'
+                }`}>
+                  {v.kicker}
+                </span>
+                <p className="mt-1 text-[1.1rem] font-bold text-navy">{v.was}</p>
+
+                <dl className="mt-4 space-y-3 text-[0.84rem] leading-relaxed">
+                  {[
+                    ['Wer begleitet', v.wer],
+                    ['Wie es abläuft', v.wie],
+                    ['Wofür es taugt', v.wann],
+                    ['Was es kostet', v.kosten],
+                  ].map(([label, wert]) => (
+                    <div key={label}>
+                      <dt className="text-[0.68rem] font-bold uppercase tracking-wide text-brand-muted/70">
+                        {label}
+                      </dt>
+                      <dd className="mt-0.5 text-brand-muted">{wert}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
+
+          {/* Die Klarstellung gehört genau hierhin – direkt neben den Vergleich. */}
+          <div className="mt-8 rounded-brand-lg border-l-4 border-l-accent border border-brand-border bg-white p-6">
+            <h3 className="text-[1.05rem] font-bold text-navy">
+              EchoB bietet keine Paartherapie an
+            </h3>
+            <p className="mt-2.5 text-[0.92rem] leading-relaxed text-brand-muted">
+              Das ist keine Bescheidenheitsfloskel, sondern eine Tatsache: Wir sind kein
+              Therapieanbieter, vermitteln keine Behandlung und stellen keine Diagnosen. Was
+              ihr hier bekommt, ist ein <strong className="text-navy">Werkzeug</strong> –
+              moderierte Gespräche, die ihr selbst führt, in eurem Tempo.
+            </p>
+            <p className="mt-3 text-[0.92rem] leading-relaxed text-brand-muted">
+              Wenn ihr Therapie braucht, sagt Echo das auch. Im{' '}
+              <Link to="/fachpersonen" className="font-medium text-accent hover:underline">
+                Verzeichnis
+              </Link>{' '}
+              findet ihr Fachpersonen – und alles, was ihr hier erarbeitet habt, könnt ihr
+              zum Erstgespräch mitnehmen, statt dort bei null anzufangen.
+            </p>
           </div>
 
           <p className="mt-6 max-w-[640px] text-[0.9rem] leading-relaxed text-brand-muted">
@@ -379,11 +423,8 @@ export default function ZuZweitPage() {
           </h2>
 
           <div className="mt-8 space-y-3">
-            {FAQ.map(({ q, a }) => (
-              <details key={q} className="rounded-brand-lg border border-brand-border bg-white px-5 py-4">
-                <summary className="cursor-pointer text-[0.95rem] font-semibold text-navy">{q}</summary>
-                <p className="mt-2.5 text-[0.9rem] leading-relaxed text-brand-muted">{a}</p>
-              </details>
+            {FAQ.map(({ q, a }, i) => (
+              <FaqCard key={q} q={q} a={a} defaultOpen={i === 0} />
             ))}
           </div>
         </div>
