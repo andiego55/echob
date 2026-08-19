@@ -161,6 +161,24 @@ def partner_of(link: dict, user_id) -> str | None:
     return link["initiator_user_id"]
 
 
+async def load_partner_profile(conn, link: dict, user_id) -> dict:
+    """Anzeigename und Avatar der anderen Person — mehr geht bewusst nicht über.
+
+    Beide haben der Kopplung zugestimmt; für Anrede und Wiedererkennung im Raum reicht
+    das. Keine E-Mail, kein Profil, keine Fall-Daten.
+    """
+    partner_id = partner_of(link, user_id)
+    if not partner_id:
+        return {"display_name": None, "avatar": None}
+    row = await conn.fetchrow(
+        "SELECT display_name, avatar FROM user_profiles WHERE user_id = $1", partner_id,
+    )
+    return {
+        "display_name": row["display_name"] if row else None,
+        "avatar": row["avatar"] if row else None,
+    }
+
+
 async def load_partner_display_name(conn, link: dict, user_id) -> str | None:
     """Selbstgewählter Anzeigename der anderen Person — bewusst das EINZIGE, was übergeht.
 

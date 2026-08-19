@@ -1,5 +1,4 @@
 import { apiClient } from './client'
-import type { CouplePrivateThread } from './couplePrivate'
 
 /**
  * Paartherapie (peer-to-peer): zwei Nutzer:innen verbinden sich zu einem Paarraum.
@@ -17,6 +16,7 @@ export interface CoupleLink {
   /** Eigener Anker-Fall (nur Bezug, kein Datenzugriff der anderen Person). */
   case_id: string | null
   partner_display_name: string | null
+  partner_avatar: string | null
   partner_connected: boolean
   created_at: string
   accepted_at: string | null
@@ -54,8 +54,20 @@ export interface CoupleDashboardItem {
   target: string | null
 }
 
+export interface CoupleEchoSummarySnippet {
+  id: string
+  title: string | null
+  summary_text: string
+  created_at: string
+}
+
 export interface CoupleDashboard {
   partner_name: string | null
+  partner_avatar: string | null
+  own_name: string
+  own_avatar: string | null
+  /** Eigene Begleiter-Zusammenfassungen – nur du siehst sie. */
+  echo_summaries: CoupleEchoSummarySnippet[]
   /** Liegt bei dir. */
   attention: CoupleDashboardItem[]
   /** Liegt bei der anderen Person. */
@@ -76,14 +88,6 @@ export interface CoupleDashboard {
 }
 
 export const coupleApi = {
-  /** Dein persönlicher Paar-Begleiter – kennt eigenen Fall UND Raum-Stand, bleibt privat. */
-  companion: (coupleId: string) =>
-    apiClient.get<CouplePrivateThread>(`/couple/links/${coupleId}/echo`).then(r => r.data),
-
-  talkToCompanion: (coupleId: string, content: string) =>
-    apiClient.post<CouplePrivateThread>(`/couple/links/${coupleId}/echo`, { content })
-      .then(r => r.data),
-
   dashboard: (coupleId: string) =>
     apiClient.get<CoupleDashboard>(`/couple/links/${coupleId}/dashboard`).then(r => r.data),
 

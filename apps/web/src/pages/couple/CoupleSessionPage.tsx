@@ -10,6 +10,8 @@ import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import { useAuth } from '@/contexts/AuthContext'
+import Avatar from '@/components/Avatar'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import { apiErrorMessage } from '@/api/errors'
 import type { CoupleSessionDetail } from '@/api/coupleSessions'
@@ -28,6 +30,7 @@ import { coupleAgreementsApi } from '@/api/coupleAgreements'
 export default function CoupleSessionPage() {
   const { sessionId = '' } = useParams<{ sessionId: string }>()
   const qc = useQueryClient()
+  const { user } = useAuth()
   const [text, setText] = useState('')
   const [panel, setPanel] = useState<'prep' | 'private'>('prep')
   const [prepMode, setPrepMode] = useState<'wizard' | 'manual'>('wizard')
@@ -78,6 +81,8 @@ export default function CoupleSessionPage() {
   }
 
   const { session, messages, contexts } = data
+  const ownAvatar = data.members.find(m => m.user_id === user?.id)?.avatar ?? null
+  const partnerAvatar = data.members.find(m => m.user_id !== user?.id)?.avatar ?? null
   const closed = session.status === 'closed'
   const busy = send.isPending || moderate.isPending
 
@@ -114,6 +119,14 @@ export default function CoupleSessionPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
           {/* ── Gespräch ─────────────────────────────────────────── */}
           <div className="card flex flex-col">
+            {session.goal && (
+              <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-3 rounded-t-brand-lg border-b border-brand-border bg-white/95 px-5 py-2.5 backdrop-blur">
+                <p className="text-[0.68rem] font-bold uppercase tracking-wide text-brand-muted">
+                  Unser Ziel
+                </p>
+                <p className="mt-0.5 text-sm font-medium text-navy">{session.goal}</p>
+              </div>
+            )}
             <div className="flex-1 space-y-4 overflow-y-auto pr-1" style={{ maxHeight: '58vh' }}>
               {messages.length === 0 && !closed && (
                 <div className="rounded-brand border border-accent/30 bg-accent/[0.04] px-5 py-6 text-center">
@@ -141,18 +154,41 @@ export default function CoupleSessionPage() {
                   )}
                 </div>
               )}
-              {messages.map(m => (
-                <div key={m.id} className={m.role === 'echo' ? '' : 'rounded-brand bg-brand-bg px-3.5 py-2.5'}>
-                  <p className={`text-xs font-semibold ${m.role === 'echo' ? 'text-accent' : 'text-navy'}`}>
-                    {m.speaker}
-                  </p>
-                  <div className="mt-1 text-sm text-brand-text">
-                    {m.role === 'echo'
-                      ? <MarkdownMessage content={m.content} />
-                      : <p className="whitespace-pre-wrap">{m.content}</p>}
+              {messages.map(m => {
+                // Echo sitzt in der Mitte und sieht anders aus als ihr beide — die
+                // Moderationsrolle soll man sehen, nicht lesen muessen.
+                if (m.role === 'echo') {
+                  return (
+                    <div key={m.id} className="flex justify-center">
+                      <div className="w-full max-w-[92%] rounded-brand-lg border border-accent/35 bg-accent/[0.05] px-4 py-3">
+                        <p className="text-[0.65rem] font-bold uppercase tracking-wide text-accent">
+                          Echo · Moderation
+                        </p>
+                        <div className="mt-1.5 text-sm text-brand-text">
+                          <MarkdownMessage content={m.content} />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
+                const meins = !!user?.id && m.user_id === user.id
+                return (
+                  <div key={m.id} className={`flex gap-2 ${meins ? 'justify-end' : 'justify-start'}`}>
+                    {!meins && <Avatar value={partnerAvatar} size="sm" className="mt-0.5" />}
+                    <div className={`max-w-[78%] rounded-2xl px-3.5 py-2.5 ${
+                      meins
+                        ? 'rounded-br-sm bg-navy text-white'
+                        : 'rounded-bl-sm bg-brand-bg text-brand-text'
+                    }`}>
+                      <p className={`text-[0.68rem] font-semibold ${meins ? 'text-white/70' : 'text-navy'}`}>
+                        {m.speaker}
+                      </p>
+                      <p className="mt-0.5 whitespace-pre-wrap text-sm">{m.content}</p>
+                    </div>
+                    {meins && <Avatar value={ownAvatar} size="sm" className="mt-0.5" />}
                   </div>
-                </div>
-              ))}
+                )
+              })}
               <div ref={endRef} />
             </div>
 

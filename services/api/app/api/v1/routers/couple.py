@@ -59,6 +59,7 @@ async def _require_owned_case(conn, case_id, user_id) -> None:
 
 
 async def _to_response(conn, link: dict, user_id) -> CoupleLinkResponse:
+    partner = await cts.load_partner_profile(conn, link, user_id)
     is_initiator = str(link["initiator_user_id"]) == str(user_id)
     pending = link["status"] == "pending"
     return CoupleLinkResponse(
@@ -68,7 +69,8 @@ async def _to_response(conn, link: dict, user_id) -> CoupleLinkResponse:
         # Code ist nur solange nützlich (und sichtbar), wie die Einladung offen ist.
         invite_code=link["invite_code"] if (pending and is_initiator) else None,
         case_id=link["initiator_case_id"] if is_initiator else link["partner_case_id"],
-        partner_display_name=await cts.load_partner_display_name(conn, link, user_id),
+        partner_display_name=partner.get("display_name"),
+        partner_avatar=partner.get("avatar"),
         partner_connected=link["status"] == "active",
         created_at=link["created_at"],
         accepted_at=link["accepted_at"],

@@ -55,7 +55,14 @@ export default function TopicsCard({ coupleId }: { coupleId: string }) {
       )}
 
       {topics.length === 0 ? (
-        <p className="mt-4 text-sm text-brand-muted">Noch kein Thema in Mediation.</p>
+        <div className="mt-4 rounded-brand border border-dashed border-brand-border px-4 py-5">
+          <p className="text-sm font-semibold text-navy">Noch kein Thema in Mediation</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-brand-muted">
+            Mediation ist für das, worüber ihr schon oft gesprochen habt, ohne weiterzukommen.
+            Ihr schreibt erst getrennt – offen und vertraulich – und Echo erarbeitet daraus
+            drei konkrete Brücken, über die ihr dann verhandelt.
+          </p>
+        </div>
       ) : (
         <div className="mt-4 space-y-2">
           {topics.map(t => (

@@ -13,16 +13,16 @@ from __future__ import annotations
 from typing import Any
 
 from app.core import crypto
+from app.services.couple_companion_service import list_summaries
 from app.services.couple_progress_service import load_progress
-from app.services.couple_session_service import load_member_names
-from app.services.couple_therapy_service import require_couple_member
+from app.services.couple_therapy_service import load_partner_profile, require_couple_member
 
 
 async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
     link = await require_couple_member(conn, couple_id, user_id)
-    partner_name = (await load_member_names(conn, link)).get(
-        str(link.get("partner_user_id") if str(link["initiator_user_id"]) == str(user_id)
-            else link["initiator_user_id"])
+    partner = await load_partner_profile(conn, link, user_id)
+    eigen = await conn.fetchrow(
+        "SELECT display_name, avatar FROM user_profiles WHERE user_id = $1", user_id,
     )
     me = str(user_id)
 
@@ -70,8 +70,22 @@ async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
 
     attention, waiting = _sort_by_who_acts(sessions, topics, agreements, tests, me)
 
+    # Eigene Echo-Zusammenfassungen — sie gehören auf die Übersicht, aber nur der
+    # Person, die sie geführt hat.
+    zusammenfassungen = await list_summaries(conn, couple_id, user_id, limit=4)
+
     return {
-        "partner_name": partner_name,
+        "partner_name": partner.get("display_name"),
+        "partner_avatar": partner.get("avatar"),
+        "own_name": (eigen["display_name"] if eigen else None) or "Du",
+        "own_avatar": eigen["avatar"] if eigen else None,
+        "echo_summaries": [
+            {
+                "id": s["id"], "title": s.get("title"),
+                "summary_text": s["summary_text"], "created_at": s["created_at"],
+            }
+            for s in zusammenfassungen
+        ],
         "attention": attention,
         "waiting_for_partner": waiting,
         "sessions": [

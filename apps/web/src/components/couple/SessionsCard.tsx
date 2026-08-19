@@ -86,9 +86,17 @@ export default function SessionsCard({ coupleId }: { coupleId: string }) {
       )}
 
       {sessions.length === 0 ? (
-        <p className="mt-4 text-sm text-brand-muted">
-          Noch kein Gespräch. Fangt mit einem kleinen Thema an – nicht mit dem größten.
-        </p>
+        <div className="mt-4 rounded-brand border border-dashed border-brand-border px-4 py-5">
+          <p className="text-sm font-semibold text-navy">Noch kein Gespräch</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-brand-muted">
+            Ein Gespräch hat ein Thema und ein Ziel. Du bereitest es in Ruhe vor, schlägst es
+            der anderen Person vor – und wenn sie zusagt, eröffnet Echo und moderiert.
+          </p>
+          <p className="mt-2 text-xs text-brand-muted">
+            Fangt mit etwas Kleinem an, nicht mit dem größten Thema. Das Format übt sich
+            leichter an „Wie wir Sonntage verbringen" als an der Grundsatzfrage.
+          </p>
+        </div>
       ) : (
         <div className="mt-4 space-y-2">
           {sessions.map(s => (

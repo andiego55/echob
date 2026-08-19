@@ -34,6 +34,16 @@ export default function TestsCard({ coupleId }: { coupleId: string }) {
         Ergebnis der anderen Person siehst du erst, wenn du selbst geantwortet hast.
       </p>
 
+      {offer.length === 0 && (
+        <div className="mt-4 rounded-brand border border-dashed border-brand-border px-4 py-5">
+          <p className="text-sm font-semibold text-navy">Gerade keine passenden Tests</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-brand-muted">
+            Im Paarraum gibt es nur Tests, die zu zweit vertretbar sind. Tests, in denen eine
+            Person die andere einschätzt, bleiben bewusst in deinem privaten Bereich.
+          </p>
+        </div>
+      )}
+
       <div className="mt-4 space-y-2">
         {offer.map(t => {
           const state = started.find(s => s.slug === t.slug)

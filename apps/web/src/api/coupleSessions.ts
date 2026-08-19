@@ -43,7 +43,7 @@ export interface CoupleSharedContext {
 
 export interface CoupleSessionDetail {
   session: CoupleSession
-  members: { user_id: string; name: string }[]
+  members: { user_id: string; name: string; avatar: string | null }[]
   messages: CoupleSessionMessage[]
   contexts: CoupleSharedContext[]
 }

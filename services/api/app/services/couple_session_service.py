@@ -337,6 +337,23 @@ def public_message(row: dict, names: dict[str, str]) -> dict[str, Any]:
     }
 
 
+async def load_member_profiles(conn, link: dict) -> dict[str, dict]:
+    """Anzeigename und Avatar beider Mitglieder — mehr geht im Paarraum nicht über."""
+    profile: dict[str, dict] = {}
+    for idx, key in enumerate(("initiator_user_id", "partner_user_id")):
+        uid = link.get(key)
+        if not uid:
+            continue
+        row = await conn.fetchrow(
+            "SELECT display_name, avatar FROM user_profiles WHERE user_id = $1", uid,
+        )
+        profile[str(uid)] = {
+            "name": (row["display_name"] if row else None) or f"Person {'AB'[idx]}",
+            "avatar": row["avatar"] if row else None,
+        }
+    return profile
+
+
 async def load_member_names(conn, link: dict) -> dict[str, str]:
     """Anzeigenamen beider Mitglieder (Fallback: neutrale Bezeichnung)."""
     names: dict[str, str] = {}

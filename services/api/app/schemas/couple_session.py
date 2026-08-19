@@ -68,6 +68,7 @@ class CoupleSessionResponse(BaseModel):
 class CoupleMember(BaseModel):
     user_id: UUID
     name: str
+    avatar: str | None = None
 
 
 class CoupleSessionMessage(BaseModel):

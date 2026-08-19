@@ -195,6 +195,35 @@ function BridgeCard({ bridge, topicId }: { bridge: CoupleBridge; topicId: string
           {vonMir ? 'Von dir geändert' : 'Von deiner Partnerperson geändert'}
         </p>
       )}
+
+      {/* Der Weg dorthin — man sieht die Bewegung, nicht nur den Endstand. */}
+      {bridge.versions.length > 1 && !edit && (
+        <details className="mt-2">
+          <summary className="cursor-pointer text-[0.7rem] text-brand-muted hover:text-navy">
+            Verlauf ansehen ({bridge.versions.length} Fassungen)
+          </summary>
+          <ol className="mt-2 space-y-2 border-l-2 border-brand-border pl-3">
+            {bridge.versions.map((v, i) => {
+              const wer = v.changed_by === null
+                ? 'Echos Vorschlag'
+                : v.changed_by === user?.id ? 'Deine Fassung' : 'Ihre Fassung'
+              const aktuell = i === bridge.versions.length - 1
+              return (
+                <li key={i} className="relative">
+                  <span className={`absolute -left-[1.05rem] top-1.5 h-2 w-2 rounded-full ${
+                    aktuell ? 'bg-accent' : 'bg-brand-border'
+                  }`} />
+                  <p className={`text-[0.68rem] font-semibold ${aktuell ? 'text-accent' : 'text-brand-muted'}`}>
+                    {wer}
+                    {aktuell && ' · gilt gerade'}
+                  </p>
+                  <p className="mt-0.5 whitespace-pre-wrap text-xs text-brand-muted">{v.body}</p>
+                </li>
+              )
+            })}
+          </ol>
+        </details>
+      )}
       {bridge.note && (
         <p className="mt-1.5 text-[0.7rem] text-brand-muted">Notiz: {bridge.note}</p>
       )}

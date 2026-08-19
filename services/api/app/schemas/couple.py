@@ -37,6 +37,7 @@ class CoupleLinkResponse(BaseModel):
     invite_code: str | None = None
     case_id: UUID | None = None                # eigener Anker-Fall
     partner_display_name: str | None = None
+    partner_avatar: str | None = None
     partner_connected: bool = False
     created_at: datetime
     accepted_at: datetime | None = None
@@ -126,9 +127,21 @@ class CoupleAgreementSummary(BaseModel):
     recent: list[CoupleAgreementSnippet] = []
 
 
+class CoupleEchoSummarySnippet(BaseModel):
+    """Eigene Begleiter-Zusammenfassung für die Übersicht."""
+    id: UUID
+    title: str | None = None
+    summary_text: str
+    created_at: datetime
+
+
 class CoupleDashboard(BaseModel):
     """Was im Paarraum gerade dran ist — serverseitig sortiert nach „wer ist am Zug“."""
     partner_name: str | None = None
+    partner_avatar: str | None = None
+    own_name: str = "Du"
+    own_avatar: str | None = None
+    echo_summaries: list[CoupleEchoSummarySnippet] = []
     attention: list[CoupleDashboardItem] = []
     waiting_for_partner: list[CoupleDashboardItem] = []
     sessions: list[CoupleDashboardSession] = []

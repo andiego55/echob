@@ -56,6 +56,15 @@ def _echo(request: Request):
     return svc
 
 
+async def _members(conn, link) -> list[dict]:
+    """Mitglieder samt Avatar — Grundlage für die Sprechblasen im Gespräch."""
+    profile = await css.load_member_profiles(conn, link)
+    return [
+        {"user_id": uid, "name": p["name"], "avatar": p["avatar"]}
+        for uid, p in profile.items()
+    ]
+
+
 def _context_out(c: dict, names: dict[str, str]) -> dict:
     """Ein bestätigter Beitrag, wie ihn beide im Raum sehen."""
     return {
@@ -115,7 +124,7 @@ async def get_session(
         contexts = await css.load_confirmed_contexts(conn, session_id)
     return CoupleSessionDetail(
         session=_session_out(session),
-        members=[{"user_id": uid, "name": name} for uid, name in names.items()],
+        members=await _members(conn, link),
         messages=[css.public_message(m, names) for m in messages],
         # Bestätigte Beiträge sind im Raum bewusst für beide sichtbar.
         contexts=[_context_out(c, names) for c in contexts],
@@ -342,7 +351,7 @@ async def post_message(
         contexts = await css.load_confirmed_contexts(conn, session_id)
     return CoupleSessionDetail(
         session=_session_out(session),
-        members=[{"user_id": uid, "name": name} for uid, name in names.items()],
+        members=await _members(conn, link),
         messages=[css.public_message(m, names) for m in messages],
         contexts=[_context_out(c, names) for c in contexts],
     )
@@ -382,7 +391,7 @@ async def moderate(
 
     return CoupleSessionDetail(
         session=_session_out(session),
-        members=[{"user_id": uid, "name": name} for uid, name in names.items()],
+        members=await _members(conn, link),
         messages=[css.public_message(m, names) for m in messages],
         contexts=[_context_out(c, names) for c in contexts],
     )

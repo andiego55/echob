@@ -48,6 +48,16 @@ export interface CoupleBridge {
   note: string | null
   agreement_id: string | null
   updated_at: string
+  /** Älteste zuerst: Original von Echo, dann jede Gegenfassung. */
+  versions: CoupleBridgeVersion[]
+}
+
+/** Eine Fassung im Verhandlungsverlauf. `changed_by: null` = Original von Echo. */
+export interface CoupleBridgeVersion {
+  title: string | null
+  body: string
+  changed_by: string | null
+  created_at: string
 }
 
 export interface CoupleTopicMessage {
