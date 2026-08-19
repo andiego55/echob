@@ -36,7 +36,7 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
     ),
   },
   {
-    kicker: 'EchoB ordnet es – Szene für Szene zu einer klaren Fallakte.',
+    kicker: 'Du hältst einzelne Situationen fest – so, wie sie wirklich waren.',
     visual: (
       <div className="flex w-full max-w-xs flex-col gap-2">
         {['Szene 1 · Der Abend', 'Szene 2 · Das Gespräch', 'Szene 3 · Danach'].map((t, i) => (
@@ -52,7 +52,7 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
     ),
   },
   {
-    kicker: 'Echo trennt Beobachtung, Gefühl und Interpretation.',
+    kicker: 'Beobachtung, Gefühl, Deutung – Echo hält sie auseinander.',
     visual: (
       <div className="flex flex-wrap items-center justify-center gap-2.5">
         {[
@@ -84,7 +84,7 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
     ),
   },
   {
-    kicker: 'Über mehrere Situationen werden Muster sichtbar – ohne Diagnose.',
+    kicker: 'Nach ein paar Szenen wird sichtbar, was sich wiederholt. Ohne Diagnose.',
     visual: (
       <svg viewBox="0 0 320 120" className="w-full max-w-sm">
         <polyline
@@ -110,12 +110,12 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
     ),
   },
   {
-    kicker: 'Kein generischer Chatbot – strukturiert, vorsichtig, in der EU verschlüsselt.',
+    kicker: 'Kein Chat, der dich nach fünf Minuten wieder vergisst.',
     visual: (
       <div className="grid w-full max-w-lg grid-cols-2 gap-3 text-left">
         <div className="rounded-xl border border-white/12 bg-white/[0.04] p-3.5" style={fade(0)}>
           <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-white/45">Allgemeiner KI-Chat</p>
-          {['Vergisst nach dem Chat', 'Urteilt über andere', 'Daten in die US-Cloud'].map((t) => (
+          {['Fängt jedes Mal bei null an', 'Sagt, was du hören willst', 'Urteilt über Menschen, die es nicht kennt'].map((t) => (
             <p key={t} className="mb-1 flex gap-1.5 text-xs text-white/70">
               <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
               {t}
@@ -124,12 +124,31 @@ const SCENES: { kicker: string; visual: React.ReactNode }[] = [
         </div>
         <div className="rounded-xl border border-accent/40 bg-accent/10 p-3.5" style={fade(0.15)}>
           <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-accent">EchoB</p>
-          {['Strukturierte Fallakte', 'Keine Diagnosen', 'EU-verschlüsselt'].map((t) => (
+          {['Kennt deine Szenen von gestern', 'Bleibt ehrlich statt gefällig', 'Ordnet ein, ohne zu diagnostizieren'].map((t) => (
             <p key={t} className="mb-1 flex gap-1.5 text-xs text-white">
               <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
               {t}
             </p>
           ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    kicker: 'Und dann? Mitnehmen zur Fachperson – oder zu zweit weitersprechen.',
+    visual: (
+      <div className="grid w-full max-w-lg grid-cols-1 gap-3 text-left sm:grid-cols-2">
+        <div className="rounded-xl border border-white/12 bg-white/[0.04] p-4" style={fade(0)}>
+          <p className="text-xs font-bold text-white">Zur Fachperson</p>
+          <p className="mt-1.5 text-[0.72rem] leading-snug text-white/65">
+            Gib einzelne Inhalte gezielt frei – statt im Erstgespräch bei null anzufangen.
+          </p>
+        </div>
+        <div className="rounded-xl border border-accent/40 bg-accent/10 p-4" style={fade(0.15)}>
+          <p className="text-xs font-bold text-white">Zu zweit</p>
+          <p className="mt-1.5 text-[0.72rem] leading-snug text-white/80">
+            Verbindet euch zu einem Paarraum, in dem Echo eure Gespräche moderiert.
+          </p>
         </div>
       </div>
     ),
