@@ -9,11 +9,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import { apiErrorMessage } from '@/api/errors'
-
-const MOOD_EMOJI: Record<string, string> = {
-  ruhig: '🌤', hoffnungsvoll: '🌱', angespannt: '⚡',
-  traurig: '🌧', wuetend: '🔥', erschoepft: '🌙',
-}
+import { MOOD_EMOJI } from './moods'
 
 const STEPS = ['Stimmung', 'Wertschätzung', 'Anliegen', 'Bitte', 'Freigeben'] as const
 

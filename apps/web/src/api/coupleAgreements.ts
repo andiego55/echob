@@ -22,6 +22,9 @@ export interface CoupleAgreement {
   accepted_at: string | null
   status: 'proposed' | 'active' | 'kept' | 'dropped'
   due_at: string | null
+  /** Gesetzt, sobald jemand die Nachfrage beantwortet hat. */
+  reviewed_at: string | null
+  review_note: string | null
   created_at: string
   updated_at: string
 }
@@ -36,7 +39,15 @@ export const coupleAgreementsApi = {
   list: (coupleId: string) =>
     apiClient.get<CoupleAgreement[]>(`/couple/links/${coupleId}/agreements`).then(r => r.data),
 
-  propose: (coupleId: string, body: { body: string; session_id?: string | null }) =>
+  /** Was heute nachgefragt gehört: geltende Abmachungen mit erreichtem Termin. */
+  listDue: (coupleId: string) =>
+    apiClient.get<CoupleAgreement[]>(`/couple/links/${coupleId}/agreements/due`).then(r => r.data),
+
+  /** `again` verschiebt die Nachfrage um eine Woche, statt sie zu beenden. */
+  review: (agreementId: string, body: { outcome: 'kept' | 'again' | 'dropped'; note?: string | null }) =>
+    apiClient.post<CoupleAgreement>(`/couple/agreements/${agreementId}/review`, body).then(r => r.data),
+
+  propose: (coupleId: string, body: { body: string; session_id?: string | null; due_at?: string | null }) =>
     apiClient.post<CoupleAgreement>(`/couple/links/${coupleId}/agreements`, body).then(r => r.data),
 
   accept: (agreementId: string) =>

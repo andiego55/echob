@@ -20,6 +20,7 @@ from app.schemas.couple_test import (
     CoupleTestState,
     CoupleTestSummary,
 )
+from app.services import couple_notify_service as notify
 from app.services import couple_progress_service as progress
 from app.services import couple_test_service as cts_test
 from app.services.subscription_service import enforce_echo_prompt_limit
@@ -75,7 +76,10 @@ async def save_test(
             slug=slug, title=body.title, answers=body.answers, result=body.result,
         )
         await progress.award(conn, couple_id, user_id, "test_taken", slug)
-        return await _state(conn, couple_id, slug, user_id)
+        state = await _state(conn, couple_id, slug, user_id)
+        if not state.both_done:
+            await notify.to_partner(conn, couple_id, user_id, notify.test_taken(body.title))
+        return state
 
 
 @router.post("/{slug}/compare", response_model=CoupleTestState)

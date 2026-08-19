@@ -34,6 +34,7 @@ from app.schemas.couple_mediation import (
 from app.schemas.couple_private import CouplePrivateMessageCreate, CouplePrivateThread
 from app.services import couple_agreement_service as cas
 from app.services import couple_mediation_service as cms
+from app.services import couple_notify_service as notify
 from app.services import couple_private_service as cps
 from app.services import couple_progress_service as progress
 from app.services.couple_session_service import load_member_names
@@ -127,6 +128,8 @@ async def save_perspective(
         if body.open_text:
             await progress.award(conn, topic["couple_id"], user_id,
                                  "perspective_shared", topic_id)
+            await notify.to_partner(conn, topic["couple_id"], user_id,
+                                    notify.perspective_shared(topic["title"]))
         return await _detail(conn, topic, link, user_id)
 
 
@@ -188,6 +191,8 @@ async def update_bridge(
     async with pool.acquire() as conn:
         await cms.update_bridge(conn, bridge_id, user_id, title=body.title, body=body.body)
         _, topic, link = await cms.require_bridge(conn, bridge_id, user_id)
+        await notify.to_partner(conn, topic["couple_id"], user_id,
+                                notify.bridge_changed(topic["title"]))
         return await _detail(conn, topic, link, user_id)
 
 
@@ -210,6 +215,8 @@ async def accept_bridge(
                                     agreement_id=agreement["id"])
         await progress.award(conn, topic["couple_id"], user_id,
                              "agreement_proposed", agreement["id"])
+        await notify.to_partner(conn, topic["couple_id"], user_id,
+                                notify.agreement_proposed(text))
         return await _detail(conn, topic, link, user_id)
 
 

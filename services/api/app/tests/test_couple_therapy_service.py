@@ -12,6 +12,7 @@ import ast
 import inspect
 import os
 import uuid
+from datetime import UTC, datetime, timedelta
 
 import asyncpg
 import pytest
@@ -19,8 +20,10 @@ from fastapi import HTTPException
 
 from app.core import crypto
 from app.services import couple_agreement_service as cas
+from app.services import couple_checkin_service as cchk
 from app.services import couple_dashboard_service as dash
 from app.services import couple_mediation_service as cms
+from app.services import couple_notify_service as cnotify
 from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
 from app.services import couple_progress_service as prog
@@ -96,7 +99,7 @@ async def test_link_grants_no_case_access(db):
         assert f"CONCERN_{foreign}" not in payload   # Anliegen der anderen Person
 
 
-@pytest.mark.parametrize("modul", [cts, css])
+@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify])
 async def test_service_never_touches_case_content(modul):
     """Struktur-Wächter: Kopplung UND Sitzung ziehen bewusst keine Fall-Inhalte heran.
 
@@ -551,6 +554,8 @@ async def _fill_room(db, user_a, user_b, couple_id):
     await ctest.save_run(db, couple_id, user_a, slug="bindung", title="B",
                          answers={}, result={})
     await cps.add_private_message(db, session["id"], user_a, role="user", content="PRIVAT")
+    await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="CHECKIN_VON_ALEX",
+                    wish="MEHR ZEIT")
     await prog.award(db, couple_id, user_a, "session_started", session["id"])
     return session, topic
 
@@ -579,6 +584,8 @@ async def _room_row_counts(db, couple_id, session_id, topic_id) -> dict[str, int
             "SELECT count(*) FROM couple_test_runs WHERE couple_id=$1", couple_id),
         "points": await db.fetchval(
             "SELECT count(*) FROM couple_point_events WHERE couple_id=$1", couple_id),
+        "checkins": await db.fetchval(
+            "SELECT count(*) FROM couple_checkins WHERE couple_id=$1", couple_id),
     }
 
 
@@ -593,7 +600,7 @@ async def test_ending_a_room_keeps_the_content(db):
 
 
 async def test_purge_removes_everything_in_the_room(db):
-    """Löschen räumt über die Cascade wirklich alle zwölf abhängigen Tabellen ab."""
+    """Löschen räumt über die Cascade wirklich alle abhängigen Tabellen ab."""
     user_a, _, user_b, _, couple_id = await _linked_pair(db)
     session, topic = await _fill_room(db, user_a, user_b, couple_id)
 
@@ -655,6 +662,7 @@ async def test_export_holds_own_data_but_not_the_partners_secrets(db):
     await cps.add_private_message(db, session["id"], user_b, role="user",
                                   content="PRIVAT_VON_RIO")
     await cms.save_perspective(db, topic["id"], user_b, private_text="GEHEIM_VON_RIO")
+    await cchk.save(db, couple_id, user_b, highlight="CHECKIN_VON_RIO")
 
     export = await privacy.export_for_user(db, user_a)
     blob = str(export)
@@ -662,6 +670,8 @@ async def test_export_holds_own_data_but_not_the_partners_secrets(db):
     assert "PRIVAT_VON_RIO" not in blob                 # fremder privater Dialog nicht
     assert "GEHEIM_VON_RIO" not in blob                 # fremder vertraulicher Beitrag nicht
     assert "Zusammenfassung" in blob and "Abmachung" in blob   # Gemeinsames schon
+    assert "CHECKIN_VON_ALEX" in blob                    # eigener Check-in ist drin
+    assert "CHECKIN_VON_RIO" not in blob                 # der der anderen Person nicht
 
 
 # ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────
@@ -1084,3 +1094,219 @@ async def test_context_length_is_capped(db):
         await css.save_context(db, session["id"], user_a,
                                confirmed_text="x" * (css.MAX_CONTEXT_CHARS + 1))
     assert exc.value.status_code == 400
+
+
+# ── Rhythmus: Wochen-Check-in ────────────────────────────────────────────────
+
+
+async def test_checkin_hidden_until_you_wrote_your_own(db):
+    """Erst schreiben, dann sehen — wie überall im Modul."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cchk.save(db, couple_id, user_b, mood="ruhig", highlight="SPAZIERGANG",
+                    wish="MEHR ZEIT")
+
+    verdeckt = await cchk.load_week(db, couple_id, user_a)
+    fremd = next(e for e in verdeckt["entries"] if not e["is_own"])
+    assert fremd["done"] is True          # dass sie da war, sieht man
+    assert fremd["visible"] is False      # was sie schrieb, noch nicht
+    assert fremd["highlight"] is None and fremd["wish"] is None and fremd["mood"] is None
+
+    await cchk.save(db, couple_id, user_a, mood="hoffnungsvoll", highlight="KAFFEE")
+    offen = await cchk.load_week(db, couple_id, user_a)
+    fremd = next(e for e in offen["entries"] if not e["is_own"])
+    assert fremd["visible"] is True
+    assert fremd["highlight"] == "SPAZIERGANG"
+    assert offen["both_done"] is True
+
+
+async def test_checkin_is_one_entry_per_person_and_week(db):
+    """Zweimal antworten ergänzt denselben Eintrag, statt einen zweiten anzulegen."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="ERSTES")
+    await cchk.save(db, couple_id, user_a, wish="ZWEITES")
+
+    anzahl = await db.fetchval(
+        "SELECT COUNT(*) FROM couple_checkins WHERE couple_id = $1 AND user_id = $2",
+        couple_id, user_a)
+    assert anzahl == 1
+    eigen = next(e for e in (await cchk.load_week(db, couple_id, user_a))["entries"]
+                 if e["is_own"])
+    assert eigen["highlight"] == "ERSTES"   # bleibt stehen
+    assert eigen["wish"] == "ZWEITES"       # kommt dazu
+
+
+async def test_checkin_free_text_is_encrypted_at_rest(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await cchk.save(db, couple_id, user_a, highlight="GEHEIMER MOMENT", wish="GEHEIMER WUNSCH")
+    roh = await db.fetchrow(
+        "SELECT highlight, wish FROM couple_checkins WHERE couple_id = $1 AND user_id = $2",
+        couple_id, user_a)
+    assert "GEHEIMER MOMENT" not in (roh["highlight"] or "")
+    assert "GEHEIMER WUNSCH" not in (roh["wish"] or "")
+
+
+async def test_checkin_history_groups_by_week_and_names_both(db):
+    """Der Zeitstrahl zeigt beide Stimmungen je Woche — und keinen Freitext."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="NICHT IM VERLAUF")
+    await cchk.save(db, couple_id, user_b, mood="erschoepft")
+
+    verlauf = await cchk.load_history(db, couple_id, user_a)
+    assert len(verlauf) == 1                       # eine Woche, beide darin
+    woche = verlauf[0]
+    assert {m["mood"] for m in woche["moods"]} == {"ruhig", "erschoepft"}
+    assert [m["is_own"] for m in woche["moods"]].count(True) == 1
+    assert all(m["name"] for m in woche["moods"])  # Anzeigenamen aufgeloest
+    assert "NICHT IM VERLAUF" not in str(verlauf)  # bewusst nur Stimmungen
+
+
+async def test_checkin_history_closed_to_outsiders(db):
+    _, _, _, _, couple_id = await _linked_pair(db)
+    with pytest.raises(HTTPException) as e:
+        await cchk.load_history(db, couple_id, uuid.uuid4())
+    assert e.value.status_code == 404
+
+
+async def test_checkin_closed_to_outsiders(db):
+    _, _, _, _, couple_id = await _linked_pair(db)
+    fremd = uuid.uuid4()
+    with pytest.raises(HTTPException) as e1:
+        await cchk.load_week(db, couple_id, fremd)
+    assert e1.value.status_code == 404
+    with pytest.raises(HTTPException) as e2:
+        await cchk.save(db, couple_id, fremd, highlight="X")
+    assert e2.value.status_code == 404
+
+
+async def test_checkin_rejects_unknown_mood(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    with pytest.raises(HTTPException) as e:
+        await cchk.save(db, couple_id, user_a, mood="euphorisch")
+    assert e.value.status_code == 400
+
+
+# ── Rhythmus: Nachfrage zu Abmachungen ──────────────────────────────────────
+
+
+async def _aktive_abmachung(db, couple_id, user_a, user_b, *, due_at):
+    """Eine geltende Abmachung mit Termin — vorgeschlagen von A, bestätigt von B."""
+    row = await cas.propose(db, couple_id, user_a, body="Handy weg beim Essen",
+                            due_at=due_at)
+    await cas.accept(db, row["id"], user_b)
+    return row["id"]
+
+
+async def test_only_reached_dates_are_asked_about(db):
+    """Ohne Termin oder mit Termin in der Zukunft wird nicht nachgefragt."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    morgen = datetime.now(UTC) + timedelta(days=1)
+    gestern = datetime.now(UTC) - timedelta(days=1)
+
+    ohne = await cas.propose(db, couple_id, user_a, body="Ohne Termin")
+    await cas.accept(db, ohne["id"], user_b)
+    spaeter = await _aktive_abmachung(db, couple_id, user_a, user_b, due_at=morgen)
+    faellig = await _aktive_abmachung(db, couple_id, user_a, user_b, due_at=gestern)
+
+    ids = {str(r["id"]) for r in await cas.list_due(db, couple_id, user_a)}
+    assert str(faellig) in ids
+    assert str(spaeter) not in ids and str(ohne["id"]) not in ids
+
+
+async def test_review_kept_closes_the_question(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    gestern = datetime.now(UTC) - timedelta(days=1)
+    aid = await _aktive_abmachung(db, couple_id, user_a, user_b, due_at=gestern)
+
+    row = await cas.review(db, aid, user_a, "kept", "HAT GUT GEKLAPPT")
+    assert row["status"] == "kept"
+    assert row["reviewed_at"] is not None
+    assert row["review_note"] == "HAT GUT GEKLAPPT"
+    assert await cas.list_due(db, couple_id, user_a) == []
+
+
+async def test_review_again_asks_a_week_later(db):
+    """Noch dran verschiebt die Frage, statt sie zu beenden."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    gestern = datetime.now(UTC) - timedelta(days=1)
+    aid = await _aktive_abmachung(db, couple_id, user_a, user_b, due_at=gestern)
+
+    row = await cas.review(db, aid, user_a, "again")
+    assert row["status"] == "active"
+    assert row["reviewed_at"] is None          # die Frage bleibt offen
+    assert row["due_at"] > datetime.now(UTC)   # nur eben später
+    assert await cas.list_due(db, couple_id, user_a) == []
+
+
+async def test_review_note_is_encrypted_at_rest(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    aid = await _aktive_abmachung(db, couple_id, user_a, user_b,
+                                  due_at=datetime.now(UTC) - timedelta(days=1))
+    await cas.review(db, aid, user_a, "kept", "GEHEIME RUECKMELDUNG")
+    roh = await db.fetchval("SELECT review_note FROM couple_agreements WHERE id = $1", aid)
+    assert "GEHEIME RUECKMELDUNG" not in (roh or "")
+
+
+async def test_review_closed_to_outsiders(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    aid = await _aktive_abmachung(db, couple_id, user_a, user_b,
+                                  due_at=datetime.now(UTC) - timedelta(days=1))
+    with pytest.raises(HTTPException) as e:
+        await cas.review(db, aid, uuid.uuid4(), "kept")
+    assert e.value.status_code == 404
+
+
+async def test_unknown_review_outcome_rejected(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    aid = await _aktive_abmachung(db, couple_id, user_a, user_b,
+                                  due_at=datetime.now(UTC) - timedelta(days=1))
+    with pytest.raises(HTTPException) as e:
+        await cas.review(db, aid, user_a, "vielleicht")
+    assert e.value.status_code == 400
+
+
+# ── Rhythmus: Benachrichtigungen ────────────────────────────────────────────
+
+
+async def test_notification_reaches_only_the_other_person(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cnotify.to_partner(db, couple_id, user_a, cnotify.checkin_done())
+
+    an_b = await db.fetch("SELECT kind FROM client_notifications WHERE user_id = $1", user_b)
+    an_a = await db.fetch("SELECT kind FROM client_notifications WHERE user_id = $1", user_a)
+    assert [r["kind"] for r in an_b] == ["couple_checkin_done"]
+    assert an_a == []
+
+
+async def test_notification_carries_no_case_content(db):
+    """Der gemeinsam formulierte Text darf mit — Fall-Inhalte nie."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cnotify.to_partner(db, couple_id, user_a,
+                             cnotify.agreement_proposed("Handy weg beim Essen"))
+    body = await db.fetchval(
+        "SELECT body FROM client_notifications WHERE user_id = $1", user_b)
+    assert "Handy weg beim Essen" in body
+    assert "AAA" not in body and "BBB" not in body
+
+
+async def test_notification_never_reaches_an_open_invite(db):
+    """Solange niemand angenommen hat, gibt es keine andere Person."""
+    user_a, case_a = await _seed_user(db, "SOLO")
+    link = await cts.create_link(db, user_a, case_a)
+    await cnotify.to_partner(db, link["id"], user_a, cnotify.checkin_done())
+    assert await db.fetchval("SELECT COUNT(*) FROM client_notifications") == 0
+
+
+async def test_notification_failure_never_breaks_the_action(db):
+    """Ein kaputter Kanal darf die eigentliche Handlung nicht mitreissen."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+
+    class Kaputt:
+        async def fetchrow(self, *a, **k):
+            return await db.fetchrow(*a, **k)
+
+        async def execute(self, *a, **k):
+            raise RuntimeError("Kanal weg")
+
+    # Wirft nichts nach aussen — das ist die ganze Zusicherung.
+    await cnotify.to_partner(Kaputt(), couple_id, user_a, cnotify.checkin_done())
+    assert await db.fetchval("SELECT COUNT(*) FROM client_notifications") == 0

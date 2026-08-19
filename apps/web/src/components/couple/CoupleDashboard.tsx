@@ -13,6 +13,9 @@ import Avatar from '@/components/Avatar'
 import { coupleApi } from '@/api/couple'
 import type { CoupleDashboardItem } from '@/api/couple'
 import { apiErrorMessage } from '@/api/errors'
+import CoupleNotices from './CoupleNotices'
+import DueAgreementsCard from './DueAgreementsCard'
+import WeeklyCheckinCard from './WeeklyCheckinCard'
 
 export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
   const { data, isLoading, isError, error } = useQuery({
@@ -43,6 +46,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
 
   return (
     <div className="space-y-5">
+      <CoupleNotices />
+
       {/* ── Wer hier ist ──────────────────────────────────────────── */}
       <div className="card bg-gradient-to-br from-accent/[0.07] to-transparent">
         <div className="flex flex-wrap items-center gap-4">
@@ -86,6 +91,15 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
           </p>
         </div>
       )}
+
+      {/* ── Rhythmus: was sich wiederholt ─────────────────────────── */}
+      <DueAgreementsCard coupleId={coupleId} />
+
+      <WeeklyCheckinCard
+        coupleId={coupleId}
+        ownAvatar={data.own_avatar}
+        partnerAvatar={data.partner_avatar}
+      />
 
       {waiting.length > 0 && (
         <div className="card">

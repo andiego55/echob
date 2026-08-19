@@ -184,6 +184,13 @@ async def export_for_user(conn: asyncpg.Connection, user_id) -> dict[str, Any]:
         for c in await rows(
             "SELECT * FROM couple_test_comparisons WHERE couple_id = ANY($1::uuid[])", ids)
     ]
+    # Nur die EIGENEN Check-ins - der Text der anderen Person gehoert ihr, nicht dieser Person.
+    data["couple_checkins"] = [
+        crypto.decrypt_fields(c, "highlight", "wish")
+        for c in await rows(
+            "SELECT * FROM couple_checkins WHERE user_id = $1 AND couple_id = ANY($2::uuid[])",
+            user_id, ids)
+    ]
     data["couple_point_events"] = await rows(
         "SELECT * FROM couple_point_events WHERE couple_id = ANY($1::uuid[])", ids)
     return data

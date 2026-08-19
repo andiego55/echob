@@ -20,10 +20,12 @@ from app.core.dependencies import get_current_user, get_pool
 from app.schemas.couple_agreement import (
     CoupleAgreement,
     CoupleAgreementCreate,
+    CoupleAgreementReview,
     CoupleAgreementStatus,
     CoupleSummary,
 )
 from app.services import couple_agreement_service as cas
+from app.services import couple_notify_service as notify
 from app.services import couple_progress_service as progress
 from app.services import couple_session_service as css
 from app.services.subscription_service import enforce_echo_prompt_limit
@@ -109,6 +111,8 @@ async def propose_agreement(
             body=body.body, session_id=body.session_id, due_at=body.due_at,
         )
         await progress.award(conn, couple_id, user_id, "agreement_proposed", row["id"])
+        await notify.to_partner(conn, couple_id, user_id,
+                                notify.agreement_proposed(row["body"]))
     return CoupleAgreement(**row)
 
 
@@ -120,6 +124,35 @@ async def accept_agreement(
     async with pool.acquire() as conn:
         row = await cas.accept(conn, agreement_id, user_id)
         await progress.award(conn, row["couple_id"], user_id, "agreement_accepted", agreement_id)
+        await notify.to_partner(conn, row["couple_id"], user_id,
+                                notify.agreement_accepted(row["body"]))
+    return CoupleAgreement(**row)
+
+
+@router.get("/links/{couple_id}/agreements/due", response_model=list[CoupleAgreement])
+async def list_due_agreements(
+    couple_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> list[CoupleAgreement]:
+    """Was heute nachgefragt gehoert: geltende Abmachungen mit erreichtem Termin."""
+    async with pool.acquire() as conn:
+        rows = await cas.list_due(conn, couple_id, current["user_id"])
+    return [CoupleAgreement(**r) for r in rows]
+
+
+@router.post("/agreements/{agreement_id}/review", response_model=CoupleAgreement)
+async def review_agreement(
+    agreement_id: UUID, body: CoupleAgreementReview,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleAgreement:
+    """Die Antwort auf die Nachfrage - und der Punkt, an dem aus Vorsatz Erfahrung wird."""
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        row = await cas.review(conn, agreement_id, user_id, body.outcome, body.note)
+        if body.outcome == "kept":
+            await progress.award(conn, row["couple_id"], user_id, "agreement_kept", agreement_id)
+        await progress.award(conn, row["couple_id"], user_id, "agreement_reviewed", agreement_id)
+        await notify.to_partner(conn, row["couple_id"], user_id,
+                                notify.agreement_reviewed(row["body"], body.outcome))
     return CoupleAgreement(**row)
 
 

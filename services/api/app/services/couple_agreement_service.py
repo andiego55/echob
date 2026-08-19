@@ -54,7 +54,7 @@ async def propose(conn, couple_id, user_id, *, body: str, session_id=None, due_a
         "due_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
         couple_id, session_id, topic_id, crypto.encrypt(text), user_id, due_at,
     )
-    return crypto.decrypt_fields(dict(row), "body")
+    return crypto.decrypt_fields(dict(row), "body", "review_note")
 
 
 async def accept(conn, agreement_id, user_id) -> dict:
@@ -80,7 +80,7 @@ async def accept(conn, agreement_id, user_id) -> dict:
         "accepted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *",
         agreement_id, user_id,
     )
-    return crypto.decrypt_fields(dict(updated), "body")
+    return crypto.decrypt_fields(dict(updated), "body", "review_note")
 
 
 async def set_status(conn, agreement_id, user_id, status: str) -> dict:
@@ -100,7 +100,60 @@ async def set_status(conn, agreement_id, user_id, status: str) -> dict:
         "UPDATE couple_agreements SET status = $2, updated_at = NOW() WHERE id = $1 RETURNING *",
         agreement_id, status,
     )
-    return crypto.decrypt_fields(dict(updated), "body")
+    return crypto.decrypt_fields(dict(updated), "body", "review_note")
+
+
+# ── Nachfrage: "Wie lief es?" ────────────────────────────────────────────────
+# ``due_at`` gab es von Anfang an, aber nichts hat je danach gefragt. Ohne Nachfrage ist
+# eine Abmachung nur ein guter Vorsatz. ``reviewed_at`` verhindert, dass dieselbe Frage
+# ewig wiederkommt.
+
+REVIEW_OUTCOMES = ("kept", "again", "dropped")
+
+
+async def list_due(conn, couple_id, user_id) -> list[dict]:
+    """Geltende Abmachungen, deren Termin erreicht ist und die noch keiner bewertet hat."""
+    await require_couple_member(conn, couple_id, user_id)
+    rows = await conn.fetch(
+        "SELECT * FROM couple_agreements "
+        "WHERE couple_id = $1 AND status = 'active' "
+        "  AND due_at IS NOT NULL AND due_at <= NOW() AND reviewed_at IS NULL "
+        "ORDER BY due_at",
+        couple_id,
+    )
+    return [crypto.decrypt_fields(dict(r), "body", "review_note") for r in rows]
+
+
+async def review(conn, agreement_id, user_id, outcome: str, note: str | None = None) -> dict:
+    """Haelt fest, wie es gelaufen ist.
+
+    ``kept`` schliesst ab, ``dropped`` verwirft, ``again`` verschiebt die Nachfrage um eine
+    Woche - fuer das, was noch in Arbeit ist. Nur ``again`` laesst ``reviewed_at`` leer,
+    damit die Frage wiederkommt.
+    """
+    if outcome not in REVIEW_OUTCOMES:
+        raise HTTPException(status_code=400, detail="Unbekannte Rueckmeldung.")
+    row = await conn.fetchrow("SELECT * FROM couple_agreements WHERE id = $1", agreement_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Abmachung nicht gefunden.")
+    await require_couple_member(conn, row["couple_id"], user_id)
+
+    notiz = crypto.encrypt(note.strip()[:500]) if note and note.strip() else None
+    if outcome == "again":
+        updated = await conn.fetchrow(
+            "UPDATE couple_agreements SET due_at = NOW() + INTERVAL '7 days', "
+            "review_note = COALESCE($2, review_note), updated_at = NOW() "
+            "WHERE id = $1 RETURNING *",
+            agreement_id, notiz,
+        )
+    else:
+        updated = await conn.fetchrow(
+            "UPDATE couple_agreements SET status = $2, reviewed_at = NOW(), "
+            "review_note = COALESCE($3, review_note), updated_at = NOW() "
+            "WHERE id = $1 RETURNING *",
+            agreement_id, "kept" if outcome == "kept" else "dropped", notiz,
+        )
+    return crypto.decrypt_fields(dict(updated), "body", "review_note")
 
 
 async def list_agreements(conn, couple_id, user_id) -> list[dict]:
@@ -109,7 +162,7 @@ async def list_agreements(conn, couple_id, user_id) -> list[dict]:
         "SELECT * FROM couple_agreements WHERE couple_id = $1 ORDER BY created_at DESC",
         couple_id,
     )
-    return [crypto.decrypt_fields(dict(r), "body") for r in rows]
+    return [crypto.decrypt_fields(dict(r), "body", "review_note") for r in rows]
 
 
 async def list_active_for_context(conn, couple_id) -> list[str]:

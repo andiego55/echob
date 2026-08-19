@@ -36,6 +36,7 @@ from app.schemas.couple_session import (
     CoupleSessionUpdate,
 )
 from app.services import couple_context_service as ccs
+from app.services import couple_notify_service as notify
 from app.services import couple_progress_service as progress
 from app.services import couple_session_service as css
 from app.services.subscription_service import enforce_echo_prompt_limit
@@ -269,6 +270,8 @@ async def propose_session(
     """Schlägt der anderen Person das vorbereitete Gespräch vor."""
     async with pool.acquire() as conn:
         session = await css.propose(conn, session_id, current["user_id"])
+        await notify.to_partner(conn, session["couple_id"], current["user_id"],
+                                notify.session_proposed(session["title"]))
     return _session_out(session)
 
 
@@ -280,6 +283,9 @@ async def respond_session(
     """Nimmt einen Vorschlag an oder lehnt ihn ab — nur die jeweils andere Person."""
     async with pool.acquire() as conn:
         session = await css.respond(conn, session_id, current["user_id"], body.accept)
+        if body.accept:
+            await notify.to_partner(conn, session["couple_id"], current["user_id"],
+                                    notify.session_accepted(session["title"]))
     return _session_out(session)
 
 
@@ -291,6 +297,9 @@ async def schedule_session(
     """Die Dialogeinladung: setzt einen Zeitpunkt (oder hebt ihn auf)."""
     async with pool.acquire() as conn:
         session = await css.schedule(conn, session_id, current["user_id"], body.scheduled_for)
+        if body.scheduled_for:
+            await notify.to_partner(conn, session["couple_id"], current["user_id"],
+                                    notify.session_scheduled(session["title"]))
     return _session_out(session)
 
 

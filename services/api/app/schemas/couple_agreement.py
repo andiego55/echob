@@ -29,6 +29,13 @@ class CoupleAgreementStatus(BaseModel):
     status: str = Field(..., pattern="^(kept|dropped)$")
 
 
+class CoupleAgreementReview(BaseModel):
+    """Die Antwort auf die Nachfrage: ``again`` verschiebt sie um eine Woche."""
+
+    outcome: str = Field(..., pattern="^(kept|again|dropped)$")
+    note: str | None = Field(None, max_length=500)
+
+
 class CoupleAgreement(BaseModel):
     id: UUID
     couple_id: UUID
@@ -39,5 +46,7 @@ class CoupleAgreement(BaseModel):
     accepted_at: datetime | None = None
     status: str
     due_at: datetime | None = None
+    reviewed_at: datetime | None = None
+    review_note: str | None = None
     created_at: datetime
     updated_at: datetime
