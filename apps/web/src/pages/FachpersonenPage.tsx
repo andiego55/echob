@@ -143,7 +143,7 @@ const TRUST = [
   { title: 'Nur Freigegebenes', text: 'Serverseitig erzwungen: Sie – und Echo – erhalten ausschließlich die Inhalte, die Ihre Klient:in gezielt freigibt.' },
   { title: 'Einwilligung bei der Klient:in', text: 'Kein ganzer Account, sondern einzelne Inhalte. Jede Freigabe ist jederzeit widerrufbar.' },
   { title: 'Pseudonym statt Klarname', text: 'Sie sehen ein Pseudonym – keine E-Mail-Adresse, keine Kontodaten der Klient:in.' },
-  { title: 'EU-verschlüsselt, keine Diagnosen', text: 'Daten verschlüsselt auf EU-Servern. EchoB stellt keine Diagnosen und ersetzt keine Behandlung.' },
+  { title: 'Verschlüsselt, keine Diagnosen', text: 'Inhalte werden verschlüsselt gespeichert; für die KI-Funktionen werden die nötigen Inhalte an unseren Dienstleister in den USA übermittelt – nicht zum Training von Modellen. EchoB stellt keine Diagnosen und ersetzt keine Behandlung.' },
 ]
 
 const AUDIENCE = [

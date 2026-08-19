@@ -114,7 +114,7 @@ const AUSBILDUNGEN = [
 const ETHIK = [
   { title: 'Keine echten Patient:innen nötig', text: 'Geübt wird an Fallbeispielen – kein Umgang mit realen, schützenswerten Falldaten in der Lehre.' },
   { title: 'Keine Diagnosen', text: 'EchoB bildet tastende Hypothesen, keine Diagnostik. Das passt zur Haltung verantwortungsvoller Ausbildung.' },
-  { title: 'Sicher & pseudonym', text: 'Fallmaterial verschlüsselt auf EU-Servern, ohne Klarnamen. Der Rahmen bleibt geschützt.' },
+  { title: 'Sicher & pseudonym', text: 'Fallmaterial wird verschlüsselt gespeichert und ohne Klarnamen geführt. Der Rahmen bleibt geschützt.' },
   { title: 'Die Dozent:in bleibt die Instanz', text: 'Echo ist Übungspartner, nicht Prüfer. Die fachliche Bewertung liegt immer bei der Lehre.' },
 ]
 
