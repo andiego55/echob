@@ -66,6 +66,14 @@ class CoupleSessionFromTopic(BaseModel):
     created: bool
 
 
+class CoupleBridgeVersion(BaseModel):
+    """Eine Fassung im Verhandlungsverlauf. ``changed_by=None`` = Original von Echo."""
+    title: str | None = None
+    body: str
+    changed_by: UUID | None = None
+    created_at: datetime
+
+
 class CoupleBridge(BaseModel):
     """Ein verhandelbarer Vorschlag aus Echos Mediation."""
     id: UUID
@@ -77,6 +85,8 @@ class CoupleBridge(BaseModel):
     note: str | None = None
     agreement_id: UUID | None = None
     updated_at: datetime
+    # Aelteste zuerst: Original von Echo, dann jede Gegenfassung.
+    versions: list[CoupleBridgeVersion] = []
 
 
 class CoupleBridgeUpdate(BaseModel):

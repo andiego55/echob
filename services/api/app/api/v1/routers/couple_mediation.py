@@ -59,6 +59,9 @@ async def _detail(conn, topic, link, user_id) -> CoupleTopicDetail:
     perspectives = await cms.load_perspectives(conn, topic["id"])
     mediations = await cms.list_mediations(conn, topic["id"])
     bridges = await cms.list_bridges(conn, topic["id"])
+    verlauf = await cms.load_bridge_versions(conn, [b["id"] for b in bridges])
+    for b in bridges:
+        b["versions"] = verlauf.get(str(b["id"]), [])
     messages = await cms.load_topic_messages(conn, topic["id"])
     return CoupleTopicDetail(
         topic=CoupleTopic(**topic),

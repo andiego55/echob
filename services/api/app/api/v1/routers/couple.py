@@ -28,7 +28,14 @@ from app.schemas.couple import (
     CoupleLinkResponse,
     CoupleProgress,
 )
-from app.schemas.couple_private import CouplePrivateMessageCreate, CouplePrivateThread
+from app.schemas.couple_companion import (
+    CoupleEchoConversation,
+    CoupleEchoSummary,
+    CoupleEchoSummaryEdit,
+    CoupleEchoThread,
+)
+from app.schemas.couple_private import CouplePrivateMessageCreate
+from app.services import couple_companion_service as companion
 from app.services import couple_dashboard_service as dashboard
 from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
@@ -198,54 +205,203 @@ async def get_dashboard(
     return CoupleDashboard(**data)
 
 
-@router.get("/links/{couple_id}/echo", response_model=CouplePrivateThread)
+# ── Paar-Begleiter: Gespräche mit Verlauf und Zusammenfassungen ──────────────
+
+_COMPANION_PROMPT = "echo_couple_companion_prompt.md"
+
+
+def _echo_svc(request: Request):
+    svc = request.app.state.echo_service
+    if svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    return svc
+
+
+def _thread_out(t: dict) -> dict:
+    return {
+        "id": t["id"], "title": t.get("title"),
+        "created_at": t["created_at"], "updated_at": t["updated_at"],
+        "closed_at": t.get("closed_at"),
+        "message_count": t.get("message_count", 0),
+        "summary_count": t.get("summary_count", 0),
+    }
+
+
+async def _conversation(conn, thread, user_id) -> CoupleEchoConversation:
+    msgs = await companion.load_messages(conn, thread["id"], user_id)
+    return CoupleEchoConversation(
+        thread=CoupleEchoThread(**_thread_out(thread)),
+        messages=[cps.public_private_message(m) for m in msgs],
+    )
+
+
+@router.get("/links/{couple_id}/echo", response_model=CoupleEchoConversation)
 async def get_companion(
     couple_id: UUID,
     current=Depends(get_current_user),
     pool=Depends(get_pool),
-) -> CouplePrivateThread:
-    """Dein persönlicher Paar-Begleiter. Die andere Person sieht diesen Dialog nie."""
+) -> CoupleEchoConversation:
+    """Das laufende Gespräch mit deinem Begleiter. Die andere Person sieht es nie."""
     user_id = current["user_id"]
     async with pool.acquire() as conn:
-        await cts.require_couple_member(conn, couple_id, user_id)
-        msgs = await cps.load_room_private_messages(conn, couple_id, user_id)
-    return CouplePrivateThread(messages=[cps.public_private_message(m) for m in msgs])
+        thread = await companion.ensure_open_thread(conn, couple_id, user_id)
+        return await _conversation(conn, thread, user_id)
 
 
-@router.post("/links/{couple_id}/echo", response_model=CouplePrivateThread)
+@router.post("/links/{couple_id}/echo", response_model=CoupleEchoConversation)
 async def talk_to_companion(
     couple_id: UUID,
     body: CouplePrivateMessageCreate,
     request: Request,
     current=Depends(get_current_user),
     pool=Depends(get_pool),
-) -> CouplePrivateThread:
+) -> CoupleEchoConversation:
     """Echo kennt hier BEIDE Welten: deinen eigenen Fall und den Stand eures Raums."""
     user_id = current["user_id"]
-    svc = request.app.state.echo_service
-    if svc is None:
-        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    svc = _echo_svc(request)
 
     async with pool.acquire() as conn:
         await enforce_echo_prompt_limit(user_id, conn)
         link = await cts.require_couple_member(conn, couple_id, user_id)
+        thread = await companion.ensure_open_thread(conn, couple_id, user_id)
 
-        await cps.add_room_private_message(conn, couple_id, user_id, role="user",
-                                           content=body.content)
-        history = cps.build_private_history(
-            await cps.load_room_private_messages(conn, couple_id, user_id)
-        )
+        await companion.add_message(conn, thread, user_id, role="user", content=body.content)
+        verlauf = await companion.load_messages(conn, thread["id"], user_id)
         context = await cps.build_companion_context(conn, link, user_id)
+
         reply = await svc.professional_chat(
             user_message=body.content,
             shared_context=context,
-            history=history[:-1],
-            prompt_file="echo_couple_companion_prompt.md",
+            history=companion.build_history(verlauf)[:-1],
+            prompt_file=_COMPANION_PROMPT,
         )
-        await cps.add_room_private_message(conn, couple_id, user_id, role="echo",
-                                           content=reply)
-        msgs = await cps.load_room_private_messages(conn, couple_id, user_id)
-    return CouplePrivateThread(messages=[cps.public_private_message(m) for m in msgs])
+        await companion.add_message(conn, thread, user_id, role="echo", content=reply)
+
+        # Der erste Austausch gibt dem Gespräch seinen Namen — sonst heißen später alle
+        # gleich und man findet nichts wieder.
+        if not thread.get("title"):
+            titel = await svc.professional_chat(
+                user_message=(
+                    "Gib diesem Gespräch eine Überschrift von höchstens fünf Wörtern. "
+                    "Nur die Überschrift, ohne Anführungszeichen.\n\n"
+                    "Erste Nachricht: " + body.content
+                ),
+                shared_context="", history=[], prompt_file=_COMPANION_PROMPT,
+            )
+            sauber = titel.strip().strip(chr(34)).strip()[:160]
+            thread = await companion.rename_thread(
+                conn, thread["id"], user_id, sauber or "Gespräch",
+            )
+
+        return await _conversation(conn, thread, user_id)
+
+
+@router.post("/links/{couple_id}/echo/summary", response_model=CoupleEchoSummary,
+             status_code=201)
+async def summarize_companion(
+    couple_id: UUID,
+    request: Request,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CoupleEchoSummary:
+    """Fasst das laufende Gespräch zusammen, schließt es ab und behält die Zusammenfassung.
+
+    Genau das gewohnte Vorgehen aus den Themendialogen: reden, festhalten, wiederfinden.
+    """
+    user_id = current["user_id"]
+    svc = _echo_svc(request)
+
+    async with pool.acquire() as conn:
+        await enforce_echo_prompt_limit(user_id, conn)
+        thread = await companion.ensure_open_thread(conn, couple_id, user_id)
+        msgs = await companion.load_messages(conn, thread["id"], user_id)
+        if not msgs:
+            raise HTTPException(
+                status_code=400,
+                detail="Sprich erst mit Echo, dann gibt es etwas zusammenzufassen.",
+            )
+
+        verlauf = "\n".join(
+            ("Echo: " if m["role"] == "echo" else "Ich: ") + m["content"] for m in msgs
+        )
+        text = await svc.professional_chat(
+            user_message=(
+                "Fasse unser Gespräch für mich zusammen — in meiner Perspektive, höchstens "
+                "200 Wörter. Was mir klar geworden ist, was ich mir vorgenommen habe, was "
+                "offen blieb. Keine Einleitung, kein Rahmentext.\n\n" + verlauf
+            ),
+            shared_context="", history=[], prompt_file=_COMPANION_PROMPT,
+        )
+        summary = await companion.save_summary(
+            conn, couple_id, user_id,
+            text=text, title=thread.get("title"), thread_id=thread["id"],
+        )
+        await companion.close_thread(conn, thread["id"], user_id)
+    return CoupleEchoSummary(**summary)
+
+
+@router.get("/links/{couple_id}/echo/threads", response_model=list[CoupleEchoThread])
+async def list_companion_threads(
+    couple_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[CoupleEchoThread]:
+    """Deine früheren Gespräche — nur deine."""
+    async with pool.acquire() as conn:
+        rows = await companion.list_threads(conn, couple_id, current["user_id"])
+    return [CoupleEchoThread(**_thread_out(r)) for r in rows]
+
+
+@router.get("/echo/threads/{thread_id}", response_model=CoupleEchoConversation)
+async def get_companion_thread(
+    thread_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CoupleEchoConversation:
+    """Ein früheres Gespräch zum Nachlesen."""
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        thread = await companion.require_thread(conn, thread_id, user_id)
+        return await _conversation(conn, thread, user_id)
+
+
+@router.get("/links/{couple_id}/echo/summaries", response_model=list[CoupleEchoSummary])
+async def list_companion_summaries(
+    couple_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[CoupleEchoSummary]:
+    async with pool.acquire() as conn:
+        rows = await companion.list_summaries(conn, couple_id, current["user_id"])
+    return [CoupleEchoSummary(**r) for r in rows]
+
+
+@router.patch("/echo/summaries/{summary_id}", response_model=CoupleEchoSummary)
+async def edit_companion_summary(
+    summary_id: UUID,
+    body: CoupleEchoSummaryEdit,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CoupleEchoSummary:
+    async with pool.acquire() as conn:
+        row = await companion.update_summary(
+            conn, summary_id, current["user_id"],
+            title=body.title, text=body.summary_text,
+        )
+    return CoupleEchoSummary(**row)
+
+
+@router.delete("/echo/summaries/{summary_id}")
+async def delete_companion_summary(
+    summary_id: UUID,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    async with pool.acquire() as conn:
+        ok = await companion.delete_summary(conn, summary_id, current["user_id"])
+    if not ok:
+        raise HTTPException(status_code=404, detail="Zusammenfassung nicht gefunden.")
+    return {"deleted": True}
 
 
 @router.get("/invites/{code}", response_model=CoupleInvitePublic)

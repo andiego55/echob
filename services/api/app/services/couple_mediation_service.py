@@ -234,11 +234,14 @@ async def save_bridges(conn, topic_id, bruecken: list[dict[str, str]]) -> None:
         topic_id,
     )
     for i, b in enumerate(bruecken):
-        await conn.execute(
+        bridge_id = await conn.fetchval(
             "INSERT INTO couple_bridges (topic_id, position, title, body) "
-            "VALUES ($1, $2, $3, $4)",
+            "VALUES ($1, $2, $3, $4) RETURNING id",
             topic_id, start + i, crypto.encrypt(b["title"]), crypto.encrypt(b["body"]),
         )
+        # Die Originalfassung gehoert in den Verlauf, sonst faengt die Spur erst bei
+        # der ersten Aenderung an und man sieht nicht, wovon man ausgegangen ist.
+        await _record_version(conn, bridge_id, b["title"], b["body"], None)
 
 
 async def list_bridges(conn, topic_id) -> list[dict]:
@@ -258,15 +261,18 @@ async def require_bridge(conn, bridge_id, user_id) -> tuple[dict, dict, dict]:
 
 
 async def update_bridge(conn, bridge_id, user_id, *, title=None, body=None) -> dict:
-    """Ändern heißt: Gegenvorschlag. Wer zuletzt geändert hat, steht danach dabei."""
-    await require_bridge(conn, bridge_id, user_id)
+    """Ändern heißt: Gegenvorschlag. Der bisherige Stand wandert in den Verlauf."""
+    vorher, _, _ = await require_bridge(conn, bridge_id, user_id)
     row = await conn.fetchrow(
         "UPDATE couple_bridges SET "
         "title = COALESCE($2::text, title), body = COALESCE($3::text, body), "
         "updated_by = $4, updated_at = NOW() WHERE id = $1 RETURNING *",
         bridge_id, crypto.encrypt(title), crypto.encrypt(body), user_id,
     )
-    return crypto.decrypt_fields(dict(row), "title", "body", "note")
+    neu = crypto.decrypt_fields(dict(row), "title", "body", "note")
+    if neu["body"] != vorher["body"] or neu.get("title") != vorher.get("title"):
+        await _record_version(conn, bridge_id, neu["title"], neu["body"], user_id)
+    return neu
 
 
 async def set_bridge_status(conn, bridge_id, user_id, status, *, note=None,
@@ -281,6 +287,31 @@ async def set_bridge_status(conn, bridge_id, user_id, status, *, note=None,
         bridge_id, status, crypto.encrypt(note), agreement_id, user_id,
     )
     return crypto.decrypt_fields(dict(row), "title", "body", "note")
+
+
+async def _record_version(conn, bridge_id, title, body, changed_by) -> None:
+    """Haelt eine Fassung fest. ``changed_by=None`` ist das Original von Echo."""
+    await conn.execute(
+        "INSERT INTO couple_bridge_versions (bridge_id, title, body, changed_by) "
+        "VALUES ($1, $2, $3, $4)",
+        bridge_id, crypto.encrypt(title), crypto.encrypt(body), changed_by,
+    )
+
+
+async def load_bridge_versions(conn, bridge_ids: list) -> dict:
+    """Verlauf je Bruecke, aelteste zuerst — fuer die Spur auf der Karte."""
+    if not bridge_ids:
+        return {}
+    rows = await conn.fetch(
+        "SELECT * FROM couple_bridge_versions WHERE bridge_id = ANY($1::uuid[]) "
+        "ORDER BY created_at",
+        bridge_ids,
+    )
+    verlauf: dict = {}
+    for r in rows:
+        eintrag = crypto.decrypt_fields(dict(r), "title", "body")
+        verlauf.setdefault(str(eintrag["bridge_id"]), []).append(eintrag)
+    return verlauf
 
 
 # ── Gemeinsamer Diskussionsfaden am Thema ────────────────────────────────────
