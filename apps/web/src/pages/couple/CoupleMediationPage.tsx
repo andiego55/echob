@@ -23,7 +23,7 @@ export default function CoupleMediationPage() {
   const [priv, setPriv] = useState('')
   const [touched, setTouched] = useState(false)
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['couple-topic', topicId],
     queryFn: () => coupleMediationApi.get(topicId),
     enabled: !!topicId,
@@ -65,7 +65,8 @@ export default function CoupleMediationPage() {
       <AppShell>
         <div className="mx-auto max-w-[1000px] px-6 py-8">
           <div className="card">
-            <h1 className="text-sm font-bold text-navy">Thema nicht gefunden</h1>
+            <h1 className="text-sm font-bold text-navy">Thema lässt sich nicht öffnen</h1>
+            <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
             <Link to="/app/paar" className="btn-outline !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
         </div>

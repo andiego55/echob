@@ -19,11 +19,7 @@ import ContextComposer from '@/components/couple/ContextComposer'
 import PreparationWizard from '@/components/couple/PreparationWizard'
 import PrivateEchoPanel from '@/components/couple/PrivateEchoPanel'
 import ProposalBar from '@/components/couple/ProposalBar'
-
-const MOOD_EMOJI: Record<string, string> = {
-  ruhig: '🌤', hoffnungsvoll: '🌱', angespannt: '⚡',
-  traurig: '🌧', wuetend: '🔥', erschoepft: '🌙',
-}
+import { MOOD_EMOJI } from '@/components/couple/moods'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
 
@@ -36,7 +32,7 @@ export default function CoupleSessionPage() {
   const [prepMode, setPrepMode] = useState<'wizard' | 'manual'>('wizard')
   const endRef = useRef<HTMLDivElement>(null)
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['couple-session', sessionId],
     queryFn: () => coupleSessionsApi.get(sessionId),
     enabled: !!sessionId,
@@ -72,7 +68,8 @@ export default function CoupleSessionPage() {
       <AppShell>
         <div className="mx-auto max-w-[1000px] px-6 py-8">
           <div className="card">
-            <h1 className="text-sm font-bold text-navy">Sitzung nicht gefunden</h1>
+            <h1 className="text-sm font-bold text-navy">Gespräch lässt sich nicht öffnen</h1>
+            <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
             <Link to="/app/paar" className="btn-outline !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
         </div>

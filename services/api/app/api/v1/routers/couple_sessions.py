@@ -121,11 +121,12 @@ async def get_session(
     async with pool.acquire() as conn:
         session, link = await css.require_session(conn, session_id, user_id)
         names = await css.load_member_names(conn, link)
+        members = await _members(conn, link)
         messages = await css.load_messages(conn, session_id)
         contexts = await css.load_confirmed_contexts(conn, session_id)
     return CoupleSessionDetail(
         session=_session_out(session),
-        members=await _members(conn, link),
+        members=members,
         messages=[css.public_message(m, names) for m in messages],
         # Bestätigte Beiträge sind im Raum bewusst für beide sichtbar.
         contexts=[_context_out(c, names) for c in contexts],
@@ -356,11 +357,12 @@ async def post_message(
                                  "session_started", session_id)
 
         names = await css.load_member_names(conn, link)
+        members = await _members(conn, link)
         messages = await css.load_messages(conn, session_id)
         contexts = await css.load_confirmed_contexts(conn, session_id)
     return CoupleSessionDetail(
         session=_session_out(session),
-        members=await _members(conn, link),
+        members=members,
         messages=[css.public_message(m, names) for m in messages],
         contexts=[_context_out(c, names) for c in contexts],
     )
@@ -391,6 +393,7 @@ async def moderate(
         await _echo_turn(conn, echo_svc, session, link, opener)
 
         names = await css.load_member_names(conn, link)
+        members = await _members(conn, link)
         contexts = await css.load_confirmed_contexts(conn, session_id)
 
         if session["status"] == "draft":
@@ -400,7 +403,7 @@ async def moderate(
 
     return CoupleSessionDetail(
         session=_session_out(session),
-        members=await _members(conn, link),
+        members=members,
         messages=[css.public_message(m, names) for m in messages],
         contexts=[_context_out(c, names) for c in contexts],
     )
