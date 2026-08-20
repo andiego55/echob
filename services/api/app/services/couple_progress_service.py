@@ -34,6 +34,7 @@ POINTS: dict[str, tuple[int, str]] = {
     "self_feedback":       (10, "Auf den eigenen Anteil geschaut"),
     "checkin_done":        (10, "Beim Wochen-Check-in dabei gewesen"),
     "appreciation_left":   (10, "Etwas Wertschaetzendes dagelassen"),
+    "barometer_set":       (5,  "Das Barometer gestellt"),
     "agreement_reviewed":  (15, "Nachgehalten, wie es gelaufen ist"),
 }
 

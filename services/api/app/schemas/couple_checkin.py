@@ -78,3 +78,36 @@ class CoupleAppreciationWall(BaseModel):
     prompts: list[str]
     partner_name: str | None = None
     max_chars: int
+
+
+# ── Stimmungsbarometer ──────────────────────────────────────────────────────
+
+
+class CoupleBarometerSet(BaseModel):
+    value: int = Field(..., ge=1, le=10)
+    note: str | None = Field(None, max_length=300)
+
+
+class CoupleBarometerEntry(BaseModel):
+    user_id: str | None = None
+    name: str
+    is_own: bool
+    #: None = diese Person hat den Regler noch nie gestellt.
+    value: int | None = None
+    label: str | None = None
+    note: str | None = None
+    updated_at: datetime | None = None
+
+
+class CoupleBarometerPoint(BaseModel):
+    value: int
+    created_at: datetime
+
+
+class CoupleBarometerState(BaseModel):
+    """Beide Regler nebeneinander. Der Verlauf ist bewusst nur der eigene."""
+
+    entries: list[CoupleBarometerEntry]
+    own_history: list[CoupleBarometerPoint]
+    levels: dict[str, str]
+    note_max_chars: int

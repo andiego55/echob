@@ -14,6 +14,7 @@ import { coupleApi } from '@/api/couple'
 import type { CoupleDashboardItem } from '@/api/couple'
 import { apiErrorMessage } from '@/api/errors'
 import AppreciationCard from './AppreciationCard'
+import BarometerCard from './BarometerCard'
 import CoupleNotices from './CoupleNotices'
 import DueAgreementsCard from './DueAgreementsCard'
 import WeeklyCheckinCard from './WeeklyCheckinCard'
@@ -68,6 +69,12 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
           </div>
         </div>
       </div>
+
+      <BarometerCard
+        coupleId={coupleId}
+        ownAvatar={data.own_avatar}
+        partnerAvatar={data.partner_avatar}
+      />
 
       {/* ── Ball bei dir ──────────────────────────────────────────── */}
       {attention.length > 0 ? (

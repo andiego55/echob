@@ -21,6 +21,7 @@ from fastapi import HTTPException
 from app.core import crypto
 from app.services import couple_agreement_service as cas
 from app.services import couple_appreciation_service as cappr
+from app.services import couple_barometer_service as cbar
 from app.services import couple_checkin_service as cchk
 from app.services import couple_companion_service as ccomp
 from app.services import couple_dashboard_service as dash
@@ -101,7 +102,7 @@ async def test_link_grants_no_case_access(db):
         assert f"CONCERN_{foreign}" not in payload   # Anliegen der anderen Person
 
 
-@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr])
+@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr, cbar])
 async def test_service_never_touches_case_content(modul):
     """Struktur-Wächter: Kopplung UND Sitzung ziehen bewusst keine Fall-Inhalte heran.
 
@@ -559,6 +560,7 @@ async def _fill_room(db, user_a, user_b, couple_id):
     await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="CHECKIN_VON_ALEX",
                     wish="MEHR ZEIT")
     await cappr.leave(db, couple_id, user_a, "DANKE_VON_ALEX")
+    await cbar.set_value(db, couple_id, user_a, 7, "BAROMETER_VON_ALEX")
     await prog.award(db, couple_id, user_a, "session_started", session["id"])
     return session, topic
 
@@ -591,6 +593,8 @@ async def _room_row_counts(db, couple_id, session_id, topic_id) -> dict[str, int
             "SELECT count(*) FROM couple_checkins WHERE couple_id=$1", couple_id),
         "appreciations": await db.fetchval(
             "SELECT count(*) FROM couple_appreciations WHERE couple_id=$1", couple_id),
+        "barometer": await db.fetchval(
+            "SELECT count(*) FROM couple_barometer_readings WHERE couple_id=$1", couple_id),
     }
 
 
@@ -669,6 +673,7 @@ async def test_export_holds_own_data_but_not_the_partners_secrets(db):
     await cms.save_perspective(db, topic["id"], user_b, private_text="GEHEIM_VON_RIO")
     await cchk.save(db, couple_id, user_b, highlight="CHECKIN_VON_RIO")
     await cappr.leave(db, couple_id, user_b, "DANKE_VON_RIO")
+    await cbar.set_value(db, couple_id, user_b, 4, "BAROMETER_VON_RIO")
 
     export = await privacy.export_for_user(db, user_a)
     blob = str(export)
@@ -680,6 +685,8 @@ async def test_export_holds_own_data_but_not_the_partners_secrets(db):
     assert "CHECKIN_VON_RIO" not in blob                 # der der anderen Person nicht
     assert "DANKE_VON_ALEX" in blob                      # eigene Wertschätzung ist drin
     assert "DANKE_VON_RIO" not in blob                   # ihr Text gehört ihr
+    assert "BAROMETER_VON_ALEX" in blob                  # eigener Barometer-Vermerk
+    assert "BAROMETER_VON_RIO" not in blob               # ihrer nicht
 
 
 # ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────
@@ -1429,3 +1436,90 @@ async def test_every_thread_kind_has_a_prompt_file():
     for kind, datei in ccomp.THREAD_KINDS.items():
         assert (prompts / datei).is_file(), f"Prompt für '{kind}' fehlt: {datei}"
         assert kind in ccomp.KIND_LABELS, f"Beschriftung für '{kind}' fehlt"
+
+
+# ── Stimmungsbarometer ──────────────────────────────────────────────────────
+
+
+async def test_barometer_is_visible_to_the_other_immediately(db):
+    """Ohne Blindheitsregel — ein Barometer, das man erst nach eigener Eingabe sieht,
+    wäre keines."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cbar.set_value(db, couple_id, user_a, 8, "Gute Woche")
+
+    # Rio sieht Alex' Stand, ohne selbst eingestellt zu haben.
+    stand = await cbar.load_state(db, couple_id, user_b)
+    fremd = next(e for e in stand["entries"] if not e["is_own"])
+    eigen = next(e for e in stand["entries"] if e["is_own"])
+    assert fremd["value"] == 8 and fremd["note"] == "Gute Woche"
+    assert fremd["label"] == "ganz gut"
+    assert eigen["value"] is None      # eigener Regler noch ungestellt
+    assert eigen["name"] == "Du"
+
+
+async def test_latest_reading_wins_and_history_is_kept(db):
+    """Anhängend statt überschreibend: aktueller Wert = jüngste Zeile, Verlauf bleibt."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    for wert in (3, 6, 9):
+        await cbar.set_value(db, couple_id, user_a, wert)
+
+    stand = await cbar.load_state(db, couple_id, user_a)
+    assert next(e for e in stand["entries"] if e["is_own"])["value"] == 9
+    assert [p["value"] for p in stand["own_history"]] == [3, 6, 9]   # älteste zuerst
+
+
+async def test_history_stays_with_its_owner(db):
+    """Der aktuelle Stand ist ein Signal zum Hinsehen — eine Chronik ihrer schlechten
+    Tage wäre Material für Vorhaltungen."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    for wert in (2, 3, 4):
+        await cbar.set_value(db, couple_id, user_b, wert)
+    await cbar.set_value(db, couple_id, user_a, 7)
+
+    stand = await cbar.load_state(db, couple_id, user_a)
+    assert [p["value"] for p in stand["own_history"]] == [7]   # nur der eigene Verlauf
+    assert "own_history" in stand and len(stand) == 4          # kein fremder Verlauf dabei
+
+
+async def test_previous_value_comes_back_for_the_drop_notice(db):
+    """Der Service benachrichtigt nicht selbst — er liefert nur, was der Router braucht."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    erst = await cbar.set_value(db, couple_id, user_a, 8)
+    assert erst["previous_value"] is None
+
+    dann = await cbar.set_value(db, couple_id, user_a, 5)
+    assert dann["previous_value"] == 8
+    assert dann["previous_value"] - dann["value"] >= cbar.DROP_NOTICE
+
+
+async def test_values_outside_the_scale_rejected(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    for schlecht in (0, 11, -3):
+        with pytest.raises(HTTPException) as e:
+            await cbar.set_value(db, couple_id, user_a, schlecht)
+        assert e.value.status_code == 400
+
+
+async def test_barometer_note_is_encrypted_at_rest(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await cbar.set_value(db, couple_id, user_a, 5, "GEHEIMER VERMERK")
+    roh = await db.fetchval(
+        "SELECT note FROM couple_barometer_readings WHERE couple_id = $1", couple_id)
+    assert "GEHEIMER VERMERK" not in (roh or "")
+
+
+async def test_barometer_closed_to_outsiders(db):
+    _, _, _, _, couple_id = await _linked_pair(db)
+    fremd = uuid.uuid4()
+    for aufruf in (cbar.load_state(db, couple_id, fremd),
+                   cbar.set_value(db, couple_id, fremd, 5)):
+        with pytest.raises(HTTPException) as e:
+            await aufruf
+        assert e.value.status_code == 404
+
+
+async def test_every_step_of_the_scale_has_a_label():
+    """Eine Zahl ohne Wort wäre eine Note — genau das soll es nicht sein."""
+    for wert in range(cbar.MIN_VALUE, cbar.MAX_VALUE + 1):
+        assert cbar.label_for(wert), wert
+    assert cbar.label_for(None) is None

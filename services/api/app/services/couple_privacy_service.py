@@ -184,6 +184,12 @@ async def export_for_user(conn: asyncpg.Connection, user_id) -> dict[str, Any]:
         for c in await rows(
             "SELECT * FROM couple_test_comparisons WHERE couple_id = ANY($1::uuid[])", ids)
     ]
+    data["couple_barometer_readings"] = [
+        crypto.decrypt_fields(b, "note")
+        for b in await rows(
+            "SELECT * FROM couple_barometer_readings WHERE user_id = $1 "
+            "AND couple_id = ANY($2::uuid[])", user_id, ids)
+    ]
     # Wie bei den Check-ins: nur die EIGENEN Saetze. Was die andere Person dir
     # dagelassen hat, ist ihr Text.
     data["couple_appreciations"] = [

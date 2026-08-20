@@ -148,3 +148,11 @@ def appreciation_left() -> tuple[str, str]:
     # nebenbei verpuffen.
     return ("couple_appreciation_left",
             "Es liegt etwas Wertschätzendes für dich im Paarraum.")
+
+
+def barometer_dropped() -> tuple[str, str]:
+    # Ohne Zahl und ohne Namen der Stimmung: Das gehoert in den Paarraum, nicht in eine
+    # Meldung. Als Einladung formuliert, nicht als Alarm.
+    return ("couple_barometer_dropped",
+            "Im Paarraum hat sich etwas verändert. Vielleicht ein guter Moment, "
+            "kurz nachzufragen.")

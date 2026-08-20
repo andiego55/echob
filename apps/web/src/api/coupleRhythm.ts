@@ -85,3 +85,38 @@ export const coupleAppreciationApi = {
     apiClient.post<{ seen: number }>(`/couple/links/${coupleId}/wertschaetzung/gesehen`)
       .then(r => r.data),
 }
+
+/**
+ * Stimmungsbarometer – ein Regler von 1 bis 10, den die andere Person immer sieht.
+ *
+ * Bewusst ohne Blindheitsregel: Ein Barometer, das man erst nach eigener Eingabe sieht,
+ * wäre keines. Der Verlauf ist dagegen nur der eigene – der aktuelle Stand ist ein Signal
+ * zum Hinsehen, eine Chronik der schlechten Tage wäre Material für Vorhaltungen.
+ */
+export interface CoupleBarometerEntry {
+  user_id: string | null
+  name: string
+  is_own: boolean
+  /** null = diese Person hat den Regler noch nie gestellt. */
+  value: number | null
+  label: string | null
+  note: string | null
+  updated_at: string | null
+}
+
+export interface CoupleBarometerState {
+  entries: CoupleBarometerEntry[]
+  own_history: { value: number; created_at: string }[]
+  /** Zahl → Wort. Eine Zahl ohne Wort wäre eine Note. */
+  levels: Record<string, string>
+  note_max_chars: number
+}
+
+export const coupleBarometerApi = {
+  get: (coupleId: string) =>
+    apiClient.get<CoupleBarometerState>(`/couple/links/${coupleId}/barometer`).then(r => r.data),
+
+  set: (coupleId: string, value: number, note?: string | null) =>
+    apiClient.put<CoupleBarometerState>(`/couple/links/${coupleId}/barometer`, { value, note })
+      .then(r => r.data),
+}

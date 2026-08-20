@@ -6,6 +6,8 @@
   GET  /couple/links/{couple_id}/wertschaetzung    - beide Richtungen
   POST /couple/links/{couple_id}/wertschaetzung    - einen Satz dalassen
   POST /couple/links/{couple_id}/wertschaetzung/gesehen - den "neu"-Hinweis abhaken
+  GET  /couple/links/{couple_id}/barometer         - beide Regler + eigener Verlauf
+  PUT  /couple/links/{couple_id}/barometer         - eigenen Regler stellen
 
 Sicherheit: alles ueber ``require_couple_member`` im Service (404 fuer Fremde). Kein Zugriff
 auf Fall-Daten, kein Echo-Aufruf - der Check-in ist bewusst ein reines Zwischen-euch-Ritual.
@@ -21,11 +23,14 @@ from app.schemas.couple_checkin import (
     CoupleAppreciation,
     CoupleAppreciationCreate,
     CoupleAppreciationWall,
+    CoupleBarometerSet,
+    CoupleBarometerState,
     CoupleCheckinHistoryWeek,
     CoupleCheckinSave,
     CoupleCheckinWeek,
 )
 from app.services import couple_appreciation_service as cas_appr
+from app.services import couple_barometer_service as cbar
 from app.services import couple_checkin_service as ccs
 from app.services import couple_notify_service as notify
 from app.services import couple_progress_service as progress
@@ -105,3 +110,39 @@ async def mark_appreciations_seen(
     async with pool.acquire() as conn:
         anzahl = await cas_appr.mark_seen(conn, couple_id, current["user_id"])
     return {"seen": anzahl}
+
+
+# ── Stimmungsbarometer ──────────────────────────────────────────────────────
+# Zustand, kein Urteil: Wie geht es DIR gerade mit euch. Ohne Blindheitsregel - ein
+# Barometer, das man erst nach eigener Eingabe sieht, waere keines.
+
+
+@router.get("/barometer", response_model=CoupleBarometerState)
+async def get_barometer(
+    couple_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleBarometerState:
+    async with pool.acquire() as conn:
+        data = await cbar.load_state(conn, couple_id, current["user_id"])
+    return CoupleBarometerState(**data)
+
+
+@router.put("/barometer", response_model=CoupleBarometerState)
+async def set_barometer(
+    couple_id: UUID, body: CoupleBarometerSet,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleBarometerState:
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        neu = await cbar.set_value(conn, couple_id, user_id, body.value, body.note)
+        # Einmal am Tag zaehlt es - der Regler soll nicht zum Punkte-Automaten werden.
+        await progress.award(conn, couple_id, user_id, "barometer_set",
+                             neu["created_at"].date().isoformat())
+
+        # Nur bei einem deutlichen Absacken. Eine Meldung bei jedem Regler-Zupfen waere
+        # Laerm; ein Einbruch ist genau der Moment, in dem Nachfragen etwas bringt.
+        vorher = neu.get("previous_value")
+        if vorher is not None and vorher - neu["value"] >= cbar.DROP_NOTICE:
+            await notify.to_partner(conn, couple_id, user_id, notify.barometer_dropped())
+
+        data = await cbar.load_state(conn, couple_id, user_id)
+    return CoupleBarometerState(**data)
