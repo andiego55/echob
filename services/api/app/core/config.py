@@ -98,6 +98,9 @@ class Settings(BaseSettings):
     # ── Lead-Benachrichtigung (Resend) ─────────────────────────────────
     # Leer = kein Mailversand (Leads werden trotzdem in der DB gespeichert).
     resend_api_key: str = ""
+    # Gemeinsames Geheimnis fuer angestossene Wartungslaeufe (Erinnerungsversand).
+    # Leer = Endpunkt abgeschaltet; es gibt keinen unbewachten Zustand.
+    cron_token: str = ""
     lead_notify_to: str = "kontakt@echo-b.de"     # Empfänger der Lead-Mails
     # Absender != Empfänger → weniger „an mich selbst"-Spam-Verdacht (M365).
     # leads@echo-b.de braucht kein Postfach, nur die verifizierte Resend-Domain.

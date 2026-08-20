@@ -148,16 +148,18 @@ export default function CoupleSessionPage() {
 
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
           {/* ── Gespräch ─────────────────────────────────────────── */}
-          <div className="card flex flex-col">
+          <div className={`card flex flex-col lg:order-1 ${
+            messages.length === 0 ? 'order-2' : 'order-1'
+          }`}>
             {session.goal && (
-              <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-3 rounded-t-brand-lg border-b border-brand-border bg-white/95 px-5 py-2.5 backdrop-blur">
+              <div className="lg:sticky lg:top-0 z-10 -mx-5 -mt-5 mb-3 rounded-t-brand-lg border-b border-brand-border bg-white/95 px-5 py-2.5 backdrop-blur">
                 <p className="text-[0.68rem] font-bold uppercase tracking-wide text-brand-muted">
                   Unser Ziel
                 </p>
                 <p className="mt-0.5 text-sm font-medium text-navy">{session.goal}</p>
               </div>
             )}
-            <div className="flex-1 space-y-4 overflow-y-auto pr-1" style={{ maxHeight: '58vh' }}>
+            <div className="max-h-[46vh] flex-1 space-y-4 overflow-y-auto pr-1 sm:max-h-[52vh] lg:max-h-[58vh]">
               {messages.length === 0 && !closed && (
                 <div className="rounded-brand border border-accent/30 bg-accent/[0.04] px-5 py-6 text-center">
                   <p className="text-[1rem] font-bold text-navy">Bereit für euer Gespräch?</p>
@@ -289,7 +291,9 @@ export default function CoupleSessionPage() {
           </div>
 
           {/* ── Vorbereitung / privater Echo ─────────────────────── */}
-          <div className="space-y-5">
+          <div className={`space-y-5 lg:order-2 ${
+            messages.length === 0 ? 'order-1' : 'order-2'
+          }`}>
             <div className="flex gap-1 rounded-brand border border-brand-border p-1">
               {([['prep', 'Vorbereitung'], ['private', 'Nur für dich']] as const).map(([key, label]) => (
                 <button

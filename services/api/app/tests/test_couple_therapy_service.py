@@ -31,6 +31,7 @@ from app.services import couple_notify_service as cnotify
 from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
 from app.services import couple_progress_service as prog
+from app.services import couple_reminder_service as crem
 from app.services import couple_retrospect_service as cretro
 from app.services import couple_session_service as css
 from app.services import couple_test_service as ctest
@@ -104,7 +105,7 @@ async def test_link_grants_no_case_access(db):
         assert f"CONCERN_{foreign}" not in payload   # Anliegen der anderen Person
 
 
-@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr, cbar, cretro, cmod])
+@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr, cbar, cretro, cmod, crem])
 async def test_service_never_touches_case_content(modul):
     """Struktur-Wächter: Kopplung UND Sitzung ziehen bewusst keine Fall-Inhalte heran.
 
@@ -642,6 +643,7 @@ async def _fill_room(db, user_a, user_b, couple_id):
     await cbar.set_value(db, couple_id, user_a, 7, "BAROMETER_VON_ALEX")
     await cretro.save(db, couple_id, user_a, body="RUECKBLICK_TEXT",
                       period_start=date.today(), period_end=date.today())
+    await crem.set_settings(db, couple_id, user_a, email_enabled=True)
     await prog.award(db, couple_id, user_a, "session_started", session["id"])
     return session, topic
 
@@ -678,6 +680,8 @@ async def _room_row_counts(db, couple_id, session_id, topic_id) -> dict[str, int
             "SELECT count(*) FROM couple_barometer_readings WHERE couple_id=$1", couple_id),
         "retrospectives": await db.fetchval(
             "SELECT count(*) FROM couple_retrospectives WHERE couple_id=$1", couple_id),
+        "reminders": await db.fetchval(
+            "SELECT count(*) FROM couple_reminder_settings WHERE couple_id=$1", couple_id),
     }
 
 
@@ -1805,3 +1809,115 @@ async def test_retrospect_input_carries_no_conversation_content(db):
     for geheim in ("GEHEIMER BEITRAG", "GEHEIMER KONTEXT", "GEHEIME SICHT",
                    "GEHEIME WERTSCHAETZUNG"):
         assert geheim not in text, geheim
+
+
+# ── Erinnerungen außerhalb der App ──────────────────────────────────────────
+
+
+async def _wartende_meldung(db, user_id, *, alter_stunden: int):
+    """Eine ungelesene Paar-Meldung mit einstellbarem Alter."""
+    mid = await db.fetchval(
+        "INSERT INTO client_notifications (user_id, kind, body) "
+        "VALUES ($1, 'couple_session_proposed', 'Etwas wartet.') RETURNING id", user_id)
+    await db.execute(
+        "UPDATE client_notifications SET created_at = NOW() - make_interval(hours => $2) "
+        "WHERE id = $1", mid, alter_stunden)
+    return mid
+
+
+async def test_reminders_are_off_until_someone_says_yes(db):
+    """Opt-in: Bei diesem Thema kann eine Mail im falschen Postfach Schaden anrichten."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    assert (await crem.get_settings(db, couple_id, user_a))["email_enabled"] is False
+
+    await _wartende_meldung(db, user_a, alter_stunden=crem.KARENZ_STUNDEN + 2)
+    assert await crem.find_due(db) == []          # ausgeschaltet = kein Versand
+
+    await crem.set_settings(db, couple_id, user_a, email_enabled=True)
+    faellig = await crem.find_due(db)
+    assert [str(f["user_id"]) for f in faellig] == [str(user_a)]
+    assert faellig[0]["offen"] == 1
+
+
+async def test_fresh_notifications_wait(db):
+    """Wer gerade noch in der App war, soll keine Mail hinterhergeschickt bekommen."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await crem.set_settings(db, couple_id, user_a, email_enabled=True)
+    await _wartende_meldung(db, user_a, alter_stunden=1)
+    assert await crem.find_due(db) == []
+
+    await _wartende_meldung(db, user_a, alter_stunden=crem.KARENZ_STUNDEN + 1)
+    assert len(await crem.find_due(db)) == 1
+
+
+async def test_at_most_one_mail_per_day(db):
+    """Eine Mail je Ereignis waere Laerm — der Tagesdeckel haengt an last_sent_at."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await crem.set_settings(db, couple_id, user_a, email_enabled=True)
+    await _wartende_meldung(db, user_a, alter_stunden=crem.KARENZ_STUNDEN + 2)
+    assert len(await crem.find_due(db)) == 1
+
+    await crem.mark_sent(db, couple_id, user_a)
+    assert await crem.find_due(db) == []          # heute nicht noch einmal
+
+    await db.execute(
+        "UPDATE couple_reminder_settings SET last_sent_at = NOW() - make_interval(hours => $1) "
+        "WHERE couple_id = $2 AND user_id = $3",
+        crem.RUHE_STUNDEN + 1, couple_id, user_a)
+    assert len(await crem.find_due(db)) == 1      # am naechsten Tag wieder
+
+
+async def test_read_notifications_do_not_remind(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await crem.set_settings(db, couple_id, user_a, email_enabled=True)
+    mid = await _wartende_meldung(db, user_a, alter_stunden=crem.KARENZ_STUNDEN + 2)
+    await db.execute("UPDATE client_notifications SET read_at = NOW() WHERE id = $1", mid)
+    assert await crem.find_due(db) == []
+
+
+async def test_only_couple_notifications_count(db):
+    """Eine Meldung aus dem Fachpersonenbereich loest keine Paar-Erinnerung aus."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await crem.set_settings(db, couple_id, user_a, email_enabled=True)
+    mid = await db.fetchval(
+        "INSERT INTO client_notifications (user_id, kind, body) "
+        "VALUES ($1, 'connection_dissolved', 'Etwas anderes.') RETURNING id", user_a)
+    await db.execute(
+        "UPDATE client_notifications SET created_at = NOW() - INTERVAL '2 days' WHERE id = $1",
+        mid)
+    assert await crem.find_due(db) == []
+
+
+async def test_ended_rooms_stop_reminding(db):
+    """Ein beendeter Paarraum erinnert an nichts mehr."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await crem.set_settings(db, couple_id, user_a, email_enabled=True)
+    await _wartende_meldung(db, user_a, alter_stunden=crem.KARENZ_STUNDEN + 2)
+    assert len(await crem.find_due(db)) == 1
+
+    await cts.end_link(db, couple_id, user_a)
+    assert await crem.find_due(db) == []
+
+
+async def test_reminder_settings_closed_to_outsiders(db):
+    _, _, _, _, couple_id = await _linked_pair(db)
+    fremd = uuid.uuid4()
+    for aufruf in (crem.get_settings(db, couple_id, fremd),
+                   crem.set_settings(db, couple_id, fremd, email_enabled=True)):
+        with pytest.raises(HTTPException) as e:
+            await aufruf
+        assert e.value.status_code == 404
+
+
+async def test_mail_says_that_something_waits_never_what():
+    """Der Text steht im Paarraum, nicht im Postfach."""
+    betreff, text = crem.build_mail(3, "https://echo-b.de")
+    assert "3 Dinge warten" in betreff
+    assert "https://echo-b.de/app/paar" in text
+    # Kein Inhalt, kein Name, kein Thema — und ein Weg hinaus.
+    assert "Einstellungen" in text and "einmal am Tag" in text
+    for verraeterisch in ("Abmachung", "Sitzung", "Thema", "Barometer", "Check-in"):
+        assert verraeterisch not in text, verraeterisch
+
+    einzeln, _ = crem.build_mail(1, "https://echo-b.de")
+    assert "Etwas wartet" in einzeln

@@ -142,7 +142,7 @@ export default function CoupleDeescalationPage() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[280px_1fr]">
           {/* ── Frühere Male ─────────────────────────────────────── */}
-          <div className="space-y-4">
+          <div className="order-2 space-y-4 lg:order-1">
             {vergangene.length > 0 && (
               <div className="card">
                 <h2 className="text-sm font-bold text-navy">Frühere Male</h2>
@@ -184,7 +184,7 @@ export default function CoupleDeescalationPage() {
           </div>
 
           {/* ── Der Faden ────────────────────────────────────────── */}
-          <div>
+          <div className="order-1 lg:order-2">
             {ansicht !== 'aktuell' ? (
               <div className="card">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -292,7 +292,7 @@ export default function CoupleDeescalationPage() {
                   </div>
 
                   {nachrichten.length > 0 && (
-                    <div className="mt-4 space-y-3 overflow-y-auto pr-1" style={{ maxHeight: '46vh' }}>
+                    <div className="mt-4 max-h-[42vh] space-y-3 overflow-y-auto pr-1 sm:max-h-[46vh]">
                       {nachrichten.map((m, i) => (
                         <Blase key={m.id} role={m.role} content={m.content}
                           neu={i === nachrichten.length - 1} />

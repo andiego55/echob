@@ -143,7 +143,7 @@ export default function CoupleEchoPage() {
     <CoupleShell subtitle="Nur für dich – Echo kennt deinen Fall und euren Raum.">
       <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
         {/* ── Startpunkte + Verlauf ──────────────────────────────── */}
-        <div className="space-y-4">
+        <div className="order-2 space-y-4 lg:order-1">
           {vergangene.length > 0 && (
             <div className="card">
               <h2 className="text-sm font-bold text-navy">Deine Gespräche</h2>

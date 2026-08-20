@@ -120,3 +120,24 @@ export const coupleBarometerApi = {
     apiClient.put<CoupleBarometerState>(`/couple/links/${coupleId}/barometer`, { value, note })
       .then(r => r.data),
 }
+
+/**
+ * Erinnerungen außerhalb der App – opt-in, je Person und je Paarraum.
+ *
+ * Aus per Vorgabe: Bei diesem Thema kann eine Mail im falschen Postfach Schaden
+ * anrichten. In der Mail steht nie, *was* wartet – nur, dass etwas wartet.
+ */
+export interface CoupleReminderSettings {
+  email_enabled: boolean
+  last_sent_at: string | null
+}
+
+export const coupleReminderApi = {
+  get: (coupleId: string) =>
+    apiClient.get<CoupleReminderSettings>(`/couple/links/${coupleId}/erinnerungen`)
+      .then(r => r.data),
+
+  set: (coupleId: string, emailEnabled: boolean) =>
+    apiClient.put<CoupleReminderSettings>(`/couple/links/${coupleId}/erinnerungen`,
+      { email_enabled: emailEnabled }).then(r => r.data),
+}

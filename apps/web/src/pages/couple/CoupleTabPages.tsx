@@ -13,6 +13,7 @@ import TestsCard from '@/components/couple/TestsCard'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import ProgressCard from '@/components/couple/ProgressCard'
 import ChronicleCard from '@/components/couple/ChronicleCard'
+import ReminderCard from '@/components/couple/ReminderCard'
 import RetrospectCard from '@/components/couple/RetrospectCard'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
@@ -105,6 +106,7 @@ export function CoupleSettingsPage() {
     <CoupleShell subtitle="Was privat bleibt, was gilt – und wie ihr wieder auseinandergeht.">
       <div className="space-y-5">
         <IsolationNotice />
+        <ReminderCard coupleId={coupleId} />
         {room && <EndRoomPanel coupleId={coupleId} since={room.accepted_at ?? room.created_at} />}
         <CoupleSafetyNote />
         <p className="text-center text-[0.7rem] leading-relaxed text-brand-muted">

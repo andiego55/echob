@@ -185,6 +185,9 @@ async def export_for_user(conn: asyncpg.Connection, user_id) -> dict[str, Any]:
             "SELECT * FROM couple_test_comparisons WHERE couple_id = ANY($1::uuid[])", ids)
     ]
     # Gehoert beiden: entsteht nur aus Daten, die ohnehin beide sehen.
+    data["couple_reminder_settings"] = await rows(
+        "SELECT * FROM couple_reminder_settings WHERE user_id = $1 "
+        "AND couple_id = ANY($2::uuid[])", user_id, ids)
     data["couple_retrospectives"] = [
         crypto.decrypt_fields(r, "body")
         for r in await rows(
