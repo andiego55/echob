@@ -9,6 +9,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
 import { apiErrorMessage } from '@/api/errors'
+import Avatar from '@/components/Avatar'
+import { useCoupleFaces } from './useCoupleFaces'
 import type { CoupleAgreement } from '@/api/coupleAgreements'
 
 const STATUS_CHIP: Record<CoupleAgreement['status'], { label: string; cls: string }> = {
@@ -23,6 +25,7 @@ export default function AgreementsCard({
 }: { coupleId: string; sessionId?: string | null }) {
   const qc = useQueryClient()
   const { user } = useAuth()
+  const { faceFor } = useCoupleFaces(coupleId)
   const [body, setBody] = useState('')
 
   const { data: agreements = [] } = useQuery({
@@ -88,6 +91,7 @@ export default function AgreementsCard({
             return (
               <div key={a.id} className="rounded-brand border border-brand-border px-3.5 py-3">
                 <div className="flex flex-wrap items-start justify-between gap-2">
+                  <Avatar value={faceFor(a.proposed_by).avatar} size="sm" className="mt-0.5" />
                   <p className="min-w-0 flex-1 text-sm text-brand-text">{a.body}</p>
                   <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold ${chip.cls}`}>
                     {chip.label}

@@ -211,7 +211,8 @@ export default function CoupleMediationPage() {
         </div>
 
         {mediations.length > 0 && (
-          <BridgeBoard topicId={topicId} bridges={data.bridges} messages={data.messages} />
+          <BridgeBoard topicId={topicId} coupleId={data.topic.couple_id}
+            bridges={data.bridges} messages={data.messages} />
         )}
 
         {mediations.length > 0 && <MediationFollowUp topicId={topicId} />}

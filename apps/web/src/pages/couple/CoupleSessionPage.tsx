@@ -20,6 +20,7 @@ import PreparationWizard from '@/components/couple/PreparationWizard'
 import PrivateEchoPanel from '@/components/couple/PrivateEchoPanel'
 import ProposalBar from '@/components/couple/ProposalBar'
 import EchoThinking from '@/components/couple/EchoThinking'
+import { SessionSkeleton } from '@/components/couple/Skeleton'
 import { MOOD_EMOJI } from '@/components/couple/moods'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
@@ -89,7 +90,11 @@ export default function CoupleSessionPage() {
   }, [data?.messages.length])
 
   if (isLoading) {
-    return <AppShell><div className="mx-auto max-w-[1000px] px-6 py-8 text-sm text-brand-muted">Lade …</div></AppShell>
+    return (
+      <AppShell>
+        <div className="mx-auto max-w-[1000px] px-6 py-8"><SessionSkeleton /></div>
+      </AppShell>
+    )
   }
   if (isError || !data) {
     return (

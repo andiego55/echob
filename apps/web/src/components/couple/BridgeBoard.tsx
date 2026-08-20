@@ -13,6 +13,8 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import type { CoupleBridge, CoupleTopicDetail, CoupleTopicMessage } from '@/api/coupleMediation'
 import { apiErrorMessage } from '@/api/errors'
+import Avatar from '@/components/Avatar'
+import { useCoupleFaces } from './useCoupleFaces'
 import EchoThinking from './EchoThinking'
 
 const STATUS_CHIP: Record<CoupleBridge['status'], { label: string; cls: string }> = {
@@ -22,8 +24,13 @@ const STATUS_CHIP: Record<CoupleBridge['status'], { label: string; cls: string }
 }
 
 export default function BridgeBoard({
-  topicId, bridges, messages,
-}: { topicId: string; bridges: CoupleBridge[]; messages: CoupleTopicMessage[] }) {
+  topicId, coupleId, bridges, messages,
+}: {
+  topicId: string
+  coupleId: string
+  bridges: CoupleBridge[]
+  messages: CoupleTopicMessage[]
+}) {
   const qc = useQueryClient()
   const [text, setText] = useState('')
   const apply = (d: CoupleTopicDetail) => qc.setQueryData(['couple-topic', topicId], d)
@@ -56,7 +63,7 @@ export default function BridgeBoard({
       ) : (
         <div className="mt-4 space-y-3">
           {[...offen, ...erledigt].map(b => (
-            <BridgeCard key={b.id} bridge={b} topicId={topicId} />
+            <BridgeCard key={b.id} bridge={b} topicId={topicId} coupleId={coupleId} />
           ))}
         </div>
       )}
@@ -122,9 +129,12 @@ export default function BridgeBoard({
   )
 }
 
-function BridgeCard({ bridge, topicId }: { bridge: CoupleBridge; topicId: string }) {
+function BridgeCard({
+  bridge, topicId, coupleId,
+}: { bridge: CoupleBridge; topicId: string; coupleId: string }) {
   const qc = useQueryClient()
   const { user } = useAuth()
+  const { faceFor } = useCoupleFaces(coupleId)
   const [edit, setEdit] = useState(false)
   const [body, setBody] = useState(bridge.body)
   const [note, setNote] = useState('')
@@ -194,7 +204,8 @@ function BridgeCard({ bridge, topicId }: { bridge: CoupleBridge; topicId: string
       )}
 
       {geaendert && !edit && (
-        <p className="mt-1.5 text-[0.7rem] text-accent">
+        <p className="mt-1.5 flex items-center gap-1.5 text-[0.7rem] text-accent">
+          <Avatar value={faceFor(bridge.updated_by).avatar} size="xs" />
           {vonMir ? 'Von dir geändert' : 'Von deiner Partnerperson geändert'}
         </p>
       )}
@@ -216,7 +227,10 @@ function BridgeCard({ bridge, topicId }: { bridge: CoupleBridge; topicId: string
                   <span className={`absolute -left-[1.05rem] top-1.5 h-2 w-2 rounded-full ${
                     aktuell ? 'bg-accent' : 'bg-brand-border'
                   }`} />
-                  <p className={`text-[0.68rem] font-semibold ${aktuell ? 'text-accent' : 'text-brand-muted'}`}>
+                  <p className={`flex items-center gap-1.5 text-[0.68rem] font-semibold ${
+                    aktuell ? 'text-accent' : 'text-brand-muted'
+                  }`}>
+                    {v.changed_by && <Avatar value={faceFor(v.changed_by).avatar} size="xs" />}
                     {wer}
                     {aktuell && ' · gilt gerade'}
                   </p>

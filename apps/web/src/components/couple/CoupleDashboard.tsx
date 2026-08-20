@@ -22,6 +22,7 @@ import { apiErrorMessage } from '@/api/errors'
 import AppreciationCard from './AppreciationCard'
 import BarometerCard from './BarometerCard'
 import CoupleNotices from './CoupleNotices'
+import { DashboardSkeleton } from './Skeleton'
 import DueAgreementsCard from './DueAgreementsCard'
 import WeeklyCheckinCard from './WeeklyCheckinCard'
 
@@ -34,7 +35,7 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
     refetchInterval: 20000,
   })
 
-  if (isLoading) return <div className="card text-sm text-brand-muted">Lade …</div>
+  if (isLoading) return <DashboardSkeleton />
   if (isError || !data) {
     return (
       <div className="card border-l-4 border-l-red-400">

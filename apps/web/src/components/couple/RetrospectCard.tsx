@@ -17,6 +17,7 @@ import { coupleRetrospectApi } from '@/api/coupleRetrospect'
 import type { CoupleRetrospective, CoupleRetrospectStats } from '@/api/coupleRetrospect'
 import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from './EchoThinking'
+import { RetrospectSkeleton } from './Skeleton'
 import { MOOD_EMOJI } from './moods'
 import { barometerColor } from './EchoBarometer'
 
@@ -42,7 +43,7 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-retrospect', coupleId] }),
   })
 
-  if (!data) return null
+  if (!data) return <RetrospectSkeleton />
   const s = data.stats
 
   return (
