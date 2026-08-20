@@ -209,8 +209,6 @@ async def get_dashboard(
 
 # ── Paar-Begleiter: Gespräche mit Verlauf und Zusammenfassungen ──────────────
 
-_COMPANION_PROMPT = "echo_couple_companion_prompt.md"
-
 
 def _echo_svc(request: Request):
     svc = request.app.state.echo_service
@@ -221,7 +219,7 @@ def _echo_svc(request: Request):
 
 def _thread_out(t: dict) -> dict:
     return {
-        "id": t["id"], "title": t.get("title"),
+        "id": t["id"], "title": t.get("title"), "kind": t.get("kind") or "chat",
         "created_at": t["created_at"], "updated_at": t["updated_at"],
         "closed_at": t.get("closed_at"),
         "message_count": t.get("message_count", 0),
@@ -240,13 +238,18 @@ async def _conversation(conn, thread, user_id) -> CoupleEchoConversation:
 @router.get("/links/{couple_id}/echo", response_model=CoupleEchoConversation)
 async def get_companion(
     couple_id: UUID,
+    kind: str = "chat",
     current=Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CoupleEchoConversation:
-    """Das laufende Gespräch mit deinem Begleiter. Die andere Person sieht es nie."""
+    """Das laufende Gespräch mit deinem Begleiter. Die andere Person sieht es nie.
+
+    ``kind`` trennt die Fäden: Ein Streit-Einstieg landet nie mitten in einem offenen
+    Gespräch und wechselt dort den Ton.
+    """
     user_id = current["user_id"]
     async with pool.acquire() as conn:
-        thread = await companion.ensure_open_thread(conn, couple_id, user_id)
+        thread = await companion.ensure_open_thread(conn, couple_id, user_id, kind)
         return await _conversation(conn, thread, user_id)
 
 
@@ -255,6 +258,7 @@ async def talk_to_companion(
     couple_id: UUID,
     body: CouplePrivateMessageCreate,
     request: Request,
+    kind: str = "chat",
     current=Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CoupleEchoConversation:
@@ -265,7 +269,8 @@ async def talk_to_companion(
     async with pool.acquire() as conn:
         await enforce_echo_prompt_limit(user_id, conn)
         link = await cts.require_couple_member(conn, couple_id, user_id)
-        thread = await companion.ensure_open_thread(conn, couple_id, user_id)
+        thread = await companion.ensure_open_thread(conn, couple_id, user_id, kind)
+        prompt = companion.prompt_for(thread.get("kind"))
 
         await companion.add_message(conn, thread, user_id, role="user", content=body.content)
         verlauf = await companion.load_messages(conn, thread["id"], user_id)
@@ -275,7 +280,7 @@ async def talk_to_companion(
             user_message=body.content,
             shared_context=context,
             history=companion.build_history(verlauf)[:-1],
-            prompt_file=_COMPANION_PROMPT,
+            prompt_file=prompt,
         )
         await companion.add_message(conn, thread, user_id, role="echo", content=reply)
 
@@ -288,11 +293,12 @@ async def talk_to_companion(
                     "Nur die Überschrift, ohne Anführungszeichen.\n\n"
                     "Erste Nachricht: " + body.content
                 ),
-                shared_context="", history=[], prompt_file=_COMPANION_PROMPT,
+                shared_context="", history=[], prompt_file=prompt,
             )
             sauber = titel.strip().strip(chr(34)).strip()[:160]
             thread = await companion.rename_thread(
-                conn, thread["id"], user_id, sauber or "Gespräch",
+                conn, thread["id"], user_id,
+                sauber or companion.KIND_LABELS.get(thread.get("kind"), "Gespräch"),
             )
 
         return await _conversation(conn, thread, user_id)
@@ -303,6 +309,7 @@ async def talk_to_companion(
 async def summarize_companion(
     couple_id: UUID,
     request: Request,
+    kind: str = "chat",
     current=Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CoupleEchoSummary:
@@ -315,7 +322,7 @@ async def summarize_companion(
 
     async with pool.acquire() as conn:
         await enforce_echo_prompt_limit(user_id, conn)
-        thread = await companion.ensure_open_thread(conn, couple_id, user_id)
+        thread = await companion.ensure_open_thread(conn, couple_id, user_id, kind)
         msgs = await companion.load_messages(conn, thread["id"], user_id)
         if not msgs:
             raise HTTPException(
@@ -332,7 +339,8 @@ async def summarize_companion(
                 "200 Wörter. Was mir klar geworden ist, was ich mir vorgenommen habe, was "
                 "offen blieb. Keine Einleitung, kein Rahmentext.\n\n" + verlauf
             ),
-            shared_context="", history=[], prompt_file=_COMPANION_PROMPT,
+            shared_context="", history=[],
+            prompt_file=companion.prompt_for(thread.get("kind")),
         )
         summary = await companion.save_summary(
             conn, couple_id, user_id,

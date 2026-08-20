@@ -20,7 +20,9 @@ from fastapi import HTTPException
 
 from app.core import crypto
 from app.services import couple_agreement_service as cas
+from app.services import couple_appreciation_service as cappr
 from app.services import couple_checkin_service as cchk
+from app.services import couple_companion_service as ccomp
 from app.services import couple_dashboard_service as dash
 from app.services import couple_mediation_service as cms
 from app.services import couple_notify_service as cnotify
@@ -99,7 +101,7 @@ async def test_link_grants_no_case_access(db):
         assert f"CONCERN_{foreign}" not in payload   # Anliegen der anderen Person
 
 
-@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify])
+@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr])
 async def test_service_never_touches_case_content(modul):
     """Struktur-Wächter: Kopplung UND Sitzung ziehen bewusst keine Fall-Inhalte heran.
 
@@ -556,6 +558,7 @@ async def _fill_room(db, user_a, user_b, couple_id):
     await cps.add_private_message(db, session["id"], user_a, role="user", content="PRIVAT")
     await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="CHECKIN_VON_ALEX",
                     wish="MEHR ZEIT")
+    await cappr.leave(db, couple_id, user_a, "DANKE_VON_ALEX")
     await prog.award(db, couple_id, user_a, "session_started", session["id"])
     return session, topic
 
@@ -586,6 +589,8 @@ async def _room_row_counts(db, couple_id, session_id, topic_id) -> dict[str, int
             "SELECT count(*) FROM couple_point_events WHERE couple_id=$1", couple_id),
         "checkins": await db.fetchval(
             "SELECT count(*) FROM couple_checkins WHERE couple_id=$1", couple_id),
+        "appreciations": await db.fetchval(
+            "SELECT count(*) FROM couple_appreciations WHERE couple_id=$1", couple_id),
     }
 
 
@@ -663,6 +668,7 @@ async def test_export_holds_own_data_but_not_the_partners_secrets(db):
                                   content="PRIVAT_VON_RIO")
     await cms.save_perspective(db, topic["id"], user_b, private_text="GEHEIM_VON_RIO")
     await cchk.save(db, couple_id, user_b, highlight="CHECKIN_VON_RIO")
+    await cappr.leave(db, couple_id, user_b, "DANKE_VON_RIO")
 
     export = await privacy.export_for_user(db, user_a)
     blob = str(export)
@@ -672,6 +678,8 @@ async def test_export_holds_own_data_but_not_the_partners_secrets(db):
     assert "Zusammenfassung" in blob and "Abmachung" in blob   # Gemeinsames schon
     assert "CHECKIN_VON_ALEX" in blob                    # eigener Check-in ist drin
     assert "CHECKIN_VON_RIO" not in blob                 # der der anderen Person nicht
+    assert "DANKE_VON_ALEX" in blob                      # eigene Wertschätzung ist drin
+    assert "DANKE_VON_RIO" not in blob                   # ihr Text gehört ihr
 
 
 # ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────
@@ -1310,3 +1318,114 @@ async def test_notification_failure_never_breaks_the_action(db):
     # Wirft nichts nach aussen — das ist die ganze Zusicherung.
     await cnotify.to_partner(Kaputt(), couple_id, user_a, cnotify.checkin_done())
     assert await db.fetchval("SELECT COUNT(*) FROM client_notifications") == 0
+
+
+# ── Ritual: Wertschätzung ───────────────────────────────────────────────────
+
+
+async def test_appreciation_goes_over_immediately(db):
+    """Bewusst OHNE Blindheitsregel — ein Geschenk, kein Zug im Wechselspiel."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cappr.leave(db, couple_id, user_a, "Danke für gestern Abend")
+
+    # Rio sieht sie sofort, ohne selbst etwas geschrieben zu haben.
+    wand = await cappr.load_wall(db, couple_id, user_b)
+    assert [e["body"] for e in wand["received"]] == ["Danke für gestern Abend"]
+    assert wand["given"] == []
+    assert wand["unseen"] == 1
+
+    # Bei Alex steht sie auf der anderen Seite.
+    eigene = await cappr.load_wall(db, couple_id, user_a)
+    assert [e["body"] for e in eigene["given"]] == ["Danke für gestern Abend"]
+    assert eigene["received"] == [] and eigene["unseen"] == 0
+
+
+async def test_seen_marker_stays_with_the_recipient(db):
+    """Abhaken ist nur der „neu"-Hinweis — die schreibende Person erfährt nichts davon."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cappr.leave(db, couple_id, user_a, "Danke")
+
+    assert await cappr.count_unseen(db, couple_id, user_b) == 1
+    assert await cappr.mark_seen(db, couple_id, user_b) == 1
+    assert await cappr.count_unseen(db, couple_id, user_b) == 0
+
+    # Alex sieht nach wie vor keine Lesebestätigung in ihrer eigenen Ansicht.
+    eigene = await cappr.load_wall(db, couple_id, user_a)
+    assert eigene["unseen"] == 0
+    assert len(eigene["given"]) == 1
+
+
+async def test_own_seen_marker_never_touches_the_partners(db):
+    """Abhaken darf nur die an DICH gerichteten treffen."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cappr.leave(db, couple_id, user_a, "Von Alex")
+    await cappr.leave(db, couple_id, user_b, "Von Rio")
+
+    await cappr.mark_seen(db, couple_id, user_b)
+    assert await cappr.count_unseen(db, couple_id, user_a) == 1  # Rios Satz wartet weiter
+
+
+async def test_appreciation_is_encrypted_at_rest(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await cappr.leave(db, couple_id, user_a, "GEHEIMER DANK")
+    roh = await db.fetchval("SELECT body FROM couple_appreciations WHERE couple_id = $1",
+                            couple_id)
+    assert "GEHEIMER DANK" not in (roh or "")
+
+
+async def test_appreciation_closed_to_outsiders(db):
+    _, _, _, _, couple_id = await _linked_pair(db)
+    fremd = uuid.uuid4()
+    for aufruf in (cappr.load_wall(db, couple_id, fremd),
+                   cappr.leave(db, couple_id, fremd, "X"),
+                   cappr.mark_seen(db, couple_id, fremd)):
+        with pytest.raises(HTTPException) as e:
+            await aufruf
+        assert e.value.status_code == 404
+
+
+async def test_empty_appreciation_rejected(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    with pytest.raises(HTTPException) as e:
+        await cappr.leave(db, couple_id, user_a, "   ")
+    assert e.value.status_code == 400
+
+
+# ── Ritual: Streit-Einstieg als eigene Fadenart ─────────────────────────────
+
+
+async def test_deescalation_gets_its_own_thread(db):
+    """Ein Streit-Einstieg landet nie mitten im offenen Gespräch."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    chat = await ccomp.ensure_open_thread(db, couple_id, user_a, "chat")
+    streit = await ccomp.ensure_open_thread(db, couple_id, user_a, "deescalation")
+
+    assert str(chat["id"]) != str(streit["id"])
+    assert chat["kind"] == "chat" and streit["kind"] == "deescalation"
+    # Und beide bleiben stabil: derselbe Aufruf holt denselben Faden wieder.
+    assert str((await ccomp.ensure_open_thread(db, couple_id, user_a, "chat"))["id"]) \
+        == str(chat["id"])
+
+
+async def test_thread_kind_picks_the_prompt(db):
+    """Die Art entscheidet über den Ton — genau dafür gibt es sie."""
+    assert ccomp.prompt_for("deescalation") == "echo_couple_deescalation_prompt.md"
+    assert ccomp.prompt_for("chat") == ccomp.THREAD_KINDS["chat"]
+    assert ccomp.prompt_for(None) == ccomp.THREAD_KINDS["chat"]
+    assert ccomp.prompt_for("ausgedacht") == ccomp.THREAD_KINDS["chat"]  # nie ohne Prompt
+
+
+async def test_unknown_thread_kind_rejected(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    with pytest.raises(HTTPException) as e:
+        await ccomp.ensure_open_thread(db, couple_id, user_a, "ausgedacht")
+    assert e.value.status_code == 400
+
+
+async def test_every_thread_kind_has_a_prompt_file():
+    """Ein Eintrag in der Registry ohne Datei wäre erst zur Laufzeit sichtbar."""
+    from pathlib import Path
+    prompts = Path(__file__).resolve().parents[1] / "prompts"
+    for kind, datei in ccomp.THREAD_KINDS.items():
+        assert (prompts / datei).is_file(), f"Prompt für '{kind}' fehlt: {datei}"
+        assert kind in ccomp.KIND_LABELS, f"Beschriftung für '{kind}' fehlt"

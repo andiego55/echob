@@ -8,9 +8,16 @@ import type { CouplePrivateMessage } from './couplePrivate'
  * lassen, behalten. Alles hier gehört ausschließlich dir; die Partnerperson hat keinen
  * Endpunkt, über den sie es sehen könnte.
  */
+/**
+ * Art eines Fadens. Sie entscheidet ueber den Ton, in dem Echo antwortet, und haelt die
+ * Faeden auseinander – ein Streit-Einstieg landet nie mitten in einem offenen Gespraech.
+ */
+export type CoupleThreadKind = 'chat' | 'deescalation'
+
 export interface CoupleEchoThread {
   id: string
   title: string | null
+  kind: CoupleThreadKind
   created_at: string
   updated_at: string
   closed_at: string | null
@@ -34,16 +41,18 @@ export interface CoupleEchoSummary {
 
 export const coupleCompanionApi = {
   /** Das laufende Gespräch. */
-  current: (coupleId: string) =>
-    apiClient.get<CoupleEchoConversation>(`/couple/links/${coupleId}/echo`).then(r => r.data),
-
-  send: (coupleId: string, content: string) =>
-    apiClient.post<CoupleEchoConversation>(`/couple/links/${coupleId}/echo`, { content })
+  current: (coupleId: string, kind: CoupleThreadKind = 'chat') =>
+    apiClient.get<CoupleEchoConversation>(`/couple/links/${coupleId}/echo`, { params: { kind } })
       .then(r => r.data),
 
+  send: (coupleId: string, content: string, kind: CoupleThreadKind = 'chat') =>
+    apiClient.post<CoupleEchoConversation>(`/couple/links/${coupleId}/echo`, { content },
+      { params: { kind } }).then(r => r.data),
+
   /** Fasst zusammen, schließt das Gespräch ab und behält die Zusammenfassung. */
-  summarize: (coupleId: string) =>
-    apiClient.post<CoupleEchoSummary>(`/couple/links/${coupleId}/echo/summary`).then(r => r.data),
+  summarize: (coupleId: string, kind: CoupleThreadKind = 'chat') =>
+    apiClient.post<CoupleEchoSummary>(`/couple/links/${coupleId}/echo/summary`, null,
+      { params: { kind } }).then(r => r.data),
 
   threads: (coupleId: string) =>
     apiClient.get<CoupleEchoThread[]>(`/couple/links/${coupleId}/echo/threads`).then(r => r.data),

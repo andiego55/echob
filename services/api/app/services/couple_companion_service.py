@@ -17,24 +17,51 @@ from fastapi import HTTPException
 from app.core import crypto
 from app.services.couple_therapy_service import require_couple_member
 
+#: Art eines Fadens -> Prompt-Datei. Die Art entscheidet über den Ton, mit dem Echo
+#: antwortet: 'chat' ist das offene Gespräch, 'deescalation' der Einstieg nach einem
+#: Streit. Registry in der Anwendung statt CHECK-Constraint in der Datenbank - eine neue
+#: Art soll keine Migration kosten (siehe echo_messages.thread_type).
+THREAD_KINDS: dict[str, str] = {
+    "chat": "echo_couple_companion_prompt.md",
+    "deescalation": "echo_couple_deescalation_prompt.md",
+}
+
+#: Wie ein Faden im Verlauf überschrieben wird, solange er keinen eigenen Namen hat.
+KIND_LABELS: dict[str, str] = {
+    "chat": "Gespräch",
+    "deescalation": "Nach einem Streit",
+}
+
+
+def prompt_for(kind: str | None) -> str:
+    return THREAD_KINDS.get(kind or "chat", THREAD_KINDS["chat"])
+
+
 # So viele Beiträge bekommt Echo als Verlauf mit.
 HISTORY_LIMIT = 40
 
 
-async def ensure_open_thread(conn, couple_id, user_id) -> dict:
-    """Der laufende Faden — oder ein neuer, wenn keiner offen ist."""
+async def ensure_open_thread(conn, couple_id, user_id, kind: str = "chat") -> dict:
+    """Der laufende Faden dieser Art — oder ein neuer, wenn keiner offen ist.
+
+    Nach Art getrennt, damit ein Streit-Einstieg nicht mitten in einem offenen Gespräch
+    landet und dort den Ton wechselt.
+    """
     await require_couple_member(conn, couple_id, user_id)
+    if kind not in THREAD_KINDS:
+        raise HTTPException(status_code=400, detail="Unbekannte Gesprächsart.")
     row = await conn.fetchrow(
         "SELECT * FROM couple_echo_threads "
-        "WHERE couple_id = $1 AND user_id = $2 AND closed_at IS NULL "
+        "WHERE couple_id = $1 AND user_id = $2 AND kind = $3 AND closed_at IS NULL "
         "ORDER BY updated_at DESC LIMIT 1",
-        couple_id, user_id,
+        couple_id, user_id, kind,
     )
     if row:
         return crypto.decrypt_fields(dict(row), "title")
     row = await conn.fetchrow(
-        "INSERT INTO couple_echo_threads (couple_id, user_id) VALUES ($1, $2) RETURNING *",
-        couple_id, user_id,
+        "INSERT INTO couple_echo_threads (couple_id, user_id, kind) "
+        "VALUES ($1, $2, $3) RETURNING *",
+        couple_id, user_id, kind,
     )
     return crypto.decrypt_fields(dict(row), "title")
 

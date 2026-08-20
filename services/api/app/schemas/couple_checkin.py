@@ -1,4 +1,4 @@
-"""Schemas: woechentlicher Check-in im Paarraum.
+"""Schemas: die wiederkehrenden Anlaesse im Paarraum - Check-in und Wertschaetzung.
 
 Drei Fragen, eine Antwort je Person und Woche. Die Antwort der anderen Person wird erst
 sichtbar, wenn man selbst geschrieben hat - deshalb ``visible``.
@@ -6,7 +6,8 @@ Siehe services/couple_checkin_service.py.
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -48,3 +49,32 @@ class CoupleCheckinMood(BaseModel):
 class CoupleCheckinHistoryWeek(BaseModel):
     week_start: date
     moods: list[CoupleCheckinMood]
+
+
+# ── Wertschaetzung ──────────────────────────────────────────────────────────
+
+
+class CoupleAppreciationCreate(BaseModel):
+    body: str = Field(..., min_length=1, max_length=400)
+
+
+class CoupleAppreciation(BaseModel):
+    id: UUID
+    from_user_id: UUID
+    from_name: str
+    is_own: bool
+    body: str
+    created_at: datetime
+    seen_at: datetime | None = None
+
+
+class CoupleAppreciationWall(BaseModel):
+    """Beide Richtungen — was dir dagelassen wurde und was du dagelassen hast."""
+
+    received: list[CoupleAppreciation]
+    given: list[CoupleAppreciation]
+    unseen: int
+    #: Anstoesse fuer den leeren Zettel.
+    prompts: list[str]
+    partner_name: str | None = None
+    max_chars: int

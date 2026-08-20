@@ -13,6 +13,7 @@ import Avatar from '@/components/Avatar'
 import { coupleApi } from '@/api/couple'
 import type { CoupleDashboardItem } from '@/api/couple'
 import { apiErrorMessage } from '@/api/errors'
+import AppreciationCard from './AppreciationCard'
 import CoupleNotices from './CoupleNotices'
 import DueAgreementsCard from './DueAgreementsCard'
 import WeeklyCheckinCard from './WeeklyCheckinCard'
@@ -101,6 +102,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         partnerAvatar={data.partner_avatar}
       />
 
+      <AppreciationCard coupleId={coupleId} />
+
       {waiting.length > 0 && (
         <div className="card">
           <h2 className="text-sm font-bold text-navy">Wartet auf {partner}</h2>
@@ -128,6 +131,19 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
           text="Für alles, bei dem ihr feststeckt."
         />
       </div>
+
+      <Link
+        to={`/app/paar/${coupleId}/streit`}
+        className="flex items-center justify-between gap-3 rounded-brand-lg border border-brand-border bg-white px-4 py-3 no-underline shadow-brand-sm transition hover:border-accent/50"
+      >
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-navy">Gerade gestritten?</p>
+          <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
+            Erst runterkommen, dann sortieren. Nur für dich – es muss nichts daraus werden.
+          </p>
+        </div>
+        <span className="shrink-0 text-xs text-accent">Hier entlang →</span>
+      </Link>
 
       {/* ── Zahlen ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

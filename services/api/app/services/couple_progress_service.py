@@ -33,6 +33,7 @@ POINTS: dict[str, tuple[int, str]] = {
     "agreement_kept":      (30, "Eine Abmachung eingehalten"),
     "self_feedback":       (10, "Auf den eigenen Anteil geschaut"),
     "checkin_done":        (10, "Beim Wochen-Check-in dabei gewesen"),
+    "appreciation_left":   (10, "Etwas Wertschaetzendes dagelassen"),
     "agreement_reviewed":  (15, "Nachgehalten, wie es gelaufen ist"),
 }
 

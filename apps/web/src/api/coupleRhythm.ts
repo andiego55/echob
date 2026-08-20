@@ -45,3 +45,43 @@ export const coupleRhythmApi = {
     apiClient.get<CoupleCheckinHistoryWeek[]>(`/couple/links/${coupleId}/checkin/history`)
       .then(r => r.data),
 }
+
+/**
+ * Wertschätzung – der zweite wiederkehrende Anlass.
+ *
+ * Bewusst ohne die Blindheitsregel des Check-ins: Sie geht sofort hinüber, auch wenn
+ * nichts zurückkommt. Ein Geschenk, kein Zug im Wechselspiel.
+ */
+export interface CoupleAppreciation {
+  id: string
+  from_user_id: string
+  from_name: string
+  is_own: boolean
+  body: string
+  created_at: string
+  seen_at: string | null
+}
+
+export interface CoupleAppreciationWall {
+  received: CoupleAppreciation[]
+  given: CoupleAppreciation[]
+  unseen: number
+  /** Anstöße für den leeren Zettel. */
+  prompts: string[]
+  partner_name: string | null
+  max_chars: number
+}
+
+export const coupleAppreciationApi = {
+  wall: (coupleId: string) =>
+    apiClient.get<CoupleAppreciationWall>(`/couple/links/${coupleId}/wertschaetzung`)
+      .then(r => r.data),
+
+  leave: (coupleId: string, body: string) =>
+    apiClient.post<CoupleAppreciation>(`/couple/links/${coupleId}/wertschaetzung`, { body })
+      .then(r => r.data),
+
+  markSeen: (coupleId: string) =>
+    apiClient.post<{ seen: number }>(`/couple/links/${coupleId}/wertschaetzung/gesehen`)
+      .then(r => r.data),
+}

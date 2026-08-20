@@ -141,3 +141,10 @@ def agreement_reviewed(text: str, outcome: str) -> tuple[str, str]:
     }.get(outcome, "bewertet")
     return ("couple_agreement_reviewed",
             f"Eure Abmachung „{_kurz(text)}“ wurde {wie}.")
+
+
+def appreciation_left() -> tuple[str, str]:
+    # Ohne den Satz selbst: Er soll im Paarraum gelesen werden, nicht in einer Meldung
+    # nebenbei verpuffen.
+    return ("couple_appreciation_left",
+            "Es liegt etwas Wertschätzendes für dich im Paarraum.")

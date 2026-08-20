@@ -71,6 +71,7 @@ import {
 } from '@/pages/couple/CoupleTabPages'
 // Nicht zu verwechseln mit der Paar-Analyse im Fachpersonenbereich (weiter unten).
 import CouplePartnerEchoPage  from '@/pages/couple/CoupleEchoPage'
+import CoupleDeescalationPage from '@/pages/couple/CoupleDeescalationPage'
 import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
 import SettingsPage           from '@/pages/app/SettingsPage'
 import { useParams }         from 'react-router-dom'
@@ -261,6 +262,7 @@ export function AppRoutes() {
       <Route path="/app/paar/sitzung/:sessionId" element={<ProtectedRoute><CoupleSessionPage /></ProtectedRoute>} />
       <Route path="/app/paar/thema/:topicId" element={<ProtectedRoute><CoupleMediationPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/echo" element={<ProtectedRoute><CouplePartnerEchoPage /></ProtectedRoute>} />
+      <Route path="/app/paar/:coupleId/streit" element={<ProtectedRoute><CoupleDeescalationPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/gespraeche" element={<ProtectedRoute><CoupleSessionsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/mediation" element={<ProtectedRoute><CoupleTopicsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/abmachungen" element={<ProtectedRoute><CoupleAgreementsPage /></ProtectedRoute>} />
