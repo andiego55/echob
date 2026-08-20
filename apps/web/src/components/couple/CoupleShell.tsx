@@ -17,6 +17,7 @@ const TABS = [
   { path: '/mediation',     label: 'Mediation' },
   { path: '/abmachungen',   label: 'Abmachungen' },
   { path: '/tests',         label: 'Tests' },
+  { path: '/rueckblick',    label: 'Rückblick' },
   { path: '/fortschritt',   label: 'Fortschritt' },
   { path: '/einstellungen', label: 'Einstellungen' },
 ]

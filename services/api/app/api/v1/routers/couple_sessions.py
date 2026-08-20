@@ -20,6 +20,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
+from app.core.logging import get_logger
 from app.schemas.couple_session import (
     CoupleContextDraftRequest,
     CoupleContextResponse,
@@ -36,12 +37,15 @@ from app.schemas.couple_session import (
     CoupleSessionUpdate,
 )
 from app.services import couple_context_service as ccs
+from app.services import couple_moderation_service as cmod
 from app.services import couple_notify_service as notify
 from app.services import couple_progress_service as progress
 from app.services import couple_session_service as css
 from app.services.subscription_service import enforce_echo_prompt_limit
 
 router = APIRouter(prefix="/couple", tags=["couple-sessions"])
+
+logger = get_logger(__name__)
 
 _MODERATION_PROMPT = "echo_couple_session_prompt.md"
 # Der Entwurf ist eine PRIVATE Schreibhilfe für eine Person — nicht die Moderation im Raum.
@@ -343,18 +347,44 @@ async def post_message(
                               content=body.content)
 
         # »Echo, was meinst du?« soll wirken wie ein Zuruf im Raum — nicht ins Leere gehen.
-        if css.addresses_echo(body.content):
-            await enforce_echo_prompt_limit(user_id, conn)
-            await _echo_turn(
-                conn, _echo(request), session, link,
+        gerufen = css.addresses_echo(body.content)
+        # Und wenn niemand ruft: Echo schaut selbst, ob es dran ist. Wer sich gerade
+        # festfährt, denkt nicht daran, die Moderation zu holen.
+        urteil = None if gerufen else cmod.assess(await css.load_messages(conn, session_id))
+
+        if gerufen or urteil:
+            opener = (
                 "Du wurdest gerade im Raum direkt angesprochen. Antworte kurz und "
                 "allparteilich auf das, was zuletzt gesagt wurde, und gib das Gespräch "
-                "danach an die beiden zurück.",
+                "danach an die beiden zurück."
+                if gerufen else cmod.opener_for(urteil)
             )
-            if session["status"] == "draft":
-                session = await css.set_status(conn, session_id, user_id, "open")
-            await progress.award(conn, session["couple_id"], user_id,
-                                 "session_started", session_id)
+            # Ein ungefragter Beitrag darf die Nachricht nicht mitreißen: Ist das
+            # Kontingent erschöpft oder Echo gerade nicht erreichbar, bleibt der Beitrag
+            # trotzdem stehen. Ein gerufenes Echo meldet den Fehler dagegen ehrlich.
+            try:
+                await enforce_echo_prompt_limit(user_id, conn)
+                await _echo_turn(conn, _echo(request), session, link, opener)
+                geantwortet = True
+            except Exception:
+                if gerufen:
+                    raise
+                logger.info("Selbsteinschaltung ausgelassen (%s).", urteil.reason)
+                geantwortet = False
+
+            # Bei Sicherheit kommen die Anlaufstellen als eigener, statischer Beitrag
+            # hinterher — Telefonnummern dürfen nie aus dem Modell stammen.
+            if geantwortet and urteil and urteil.reason == "safety":
+                await css.add_message(
+                    conn, session_id, user_id=None, role="echo",
+                    content=cmod.safety_notice(urteil.safety_level or "elevated"),
+                )
+
+            if geantwortet:
+                if session["status"] == "draft":
+                    session = await css.set_status(conn, session_id, user_id, "open")
+                await progress.award(conn, session["couple_id"], user_id,
+                                     "session_started", session_id)
 
         names = await css.load_member_names(conn, link)
         members = await _members(conn, link)

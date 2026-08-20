@@ -12,7 +12,7 @@ import ast
 import inspect
 import os
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 import asyncpg
 import pytest
@@ -26,10 +26,12 @@ from app.services import couple_checkin_service as cchk
 from app.services import couple_companion_service as ccomp
 from app.services import couple_dashboard_service as dash
 from app.services import couple_mediation_service as cms
+from app.services import couple_moderation_service as cmod
 from app.services import couple_notify_service as cnotify
 from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
 from app.services import couple_progress_service as prog
+from app.services import couple_retrospect_service as cretro
 from app.services import couple_session_service as css
 from app.services import couple_test_service as ctest
 from app.services import couple_therapy_service as cts
@@ -102,7 +104,7 @@ async def test_link_grants_no_case_access(db):
         assert f"CONCERN_{foreign}" not in payload   # Anliegen der anderen Person
 
 
-@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr, cbar])
+@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr, cbar, cretro, cmod])
 async def test_service_never_touches_case_content(modul):
     """Struktur-Wächter: Kopplung UND Sitzung ziehen bewusst keine Fall-Inhalte heran.
 
@@ -561,6 +563,8 @@ async def _fill_room(db, user_a, user_b, couple_id):
                     wish="MEHR ZEIT")
     await cappr.leave(db, couple_id, user_a, "DANKE_VON_ALEX")
     await cbar.set_value(db, couple_id, user_a, 7, "BAROMETER_VON_ALEX")
+    await cretro.save(db, couple_id, user_a, body="RUECKBLICK_TEXT",
+                      period_start=date.today(), period_end=date.today())
     await prog.award(db, couple_id, user_a, "session_started", session["id"])
     return session, topic
 
@@ -595,6 +599,8 @@ async def _room_row_counts(db, couple_id, session_id, topic_id) -> dict[str, int
             "SELECT count(*) FROM couple_appreciations WHERE couple_id=$1", couple_id),
         "barometer": await db.fetchval(
             "SELECT count(*) FROM couple_barometer_readings WHERE couple_id=$1", couple_id),
+        "retrospectives": await db.fetchval(
+            "SELECT count(*) FROM couple_retrospectives WHERE couple_id=$1", couple_id),
     }
 
 
@@ -687,6 +693,7 @@ async def test_export_holds_own_data_but_not_the_partners_secrets(db):
     assert "DANKE_VON_RIO" not in blob                   # ihr Text gehört ihr
     assert "BAROMETER_VON_ALEX" in blob                  # eigener Barometer-Vermerk
     assert "BAROMETER_VON_RIO" not in blob               # ihrer nicht
+    assert "RUECKBLICK_TEXT" in blob                     # gehört beiden
 
 
 # ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────
@@ -1523,3 +1530,201 @@ async def test_every_step_of_the_scale_has_a_label():
     for wert in range(cbar.MIN_VALUE, cbar.MAX_VALUE + 1):
         assert cbar.label_for(wert), wert
     assert cbar.label_for(None) is None
+
+
+# ── Echo hakt von selbst ein ────────────────────────────────────────────────
+
+
+def _beitrag(text, role="partner"):
+    return {"role": role, "content": text}
+
+
+async def test_calm_conversation_is_left_alone():
+    """Der teuerste Fehler wäre eine Moderation, die sich überall einmischt."""
+    ruhig = [
+        _beitrag("Ich fand den Sonntag schön, aber ich war danach ziemlich müde."),
+        _beitrag("Ging mir ähnlich. Sollen wir das nächste Mal früher losfahren?"),
+        _beitrag("Gern. Mir ist wichtig, dass wir uns nicht so hetzen."),
+        _beitrag("Einverstanden."),
+    ]
+    assert cmod.assess(ruhig) is None
+    for b in ruhig:
+        assert cmod.tension_signals(b["content"]) == set(), b["content"]
+
+
+async def test_safety_interrupts_immediately():
+    """Sicherheit ist der einzige Anlass ohne Ruheabstand — sofort, auch nach Echo."""
+    verlauf = [
+        _beitrag("Alles gut soweit.", role="echo"),
+        _beitrag("Er hat mich gestern geschlagen."),
+    ]
+    urteil = cmod.assess(verlauf)
+    assert urteil is not None
+    assert urteil.reason == "safety"
+    assert urteil.safety_level == "acute"
+
+
+async def test_tone_tipping_brings_echo_in():
+    verlauf = [
+        _beitrag("Das ist doch wieder typisch du."),
+        _beitrag("Du machst das immer so."),
+        _beitrag("DAS IST LÄCHERLICH!!"),
+    ]
+    urteil = cmod.assess(verlauf)
+    assert urteil is not None and urteil.reason == "tone"
+
+
+async def test_quiet_period_after_an_echo_turn():
+    """Eine Moderation, die sich in jede zweite Zeile drängt, wird überlesen."""
+    verlauf = [
+        _beitrag("Kurz zusammengefasst …", role="echo"),
+        _beitrag("Du machst das immer so, typisch du."),
+        _beitrag("DAS IST LÄCHERLICH!!"),
+    ]
+    assert len(verlauf) - 1 < cmod.MIN_GAP
+    assert cmod.assess(verlauf) is None       # noch Ruhe
+
+    verlauf.append(_beitrag("Du bist ja nie da."))
+    assert cmod.assess(verlauf).reason == "tone"   # jetzt greift es
+
+
+async def test_drifting_gets_a_short_check_in():
+    verlauf = [_beitrag("Zur Sache …", role="echo")]
+    verlauf += [_beitrag(f"Ganz sachlicher Beitrag Nummer {i}.")
+                for i in range(cmod.DRIFT_AFTER)]
+    urteil = cmod.assess(verlauf)
+    assert urteil is not None and urteil.reason == "drift"
+
+
+async def test_echo_does_not_answer_itself():
+    assert cmod.assess([_beitrag("Ein Moderationsbeitrag.", role="echo")]) is None
+    assert cmod.assess([]) is None
+
+
+async def test_one_sharp_sentence_is_not_enough():
+    """Ein einzelner scharfer Satz soll die Moderation nicht herbeirufen — ein Muster schon."""
+    verlauf = [
+        _beitrag("Mir ist wichtig, dass wir das anders machen."),
+        _beitrag("Ich verstehe das."),
+        _beitrag("Du machst das doch immer so, typisch du."),
+    ]
+    assert cmod.assess(verlauf) is None
+
+
+async def test_every_reason_has_an_opener():
+    for grund in ("safety", "tone", "drift"):
+        text = cmod.opener_for(cmod.Verdict(grund))
+        assert len(text) > 40, grund
+
+
+async def test_safety_notice_is_static_and_carries_the_numbers():
+    """Telefonnummern dürfen nie aus dem Modell stammen."""
+    for stufe in ("elevated", "acute"):
+        text = cmod.safety_notice(stufe)
+        assert "0800 111 0 111" in text or "116 016" in text, stufe
+        # Der Hinweis verteilt keine Rollen: Echo benennt niemanden als Betroffene
+        # oder Verursacher. (Namen von Beratungsstellen wie der Schweizer Opferhilfe
+        # sind davon unberuehrt — die stehen so im Telefonbuch.)
+        klein = text.lower()
+        for rolle in ('du bist', 'dein partner', 'deine partnerin', 'er hat dich',
+                      'sie hat dich'):
+            assert rolle not in klein, (stufe, rolle)
+    assert "110" in cmod.safety_notice("acute")
+
+
+# ── Rückblick über Zeit ─────────────────────────────────────────────────────
+
+
+async def test_retrospect_uses_the_couples_average_not_her_curve(db):
+    """Die Regel vom Barometer gilt weiter: kein Tagesprotokoll der anderen Person.
+
+    Ein Durchschnitt sagt etwas über euch; „am 12. stand sie auf 2" wäre eine Waffe.
+    """
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cbar.set_value(db, couple_id, user_a, 8)
+    await cbar.set_value(db, couple_id, user_b, 4)
+
+    stats = await cretro.load_stats(db, couple_id, user_a)
+    assert stats["barometer_avg"] == 6.0          # (8 + 4) / 2
+
+    text = cretro.build_input(stats)
+    assert "6.0" in text
+    # Keine Einzelwerte, keine Kurve, kein Datum je Person.
+    assert "am " not in text.lower().split("zeitraum:")[-1].split(".")[0]
+    assert str(user_b) not in text
+
+
+async def test_retrospect_counts_what_happened(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    sitzung = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    await css.set_status(db, sitzung["id"], user_a, "open")
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.set_topic_status(db, topic["id"], user_a, "resolved")
+    abm = await cas.propose(db, couple_id, user_a, body="Handy weg beim Essen")
+    await cas.accept(db, abm["id"], user_b)
+    await cappr.leave(db, couple_id, user_a, "Danke")
+    await cchk.save(db, couple_id, user_a, mood="ruhig")
+
+    stats = await cretro.load_stats(db, couple_id, user_a)
+    assert stats["sessions_started"] == 1
+    assert stats["topics_opened"] == 1 and stats["topics_resolved"] == 1
+    assert stats["agreements_made"] == 1
+    assert stats["appreciations"] == 1
+    assert stats["checkin_weeks"] == 1
+    assert cretro.has_substance(stats) is True
+
+
+async def test_empty_period_has_no_substance(db):
+    """Ein Text über einen leeren Zeitraum täte so, als gäbe es etwas zu sehen."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    stats = await cretro.load_stats(db, couple_id, user_a)
+    assert cretro.has_substance(stats) is False
+
+
+async def test_retrospect_belongs_to_both(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cretro.save(db, couple_id, user_a, body="Unser Bild dieser Wochen",
+                      period_start=date.today(), period_end=date.today())
+
+    # Rio hat ihn nicht geschrieben und sieht ihn trotzdem.
+    fremd = await cretro.list_all(db, couple_id, user_b)
+    assert [r["body"] for r in fremd] == ["Unser Bild dieser Wochen"]
+
+
+async def test_retrospect_is_encrypted_at_rest(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await cretro.save(db, couple_id, user_a, body="GEHEIMES BILD",
+                      period_start=date.today(), period_end=date.today())
+    roh = await db.fetchval("SELECT body FROM couple_retrospectives WHERE couple_id = $1",
+                            couple_id)
+    assert "GEHEIMES BILD" not in (roh or "")
+
+
+async def test_retrospect_closed_to_outsiders(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    retro = await cretro.save(db, couple_id, user_a, body="Text",
+                              period_start=date.today(), period_end=date.today())
+    fremd = uuid.uuid4()
+    for aufruf in (cretro.load_stats(db, couple_id, fremd),
+                   cretro.list_all(db, couple_id, fremd),
+                   cretro.delete(db, retro["id"], fremd)):
+        with pytest.raises(HTTPException) as e:
+            await aufruf
+        assert e.value.status_code == 404
+
+
+async def test_retrospect_input_carries_no_conversation_content(db):
+    """Echo bekommt AUSSCHLIESSLICH Aggregate — nie Beiträge oder Kontexte."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    sitzung = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    await css.add_message(db, sitzung["id"], user_id=user_a, role="partner",
+                          content="GEHEIMER BEITRAG")
+    await css.save_context(db, sitzung["id"], user_a, confirmed_text="GEHEIMER KONTEXT")
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_perspective(db, topic["id"], user_a, private_text="GEHEIME SICHT")
+    await cappr.leave(db, couple_id, user_b, "GEHEIME WERTSCHAETZUNG")
+
+    text = cretro.build_input(await cretro.load_stats(db, couple_id, user_a))
+    for geheim in ("GEHEIMER BEITRAG", "GEHEIMER KONTEXT", "GEHEIME SICHT",
+                   "GEHEIME WERTSCHAETZUNG"):
+        assert geheim not in text, geheim

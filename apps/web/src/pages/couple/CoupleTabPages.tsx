@@ -12,6 +12,7 @@ import TopicsCard from '@/components/couple/TopicsCard'
 import TestsCard from '@/components/couple/TestsCard'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import ProgressCard from '@/components/couple/ProgressCard'
+import RetrospectCard from '@/components/couple/RetrospectCard'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
 import EndRoomPanel from '@/components/couple/EndRoomPanel'
@@ -107,6 +108,15 @@ export function CoupleSettingsPage() {
           stellt keine Diagnosen und spricht keine Schuld zu.
         </p>
       </div>
+    </CoupleShell>
+  )
+}
+
+export function CoupleRetrospectPage() {
+  const coupleId = useCoupleId()
+  return (
+    <CoupleShell subtitle="Punkte zeigen, dass ihr arbeitet. Hier steht, was daraus geworden ist.">
+      <RetrospectCard coupleId={coupleId} />
     </CoupleShell>
   )
 }

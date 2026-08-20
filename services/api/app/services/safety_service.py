@@ -108,6 +108,16 @@ def _resource_block(*, full: bool) -> str:
     return "\n".join(lines).rstrip()
 
 
+def resource_block(*, full: bool = False) -> str:
+    """Die Anlaufstellen als Markdown — fuer Bereiche mit eigener Rahmung.
+
+    Der Paarraum formuliert die Unterbrechung selbst (dort sitzen zwei Menschen, nicht
+    einer), braucht aber dieselben Nummern. Sie duerfen nur an EINER Stelle stehen, sonst
+    veralten sie irgendwo.
+    """
+    return _resource_block(full=full)
+
+
 def build_safety_message(level: SafetyLevel, *, category: str | None = None) -> str:
     """Deterministische Sicherheits-Antwort (Markdown).
 

@@ -131,7 +131,7 @@ export default function CoupleSessionPage() {
                   <p className="mx-auto mt-2 max-w-[460px] text-sm leading-relaxed text-brand-muted">
                     Echo begrüßt euch, fasst Thema und Ziel zusammen, nennt kurz die
                     Gesprächsregeln und stellt die erste Frage. Danach redet ihr miteinander –
-                    Echo meldet sich, wenn ihr es dazuholt.
+                    Echo meldet sich, wenn ihr es dazuholt – und von selbst, wenn der Ton kippt.
                   </p>
 
                   <button
@@ -220,7 +220,7 @@ export default function CoupleSessionPage() {
                       onClick={() => moderate.mutate()}
                       disabled={busy}
                       className="btn !py-2 !px-4 !text-sm border-2 border-accent text-accent hover:bg-accent hover:text-white disabled:opacity-50"
-                      title="Echo meldet sich einmal zu Wort und gibt das Gespräch dann zurück."
+                      title="Echo meldet sich einmal zu Wort und gibt das Gespräch dann zurück. Von selbst kommt es dazu, wenn der Ton kippt oder ihr länger ohne Moderation redet."
                     >
                       {moderate.isPending ? 'Echo denkt nach …' : 'Echo dazuholen'}
                     </button>
