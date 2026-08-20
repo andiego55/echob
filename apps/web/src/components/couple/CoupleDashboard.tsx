@@ -22,6 +22,7 @@ import { apiErrorMessage } from '@/api/errors'
 import AppreciationCard from './AppreciationCard'
 import BarometerCard from './BarometerCard'
 import CoupleNotices from './CoupleNotices'
+import SinceLastVisit from './SinceLastVisit'
 import { DashboardSkeleton } from './Skeleton'
 import DueAgreementsCard from './DueAgreementsCard'
 import WeeklyCheckinCard from './WeeklyCheckinCard'
@@ -56,6 +57,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
   return (
     <div className="space-y-5">
       <CoupleNotices />
+
+      <SinceLastVisit coupleId={coupleId} />
 
       {/* ── Wer hier ist ──────────────────────────────────────────── */}
       <div className="card card-hero card-static">

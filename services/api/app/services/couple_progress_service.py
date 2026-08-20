@@ -96,7 +96,8 @@ async def load_progress(conn, couple_id, user_id) -> dict[str, Any]:
                 "name": names.get(str(e["user_id"]), "Person"),
                 "created_at": e["created_at"],
             }
-            for e in events[:15]
+            # 60 statt 15: Die Chronik erzaehlt den Weg, nicht nur die letzten Schritte.
+            for e in events[:60]
         ],
     }
 

@@ -7,12 +7,24 @@
  * Bewusst ohne die Blindheitsregel des Check-ins: Der Satz geht sofort hinüber, auch wenn
  * nichts zurückkommt. Eine Gegenleistung zu verlangen wäre genau der Buchhaltungsblick,
  * den das Modul sonst zu vermeiden versucht.
+ *
+ * **Warum eine Wand und keine Liste.** Der ganze Paarbereich ist Software: Karten, Listen,
+ * Zeilen. Das ist richtig für Abmachungen und Termine, aber falsch für einen Satz, den
+ * jemand für einen anderen Menschen hingelegt hat. Deshalb hier Zettel — leicht gedreht,
+ * warm, unterschiedlich groß. Der einzige Ort im Modul, der bewusst handgemacht aussieht.
  */
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleAppreciationApi } from '@/api/coupleRhythm'
 import type { CoupleAppreciation } from '@/api/coupleRhythm'
 import { apiErrorMessage } from '@/api/errors'
+
+/** Immer derselbe Dreh für denselben Zettel — sonst springt die Wand bei jedem Neuzeichnen. */
+function drehung(id: string): number {
+  let h = 0
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0
+  return ((Math.abs(h) % 9) - 4) * 0.4      // −1,6° … +1,6°
+}
 
 export default function AppreciationCard({ coupleId }: { coupleId: string }) {
   const qc = useQueryClient()
@@ -103,7 +115,7 @@ export default function AppreciationCard({ coupleId }: { coupleId: string }) {
       {data.received.length > 0 && (
         <div className="mt-5 border-t border-brand-border pt-4">
           <p className="text-xs font-semibold text-navy">Für dich</p>
-          <div className="mt-2 space-y-2">
+          <div className="mt-3 flex flex-wrap gap-3">
             {erhalten.map(a => <Zettel key={a.id} eintrag={a} />)}
           </div>
           {data.received.length > 3 && (
@@ -129,7 +141,7 @@ export default function AppreciationCard({ coupleId }: { coupleId: string }) {
           <summary className="cursor-pointer text-xs text-brand-muted hover:text-navy">
             Was du dagelassen hast ({data.given.length})
           </summary>
-          <div className="mt-2 space-y-2">
+          <div className="mt-3 flex flex-wrap gap-3">
             {data.given.map(a => <Zettel key={a.id} eintrag={a} gedimmt />)}
           </div>
         </details>
@@ -139,12 +151,26 @@ export default function AppreciationCard({ coupleId }: { coupleId: string }) {
 }
 
 function Zettel({ eintrag, gedimmt = false }: { eintrag: CoupleAppreciation; gedimmt?: boolean }) {
+  // Kurze Sätze bekommen einen kleinen Zettel, lange einen breiten — wie an einer echten Wand.
+  const breit = eintrag.body.length > 90
+
   return (
-    <div className={`rounded-brand border px-3.5 py-2.5 ${
-      gedimmt ? 'border-brand-border' : 'border-accent/30 bg-accent/[0.04]'
-    }`}>
-      <p className="whitespace-pre-wrap text-sm text-brand-text">{eintrag.body}</p>
-      <p className="mt-1 text-[0.65rem] text-brand-muted">
+    <div
+      style={{ transform: `rotate(${drehung(eintrag.id)}deg)` }}
+      className={`rounded-brand-sm px-4 py-3 shadow-brand-sm transition-transform duration-200 hover:!rotate-0 ${
+        breit ? 'w-full sm:w-[22rem]' : 'w-full sm:w-[15rem]'
+      } ${
+        gedimmt
+          ? 'border border-brand-border bg-white'
+          : 'border border-[#f0d9c9] bg-gradient-to-br from-[#fdf2ea] to-[#fbe8db]'
+      }`}
+    >
+      <p className={`whitespace-pre-wrap text-sm leading-relaxed ${
+        gedimmt ? 'text-brand-muted' : 'text-navy'
+      }`}>
+        {eintrag.body}
+      </p>
+      <p className="mt-2 text-[0.65rem] text-brand-muted">
         {eintrag.is_own ? 'von dir' : `von ${eintrag.from_name}`}
         {' · '}
         {new Date(eintrag.created_at).toLocaleDateString('de-DE', {

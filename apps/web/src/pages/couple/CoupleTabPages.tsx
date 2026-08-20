@@ -12,6 +12,7 @@ import TopicsCard from '@/components/couple/TopicsCard'
 import TestsCard from '@/components/couple/TestsCard'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import ProgressCard from '@/components/couple/ProgressCard'
+import ChronicleCard from '@/components/couple/ChronicleCard'
 import RetrospectCard from '@/components/couple/RetrospectCard'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
@@ -83,7 +84,10 @@ export function CoupleProgressPage() {
   const coupleId = useCoupleId()
   return (
     <CoupleShell subtitle="Was ihr euch erarbeitet habt – gemeinsam, ohne Rangliste.">
-      <ProgressCard coupleId={coupleId} />
+      <div className="space-y-5">
+        <ProgressCard coupleId={coupleId} />
+        <ChronicleCard coupleId={coupleId} />
+      </div>
     </CoupleShell>
   )
 }
