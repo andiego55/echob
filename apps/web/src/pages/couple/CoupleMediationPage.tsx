@@ -12,6 +12,7 @@ import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import { apiErrorMessage } from '@/api/errors'
+import EchoThinking from '@/components/couple/EchoThinking'
 import MediationFollowUp from '@/components/couple/MediationFollowUp'
 import BridgeBoard from '@/components/couple/BridgeBoard'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
@@ -166,7 +167,7 @@ export default function CoupleMediationPage() {
                 className="btn-primary !py-2 !px-4 !text-sm disabled:opacity-50"
               >
                 {mediate.isPending
-                  ? 'Echo arbeitet …'
+                  ? <EchoThinking text="Echo liest beide Sichten …" size={34} />
                   : mediations.length ? 'Neu erarbeiten' : 'Mediation starten'}
               </button>
               {topic.status === 'open' && mediations.length > 0 && (

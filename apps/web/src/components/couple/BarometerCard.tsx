@@ -58,10 +58,10 @@ export default function BarometerCard({
   const veraendert = wert !== (eigen?.value ?? null)
 
   return (
-    <div className="card">
+    <div className="card card-hero card-static">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-navy">Wie nah fühlt es sich gerade an?</h2>
+          <h2 className="card-title-lg">Wie nah fühlt es sich gerade an?</h2>
           <p className="mt-1 text-xs text-brand-muted">
             Kein Zeugnis füreinander – nur, wie es dir mit euch geht. Beide sehen es immer.
           </p>

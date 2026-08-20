@@ -6,11 +6,14 @@ import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import { apiErrorMessage } from '@/api/errors'
+import Avatar from '@/components/Avatar'
+import { useCoupleFaces } from './useCoupleFaces'
 
 // ── Mediation ─────────────────────────────────────────────────────────────────
 
 export default function TopicsCard({ coupleId }: { coupleId: string }) {
   const qc = useQueryClient()
+  const { faceFor } = useCoupleFaces(coupleId)
   const [title, setTitle] = useState('')
 
   const { data: topics = [] } = useQuery({
@@ -71,7 +74,8 @@ export default function TopicsCard({ coupleId }: { coupleId: string }) {
               to={`/app/paar/thema/${t.id}`}
               className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3.5 py-3 no-underline transition hover:border-accent/50"
             >
-              <p className="min-w-0 truncate text-sm font-semibold text-navy">{t.title}</p>
+              <Avatar value={faceFor(t.created_by).avatar} size="sm" />
+              <p className="min-w-0 flex-1 truncate text-sm font-semibold text-navy">{t.title}</p>
               <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold ${
                 t.status === 'resolved' ? 'bg-green-50 text-green-700' : 'bg-brand-bg text-brand-muted'
               }`}>

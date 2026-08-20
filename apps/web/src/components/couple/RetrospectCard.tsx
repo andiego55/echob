@@ -16,6 +16,7 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleRetrospectApi } from '@/api/coupleRetrospect'
 import type { CoupleRetrospective, CoupleRetrospectStats } from '@/api/coupleRetrospect'
 import { apiErrorMessage } from '@/api/errors'
+import EchoThinking from './EchoThinking'
 import { MOOD_EMOJI } from './moods'
 import { barometerColor } from './EchoBarometer'
 
@@ -114,7 +115,9 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
             disabled={!s.has_substance || schreiben.isPending}
             className="btn-primary shrink-0 !py-2 !px-4 !text-sm disabled:opacity-50"
           >
-            {schreiben.isPending ? 'Echo schaut zurück …' : 'Rückblick schreiben lassen'}
+            {schreiben.isPending
+              ? <EchoThinking text="Echo schaut zurück …" size={34} />
+              : 'Rückblick schreiben lassen'}
           </button>
         </div>
 

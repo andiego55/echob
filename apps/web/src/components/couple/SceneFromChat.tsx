@@ -20,6 +20,7 @@ import { coupleCompanionApi } from '@/api/coupleCompanion'
 import type { CoupleSceneDraft, CoupleThreadKind } from '@/api/coupleCompanion'
 import { scenesApi } from '@/api/scenes'
 import { apiErrorMessage } from '@/api/errors'
+import EchoThinking from './EchoThinking'
 
 const BELASTUNG = [
   { wert: 1, label: 'kaum' },
@@ -203,7 +204,9 @@ export default function SceneFromChat({
         className="rounded-brand border border-brand-border px-3.5 py-3 text-left transition hover:border-accent/50 disabled:opacity-50 w-full"
       >
         <p className="text-sm font-semibold text-navy">
-          {bauen.isPending ? 'Echo formt eine Szene …' : 'Szene erstellen'}
+          {bauen.isPending
+            ? <EchoThinking text="Echo formt eine Szene …" size={34} className="text-accent" />
+            : 'Szene erstellen'}
         </p>
         <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
           {caseId

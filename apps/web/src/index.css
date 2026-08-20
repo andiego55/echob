@@ -52,12 +52,58 @@
            hover:shadow-brand-lg hover:-translate-y-0.5;
   }
 
+  /* Drei Stufen statt einer. Wenn alles gleich wichtig aussieht, findet das Auge
+     keinen Einstieg. Held: hoechstens EINE je Ansicht - sonst verpufft die Stufe. */
+  .card-hero {
+    @apply bg-gradient-to-br from-accent/[0.09] via-brand-card to-brand-card
+           border-accent/25 p-7 shadow-brand-lg;
+  }
+  .card-quiet {
+    @apply bg-transparent border-dashed p-4 shadow-none
+           hover:shadow-none hover:translate-y-0;
+  }
+  /* Karten, die nichts anklickbar enthalten, sollen sich auch nicht so anfuehlen. */
+  .card-static {
+    @apply hover:shadow-brand hover:translate-y-0;
+  }
+
+  /* ── Karten-Ueberschriften ───────────────────────────────────── */
+  .card-title    { @apply text-sm font-bold text-navy; }
+  .card-title-lg { @apply text-[1.15rem] font-bold text-navy tracking-[-0.01em]; }
+  .card-title-sm { @apply text-[0.8rem] font-semibold text-brand-muted; }
+  /* Abschnittsmarke zwischen Karten - gibt dem Auge Halt, ohne Platz zu kosten. */
+  .section-label {
+    @apply text-[0.68rem] font-bold uppercase tracking-[0.09em] text-brand-muted;
+  }
+
   /* ── Formularfelder ──────────────────────────────────────────── */
   .input {
     @apply w-full rounded-brand-sm border border-brand-border bg-white px-3.5 py-2.5
            text-[0.9rem] text-navy placeholder:text-brand-muted/60
            transition-colors focus:border-accent focus:outline-none
            focus:ring-2 focus:ring-accent/20;
+  }
+
+  /* ── Echos Wartefigur ────────────────────────────────────────── */
+  .echo-welle { animation: echo-puls 1.9s ease-in-out infinite; }
+  .echo-welle:nth-child(2) { animation-delay: 0.17s; }
+  .echo-welle:nth-child(3) { animation-delay: 0.34s; }
+  @keyframes echo-puls {
+    0%, 100% { opacity: 0.22; }
+    45%      { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .echo-welle { animation: none; opacity: 0.7; }
+  }
+
+  /* Neue Beitraege blenden ein, statt hereinzuspringen. */
+  .beitrag-neu { animation: beitrag-auf 260ms ease-out; }
+  @keyframes beitrag-auf {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .beitrag-neu { animation: none; }
   }
 
   /* ── Safety Notice ───────────────────────────────────────────── */

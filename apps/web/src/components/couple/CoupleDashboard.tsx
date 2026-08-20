@@ -6,6 +6,12 @@
  *
  * Leerzustände erklären, was der Bereich kann, statt „nichts vorhanden" zu melden. Wer
  * zum ersten Mal hier ist, soll wissen, was ihn erwartet.
+ *
+ * **Drei benannte Abschnitte statt eines Stapels.** Die Seite war mit jedem Feature
+ * gewachsen und stapelte zuletzt gut zwanzig gleich aussehende Blöcke — wer sie öffnete,
+ * sah keine Antwort auf „was ist heute dran", sondern eine Wand. Jetzt: **Jetzt** (was
+ * Aufmerksamkeit braucht), **Euer Rhythmus** (was wiederkehrt), **Weitermachen** (wo es
+ * weitergeht). Was nur zum Nachschlagen da ist, liegt zugeklappt darunter.
  */
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -51,14 +57,14 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
       <CoupleNotices />
 
       {/* ── Wer hier ist ──────────────────────────────────────────── */}
-      <div className="card bg-gradient-to-br from-accent/[0.07] to-transparent">
+      <div className="card card-hero card-static">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex -space-x-3">
             <Avatar value={data.own_avatar} size="lg" className="ring-2 ring-white" />
             <Avatar value={data.partner_avatar} size="lg" className="ring-2 ring-white" />
           </div>
           <div className="min-w-0">
-            <p className="text-[1.05rem] font-bold text-navy">
+            <p className="card-title-lg">
               {data.own_name} &amp; {data.partner_name || 'Partnerperson'}
             </p>
             <p className="mt-0.5 text-xs text-brand-muted">
@@ -69,6 +75,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
           </div>
         </div>
       </div>
+
+      <Abschnitt titel="Jetzt" />
 
       <BarometerCard
         coupleId={coupleId}
@@ -100,8 +108,22 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         </div>
       )}
 
-      {/* ── Rhythmus: was sich wiederholt ─────────────────────────── */}
       <DueAgreementsCard coupleId={coupleId} />
+
+      <Link
+        to={`/app/paar/${coupleId}/streit`}
+        className="flex items-center justify-between gap-3 rounded-brand-lg border border-brand-border bg-white px-4 py-3 no-underline shadow-brand-sm transition hover:border-accent/50"
+      >
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-navy">Gerade gestritten?</p>
+          <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
+            Erst runterkommen, dann sortieren. Nur für dich – es muss nichts daraus werden.
+          </p>
+        </div>
+        <span className="shrink-0 text-xs text-accent">Hier entlang →</span>
+      </Link>
+
+      <Abschnitt titel="Euer Rhythmus" hinweis="Fünf Minuten, die über Wochen tragen." />
 
       <WeeklyCheckinCard
         coupleId={coupleId}
@@ -120,7 +142,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         </div>
       )}
 
-      {/* ── Womit weitermachen ────────────────────────────────────── */}
+      <Abschnitt titel="Weitermachen" />
+
       <div className="grid gap-3 sm:grid-cols-3">
         <QuickAction
           to={`/app/paar/${coupleId}/echo`}
@@ -139,20 +162,21 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         />
       </div>
 
-      <Link
-        to={`/app/paar/${coupleId}/streit`}
-        className="flex items-center justify-between gap-3 rounded-brand-lg border border-brand-border bg-white px-4 py-3 no-underline shadow-brand-sm transition hover:border-accent/50"
-      >
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-navy">Gerade gestritten?</p>
-          <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
-            Erst runterkommen, dann sortieren. Nur für dich – es muss nichts daraus werden.
-          </p>
-        </div>
-        <span className="shrink-0 text-xs text-accent">Hier entlang →</span>
-      </Link>
+      {/* ── Zum Nachschlagen ──────────────────────────────────────
+          Zahlen, eigene Zusammenfassungen und das Archiv sind selten das, weshalb
+          jemand die Seite öffnet. Sichtbar kosten sie Aufmerksamkeit, zugeklappt
+          nicht — verfügbar bleiben sie trotzdem. */}
+      <details className="group">
+        <summary className="cursor-pointer list-none py-2">
+          <span className="section-label transition-colors group-open:text-accent">
+            Mehr aus eurem Raum
+          </span>
+          <span className="ml-1.5 text-[0.68rem] text-brand-muted transition-transform group-open:rotate-90 inline-block">
+            ▸
+          </span>
+        </summary>
 
-      {/* ── Zahlen ────────────────────────────────────────────────── */}
+        <div className="mt-3 space-y-5">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile label="Stufe" value={progress.level.name} />
         <Tile label="Punkte" value={String(progress.total_points)} hint="gemeinsam" />
@@ -205,10 +229,10 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
       )}
 
       {/* ── Was du für dich festgehalten hast ─────────────────────── */}
-      <div className="card">
+      <div className="card card-quiet">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-sm font-bold text-navy">Was du für dich festgehalten hast</h2>
+            <h2 className="card-title-sm">Was du für dich festgehalten hast</h2>
             <p className="mt-1 text-xs text-brand-muted">
               Zusammenfassungen deiner Gespräche mit Echo. {partner} sieht sie nicht.
             </p>
@@ -244,8 +268,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
 
       {/* ── Gespeicherte Gespräche ────────────────────────────────── */}
       {archiv.length > 0 && (
-        <div className="card">
-          <h2 className="text-sm font-bold text-navy">Was ihr besprochen habt</h2>
+        <div className="card card-quiet">
+          <h2 className="card-title-sm">Was ihr besprochen habt</h2>
           <p className="mt-1 text-xs text-brand-muted">
             Zum Nachlesen, wenn die Erinnerung auseinandergeht.
           </p>
@@ -265,9 +289,22 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
           </div>
         </div>
       )}
+        </div>
+      </details>
     </div>
   )
 }
+
+/** Abschnittsmarke zwischen Karten — gibt dem Auge Halt, ohne Platz zu kosten. */
+function Abschnitt({ titel, hinweis }: { titel: string; hinweis?: string }) {
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-3 pt-2">
+      <h2 className="section-label">{titel}</h2>
+      {hinweis && <p className="text-[0.72rem] text-brand-muted/80">{hinweis}</p>}
+    </div>
+  )
+}
+
 
 function RowLink({ to, title, detail }: { to: string; title: string; detail: string }) {
   return (

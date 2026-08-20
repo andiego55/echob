@@ -13,6 +13,7 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import type { CoupleBridge, CoupleTopicDetail, CoupleTopicMessage } from '@/api/coupleMediation'
 import { apiErrorMessage } from '@/api/errors'
+import EchoThinking from './EchoThinking'
 
 const STATUS_CHIP: Record<CoupleBridge['status'], { label: string; cls: string }> = {
   open:     { label: 'In Verhandlung', cls: 'bg-brand-bg text-brand-muted' },
@@ -105,7 +106,9 @@ export default function BridgeBoard({
               disabled={busy}
               className="btn !py-2 !px-4 !text-sm border-2 border-accent text-accent hover:bg-accent hover:text-white disabled:opacity-50"
             >
-              {callEcho.isPending ? 'Echo denkt nach …' : 'Echo dazuholen'}
+              {callEcho.isPending
+                ? <EchoThinking text="Echo denkt nach …" size={34} />
+                : 'Echo dazuholen'}
             </button>
           </div>
           {(send.isError || callEcho.isError) && (

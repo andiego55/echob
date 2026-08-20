@@ -19,6 +19,7 @@ import ContextComposer from '@/components/couple/ContextComposer'
 import PreparationWizard from '@/components/couple/PreparationWizard'
 import PrivateEchoPanel from '@/components/couple/PrivateEchoPanel'
 import ProposalBar from '@/components/couple/ProposalBar'
+import EchoThinking from '@/components/couple/EchoThinking'
 import { MOOD_EMOJI } from '@/components/couple/moods'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
@@ -43,9 +44,36 @@ export default function CoupleSessionPage() {
 
   const apply = (d: CoupleSessionDetail) => qc.setQueryData(['couple-session', sessionId], d)
 
+  // Eigene Nachricht sofort zeigen. Ohne das steht man nach dem Absenden vor einem
+  // leeren Feld und wartet – das fühlt sich an wie ein Fehler, nicht wie Senden.
   const send = useMutation({
     mutationFn: (content: string) => coupleSessionsApi.send(sessionId, content),
-    onSuccess: d => { apply(d); setText('') },
+    onMutate: async (content: string) => {
+      const key = ['couple-session', sessionId]
+      await qc.cancelQueries({ queryKey: key })
+      const vorher = qc.getQueryData<CoupleSessionDetail>(key)
+      if (vorher) {
+        qc.setQueryData<CoupleSessionDetail>(key, {
+          ...vorher,
+          messages: [...vorher.messages, {
+            id: `eigen-${Date.now()}`,
+            role: 'partner',
+            user_id: user?.id ?? null,
+            speaker: 'Du',
+            content,
+            created_at: new Date().toISOString(),
+          }],
+        })
+      }
+      setText('')
+      return { vorher, content }
+    },
+    onError: (_e, _v, ctx) => {
+      // Zurückrollen und den Text zurückgeben – sonst ist er weg.
+      if (ctx?.vorher) qc.setQueryData(['couple-session', sessionId], ctx.vorher)
+      if (ctx?.content) setText(ctx.content)
+    },
+    onSuccess: apply,
   })
   const moderate = useMutation({
     mutationFn: () => coupleSessionsApi.moderate(sessionId),
@@ -139,7 +167,9 @@ export default function CoupleSessionPage() {
                     disabled={busy}
                     className="btn-primary !px-6 !py-3 mt-5 disabled:opacity-50"
                   >
-                    {moderate.isPending ? 'Echo eröffnet …' : 'Sitzung starten'}
+                    {moderate.isPending
+                      ? <EchoThinking text="Echo eröffnet …" size={38} />
+                      : 'Sitzung starten'}
                   </button>
 
                   {contexts.length === 0 && (
@@ -222,7 +252,9 @@ export default function CoupleSessionPage() {
                       className="btn !py-2 !px-4 !text-sm border-2 border-accent text-accent hover:bg-accent hover:text-white disabled:opacity-50"
                       title="Echo meldet sich einmal zu Wort und gibt das Gespräch dann zurück. Von selbst kommt es dazu, wenn der Ton kippt oder ihr länger ohne Moderation redet."
                     >
-                      {moderate.isPending ? 'Echo denkt nach …' : 'Echo dazuholen'}
+                      {moderate.isPending
+                        ? <EchoThinking text="Echo denkt nach …" size={34} />
+                        : 'Echo dazuholen'}
                     </button>
                   )}
                   <button

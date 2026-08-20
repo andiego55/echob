@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import { apiErrorMessage } from '@/api/errors'
+import Avatar from '@/components/Avatar'
+import { useCoupleFaces } from './useCoupleFaces'
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'In Vorbereitung',
@@ -18,6 +20,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function SessionsCard({ coupleId }: { coupleId: string }) {
   const qc = useQueryClient()
+  const { faceFor } = useCoupleFaces(coupleId)
   const [form, setForm] = useState(false)
   const [title, setTitle] = useState('')
   const [topic, setTopic] = useState('')
@@ -105,7 +108,8 @@ export default function SessionsCard({ coupleId }: { coupleId: string }) {
               to={`/app/paar/sitzung/${s.id}`}
               className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3.5 py-3 no-underline transition hover:border-accent/50"
             >
-              <div className="min-w-0">
+              <Avatar value={faceFor(s.created_by).avatar} size="sm" />
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-navy">{s.title}</p>
                 {s.scheduled_for
                   ? <p className="mt-0.5 truncate text-xs text-accent">

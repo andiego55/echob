@@ -77,11 +77,35 @@ export default function CoupleDeescalationPage() {
     retry: false,
   })
 
+  // Eigene Nachricht sofort zeigen – gerade hier, wo jemand aufgewühlt schreibt, ist
+  // Stille nach dem Absenden das Letzte, was man gebrauchen kann.
   const send = useMutation({
     mutationFn: (content: string) => coupleCompanionApi.send(coupleId, content, 'deescalation'),
+    onMutate: async (content: string) => {
+      const key = ['couple-deescalation', coupleId]
+      await qc.cancelQueries({ queryKey: key })
+      const vorher = qc.getQueryData<CoupleEchoConversation>(key)
+      if (vorher) {
+        qc.setQueryData<CoupleEchoConversation>(key, {
+          ...vorher,
+          messages: [...vorher.messages, {
+            id: `eigen-${Date.now()}`,
+            role: 'user',
+            kind: 'chat',
+            content,
+            created_at: new Date().toISOString(),
+          }],
+        })
+      }
+      setText('')
+      return { vorher, content }
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.vorher) qc.setQueryData(['couple-deescalation', coupleId], ctx.vorher)
+      if (ctx?.content) setText(ctx.content)
+    },
     onSuccess: (d: CoupleEchoConversation) => {
       qc.setQueryData(['couple-deescalation', coupleId], d)
-      setText('')
     },
   })
 
@@ -277,8 +301,9 @@ export default function CoupleDeescalationPage() {
 
                   {nachrichten.length > 0 && (
                     <div className="mt-4 space-y-3 overflow-y-auto pr-1" style={{ maxHeight: '46vh' }}>
-                      {nachrichten.map(m => (
-                        <Blase key={m.id} role={m.role} content={m.content} />
+                      {nachrichten.map((m, i) => (
+                        <Blase key={m.id} role={m.role} content={m.content}
+                          neu={i === nachrichten.length - 1} />
                       ))}
                       <div ref={endRef} />
                     </div>
@@ -348,12 +373,14 @@ export default function CoupleDeescalationPage() {
   )
 }
 
-function Blase({ role, content }: { role: string; content: string }) {
+function Blase({
+  role, content, neu = false,
+}: { role: string; content: string; neu?: boolean }) {
   const vonEcho = role === 'echo'
   return (
-    <div className={vonEcho
+    <div className={`${neu ? 'beitrag-neu ' : ''}${vonEcho
       ? 'rounded-brand border border-accent/25 px-3.5 py-3'
-      : 'rounded-brand bg-brand-bg px-3.5 py-2.5'}>
+      : 'rounded-brand bg-brand-bg px-3.5 py-2.5'}`}>
       <p className={`text-xs font-semibold ${vonEcho ? 'text-accent' : 'text-navy'}`}>
         {vonEcho ? 'Echo' : 'Du'}
       </p>
