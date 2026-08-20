@@ -14,6 +14,7 @@ import { coupleApi, coupleInviteLink, formatCoupleCode } from '@/api/couple'
 import { apiErrorMessage } from '@/api/errors'
 import type { CoupleLink } from '@/api/couple'
 import IsolationNotice from '@/components/couple/IsolationNotice'
+import { ArtEinladung } from '@/components/couple/CoupleEmptyArt'
 
 export default function CoupleOverviewPage() {
   const { data: links = [], isLoading, isError, error } = useQuery({
@@ -85,9 +86,10 @@ export default function CoupleOverviewPage() {
 
 function EmptyState() {
   return (
-    <div className="card">
-      <h2 className="text-sm font-bold text-navy">Noch kein Paarraum</h2>
-      <p className="mt-2 text-sm text-brand-muted">
+    <div className="card card-static text-center">
+      <ArtEinladung className="mt-2" />
+      <h2 className="card-title-lg mt-4">Noch kein Paarraum</h2>
+      <p className="mx-auto mt-2 max-w-[46ch] text-sm leading-relaxed text-brand-muted">
         Ihr braucht beide ein eigenes EchoB-Konto. Eine:r von euch lädt ein, die andere Person
         löst den Kopplungscode ein – danach steht euer gemeinsamer Raum.
       </p>
