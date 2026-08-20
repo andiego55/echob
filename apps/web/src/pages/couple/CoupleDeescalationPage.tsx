@@ -20,7 +20,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import AppShell from '@/components/app/AppShell'
+import CoupleShell from '@/components/couple/CoupleShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleApi } from '@/api/couple'
 import { coupleCompanionApi } from '@/api/coupleCompanion'
@@ -136,17 +136,9 @@ export default function CoupleDeescalationPage() {
   }
 
   return (
-    <AppShell>
-      <div className="mx-auto max-w-[1000px] px-6 py-8">
-        <Link to={`/app/paar/${coupleId}`} className="text-xs text-brand-muted hover:text-navy">
-          ← Zurück zum Paarraum
-        </Link>
-
-        <h1 className="mt-3 text-xl font-bold text-navy">Ihr habt euch gerade gestritten</h1>
-        <p className="mt-1.5 text-sm leading-relaxed text-brand-muted">
-          Hier muss nichts gelöst werden. Dieser Raum gehört dir allein – die andere Person
-          sieht nichts davon.
-        </p>
+    <CoupleShell subtitle="Hier muss nichts gelöst werden. Dieser Raum gehört dir allein – die andere Person sieht nichts davon.">
+      <div>
+        <h1 className="text-xl font-bold text-navy">Ihr habt euch gerade gestritten</h1>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[280px_1fr]">
           {/* ── Frühere Male ─────────────────────────────────────── */}
@@ -369,7 +361,7 @@ export default function CoupleDeescalationPage() {
           </div>
         </div>
       </div>
-    </AppShell>
+    </CoupleShell>
   )
 }
 
