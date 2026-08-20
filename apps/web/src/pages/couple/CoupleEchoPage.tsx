@@ -97,7 +97,7 @@ export default function CoupleEchoPage() {
   })
   const frueher = useQuery({
     queryKey: ['couple-companion-threads', coupleId],
-    queryFn: () => coupleCompanionApi.threads(coupleId),
+    queryFn: () => coupleCompanionApi.threads(coupleId, 'chat'),
     enabled: !!coupleId,
   })
   const altes = useQuery({

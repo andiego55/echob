@@ -78,8 +78,12 @@ async def require_thread(conn, thread_id, user_id) -> dict:
     return crypto.decrypt_fields(dict(row), "title")
 
 
-async def list_threads(conn, couple_id, user_id) -> list[dict[str, Any]]:
-    """Eigene Gespräche mit Umfang und Abschluss-Zustand."""
+async def list_threads(conn, couple_id, user_id, kind: str | None = None) -> list[dict[str, Any]]:
+    """Eigene Gespräche mit Umfang und Abschluss-Zustand.
+
+    ``kind`` trennt die beiden Faeden-Arten: Der Begleiter zeigt seine Gespraeche, der
+    Streit-Einstieg seine. Ohne Filter kaemen die Streit-Faeden im Begleiter mit heraus.
+    """
     await require_couple_member(conn, couple_id, user_id)
     rows = await conn.fetch(
         "SELECT t.*, "
@@ -89,8 +93,9 @@ async def list_threads(conn, couple_id, user_id) -> list[dict[str, Any]]:
         "  AS summary_count "
         "FROM couple_echo_threads t "
         "WHERE t.couple_id = $1 AND t.user_id = $2 "
+        "  AND ($3::text IS NULL OR t.kind = $3) "
         "ORDER BY t.closed_at IS NOT NULL, t.updated_at DESC",
-        couple_id, user_id,
+        couple_id, user_id, kind,
     )
     return [crypto.decrypt_fields(dict(r), "title") for r in rows]
 

@@ -5,7 +5,7 @@ Endpunkt, über den sie es sehen könnte.
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -47,3 +47,19 @@ class CoupleEchoSummaryEdit(BaseModel):
 
 class CoupleThreadRename(BaseModel):
     title: str = Field(..., min_length=1, max_length=160)
+
+
+class CoupleSceneDraft(BaseModel):
+    """Ein Szenen-ENTWURF aus einem eigenen Echo-Gespraech.
+
+    Wird nicht gespeichert. Die nutzende Person prueft und bearbeitet ihn und legt ihn
+    dann ueber den regulaeren Fall-Endpunkt an - der Paarbereich schreibt nie in einen Fall.
+    """
+
+    title: str = ""
+    description: str = ""
+    user_reaction: str | None = None
+    scene_date: date | None = None
+    #: 1-5 wie im Fall-Bereich.
+    distress_score: int | None = None
+    pattern_tags: list[str] = []

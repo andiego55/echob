@@ -30,6 +30,16 @@ export interface CoupleEchoConversation {
   messages: CouplePrivateMessage[]
 }
 
+/** Von Echo aus dem Gespräch gebauter Szenen-Entwurf. Noch nichts gespeichert. */
+export interface CoupleSceneDraft {
+  title: string
+  description: string
+  user_reaction: string | null
+  scene_date: string | null
+  distress_score: number | null
+  pattern_tags: string[]
+}
+
 export interface CoupleEchoSummary {
   id: string
   thread_id: string | null
@@ -54,8 +64,17 @@ export const coupleCompanionApi = {
     apiClient.post<CoupleEchoSummary>(`/couple/links/${coupleId}/echo/summary`, null,
       { params: { kind } }).then(r => r.data),
 
-  threads: (coupleId: string) =>
-    apiClient.get<CoupleEchoThread[]>(`/couple/links/${coupleId}/echo/threads`).then(r => r.data),
+  threads: (coupleId: string, kind?: CoupleThreadKind) =>
+    apiClient.get<CoupleEchoThread[]>(`/couple/links/${coupleId}/echo/threads`,
+      { params: kind ? { kind } : undefined }).then(r => r.data),
+
+  /**
+   * Macht aus dem eigenen Gespräch einen Szenen-ENTWURF für den eigenen Fall.
+   * Speichert nichts – gespeichert wird danach über den regulären Fall-Endpunkt.
+   */
+  sceneDraft: (coupleId: string, kind: CoupleThreadKind = 'deescalation') =>
+    apiClient.post<CoupleSceneDraft>(`/couple/links/${coupleId}/echo/szene-entwurf`, null,
+      { params: { kind } }).then(r => r.data),
 
   thread: (threadId: string) =>
     apiClient.get<CoupleEchoConversation>(`/couple/echo/threads/${threadId}`).then(r => r.data),

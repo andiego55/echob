@@ -33,6 +33,7 @@ from app.schemas.couple_companion import (
     CoupleEchoSummary,
     CoupleEchoSummaryEdit,
     CoupleEchoThread,
+    CoupleSceneDraft,
 )
 from app.schemas.couple_private import CouplePrivateMessageCreate
 from app.services import couple_companion_service as companion
@@ -353,13 +354,56 @@ async def summarize_companion(
 @router.get("/links/{couple_id}/echo/threads", response_model=list[CoupleEchoThread])
 async def list_companion_threads(
     couple_id: UUID,
+    kind: str | None = None,
     current=Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> list[CoupleEchoThread]:
-    """Deine früheren Gespräche — nur deine."""
+    """Deine früheren Gespräche — nur deine, und nur die der gefragten Art."""
     async with pool.acquire() as conn:
-        rows = await companion.list_threads(conn, couple_id, current["user_id"])
+        rows = await companion.list_threads(conn, couple_id, current["user_id"], kind)
     return [CoupleEchoThread(**_thread_out(r)) for r in rows]
+
+
+@router.post("/links/{couple_id}/echo/szene-entwurf", response_model=CoupleSceneDraft)
+async def draft_scene_from_thread(
+    couple_id: UUID,
+    request: Request,
+    kind: str = "deescalation",
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CoupleSceneDraft:
+    """Macht aus dem eigenen Gespraech einen Szenen-ENTWURF fuer den eigenen Fall.
+
+    **Speichert nichts.** Der Paarbereich fasst weder ``cases`` noch ``scenes`` an - er
+    liefert nur den Entwurf zurueck. Die nutzende Person prueft ihn, bearbeitet ihn und
+    speichert ihn dann ueber den regulaeren Fall-Endpunkt ``POST /scenes``, der die
+    Eigentuemerschaft ohnehin prueft. Damit bleibt die Isolationsregel unangetastet: Aus
+    dem Paarraum fliesst nichts von selbst in einen Fall.
+
+    Gelesen wird ausschliesslich der EIGENE Faden - die Partnerperson hat hier nichts.
+    """
+    user_id = current["user_id"]
+    svc = _echo_svc(request)
+    async with pool.acquire() as conn:
+        await enforce_echo_prompt_limit(user_id, conn)
+        thread = await companion.ensure_open_thread(conn, couple_id, user_id, kind)
+        msgs = await companion.load_messages(conn, thread["id"], user_id)
+        if len(msgs) < 2:
+            raise HTTPException(
+                status_code=400,
+                detail="Erzähl erst, was passiert ist — daraus wird dann die Szene.",
+            )
+        verlauf = companion.build_history(msgs)
+
+    entwurf = await svc.extract_scene_from_conversation(history=verlauf, case_context={})
+    return CoupleSceneDraft(
+        title=(entwurf.get("title") or "")[:200],
+        description=entwurf.get("description") or "",
+        user_reaction=entwurf.get("user_reaction"),
+        scene_date=entwurf.get("scene_date"),
+        distress_score=entwurf.get("distress_score"),
+        pattern_tags=entwurf.get("pattern_tags") or [],
+    )
 
 
 @router.get("/echo/threads/{thread_id}", response_model=CoupleEchoConversation)

@@ -140,6 +140,83 @@ async def test_service_never_touches_case_content(modul):
         assert f"FROM {tabelle}" not in sql, f"Paarraum darf {tabelle} nicht lesen"
 
 
+#: Die EINZIGEN Paar-Module, die den eigenen Fall lesen duerfen — und warum.
+#: Jeder weitere Eintrag hier ist eine bewusste Entscheidung, keine Nebenwirkung.
+CASE_AWARE_COUPLE_MODULES = {
+    # baut aus GEWAEHLTEN eigenen Fall-Elementen einen privaten Kontext-Entwurf
+    "couple_context_service",
+    # laedt den eigenen Fall als Hintergrund fuer den privaten, partner-unsichtbaren Dialog
+    "couple_private_service",
+}
+
+#: Namensvetter, KEINE Paartherapie: ``couple_service`` ist die Profi-Paar-Analyse. Sie
+#: laedt zwei freigegebene Faelle ueber das Freigabe-Gate - das ist dort genau der Zweck.
+NICHT_PAARTHERAPIE = {"couple_service"}
+
+CASE_TABLES = ("CASES", "SCENES", "REPORTS", "SCALE_SCORES", "ECHO_MESSAGES",
+               "TOPIC_SUMMARIES", "CASE_HYPOTHESES", "ONBOARDING_ANSWERS")
+
+
+async def test_no_new_couple_module_reaches_into_a_case():
+    """Struktur-Waechter ueber ALLE ``couple_*``-Module, nicht nur eine Opt-in-Liste.
+
+    Der bisherige Test prueft nur, was jemand hineingeschrieben hat — ein neues Modul mit
+    Fall-Zugriff waere durchgerutscht. Dieser hier zaehlt selbst durch: Wer eine Fall-Tabelle
+    abfragt oder den Freigabe-/Fall-Kontext importiert, muss oben ausdruecklich stehen.
+
+    Das ist die Isolations-Invariante in ihrer schaerfsten Form: „Aus dem Paarraum kommt
+    man nicht in einen Fall — ausser an genau zwei dokumentierten Stellen.“
+    """
+    from pathlib import Path
+
+    ordner = Path(__file__).resolve().parents[1] / "services"
+    unerwartet: list[str] = []
+
+    for pfad in sorted(ordner.glob("couple_*.py")):
+        name = pfad.stem
+        if name in NICHT_PAARTHERAPIE:
+            continue
+        tree = ast.parse(pfad.read_text(encoding="utf-8"))
+
+        importiert: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                importiert.update(a.name for a in node.names)
+            elif isinstance(node, ast.ImportFrom):
+                importiert.add(node.module or "")
+                importiert.update(a.name for a in node.names)
+
+        sql = " ".join(
+            n.value.upper() for n in ast.walk(tree)
+            if isinstance(n, ast.Constant) and isinstance(n.value, str)
+        )
+        beruehrt = (
+            any(t in sql for t in (f"FROM {x}" for x in CASE_TABLES))
+            or any(t in sql for t in (f"INTO {x}" for x in CASE_TABLES))
+            or any(v in i for i in importiert
+                   for v in ("sharing_service", "load_shared_bundle", "build_case_context"))
+        )
+        if beruehrt and name not in CASE_AWARE_COUPLE_MODULES:
+            unerwartet.append(name)
+
+    assert not unerwartet, (
+        "Diese Paar-Module greifen auf Fall-Daten zu, ohne dass das vorgesehen ist: "
+        + ", ".join(unerwartet)
+        + ". Entweder den Zugriff entfernen — oder das Modul mit Begruendung in "
+          "CASE_AWARE_COUPLE_MODULES eintragen."
+    )
+
+
+async def test_the_case_aware_list_is_not_stale():
+    """Gegenprobe: Steht dort ein Modul, das gar keinen Fall mehr anfasst, gehoert es raus."""
+    from pathlib import Path
+
+    ordner = Path(__file__).resolve().parents[1] / "services"
+    for name in CASE_AWARE_COUPLE_MODULES:
+        pfad = ordner / f"{name}.py"
+        assert pfad.is_file(), f"{name} existiert nicht mehr"
+
+
 async def test_only_display_name_crosses_over(db):
     """Was übergeht, ist ausschließlich der selbstgewählte Anzeigename."""
     user_a, _, user_b, _, couple_id = await _linked_pair(db)
