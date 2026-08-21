@@ -440,3 +440,12 @@ async def set_status(
     async with pool.acquire() as conn:
         row = await cms.set_topic_status(conn, topic_id, current["user_id"], body.status)
     return CoupleTopic(**row)
+
+
+@router.delete("/topics/{topic_id}", response_model=None, status_code=204)
+async def delete_topic(
+    topic_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> None:
+    """Ein Thema loeschen, an dem noch niemand sonst gearbeitet hat."""
+    async with pool.acquire() as conn:
+        await cms.delete_topic(conn, topic_id, current["user_id"])

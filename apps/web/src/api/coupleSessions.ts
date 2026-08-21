@@ -100,6 +100,14 @@ export const coupleSessionsApi = {
   propose: (sessionId: string) =>
     apiClient.post<CoupleSession>(`/couple/sessions/${sessionId}/propose`).then(r => r.data),
 
+  /** Den eigenen Vorschlag zurückholen – zurück in den Entwurf, nichts geht verloren. */
+  withdraw: (sessionId: string) =>
+    apiClient.post<CoupleSession>(`/couple/sessions/${sessionId}/zurueckziehen`).then(r => r.data),
+
+  /** Nur für Sitzungen, aus denen nie ein Gespräch geworden ist. */
+  remove: (sessionId: string) =>
+    apiClient.delete(`/couple/sessions/${sessionId}`).then(() => true),
+
   respond: (sessionId: string, accept: boolean) =>
     apiClient.post<CoupleSession>(`/couple/sessions/${sessionId}/respond`, { accept }).then(r => r.data),
 

@@ -167,3 +167,21 @@ async def set_agreement_status(
         if body.status == "kept":
             await progress.award(conn, row["couple_id"], user_id, "agreement_kept", agreement_id)
     return CoupleAgreement(**row)
+
+
+@router.delete("/summaries/{summary_id}", response_model=None, status_code=204)
+async def delete_summary(
+    summary_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> None:
+    """Eine Zusammenfassung wegraeumen - sie sammeln sich sonst mit jedem Klick an."""
+    async with pool.acquire() as conn:
+        await cas.delete_summary(conn, summary_id, current["user_id"])
+
+
+@router.delete("/agreements/{agreement_id}", response_model=None, status_code=204)
+async def withdraw_agreement(
+    agreement_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> None:
+    """Den eigenen, noch nicht angenommenen Vorschlag zuruecknehmen."""
+    async with pool.acquire() as conn:
+        await cas.withdraw(conn, agreement_id, current["user_id"])

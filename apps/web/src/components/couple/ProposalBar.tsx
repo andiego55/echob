@@ -19,6 +19,16 @@ export default function ProposalBar({ session }: { session: CoupleSession }) {
   const refresh = () => qc.invalidateQueries({ queryKey: ['couple-session', session.id] })
 
   const propose = useMutation({ mutationFn: () => coupleSessionsApi.propose(session.id), onSuccess: refresh })
+  // Bisher fuehrte aus einem Vorschlag nur ein Weg heraus, und der lief ueber die andere
+  // Person. Wer es sich anders ueberlegte, konnte nichts tun ausser warten.
+  const withdraw = useMutation({
+    mutationFn: () => coupleSessionsApi.withdraw(session.id),
+    onSuccess: () => {
+      refresh()
+      qc.invalidateQueries({ queryKey: ['couple-sessions', session.couple_id] })
+      qc.invalidateQueries({ queryKey: ['couple-dashboard', session.couple_id] })
+    },
+  })
   const respond = useMutation({
     mutationFn: (accept: boolean) => coupleSessionsApi.respond(session.id, accept),
     onSuccess: refresh,
@@ -73,10 +83,20 @@ export default function ProposalBar({ session }: { session: CoupleSession }) {
             </p>
             <p className="mt-0.5 text-xs text-brand-muted">
               {mine
-                ? 'Warte auf die Antwort der anderen Person.'
+                ? 'Die andere Person hat noch nicht geantwortet.'
                 : 'Möchtest du dieses Gespräch führen? Du kannst auch später zusagen.'}
             </p>
           </div>
+          {mine && (
+            <button
+              onClick={() => withdraw.mutate()}
+              disabled={withdraw.isPending}
+              className="btn-quiet shrink-0 !py-2 !px-4 !text-sm disabled:opacity-50"
+              title="Zurück in die Vorbereitung – Kontext und Notizen bleiben erhalten."
+            >
+              {withdraw.isPending ? 'Nehme zurück …' : 'Vorschlag zurückziehen'}
+            </button>
+          )}
           {!mine && (
             <div className="flex flex-wrap gap-2 shrink-0">
               <button

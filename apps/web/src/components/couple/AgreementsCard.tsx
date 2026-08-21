@@ -40,6 +40,13 @@ export default function AgreementsCard({
     mutationFn: () => coupleAgreementsApi.propose(coupleId, { body: body.trim(), session_id: sessionId }),
     onSuccess: () => { invalidate(); setBody('') },
   })
+  // Zuruecknehmen ist etwas anderes als verwerfen: Es loescht einen Vorschlag, dem niemand
+  // zugestimmt hat, statt ihn als "Verworfen" stehen zu lassen. Fuer einen Vertipper ist
+  // "wir haben es versucht und aufgegeben" die falsche Geschichte.
+  const withdraw = useMutation({
+    mutationFn: (id: string) => coupleAgreementsApi.withdraw(id),
+    onSuccess: invalidate,
+  })
   const accept = useMutation({
     mutationFn: (id: string) => coupleAgreementsApi.accept(id),
     onSuccess: invalidate,
@@ -75,9 +82,9 @@ export default function AgreementsCard({
         </button>
       </form>
 
-      {(propose.isError || accept.isError || setStatus.isError) && (
+      {(propose.isError || accept.isError || setStatus.isError || withdraw.isError) && (
         <p className="mt-3 text-sm text-red-600">
-          {apiErrorMessage(propose.error ?? accept.error ?? setStatus.error)}
+          {apiErrorMessage(propose.error ?? accept.error ?? setStatus.error ?? withdraw.error)}
         </p>
       )}
 
@@ -100,7 +107,19 @@ export default function AgreementsCard({
 
                 <div className="mt-2 flex flex-wrap items-center gap-3">
                   {a.status === 'proposed' && (mine
-                    ? <span className="text-xs text-brand-muted">Warte auf die Zustimmung der anderen Person.</span>
+                    ? <>
+                        <span className="text-xs text-brand-muted">
+                          Warte auf die Zustimmung der anderen Person.
+                        </span>
+                        <button
+                          onClick={() => withdraw.mutate(a.id)}
+                          disabled={withdraw.isPending}
+                          className="text-xs text-brand-muted hover:text-navy disabled:opacity-50"
+                          title="Löscht den Vorschlag, statt ihn als „verworfen“ stehen zu lassen."
+                        >
+                          Zurücknehmen
+                        </button>
+                      </>
                     : <button
                         onClick={() => accept.mutate(a.id)}
                         disabled={accept.isPending}
@@ -118,7 +137,7 @@ export default function AgreementsCard({
                       Hat gehalten
                     </button>
                   )}
-                  {(a.status === 'proposed' || a.status === 'active') && (
+                  {(a.status === 'active' || (a.status === 'proposed' && !mine)) && (
                     <button
                       onClick={() => setStatus.mutate({ id: a.id, status: 'dropped' })}
                       disabled={setStatus.isPending}

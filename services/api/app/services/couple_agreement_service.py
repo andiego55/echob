@@ -42,6 +42,25 @@ async def list_summaries(conn, session_id, user_id) -> list[dict]:
 
 # ── Abmachungen ──────────────────────────────────────────────────────────────
 
+async def delete_summary(conn, summary_id, user_id) -> bool:
+    """Eine Zusammenfassung loeschen - jede Person im Raum darf das.
+
+    Der Knopf legt bei jedem Druck eine NEUE an. Wer zweimal drueckt, hat zwei fast gleiche
+    Texte untereinander stehen und keinen Weg zurueck. Die Zusammenfassung gehoert beiden,
+    also darf sie auch jeder von beiden wegraeumen - genau wie beim Rueckblick.
+    """
+    row = await conn.fetchrow(
+        "SELECT s.session_id, x.couple_id FROM couple_session_summaries s "
+        "JOIN couple_sessions x ON x.id = s.session_id WHERE s.id = $1",
+        summary_id,
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Zusammenfassung nicht gefunden.")
+    await require_couple_member(conn, row["couple_id"], user_id)
+    await conn.execute("DELETE FROM couple_session_summaries WHERE id = $1", summary_id)
+    return True
+
+
 async def propose(conn, couple_id, user_id, *, body: str, session_id=None, due_at=None,
                   topic_id=None) -> dict:
     """Schlägt eine Abmachung vor. Sie gilt erst, wenn die andere Person zustimmt."""
@@ -55,6 +74,35 @@ async def propose(conn, couple_id, user_id, *, body: str, session_id=None, due_a
         couple_id, session_id, topic_id, crypto.encrypt(text), user_id, due_at,
     )
     return crypto.decrypt_fields(dict(row), "body", "review_note")
+
+
+async def withdraw(conn, agreement_id, user_id) -> bool:
+    """Den eigenen Vorschlag zuruecknehmen - solange niemand zugestimmt hat.
+
+    ``dropped`` gibt es schon, aber das erzaehlt eine andere Geschichte: Es laesst die
+    Abmachung als "Verworfen" in der Liste stehen, und das liest sich wie "wir haben es
+    versucht und es hat nicht geklappt". Fuer einen Vertipper oder einen Vorschlag, den man
+    sofort bereut, ist das die falsche Geschichte.
+
+    Sobald zugestimmt wurde, ist es eine gemeinsame Zusage. Die verschwindet nicht still -
+    dann ist ``dropped`` genau richtig, weil es ehrlich festhaelt, dass etwas nicht
+    weiterverfolgt wird.
+    """
+    row = await conn.fetchrow("SELECT * FROM couple_agreements WHERE id = $1", agreement_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Abmachung nicht gefunden.")
+    await require_couple_member(conn, row["couple_id"], user_id)
+    if str(row["proposed_by"]) != str(user_id):
+        raise HTTPException(
+            status_code=403, detail="Zurücknehmen kann nur, wer vorgeschlagen hat.",
+        )
+    if row["status"] != "proposed" or row["accepted_by"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Dazu gab es schon eine Zusage – verwerfen statt zurücknehmen.",
+        )
+    await conn.execute("DELETE FROM couple_agreements WHERE id = $1", agreement_id)
+    return True
 
 
 async def accept(conn, agreement_id, user_id) -> dict:

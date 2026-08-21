@@ -106,3 +106,13 @@ async def compare(
         await cts_test.save_comparison(conn, couple_id, user_id, slug, body)
         await progress.award(conn, couple_id, user_id, "test_compared", slug)
         return await _state(conn, couple_id, slug, user_id)
+
+
+@router.delete("/vergleiche/{comparison_id}", response_model=None, status_code=204)
+async def delete_comparison(
+    couple_id: UUID, comparison_id: UUID,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> None:
+    """Einen Testvergleich wegraeumen - `Neu ansehen` legt jedes Mal einen weiteren an."""
+    async with pool.acquire() as conn:
+        await cts_test.delete_comparison(conn, couple_id, comparison_id, current["user_id"])

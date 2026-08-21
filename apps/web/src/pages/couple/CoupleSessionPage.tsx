@@ -6,7 +6,7 @@
  * erst das Freigeben macht ihn zum Kontext, den Echo kennt und beide sehen.
  */
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
@@ -30,6 +30,7 @@ import { coupleAgreementsApi } from '@/api/coupleAgreements'
 export default function CoupleSessionPage() {
   const { sessionId = '' } = useParams<{ sessionId: string }>()
   const qc = useQueryClient()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [text, setText] = useState('')
   const [panel, setPanel] = useState<'prep' | 'private'>('prep')
@@ -82,6 +83,16 @@ export default function CoupleSessionPage() {
     mutationFn: () => coupleSessionsApi.moderate(sessionId),
     onSuccess: apply,
   })
+  // Loeschen statt Abschliessen, wenn nie ein Gespraech daraus wurde. Ein vertippter
+  // Titel stand sonst fuer immer in der Liste.
+  const entfernen = useMutation({
+    mutationFn: () => coupleSessionsApi.remove(sessionId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['couple-dashboard'] })
+      navigate(`/app/paar/${data?.session.couple_id ?? ''}`)
+    },
+  })
+
   const close = useMutation({
     mutationFn: () => coupleSessionsApi.setStatus(sessionId, 'closed'),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-session', sessionId] }),
@@ -116,6 +127,11 @@ export default function CoupleSessionPage() {
   const ownAvatar = data.members.find(m => m.user_id === user?.id)?.avatar ?? null
   const partnerAvatar = data.members.find(m => m.user_id !== user?.id)?.avatar ?? null
   const closed = session.status === 'closed'
+  // Dieselbe Grenze wie im Dienst: eigene Sitzung, noch nicht gelaufen, kein Beitrag.
+  // Sobald etwas Gemeinsames darin steht, gehoert es nicht mehr einer Person allein.
+  const loeschbar = user?.id === session.created_by
+    && (session.status === 'draft' || session.status === 'proposed')
+    && messages.length === 0
   const busy = send.isPending || moderate.isPending
 
   return (
@@ -133,7 +149,18 @@ export default function CoupleSessionPage() {
                 </p>
               )}
             </div>
-            {!closed && (
+            {loeschbar ? (
+              <button
+                onClick={() => {
+                  if (confirm('Diese Sitzung löschen? Es steht noch nichts Gemeinsames darin – Vorbereitung und Notizen gehen mit.')) entfernen.mutate()
+                }}
+                disabled={entfernen.isPending}
+                className="btn-quiet !py-2 !px-4 !text-sm sm:shrink-0 disabled:opacity-50"
+                title="Nur möglich, solange niemand etwas geschrieben hat."
+              >
+                {entfernen.isPending ? 'Lösche …' : 'Sitzung löschen'}
+              </button>
+            ) : !closed && (
               <button
                 onClick={() => { if (confirm('Sitzung abschließen? Danach kann niemand mehr schreiben.')) close.mutate() }}
                 className="btn-quiet !py-2 !px-4 !text-sm sm:shrink-0"
@@ -143,6 +170,10 @@ export default function CoupleSessionPage() {
             )}
           </div>
         </div>
+
+        {entfernen.isError && (
+          <p className="mb-3 text-sm text-red-600">{apiErrorMessage(entfernen.error)}</p>
+        )}
 
         <div className="mb-5">
           <ProposalBar session={session} />
@@ -387,6 +418,10 @@ function SummaryCard({ sessionId, coupleId, hasMessages }: {
     queryFn: () => coupleAgreementsApi.listSummaries(sessionId),
     enabled: !!sessionId,
   })
+  const entfernen = useMutation({
+    mutationFn: (id: string) => coupleAgreementsApi.deleteSummary(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-summaries', sessionId] }),
+  })
   const create = useMutation({
     mutationFn: () => coupleAgreementsApi.createSummary(sessionId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-summaries', sessionId] }),
@@ -413,9 +448,21 @@ function SummaryCard({ sessionId, coupleId, hasMessages }: {
           {summaries.map((s, i) => (
             <div key={s.id}>
               <div className="rounded-brand border border-brand-border px-3.5 py-3">
-                <p className="text-[0.65rem] text-brand-muted">
-                  {new Date(s.created_at).toLocaleString('de-DE')}
-                </p>
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[0.65rem] text-brand-muted">
+                    {new Date(s.created_at).toLocaleString('de-DE')}
+                  </p>
+                  {/* Jeder Klick auf „zusammenfassen" legt eine NEUE an. Ohne diesen Knopf
+                      stapeln sich fast gleiche Texte, und der aelteste sieht so wichtig aus
+                      wie der neueste. */}
+                  <button
+                    onClick={() => { if (confirm('Diese Zusammenfassung löschen?')) entfernen.mutate(s.id) }}
+                    disabled={entfernen.isPending}
+                    className="shrink-0 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
+                  >
+                    Löschen
+                  </button>
+                </div>
                 <div className="mt-1.5 text-xs text-brand-text">
                   <MarkdownMessage content={s.summary_text} />
                 </div>

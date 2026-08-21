@@ -39,6 +39,42 @@ async def create_topic(conn, couple_id, user_id, *, title, description=None) -> 
     return crypto.decrypt_fields(dict(row), "description")
 
 
+async def delete_topic(conn, topic_id, user_id) -> bool:
+    """Ein Thema loeschen, an dem noch niemand sonst gearbeitet hat.
+
+    Dieselbe Grenze wie bei den Sitzungen: Ein vertipptes oder doppelt angelegtes Thema soll
+    verschwinden koennen, gemeinsame Arbeit nicht. Sobald die andere Person ihre Sicht
+    geschrieben hat oder Echo vermittelt hat, ist es eine gemeinsame Sache - dann fuehrt der
+    Weg ueber ``status = 'resolved'``, nicht ueber den Papierkorb.
+
+    Die eigene Sicht steht dem nicht entgegen: Wer ein Thema anlegt und gleich selbst etwas
+    hineinschreibt, soll es trotzdem noch zuruecknehmen koennen.
+    """
+    row = await conn.fetchrow("SELECT * FROM couple_topics WHERE id = $1", topic_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
+    await require_couple_member(conn, row["couple_id"], user_id)
+    if str(row["created_by"]) != str(user_id):
+        raise HTTPException(
+            status_code=403, detail="Löschen kann nur, wer das Thema angelegt hat.",
+        )
+
+    fremd = await conn.fetchval(
+        "SELECT count(*) FROM couple_perspectives WHERE topic_id = $1 AND user_id <> $2",
+        topic_id, user_id,
+    )
+    vermittelt = await conn.fetchval(
+        "SELECT count(*) FROM couple_mediations WHERE topic_id = $1", topic_id,
+    )
+    if fremd or vermittelt:
+        raise HTTPException(
+            status_code=400,
+            detail="Hier steckt schon gemeinsame Arbeit drin – schließ das Thema lieber ab.",
+        )
+    await conn.execute("DELETE FROM couple_topics WHERE id = $1", topic_id)
+    return True
+
+
 async def list_topics(conn, couple_id, user_id) -> list[dict]:
     await require_couple_member(conn, couple_id, user_id)
     rows = await conn.fetch(

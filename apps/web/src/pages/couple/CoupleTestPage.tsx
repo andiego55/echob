@@ -52,6 +52,13 @@ export default function CoupleTestPage() {
     onSuccess: apply,
   })
 
+  // "Neu ansehen" legt jedes Mal einen weiteren Vergleich an - ohne Loeschen waechst die
+  // Seite mit jedem Klick, und der aelteste steht so prominent da wie der neueste.
+  const vergleichLoeschen = useMutation({
+    mutationFn: (id: string) => coupleTestsApi.deleteComparison(coupleId, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-test', coupleId, slug] }),
+  })
+
   // Auch bei direkt eingetippter URL: Tests, die eine Person über die andere urteilen
   // lassen, gibt es im gemeinsamen Raum nicht.
   if (!test || !isCoupleSafe(test)) {
@@ -188,9 +195,20 @@ export default function CoupleTestPage() {
                 <div className="mt-4 space-y-4">
                   {data.comparisons.map(c => (
                     <div key={c.id} className="rounded-brand border border-brand-border px-4 py-3.5">
-                      <p className="text-[0.65rem] text-brand-muted">
-                        {new Date(c.created_at).toLocaleString('de-DE')}
-                      </p>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="text-[0.65rem] text-brand-muted">
+                          {new Date(c.created_at).toLocaleString('de-DE')}
+                        </p>
+                        {/* „Neu ansehen" legt jedes Mal einen weiteren an. Ohne Loeschen
+                            waechst die Seite mit jedem Klick. */}
+                        <button
+                          onClick={() => { if (confirm('Diesen Vergleich löschen?')) vergleichLoeschen.mutate(c.id) }}
+                          disabled={vergleichLoeschen.isPending}
+                          className="shrink-0 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
+                        >
+                          Löschen
+                        </button>
+                      </div>
                       <div className="mt-2 text-sm text-brand-text">
                         <MarkdownMessage content={c.body} />
                       </div>

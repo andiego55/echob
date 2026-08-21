@@ -136,6 +136,85 @@ async def respond(conn, session_id, user_id, accept: bool) -> dict:
     return _decrypt_session(dict(row))
 
 
+async def withdraw(conn, session_id, user_id) -> dict:
+    """Den eigenen Vorschlag zuruecknehmen - solange niemand zugesagt hat.
+
+    Bisher fuehrte aus einem Vorschlag nur ein Weg heraus, und der lief ueber die andere
+    Person: Sie nahm an oder lehnte ab. Wer einen Vorschlag im Affekt gemacht hatte oder es
+    sich anders ueberlegte, konnte ihn nicht zurueckholen - der Ball lag bei jemand anderem,
+    und "wartet auf Zusage" stand weiter auf der Uebersicht.
+
+    Zurueck geht es in den Entwurf, nicht in den Papierkorb: Vorbereitung und Kontext
+    bleiben erhalten, der Vorschlag laesst sich spaeter erneut machen.
+
+    Nach einer Zusage ist Schluss damit. Dann ist es keine einseitige Ankuendigung mehr,
+    sondern eine Verabredung - die sagt man ab, indem man miteinander redet.
+    """
+    session, _ = await require_session(conn, session_id, user_id)
+    if str(session["created_by"]) != str(user_id):
+        raise HTTPException(
+            status_code=403,
+            detail="Zurücknehmen kann nur, wer vorgeschlagen hat.",
+        )
+    if session["status"] != "proposed":
+        raise HTTPException(status_code=400, detail="Hier steht gerade kein Vorschlag offen.")
+    if session.get("accepted_at"):
+        raise HTTPException(
+            status_code=400,
+            detail="Der Vorschlag wurde schon angenommen – sprecht miteinander darüber.",
+        )
+    row = await conn.fetchrow(
+        "UPDATE couple_sessions SET status = 'draft', proposed_at = NULL, "
+        "declined_at = NULL WHERE id = $1 RETURNING *",
+        session_id,
+    )
+    return _decrypt_session(dict(row))
+
+
+async def delete_session(conn, session_id, user_id) -> bool:
+    """Eine Sitzung loeschen, aus der nie ein Gespraech geworden ist.
+
+    Es gab bisher keinen Weg, eine versehentlich angelegte Sitzung wieder loszuwerden - ein
+    vertippter Titel stand fuer immer in der Liste. Loeschen ist hier aber nur richtig,
+    solange nichts Gemeinsames darin steht.
+
+    Zwei Bedingungen, beide notwendig:
+
+      * **Kein Beitrag.** Sobald jemand etwas geschrieben hat, ist es gemeinsame
+        Geschichte. Die gehoert niemandem allein, also loescht sie auch niemand allein -
+        dieselbe Ueberlegung wie bei ``purge_couple``.
+      * **Noch nicht gelaufen.** Nur Entwurf oder Vorschlag.
+
+    Und nur die anlegende Person: Ein Vorschlag der anderen Person ist deren Zug; ihn
+    wegzuraeumen waere etwas anderes als ihn abzulehnen (dafuer gibt es ``respond``).
+
+    Vorbereitungen und private Notizen an dieser Sitzung gehen per CASCADE mit. Bereits
+    beschlossene Abmachungen nicht - deren ``session_id`` steht auf ON DELETE SET NULL,
+    sie ueberleben ihre Sitzung.
+    """
+    session, _ = await require_session(conn, session_id, user_id)
+    if str(session["created_by"]) != str(user_id):
+        raise HTTPException(
+            status_code=403,
+            detail="Löschen kann nur, wer die Sitzung angelegt hat.",
+        )
+    if session["status"] not in ("draft", "proposed"):
+        raise HTTPException(
+            status_code=400,
+            detail="Aus diesem Gespräch ist schon etwas geworden – es bleibt zum Nachlesen.",
+        )
+    beitraege = await conn.fetchval(
+        "SELECT count(*) FROM couple_session_messages WHERE session_id = $1", session_id,
+    )
+    if beitraege:
+        raise HTTPException(
+            status_code=400,
+            detail="Hier steht schon etwas Gemeinsames – das lässt sich nicht einseitig löschen.",
+        )
+    await conn.execute("DELETE FROM couple_sessions WHERE id = $1", session_id)
+    return True
+
+
 async def schedule(conn, session_id, user_id, when) -> dict:
     """Setzt (oder löscht) die Verabredung — die Dialogeinladung mit Zeitpunkt."""
     await require_session(conn, session_id, user_id)

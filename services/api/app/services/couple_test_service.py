@@ -101,6 +101,24 @@ async def save_comparison(conn, couple_id, user_id, slug, body: str) -> dict:
     return crypto.decrypt_fields(dict(row), "body")
 
 
+async def delete_comparison(conn, couple_id, comparison_id, user_id) -> bool:
+    """Einen Testvergleich loeschen - jede Person im Raum darf das.
+
+    Wie bei den Zusammenfassungen: "Neu ansehen" legt jedes Mal einen weiteren an. Ohne
+    Loeschen waechst die Seite mit jedem Klick, und der aelteste Vergleich steht so
+    prominent da wie der neueste.
+    """
+    await require_couple_member(conn, couple_id, user_id)
+    row = await conn.fetchrow(
+        "SELECT id FROM couple_test_comparisons WHERE id = $1 AND couple_id = $2",
+        comparison_id, couple_id,
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Vergleich nicht gefunden.")
+    await conn.execute("DELETE FROM couple_test_comparisons WHERE id = $1", comparison_id)
+    return True
+
+
 async def list_comparisons(conn, couple_id, slug, user_id) -> list[dict]:
     await require_couple_member(conn, couple_id, user_id)
     rows = await conn.fetch(

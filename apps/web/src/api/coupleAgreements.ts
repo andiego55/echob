@@ -36,6 +36,10 @@ export const coupleAgreementsApi = {
   listSummaries: (sessionId: string) =>
     apiClient.get<CoupleSummary[]>(`/couple/sessions/${sessionId}/summaries`).then(r => r.data),
 
+  /** Jeder Klick auf „zusammenfassen" legt eine neue an – deshalb muss man sie wegräumen können. */
+  deleteSummary: (summaryId: string) =>
+    apiClient.delete(`/couple/summaries/${summaryId}`).then(() => true),
+
   list: (coupleId: string) =>
     apiClient.get<CoupleAgreement[]>(`/couple/links/${coupleId}/agreements`).then(r => r.data),
 
@@ -49,6 +53,10 @@ export const coupleAgreementsApi = {
 
   propose: (coupleId: string, body: { body: string; session_id?: string | null; due_at?: string | null }) =>
     apiClient.post<CoupleAgreement>(`/couple/links/${coupleId}/agreements`, body).then(r => r.data),
+
+  /** Den eigenen, noch nicht angenommenen Vorschlag zurücknehmen – anders als „verwerfen". */
+  withdraw: (agreementId: string) =>
+    apiClient.delete(`/couple/agreements/${agreementId}`).then(() => true),
 
   accept: (agreementId: string) =>
     apiClient.post<CoupleAgreement>(`/couple/agreements/${agreementId}/accept`).then(r => r.data),

@@ -6,10 +6,11 @@
  * wieder beide lesen – ohne die vertraulichen Beiträge preiszugeben.
  */
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import { useAuth } from '@/contexts/AuthContext'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from '@/components/couple/EchoThinking'
@@ -20,6 +21,8 @@ import type { CoupleTopicDetail } from '@/api/coupleMediation'
 export default function CoupleMediationPage() {
   const { topicId = '' } = useParams<{ topicId: string }>()
   const qc = useQueryClient()
+  const navigate = useNavigate()
+  const { user } = useAuth()
   const [open, setOpen] = useState('')
   const [priv, setPriv] = useState('')
   const [touched, setTouched] = useState(false)
@@ -53,6 +56,17 @@ export default function CoupleMediationPage() {
     mutationFn: () => coupleMediationApi.mediate(topicId),
     onSuccess: apply,
   })
+  // Ein doppelt oder falsch angelegtes Thema soll verschwinden koennen. Die Grenze zieht
+  // der Dienst; hier wird der Knopf nur gezeigt, wenn sie eingehalten ist.
+  const entfernen = useMutation({
+    mutationFn: () => coupleMediationApi.remove(topicId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['couple-topics'] })
+      qc.invalidateQueries({ queryKey: ['couple-dashboard'] })
+      navigate(`/app/paar/${data?.topic.couple_id ?? ''}`)
+    },
+  })
+
   const resolve = useMutation({
     mutationFn: () => coupleMediationApi.setStatus(topicId, 'resolved'),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-topic', topicId] }),
@@ -76,6 +90,9 @@ export default function CoupleMediationPage() {
   }
 
   const { topic, mediations, both_sides_ready } = data
+  // Eigenes Thema, keine fremde Sicht (`other`), keine Vermittlung - dieselbe Grenze wie
+  // im Dienst, damit der Knopf nur da steht, wo er auch funktioniert.
+  const loeschbar = user?.id === topic.created_by && !other && mediations.length === 0
 
   return (
     <AppShell>
@@ -86,6 +103,23 @@ export default function CoupleMediationPage() {
           <h1 className="mt-1 text-2xl font-bold text-navy">{topic.title}</h1>
           {topic.description && (
             <p className="mt-2 text-sm text-brand-muted">{topic.description}</p>
+          )}
+          {/* Ein doppelt oder falsch angelegtes Thema soll verschwinden koennen -
+              gemeinsame Arbeit nicht. Sobald die andere Person ihre Sicht geschrieben hat
+              oder Echo vermittelt hat, fuehrt der Weg ueber „abschliessen". */}
+          {loeschbar && (
+            <button
+              onClick={() => {
+                if (confirm('Dieses Thema löschen? Es hat noch niemand außer dir daran gearbeitet.')) entfernen.mutate()
+              }}
+              disabled={entfernen.isPending}
+              className="mt-3 text-xs text-brand-muted hover:text-navy disabled:opacity-50"
+            >
+              {entfernen.isPending ? 'Lösche …' : 'Thema löschen'}
+            </button>
+          )}
+          {entfernen.isError && (
+            <p className="mt-2 text-sm text-red-600">{apiErrorMessage(entfernen.error)}</p>
           )}
         </div>
 

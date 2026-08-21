@@ -85,6 +85,10 @@ export const coupleMediationApi = {
   create: (coupleId: string, body: { title: string; description?: string | null }) =>
     apiClient.post<CoupleTopic>(`/couple/links/${coupleId}/topics`, body).then(r => r.data),
 
+  /** Nur solange niemand außer dir daran gearbeitet hat. */
+  remove: (topicId: string) =>
+    apiClient.delete(`/couple/topics/${topicId}`).then(() => true),
+
   get: (topicId: string) =>
     apiClient.get<CoupleTopicDetail>(`/couple/topics/${topicId}`).then(r => r.data),
 

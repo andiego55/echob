@@ -437,3 +437,22 @@ async def moderate(
         messages=[css.public_message(m, names) for m in messages],
         contexts=[_context_out(c, names) for c in contexts],
     )
+
+
+@router.post("/sessions/{session_id}/zurueckziehen", response_model=CoupleSessionResponse)
+async def withdraw_session(
+    session_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleSessionResponse:
+    """Den eigenen Vorschlag zuruecknehmen - zurueck in den Entwurf, nichts geht verloren."""
+    async with pool.acquire() as conn:
+        session = await css.withdraw(conn, session_id, current["user_id"])
+    return _session_out(session)
+
+
+@router.delete("/sessions/{session_id}", response_model=None, status_code=204)
+async def delete_session(
+    session_id: UUID, current=Depends(get_current_user), pool=Depends(get_pool),
+) -> None:
+    """Eine Sitzung loeschen, aus der nie ein Gespraech geworden ist."""
+    async with pool.acquire() as conn:
+        await css.delete_session(conn, session_id, current["user_id"])

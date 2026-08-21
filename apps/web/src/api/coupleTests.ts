@@ -56,4 +56,8 @@ export const coupleTestsApi = {
 
   compare: (coupleId: string, slug: string) =>
     apiClient.post<CoupleTestState>(`/couple/links/${coupleId}/tests/${slug}/compare`).then(r => r.data),
+
+  /** „Neu ansehen" legt jedes Mal einen weiteren an – deshalb löschbar. */
+  deleteComparison: (coupleId: string, comparisonId: string) =>
+    apiClient.delete(`/couple/links/${coupleId}/tests/vergleiche/${comparisonId}`).then(() => true),
 }
