@@ -10,6 +10,7 @@ import QuestionnaireRenderer from '@/components/QuestionnaireRenderer'
 import type { Question } from '@/lib/questionnaire'
 import { collabApi, type Assignment, type Appointment } from '@/api/collab'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { ListSkeleton } from '@/components/Skeleton'
 
 const TYPE_META: Record<string, { icon: string; label: string }> = {
   dialog: { icon: '💬', label: 'Dialog-Vorschlag' },
@@ -45,7 +46,7 @@ export default function InboxPage() {
           bereitstellt. Kein Notfallkanal – bei akuter Not wende dich an die Telefonseelsorge (0800 111 0 111).
         </p>
 
-        {isLoading && <p className="mt-8 text-sm text-brand-muted">Wird geladen …</p>}
+        {isLoading && <div className="mt-8"><ListSkeleton rows={3} label="Postfach wird geladen" /></div>}
 
         {isEmpty && (
           <div className="mt-8 card text-center py-12">

@@ -23,6 +23,7 @@ import {
   CONTACT_FREQUENCY_LABELS,
 } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { ListSkeleton, PageSkeleton } from '@/components/Skeleton'
 
 const TOPIC_ORDER = ['topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt'] as const
 
@@ -57,7 +58,7 @@ export default function CaseDetailPage() {
   if (isLoading || !caseData) {
     return (
       <AppShell>
-        <div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div>
+        <div className="mx-auto max-w-[1100px] px-6 py-8"><PageSkeleton /></div>
       </AppShell>
     )
   }
@@ -549,7 +550,7 @@ function TestResultsCard({ caseId }: { caseId: string }) {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-brand-muted">Lädt …</p>
+        <ListSkeleton rows={2} label="Testergebnisse werden geladen" />
       ) : results.length === 0 ? (
         <p className="text-xs text-brand-muted/60 italic">Mach einen Test – dein Ergebnis erscheint dann hier.</p>
       ) : (

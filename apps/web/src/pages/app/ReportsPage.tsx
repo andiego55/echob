@@ -8,6 +8,7 @@ import CaseNav from '@/components/app/CaseNav'
 import { reportsApi } from '@/api/reports'
 import type { Report, ReportType } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { ListSkeleton } from '@/components/Skeleton'
 
 const MAX_REPORTS = 20
 
@@ -90,9 +91,7 @@ export default function ReportsPage() {
 
         <Fehlermeldung error={deleteMutation.error} className="mb-4" />
 
-        {isLoading && (
-          <p className="text-sm text-brand-muted py-8">Wird geladen …</p>
-        )}
+        {isLoading && <ListSkeleton rows={3} label="Berichte werden geladen" />}
 
         {data && data.reports.length === 0 && (
           <EmptyReports caseId={caseId!} />

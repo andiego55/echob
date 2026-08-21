@@ -13,6 +13,7 @@ import PasswordCard from '@/components/settings/PasswordCard'
 import DataAccountCard from '@/components/settings/DataAccountCard'
 import NotificationsBanner from '@/components/NotificationsBanner'
 import { profileApi } from '@/api/profile'
+import { CardSkeleton } from '@/components/Skeleton'
 
 const USER_MODES: EchoModeOption[] = [
   { key: 'base', name: 'Basis — ruhig sortieren',
@@ -71,7 +72,7 @@ export default function SettingsPage() {
           </p>
           <div className="mt-6">
             {isLoading || !val
-              ? <p className="text-sm text-brand-muted">Wird geladen …</p>
+              ? <CardSkeleton label="Einstellungen werden geladen" />
               : <EchoSteeringForm presetLabel="Echo-Modus" modes={USER_MODES} value={val} onChange={setVal} />}
           </div>
           {val && (

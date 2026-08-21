@@ -7,6 +7,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { scenesApi } from '@/api/scenes'
 import type { Scene } from '@/types'
+import { ListSkeleton } from '@/components/Skeleton'
 
 const SAFETY_COLORS: Record<string, string> = {
   none:     'bg-green-100 text-green-800',
@@ -52,7 +53,7 @@ export default function ScenesPage() {
           </Link>
         </div>
 
-        {isLoading && <p className="text-sm text-brand-muted">Szenen werden geladen …</p>}
+        {isLoading && <ListSkeleton rows={3} label="Szenen werden geladen" />}
 
         {data && data.scenes.length === 0 && <ScenesEmpty caseId={caseId!} />}
 

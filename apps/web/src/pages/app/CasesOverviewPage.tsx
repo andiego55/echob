@@ -16,6 +16,7 @@ import { PROFILE_MODULES } from '@/utils/profileModules'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { Case } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { ListSkeleton } from '@/components/Skeleton'
 
 const BLOG_TOPIC_LABELS: Record<string, string> = {
   blog_beziehungsmuster:     'Beziehungsmuster erkennen',
@@ -177,7 +178,7 @@ export default function CasesOverviewPage() {
         )}
 
         {isLoading && (
-          <div className="text-brand-muted text-sm">Wird geladen …</div>
+          <ListSkeleton rows={2} label="Fälle werden geladen" />
         )}
 
         {isError && (

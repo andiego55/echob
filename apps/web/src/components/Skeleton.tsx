@@ -7,6 +7,11 @@
  *
  * Die Formen sind bewusst grob. Ein Skelett, das den Inhalt zu genau nachbaut, wirkt
  * wie ein Fehler, sobald der echte Inhalt anders aussieht.
+ *
+ * **Lag bis zur Angleichung im Paarraum.** Der Nutzerbereich hatte davon nichts: Dort stand
+ * an sechzehn Stellen eine Textzeile („Wird geladen …") oder gar nichts, und die Seite sprang
+ * beim Eintreffen der Daten. Weil das Skelett nichts über den Paarraum weiß, gehört es
+ * hierher — die generischen Formen unten sind für beide Welten gedacht.
  */
 
 /** Ein grauer Balken. `w` in Prozent, damit Zeilen unterschiedlich lang wirken. */
@@ -122,6 +127,58 @@ export function RetrospectSkeleton() {
         </div>
       </Karte>
       <Karte><Balken w={50} h={14} /><Balken w={94} /><Balken w={88} /><Balken w={52} /></Karte>
+    </Huelle>
+  )
+}
+
+/* ── Generische Formen für beide Bereiche ─────────────────────────────── */
+
+/** Eine Liste gleichartiger Zeilen — Szenen, Berichte, Fälle, Postfach. */
+export function ListSkeleton({ rows = 3, label = 'Wird geladen' }: {
+  rows?: number; label?: string
+}) {
+  return (
+    <Huelle label={label}>
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: rows }, (_, i) => (
+          <div key={i} className="card card-static" aria-hidden="true">
+            <div className="flex items-center gap-4">
+              <div className="flex flex-1 flex-col gap-2">
+                <Balken w={38 + (i % 3) * 12} h={13} />
+                <Balken w={72 - (i % 2) * 14} h={10} />
+              </div>
+              <div className="h-7 w-16 shrink-0 rounded-full bg-brand-border/50" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </Huelle>
+  )
+}
+
+/**
+ * Eine ganze Seite: Überschrift, Beschreibung, ein paar Karten.
+ *
+ * Für den Moment, in dem noch gar nichts da ist — vorher war das im Nutzerbereich
+ * eine leere Fläche mit einer grauen Zeile darin.
+ */
+export function PageSkeleton({ cards = 2, label = 'Seite wird geladen' }: {
+  cards?: number; label?: string
+}) {
+  return (
+    <Huelle label={label}>
+      <div className="flex flex-col gap-2">
+        <Balken w={30} h={22} />
+        <Balken w={58} h={11} />
+      </div>
+      {Array.from({ length: cards }, (_, i) => (
+        <Karte key={i}>
+          <Balken w={34} h={14} />
+          <Balken w={90} />
+          <Balken w={72} />
+          {i === 0 && <Balken w={44} />}
+        </Karte>
+      ))}
     </Huelle>
   )
 }

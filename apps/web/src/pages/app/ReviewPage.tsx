@@ -12,6 +12,7 @@ import { reviewsApi } from '@/api/reviews'
 import { apiErrorMessage } from '@/api/errors'
 import { SCALE_LABELS } from '@/types'
 import type { CaseTrends, DistressPoint, TrendMonth } from '@/types'
+import { CardSkeleton } from '@/components/Skeleton'
 
 export default function ReviewPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -52,7 +53,7 @@ export default function ReviewPage() {
           </p>
         </header>
 
-        {trendsLoading && <p className="text-sm text-brand-muted">Lädt …</p>}
+        {trendsLoading && <CardSkeleton label="Verlauf wird geladen" />}
 
         {!trendsLoading && !hasData && (
           <div className="card text-center py-10">

@@ -19,7 +19,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleQuestionsApi } from '@/api/coupleQuestions'
 import type { CoupleQuestion } from '@/api/coupleQuestions'
 import { apiErrorMessage } from '@/api/errors'
-import { CardSkeleton } from './Skeleton'
+import { CardSkeleton } from '@/components/Skeleton'
 import Weiterfuehren from './Weiterfuehren'
 import Fehlermeldung from '@/components/Fehlermeldung'
 

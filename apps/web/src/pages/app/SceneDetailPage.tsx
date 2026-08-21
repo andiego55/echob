@@ -8,6 +8,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { scenesApi } from '@/api/scenes'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { PageSkeleton } from '@/components/Skeleton'
 
 const SAFETY_BADGE: Record<string, { label: string; cls: string }> = {
   none:     { label: 'Kein Sicherheitsrisiko',    cls: 'bg-green-100 text-green-800' },
@@ -77,7 +78,7 @@ export default function SceneDetailPage() {
   })
 
   if (isLoading || !scene) {
-    return <AppShell><CaseNav caseId={caseId!} /><div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div></AppShell>
+    return <AppShell><CaseNav caseId={caseId!} /><div className="mx-auto max-w-[1100px] px-6 py-8"><PageSkeleton /></div></AppShell>
   }
 
   const safety = SAFETY_BADGE[scene.safety_level]

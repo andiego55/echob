@@ -10,6 +10,7 @@ import CaseNav from '@/components/app/CaseNav'
 import Avatar from '@/components/Avatar'
 import AvatarPicker from '@/components/AvatarPicker'
 import { onboardingApi, type OnboardingAnswers } from '@/api/onboarding'
+import { PageSkeleton } from '@/components/Skeleton'
 
 // ── Schritte ──────────────────────────────────────────────────────────────────
 
@@ -193,7 +194,7 @@ export default function OnboardingPage() {
     return (
       <AppShell>
         <CaseNav caseId={caseId!} />
-        <div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div>
+        <div className="mx-auto max-w-[1100px] px-6 py-8"><PageSkeleton /></div>
       </AppShell>
     )
   }

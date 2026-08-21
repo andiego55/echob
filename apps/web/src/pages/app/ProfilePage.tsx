@@ -12,6 +12,7 @@ import { PROFILE_MODULES } from '@/utils/profileModules'
 import type { ProfileModuleConfig } from '@/utils/profileModules'
 import { computeModuleScores, computeResourcesIndex, scoreLevel, buildSummaryText } from '@/utils/profileScoring'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { PageSkeleton } from '@/components/Skeleton'
 
 const SAFETY_STATUS_INFO: Record<string, { label: string; cls: string; show: boolean }> = {
   no_indication:       { label: 'Keine Sicherheitshinweise', cls: 'bg-green-50 border-green-200 text-green-800', show: false },
@@ -124,7 +125,7 @@ export default function ProfilePage() {
   }
 
   if (isLoading) {
-    return <AppShell><div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div></AppShell>
+    return <AppShell><div className="mx-auto max-w-[1100px] px-6 py-8"><PageSkeleton /></div></AppShell>
   }
 
   if (showSummary) {

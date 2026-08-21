@@ -10,6 +10,7 @@ import { apiClient } from '@/api/client'
 import { subscriptionApi } from '@/api/subscription'
 import { apiErrorMessage } from '@/api/errors'
 import type { ScalesOverview, ScaleScore } from '@/types'
+import { CardSkeleton } from '@/components/Skeleton'
 
 function fetchScales(caseId: string) {
   return apiClient.get<ScalesOverview>(`/cases/${caseId}/scales`).then(r => r.data)
@@ -110,7 +111,7 @@ export default function ScalesPage() {
           </button>
         </div>
 
-        {isLoading && <p className="text-sm text-brand-muted">Wird geladen …</p>}
+        {isLoading && <CardSkeleton label="Muster werden geladen" />}
 
         {showScaleHint && (
           <div className={`mb-4 rounded-brand border px-4 py-3 text-sm ${scalesExhausted ? 'border-red-200 bg-red-50 text-red-700' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>

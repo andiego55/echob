@@ -15,6 +15,7 @@ import type { PersonProfileModuleConfig } from '@/utils/personProfileModules'
 import { computePersonModuleScores, scoreLevel, buildPersonSummaryText } from '@/utils/personProfileScoring'
 import { RELATIONSHIP_TYPE_LABELS } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { PageSkeleton } from '@/components/Skeleton'
 
 const LIKERT_LABELS = ['', 'Trifft gar nicht zu', 'Trifft eher nicht zu', 'Teils/teils', 'Trifft eher zu', 'Trifft sehr zu']
 
@@ -104,7 +105,7 @@ export default function PersonProfilePage() {
     return (
       <AppShell>
         <CaseNav caseId={caseId!} />
-        <div className="px-6 py-10 text-sm text-brand-muted">Wird geladen …</div>
+        <div className="mx-auto max-w-[1100px] px-6 py-8"><PageSkeleton /></div>
       </AppShell>
     )
   }

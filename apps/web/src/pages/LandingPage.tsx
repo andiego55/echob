@@ -74,7 +74,7 @@ const FAQ = [
   },
   {
     q: 'Was unterscheidet EchoB von einem KI-Chat wie ChatGPT?',
-    a: 'Ein normaler KI-Chat vergisst nach dem Gespräch, urteilt schnell und speichert oft in US-Clouds. EchoB ist das Gegenteil: eine strukturierte Fallakte statt flüchtigem Chat, die über viele Situationen hinweg Muster sichtbar macht – vorsichtig, ohne Diagnosen, verschlüsselt auf Servern in Europa.',
+    a: 'Ein normaler KI-Chat vergisst nach dem Gespräch und kann den Beziehungskontext nicht so strukturiert erfassen wie EchoB das tut. EchoB ist das Gegenteil: eine strukturierte Fallakte statt flüchtigem Chat, die über viele Situationen hinweg Muster sichtbar macht – vorsichtig, ohne Diagnosen.',
   },
   {
     q: 'Wer sieht meine Eingaben – sind meine Daten sicher?',
