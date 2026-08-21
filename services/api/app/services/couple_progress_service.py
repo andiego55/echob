@@ -36,6 +36,11 @@ POINTS: dict[str, tuple[int, str]] = {
     "appreciation_left":   (10, "Etwas Wertschaetzendes dagelassen"),
     "barometer_set":       (5,  "Das Barometer gestellt"),
     "agreement_reviewed":  (15, "Nachgehalten, wie es gelaufen ist"),
+    # Fragen kostet wenig, antworten mehr - deshalb der Unterschied. Belohnt wird das
+    # Zuwenden, nicht das Anstossen.
+    "question_asked":      (5,  "Eine Frage dagelassen"),
+    "question_answered":   (15, "Auf eine Frage geantwortet"),
+    "impulse_done":        (15, "Bei einem Impuls mitgemacht"),
 }
 
 
@@ -158,6 +163,14 @@ def _milestones(counts: dict[str, int], total: int, streak: int) -> list[dict[st
         ("beide_getestet",  "Nebeneinandergelegt", "Ihr habt Testergebnisse verglichen.",
          counts.get("test_compared", 0) > 0),
         ("dranbleiber",     "Dranbleiber",         "Drei Wochen in Folge aktiv.", streak >= 3),
+        ("nachgefragt",     "Nachgefragt",         "Ihr habt euch etwas gefragt und geantwortet.",
+         counts.get("question_answered", 0) > 0),
+        ("neugierig",       "Neugierig geblieben", "Fuenf Fragen beantwortet.",
+         counts.get("question_answered", 0) >= 5),
+        ("erster_impuls",   "Erster Impuls",       "Ihr habt eine Uebung zusammen gemacht.",
+         counts.get("impulse_done", 0) > 0),
+        ("fuenf_impulse",   "Eingespieltes Team",  "Fuenf Impulse gemeinsam durchgezogen.",
+         counts.get("impulse_done", 0) >= 5),
         ("hundert",         "100 Punkte",          "Gemeinsam 100 Punkte gesammelt.", total >= 100),
         ("dreihundert",     "300 Punkte",          "Gemeinsam 300 Punkte gesammelt.", total >= 300),
     ]

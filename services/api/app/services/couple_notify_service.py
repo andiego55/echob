@@ -150,6 +150,25 @@ def appreciation_left() -> tuple[str, str]:
             "Es liegt etwas Wertschätzendes für dich im Paarraum.")
 
 
+def impulse_answered() -> tuple[str, str]:
+    # Ohne den Titel des Impulses: Wer ihn in der Meldung liest, denkt schon darueber nach,
+    # bevor er antwortet - und die Blindheitsregel waere praktisch ausgehebelt.
+    return ("couple_impulse_answered",
+            "Im Paarraum wartet ein Impuls auf deine Antwort.")
+
+
+def question_asked() -> tuple[str, str]:
+    # Ohne die Frage selbst. Eine Frage, die man in der Meldung liest, beantwortet man im
+    # Kopf und nie im Raum - genau das soll sie nicht.
+    return ("couple_question_asked",
+            "Im Paarraum wartet eine Frage auf dich.")
+
+
+def question_answered() -> tuple[str, str]:
+    return ("couple_question_answered",
+            "Deine Frage im Paarraum wurde beantwortet.")
+
+
 def barometer_dropped() -> tuple[str, str]:
     # Ohne Zahl und ohne Namen der Stimmung: Das gehoert in den Paarraum, nicht in eine
     # Meldung. Als Einladung formuliert, nicht als Alarm.

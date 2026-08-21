@@ -97,6 +97,15 @@ export function SessionSkeleton() {
   )
 }
 
+/** Eine einzelne Karte — fuer Bereiche, die nur aus einer bestehen. */
+export function CardSkeleton({ label = 'Wird geladen' }: { label?: string }) {
+  return (
+    <Huelle label={label}>
+      <Karte><Balken w={38} h={14} /><Balken w={92} /><Balken w={78} /><Balken w={45} /></Karte>
+    </Huelle>
+  )
+}
+
 /** Rückblick: Zahlenkacheln über Echos Text. */
 export function RetrospectSkeleton() {
   return (

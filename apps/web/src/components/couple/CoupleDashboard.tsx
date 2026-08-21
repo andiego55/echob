@@ -26,6 +26,7 @@ import SinceLastVisit from './SinceLastVisit'
 import { DashboardSkeleton } from './Skeleton'
 import DueAgreementsCard from './DueAgreementsCard'
 import WeeklyCheckinCard from './WeeklyCheckinCard'
+import ImpulseTeaser from './ImpulseTeaser'
 
 export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
   const { data, isLoading, isError, error } = useQuery({
@@ -135,6 +136,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         partnerAvatar={data.partner_avatar}
       />
 
+      <ImpulseTeaser coupleId={coupleId} />
+
       <AppreciationCard coupleId={coupleId} />
 
       {waiting.length > 0 && (
@@ -148,7 +151,12 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
 
       <Abschnitt titel="Weitermachen" />
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <QuickAction
+          to={`/app/paar/${coupleId}/fragen`}
+          title="Etwas fragen"
+          text="Eine Frage dalassen – sie wartet, bis die andere Person Zeit hat."
+        />
         <QuickAction
           to={`/app/paar/${coupleId}/echo`}
           title="Mit Echo sprechen"

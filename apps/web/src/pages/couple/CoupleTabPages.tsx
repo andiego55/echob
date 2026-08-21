@@ -16,6 +16,8 @@ import ChronicleCard from '@/components/couple/ChronicleCard'
 import ReminderCard from '@/components/couple/ReminderCard'
 import SharesCard from '@/components/couple/SharesCard'
 import RetrospectCard from '@/components/couple/RetrospectCard'
+import QuestionsBoard from '@/components/couple/QuestionsBoard'
+import ImpulseBoard from '@/components/couple/ImpulseBoard'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
 import EndRoomPanel from '@/components/couple/EndRoomPanel'
@@ -25,6 +27,26 @@ import { useQuery } from '@tanstack/react-query'
 function useCoupleId() {
   const { coupleId = '' } = useParams<{ coupleId: string }>()
   return coupleId
+}
+
+export function CoupleQuestionsPage() {
+  const coupleId = useCoupleId()
+  return (
+    <CoupleShell subtitle="Eine Frage dalassen. Die Antwort kommt, wenn sie kommt.">
+      <QuestionsBoard coupleId={coupleId} />
+      <CoupleSafetyNote />
+    </CoupleShell>
+  )
+}
+
+export function CoupleImpulsePage() {
+  const coupleId = useCoupleId()
+  return (
+    <CoupleShell subtitle="Kleine Übungen für die Zeit, in der gerade nichts brennt.">
+      <ImpulseBoard coupleId={coupleId} />
+      <CoupleSafetyNote />
+    </CoupleShell>
+  )
 }
 
 export function CoupleSessionsPage() {

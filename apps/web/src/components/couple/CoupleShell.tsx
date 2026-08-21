@@ -31,6 +31,7 @@ const GRUPPEN: Gruppe[] = [
     label: 'Reden',
     kinder: [
       { path: '/echo', label: 'Echo' },
+      { path: '/fragen', label: 'Fragen' },
       { path: '/gespraeche', label: 'Gespräche' },
       { path: '/streit', label: 'Nach einem Streit' },
     ],
@@ -45,6 +46,7 @@ const GRUPPEN: Gruppe[] = [
   {
     label: 'Wir',
     kinder: [
+      { path: '/impulse', label: 'Impulse' },
       { path: '/rueckblick', label: 'Rückblick' },
       { path: '/fortschritt', label: 'Fortschritt' },
       { path: '/tests', label: 'Tests' },

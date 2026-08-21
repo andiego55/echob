@@ -15,6 +15,7 @@ from typing import Any
 from app.core import crypto
 from app.services.couple_companion_service import list_summaries
 from app.services.couple_progress_service import load_progress
+from app.services.couple_question_service import load_open_for_dashboard
 from app.services.couple_therapy_service import load_partner_profile, require_couple_member
 
 
@@ -70,6 +71,24 @@ async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
 
     attention, waiting = _sort_by_who_acts(sessions, topics, agreements, tests, me)
 
+    # Offene Fragen gehoeren ganz nach vorn: Sie kosten am wenigsten und bewegen am
+    # schnellsten etwas. Sie stehen deshalb VOR den schwereren Posten in derselben Liste.
+    fragen = await load_open_for_dashboard(conn, couple_id, user_id)
+    fuer_mich = [
+        {"kind": "question_open", "title": _kurz(f["question"]),
+         "detail": f"{f['asked_by_name']} hat dich etwas gefragt.",
+         "target": f"/app/paar/{couple_id}/fragen"}
+        for f in fragen if f["waiting_for_me"]
+    ]
+    fuer_sie = [
+        {"kind": "question_waiting", "title": _kurz(f["question"]),
+         "detail": "Deine Frage wartet noch auf eine Antwort.",
+         "target": f"/app/paar/{couple_id}/fragen"}
+        for f in fragen if f["is_mine"]
+    ]
+    attention = fuer_mich + attention
+    waiting = fuer_sie + waiting
+
     # Eigene Echo-Zusammenfassungen — sie gehören auf die Übersicht, aber nur der
     # Person, die sie geführt hat.
     zusammenfassungen = await list_summaries(conn, couple_id, user_id, limit=4)
@@ -118,6 +137,11 @@ async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
         },
         "progress": await load_progress(conn, couple_id, user_id),
     }
+
+
+def _kurz(text: str, laenge: int = 70) -> str:
+    text = (text or "").strip()
+    return text if len(text) <= laenge else text[: laenge - 1].rstrip() + "…"
 
 
 def _sort_by_who_acts(sessions, topics, agreements, tests, me):

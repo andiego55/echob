@@ -56,6 +56,16 @@ DEFAULT_ON: frozenset[str] = frozenset({
 #: Wer davon etwas teilen will, tut das über den eigenen Fall, nicht über den Raum.
 #: Diese Namen tauchen in keinem Freigabe-Pfad auf; ``test_forbidden_never_reachable``
 #: macht daraus eine überprüfbare Eigenschaft statt einer Absicht.
+#: **Bewusst NICHT freigebbar, und zwar vorerst gar nicht:** die offenen Fragen zwischen den
+#: Partnern (``couple_questions``) und die Impuls-Antworten (``couple_impulse_runs``). Beide
+#: sind neu, und die Entscheidung, ob eine Fachperson sie sehen darf, ist eine inhaltliche,
+#: keine technische — sie gehoert dem Menschen, der das Modul verantwortet, nicht dem
+#: Code. Bis dahin gilt die sichere Richtung: Was nicht in ``ELEMENTS`` steht, hat keinen
+#: Lader und keinen Pfad. Das ist also kein Versehen.
+#:
+#: Wer sie spaeter aufnimmt, braucht: einen Eintrag in ``ELEMENTS``, einen Lader, eine
+#: bewusste Entscheidung ueber ``DEFAULT_ON`` — und muss bedenken, dass eine Frage an die
+#: Partnerperson naeher an ``transcripts`` liegt als an ``summaries``.
 NIEMALS: frozenset[str] = frozenset({
     "private_echo",             # der private Begleiter
     "deescalation",             # der Faden „Nach einem Streit"
