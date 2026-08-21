@@ -233,7 +233,7 @@ export default function SceneDetailPage() {
               </button>
               <button
                 onClick={() => setEditMode(false)}
-                className="btn-outline !py-2 !px-4 !text-sm"
+                className="btn-quiet !py-2 !px-4 !text-sm"
               >
                 Abbrechen
               </button>
@@ -276,7 +276,7 @@ export default function SceneDetailPage() {
         <div className="flex gap-3 flex-wrap">
           <button
             onClick={() => navigate(`/app/cases/${caseId}/echo`)}
-            className="btn-outline !py-2 !px-4 !text-sm"
+            className="btn-quiet !py-2 !px-4 !text-sm"
           >
             Mit Echo besprechen
           </button>

@@ -504,7 +504,7 @@ function SummaryView({
           </p>
         </div>
         <div className="flex gap-2">
-          <button onClick={onEdit} className="btn-outline !py-2 !px-4 !text-sm">
+          <button onClick={onEdit} className="btn-quiet !py-2 !px-4 !text-sm">
             Profil bearbeiten
           </button>
           <Link to="/app/profile/echo" className="btn-primary !py-2 !px-4 !text-sm">

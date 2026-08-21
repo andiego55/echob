@@ -443,7 +443,7 @@ function PersonProfileSummaryView({
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={onEdit} className="btn-outline !py-2 !px-4 !text-sm">
+          <button onClick={onEdit} className="btn-quiet !py-2 !px-4 !text-sm">
             Module bearbeiten
           </button>
           <Link to={`/app/cases/${caseId}/person-profile/echo`} className="btn-primary !py-2 !px-4 !text-sm">
@@ -525,7 +525,7 @@ function PersonProfileSummaryView({
             <button
               onClick={() => generateMutation.mutate()}
               disabled={generateMutation.isPending}
-              className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50"
+              className="btn-quiet !py-2 !px-4 !text-sm disabled:opacity-50"
             >
               {generateMutation.isPending ? 'Wird generiert …' : 'KI-Zusammenfassung generieren'}
             </button>
@@ -544,7 +544,7 @@ function PersonProfileSummaryView({
                 </button>
                 <button
                   onClick={() => { setShowAiSuggestion(false); setAiSuggestion(null) }}
-                  className="btn-outline !py-2 !px-4 !text-sm"
+                  className="btn-quiet !py-2 !px-4 !text-sm"
                 >
                   Verwerfen
                 </button>

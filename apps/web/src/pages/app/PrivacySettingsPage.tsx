@@ -163,7 +163,7 @@ export default function PrivacySettingsPage() {
               <p className="text-sm font-medium text-navy">Daten exportieren</p>
               <p className="text-xs text-brand-muted">Alle deine Fälle, Szenen, Echo-Gespräche und Profile als JSON-Datei.</p>
             </div>
-            <button onClick={handleExport} disabled={exporting} className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50">
+            <button onClick={handleExport} disabled={exporting} className="btn-quiet !py-2 !px-4 !text-sm disabled:opacity-50">
               {exporting ? 'Exportiere…' : 'Exportieren'}
             </button>
           </div>

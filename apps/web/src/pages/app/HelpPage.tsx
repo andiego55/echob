@@ -85,7 +85,7 @@ export default function HelpPage() {
                 <p className="text-xs text-brand-muted mb-4">{o.desc}</p>
                 <button
                   disabled={!o.available}
-                  className="btn-outline !py-2 !px-4 !text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="btn-quiet !py-2 !px-4 !text-xs disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {o.available ? o.cta : 'Bald verfügbar'}
                 </button>
@@ -107,7 +107,7 @@ export default function HelpPage() {
             <p className="text-xs text-brand-muted mb-4">
               Empfehlungen für Psychotherapeut:innen, Beratungsstellen und Coaches folgen bald.
             </p>
-            <Link to="/warteliste" className="btn-outline !py-2 !px-4 !text-sm">
+            <Link to="/warteliste" className="btn-quiet !py-2 !px-4 !text-sm">
               Auf Warteliste eintragen
             </Link>
           </div>

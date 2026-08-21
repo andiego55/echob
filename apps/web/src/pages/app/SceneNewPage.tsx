@@ -289,7 +289,7 @@ export default function SceneNewPage() {
             <button type="submit" disabled={mutation.isPending} className="btn-primary">
               {mutation.isPending ? 'Wird gespeichert …' : 'Szene speichern'}
             </button>
-            <button type="button" onClick={() => navigate(-1)} className="btn-outline">
+            <button type="button" onClick={() => navigate(-1)} className="btn-quiet">
               Abbrechen
             </button>
           </div>

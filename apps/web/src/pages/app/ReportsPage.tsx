@@ -58,7 +58,7 @@ export default function ReportsPage() {
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <Link to={`/app/cases/${caseId}/export`} className="btn-outline !py-2 !px-4 !text-sm whitespace-nowrap" title="Druckbare Fall-Zusammenfassung ohne KI – zum Mitnehmen zu Fachpersonen">
+            <Link to={`/app/cases/${caseId}/export`} className="btn-quiet !py-2 !px-4 !text-sm whitespace-nowrap" title="Druckbare Fall-Zusammenfassung ohne KI – zum Mitnehmen zu Fachpersonen">
               Zusammenfassung (PDF)
             </Link>
             {count > 0 && (

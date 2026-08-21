@@ -145,7 +145,7 @@ export default function CaseNewPage() {
               <button
                 type="button"
                 onClick={() => navigate('/app')}
-                className="btn-outline"
+                className="btn-quiet"
               >
                 Abbrechen
               </button>

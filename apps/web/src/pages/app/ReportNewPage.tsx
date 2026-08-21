@@ -254,7 +254,7 @@ export default function ReportNewPage() {
           >
             Bericht erstellen
           </button>
-          <button type="button" onClick={() => navigate(-1)} className="btn-outline">
+          <button type="button" onClick={() => navigate(-1)} className="btn-quiet">
             Abbrechen
           </button>
         </div>
