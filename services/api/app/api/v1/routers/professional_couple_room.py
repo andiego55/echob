@@ -18,16 +18,19 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.couple_professional import (
+    CoupleRoomEchoReply,
+    CoupleRoomEchoRequest,
     CoupleRoomOverview,
     CoupleRoomRequest,
     CoupleRoomSummary,
 )
 from app.services import couple_professional_service as cprof
 from app.services import sharing_service
+from app.services.subscription_service import enforce_echo_prompt_limit
 
 router = APIRouter(prefix="/professional", tags=["professional-couple-room"])
 
@@ -91,3 +94,37 @@ async def request_room(
                 # darf nach aussen nicht sichtbar werden.
                 continue
     return {"requested": True}
+
+
+_ROOM_PROMPT = "echo_couple_room_prompt.md"
+
+
+@router.post("/paarraeume/{couple_id}/echo", response_model=CoupleRoomEchoReply)
+async def room_echo(
+    couple_id: UUID, body: CoupleRoomEchoRequest, request: Request,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleRoomEchoReply:
+    """Echo ueber das freigegebene Raum-Material.
+
+    **Bewusst nicht gespeichert.** Ein abgelegter Dialog wuerde altern und - schlimmer -
+    einen Widerruf ueberleben: Das Paar beendet die Freigabe, und der Wortlaut laege
+    weiter bei der Fachperson. Der Verlauf bleibt deshalb im Browser und wird bei jeder
+    Frage mitgeschickt. Was die Fachperson behalten will, gehoert in ihre eigenen Notizen -
+    eine bewusste Handlung, keine Nebenwirkung.
+    """
+    prof_id = current["user_id"]
+    svc = getattr(request.app.state, "echo_service", None)
+    if svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+
+    async with pool.acquire() as conn:
+        await enforce_echo_prompt_limit(prof_id, conn)
+        kontext = await cprof.build_room_context(conn, couple_id, prof_id)
+
+    antwort = await svc.professional_chat(
+        user_message=body.message,
+        shared_context=kontext,
+        history=[{"role": h.role, "content": h.content} for h in body.history][-20:],
+        prompt_file=_ROOM_PROMPT,
+    )
+    return CoupleRoomEchoReply(reply=antwort)

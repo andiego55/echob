@@ -546,3 +546,113 @@ async def load_overview(conn, couple_id, professional_user_id) -> dict[str, Any]
         "catalogue": {k: v for k, v in ELEMENTS.items() if k in share["elements"]},
         "room_since": link["accepted_at"] or link["created_at"],
     }
+
+
+# ── Kontext fuer Echo ───────────────────────────────────────────────────────
+
+
+def _kurzfassung(text: str, laenge: int = 700) -> str:
+    text = (text or "").strip().replace("\r", "")
+    return text if len(text) <= laenge else text[: laenge - 1].rstrip() + "…"
+
+
+async def build_room_context(conn, couple_id, professional_user_id) -> str:
+    """Baut Echos Kontext aus dem, was FREIGEGEBEN ist — und nur daraus.
+
+    Der Bauer geht durch dieselben Lader wie die Anzeige, also durch
+    ``require_released``. Damit kann hier nichts landen, was das Paar nicht freigegeben
+    hat — auch dann nicht, wenn jemand später ein Element vergisst zu prüfen. Die
+    Freigabe gilt automatisch mit.
+    """
+    ueberblick = await load_overview(conn, couple_id, professional_user_id)
+    namen = " und ".join(m["name"] for m in ueberblick["members"]) or "zwei Personen"
+    teile = [
+        f"Paarraum von {namen}.",
+        "Dieses Material haben BEIDE Personen gemeinsam freigegeben.",
+        "",
+    ]
+
+    async def hole(element):
+        try:
+            return await load_released(conn, couple_id, professional_user_id, element)
+        except HTTPException:
+            return None      # nicht freigegeben — dann steht dazu auch nichts im Kontext
+
+    zusammen = await hole("summaries")
+    if zusammen:
+        teile.append("ZUSAMMENFASSUNGEN DER GESPRÄCHE:")
+        for z in zusammen[:8]:
+            teile.append(f"- {z.get('title') or 'Gespräch'}: {_kurzfassung(z['summary_text'])}")
+        teile.append("")
+
+    themen = await hole("topics")
+    if themen:
+        teile.append("THEMEN IN MEDIATION (nur die offenen Sichten — Vertrauliches liegt nicht vor):")
+        for t in themen[:6]:
+            teile.append(f"- Thema: {t['title']} ({t['status']})")
+            for p in t.get("perspectives", []):
+                teile.append(f"  offene Sicht: {_kurzfassung(p.get('open_text') or '', 400)}")
+            for m in t.get("mediations", [])[:1]:
+                teile.append(f"  Echos Vorschlag: {_kurzfassung(m['body'], 500)}")
+        teile.append("")
+
+    abmachungen = await hole("agreements")
+    if abmachungen:
+        teile.append("ABMACHUNGEN:")
+        for a in abmachungen[:12]:
+            stand = a["status"]
+            notiz = f" — Rückmeldung: {a['review_note']}" if a.get("review_note") else ""
+            teile.append(f"- [{stand}] {_kurzfassung(a['body'], 200)}{notiz}")
+        teile.append("")
+
+    verlauf = await hole("history")
+    if verlauf and (verlauf["barometer"] or verlauf["moods"]):
+        teile.append("VERLAUF:")
+        for w in verlauf["barometer"][-8:]:
+            teile.append(f"- Woche {w['week']}: Barometer-Schnitt beider {w['average']} von 10")
+        stimmungen = {}
+        for m in verlauf["moods"]:
+            stimmungen[m["mood"]] = stimmungen.get(m["mood"], 0) + m["count"]
+        if stimmungen:
+            teile.append("- Stimmungen in den Check-ins: " + ", ".join(
+                f"{k} ({v}x)" for k, v in sorted(stimmungen.items(), key=lambda x: -x[1])))
+        teile.append("")
+
+    rueckblicke = await hole("retrospectives")
+    if rueckblicke:
+        teile.append("RÜCKBLICKE:")
+        for r in rueckblicke[:3]:
+            teile.append(f"- {r['period_start']} bis {r['period_end']}: {_kurzfassung(r['body'])}")
+        teile.append("")
+
+    vergleiche = await hole("tests")
+    if vergleiche:
+        teile.append("TESTVERGLEICHE:")
+        for v in vergleiche[:3]:
+            teile.append(f"- {v['slug']}: {_kurzfassung(v['body'], 500)}")
+        teile.append("")
+
+    wortlaut = await hole("transcripts")
+    if wortlaut:
+        teile.append("AUSZUG AUS DEN GESPRÄCHEN (im Wortlaut freigegeben):")
+        for s in wortlaut[:2]:
+            teile.append(f"- {s.get('title') or 'Gespräch'}:")
+            for m in (s.get("messages") or [])[-12:]:
+                wer = "Echo" if m["role"] == "echo" else "Person"
+                teile.append(f"    {wer}: {_kurzfassung(m['content'], 300)}")
+        teile.append("")
+
+    wertschaetzung = await hole("appreciation")
+    if wertschaetzung and wertschaetzung.get("total"):
+        teile.append(
+            f"WERTSCHÄTZUNG: {wertschaetzung['total']} Mal, "
+            "Texte werden bewusst nicht übergeben."
+        )
+        teile.append("")
+
+    fehlend = [ELEMENTS[k] for k in ELEMENTS if k not in ueberblick["elements"]]
+    if fehlend:
+        teile.append("NICHT FREIGEGEBEN (darüber liegt dir nichts vor, spekuliere nicht): "
+                     + "; ".join(fehlend))
+
+    return "\n".join(teile)

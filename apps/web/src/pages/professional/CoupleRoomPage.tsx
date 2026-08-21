@@ -11,13 +11,14 @@
  * ein gesperrter sagt die Wahrheit — und macht nebenbei sichtbar, worüber man mit dem
  * Paar sprechen könnte.
  */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { professionalRoomApi } from '@/api/professionalCoupleRoom'
 import { apiErrorMessage } from '@/api/errors'
+import EchoThinking from '@/components/couple/EchoThinking'
 
 /** Die Reihenfolge im Menü — vom Überblick zum Detail. */
 const BEREICHE: { key: string; label: string }[] = [
@@ -87,12 +88,18 @@ export default function CoupleRoomPage() {
                 onClick={() => setBereich(b.key)}
               />
             ))}
+            <div className="pt-2">
+              <MenuKnopf label="Echo-Dialog" aktiv={bereich === 'echo'} frei
+                onClick={() => setBereich('echo')} />
+            </div>
           </nav>
 
           {/* ── Inhalt ────────────────────────────────────────────── */}
           <div className="order-1 lg:order-2">
             {bereich === 'overview' ? (
               <Ueberblick data={ueberblick} />
+            ) : bereich === 'echo' ? (
+              <EchoDialog coupleId={coupleId} />
             ) : ueberblick.elements.includes(bereich) ? (
               <Bereich coupleId={coupleId} element={bereich}
                 titel={BEREICHE.find(b => b.key === bereich)!.label} />
@@ -363,6 +370,96 @@ function Inhalt({ element, data }: { element: string; data: any }) {
           </div>
         </details>
       ))}
+    </div>
+  )
+}
+
+
+/**
+ * Echo über das freigegebene Material.
+ *
+ * Der Verlauf lebt hier im Browser und nirgends sonst. Ein gespeicherter Dialog würde
+ * altern und – schwerer wiegend – einen Widerruf überleben: Das Paar beendet die
+ * Freigabe, und der Wortlaut läge weiter in der Praxis. Was die Fachperson behalten will,
+ * gehört in ihre eigenen Notizen; das ist dann eine Handlung, keine Nebenwirkung.
+ */
+function EchoDialog({ coupleId }: { coupleId: string }) {
+  const [verlauf, setVerlauf] = useState<{ role: string; content: string }[]>([])
+  const [text, setText] = useState('')
+  const endRef = useRef<HTMLDivElement>(null)
+
+  const fragen = useMutation({
+    mutationFn: (frage: string) =>
+      professionalRoomApi.echo(coupleId, frage, verlauf),
+    onMutate: (frage: string) => {
+      setVerlauf(v => [...v, { role: 'user', content: frage }])
+      setText('')
+      return { frage }
+    },
+    onSuccess: antwort => {
+      setVerlauf(v => [...v, { role: 'assistant', content: antwort }])
+      setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+    },
+    onError: (_e, _v, ctx) => {
+      setVerlauf(v => v.slice(0, -1))
+      if (ctx?.frage) setText(ctx.frage)
+    },
+  })
+
+  return (
+    <div className="card card-static">
+      <h2 className="card-title">Echo-Dialog</h2>
+      <p className="mt-1 text-xs text-brand-muted">
+        Echo kennt hier nur das freigegebene Material – nichts Einseitiges. Dieser Dialog
+        wird nicht gespeichert; er endet mit dem Schließen der Seite.
+      </p>
+
+      {verlauf.length > 0 && (
+        <div className="mt-4 space-y-3 overflow-y-auto pr-1" style={{ maxHeight: '52vh' }}>
+          {verlauf.map((m, i) => (
+            <div key={i} className={m.role === 'assistant'
+              ? 'rounded-brand border border-accent/25 px-3.5 py-3'
+              : 'rounded-brand bg-brand-bg px-3.5 py-2.5'}>
+              <p className={`text-xs font-semibold ${
+                m.role === 'assistant' ? 'text-accent' : 'text-navy'
+              }`}>
+                {m.role === 'assistant' ? 'Echo' : 'Sie'}
+              </p>
+              <div className="mt-1 text-sm text-brand-text">
+                {m.role === 'assistant'
+                  ? <MarkdownMessage content={m.content} />
+                  : <p className="whitespace-pre-wrap">{m.content}</p>}
+              </div>
+            </div>
+          ))}
+          <div ref={endRef} />
+        </div>
+      )}
+
+      <form
+        onSubmit={e => { e.preventDefault(); if (text.trim()) fragen.mutate(text.trim()) }}
+        className="mt-4"
+      >
+        <textarea
+          value={text}
+          onChange={e => setText(e.target.value)}
+          rows={3}
+          placeholder="Was fällt an diesem Material auf? Woran könnte man ansetzen?"
+          className="input w-full resize-y !text-sm"
+        />
+        <button
+          type="submit"
+          disabled={!text.trim() || fragen.isPending}
+          className="btn-primary mt-2 !py-2 !px-5 !text-sm disabled:opacity-50"
+        >
+          {fragen.isPending
+            ? <EchoThinking text="Echo liest das Material …" size={34} />
+            : 'Fragen'}
+        </button>
+        {fragen.isError && (
+          <p className="mt-2 text-sm text-red-600">{apiErrorMessage(fragen.error)}</p>
+        )}
+      </form>
     </div>
   )
 }

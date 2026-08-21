@@ -43,6 +43,15 @@ export const professionalRoomApi = {
   element: <T = unknown>(coupleId: string, element: string) =>
     apiClient.get<T>(`/professional/paarraeume/${coupleId}/${element}`).then(r => r.data),
 
+  /**
+   * Echo über das freigegebene Material. Der Verlauf kommt aus dem Browser – der Server
+   * legt nichts ab. Ein gespeicherter Dialog würde einen Widerruf überleben: Das Paar
+   * beendet die Freigabe, und der Wortlaut läge weiter bei der Fachperson.
+   */
+  echo: (coupleId: string, message: string, history: { role: string; content: string }[]) =>
+    apiClient.post<{ reply: string }>(`/professional/paarraeume/${coupleId}/echo`,
+      { message, history }).then(r => r.data.reply),
+
   /** Bittet um Zugang. Die Antwort ist immer dieselbe – auch wenn es gar keinen Raum gibt. */
   request: (caseId: string, elements: string[], message?: string | null) =>
     apiClient.post<{ requested: boolean }>(

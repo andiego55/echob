@@ -101,4 +101,20 @@ class CoupleRoomRequest(BaseModel):
     message: str | None = Field(None, max_length=500)
 
 
+
+class CoupleRoomEchoTurn(BaseModel):
+    role: str
+    content: str
+
+
+class CoupleRoomEchoRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=4000)
+    #: Der Verlauf kommt aus dem Browser - serverseitig wird nichts abgelegt.
+    history: list[CoupleRoomEchoTurn] = []
+
+
+class CoupleRoomEchoReply(BaseModel):
+    reply: str
+
+
 CoupleRoomSummary.model_rebuild()
