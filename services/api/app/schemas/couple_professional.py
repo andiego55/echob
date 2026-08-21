@@ -75,6 +75,8 @@ class CoupleRoomSummary(BaseModel):
     elements: list[str] = []
     #: false = der Raum wurde beendet oder die Freigabe ruht noch.
     readable: bool
+    #: Die beiden Personen - damit die Oberflaeche den Raum einem Fall zuordnen kann.
+    members: list[CoupleRoomMember] = []
     created_at: datetime
     updated_at: datetime
 
@@ -97,3 +99,6 @@ class CoupleRoomOverview(BaseModel):
 class CoupleRoomRequest(BaseModel):
     elements: list[str] = Field(..., min_length=1)
     message: str | None = Field(None, max_length=500)
+
+
+CoupleRoomSummary.model_rebuild()

@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import ClientInviteButton from '@/components/professional/ClientInviteButton'
+import CoupleRoomsCard from '@/components/professional/CoupleRoomsCard'
 import NotificationsBanner from '@/components/NotificationsBanner'
 import Avatar from '@/components/Avatar'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
@@ -175,6 +176,8 @@ export default function ProfessionalDashboardPage() {
         </div>
 
         <NotificationsBanner />
+
+        <CoupleRoomsCard />
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <Tile label="Klient:innen" value={clientsCount} icon={<IconUsers />} onClick={() => { setFilter('all'); setQ('') }} />

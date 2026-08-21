@@ -124,6 +124,7 @@ import { REGION_PROFESSIONS }    from '@/directory/regions'
 import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalReportTemplatesPage'
 import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
 import CoupleEchoPage from '@/pages/professional/CoupleEchoPage'
+import ProfCoupleRoomPage from '@/pages/professional/CoupleRoomPage'
 import CoupleReportDetailPage from '@/pages/professional/CoupleReportDetailPage'
 import InstituteRoute, { useInstitute } from '@/components/auth/InstituteRoute'
 import InstituteRegisterPage from '@/pages/institute/InstituteRegisterPage'
@@ -288,6 +289,7 @@ export function AppRoutes() {
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/reports/:reportId" element={<ProfessionalRoute><ProfessionalReportDetailPage /></ProfessionalRoute>} />
+      <Route path="/professional/paarraum/:coupleId" element={<ProfessionalRoute><ProfCoupleRoomPage /></ProfessionalRoute>} />
       <Route path="/professional/couples/:coupleId/echo" element={<ProfessionalRoute><CoupleEchoPage /></ProfessionalRoute>} />
       <Route path="/professional/couples/:coupleId/reports/:reportId" element={<ProfessionalRoute><CoupleReportDetailPage /></ProfessionalRoute>} />
 

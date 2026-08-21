@@ -315,6 +315,13 @@ async def list_for_professional(conn, professional_user_id) -> list[dict[str, An
         # Ein beendeter Raum bleibt in der Liste, aber ohne Zugang — sonst verschwaende
         # er kommentarlos und die Fachperson wüsste nicht, warum.
         eintrag["readable"] = r["status"] == "active" and r["room_status"] == "active"
+        # Namen und IDs der beiden - damit die Oberflaeche den Raum einem Fall zuordnen
+        # kann. Mehr als Anzeigename geht ohnehin nie ueber die Kopplung hinaus.
+        link = await conn.fetchrow("SELECT * FROM couple_links WHERE id = $1", r["couple_id"])
+        names = await load_member_names(conn, dict(link))
+        eintrag["members"] = [
+            {"user_id": str(uid), "name": name} for uid, name in names.items()
+        ]
         ergebnis.append(eintrag)
     return ergebnis
 
