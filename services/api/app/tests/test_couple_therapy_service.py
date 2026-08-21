@@ -30,6 +30,7 @@ from app.services import couple_moderation_service as cmod
 from app.services import couple_notify_service as cnotify
 from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
+from app.services import couple_professional_service as cprof
 from app.services import couple_progress_service as prog
 from app.services import couple_reminder_service as crem
 from app.services import couple_retrospect_service as cretro
@@ -105,7 +106,7 @@ async def test_link_grants_no_case_access(db):
         assert f"CONCERN_{foreign}" not in payload   # Anliegen der anderen Person
 
 
-@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr, cbar, cretro, cmod, crem])
+@pytest.mark.parametrize("modul", [cts, css, cchk, cnotify, cappr, cbar, cretro, cmod, crem, cprof])
 async def test_service_never_touches_case_content(modul):
     """Struktur-Wächter: Kopplung UND Sitzung ziehen bewusst keine Fall-Inhalte heran.
 
@@ -644,6 +645,8 @@ async def _fill_room(db, user_a, user_b, couple_id):
     await cretro.save(db, couple_id, user_a, body="RUECKBLICK_TEXT",
                       period_start=date.today(), period_end=date.today())
     await crem.set_settings(db, couple_id, user_a, email_enabled=True)
+    await cprof.propose(db, couple_id, user_a, professional_user_id=uuid.uuid4(),
+                        elements=["summaries"])
     await prog.award(db, couple_id, user_a, "session_started", session["id"])
     return session, topic
 
@@ -682,6 +685,8 @@ async def _room_row_counts(db, couple_id, session_id, topic_id) -> dict[str, int
             "SELECT count(*) FROM couple_retrospectives WHERE couple_id=$1", couple_id),
         "reminders": await db.fetchval(
             "SELECT count(*) FROM couple_reminder_settings WHERE couple_id=$1", couple_id),
+        "prof_shares": await db.fetchval(
+            "SELECT count(*) FROM couple_professional_shares WHERE couple_id=$1", couple_id),
     }
 
 
@@ -1921,3 +1926,203 @@ async def test_mail_says_that_something_waits_never_what():
 
     einzeln, _ = crem.build_mail(1, "https://echo-b.de")
     assert "Etwas wartet" in einzeln
+
+
+# ── Freigabe an eine Fachperson ─────────────────────────────────────────────
+
+
+async def _mit_avv(db):
+    """Eine Fachperson mit gueltigem AVV — sonst greift das Art.-28-Gate vor allem anderen."""
+    from app.services.agreement_service import CURRENT_AVV_VERSION
+    pro = uuid.uuid4()
+    await db.execute(
+        "INSERT INTO professional_agreements (professional_user_id, version) VALUES ($1,$2)",
+        pro, CURRENT_AVV_VERSION)
+    return pro
+
+
+async def test_one_partner_alone_cannot_release_the_room(db):
+    """Der Kern: In den Verläufen steckt, was BEIDE beigetragen haben."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=["summaries"])
+    assert share["status"] == "pending"                  # Alex allein reicht nicht
+    assert share["consented_by"] == [str(user_a)]
+
+    with pytest.raises(HTTPException) as e:
+        await cprof.require_released(db, couple_id, pro, "summaries")
+    assert e.value.status_code == 404                    # nichts geht hinaus
+
+    await cprof.consent(db, share["id"], user_b)
+    frei = await cprof.require_released(db, couple_id, pro, "summaries")
+    assert frei["elements"] == ["summaries"]
+
+
+async def test_revoking_needs_only_one(db):
+    """Zustimmung zu einer Offenlegung muss gemeinsam sein — der Rückzug nie."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=["summaries"])
+    await cprof.consent(db, share["id"], user_b)
+    await cprof.require_released(db, couple_id, pro, "summaries")
+
+    beendet = await cprof.revoke(db, share["id"], user_b)   # eine Person genügt
+    assert beendet["status"] == "revoked"
+    with pytest.raises(HTTPException) as e:
+        await cprof.require_released(db, couple_id, pro, "summaries")
+    assert e.value.status_code == 404
+
+
+async def test_private_things_can_never_be_released(db):
+    """Auch nicht von der Person, der sie gehören — sonst wäre die Zustimmung der
+    anderen eine Zustimmung ins Ungewisse."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    for verboten in sorted(cprof.NIEMALS):
+        with pytest.raises(HTTPException) as e:
+            await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=[verboten])
+        assert e.value.status_code == 400, verboten
+
+
+async def test_forbidden_never_reachable():
+    """Struktur-Wächter: Was nie hinausgeht, darf in keinem Freigabe-Pfad auftauchen."""
+    assert not (cprof.NIEMALS & set(cprof.ELEMENTS))
+    assert cprof.DEFAULT_ON <= set(cprof.ELEMENTS)
+    # Der Wortlaut ist bewusst NICHT vorausgewählt.
+    assert "transcripts" not in cprof.DEFAULT_ON
+    assert "appreciation" not in cprof.DEFAULT_ON
+    for e in cprof.ELEMENTS.values():
+        assert e and len(e) > 8                      # jedes Element ist erklärt
+
+
+async def test_unreleased_element_is_invisible(db):
+    """Nicht freigegeben heißt nicht sichtbar — auch wenn die Freigabe aktiv ist."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=["summaries"])
+    await cprof.consent(db, share["id"], user_b)
+
+    with pytest.raises(HTTPException) as e:
+        await cprof.require_released(db, couple_id, pro, "transcripts")
+    assert e.value.status_code == 404
+
+
+async def test_widening_costs_the_consent_again(db):
+    """Wer zugestimmt hat, hat einer Liste zugestimmt — nicht einer Kategorie, die wächst."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=["summaries"])
+    await cprof.consent(db, share["id"], user_b)
+    assert (await cprof.require_released(db, couple_id, pro))["elements"] == ["summaries"]
+
+    erweitert = await cprof.set_elements(db, share["id"], user_a,
+                                         ["summaries", "transcripts"])
+    assert erweitert["status"] == "pending"                  # zurück auf Anfang
+    assert erweitert["consented_by"] == [str(user_a)]
+    with pytest.raises(HTTPException):
+        await cprof.require_released(db, couple_id, pro, "transcripts")
+
+    # Verkleinern dagegen braucht keine Erlaubnis.
+    await cprof.consent(db, share["id"], user_b)
+    verkleinert = await cprof.set_elements(db, share["id"], user_b, ["summaries"])
+    assert verkleinert["status"] == "active"
+
+
+async def test_professional_may_ask_but_not_decide(db):
+    """Die Bitte nimmt dem Paar nichts — beide muessen trotzdem zustimmen."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+
+    gebeten = await cprof.request_by_professional(
+        db, couple_id, pro, elements=["summaries"], message="Für unsere Sitzung nützlich.")
+    assert gebeten["status"] == "pending"
+    assert gebeten["origin"] == "professional"
+    assert gebeten["consented_by"] == []                 # noch niemand
+
+    with pytest.raises(HTTPException):
+        await cprof.require_released(db, couple_id, pro, "summaries")
+
+    await cprof.consent(db, gebeten["id"], user_a)
+    with pytest.raises(HTTPException):                   # eine Zustimmung reicht nicht
+        await cprof.require_released(db, couple_id, pro, "summaries")
+
+    await cprof.consent(db, gebeten["id"], user_b)
+    assert await cprof.require_released(db, couple_id, pro, "summaries")
+
+
+async def test_ending_the_room_ends_the_release(db):
+    """Entscheidung: Mit dem Raum endet die Freigabe."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=["summaries"])
+    await cprof.consent(db, share["id"], user_b)
+    await cprof.require_released(db, couple_id, pro, "summaries")
+
+    await cts.end_link(db, couple_id, user_a)
+    with pytest.raises(HTTPException) as e:
+        await cprof.require_released(db, couple_id, pro, "summaries")
+    assert e.value.status_code == 404
+    assert await cprof.list_for_professional(db, pro) == []
+
+
+async def test_avv_gate_holds_even_with_both_consents(db):
+    """Art. 28: Ohne AVV sieht die Fachperson nichts — auch mit beider Zustimmung."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    ohne_avv = uuid.uuid4()
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=ohne_avv, elements=["summaries"])
+    await cprof.consent(db, share["id"], user_b)
+
+    with pytest.raises(HTTPException) as e:
+        await cprof.require_released(db, couple_id, ohne_avv, "summaries")
+    assert e.value.status_code == 403
+
+
+async def test_outsiders_touch_nothing(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=["summaries"])
+    fremd = uuid.uuid4()
+    for aufruf in (cprof.list_for_couple(db, couple_id, fremd),
+                   cprof.consent(db, share["id"], fremd),
+                   cprof.revoke(db, share["id"], fremd),
+                   cprof.set_elements(db, share["id"], fremd, ["summaries"])):
+        with pytest.raises(HTTPException) as e:
+            await aufruf
+        assert e.value.status_code == 404
+
+
+async def test_only_one_open_release_per_professional(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    await cprof.propose(db, couple_id, user_a,
+                        professional_user_id=pro, elements=["summaries"])
+    with pytest.raises(HTTPException) as e:
+        await cprof.propose(db, couple_id, user_a,
+                            professional_user_id=pro, elements=["agreements"])
+    assert e.value.status_code == 400
+
+
+async def test_a_stranger_consent_does_not_activate(db):
+    """Zwei beliebige Zustimmungszeilen reichen nicht — es muessen DIE Mitglieder sein."""
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=["summaries"])
+    # Direkt in die Tabelle geschrieben, am Service vorbei.
+    await db.execute(
+        "INSERT INTO couple_share_consents (share_id, user_id) VALUES ($1, $2)",
+        share["id"], uuid.uuid4())
+    await cprof.consent(db, share["id"], user_a)          # erneut, loest die Pruefung aus
+
+    row = await db.fetchrow(
+        "SELECT status FROM couple_professional_shares WHERE id = $1", share["id"])
+    assert row["status"] == "pending"

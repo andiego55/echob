@@ -211,4 +211,14 @@ async def end_link(conn, couple_id, user_id) -> bool:
         "AND (initiator_user_id = $2 OR partner_user_id = $2)",
         couple_id, user_id,
     )
+    if result != "UPDATE 0":
+        # Mit dem Raum endet die Freigabe an Fachpersonen. Der Lesepfad prueft den
+        # Raum-Status ohnehin mit (require_released) - das hier ist der zweite Riegel und
+        # sorgt dafuer, dass die Listen die Wahrheit zeigen statt einer toten Freigabe.
+        await conn.execute(
+            "UPDATE couple_professional_shares SET status = 'revoked', "
+            "revoked_by = $2, revoked_at = NOW(), updated_at = NOW() "
+            "WHERE couple_id = $1 AND status IN ('pending', 'active')",
+            couple_id, user_id,
+        )
     return result != "UPDATE 0"

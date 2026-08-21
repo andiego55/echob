@@ -185,6 +185,18 @@ async def export_for_user(conn: asyncpg.Connection, user_id) -> dict[str, Any]:
             "SELECT * FROM couple_test_comparisons WHERE couple_id = ANY($1::uuid[])", ids)
     ]
     # Gehoert beiden: entsteht nur aus Daten, die ohnehin beide sehen.
+    # Freigaben an Fachpersonen samt eigener Zustimmung - die Zustimmung ist eine
+    # Willenserklaerung dieser Person und gehoert in die Auskunft.
+    data["couple_professional_shares"] = [
+        crypto.decrypt_fields(sh, "message")
+        for sh in await rows(
+            "SELECT * FROM couple_professional_shares WHERE couple_id = ANY($1::uuid[])",
+            ids)
+    ]
+    data["couple_share_consents"] = await rows(
+        "SELECT c.* FROM couple_share_consents c "
+        "JOIN couple_professional_shares s ON s.id = c.share_id "
+        "WHERE c.user_id = $1 AND s.couple_id = ANY($2::uuid[])", user_id, ids)
     data["couple_reminder_settings"] = await rows(
         "SELECT * FROM couple_reminder_settings WHERE user_id = $1 "
         "AND couple_id = ANY($2::uuid[])", user_id, ids)
