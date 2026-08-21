@@ -13,8 +13,10 @@ import { apiErrorMessage } from '@/api/errors'
 import { SCALE_LABELS } from '@/types'
 import type { CaseTrends, DistressPoint, TrendMonth } from '@/types'
 import { CardSkeleton } from '@/components/Skeleton'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function ReviewPage() {
+  const bestaetigen = useBestaetigen()
   const { caseId } = useParams<{ caseId: string }>()
   const qc = useQueryClient()
 
@@ -143,7 +145,7 @@ export default function ReviewPage() {
                       {' · '}{r.scene_count} Szenen
                     </span>
                     <button
-                      onClick={() => { if (window.confirm('Diesen Rückblick löschen?')) remove.mutate(r.id) }}
+                      onClick={async () => { if (await bestaetigen({ titel: 'Rückblick löschen?', text: 'Der Text verschwindet. Die Zahlen dahinter bleiben – du kannst jederzeit einen neuen schreiben lassen.', knopf: 'Löschen', gefahr: true })) remove.mutate(r.id) }}
                       className="text-xs text-brand-muted hover:text-red-600 transition-colors"
                     >
                       Löschen

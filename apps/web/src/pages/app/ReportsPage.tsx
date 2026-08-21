@@ -9,6 +9,7 @@ import { reportsApi } from '@/api/reports'
 import type { Report, ReportType } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { ListSkeleton } from '@/components/Skeleton'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 const MAX_REPORTS = 20
 
@@ -22,6 +23,7 @@ const TYPE_META: Record<ReportType, { color: string; bg: string; border: string 
 }
 
 export default function ReportsPage() {
+  const bestaetigen = useBestaetigen()
   const { caseId } = useParams<{ caseId: string }>()
   const qc = useQueryClient()
 
@@ -36,8 +38,8 @@ export default function ReportsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['reports', caseId] }),
   })
 
-  const handleDelete = (reportId: string, label: string) => {
-    if (window.confirm(`Bericht „${label}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+  const handleDelete = async (reportId: string, label: string) => {
+    if (await bestaetigen({ titel: `Bericht „${label}" löschen?`, text: 'Der Text verschwindet. Die Szenen und Ergebnisse, aus denen er entstanden ist, bleiben.', knopf: 'Löschen', gefahr: true })) {
       deleteMutation.mutate(reportId)
     }
   }

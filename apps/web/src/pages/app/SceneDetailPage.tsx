@@ -9,6 +9,7 @@ import CaseNav from '@/components/app/CaseNav'
 import { scenesApi } from '@/api/scenes'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 const SAFETY_BADGE: Record<string, { label: string; cls: string }> = {
   none:     { label: 'Kein Sicherheitsrisiko',    cls: 'bg-green-100 text-green-800' },
@@ -24,6 +25,7 @@ const PATTERN_TAG_OPTIONS = [
 ]
 
 export default function SceneDetailPage() {
+  const bestaetigen = useBestaetigen()
   const { caseId, sceneId } = useParams<{ caseId: string; sceneId: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
@@ -281,8 +283,8 @@ export default function SceneDetailPage() {
             Mit Echo besprechen
           </button>
           <button
-            onClick={() => {
-              if (window.confirm(`Szene „${scene.title}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+            onClick={async () => {
+              if (await bestaetigen({ titel: `Szene „${scene.title}" löschen?`, text: 'Die Szene und alles, was du dazu notiert hast, verschwinden. Das lässt sich nicht rückgängig machen.', knopf: 'Löschen', gefahr: true })) {
                 deleteMutation.mutate()
               }
             }}

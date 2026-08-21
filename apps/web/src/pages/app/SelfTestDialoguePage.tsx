@@ -30,6 +30,7 @@ import {
 import { loadTestAnswers, loadTestResult, saveTestResult, saveTestAnswers } from '@/selftests/resultStore'
 import type { SelfTest, TestQuestion, TestAnswers } from '@/selftests/types'
 import type { EchoMessage, ThreadType } from '@/types'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function SelfTestDialoguePage() {
   const { caseId, slug } = useParams<{ caseId: string; slug: string }>()
@@ -73,6 +74,7 @@ function Dialogue({
 }: {
   caseId: string; test: SelfTest; initialAnswers: TestAnswers; initialResult: TestResult
 }) {
+  const bestaetigen = useBestaetigen()
   const navigate = useNavigate()
   const qc = useQueryClient()
   const { session } = useAuth()
@@ -186,9 +188,9 @@ function Dialogue({
     if (changes.length) send(buildRevisionMessage(changes, newResult))
   }
 
-  const restart = () => {
+  const restart = async () => {
     if (chatMutation.isPending || resetMutation.isPending) return
-    if (window.confirm('Gespräch neu starten? Der bisherige Verlauf wird gelöscht und Echo beginnt frisch mit deinem aktuellen Ergebnis.')) {
+    if (await bestaetigen({ titel: 'Gespräch neu starten?', text: 'Der bisherige Verlauf wird gelöscht. Echo beginnt frisch mit deinem aktuellen Testergebnis.', knopf: 'Neu starten', gefahr: true })) {
       resetMutation.mutate()
     }
   }

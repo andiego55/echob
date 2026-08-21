@@ -19,8 +19,10 @@ import type { TestAnswers } from '@/selftests/types'
 import { coupleTestsApi } from '@/api/coupleTests'
 import type { CoupleTestState } from '@/api/coupleTests'
 import Weiterfuehren from '@/components/couple/Weiterfuehren'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function CoupleTestPage() {
+  const bestaetigen = useBestaetigen()
   const { coupleId = '', slug = '' } = useParams<{ coupleId: string; slug: string }>()
   const qc = useQueryClient()
   const test = getSelfTest(slug)
@@ -202,7 +204,7 @@ export default function CoupleTestPage() {
                         {/* „Neu ansehen" legt jedes Mal einen weiteren an. Ohne Loeschen
                             waechst die Seite mit jedem Klick. */}
                         <button
-                          onClick={() => { if (confirm('Diesen Vergleich löschen?')) vergleichLoeschen.mutate(c.id) }}
+                          onClick={async () => { if (await bestaetigen({ titel: 'Vergleich löschen?', text: 'Eure beiden Testergebnisse bleiben – nur Echos Text dazu verschwindet.', knopf: 'Löschen', gefahr: true })) vergleichLoeschen.mutate(c.id) }}
                           disabled={vergleichLoeschen.isPending}
                           className="shrink-0 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
                         >

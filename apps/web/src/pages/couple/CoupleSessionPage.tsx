@@ -27,8 +27,10 @@ import Weiterfuehren from '@/components/couple/Weiterfuehren'
 import { abmachungsvorschlaege } from '@/components/couple/abmachungsvorschlaege'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function CoupleSessionPage() {
+  const bestaetigen = useBestaetigen()
   const { sessionId = '' } = useParams<{ sessionId: string }>()
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -152,8 +154,8 @@ export default function CoupleSessionPage() {
             </div>
             {loeschbar ? (
               <button
-                onClick={() => {
-                  if (confirm('Diese Sitzung löschen? Es steht noch nichts Gemeinsames darin – Vorbereitung und Notizen gehen mit.')) entfernen.mutate()
+                onClick={async () => {
+                  if (await bestaetigen({ titel: 'Sitzung löschen?', text: 'Es steht noch nichts Gemeinsames darin. Deine Vorbereitung und deine privaten Notizen dazu gehen mit.', knopf: 'Löschen', gefahr: true })) entfernen.mutate()
                 }}
                 disabled={entfernen.isPending}
                 className="btn-quiet !py-2 !px-4 !text-sm sm:shrink-0 disabled:opacity-50"
@@ -163,7 +165,7 @@ export default function CoupleSessionPage() {
               </button>
             ) : !closed && (
               <button
-                onClick={() => { if (confirm('Sitzung abschließen? Danach kann niemand mehr schreiben.')) close.mutate() }}
+                onClick={async () => { if (await bestaetigen({ titel: 'Gespräch abschließen?', text: 'Danach kann niemand mehr schreiben. Ihr könnt es weiter nachlesen und zusammenfassen lassen.', knopf: 'Abschließen' })) close.mutate() }}
                 className="btn-quiet !py-2 !px-4 !text-sm sm:shrink-0"
               >
                 Sitzung abschließen
@@ -304,8 +306,8 @@ export default function CoupleSessionPage() {
                   )}
                   <button
                     type="button"
-                    onClick={() => {
-                      if (confirm('Kurze Pause einlegen? Beide sehen den Hinweis, und Echo greift auf.')) {
+                    onClick={async () => {
+                      if (await bestaetigen({ titel: 'Kurze Pause einlegen?', text: 'Beide sehen den Hinweis, und Echo greift ihn auf. Das ist kein Abbruch – ihr macht danach weiter.', knopf: 'Pause einlegen' })) {
                         send.mutate('Ich brauche eine kurze Pause.')
                       }
                     }}
@@ -407,6 +409,7 @@ export default function CoupleSessionPage() {
 function SummaryCard({ sessionId, coupleId, hasMessages }: {
   sessionId: string; coupleId: string; hasMessages: boolean
 }) {
+  const bestaetigen = useBestaetigen()
   const qc = useQueryClient()
   const { data: summaries = [] } = useQuery({
     queryKey: ['couple-summaries', sessionId],
@@ -451,7 +454,7 @@ function SummaryCard({ sessionId, coupleId, hasMessages }: {
                       stapeln sich fast gleiche Texte, und der aelteste sieht so wichtig aus
                       wie der neueste. */}
                   <button
-                    onClick={() => { if (confirm('Diese Zusammenfassung löschen?')) entfernen.mutate(s.id) }}
+                    onClick={async () => { if (await bestaetigen({ titel: 'Zusammenfassung löschen?', text: 'Ihr könnt das Gespräch jederzeit neu zusammenfassen lassen.', knopf: 'Löschen', gefahr: true })) entfernen.mutate(s.id) }}
                     disabled={entfernen.isPending}
                     className="shrink-0 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
                   >

@@ -16,8 +16,10 @@ import { echoApi } from '@/api/echo'
 import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
 import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function HypothesisDialogPage() {
+  const bestaetigen = useBestaetigen()
   const { caseId, hypothesisId } = useParams<{ caseId: string; hypothesisId: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
@@ -83,8 +85,8 @@ export default function HypothesisDialogPage() {
     },
   })
 
-  const handleReset = () => {
-    if (window.confirm('Dialog wirklich zurücksetzen? Alle Nachrichten werden gelöscht.')) resetMutation.mutate()
+  const handleReset = async () => {
+    if (await bestaetigen({ titel: 'Dialog zurücksetzen?', text: 'Alle Nachrichten dieses Dialogs werden gelöscht, und Echo beginnt von vorn.', knopf: 'Zurücksetzen', gefahr: true })) resetMutation.mutate()
   }
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()

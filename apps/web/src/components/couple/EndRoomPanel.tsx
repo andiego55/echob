@@ -11,8 +11,10 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { coupleApi } from '@/api/couple'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function EndRoomPanel({ coupleId, since }: { coupleId: string; since: string }) {
+  const bestaetigen = useBestaetigen()
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [open, setOpen] = useState(false)
@@ -54,8 +56,8 @@ export default function EndRoomPanel({ coupleId, since }: { coupleId: string; si
           gelesen.
         </p>
         <button
-          onClick={() => {
-            if (confirm('Deine privaten Inhalte in diesem Paarraum endgültig löschen?')) {
+          onClick={async () => {
+            if (await bestaetigen({ titel: 'Deine privaten Inhalte löschen?', text: 'Betrifft nur, was allein dir gehört: dein privater Begleiter, vertrauliche Perspektiven, Entwürfe. Gemeinsames bleibt. Das lässt sich nicht rückgängig machen.', knopf: 'Endgültig löschen', gefahr: true })) {
               clearPrivate.mutate()
             }
           }}

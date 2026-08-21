@@ -12,6 +12,7 @@ import '@fontsource/inter/500.css'
 import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'
 import './index.css'
+import { BestaetigungProvider } from '@/components/Bestaetigung'
 
 // ── Error-Monitoring (nur wenn DSN gesetzt) ───────────────────────────────────
 // Bewusst PII-frei: keine Request-Bodies, keine personenbezogenen Defaults.
@@ -76,7 +77,11 @@ createRoot(rootElement).render(
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <LockProvider>
-              <App />
+              {/* Einmal fuer die ganze App: Der Bestaetigungsdialog haengt hier, damit
+                  jede Aufrufstelle nur `await bestaetigen({…})` braucht. */}
+              <BestaetigungProvider>
+                <App />
+              </BestaetigungProvider>
             </LockProvider>
           </AuthProvider>
         </QueryClientProvider>

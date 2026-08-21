@@ -13,6 +13,7 @@ import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Chip from '@/components/Chip'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
@@ -95,6 +96,7 @@ function dedupeElementLabels(s: CaseShare): string[] {
 }
 
 function RevokeButton({ caseId, share }: { caseId: string; share: CaseShare }) {
+  const bestaetigen = useBestaetigen()
   const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: () => sharesApi.revoke(caseId, share.id),
@@ -103,7 +105,7 @@ function RevokeButton({ caseId, share }: { caseId: string; share: CaseShare }) {
   return (
     <div className="shrink-0 text-right">
       <button
-        onClick={() => { if (confirm('Freigabe wirklich widerrufen? Die Fachperson hat danach keinen Zugriff mehr.')) mutation.mutate() }}
+        onClick={async () => { if (await bestaetigen({ titel: 'Freigabe widerrufen?', text: 'Die Fachperson verliert sofort den Zugriff auf diesen Fall. Du kannst sie später neu freigeben.', knopf: 'Widerrufen', gefahr: true })) mutation.mutate() }}
         disabled={mutation.isPending}
         className="text-xs text-red-600 hover:underline disabled:opacity-50"
       >

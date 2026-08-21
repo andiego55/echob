@@ -11,6 +11,7 @@ import type { Question } from '@/lib/questionnaire'
 import { collabApi, type Assignment, type Appointment } from '@/api/collab'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { ListSkeleton } from '@/components/Skeleton'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 const TYPE_META: Record<string, { icon: string; label: string }> = {
   dialog: { icon: '💬', label: 'Dialog-Vorschlag' },
@@ -121,6 +122,7 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
 }
 
 function AssignmentCard({ item }: { item: Assignment }) {
+  const bestaetigen = useBestaetigen()
   const qc = useQueryClient()
   const meta = TYPE_META[item.type] ?? { icon: '•', label: item.type }
   const p = item.payload as Record<string, string>
@@ -164,7 +166,7 @@ function AssignmentCard({ item }: { item: Assignment }) {
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-[11px] uppercase tracking-wide text-brand-muted">{meta.label}</span>
           <button
-            onClick={() => { if (window.confirm('Diese Nachricht wirklich löschen?')) dismiss.mutate() }}
+            onClick={async () => { if (await bestaetigen({ titel: 'Nachricht löschen?', text: 'Sie verschwindet aus deinem Postfach. Die Fachperson sieht davon nichts.', knopf: 'Löschen', gefahr: true })) dismiss.mutate() }}
             disabled={dismiss.isPending}
             title="Löschen"
             className="text-brand-muted hover:text-red-600 text-sm leading-none p-1 -m-1 disabled:opacity-50"

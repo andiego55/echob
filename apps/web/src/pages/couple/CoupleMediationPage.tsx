@@ -18,8 +18,10 @@ import MediationFollowUp from '@/components/couple/MediationFollowUp'
 import BridgeBoard from '@/components/couple/BridgeBoard'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function CoupleMediationPage() {
+  const bestaetigen = useBestaetigen()
   const { topicId = '' } = useParams<{ topicId: string }>()
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -110,8 +112,8 @@ export default function CoupleMediationPage() {
               oder Echo vermittelt hat, fuehrt der Weg ueber „abschliessen". */}
           {loeschbar && (
             <button
-              onClick={() => {
-                if (confirm('Dieses Thema löschen? Es hat noch niemand außer dir daran gearbeitet.')) entfernen.mutate()
+              onClick={async () => {
+                if (await bestaetigen({ titel: 'Thema löschen?', text: 'Es hat noch niemand außer dir daran gearbeitet – deine eigene Sicht geht mit.', knopf: 'Löschen', gefahr: true })) entfernen.mutate()
               }}
               disabled={entfernen.isPending}
               className="mt-3 text-xs text-brand-muted hover:text-navy disabled:opacity-50"

@@ -16,6 +16,7 @@ import type { CoupleLink } from '@/api/couple'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import { ArtEinladung } from '@/components/couple/CoupleEmptyArt'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function CoupleOverviewPage() {
   const { data: links = [], isLoading, isError, error } = useQuery({
@@ -120,6 +121,7 @@ function RoomCard({ room }: { room: CoupleLink }) {
 }
 
 function PendingInviteCard({ link }: { link: CoupleLink }) {
+  const bestaetigen = useBestaetigen()
   const qc = useQueryClient()
   const [copied, setCopied] = useState<'code' | 'link' | null>(null)
   const withdraw = useMutation({
@@ -161,7 +163,7 @@ function PendingInviteCard({ link }: { link: CoupleLink }) {
           {copied === 'link' ? 'Kopiert ✓' : 'Einladungslink kopieren'}
         </button>
         <button
-          onClick={() => { if (confirm('Einladung wirklich zurückziehen?')) withdraw.mutate() }}
+          onClick={async () => { if (await bestaetigen({ titel: 'Einladung zurückziehen?', text: 'Der Code wird ungültig. Du kannst jederzeit eine neue Einladung erstellen.', knopf: 'Zurückziehen' })) withdraw.mutate() }}
           disabled={withdraw.isPending}
           className="ml-auto text-xs text-red-600 hover:underline disabled:opacity-50"
         >

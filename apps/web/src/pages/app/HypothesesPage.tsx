@@ -10,8 +10,10 @@ import HypothesisIcon from '@/components/HypothesisIcon'
 import HypothesisSummary from '@/components/HypothesisSummary'
 import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 export default function HypothesesPage() {
+  const bestaetigen = useBestaetigen()
   const { caseId } = useParams<{ caseId: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
@@ -66,7 +68,7 @@ export default function HypothesesPage() {
                 {s && (
                   <HypothesisSummary
                     summaryText={s.summary_text}
-                    onDelete={() => { if (window.confirm('Diese Hypothese löschen?')) remove.mutate(h.id) }}
+                    onDelete={async () => { if (await bestaetigen({ titel: 'Hypothese löschen?', text: 'Die Arbeitshypothese verschwindet. Den Dialog dazu kannst du neu führen.', knopf: 'Löschen', gefahr: true })) remove.mutate(h.id) }}
                     deleting={remove.isPending}
                   />
                 )}

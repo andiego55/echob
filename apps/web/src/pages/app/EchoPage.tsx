@@ -15,6 +15,7 @@ import { echoApi } from '@/api/echo'
 import { apiErrorMessage } from '@/api/errors'
 import type { EchoChatSession, ThreadType } from '@/types'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -334,6 +335,7 @@ function ChatSidebar({
   onSelect: (id: string) => void
   onNewChat: () => void
 }) {
+  const bestaetigen = useBestaetigen()
   const qc = useQueryClient()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
@@ -442,9 +444,9 @@ function ChatSidebar({
                     ✎
                   </button>
                   <button
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.stopPropagation()
-                      if (window.confirm('Diesen Chat endgültig löschen?')) {
+                      if (await bestaetigen({ titel: 'Chat löschen?', text: 'Der ganze Verlauf dieses Gesprächs mit Echo ist danach weg – das lässt sich nicht rückgängig machen.', knopf: 'Löschen', gefahr: true })) {
                         deleteMutation.mutate(s.id)
                       }
                     }}

@@ -9,6 +9,7 @@ import CaseNav from '@/components/app/CaseNav'
 import { reportsApi } from '@/api/reports'
 import type { ReportType } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 // ── Typ-Konfiguration ─────────────────────────────────────────────────────────
 
@@ -98,6 +99,7 @@ function buildRenderList(
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function ReportDetailPage() {
+  const bestaetigen = useBestaetigen()
   const { caseId, reportId } = useParams<{ caseId: string; reportId: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
@@ -128,9 +130,9 @@ export default function ReportDetailPage() {
     },
   })
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const label = report?.title ?? report?.type_label ?? 'diesen Bericht'
-    if (window.confirm(`Bericht „${label}" wirklich löschen?`)) deleteMutation.mutate()
+    if (await bestaetigen({ titel: `Bericht „${label}" löschen?`, text: 'Der Text verschwindet. Die Szenen und Ergebnisse, aus denen er entstanden ist, bleiben.', knopf: 'Löschen', gefahr: true })) deleteMutation.mutate()
   }
 
   if (isLoading) {

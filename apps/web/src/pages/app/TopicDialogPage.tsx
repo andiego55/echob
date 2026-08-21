@@ -18,6 +18,7 @@ import { getSelfTest, resultToSeed } from '@/selftests'
 import { loadTestResult } from '@/selftests/resultStore'
 import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 interface TopicDef {
   label: string
@@ -103,6 +104,7 @@ function resolveTopic(topicId: string): TopicDef | undefined {
 }
 
 export default function TopicDialogPage() {
+  const bestaetigen = useBestaetigen()
   const { caseId, topicId } = useParams<{ caseId: string; topicId: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
@@ -184,8 +186,8 @@ export default function TopicDialogPage() {
     },
   })
 
-  const handleReset = () => {
-    if (window.confirm('Dialog wirklich zurücksetzen? Alle Nachrichten werden gelöscht.')) {
+  const handleReset = async () => {
+    if (await bestaetigen({ titel: 'Dialog zurücksetzen?', text: 'Alle Nachrichten dieses Dialogs werden gelöscht, und Echo beginnt von vorn.', knopf: 'Zurücksetzen', gefahr: true })) {
       resetMutation.mutate()
     }
   }

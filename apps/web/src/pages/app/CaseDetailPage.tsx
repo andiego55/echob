@@ -24,6 +24,7 @@ import {
 } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { ListSkeleton, PageSkeleton } from '@/components/Skeleton'
+import { useBestaetigen } from '@/components/Bestaetigung'
 
 const TOPIC_ORDER = ['topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt'] as const
 
@@ -347,6 +348,7 @@ const TOPIC_LABELS: Record<string, string> = {
 }
 
 function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: TopicSummary[] }) {
+  const bestaetigen = useBestaetigen()
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [editingTopic, setEditingTopic] = useState<string | null>(null)
@@ -374,11 +376,14 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
     onSuccess: () => qc.invalidateQueries({ queryKey: ['topic-summaries', caseId] }),
   })
 
-  const confirmRemove = (topic: string, label: string) => {
-    if (window.confirm(
-      `Dialog „${label}" wirklich löschen?\n\nDie gespeicherte Zusammenfassung und der Gesprächsverlauf werden entfernt ` +
-      `und fließen nicht mehr in Echos Fallkontext ein. Das lässt sich nicht rückgängig machen.`,
-    )) removeMutation.mutate(topic)
+  const confirmRemove = async (topic: string, label: string) => {
+    if (await bestaetigen({
+      titel: `Dialog „${label}" löschen?`,
+      text: 'Die gespeicherte Zusammenfassung und der Gesprächsverlauf werden entfernt und '
+        + 'fließen nicht mehr in Echos Fallkontext ein. Das lässt sich nicht rückgängig machen.',
+      knopf: 'Löschen',
+      gefahr: true,
+    })) removeMutation.mutate(topic)
   }
 
   const summaryMap = Object.fromEntries(summaries.map(s => [s.topic, s]))
@@ -541,6 +546,7 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
 }
 
 function TestResultsCard({ caseId }: { caseId: string }) {
+  const bestaetigen = useBestaetigen()
   const qc = useQueryClient()
   const { data: results = [], isLoading } = useQuery({ queryKey: ['test-results'], queryFn: () => testResultsApi.list() })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -593,7 +599,7 @@ function TestResultsCard({ caseId }: { caseId: string }) {
                     {r.category && <span className="text-[10px] text-brand-muted/70 shrink-0">· {TEST_CATEGORY_LABELS[r.category as TestCategory] ?? r.category}</span>}
                   </button>
                   <button
-                    onClick={() => { if (window.confirm('Testergebnis wirklich löschen?')) remove.mutate(r.slug) }}
+                    onClick={async () => { if (await bestaetigen({ titel: 'Testergebnis löschen?', text: 'Das gespeicherte Ergebnis verschwindet aus diesem Fall. Den Test selbst kannst du jederzeit neu ausfüllen.', knopf: 'Löschen', gefahr: true })) remove.mutate(r.slug) }}
                     disabled={remove.isPending}
                     className="text-xs text-brand-muted hover:text-red-600 transition-colors flex-shrink-0 disabled:opacity-40"
                   >
