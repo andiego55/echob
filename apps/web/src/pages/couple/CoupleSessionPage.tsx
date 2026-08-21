@@ -23,6 +23,8 @@ import EchoThinking from '@/components/couple/EchoThinking'
 import { SessionSkeleton } from '@/components/couple/Skeleton'
 import { MOOD_EMOJI } from '@/components/couple/moods'
 import AgreementsCard from '@/components/couple/AgreementsCard'
+import Weiterfuehren from '@/components/couple/Weiterfuehren'
+import { abmachungsvorschlaege } from '@/components/couple/abmachungsvorschlaege'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
 
 export default function CoupleSessionPage() {
@@ -227,9 +229,15 @@ export default function CoupleSessionPage() {
             </div>
 
             {closed ? (
-              <p className="mt-4 border-t border-brand-border pt-4 text-sm text-brand-muted">
-                Diese Sitzung ist abgeschlossen.
-              </p>
+              /* Vorher stand hier nur "Diese Sitzung ist abgeschlossen." - eine Tuer, die
+                 zufaellt. Ein Gespraech ist aber genau dann etwas wert, wenn danach etwas
+                 damit passiert. */
+              <div className="mt-4 border-t border-brand-border pt-4">
+                <p className="text-sm text-brand-muted">
+                  Dieses Gespräch ist abgeschlossen – es bleibt hier zum Nachlesen stehen.
+                  Rechts kannst du es zusammenfassen lassen; daraus werden dann Abmachungen.
+                </p>
+              </div>
             ) : (
               <form
                 onSubmit={e => { e.preventDefault(); if (text.trim()) send.mutate(text.trim()) }}
@@ -310,7 +318,7 @@ export default function CoupleSessionPage() {
 
             {panel === 'private' && <PrivateEchoPanel sessionId={sessionId} />}
 
-            {panel === 'prep' && <SummaryCard sessionId={sessionId} hasMessages={messages.length > 0} />}
+            {panel === 'prep' && <SummaryCard sessionId={sessionId} coupleId={session.couple_id} hasMessages={messages.length > 0} />}
 
             {panel === 'prep' && <>
             <div className="flex gap-1 rounded-brand border border-brand-border p-1">
@@ -370,7 +378,9 @@ export default function CoupleSessionPage() {
 
 // ── Zusammenfassung ───────────────────────────────────────────────────────────
 
-function SummaryCard({ sessionId, hasMessages }: { sessionId: string; hasMessages: boolean }) {
+function SummaryCard({ sessionId, coupleId, hasMessages }: {
+  sessionId: string; coupleId: string; hasMessages: boolean
+}) {
   const qc = useQueryClient()
   const { data: summaries = [] } = useQuery({
     queryKey: ['couple-summaries', sessionId],
@@ -399,15 +409,33 @@ function SummaryCard({ sessionId, hasMessages }: { sessionId: string; hasMessage
       </button>
 
       {summaries.length > 0 && (
-        <div className="mt-4 space-y-3">
-          {summaries.map(s => (
-            <div key={s.id} className="rounded-brand border border-brand-border px-3.5 py-3">
-              <p className="text-[0.65rem] text-brand-muted">
-                {new Date(s.created_at).toLocaleString('de-DE')}
-              </p>
-              <div className="mt-1.5 text-xs text-brand-text">
-                <MarkdownMessage content={s.summary_text} />
+        <div className="mt-4 space-y-4">
+          {summaries.map((s, i) => (
+            <div key={s.id}>
+              <div className="rounded-brand border border-brand-border px-3.5 py-3">
+                <p className="text-[0.65rem] text-brand-muted">
+                  {new Date(s.created_at).toLocaleString('de-DE')}
+                </p>
+                <div className="mt-1.5 text-xs text-brand-text">
+                  <MarkdownMessage content={s.summary_text} />
+                </div>
               </div>
+
+              {/* Echo schlaegt im letzten Abschnitt konkrete Abmachungen vor. Bisher stand
+                  das nur da - wer eine wollte, musste sie abtippen. Nur bei der neuesten
+                  Zusammenfassung, sonst stapeln sich alte Vorschlaege uebereinander. */}
+              {i === 0 && (
+                <div className="mt-3">
+                  <Weiterfuehren
+                    coupleId={coupleId}
+                    sessionId={sessionId}
+                    vorschlaege={abmachungsvorschlaege(s.summary_text)}
+                    saat={s.summary_text}
+                    titel="Was nehmt ihr mit?"
+                    hinweis="Ein Klick, und aus dem Vorschlag wird eine Abmachung mit Nachfrage."
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>

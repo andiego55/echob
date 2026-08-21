@@ -20,6 +20,7 @@ import EchoThinking from './EchoThinking'
 import { RetrospectSkeleton } from './Skeleton'
 import { MOOD_EMOJI } from './moods'
 import { barometerColor } from './EchoBarometer'
+import Weiterfuehren from './Weiterfuehren'
 
 const ZEITRAEUME = [
   { days: 30, label: '30 Tage' },
@@ -138,6 +139,19 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
             {data.retrospectives.map((r, i) => (
               <Rueckblick key={r.id} eintrag={r} coupleId={coupleId} offen={i === 0} />
             ))}
+          </div>
+        )}
+
+        {/* Ein Rueckblick, der nur gelesen und dann geloescht wird, hat nichts bewegt.
+            Der Blick zurueck ist die beste Gelegenheit, etwas fuer vorn zu vereinbaren. */}
+        {data.retrospectives.length > 0 && (
+          <div className="mt-4">
+            <Weiterfuehren
+              coupleId={coupleId}
+              saat={data.retrospectives[0].body}
+              titel="Was nehmt ihr in die nächsten Wochen mit?"
+              hinweis="Der Blick zurück ist der beste Moment, um etwas für vorn festzulegen."
+            />
           </div>
         )}
       </div>

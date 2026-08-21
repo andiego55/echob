@@ -18,6 +18,7 @@ import type { DimensionResult, TestResult } from '@/selftests/scoring'
 import type { TestAnswers } from '@/selftests/types'
 import { coupleTestsApi } from '@/api/coupleTests'
 import type { CoupleTestState } from '@/api/coupleTests'
+import Weiterfuehren from '@/components/couple/Weiterfuehren'
 
 export default function CoupleTestPage() {
   const { coupleId = '', slug = '' } = useParams<{ coupleId: string; slug: string }>()
@@ -198,6 +199,18 @@ export default function CoupleTestPage() {
                 </div>
               )}
             </div>
+
+            {/* Der Vergleich endete bisher mit "worueber sich zu reden lohnt" - und bot
+                keine Moeglichkeit, genau das zu tun. Jetzt schon. */}
+            {data.comparisons.length > 0 && (
+              <Weiterfuehren
+                coupleId={coupleId}
+                saat={data.comparisons[0].body}
+                titel="Worüber lohnt es sich zu reden?"
+                hinweis="Ein Testergebnis ist erst dann etwas wert, wenn ihr darüber sprecht."
+                zuege={['gespraech', 'thema', 'abmachung']}
+              />
+            )}
           </div>
         ) : null}
       </div>

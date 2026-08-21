@@ -96,6 +96,7 @@ export default function CoupleEchoPage() {
           dir. Am Ende lässt du das Gespräch zusammenfassen; die Zusammenfassung findest du
           danach auf eurer Übersicht wieder."
         platzhalter="Schreib, was dich beschäftigt …"
+        abschlussZuege={['abmachung', 'gespraech', 'thema']}
       />
       <CoupleSafetyNote />
     </CoupleShell>

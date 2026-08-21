@@ -14,6 +14,7 @@ import { coupleRhythmApi } from '@/api/coupleRhythm'
 import type { CoupleCheckinEntry, CoupleCheckinWeek } from '@/api/coupleRhythm'
 import { apiErrorMessage } from '@/api/errors'
 import { MOOD_EMOJI } from './moods'
+import Weiterfuehren from './Weiterfuehren'
 
 function wochenLabel(iso: string): string {
   const start = new Date(iso)
@@ -154,10 +155,19 @@ export default function WeeklyCheckinCard({
         </div>
       )}
 
+      {/* Der Satz "aus einem Wunsch wird schnell eine Abmachung" stand hier lange als
+          blosse Behauptung. Jetzt steht der Weg dazu daneben - mit dem eigenen Wunsch
+          bereits im Feld, damit aus zwei Zeilen kein neues Formular wird. */}
       {data.own_done && !offen && data.both_done && (
-        <p className="mt-3 rounded-brand bg-brand-bg px-3.5 py-2.5 text-xs leading-relaxed text-brand-muted">
-          Aus einem Wunsch wird schnell eine Abmachung – und die lässt sich nachhalten.
-        </p>
+        <div className="mt-4">
+          <Weiterfuehren
+            coupleId={coupleId}
+            abmachungSaat={eigen?.wish ?? ''}
+            saat={[eigen?.wish, fremd?.wish].filter(Boolean).join(' ')}
+            titel="Aus einem Wunsch wird eine Abmachung"
+            hinweis="Ein Wunsch, den niemand aufschreibt, ist nächste Woche wieder derselbe."
+          />
+        </div>
       )}
 
       {/* ── Zeitstrahl: dass ihr drangeblieben seid ───────────────── */}

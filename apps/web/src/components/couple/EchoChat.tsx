@@ -23,6 +23,9 @@ import { coupleCompanionApi } from '@/api/coupleCompanion'
 import type { CoupleEchoConversation, CoupleThreadKind } from '@/api/coupleCompanion'
 import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from './EchoThinking'
+import Weiterfuehren from './Weiterfuehren'
+import type { Zug } from './Weiterfuehren'
+import { abmachungsvorschlaege } from './abmachungsvorschlaege'
 
 export interface Impulsgruppe {
   gruppe: string
@@ -31,6 +34,7 @@ export interface Impulsgruppe {
 
 export default function EchoChat({
   coupleId, kind, impulse, themen, leerTitel, leerText, platzhalter,
+  abschlussZuege,
 }: {
   coupleId: string
   kind: CoupleThreadKind
@@ -39,6 +43,11 @@ export default function EchoChat({
   leerTitel: string
   leerText: string
   platzhalter: string
+  /**
+   * Welche Zuege nach dem Abschliessen angeboten werden. Ohne sie endete das Gespraech
+   * frueher blind: Echo half beim Formulieren, und danach fuehrte kein Weg weiter.
+   */
+  abschlussZuege?: Zug[]
 }) {
   const qc = useQueryClient()
   const [text, setText] = useState('')
@@ -138,10 +147,25 @@ export default function EchoChat({
         </div>
         <button
           onClick={() => setFestgehalten(null)}
-          className="btn-primary mt-4 !py-2 !px-5 !text-sm"
+          className="btn-quiet mt-4 !py-2 !px-5 !text-sm"
         >
           Neues Gespräch beginnen
         </button>
+
+        {/* Der wichtigste Schritt steht hier, nicht auf der naechsten Seite: Was du gerade
+            sortiert hast, kann jetzt ein Gegenstand werden statt nur ein guter Vorsatz. */}
+        {abschlussZuege && abschlussZuege.length > 0 && (
+          <div className="mt-5">
+            <Weiterfuehren
+              coupleId={coupleId}
+              vorschlaege={abmachungsvorschlaege(festgehalten)}
+              saat={festgehalten}
+              zuege={abschlussZuege}
+              titel="Und daraus?"
+              hinweis="Nichts davon muss sein – aber jetzt ist der Moment, in dem es leichtfällt."
+            />
+          </div>
+        )}
       </div>
     )
   }

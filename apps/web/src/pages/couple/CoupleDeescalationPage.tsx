@@ -18,7 +18,7 @@
  * Technisch kein zweiter Chat-Mechanismus, sondern ein Begleiter-Faden der Art
  * `deescalation`: eigener Verlauf, eigener Prompt, dieselbe Maschinerie wie beim Begleiter.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import CoupleShell from '@/components/couple/CoupleShell'
@@ -83,7 +83,18 @@ export default function CoupleDeescalationPage() {
 
   const nachrichten = gespraech?.messages ?? []
   const laeuft = begonnen || nachrichten.length > 0
-  const genugGesagt = nachrichten.filter(m => m.role === 'user').length >= 1
+
+  // Einmal wahr, immer wahr - fuer diesen Besuch.
+  //
+  // Vorher haing das direkt an den Nachrichten des offenen Fadens. Das Zusammenfassen
+  // schliesst den Faden aber, also lieferte die Abfrage danach einen leeren neuen - und die
+  // Ausgaenge verschwanden ausgerechnet in dem Moment, in dem jemand sich entschieden hatte,
+  // etwas zu tun. Der Riegel haelt sie stehen, bis die Seite verlassen wird.
+  const [jeGeschrieben, setJeGeschrieben] = useState(false)
+  useEffect(() => {
+    if (nachrichten.some(m => m.role === 'user')) setJeGeschrieben(true)
+  }, [nachrichten])
+  const genugGesagt = jeGeschrieben
 
   return (
     <CoupleShell subtitle="Hier muss nichts gelöst werden. Dieser Raum gehört dir allein – die andere Person sieht nichts davon.">
@@ -99,6 +110,7 @@ export default function CoupleDeescalationPage() {
             leerText="Nichts davon muss gut formuliert sein. Echo hört zu und ergreift für
               niemanden Partei – auch nicht für dich, denn hier liegt nur eine Seite vor."
             platzhalter="Was ist gerade passiert?"
+            abschlussZuege={['abmachung', 'gespraech', 'thema']}
           />
 
           {genugGesagt && (
