@@ -226,7 +226,7 @@ export default function CasesOverviewPage() {
                     </Link>
                     <Link
                       to={`/app/cases/${lastCase.id}/echo`}
-                      className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-xs"
+                      className="btn-quiet !py-2 !px-4 !text-xs"
                     >
                       <span className="inline-flex items-center gap-1.5">
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

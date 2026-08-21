@@ -72,8 +72,9 @@ export default function CaseDetailPage() {
       <CaseNav caseId={caseId!} />
 
       <div className="mx-auto max-w-[1100px] px-6 py-8">
-        {/* Fall-Header */}
-        <div className="card mb-4">
+        {/* Fall-Header — der Held der Seite, wie das Namensband im Paarraum.
+            Hoechstens EIN Held je Ansicht, sonst verpufft die Stufe. */}
+        <div className="card card-hero card-static mb-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-3.5 min-w-0">
               <Avatar value={c.avatar} size="lg" />
@@ -91,13 +92,13 @@ export default function CaseDetailPage() {
             <div className="flex flex-wrap gap-2 sm:shrink-0">
               <Link
                 to={`/app/cases/${caseId}/echo`}
-                className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm"
+                className="btn-quiet !py-2 !px-4 !text-sm"
               >
                 Mit Echo sprechen
               </Link>
               <Link
                 to={`/app/cases/${caseId}/share`}
-                className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm"
+                className="btn-quiet !py-2 !px-4 !text-sm"
               >
                 Freigaben
               </Link>
@@ -131,7 +132,9 @@ export default function CaseDetailPage() {
         <NextStepCard caseId={caseId!} sceneCount={sceneCount} topicCount={coreSummaryCount} />
 
         {/* Schnell-Aktionen */}
-        <div className="grid gap-4 sm:grid-cols-3 mt-6">
+        <Abschnitt titel="Weitermachen" />
+
+        <div className="grid gap-4 sm:grid-cols-3 mt-2">
           <QuickCard
             title="Szenen"
             value={
@@ -160,7 +163,10 @@ export default function CaseDetailPage() {
         </div>
 
         {/* Personenprofil-Karte */}
-        <div className="mt-6">
+        <Abschnitt titel="Zum Nachschlagen"
+          hinweis="Was sich angesammelt hat – hier liegt nichts, das auf dich wartet." />
+
+        <div className="mt-2">
           <PersonProfileCard
             caseId={caseId!}
             avatar={c.avatar}
@@ -197,6 +203,22 @@ export default function CaseDetailPage() {
   )
 }
 
+/**
+ * Abschnittsmarke zwischen Karten — gibt dem Auge Halt, ohne Platz zu kosten.
+ *
+ * Dieselbe Bauweise wie auf der Paar-Uebersicht. Die Seite war mit jedem Feature
+ * gewachsen und stapelte zuletzt acht gleich aussehende Bloecke; wer sie oeffnete, sah
+ * keine Antwort auf "was ist heute dran", sondern eine Wand.
+ */
+function Abschnitt({ titel, hinweis }: { titel: string; hinweis?: string }) {
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-3 pt-6 pb-1">
+      <h2 className="section-label">{titel}</h2>
+      {hinweis && <p className="text-[0.72rem] text-brand-muted/80">{hinweis}</p>}
+    </div>
+  )
+}
+
 function NextStepCard({ caseId, sceneCount, topicCount }: {
   caseId: string
   sceneCount: number
@@ -204,7 +226,7 @@ function NextStepCard({ caseId, sceneCount, topicCount }: {
 }) {
   if (sceneCount === 0) {
     return (
-      <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
+      <div className="card card-static border-l-4 border-l-accent flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1.5">Einstieg</p>
           <p className="max-w-[60ch] text-sm leading-relaxed text-navy">
@@ -224,7 +246,7 @@ function NextStepCard({ caseId, sceneCount, topicCount }: {
 
   if (topicCount === 0) {
     return (
-      <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
+      <div className="card card-static border-l-4 border-l-accent flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1.5">Nächster Schritt</p>
           <p className="max-w-[60ch] text-sm leading-relaxed text-navy">
@@ -364,7 +386,7 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
   return (
     <div className="card">
       <div className="mb-4">
-        <p className="text-xs font-semibold text-brand-muted mb-0.5">Themendialoge</p>
+        <p className="section-label mb-0.5">Themendialoge</p>
         <p className="text-sm font-medium text-navy">
           {hasSummaries
             ? `${coreSummaries.length} von 4 Zusammenfassungen gespeichert`
@@ -535,7 +557,7 @@ function TestResultsCard({ caseId }: { caseId: string }) {
   return (
     <div className="card">
       <div className="mb-3">
-        <p className="text-xs font-semibold text-brand-muted mb-0.5">Selbsttests</p>
+        <p className="section-label mb-0.5">Selbsttests</p>
         <p className="text-sm font-medium text-navy">
           {results.length > 0
             ? `${results.length} gespeichertes Ergebnis${results.length === 1 ? '' : 'se'}`
@@ -605,7 +627,7 @@ function HypothesesOverviewCard({ caseId }: { caseId: string }) {
     <div className="card">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div>
-          <p className="text-xs font-semibold text-brand-muted mb-0.5">Hypothesen</p>
+          <p className="section-label mb-0.5">Hypothesen</p>
           <p className="text-sm font-medium text-navy">
             {saved.length > 0
               ? `${saved.length} Arbeitshypothese${saved.length === 1 ? '' : 'n'} gespeichert`

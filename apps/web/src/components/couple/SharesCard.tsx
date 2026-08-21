@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { coupleSharesApi } from '@/api/coupleShares'
 import type { CoupleShare, CoupleShareView } from '@/api/coupleShares'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import Chip from '@/components/Chip'
 
 /** Klartext für das, was nie hinausgeht – der Server liefert nur die Schlüssel. */
 const NIE_TEXT: Record<string, string> = {
@@ -141,11 +142,7 @@ function ShareRow({
                 : 'Vorschlag – wartet auf Zustimmung'}
           </p>
         </div>
-        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold ${
-          aktiv ? 'bg-green-50 text-green-700' : 'bg-accent/10 text-accent'
-        }`}>
-          {aktiv ? 'Aktiv' : 'Ruht'}
-        </span>
+        <Chip ton={aktiv ? 'aktiv' : 'wartet'}>{aktiv ? 'Aktiv' : 'Ruht'}</Chip>
       </div>
 
       {share.message && (

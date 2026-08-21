@@ -9,6 +9,7 @@ import Avatar from '@/components/Avatar'
 import { useCoupleFaces } from './useCoupleFaces'
 import { ArtTisch } from './CoupleEmptyArt'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import Chip from '@/components/Chip'
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'In Vorbereitung',
@@ -117,13 +118,9 @@ export default function SessionsCard({ coupleId }: { coupleId: string }) {
                     </p>
                   : s.goal && <p className="mt-0.5 truncate text-xs text-brand-muted">Ziel: {s.goal}</p>}
               </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold ${
-                s.status === 'proposed' && !s.accepted_at
-                  ? 'bg-accent/10 text-accent'
-                  : 'bg-brand-bg text-brand-muted'
-              }`}>
+              <Chip ton={s.status === 'proposed' && !s.accepted_at ? 'wartet' : 'ruht'}>
                 {s.accepted_at && s.status === 'proposed' ? 'Zugesagt' : STATUS_LABELS[s.status] ?? s.status}
-              </span>
+              </Chip>
             </Link>
           ))}
         </div>

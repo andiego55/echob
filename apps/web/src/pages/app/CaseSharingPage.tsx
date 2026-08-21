@@ -12,6 +12,7 @@ import { sharesApi, professionalsApi } from '@/api/shares'
 import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import Chip from '@/components/Chip'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
@@ -58,7 +59,9 @@ export default function CaseSharingPage() {
                     <div>
                       <p className="text-sm font-semibold text-navy">
                         {s.professional_display_name || 'Fachperson'}
-                        {s.status === 'revoked' && <span className="ml-2 text-xs text-red-600">(widerrufen)</span>}
+                        {/* Vorher rot und in Klammern - das las sich wie ein Fehler, obwohl "widerrufen"
+                            ein voellig normaler Zustand ist. */}
+                        {s.status === 'revoked' && <Chip className="ml-2">widerrufen</Chip>}
                       </p>
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         {s.elements.length === 0

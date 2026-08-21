@@ -268,12 +268,12 @@ export default function ProfilePage() {
                 {saveMutation.isPending ? 'Wird gespeichert …' : 'Speichern'}
               </button>
               {canGoPrev && (
-                <button onClick={handlePrev} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm">
+                <button onClick={handlePrev} className="btn-quiet !py-2 !px-4 !text-sm">
                   ← Zurück
                 </button>
               )}
               {canGoNext && (
-                <button onClick={handleNext} className="btn bg-white text-navy border-2 border-brand-border hover:border-navy/30 !py-2 !px-4 !text-sm">
+                <button onClick={handleNext} className="btn-quiet !py-2 !px-4 !text-sm">
                   Zum nächsten Modul →
                 </button>
               )}

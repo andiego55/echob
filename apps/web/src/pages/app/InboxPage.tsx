@@ -143,8 +143,10 @@ function AssignmentCard({ item }: { item: Assignment }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
   })
 
+  // Die farbige Kante links statt einer eingefaerbten Flaeche: Sie wird ohne Lesen
+  // erkannt und macht den Text nicht kontrastaermer.
   return (
-    <div className={`card ${item.unread ? 'border-accent bg-accent/[0.03]' : ''}`}>
+    <div className={`card ${item.unread ? 'border-l-4 border-l-accent' : ''}`}>
       {/* Eine Meldung je Karte genuegt: Die vier Zuege schliessen sich gegenseitig aus,
           es kann immer nur einer fehlschlagen. */}
       <Fehlermeldung error={respond.error ?? reply.error ?? dismiss.error ?? seen.error}
