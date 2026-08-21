@@ -189,7 +189,7 @@ async def update_scene(
     return _row_to_scene(row)
 
 
-@router.delete("/{scene_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{scene_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_scene(
     case_id: UUID,
     scene_id: UUID,

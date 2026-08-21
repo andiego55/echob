@@ -547,7 +547,7 @@ async def update_report(
     return _report_out(updated)
 
 
-@router.delete("/cases/{copy_id}/reports/{report_id}", status_code=204)
+@router.delete("/cases/{copy_id}/reports/{report_id}", status_code=204, response_model=None)
 async def delete_report(
     copy_id: UUID,
     report_id: UUID,

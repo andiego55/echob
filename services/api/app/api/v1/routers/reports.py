@@ -191,7 +191,7 @@ async def update_report(
     return _row_to_report(updated)
 
 
-@router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_report(
     case_id: UUID,
     report_id: UUID,

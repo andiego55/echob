@@ -176,7 +176,7 @@ async def get_review(
     return _row_to_review(row)
 
 
-@router.delete("/{review_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{review_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_review(
     case_id: UUID,
     review_id: UUID,

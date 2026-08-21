@@ -127,7 +127,7 @@ async def generate_hypothesis(
     return {"summary": summary}
 
 
-@router.delete("/{hypothesis_type}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{hypothesis_type}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_hypothesis(
     case_id: UUID,
     hypothesis_type: str,

@@ -137,7 +137,7 @@ async def update_case(
     return CaseResponse(**dict(row))
 
 
-@router.delete("/{case_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{case_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def archive_case(
     case_id: UUID,
     current_user: dict = Depends(get_current_user),
@@ -157,7 +157,7 @@ async def archive_case(
         raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
 
 
-@router.delete("/{case_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{case_id}/permanent", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_case_permanent(
     case_id: UUID,
     current_user: dict = Depends(get_current_user),

@@ -411,7 +411,7 @@ async def patch_example(
         return await _load_example_detail(conn, institute_id, example_id)
 
 
-@router.delete("/examples/{example_id}", status_code=204)
+@router.delete("/examples/{example_id}", status_code=204, response_model=None)
 async def delete_example(
     example_id: UUID,
     current: dict = Depends(get_current_institute),
