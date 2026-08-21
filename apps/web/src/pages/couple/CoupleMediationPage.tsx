@@ -17,6 +17,7 @@ import EchoThinking from '@/components/couple/EchoThinking'
 import MediationFollowUp from '@/components/couple/MediationFollowUp'
 import BridgeBoard from '@/components/couple/BridgeBoard'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function CoupleMediationPage() {
   const { topicId = '' } = useParams<{ topicId: string }>()
@@ -118,9 +119,7 @@ export default function CoupleMediationPage() {
               {entfernen.isPending ? 'Lösche …' : 'Thema löschen'}
             </button>
           )}
-          {entfernen.isError && (
-            <p className="mt-2 text-sm text-red-600">{apiErrorMessage(entfernen.error)}</p>
-          )}
+          <Fehlermeldung error={entfernen.error} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -163,9 +162,7 @@ export default function CoupleMediationPage() {
             >
               {save.isPending ? 'Speichere …' : 'Speichern'}
             </button>
-            {save.isError && (
-              <p className="mt-3 text-sm text-red-600">{apiErrorMessage(save.error)}</p>
-            )}
+            <Fehlermeldung error={save.error} className="mt-3" />
           </div>
 
           {/* ── Sicht der anderen Person ─────────────────────────── */}
@@ -216,9 +213,7 @@ export default function CoupleMediationPage() {
             </div>
           </div>
 
-          {mediate.isError && (
-            <p className="mt-3 text-sm text-red-600">{apiErrorMessage(mediate.error)}</p>
-          )}
+          <Fehlermeldung error={mediate.error} className="mt-3" />
 
           {!both_sides_ready && (
             <p className="mt-3 rounded-brand bg-brand-bg px-3.5 py-2.5 text-xs text-brand-muted">

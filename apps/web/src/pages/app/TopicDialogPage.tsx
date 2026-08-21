@@ -16,7 +16,7 @@ import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { getBody } from '@/content/bodies'
 import { getSelfTest, resultToSeed } from '@/selftests'
 import { loadTestResult } from '@/selftests/resultStore'
-import { apiErrorText } from '@/utils/apiError'
+import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
 
 interface TopicDef {
@@ -291,7 +291,7 @@ export default function TopicDialogPage() {
             {chatMutation.isPending && <TypingIndicator />}
 
             {chatMutation.isError && (
-              <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+              <ChatErrorMessage text={apiErrorMessage(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
             )}
 
             {/* Zusammenfassung am Ende des Dialogs */}

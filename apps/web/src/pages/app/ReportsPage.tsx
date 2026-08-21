@@ -7,6 +7,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { reportsApi } from '@/api/reports'
 import type { Report, ReportType } from '@/types'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const MAX_REPORTS = 20
 
@@ -86,6 +87,8 @@ export default function ReportsPage() {
             Maximale Anzahl von {MAX_REPORTS} Berichten erreicht. Lösche einen Bericht, um einen neuen zu erstellen.
           </div>
         )}
+
+        <Fehlermeldung error={deleteMutation.error} className="mb-4" />
 
         {isLoading && (
           <p className="text-sm text-brand-muted py-8">Wird geladen …</p>

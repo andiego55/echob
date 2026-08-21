@@ -5,10 +5,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleSessionsApi } from '@/api/coupleSessions'
-import { apiErrorMessage } from '@/api/errors'
 import Avatar from '@/components/Avatar'
 import { useCoupleFaces } from './useCoupleFaces'
 import { ArtTisch } from './CoupleEmptyArt'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'In Vorbereitung',
@@ -83,9 +83,7 @@ export default function SessionsCard({ coupleId }: { coupleId: string }) {
           >
             {create.isPending ? 'Lege an …' : 'Gespräch anlegen'}
           </button>
-          {create.isError && (
-            <p className="text-sm text-red-600">{apiErrorMessage(create.error)}</p>
-          )}
+          <Fehlermeldung error={create.error} />
         </form>
       )}
 

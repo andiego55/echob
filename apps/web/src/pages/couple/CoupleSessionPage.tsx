@@ -26,6 +26,7 @@ import AgreementsCard from '@/components/couple/AgreementsCard'
 import Weiterfuehren from '@/components/couple/Weiterfuehren'
 import { abmachungsvorschlaege } from '@/components/couple/abmachungsvorschlaege'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function CoupleSessionPage() {
   const { sessionId = '' } = useParams<{ sessionId: string }>()
@@ -171,9 +172,7 @@ export default function CoupleSessionPage() {
           </div>
         </div>
 
-        {entfernen.isError && (
-          <p className="mb-3 text-sm text-red-600">{apiErrorMessage(entfernen.error)}</p>
-        )}
+        <Fehlermeldung error={entfernen.error} />
 
         <div className="mb-5">
           <ProposalBar session={session} />
@@ -320,11 +319,7 @@ export default function CoupleSessionPage() {
                     Beide sehen alles hier. Echo hört mit und meldet sich, wenn ihr es ruft.
                   </span>
                 </div>
-                {(send.isError || moderate.isError) && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {apiErrorMessage(send.error ?? moderate.error)}
-                  </p>
-                )}
+                <Fehlermeldung error={send.error ?? moderate.error} />
               </form>
             )}
           </div>

@@ -11,7 +11,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleReminderApi } from '@/api/coupleRhythm'
-import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function ReminderCard({ coupleId }: { coupleId: string }) {
   const qc = useQueryClient()
@@ -67,9 +67,7 @@ export default function ReminderCard({ coupleId }: { coupleId: string }) {
         </p>
       )}
 
-      {umschalten.isError && (
-        <p className="mt-3 text-sm text-red-600">{apiErrorMessage(umschalten.error)}</p>
-      )}
+      <Fehlermeldung error={umschalten.error} className="mt-3" />
     </div>
   )
 }

@@ -9,7 +9,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { reviewsApi } from '@/api/reviews'
-import { apiErrorText } from '@/utils/apiError'
+import { apiErrorMessage } from '@/api/errors'
 import { SCALE_LABELS } from '@/types'
 import type { CaseTrends, DistressPoint, TrendMonth } from '@/types'
 
@@ -126,7 +126,7 @@ export default function ReviewPage() {
 
           {generate.isError && (
             <p className="text-xs text-red-600 mb-3">
-              {apiErrorText(generate.error, 'Rückblick konnte nicht erstellt werden.')}
+              {apiErrorMessage(generate.error, 'Rückblick konnte nicht erstellt werden.')}
             </p>
           )}
 

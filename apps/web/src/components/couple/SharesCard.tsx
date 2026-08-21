@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { coupleSharesApi } from '@/api/coupleShares'
 import type { CoupleShare, CoupleShareView } from '@/api/coupleShares'
-import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 /** Klartext für das, was nie hinausgeht – der Server liefert nur die Schlüssel. */
 const NIE_TEXT: Record<string, string> = {
@@ -213,9 +213,7 @@ function ShareRow({
                 Abbrechen
               </button>
             </div>
-            {speichern.isError && (
-              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(speichern.error)}</p>
-            )}
+            <Fehlermeldung error={speichern.error} />
           </>
         ) : (
           <ul className="mt-2 space-y-1">
@@ -251,11 +249,7 @@ function ShareRow({
           Beenden kannst du allein – dafür braucht es die andere Person nicht.
         </span>
       </div>
-      {(zustimmen.isError || beenden.isError) && (
-        <p className="mt-2 text-sm text-red-600">
-          {apiErrorMessage(zustimmen.error ?? beenden.error)}
-        </p>
-      )}
+      <Fehlermeldung error={zustimmen.error ?? beenden.error} />
     </div>
   )
 }
@@ -374,9 +368,7 @@ function NeuerVorschlag({
         Dein Vorschlag ist zugleich deine Zustimmung. Bis die andere Person zustimmt,
         geht nichts hinaus.
       </p>
-      {vorschlagen.isError && (
-        <p className="mt-2 text-sm text-red-600">{apiErrorMessage(vorschlagen.error)}</p>
-      )}
+      <Fehlermeldung error={vorschlagen.error} />
     </div>
   )
 }

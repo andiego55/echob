@@ -21,6 +21,7 @@ import type { CoupleQuestion } from '@/api/coupleQuestions'
 import { apiErrorMessage } from '@/api/errors'
 import { CardSkeleton } from './Skeleton'
 import Weiterfuehren from './Weiterfuehren'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function QuestionsBoard({ coupleId }: { coupleId: string }) {
   const { data, isLoading, isError, error } = useQuery({
@@ -162,9 +163,7 @@ function Fragen({ coupleId, prompts }: { coupleId: string; prompts: string[] }) 
             </>
           )}
         </div>
-        {fragen.isError && (
-          <p className="mt-2 text-xs text-red-600">{apiErrorMessage(fragen.error)}</p>
-        )}
+        <Fehlermeldung error={fragen.error} />
       </form>
     </div>
   )
@@ -214,9 +213,7 @@ function AntwortZeile({ frage, coupleId }: { frage: CoupleQuestion; coupleId: st
             Danach steht beides nebeneinander – für euch beide.
           </p>
         </div>
-        {antworten.isError && (
-          <p className="mt-2 text-xs text-red-600">{apiErrorMessage(antworten.error)}</p>
-        )}
+        <Fehlermeldung error={antworten.error} />
       </form>
     </div>
   )

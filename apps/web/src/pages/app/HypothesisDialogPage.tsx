@@ -14,7 +14,7 @@ import HypothesisIcon from '@/components/HypothesisIcon'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
 import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
-import { apiErrorText } from '@/utils/apiError'
+import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
 
 export default function HypothesisDialogPage() {
@@ -173,7 +173,7 @@ export default function HypothesisDialogPage() {
             {pendingMessage && chatMutation.isPending && <ChatMessage content={pendingMessage} isUser />}
             {chatMutation.isPending && <TypingIndicator />}
             {chatMutation.isError && (
-              <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+              <ChatErrorMessage text={apiErrorMessage(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
             )}
 
             {/* Arbeitshypothese (Zusammenfassung) */}

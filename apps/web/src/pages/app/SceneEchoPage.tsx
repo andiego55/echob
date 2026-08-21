@@ -11,7 +11,8 @@ import CaseNav from '@/components/app/CaseNav'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
-import { apiErrorText } from '@/utils/apiError'
+import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function SceneEchoPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -158,7 +159,7 @@ export default function SceneEchoPage() {
             {chatMutation.isPending && <TypingIndicator />}
 
             {chatMutation.isError && (
-              <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+              <ChatErrorMessage text={apiErrorMessage(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
             )}
 
             <div ref={messagesEndRef} />
@@ -183,11 +184,7 @@ export default function SceneEchoPage() {
               </div>
             )}
 
-            {finalizeMutation.isError && (
-              <p className="text-sm text-red-600 text-right">
-                Szene konnte nicht gespeichert werden. Bitte versuche es erneut.
-              </p>
-            )}
+            <Fehlermeldung error={finalizeMutation.error} />
 
             <ChatComposer
               value={input}

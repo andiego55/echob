@@ -14,6 +14,7 @@ import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
 import type { PersonProfileModuleConfig } from '@/utils/personProfileModules'
 import { computePersonModuleScores, scoreLevel, buildPersonSummaryText } from '@/utils/personProfileScoring'
 import { RELATIONSHIP_TYPE_LABELS } from '@/types'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const LIKERT_LABELS = ['', 'Trifft gar nicht zu', 'Trifft eher nicht zu', 'Teils/teils', 'Trifft eher zu', 'Trifft sehr zu']
 
@@ -203,9 +204,7 @@ export default function PersonProfilePage() {
               onToggleMulti={toggleMulti}
             />
 
-            {saveMutation.isError && (
-              <p className="mt-3 text-sm text-red-600">Speichern fehlgeschlagen. Bitte versuche es erneut.</p>
-            )}
+            <Fehlermeldung error={saveMutation.error} className="mt-3" />
 
             <div className="mt-6 flex items-center gap-3 flex-wrap">
               <button
@@ -552,9 +551,7 @@ function PersonProfileSummaryView({
             </div>
           ) : null}
 
-          {generateMutation.isError && (
-            <p className="mt-2 text-xs text-red-600">Generierung fehlgeschlagen. Bitte versuche es erneut.</p>
-          )}
+          <Fehlermeldung error={generateMutation.error} />
         </div>
       )}
 

@@ -12,10 +12,10 @@ import { useAuth } from '@/contexts/AuthContext'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import type { CoupleBridge, CoupleTopicDetail, CoupleTopicMessage } from '@/api/coupleMediation'
-import { apiErrorMessage } from '@/api/errors'
 import Avatar from '@/components/Avatar'
 import { useCoupleFaces } from './useCoupleFaces'
 import EchoThinking from './EchoThinking'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const STATUS_CHIP: Record<CoupleBridge['status'], { label: string; cls: string }> = {
   open:     { label: 'In Verhandlung', cls: 'bg-brand-bg text-brand-muted' },
@@ -118,11 +118,7 @@ export default function BridgeBoard({
                 : 'Echo dazuholen'}
             </button>
           </div>
-          {(send.isError || callEcho.isError) && (
-            <p className="mt-2 text-sm text-red-600">
-              {apiErrorMessage(send.error ?? callEcho.error)}
-            </p>
-          )}
+          <Fehlermeldung error={send.error ?? callEcho.error} />
         </form>
       </div>
     </div>
@@ -292,11 +288,7 @@ function BridgeCard({
         </p>
       )}
 
-      {(save.isError || accept.isError || drop.isError) && (
-        <p className="mt-2 text-xs text-red-600">
-          {apiErrorMessage(save.error ?? accept.error ?? drop.error)}
-        </p>
-      )}
+      <Fehlermeldung error={save.error ?? accept.error ?? drop.error} />
     </div>
   )
 }

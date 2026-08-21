@@ -8,6 +8,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { reportsApi } from '@/api/reports'
 import type { ReportType } from '@/types'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 // ── Typ-Konfiguration ─────────────────────────────────────────────────────────
 
@@ -260,7 +261,7 @@ export default function ReportDetailPage() {
                       className="rounded-brand border border-brand-border bg-white px-4 py-2 text-sm font-medium text-navy">
                       Abbrechen
                     </button>
-                    {updateMutation.isError && <p className="text-xs text-red-600 self-center">Speichern fehlgeschlagen.</p>}
+                    <Fehlermeldung error={updateMutation.error} />
                   </div>
                 </>
               ) : (

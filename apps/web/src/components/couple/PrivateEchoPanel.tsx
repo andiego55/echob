@@ -9,8 +9,8 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { couplePrivateApi } from '@/api/couplePrivate'
-import { apiErrorMessage } from '@/api/errors'
 import type { CouplePrivateThread } from '@/api/couplePrivate'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function PrivateEchoPanel({ sessionId }: { sessionId: string }) {
   const qc = useQueryClient()
@@ -96,11 +96,7 @@ export default function PrivateEchoPanel({ sessionId }: { sessionId: string }) {
             {feedback.isPending ? 'Werte aus …' : 'Feedback zu mir'}
           </button>
         </div>
-        {(send.isError || feedback.isError) && (
-          <p className="mt-2 text-xs text-red-600">
-            {apiErrorMessage(send.error ?? feedback.error)}
-          </p>
-        )}
+        <Fehlermeldung error={send.error ?? feedback.error} />
       </form>
     </div>
   )

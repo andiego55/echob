@@ -12,9 +12,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Avatar from '@/components/Avatar'
 import { coupleRhythmApi } from '@/api/coupleRhythm'
 import type { CoupleCheckinEntry, CoupleCheckinWeek } from '@/api/coupleRhythm'
-import { apiErrorMessage } from '@/api/errors'
 import { MOOD_EMOJI } from './moods'
 import Weiterfuehren from './Weiterfuehren'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 function wochenLabel(iso: string): string {
   const start = new Date(iso)
@@ -143,7 +143,7 @@ export default function WeeklyCheckinCard({
               </button>
             )}
           </div>
-          {save.isError && <p className="text-sm text-red-600">{apiErrorMessage(save.error)}</p>}
+          <Fehlermeldung error={save.error} />
         </div>
       )}
 

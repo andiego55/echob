@@ -19,6 +19,7 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { professionalRoomApi } from '@/api/professionalCoupleRoom'
 import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from '@/components/couple/EchoThinking'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 /** Die Reihenfolge im Menü — vom Überblick zum Detail. */
 const BEREICHE: { key: string; label: string }[] = [
@@ -189,7 +190,7 @@ function Bereich({
     return (
       <div className="card card-static">
         <h2 className="card-title">{titel}</h2>
-        <p className="mt-2 text-sm text-red-600">{apiErrorMessage(error)}</p>
+        <Fehlermeldung error={error} />
       </div>
     )
   }
@@ -456,9 +457,7 @@ function EchoDialog({ coupleId }: { coupleId: string }) {
             ? <EchoThinking text="Echo liest das Material …" size={34} />
             : 'Fragen'}
         </button>
-        {fragen.isError && (
-          <p className="mt-2 text-sm text-red-600">{apiErrorMessage(fragen.error)}</p>
-        )}
+        <Fehlermeldung error={fragen.error} />
       </form>
     </div>
   )

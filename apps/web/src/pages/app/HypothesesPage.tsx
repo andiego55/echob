@@ -9,6 +9,7 @@ import CaseNav from '@/components/app/CaseNav'
 import HypothesisIcon from '@/components/HypothesisIcon'
 import HypothesisSummary from '@/components/HypothesisSummary'
 import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function HypothesesPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -69,6 +70,7 @@ export default function HypothesesPage() {
                     deleting={remove.isPending}
                   />
                 )}
+                <Fehlermeldung error={remove.error} />
               </div>
             )
           })}

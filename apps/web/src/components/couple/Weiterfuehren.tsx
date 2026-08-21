@@ -25,8 +25,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
 import { coupleSessionsApi } from '@/api/coupleSessions'
 import { coupleMediationApi } from '@/api/coupleMediation'
-import { apiErrorMessage } from '@/api/errors'
 import { titelVorschlag } from './abmachungsvorschlaege'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export type Zug = 'abmachung' | 'gespraech' | 'thema'
 
@@ -102,9 +102,7 @@ export default function Weiterfuehren({
               />
             ))}
           </div>
-          {uebernehmen.isError && (
-            <p className="mt-2 text-xs text-red-600">{apiErrorMessage(uebernehmen.error)}</p>
-          )}
+          <Fehlermeldung error={uebernehmen.error} />
         </div>
       )}
 
@@ -315,9 +313,7 @@ function Formular({
         </button>
         <p className="text-[0.7rem] text-brand-muted">{fuss}</p>
       </div>
-      {senden.isError && (
-        <p className="mt-2 text-xs text-red-600">{apiErrorMessage(senden.error)}</p>
-      )}
+      <Fehlermeldung error={senden.error} />
     </form>
   )
 }

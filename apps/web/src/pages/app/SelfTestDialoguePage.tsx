@@ -22,7 +22,7 @@ import { topicSummariesApi } from '@/api/topicSummaries'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { testResultsApi } from '@/api/testResults'
 import { useAuth } from '@/contexts/AuthContext'
-import { apiErrorText } from '@/utils/apiError'
+import { apiErrorMessage } from '@/api/errors'
 import {
   getSelfTest, scoreTest, buildStartTrigger, buildRevisionMessage, answerLabel,
   type TestResult, type AnswerChange, type ResultDelta,
@@ -260,7 +260,7 @@ function Dialogue({
                 {pendingMessage && chatMutation.isPending && <ChatMessage content={pendingMessage} isUser />}
                 {chatMutation.isPending && <TypingIndicator />}
                 {chatMutation.isError && (
-                  <ChatErrorMessage text={apiErrorText(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+                  <ChatErrorMessage text={apiErrorMessage(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
                 )}
                 {summary && (
                   <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">

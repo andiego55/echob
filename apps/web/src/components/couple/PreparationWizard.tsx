@@ -8,8 +8,8 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleSessionsApi } from '@/api/coupleSessions'
-import { apiErrorMessage } from '@/api/errors'
 import { MOOD_EMOJI } from './moods'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const STEPS = ['Stimmung', 'Wertschätzung', 'Anliegen', 'Bitte', 'Freigeben'] as const
 
@@ -138,9 +138,7 @@ export default function PreparationWizard({
               {coach.isPending ? 'Echo formuliert …' : 'Als Ich-Botschaft formulieren'}
             </button>
 
-            {coach.isError && (
-              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(coach.error)}</p>
-            )}
+            <Fehlermeldung error={coach.error} />
 
             {coached && (
               <div className="mt-3 rounded-brand border border-accent/40 bg-accent/[0.05] px-3.5 py-3">
@@ -197,9 +195,7 @@ export default function PreparationWizard({
             >
               {finish.isPending ? 'Gebe frei …' : 'Für die Sitzung freigeben'}
             </button>
-            {finish.isError && (
-              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(finish.error)}</p>
-            )}
+            <Fehlermeldung error={finish.error} />
           </div>
         )}
       </div>

@@ -15,6 +15,7 @@ import { apiErrorMessage } from '@/api/errors'
 import type { CoupleLink } from '@/api/couple'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import { ArtEinladung } from '@/components/couple/CoupleEmptyArt'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function CoupleOverviewPage() {
   const { data: links = [], isLoading, isError, error } = useQuery({
@@ -217,9 +218,7 @@ function InviteCard({ hasPending }: { hasPending: boolean }) {
         {create.isPending ? 'Erstelle …' : 'Kopplungscode erstellen'}
       </button>
 
-      {create.isError && (
-        <p className="mt-3 text-sm text-red-600">{apiErrorMessage(create.error)}</p>
-      )}
+      <Fehlermeldung error={create.error} className="mt-3" />
     </div>
   )
 }

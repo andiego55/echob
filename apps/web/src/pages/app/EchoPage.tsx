@@ -12,7 +12,7 @@ import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import AssignmentDialogSummary from '@/components/app/AssignmentDialogSummary'
 import { echoApi } from '@/api/echo'
-import { apiErrorText } from '@/utils/apiError'
+import { apiErrorMessage } from '@/api/errors'
 import type { EchoChatSession, ThreadType } from '@/types'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 
@@ -239,7 +239,7 @@ export default function EchoPage() {
               {mutation.isPending && <TypingIndicator />}
 
               {mutation.isError && (
-                <ChatErrorMessage text={apiErrorText(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+                <ChatErrorMessage text={apiErrorMessage(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
               )}
 
               {assignmentId && selectedSession && history.length > 0 && !mutation.isPending && (

@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
 import type { CoupleAgreement } from '@/api/coupleAgreements'
-import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function DueAgreementsCard({ coupleId }: { coupleId: string }) {
   const { data: faellig = [] } = useQuery({
@@ -110,9 +110,7 @@ function DueRow({ agreement, coupleId }: { agreement: CoupleAgreement; coupleId:
         )}
       </div>
 
-      {review.isError && (
-        <p className="mt-2 text-xs text-red-600">{apiErrorMessage(review.error)}</p>
-      )}
+      <Fehlermeldung error={review.error} />
     </div>
   )
 }

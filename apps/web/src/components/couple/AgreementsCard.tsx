@@ -8,10 +8,10 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
-import { apiErrorMessage } from '@/api/errors'
 import Avatar from '@/components/Avatar'
 import { useCoupleFaces } from './useCoupleFaces'
 import type { CoupleAgreement } from '@/api/coupleAgreements'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const STATUS_CHIP: Record<CoupleAgreement['status'], { label: string; cls: string }> = {
   proposed: { label: 'Wartet auf Zustimmung', cls: 'bg-brand-bg text-brand-muted' },
@@ -82,11 +82,7 @@ export default function AgreementsCard({
         </button>
       </form>
 
-      {(propose.isError || accept.isError || setStatus.isError || withdraw.isError) && (
-        <p className="mt-3 text-sm text-red-600">
-          {apiErrorMessage(propose.error ?? accept.error ?? setStatus.error ?? withdraw.error)}
-        </p>
-      )}
+      <Fehlermeldung error={propose.error ?? accept.error ?? setStatus.error ?? withdraw.error} className="mt-3" />
 
       {agreements.length === 0 ? (
         <p className="mt-4 text-sm text-brand-muted">Noch keine Abmachung.</p>

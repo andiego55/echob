@@ -13,7 +13,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleMediationApi } from '@/api/coupleMediation'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
-import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function MediationFollowUp({ topicId }: { topicId: string }) {
   const qc = useQueryClient()
@@ -100,9 +100,7 @@ export default function MediationFollowUp({ topicId }: { topicId: string }) {
         </button>
       </div>
 
-      {toSession.isError && (
-        <p className="mt-3 text-sm text-red-600">{apiErrorMessage(toSession.error)}</p>
-      )}
+      <Fehlermeldung error={toSession.error} className="mt-3" />
 
       {/* ── 1. Privater Dialog ───────────────────────────────────── */}
       {step === 'privat' && (
@@ -156,9 +154,7 @@ export default function MediationFollowUp({ topicId }: { topicId: string }) {
                 </button>
               )}
             </div>
-            {send.isError && (
-              <p className="mt-2 text-xs text-red-600">{apiErrorMessage(send.error)}</p>
-            )}
+            <Fehlermeldung error={send.error} />
           </form>
         </div>
       )}
@@ -191,11 +187,7 @@ export default function MediationFollowUp({ topicId }: { topicId: string }) {
               Gesendet. Dein privater Dialog bleibt dabei bei dir.
             </p>
           )}
-          {(share.isError || summarize.isError) && (
-            <p className="mt-2 text-xs text-red-600">
-              {apiErrorMessage(share.error ?? summarize.error)}
-            </p>
-          )}
+          <Fehlermeldung error={share.error ?? summarize.error} />
         </div>
       )}
     </div>

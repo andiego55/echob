@@ -22,6 +22,7 @@ import {
   RELATIONSHIP_STATUS_LABELS,
   CONTACT_FREQUENCY_LABELS,
 } from '@/types'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const TOPIC_ORDER = ['topic_self', 'topic_person', 'topic_responsibility', 'topic_guilt'] as const
 
@@ -436,6 +437,7 @@ function TopicSummariesCard({ caseId, summaries }: { caseId: string; summaries: 
                       Abbrechen
                     </button>
                   </div>
+                  <Fehlermeldung error={saveMutation.error ?? removeMutation.error} />
                 </div>
               ) : saved ? (
                 <div className="mt-2 text-sm text-brand-muted leading-relaxed">
@@ -572,6 +574,7 @@ function TestResultsCard({ caseId }: { caseId: string }) {
                     Löschen
                   </button>
                 </div>
+                <Fehlermeldung error={remove.error} />
                 {isOpen && <div className="mt-3"><SavedTestResultView result={r.result} /></div>}
               </div>
             )
@@ -724,9 +727,7 @@ function DangerZone({ caseId }: { caseId: string }) {
               Abbrechen
             </button>
           </div>
-          {del.isError && (
-            <p className="mt-2 text-sm text-red-600">Löschen fehlgeschlagen. Bitte erneut versuchen.</p>
-          )}
+          <Fehlermeldung error={del.error} />
         </div>
       )}
     </div>

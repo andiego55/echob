@@ -9,6 +9,7 @@ import AppShell from '@/components/app/AppShell'
 import { subscriptionApi } from '@/api/subscription'
 import { mayOfferPurchase } from '@/lib/appContext'
 import type { ProductType } from '@/types'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const PLAN_LABELS: Record<string, string> = {
   trial: 'Testzugang',
@@ -166,6 +167,7 @@ export default function UpgradePage() {
         <div className="mb-8">
           <Link to="/app" className="text-sm text-brand-muted hover:text-navy">← Zurück</Link>
           <h1 className="mt-4 text-2xl font-bold text-navy">Pläne & Angebote</h1>
+          <Fehlermeldung error={checkoutMutation.error ?? portalMutation.error ?? verifyMutation.error} className="mt-3" />
           <p className="mt-1 text-sm text-brand-muted max-w-xl">
             Sichere Zahlung über Stripe – Kreditkarte, SEPA, PayPal & mehr. Sofortige Freischaltung.
             Alle Preise inkl. gesetzlicher MwSt.

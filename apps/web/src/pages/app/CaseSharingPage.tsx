@@ -11,6 +11,7 @@ import { scenesApi } from '@/api/scenes'
 import { sharesApi, professionalsApi } from '@/api/shares'
 import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType, CaseShare } from '@/types'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
@@ -97,13 +98,16 @@ function RevokeButton({ caseId, share }: { caseId: string; share: CaseShare }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['case-shares', caseId] }),
   })
   return (
-    <button
-      onClick={() => { if (confirm('Freigabe wirklich widerrufen? Die Fachperson hat danach keinen Zugriff mehr.')) mutation.mutate() }}
-      disabled={mutation.isPending}
-      className="text-xs text-red-600 hover:underline disabled:opacity-50 shrink-0"
-    >
-      {mutation.isPending ? 'Widerrufe …' : 'Widerrufen'}
-    </button>
+    <div className="shrink-0 text-right">
+      <button
+        onClick={() => { if (confirm('Freigabe wirklich widerrufen? Die Fachperson hat danach keinen Zugriff mehr.')) mutation.mutate() }}
+        disabled={mutation.isPending}
+        className="text-xs text-red-600 hover:underline disabled:opacity-50"
+      >
+        {mutation.isPending ? 'Widerrufe …' : 'Widerrufen'}
+      </button>
+      <Fehlermeldung error={mutation.error} className="mt-1" />
+    </div>
   )
 }
 
@@ -172,6 +176,7 @@ function ConnectionsCard() {
         </button>
         {notice && <span className="text-xs text-brand-muted">{notice}</span>}
       </div>
+      <Fehlermeldung error={invite.error} />
 
       {connections.length > 0 && (
         <ul className="mt-4 space-y-1.5 border-t border-brand-border pt-3">
@@ -347,6 +352,7 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
             </button>
             <span className="text-xs text-brand-muted">Nur ausgewählte Inhalte werden geteilt · jederzeit widerrufbar</span>
           </div>
+          <Fehlermeldung error={create.error} />
         </>
       )}
     </div>

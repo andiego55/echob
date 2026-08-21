@@ -9,6 +9,7 @@ import MessageThread, { threadFromPayload } from '@/components/MessageThread'
 import QuestionnaireRenderer from '@/components/QuestionnaireRenderer'
 import type { Question } from '@/lib/questionnaire'
 import { collabApi, type Assignment, type Appointment } from '@/api/collab'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const TYPE_META: Record<string, { icon: string; label: string }> = {
   dialog: { icon: '💬', label: 'Dialog-Vorschlag' },
@@ -94,6 +95,7 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
   const p = appt.payload as { location?: string; note?: string }
   return (
     <div className="card flex items-start justify-between gap-4 flex-wrap">
+      <Fehlermeldung error={m.error} className="w-full" />
       <div>
         <p className="text-sm font-semibold text-navy">📅 {appt.title || 'Termin'}</p>
         <p className="mt-0.5 text-sm text-brand-text">{fmt(appt.start_at)}</p>
@@ -142,6 +144,10 @@ function AssignmentCard({ item }: { item: Assignment }) {
 
   return (
     <div className={`card ${item.unread ? 'border-accent bg-accent/[0.03]' : ''}`}>
+      {/* Eine Meldung je Karte genuegt: Die vier Zuege schliessen sich gegenseitig aus,
+          es kann immer nur einer fehlschlagen. */}
+      <Fehlermeldung error={respond.error ?? reply.error ?? dismiss.error ?? seen.error}
+        className="mb-2" />
       <div className="flex items-center justify-between gap-3 mb-1">
         <span className="flex items-center gap-2 min-w-0">
           {item.unread && <span className="w-2 h-2 rounded-full bg-accent shrink-0" aria-label="ungelesen" />}

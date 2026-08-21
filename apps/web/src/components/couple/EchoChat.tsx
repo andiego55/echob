@@ -21,11 +21,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleCompanionApi } from '@/api/coupleCompanion'
 import type { CoupleEchoConversation, CoupleThreadKind } from '@/api/coupleCompanion'
-import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from './EchoThinking'
 import Weiterfuehren from './Weiterfuehren'
 import type { Zug } from './Weiterfuehren'
 import { abmachungsvorschlaege } from './abmachungsvorschlaege'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export interface Impulsgruppe {
   gruppe: string
@@ -304,11 +304,7 @@ export default function EchoChat({
                 </span>
               </span>
             </div>
-            {(send.isError || abschliessen.isError) && (
-              <p className="mt-2 text-sm text-red-600">
-                {apiErrorMessage(send.error ?? abschliessen.error)}
-              </p>
-            )}
+            <Fehlermeldung error={send.error ?? abschliessen.error} />
           </form>
         )}
       </div>

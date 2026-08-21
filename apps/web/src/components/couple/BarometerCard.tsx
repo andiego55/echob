@@ -16,8 +16,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Avatar from '@/components/Avatar'
 import { coupleBarometerApi } from '@/api/coupleRhythm'
 import type { CoupleBarometerEntry } from '@/api/coupleRhythm'
-import { apiErrorMessage } from '@/api/errors'
 import EchoBarometer, { BarometerSparkline, barometerColor } from './EchoBarometer'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function BarometerCard({
   coupleId, ownAvatar, partnerAvatar,
@@ -147,9 +147,7 @@ export default function BarometerCard({
           {eigen?.note && !notizOffen && (
             <p className="mt-2 text-xs italic text-brand-muted">„{eigen.note}"</p>
           )}
-          {speichern.isError && (
-            <p className="mt-2 text-xs text-red-600">{apiErrorMessage(speichern.error)}</p>
-          )}
+          <Fehlermeldung error={speichern.error} />
         </div>
 
         {/* ── Ihr Regler ────────────────────────────────────────────── */}

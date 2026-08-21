@@ -11,6 +11,7 @@ import { renderBold } from '@/utils/renderBold'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import type { ProfileModuleConfig } from '@/utils/profileModules'
 import { computeModuleScores, computeResourcesIndex, scoreLevel, buildSummaryText } from '@/utils/profileScoring'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const SAFETY_STATUS_INFO: Record<string, { label: string; cls: string; show: boolean }> = {
   no_indication:       { label: 'Keine Sicherheitshinweise', cls: 'bg-green-50 border-green-200 text-green-800', show: false },
@@ -254,9 +255,7 @@ export default function ProfilePage() {
               onBlurSave={handleFieldBlur}
             />
 
-            {saveMutation.isError && (
-              <p className="mt-3 text-sm text-red-600">Speichern fehlgeschlagen. Bitte versuche es erneut.</p>
-            )}
+            <Fehlermeldung error={saveMutation.error} className="mt-3" />
 
             {/* Buttons */}
             <div className="mt-6 flex items-center gap-3 flex-wrap">

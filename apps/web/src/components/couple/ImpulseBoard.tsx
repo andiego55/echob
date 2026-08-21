@@ -23,6 +23,7 @@ import { apiErrorMessage } from '@/api/errors'
 import { CardSkeleton } from './Skeleton'
 import Weiterfuehren from './Weiterfuehren'
 import { useCoupleFaces } from './useCoupleFaces'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function ImpulseBoard({ coupleId }: { coupleId: string }) {
   const [gewaehlt, setGewaehlt] = useState<string | null>(null)
@@ -195,9 +196,7 @@ function ImpulsKarte({ coupleId, impuls }: { coupleId: string; impuls: CoupleImp
                 : 'Erst schreiben, dann sehen. So bleibt deine Sicht deine.'}
             </p>
           </div>
-          {speichern.isError && (
-            <p className="mt-2 text-xs text-red-600">{apiErrorMessage(speichern.error)}</p>
-          )}
+          <Fehlermeldung error={speichern.error} />
         </form>
       ) : (
         <>

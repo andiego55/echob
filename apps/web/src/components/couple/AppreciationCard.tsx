@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleAppreciationApi } from '@/api/coupleRhythm'
 import type { CoupleAppreciation } from '@/api/coupleRhythm'
-import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 /** Immer derselbe Dreh für denselben Zettel — sonst springt die Wand bei jedem Neuzeichnen. */
 function drehung(id: string): number {
@@ -106,9 +106,7 @@ export default function AppreciationCard({ coupleId }: { coupleId: string }) {
             Anderer Anstoß
           </button>
         </div>
-        {leave.isError && (
-          <p className="mt-2 text-sm text-red-600">{apiErrorMessage(leave.error)}</p>
-        )}
+        <Fehlermeldung error={leave.error} />
       </div>
 
       {/* ── Was für dich da ist ───────────────────────────────────── */}

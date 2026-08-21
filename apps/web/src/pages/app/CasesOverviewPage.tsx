@@ -15,6 +15,7 @@ import { subscriptionApi } from '@/api/subscription'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { Case } from '@/types'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const BLOG_TOPIC_LABELS: Record<string, string> = {
   blog_beziehungsmuster:     'Beziehungsmuster erkennen',
@@ -163,6 +164,8 @@ export default function CasesOverviewPage() {
             + Fall anlegen
           </Link>
         </div>
+
+        <Fehlermeldung error={saveAvatar.error} className="mt-3" />
 
         {pickerOpen && (
           <AvatarPicker

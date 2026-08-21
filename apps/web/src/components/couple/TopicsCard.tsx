@@ -5,10 +5,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { coupleMediationApi } from '@/api/coupleMediation'
-import { apiErrorMessage } from '@/api/errors'
 import Avatar from '@/components/Avatar'
 import { useCoupleFaces } from './useCoupleFaces'
 import { ArtBruecke } from './CoupleEmptyArt'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 // ── Mediation ─────────────────────────────────────────────────────────────────
 
@@ -54,9 +54,7 @@ export default function TopicsCard({ coupleId }: { coupleId: string }) {
         </button>
       </form>
 
-      {create.isError && (
-        <p className="mt-3 text-sm text-red-600">{apiErrorMessage(create.error)}</p>
-      )}
+      <Fehlermeldung error={create.error} className="mt-3" />
 
       {topics.length === 0 ? (
         <div className="mt-4 rounded-brand border border-dashed border-brand-border px-4 py-6 text-center">

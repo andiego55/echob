@@ -19,8 +19,8 @@ import { useMutation } from '@tanstack/react-query'
 import { coupleCompanionApi } from '@/api/coupleCompanion'
 import type { CoupleSceneDraft, CoupleThreadKind } from '@/api/coupleCompanion'
 import { scenesApi } from '@/api/scenes'
-import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from './EchoThinking'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const BELASTUNG = [
   { wert: 1, label: 'kaum' },
@@ -188,9 +188,7 @@ export default function SceneFromChat({
             Verwerfen
           </button>
         </div>
-        {speichern.isError && (
-          <p className="mt-2 text-xs text-red-600">{apiErrorMessage(speichern.error)}</p>
-        )}
+        <Fehlermeldung error={speichern.error} />
       </div>
     )
   }
@@ -214,9 +212,7 @@ export default function SceneFromChat({
             : 'Dafür brauchst du einen eigenen Fall in EchoB.'}
         </p>
       </button>
-      {bauen.isError && (
-        <p className="mt-2 text-xs text-red-600">{apiErrorMessage(bauen.error)}</p>
-      )}
+      <Fehlermeldung error={bauen.error} />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { scenesApi } from '@/api/scenes'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const SAFETY_BADGE: Record<string, { label: string; cls: string }> = {
   none:     { label: 'Kein Sicherheitsrisiko',    cls: 'bg-green-100 text-green-800' },
@@ -219,9 +220,7 @@ export default function SceneDetailPage() {
               </div>
             </div>
 
-            {updateMutation.isError && (
-              <p className="text-sm text-red-600">Speichern fehlgeschlagen. Bitte versuche es erneut.</p>
-            )}
+            <Fehlermeldung error={updateMutation.error} />
 
             <div className="flex gap-3">
               <button

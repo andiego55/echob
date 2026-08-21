@@ -10,7 +10,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { coupleApi } from '@/api/couple'
-import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function EndRoomPanel({ coupleId, since }: { coupleId: string; since: string }) {
   const navigate = useNavigate()
@@ -126,9 +126,7 @@ export default function EndRoomPanel({ coupleId, since }: { coupleId: string; si
               Abbrechen
             </button>
           </div>
-          {end.isError && (
-            <p className="mt-2 text-xs text-red-600">{apiErrorMessage(end.error)}</p>
-          )}
+          <Fehlermeldung error={end.error} />
         </div>
       )}
     </div>

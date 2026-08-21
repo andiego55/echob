@@ -29,7 +29,7 @@ import SceneFromChat from '@/components/couple/SceneFromChat'
 import { coupleApi } from '@/api/couple'
 import { coupleCompanionApi } from '@/api/coupleCompanion'
 import { coupleMediationApi } from '@/api/coupleMediation'
-import { apiErrorMessage } from '@/api/errors'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 /** Einstiege für den Moment, in dem einem nichts einfällt außer Wut. */
 const EINSTIEGE: Impulsgruppe[] = [
@@ -265,9 +265,7 @@ function ThemaDaraus({ coupleId }: { coupleId: string }) {
           Abbrechen
         </button>
       </div>
-      {anlegen.isError && (
-        <p className="mt-2 text-xs text-red-600">{apiErrorMessage(anlegen.error)}</p>
-      )}
+      <Fehlermeldung error={anlegen.error} />
     </div>
   )
 }

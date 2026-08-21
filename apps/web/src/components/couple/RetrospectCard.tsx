@@ -15,12 +15,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleRetrospectApi } from '@/api/coupleRetrospect'
 import type { CoupleRetrospective, CoupleRetrospectStats } from '@/api/coupleRetrospect'
-import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from './EchoThinking'
 import { RetrospectSkeleton } from './Skeleton'
 import { MOOD_EMOJI } from './moods'
 import { barometerColor } from './EchoBarometer'
 import Weiterfuehren from './Weiterfuehren'
+import Fehlermeldung from '@/components/Fehlermeldung'
 
 const ZEITRAEUME = [
   { days: 30, label: '30 Tage' },
@@ -130,9 +130,7 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
             einem Check-in an – nach ein paar Wochen lohnt sich der Blick zurück.
           </p>
         )}
-        {schreiben.isError && (
-          <p className="mt-3 text-sm text-red-600">{apiErrorMessage(schreiben.error)}</p>
-        )}
+        <Fehlermeldung error={schreiben.error} className="mt-3" />
 
         {data.retrospectives.length > 0 && (
           <div className="mt-4 space-y-3">
@@ -231,9 +229,7 @@ function Rueckblick({
       >
         {loeschen.isPending ? 'Lösche …' : 'Diesen Rückblick verwerfen'}
       </button>
-      {loeschen.isError && (
-        <p className="mt-2 text-xs text-red-600">{apiErrorMessage(loeschen.error)}</p>
-      )}
+      <Fehlermeldung error={loeschen.error} />
     </details>
   )
 }

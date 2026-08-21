@@ -8,7 +8,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { apiClient } from '@/api/client'
 import { subscriptionApi } from '@/api/subscription'
-import { apiErrorText } from '@/utils/apiError'
+import { apiErrorMessage } from '@/api/errors'
 import type { ScalesOverview, ScaleScore } from '@/types'
 
 function fetchScales(caseId: string) {
@@ -122,7 +122,7 @@ export default function ScalesPage() {
 
         {calcMutation.isError && (
           <div className="mb-4 rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {apiErrorText(calcMutation.error, 'Berechnung fehlgeschlagen. Bitte versuche es erneut.')}
+            {apiErrorMessage(calcMutation.error, 'Berechnung fehlgeschlagen. Bitte versuche es erneut.')}
           </div>
         )}
 
