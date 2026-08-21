@@ -29,7 +29,7 @@ const { renderPage, PUBLIC_ROUTES } = await import(pathToFileURL(ssrEntry).href)
 const urls = []
 let count = 0
 for (const route of PUBLIC_ROUTES) {
-  const { appHtml, head } = renderPage(route)
+  const { appHtml, head } = await renderPage(route)
   if (appHtml.length < 400) {
     console.warn(`  ! ${route}: nur ${appHtml.length} Bytes gerendert – bitte prüfen.`)
   }

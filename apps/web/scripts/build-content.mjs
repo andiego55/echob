@@ -143,6 +143,29 @@ const out =
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true })
 fs.writeFileSync(outFile, out, 'utf-8')
+
+// ── Zahlen fuer die Navigation, getrennt vom Manifest ──────────────────────
+//
+// Der Header zeigte ein Abzeichen ("128 Szenen") und rechnete die Zahl zur Laufzeit aus
+// CONTENT_MANIFEST aus - 268 KB Quelldaten fuer EINE Zahl, auf jeder Seite. Dasselbe mit
+// SELF_TESTS fuer die Anzahl der Tests (weitere 190 KB).
+//
+// Was zur Bauzeit feststeht, gehoert in eine eigene kleine Datei.
+const szenen = manifest.filter((m) => m.type === 'scene').length
+const testDir = path.join(webRoot, 'src', 'selftests', 'tests')
+const tests = fs.readdirSync(testDir).filter((f) => f.endsWith('.ts')).length
+
+fs.writeFileSync(
+  path.join(webRoot, 'src', 'content', 'counts.generated.ts'),
+  `// AUTO-GENERIERT von scripts/build-content.mjs — NICHT bearbeiten.
+// Zahlen fuer Navigations-Abzeichen. Bewusst getrennt vom Manifest: Wer nur die Anzahl
+// braucht, soll nicht die Daten laden.
+export const SCENE_COUNT = ${szenen}
+export const TEST_COUNT = ${tests}
+`,
+  'utf-8',
+)
+console.log(`  counts.generated.ts: ${szenen} Szenen, ${tests} Selbsttests`)
 console.log(
   `✓ Content: ${manifest.length} veröffentlicht, ${pages.length - published.length} Entwurf/Entwürfe. ` +
     `Manifest → ${path.relative(webRoot, outFile)}`,

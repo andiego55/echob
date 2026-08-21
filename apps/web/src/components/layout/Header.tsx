@@ -1,7 +1,6 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { CONTENT_MANIFEST } from '@/content/manifest.generated'
-import { SELF_TESTS } from '@/selftests'
+import { SCENE_COUNT, TEST_COUNT } from '@/content/counts.generated'
 
 const WISSEN_COLS = [
   [
@@ -42,8 +41,6 @@ const WISSEN_COLS = [
   ],
 ]
 
-const SCENE_COUNT = CONTENT_MANIFEST.filter((m) => m.type === 'scene').length
-const TEST_COUNT = SELF_TESTS.length
 
 // Highlight-Elemente im Wissen-Dropdown (mit Icon, Teaser, Live-Zähler).
 const WISSEN_FEATURES = [

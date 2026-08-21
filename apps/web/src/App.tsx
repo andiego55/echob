@@ -1,70 +1,71 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
 // ── Öffentliche Seiten ────────────────────────────────────────────────────────
 import LandingPage          from '@/pages/LandingPage'
-import ImpressumPage        from '@/pages/ImpressumPage'
-import DatenschutzPage      from '@/pages/DatenschutzPage'
-import AGBPage              from '@/pages/AGBPage'
-import WiderrufPage         from '@/pages/WiderrufPage'
+const ImpressumPage = lazy(() => import('@/pages/ImpressumPage'))
+const DatenschutzPage = lazy(() => import('@/pages/DatenschutzPage'))
+const AGBPage = lazy(() => import('@/pages/AGBPage'))
+const WiderrufPage = lazy(() => import('@/pages/WiderrufPage'))
 import AuthPage             from '@/pages/AuthPage'
-import ClientInvitePage     from '@/pages/ClientInvitePage'
-import PseudonymAuthPage    from '@/pages/PseudonymAuthPage'
+const ClientInvitePage = lazy(() => import('@/pages/ClientInvitePage'))
+const PseudonymAuthPage = lazy(() => import('@/pages/PseudonymAuthPage'))
 import NotFoundPage         from '@/pages/NotFoundPage'
-import CoachingPage         from '@/pages/CoachingPage'
-import UeberPage            from '@/pages/UeberPage'
-import UeberMissionPage     from '@/pages/UeberMissionPage'
-import GruenderInterviewPage from '@/pages/GruenderInterviewPage'
-import TeamPage             from '@/pages/TeamPage'
-import FachpersonenPage     from '@/pages/FachpersonenPage'
-import FachpersonenFindenPage from '@/pages/FachpersonenFindenPage'
-import FachpersonProfilePage from '@/pages/FachpersonProfilePage'
-import AusbildungPage       from '@/pages/AusbildungPage'
-import ForschungPage        from '@/pages/ForschungPage'
-import WissenPage                    from '@/pages/WissenPage'
-import ContentPage                   from '@/pages/content/ContentPage'
-import GlossarPage                   from '@/pages/GlossarPage'
-import SzenenPage                    from '@/pages/content/SzenenPage'
-import SzeneDetailPage               from '@/pages/content/SzeneDetailPage'
-import SelbsttestsPage               from '@/pages/content/SelbsttestsPage'
-import SelbsttestDetailPage          from '@/pages/content/SelbsttestDetailPage'
-import KompatibilitaetPage           from '@/pages/content/KompatibilitaetPage'
-import ReflectPage                   from '@/pages/content/ReflectPage'
+const CoachingPage = lazy(() => import('@/pages/CoachingPage'))
+const UeberPage = lazy(() => import('@/pages/UeberPage'))
+const UeberMissionPage = lazy(() => import('@/pages/UeberMissionPage'))
+const GruenderInterviewPage = lazy(() => import('@/pages/GruenderInterviewPage'))
+const TeamPage = lazy(() => import('@/pages/TeamPage'))
+const FachpersonenPage = lazy(() => import('@/pages/FachpersonenPage'))
+const FachpersonenFindenPage = lazy(() => import('@/pages/FachpersonenFindenPage'))
+const FachpersonProfilePage = lazy(() => import('@/pages/FachpersonProfilePage'))
+const AusbildungPage = lazy(() => import('@/pages/AusbildungPage'))
+const ForschungPage = lazy(() => import('@/pages/ForschungPage'))
+const WissenPage = lazy(() => import('@/pages/WissenPage'))
+const ContentPage = lazy(() => import('@/pages/content/ContentPage'))
+const GlossarPage = lazy(() => import('@/pages/GlossarPage'))
+const SzenenPage = lazy(() => import('@/pages/content/SzenenPage'))
+const SzeneDetailPage = lazy(() => import('@/pages/content/SzeneDetailPage'))
+const SelbsttestsPage = lazy(() => import('@/pages/content/SelbsttestsPage'))
+const SelbsttestDetailPage = lazy(() => import('@/pages/content/SelbsttestDetailPage'))
+const KompatibilitaetPage = lazy(() => import('@/pages/content/KompatibilitaetPage'))
+const ReflectPage = lazy(() => import('@/pages/content/ReflectPage'))
 
 // ── App-Bereich ───────────────────────────────────────────────────────────────
-import CasesOverviewPage from '@/pages/app/CasesOverviewPage'
-import CaseNewPage       from '@/pages/app/CaseNewPage'
-import CaseDetailPage    from '@/pages/app/CaseDetailPage'
-import OnboardingPage    from '@/pages/app/OnboardingPage'
-import ScenesPage        from '@/pages/app/ScenesPage'
-import SceneNewPage      from '@/pages/app/SceneNewPage'
-import SceneDetailPage   from '@/pages/app/SceneDetailPage'
-import SceneEchoPage     from '@/pages/app/SceneEchoPage'
-import EchoPage          from '@/pages/app/EchoPage'
-import ScalesPage        from '@/pages/app/ScalesPage'
-import ReviewPage        from '@/pages/app/ReviewPage'
-import ReportsPage       from '@/pages/app/ReportsPage'
-import ReportNewPage      from '@/pages/app/ReportNewPage'
-import ReportDetailPage   from '@/pages/app/ReportDetailPage'
-import PrintSummaryPage   from '@/pages/app/PrintSummaryPage'
-import HelpPage           from '@/pages/app/HelpPage'
-import InboxPage          from '@/pages/app/InboxPage'
-import ProfilePage           from '@/pages/app/ProfilePage'
-import ProfileEchoPage       from '@/pages/app/ProfileEchoPage'
-import PersonProfilePage     from '@/pages/app/PersonProfilePage'
-import PersonProfileEchoPage from '@/pages/app/PersonProfileEchoPage'
-import TopicDialogPage       from '@/pages/app/TopicDialogPage'
-import SelfTestDialoguePage  from '@/pages/app/SelfTestDialoguePage'
-import HypothesesPage        from '@/pages/app/HypothesesPage'
-import HypothesisDialogPage  from '@/pages/app/HypothesisDialogPage'
-import UpgradePage           from '@/pages/app/UpgradePage'
-import CaseSharingPage        from '@/pages/app/CaseSharingPage'
-import ZuZweitPage            from '@/pages/ZuZweitPage'
-import CoupleOverviewPage     from '@/pages/couple/CoupleOverviewPage'
-import CoupleJoinPage         from '@/pages/couple/CoupleJoinPage'
-import CoupleRoomPage         from '@/pages/couple/CoupleRoomPage'
-import CoupleSessionPage      from '@/pages/couple/CoupleSessionPage'
-import CoupleMediationPage    from '@/pages/couple/CoupleMediationPage'
-import CoupleTestPage         from '@/pages/couple/CoupleTestPage'
+const CasesOverviewPage = lazy(() => import('@/pages/app/CasesOverviewPage'))
+const CaseNewPage = lazy(() => import('@/pages/app/CaseNewPage'))
+const CaseDetailPage = lazy(() => import('@/pages/app/CaseDetailPage'))
+const OnboardingPage = lazy(() => import('@/pages/app/OnboardingPage'))
+const ScenesPage = lazy(() => import('@/pages/app/ScenesPage'))
+const SceneNewPage = lazy(() => import('@/pages/app/SceneNewPage'))
+const SceneDetailPage = lazy(() => import('@/pages/app/SceneDetailPage'))
+const SceneEchoPage = lazy(() => import('@/pages/app/SceneEchoPage'))
+const EchoPage = lazy(() => import('@/pages/app/EchoPage'))
+const ScalesPage = lazy(() => import('@/pages/app/ScalesPage'))
+const ReviewPage = lazy(() => import('@/pages/app/ReviewPage'))
+const ReportsPage = lazy(() => import('@/pages/app/ReportsPage'))
+const ReportNewPage = lazy(() => import('@/pages/app/ReportNewPage'))
+const ReportDetailPage = lazy(() => import('@/pages/app/ReportDetailPage'))
+const PrintSummaryPage = lazy(() => import('@/pages/app/PrintSummaryPage'))
+const HelpPage = lazy(() => import('@/pages/app/HelpPage'))
+const InboxPage = lazy(() => import('@/pages/app/InboxPage'))
+const ProfilePage = lazy(() => import('@/pages/app/ProfilePage'))
+const ProfileEchoPage = lazy(() => import('@/pages/app/ProfileEchoPage'))
+const PersonProfilePage = lazy(() => import('@/pages/app/PersonProfilePage'))
+const PersonProfileEchoPage = lazy(() => import('@/pages/app/PersonProfileEchoPage'))
+const TopicDialogPage = lazy(() => import('@/pages/app/TopicDialogPage'))
+const SelfTestDialoguePage = lazy(() => import('@/pages/app/SelfTestDialoguePage'))
+const HypothesesPage = lazy(() => import('@/pages/app/HypothesesPage'))
+const HypothesisDialogPage = lazy(() => import('@/pages/app/HypothesisDialogPage'))
+const UpgradePage = lazy(() => import('@/pages/app/UpgradePage'))
+const CaseSharingPage = lazy(() => import('@/pages/app/CaseSharingPage'))
+const ZuZweitPage = lazy(() => import('@/pages/ZuZweitPage'))
+const CoupleOverviewPage = lazy(() => import('@/pages/couple/CoupleOverviewPage'))
+const CoupleJoinPage = lazy(() => import('@/pages/couple/CoupleJoinPage'))
+const CoupleRoomPage = lazy(() => import('@/pages/couple/CoupleRoomPage'))
+const CoupleSessionPage = lazy(() => import('@/pages/couple/CoupleSessionPage'))
+const CoupleMediationPage = lazy(() => import('@/pages/couple/CoupleMediationPage'))
+const CoupleTestPage = lazy(() => import('@/pages/couple/CoupleTestPage'))
 import {
   CoupleSessionsPage, CoupleTopicsPage, CoupleAgreementsPage,
   CoupleTestsPage, CoupleProgressPage,
@@ -72,10 +73,10 @@ import {
   CoupleSharesPage, CoupleSettingsPage,
 } from '@/pages/couple/CoupleTabPages'
 // Nicht zu verwechseln mit der Paar-Analyse im Fachpersonenbereich (weiter unten).
-import CouplePartnerEchoPage  from '@/pages/couple/CoupleEchoPage'
-import CoupleDeescalationPage from '@/pages/couple/CoupleDeescalationPage'
-import PrivacySettingsPage    from '@/pages/app/PrivacySettingsPage'
-import SettingsPage           from '@/pages/app/SettingsPage'
+const CouplePartnerEchoPage = lazy(() => import('@/pages/couple/CoupleEchoPage'))
+const CoupleDeescalationPage = lazy(() => import('@/pages/couple/CoupleDeescalationPage'))
+const PrivacySettingsPage = lazy(() => import('@/pages/app/PrivacySettingsPage'))
+const SettingsPage = lazy(() => import('@/pages/app/SettingsPage'))
 import { useParams }         from 'react-router-dom'
 import { useAuth }           from '@/contexts/AuthContext'
 
@@ -110,56 +111,56 @@ function AppHome() {
 
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import ProfessionalRoute, { useProfessional, Spinner as RoleSpinner } from '@/components/auth/ProfessionalRoute'
-import ProfessionalRegisterPage  from '@/pages/professional/ProfessionalRegisterPage'
-import ProfessionalInboxPage     from '@/pages/professional/ProfessionalInboxPage'
-import ProfessionalCaseDetailPage from '@/pages/professional/ProfessionalCaseDetailPage'
-import ProfessionalEchoPage      from '@/pages/professional/ProfessionalEchoPage'
-import ProfessionalDashboardPage from '@/pages/professional/ProfessionalDashboardPage'
-import ProfessionalTemplatesPage from '@/pages/professional/ProfessionalTemplatesPage'
-import ProfessionalSettingsPage  from '@/pages/professional/ProfessionalSettingsPage'
-import ProfessionalProfilePage   from '@/pages/professional/ProfessionalProfilePage'
-import AdminDirectoryPage        from '@/pages/admin/AdminDirectoryPage'
-import RegionalPage              from '@/pages/RegionalPage'
+const ProfessionalRegisterPage = lazy(() => import('@/pages/professional/ProfessionalRegisterPage'))
+const ProfessionalInboxPage = lazy(() => import('@/pages/professional/ProfessionalInboxPage'))
+const ProfessionalCaseDetailPage = lazy(() => import('@/pages/professional/ProfessionalCaseDetailPage'))
+const ProfessionalEchoPage = lazy(() => import('@/pages/professional/ProfessionalEchoPage'))
+const ProfessionalDashboardPage = lazy(() => import('@/pages/professional/ProfessionalDashboardPage'))
+const ProfessionalTemplatesPage = lazy(() => import('@/pages/professional/ProfessionalTemplatesPage'))
+const ProfessionalSettingsPage = lazy(() => import('@/pages/professional/ProfessionalSettingsPage'))
+const ProfessionalProfilePage = lazy(() => import('@/pages/professional/ProfessionalProfilePage'))
+const AdminDirectoryPage = lazy(() => import('@/pages/admin/AdminDirectoryPage'))
+const RegionalPage = lazy(() => import('@/pages/RegionalPage'))
 import { REGION_PROFESSIONS }    from '@/directory/regions'
-import ProfessionalReportTemplatesPage from '@/pages/professional/ProfessionalReportTemplatesPage'
-import ProfessionalReportDetailPage from '@/pages/professional/ProfessionalReportDetailPage'
-import CoupleEchoPage from '@/pages/professional/CoupleEchoPage'
-import ProfCoupleRoomPage from '@/pages/professional/CoupleRoomPage'
-import CoupleReportDetailPage from '@/pages/professional/CoupleReportDetailPage'
+const ProfessionalReportTemplatesPage = lazy(() => import('@/pages/professional/ProfessionalReportTemplatesPage'))
+const ProfessionalReportDetailPage = lazy(() => import('@/pages/professional/ProfessionalReportDetailPage'))
+const CoupleEchoPage = lazy(() => import('@/pages/professional/CoupleEchoPage'))
+const ProfCoupleRoomPage = lazy(() => import('@/pages/professional/CoupleRoomPage'))
+const CoupleReportDetailPage = lazy(() => import('@/pages/professional/CoupleReportDetailPage'))
 import InstituteRoute, { useInstitute } from '@/components/auth/InstituteRoute'
-import InstituteRegisterPage from '@/pages/institute/InstituteRegisterPage'
-import InstituteDashboardPage from '@/pages/institute/InstituteDashboardPage'
-import InstituteMarketplaceDetailPage from '@/pages/institute/InstituteMarketplaceDetailPage'
-import InstituteGeneratePage from '@/pages/institute/InstituteGeneratePage'
-import InstituteExampleEditorPage from '@/pages/institute/InstituteExampleEditorPage'
-import InstituteStudentsPage from '@/pages/institute/InstituteStudentsPage'
-import InstituteSubmissionsPage from '@/pages/institute/InstituteSubmissionsPage'
-import InstituteSubmissionDetailPage from '@/pages/institute/InstituteSubmissionDetailPage'
-import InstituteRubricsPage from '@/pages/institute/InstituteRubricsPage'
-import InstituteAssignmentsPage from '@/pages/institute/InstituteAssignmentsPage'
-import InstituteAssignmentDetailPage from '@/pages/institute/InstituteAssignmentDetailPage'
-import InstituteSettingsPage from '@/pages/institute/InstituteSettingsPage'
-import InstituteModulesPage from '@/pages/institute/InstituteModulesPage'
-import InstituteModuleDetailPage from '@/pages/institute/InstituteModuleDetailPage'
+const InstituteRegisterPage = lazy(() => import('@/pages/institute/InstituteRegisterPage'))
+const InstituteDashboardPage = lazy(() => import('@/pages/institute/InstituteDashboardPage'))
+const InstituteMarketplaceDetailPage = lazy(() => import('@/pages/institute/InstituteMarketplaceDetailPage'))
+const InstituteGeneratePage = lazy(() => import('@/pages/institute/InstituteGeneratePage'))
+const InstituteExampleEditorPage = lazy(() => import('@/pages/institute/InstituteExampleEditorPage'))
+const InstituteStudentsPage = lazy(() => import('@/pages/institute/InstituteStudentsPage'))
+const InstituteSubmissionsPage = lazy(() => import('@/pages/institute/InstituteSubmissionsPage'))
+const InstituteSubmissionDetailPage = lazy(() => import('@/pages/institute/InstituteSubmissionDetailPage'))
+const InstituteRubricsPage = lazy(() => import('@/pages/institute/InstituteRubricsPage'))
+const InstituteAssignmentsPage = lazy(() => import('@/pages/institute/InstituteAssignmentsPage'))
+const InstituteAssignmentDetailPage = lazy(() => import('@/pages/institute/InstituteAssignmentDetailPage'))
+const InstituteSettingsPage = lazy(() => import('@/pages/institute/InstituteSettingsPage'))
+const InstituteModulesPage = lazy(() => import('@/pages/institute/InstituteModulesPage'))
+const InstituteModuleDetailPage = lazy(() => import('@/pages/institute/InstituteModuleDetailPage'))
 import StudentRoute, { useStudent } from '@/components/auth/StudentRoute'
-import StudentRegisterPage from '@/pages/student/StudentRegisterPage'
-import StudentDashboardPage from '@/pages/student/StudentDashboardPage'
-import StudentCaseDetailPage from '@/pages/student/StudentCaseDetailPage'
-import StudentEchoPage from '@/pages/student/StudentEchoPage'
-import StudentReportsPage from '@/pages/student/StudentReportsPage'
-import StudentReportNewPage from '@/pages/student/StudentReportNewPage'
-import StudentReportDetailPage from '@/pages/student/StudentReportDetailPage'
-import StudentNotesPage from '@/pages/student/StudentNotesPage'
-import StudentHypothesesPage from '@/pages/student/StudentHypothesesPage'
-import StudentHypothesisDialogPage from '@/pages/student/StudentHypothesisDialogPage'
-import StudentSubmitPage from '@/pages/student/StudentSubmitPage'
-import StudentCouplePage from '@/pages/student/StudentCouplePage'
-import StudentRoleplayPage from '@/pages/student/StudentRoleplayPage'
-import StudentAssignmentsPage from '@/pages/student/StudentAssignmentsPage'
-import StudentModulesPage from '@/pages/student/StudentModulesPage'
-import StudentModuleDetailPage from '@/pages/student/StudentModuleDetailPage'
-import StudentScalesPage from '@/pages/student/StudentScalesPage'
-import StudentReviewPage from '@/pages/student/StudentReviewPage'
+const StudentRegisterPage = lazy(() => import('@/pages/student/StudentRegisterPage'))
+const StudentDashboardPage = lazy(() => import('@/pages/student/StudentDashboardPage'))
+const StudentCaseDetailPage = lazy(() => import('@/pages/student/StudentCaseDetailPage'))
+const StudentEchoPage = lazy(() => import('@/pages/student/StudentEchoPage'))
+const StudentReportsPage = lazy(() => import('@/pages/student/StudentReportsPage'))
+const StudentReportNewPage = lazy(() => import('@/pages/student/StudentReportNewPage'))
+const StudentReportDetailPage = lazy(() => import('@/pages/student/StudentReportDetailPage'))
+const StudentNotesPage = lazy(() => import('@/pages/student/StudentNotesPage'))
+const StudentHypothesesPage = lazy(() => import('@/pages/student/StudentHypothesesPage'))
+const StudentHypothesisDialogPage = lazy(() => import('@/pages/student/StudentHypothesisDialogPage'))
+const StudentSubmitPage = lazy(() => import('@/pages/student/StudentSubmitPage'))
+const StudentCouplePage = lazy(() => import('@/pages/student/StudentCouplePage'))
+const StudentRoleplayPage = lazy(() => import('@/pages/student/StudentRoleplayPage'))
+const StudentAssignmentsPage = lazy(() => import('@/pages/student/StudentAssignmentsPage'))
+const StudentModulesPage = lazy(() => import('@/pages/student/StudentModulesPage'))
+const StudentModuleDetailPage = lazy(() => import('@/pages/student/StudentModuleDetailPage'))
+const StudentScalesPage = lazy(() => import('@/pages/student/StudentScalesPage'))
+const StudentReviewPage = lazy(() => import('@/pages/student/StudentReviewPage'))
 import DevNoticeModal from '@/components/DevNoticeModal'
 import ConsentGate from '@/components/ConsentGate'
 import LockScreen from '@/components/app/LockScreen'
@@ -186,8 +187,23 @@ export default function App() {
 // Nur die Routen – ohne die App-Shell-Modals (DevNotice/Consent/Lock/…).
 // Wird von <App> und vom Prerender (entry-server) gerendert, damit die
 // statische HTML ausschließlich den eigentlichen Seiteninhalt enthält.
-export function AppRoutes() {
+/**
+ * Der Rueckfall, waehrend ein Bereichs-Buendel geladen wird.
+ *
+ * Bewusst karg: Ein Spinner, der bei einem 40-ms-Chunk aufblitzt, wirkt unruhiger als eine
+ * kurze leere Flaeche. Die Mindesthoehe haelt das Layout, damit beim Eintreffen nichts
+ * springt. Nur wenn es wirklich dauert, erscheint nach 400 ms ein Hinweis.
+ */
+function BereichLaedt() {
   return (
+    <div className="min-h-[60vh]" role="status" aria-busy="true">
+      <span className="sr-only">Bereich wird geladen</span>
+    </div>
+  )
+}
+
+export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
+  const routen = (
     <Routes>
       {/* ── Öffentlich ─────────────────────────────────────────────────────── */}
       <Route path="/"            element={<LandingPage />} />
@@ -337,4 +353,15 @@ export function AppRoutes() {
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
+
+  /**
+   * Im Browser faengt Suspense das Nachladen ab und zeigt solange den Rueckfall.
+   *
+   * Beim Prerendering ist genau das falsch: `renderToString` faengt das Promise an der
+   * Suspense-Grenze ab und schreibt den (leeren) Rueckfall ins HTML - die Seite waere
+   * ausgeliefert, aber inhaltslos. Ohne Grenze wirft React das Promise stattdessen nach
+   * oben durch, wo `renderPage` es abwartet und erneut rendert. Siehe entry-server.tsx.
+   */
+  if (!suspense) return routen
+  return <Suspense fallback={<BereichLaedt />}>{routen}</Suspense>
 }
