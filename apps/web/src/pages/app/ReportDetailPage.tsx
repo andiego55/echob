@@ -294,7 +294,7 @@ export default function ReportDetailPage() {
               )}
             </div>
           ) : (
-            <div className="card text-center py-8">
+            <div className="rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-8 text-center">
               <p className="text-sm text-brand-muted">Dieser Bericht hat keinen generierten Inhalt.</p>
             </div>
           )}

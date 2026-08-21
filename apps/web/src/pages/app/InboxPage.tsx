@@ -50,7 +50,7 @@ export default function InboxPage() {
         {isLoading && <div className="mt-8"><ListSkeleton rows={3} label="Postfach wird geladen" /></div>}
 
         {isEmpty && (
-          <div className="mt-8 card text-center py-12">
+          <div className="mt-8 rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-12 text-center">
             <div className="text-4xl mb-3">📭</div>
             <h2 className="text-lg font-semibold text-navy mb-1">Noch nichts da</h2>
             <p className="text-sm text-brand-muted">

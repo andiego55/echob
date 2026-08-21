@@ -113,7 +113,7 @@ function SceneRow({ scene: s, caseId }: { scene: Scene; caseId: string }) {
 
 function ScenesEmpty({ caseId }: { caseId: string }) {
   return (
-    <div className="card text-center py-12 max-w-md mx-auto">
+    <div className="rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-12 text-center max-w-md mx-auto">
       <div className="text-4xl mb-4">📖</div>
       <h2 className="text-lg font-semibold text-navy mb-2">Noch keine Einträge</h2>
       <p className="text-sm text-brand-muted mb-6">

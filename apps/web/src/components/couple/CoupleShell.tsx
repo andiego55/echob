@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { coupleApi } from '@/api/couple'
 import CoupleOnboarding from './CoupleOnboarding'
-import InfoPopover from './InfoPopover'
+import InfoPopover from '@/components/InfoPopover'
 
 interface Reiter { path: string; label: string }
 interface Gruppe { label: string; kinder: Reiter[] }

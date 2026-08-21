@@ -264,7 +264,7 @@ function ScaleCard({ score: s, colorScheme, expanded, onToggle }: {
 
 function EmptyScales({ onCalculate, isPending, disabled }: { onCalculate: () => void; isPending: boolean; disabled?: boolean }) {
   return (
-    <div className="card text-center py-12 max-w-md mx-auto">
+    <div className="rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-12 text-center max-w-md mx-auto">
       <h2 className="text-lg font-semibold text-navy mb-2">Noch keine Skalenwerte</h2>
       <p className="text-sm text-brand-muted mb-6">
         Klicke auf "Skalen berechnen", um eine KI-gestützte Einschätzung der Beziehungsmuster zu erhalten. Je mehr Szenen und Reflexionen vorliegen, desto aussagekräftiger die Ergebnisse.

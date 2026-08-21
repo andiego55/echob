@@ -524,7 +524,7 @@ function SummaryView({
       )}
 
       {!hasAnyData && (
-        <div className="card text-center py-8 text-brand-muted text-sm">
+        <div className="rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-8 text-center text-sm text-brand-muted">
           <p>Noch keine Daten vorhanden. Fülle die Module aus, um eine Zusammenfassung zu sehen.</p>
           <button onClick={onEdit} className="mt-4 btn-primary !py-2 !px-4 !text-sm">
             Module ausfüllen

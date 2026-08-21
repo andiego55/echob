@@ -9,7 +9,7 @@
  * ihn öffnet. Die Nummern bleiben damit von jeder Seite aus einen Klick entfernt – sie
  * verschwinden nicht, sie drängeln nur nicht mehr.
  */
-import InfoPopover from './InfoPopover'
+import InfoPopover from '@/components/InfoPopover'
 
 /** Der Text selbst – wird im Fragezeichen und in der Fußzeile verwendet. */
 export function SafetyText() {

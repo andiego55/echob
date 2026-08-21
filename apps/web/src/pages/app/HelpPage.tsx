@@ -101,7 +101,7 @@ export default function HelpPage() {
             Psychotherapeut:innen, Beratungsstellen und Coaches in deiner Nähe.
             Dieses Verzeichnis ist in Vorbereitung.
           </p>
-          <div className="card text-center py-8">
+          <div className="rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-8 text-center">
             <div className="text-3xl mb-3">🔍</div>
             <p className="text-sm font-semibold text-navy mb-1">Verzeichnis in Vorbereitung</p>
             <p className="text-xs text-brand-muted mb-4">

@@ -11,6 +11,11 @@
  * kein Hover – deshalb schaltet ein Tippen dieselbe Fläche um.
  *
  * Das Zeichen selbst ist die Echo-Welle mit einem Fragezeichen, kein geliehenes Icon.
+*
+ * **Lag bis zur Angleichung im Paarraum.** Der Nutzerbereich erklaert viel und hat die
+ * Erklaerung dauerhaft auf der Seite stehen — man liest sie einmal und ueberblaettert sie
+ * danach fuer immer, Platz kostet sie trotzdem jeden Tag. Weil der Baustein nichts ueber
+ * den Paarraum weiss, gehoert er hierher.
  */
 import { useEffect, useId, useRef, useState } from 'react'
 
