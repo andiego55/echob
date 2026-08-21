@@ -150,7 +150,7 @@ export default function MediationFollowUp({ topicId }: { topicId: string }) {
                   type="button"
                   onClick={() => summarize.mutate()}
                   disabled={summarize.isPending}
-                  className="btn-outline !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
+                  className="btn-quiet !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
                 >
                   {summarize.isPending ? 'Fasse zusammen …' : 'Daraus etwas teilen'}
                 </button>

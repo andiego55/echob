@@ -43,7 +43,7 @@ export default function CoupleJoinPage() {
     <AppShell>
       <div className="mx-auto max-w-[700px] px-6 py-8 space-y-6">
         <div>
-          <span className="label">Zu zweit</span>
+          <span className="label">Für Paare</span>
           <h1 className="mt-1 text-2xl font-bold text-navy">Verbindung annehmen</h1>
           <p className="mt-2 text-sm text-brand-muted">
             Code <span className="font-semibold text-navy tracking-[0.15em]">{formatCoupleCode(code.toUpperCase())}</span>
@@ -59,7 +59,7 @@ export default function CoupleJoinPage() {
               Dieser Kopplungscode ist unbekannt, bereits verwendet oder zurückgezogen worden.
               Bitte die einladende Person um einen neuen Code.
             </p>
-            <Link to="/app/paar" className="btn-outline !py-2 !px-4 !text-sm mt-4 inline-block">
+            <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">
               Zur Übersicht
             </Link>
           </div>

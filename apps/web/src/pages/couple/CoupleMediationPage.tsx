@@ -68,7 +68,7 @@ export default function CoupleMediationPage() {
           <div className="card">
             <h1 className="text-sm font-bold text-navy">Thema lässt sich nicht öffnen</h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
-            <Link to="/app/paar" className="btn-outline !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
+            <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
         </div>
       </AppShell>
@@ -174,7 +174,7 @@ export default function CoupleMediationPage() {
                 <button
                   onClick={() => resolve.mutate()}
                   disabled={resolve.isPending}
-                  className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50"
+                  className="btn-quiet !py-2 !px-4 !text-sm disabled:opacity-50"
                 >
                   Thema geklärt
                 </button>

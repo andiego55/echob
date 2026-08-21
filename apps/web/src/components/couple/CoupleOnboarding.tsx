@@ -1,13 +1,14 @@
 /**
  * Was beim ersten Betreten des Paarraums geklärt sein sollte.
  *
- * Kein Pflicht-Dialog, der weggeklickt wird, sondern eine Karte, die oben stehen bleibt,
- * bis man sie bewusst schließt. Bestätigt wird lokal – es geht um Verständnis, nicht um
- * eine Einwilligung, die wir speichern müssten.
+ * **Vorher eine Karte, jetzt hinter dem Fragezeichen.** Fünf Regeln liest man einmal und
+ * danach nie wieder – als dauerhafte Karte oben im Raum haben sie jeden Tag Platz gekostet
+ * und wurden trotzdem überblättert. Jetzt hängen sie am Fragezeichen neben dem Raumnamen:
+ * sichtbar, wo man sie sucht, und stumm, solange man sie nicht braucht.
+ *
+ * Nichts wird mehr weggeklickt und nichts gemerkt – es gibt keinen Zustand, in dem die
+ * Regeln unerreichbar wären.
  */
-import { useState } from 'react'
-
-const KEY_PREFIX = 'echob.couple.onboarding.'
 
 const RULES = [
   {
@@ -32,37 +33,21 @@ const RULES = [
   },
 ]
 
-export default function CoupleOnboarding({ coupleId }: { coupleId: string }) {
-  const storageKey = KEY_PREFIX + coupleId
-  const [done, setDone] = useState(() => {
-    try { return localStorage.getItem(storageKey) === '1' } catch { return false }
-  })
-
-  if (done) return null
-
+/** Die fünf Regeln als Inhalt für das Fragezeichen. */
+export default function CoupleOnboarding() {
   return (
-    <div className="card border-l-4 border-l-navy/30">
-      <span className="label">Bevor ihr loslegt</span>
-      <h2 className="mt-1 text-sm font-bold text-navy">Fünf Dinge, die euch das leichter machen</h2>
-
-      <ul className="mt-3 space-y-2.5">
+    <>
+      <p className="text-sm leading-relaxed text-brand-muted">
+        Fünf Dinge, die euch das leichter machen:
+      </p>
+      <ul className="mt-2.5 space-y-2">
         {RULES.map(r => (
-          <li key={r.title} className="text-sm">
+          <li key={r.title} className="text-sm leading-relaxed">
             <span className="font-medium text-navy">{r.title}.</span>{' '}
             <span className="text-brand-muted">{r.text}</span>
           </li>
         ))}
       </ul>
-
-      <button
-        onClick={() => {
-          try { localStorage.setItem(storageKey, '1') } catch { /* Speichern ist Komfort, kein Muss */ }
-          setDone(true)
-        }}
-        className="btn-outline !py-2 !px-4 !text-sm mt-4"
-      >
-        Verstanden
-      </button>
-    </div>
+    </>
   )
 }

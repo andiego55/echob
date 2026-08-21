@@ -41,7 +41,7 @@ export default function AppShell({ children }: Props) {
             {[
               { to: '/app',          label: 'Meine Fälle',        end: true },
               { to: '/app/inbox',    label: 'Postfach',            end: false },
-              { to: '/app/paar',     label: 'Zu zweit',            end: false },
+              { to: '/app/paar',     label: 'Für Paare',           end: false },
               { to: '/app/profile',  label: 'Mein Profil',         end: false },
               { to: '/app/privacy',  label: 'Schutz',              end: false },
               { to: '/app/help',     label: 'Hilfe',               end: false },

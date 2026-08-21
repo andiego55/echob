@@ -91,7 +91,7 @@ export default function PrivateEchoPanel({ sessionId }: { sessionId: string }) {
             type="button"
             onClick={() => feedback.mutate()}
             disabled={busy}
-            className="btn-outline !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
+            className="btn-quiet !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
           >
             {feedback.isPending ? 'Werte aus …' : 'Feedback zu mir'}
           </button>

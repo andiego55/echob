@@ -50,7 +50,7 @@ export default function CoupleRoomPage() {
           <div className="card">
             <h1 className="card-title">Paarraum nicht verfügbar</h1>
             <p className="mt-2 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
-            <Link to="/professional" className="btn-outline mt-4 inline-block !py-2 !px-4 !text-sm">
+            <Link to="/professional" className="btn-quiet mt-4 inline-block !py-2 !px-4 !text-sm">
               Zur Übersicht
             </Link>
           </div>

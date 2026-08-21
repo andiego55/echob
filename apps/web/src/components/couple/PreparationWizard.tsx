@@ -133,7 +133,7 @@ export default function PreparationWizard({
             <button
               onClick={() => coach.mutate()}
               disabled={!concern.trim() || coach.isPending}
-              className="btn-outline !py-1.5 !px-3.5 !text-xs mt-2 disabled:opacity-50"
+              className="btn-quiet !py-1.5 !px-3.5 !text-xs mt-2 disabled:opacity-50"
             >
               {coach.isPending ? 'Echo formuliert …' : 'Als Ich-Botschaft formulieren'}
             </button>

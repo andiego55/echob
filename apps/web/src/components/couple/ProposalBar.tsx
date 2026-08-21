@@ -89,7 +89,7 @@ export default function ProposalBar({ session }: { session: CoupleSession }) {
               <button
                 onClick={() => respond.mutate(false)}
                 disabled={respond.isPending}
-                className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50"
+                className="btn-quiet !py-2 !px-4 !text-sm disabled:opacity-50"
               >
                 Noch nicht
               </button>
@@ -116,7 +116,7 @@ export default function ProposalBar({ session }: { session: CoupleSession }) {
             <button
               onClick={() => schedule.mutate(when ? new Date(when).toISOString() : null)}
               disabled={schedule.isPending}
-              className="btn-outline !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
+              className="btn-quiet !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
             >
               {session.scheduled_for ? 'Termin ändern' : 'Termin setzen'}
             </button>

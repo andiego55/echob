@@ -67,7 +67,7 @@ export default function CoupleTestPage() {
                 mehr schaden als helfen. Du findest ihn in deinem eigenen Bereich.
               </p>
             )}
-            <Link to={`/app/paar/${coupleId}`} className="btn-outline !py-2 !px-4 !text-sm mt-4 inline-block">
+            <Link to={`/app/paar/${coupleId}`} className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">
               Zum Paarraum
             </Link>
           </div>
@@ -172,7 +172,7 @@ export default function CoupleTestPage() {
                   </button>
                   <button
                     onClick={() => { setAnswers(data.own?.answers ?? {}); setRetake(true) }}
-                    className="btn-outline !py-2 !px-4 !text-sm"
+                    className="btn-quiet !py-2 !px-4 !text-sm"
                   >
                     Antworten ändern
                   </button>

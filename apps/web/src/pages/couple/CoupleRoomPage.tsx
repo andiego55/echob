@@ -6,7 +6,6 @@
  */
 import { useParams } from 'react-router-dom'
 import CoupleShell from '@/components/couple/CoupleShell'
-import CoupleOnboarding from '@/components/couple/CoupleOnboarding'
 import CoupleDashboard from '@/components/couple/CoupleDashboard'
 
 export default function CoupleRoomPage() {
@@ -15,7 +14,6 @@ export default function CoupleRoomPage() {
   return (
     <CoupleShell subtitle="Was gerade dran ist – und was warten kann.">
       <div className="space-y-5">
-        <CoupleOnboarding coupleId={coupleId} />
         <CoupleDashboard coupleId={coupleId} />
       </div>
     </CoupleShell>

@@ -89,7 +89,7 @@ function DueRow({ agreement, coupleId }: { agreement: CoupleAgreement; coupleId:
         <button
           onClick={() => review.mutate('again')}
           disabled={review.isPending}
-          className="btn-outline !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
+          className="btn-quiet !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
         >
           Noch dran
         </button>

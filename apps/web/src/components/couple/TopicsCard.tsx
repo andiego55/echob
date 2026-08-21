@@ -49,7 +49,7 @@ export default function TopicsCard({ coupleId }: { coupleId: string }) {
           placeholder="Strittiges Thema, z. B. „Wie wir mit Geld umgehen“"
           className="input flex-1 min-w-[220px] !text-sm"
         />
-        <button type="submit" disabled={!title.trim() || create.isPending} className="btn-outline !py-2 !px-4 !text-sm disabled:opacity-50">
+        <button type="submit" disabled={!title.trim() || create.isPending} className="btn-quiet !py-2 !px-4 !text-sm disabled:opacity-50">
           {create.isPending ? 'Lege an …' : 'Thema anlegen'}
         </button>
       </form>

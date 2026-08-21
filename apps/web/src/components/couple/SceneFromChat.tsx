@@ -75,7 +75,7 @@ export default function SceneFromChat({
           {caseId && (
             <Link
               to={`/app/cases/${caseId}/scenes/${gespeichert}`}
-              className="btn-outline !py-1.5 !px-3.5 !text-xs no-underline"
+              className="btn-quiet !py-1.5 !px-3.5 !text-xs no-underline"
             >
               Szene ansehen
             </Link>

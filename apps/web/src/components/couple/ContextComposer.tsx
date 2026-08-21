@@ -125,7 +125,7 @@ export default function ContextComposer({ sessionId, disabled = false }: Props) 
             <button
               onClick={() => draft.mutate()}
               disabled={!caseId || elements.length === 0 || draft.isPending || disabled}
-              className="btn-outline !py-1.5 !px-3.5 !text-xs mt-2.5 disabled:opacity-50"
+              className="btn-quiet !py-1.5 !px-3.5 !text-xs mt-2.5 disabled:opacity-50"
             >
               {draft.isPending ? 'Echo schreibt …' : 'Entwurf erzeugen'}
             </button>

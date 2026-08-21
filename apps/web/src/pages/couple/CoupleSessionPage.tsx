@@ -103,7 +103,7 @@ export default function CoupleSessionPage() {
           <div className="card">
             <h1 className="text-sm font-bold text-navy">Gespräch lässt sich nicht öffnen</h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
-            <Link to="/app/paar" className="btn-outline !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
+            <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
         </div>
       </AppShell>
@@ -134,7 +134,7 @@ export default function CoupleSessionPage() {
             {!closed && (
               <button
                 onClick={() => { if (confirm('Sitzung abschließen? Danach kann niemand mehr schreiben.')) close.mutate() }}
-                className="btn-outline !py-2 !px-4 !text-sm sm:shrink-0"
+                className="btn-quiet !py-2 !px-4 !text-sm sm:shrink-0"
               >
                 Sitzung abschließen
               </button>
@@ -393,7 +393,7 @@ function SummaryCard({ sessionId, hasMessages }: { sessionId: string; hasMessage
       <button
         onClick={() => create.mutate()}
         disabled={!hasMessages || create.isPending}
-        className="btn-outline !py-1.5 !px-3.5 !text-xs mt-3 disabled:opacity-50"
+        className="btn-quiet !py-1.5 !px-3.5 !text-xs mt-3 disabled:opacity-50"
       >
         {create.isPending ? 'Fasse zusammen …' : 'Sitzung zusammenfassen'}
       </button>

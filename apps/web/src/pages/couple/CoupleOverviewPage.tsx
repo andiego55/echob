@@ -30,7 +30,7 @@ export default function CoupleOverviewPage() {
   const rooms = links.filter(l => l.status === 'active')
   const pending = links.filter(l => l.status === 'pending')
 
-  // Genau ein Raum? Dann führt „Zu zweit“ direkt hinein – samt Reiter-Navigation.
+  // Genau ein Raum? Dann führt „Für Paare“ direkt hinein – samt Reiter-Navigation.
   // Eine Zwischenseite mit einer einelementigen Liste kostet nur einen Klick.
   if (rooms.length === 1) {
     return <Navigate to={`/app/paar/${rooms[0].id}`} replace />
@@ -40,7 +40,7 @@ export default function CoupleOverviewPage() {
     <AppShell>
       <div className="mx-auto max-w-[900px] px-6 py-8 space-y-6">
         <div>
-          <span className="label">Zu zweit</span>
+          <span className="label">Für Paare</span>
           <h1 className="mt-1 text-2xl font-bold text-navy">Paartherapie</h1>
           {/* Ab hier gibt es keinen oder mehrere Räume – bei genau einem wurde oben
               weitergeleitet. */}
@@ -153,10 +153,10 @@ function PendingInviteCard({ link }: { link: CoupleLink }) {
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <button onClick={() => copy('code')} className="btn-outline !py-2 !px-4 !text-sm">
+        <button onClick={() => copy('code')} className="btn-quiet !py-2 !px-4 !text-sm">
           {copied === 'code' ? 'Kopiert ✓' : 'Code kopieren'}
         </button>
-        <button onClick={() => copy('link')} className="btn-outline !py-2 !px-4 !text-sm">
+        <button onClick={() => copy('link')} className="btn-quiet !py-2 !px-4 !text-sm">
           {copied === 'link' ? 'Kopiert ✓' : 'Einladungslink kopieren'}
         </button>
         <button

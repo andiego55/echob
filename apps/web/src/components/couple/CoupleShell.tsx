@@ -18,6 +18,8 @@ import { NavLink, Link, useLocation, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import { coupleApi } from '@/api/couple'
+import CoupleOnboarding from './CoupleOnboarding'
+import InfoPopover from './InfoPopover'
 
 interface Reiter { path: string; label: string }
 interface Gruppe { label: string; kinder: Reiter[] }
@@ -99,7 +101,7 @@ export default function CoupleShell({
             <p className="mt-2 text-sm text-brand-muted">
               Dieser Raum existiert nicht oder wurde beendet.
             </p>
-            <Link to="/app/paar" className="btn-outline !py-2 !px-4 !text-sm mt-4 inline-block">
+            <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">
               Zur Übersicht
             </Link>
           </div>
@@ -118,11 +120,17 @@ export default function CoupleShell({
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-start justify-between gap-3 px-6 pt-6 pb-3">
           <div className="min-w-0">
             <Link to="/app/paar" className="text-xs text-brand-muted hover:text-navy">
-              ← Zu zweit
+              ← Für Paare
             </Link>
-            <h1 className="mt-1.5 text-2xl font-bold text-navy">
-              Mit {room.partner_display_name || 'deiner Partnerperson'}
-            </h1>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-bold text-navy">
+                Mit {room.partner_display_name || 'deiner Partnerperson'}
+              </h1>
+              {/* Die fuenf Grundregeln: beim ersten Besuch offen, danach auf Zuruf. */}
+              <InfoPopover label="Die fünf Grundregeln" title="Bevor ihr loslegt" align="left">
+                <CoupleOnboarding />
+              </InfoPopover>
+            </div>
             {subtitle && <p className="mt-1 text-sm text-brand-muted">{subtitle}</p>}
           </div>
 

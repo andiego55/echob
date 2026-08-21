@@ -275,7 +275,7 @@ function BridgeCard({
             <button
               onClick={() => drop.mutate()}
               disabled={drop.isPending}
-              className="btn-outline !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
+              className="btn-quiet !py-1.5 !px-3.5 !text-xs disabled:opacity-50"
             >
               {drop.isPending ? 'Verwerfe …' : 'Verwerfen'}
             </button>

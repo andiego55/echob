@@ -35,6 +35,15 @@
            hover:bg-white/10 focus-visible:outline-white;
   }
 
+  /* Zweitrangige Handlung auf HELLEM Grund.
+     .btn-outline ist weisser Text auf transparent - richtig auf dunklen Flaechen
+     (Hero, Kopfzeile), auf einer weissen Karte aber unsichtbar. Diese Variante ist
+     das Gegenstueck dafuer. */
+  .btn-quiet {
+    @apply btn border-2 border-brand-border bg-white text-navy
+           hover:border-accent/50 hover:text-accent focus-visible:outline-accent;
+  }
+
   .btn-dark {
     @apply btn bg-navy text-white hover:bg-navy-mid;
   }
@@ -104,6 +113,19 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .beitrag-neu { animation: none; }
+  }
+
+  /* ── Atemfigur (Streit-Einstieg) ─────────────────────────────── */
+  /* Vier Sekunden ein, sechs Sekunden aus - das Ausatmen laenger als das Einatmen ist
+     der ganze Trick. Deshalb ist die Kurve asymmetrisch, nicht einfach ein Puls. */
+  .atem-figur { animation: atmen 10s ease-in-out infinite; }
+  @keyframes atmen {
+    0%   { transform: scale(0.82); }
+    40%  { transform: scale(1.12); }
+    100% { transform: scale(0.82); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .atem-figur { animation: none; }
   }
 
   /* ── Safety Notice ───────────────────────────────────────────── */

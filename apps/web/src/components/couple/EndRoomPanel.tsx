@@ -60,7 +60,7 @@ export default function EndRoomPanel({ coupleId, since }: { coupleId: string; si
             }
           }}
           disabled={clearPrivate.isPending}
-          className="btn-outline !py-1.5 !px-3.5 !text-xs mt-2.5 disabled:opacity-50"
+          className="btn-quiet !py-1.5 !px-3.5 !text-xs mt-2.5 disabled:opacity-50"
         >
           {clearPrivate.isPending ? 'Lösche …' : 'Privates löschen'}
         </button>
