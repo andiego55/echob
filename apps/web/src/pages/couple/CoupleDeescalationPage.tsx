@@ -114,7 +114,7 @@ export default function CoupleDeescalationPage() {
           />
 
           {genugGesagt && (
-            <div className="mx-auto mt-5 max-w-[820px]">
+            <div className="mt-5">
               <div className="card card-static">
                 <h2 className="card-title">Und jetzt?</h2>
                 <p className="mt-1 text-xs text-brand-muted">

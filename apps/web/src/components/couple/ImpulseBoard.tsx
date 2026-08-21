@@ -93,7 +93,7 @@ export default function ImpulseBoard({ coupleId }: { coupleId: string }) {
               <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
                 {g.name}
               </p>
-              <div className="mt-1.5 grid gap-2 sm:grid-cols-2">
+              <div className="mt-1.5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {g.eintraege.map(i => (
                   <button
                     key={i.slug}

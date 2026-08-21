@@ -94,14 +94,14 @@ export default function CoupleSessionPage() {
   if (isLoading) {
     return (
       <AppShell>
-        <div className="mx-auto max-w-[1000px] px-6 py-8"><SessionSkeleton /></div>
+        <div className="mx-auto max-w-[1100px] px-6 py-8"><SessionSkeleton /></div>
       </AppShell>
     )
   }
   if (isError || !data) {
     return (
       <AppShell>
-        <div className="mx-auto max-w-[1000px] px-6 py-8">
+        <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
             <h1 className="text-sm font-bold text-navy">Gespräch lässt sich nicht öffnen</h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>

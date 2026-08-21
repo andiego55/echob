@@ -59,12 +59,12 @@ export default function CoupleMediationPage() {
   })
 
   if (isLoading) {
-    return <AppShell><div className="mx-auto max-w-[1000px] px-6 py-8 text-sm text-brand-muted">Lade …</div></AppShell>
+    return <AppShell><div className="mx-auto max-w-[1100px] px-6 py-8 text-sm text-brand-muted">Lade …</div></AppShell>
   }
   if (isError || !data) {
     return (
       <AppShell>
-        <div className="mx-auto max-w-[1000px] px-6 py-8">
+        <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
             <h1 className="text-sm font-bold text-navy">Thema lässt sich nicht öffnen</h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
@@ -79,7 +79,7 @@ export default function CoupleMediationPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1000px] px-6 py-8">
+      <div className="mx-auto max-w-[1100px] px-6 py-8">
         <div className="mb-5">
           <Link to={`/app/paar/${topic.couple_id}`} className="text-xs text-brand-muted hover:text-navy">← Paarraum</Link>
           <span className="label mt-2 block">Mediation</span>

@@ -136,7 +136,7 @@ export default function EchoChat({
   // ── Nach dem Abschließen ────────────────────────────────────────
   if (festgehalten) {
     return (
-      <div className="card card-static mx-auto max-w-[820px]">
+      <div className="card card-static">
         <h2 className="card-title-lg">Festgehalten</h2>
         <p className="mt-1 text-sm text-brand-muted">
           Das Gespräch ist abgeschlossen und bleibt gespeichert – du findest es oben unter
@@ -171,7 +171,7 @@ export default function EchoChat({
   }
 
   return (
-    <div className="mx-auto max-w-[820px]">
+    <div>
       {/* ── Kopfzeile: Titel, Verlauf, Abschließen ─────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3">
         <div className="min-w-0">
@@ -330,7 +330,7 @@ function Blase({ role, content }: { role: string; content: string }) {
               strokeLinecap="round" opacity=".45" />
           </svg>
         </span>
-        <div className="min-w-0 flex-1 text-sm text-brand-text">
+        <div className="min-w-0 flex-1 text-sm text-brand-text lg:max-w-[74ch]">
           <MarkdownMessage content={content} />
         </div>
       </div>
@@ -338,7 +338,7 @@ function Blase({ role, content }: { role: string; content: string }) {
   }
   return (
     <div className="beitrag-neu flex justify-end">
-      <p className="max-w-[85%] whitespace-pre-wrap rounded-brand bg-brand-bg px-4 py-2.5 text-sm text-brand-text">
+      <p className="max-w-[85%] whitespace-pre-wrap rounded-brand bg-brand-bg px-4 py-2.5 text-sm text-brand-text lg:max-w-[52ch]">
         {content}
       </p>
     </div>
@@ -394,7 +394,7 @@ function Leerzustand({
           ))}
         </div>
 
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {aktiv.eintraege.map(e => (
             <button
               key={e.label}

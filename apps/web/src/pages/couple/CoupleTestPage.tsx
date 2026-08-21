@@ -57,7 +57,7 @@ export default function CoupleTestPage() {
   if (!test || !isCoupleSafe(test)) {
     return (
       <AppShell>
-        <div className="mx-auto max-w-[820px] px-6 py-8">
+        <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
             <h1 className="text-sm font-bold text-navy">
               {test ? 'Dieser Test gehört nicht in den Paarraum' : 'Test nicht gefunden'}
@@ -81,7 +81,7 @@ export default function CoupleTestPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[820px] px-6 py-8">
+      <div className="mx-auto max-w-[1100px] px-6 py-8">
         <div className="mb-5">
           <Link to={`/app/paar/${coupleId}`} className="text-xs text-brand-muted hover:text-navy">← Paarraum</Link>
           <span className="label mt-2 block">Test zu zweit</span>
