@@ -115,7 +115,7 @@ export default function CoupleSessionPage() {
       <AppShell>
         <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
-            <h1 className="text-sm font-bold text-navy">Gespräch lässt sich nicht öffnen</h1>
+            <h1 className="page-title">Gespräch lässt sich nicht öffnen</h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
             <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
@@ -143,7 +143,7 @@ export default function CoupleSessionPage() {
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <span className="label">Moderierte Sitzung</span>
-              <h1 className="mt-1 text-2xl font-bold text-navy">{session.title}</h1>
+              <h1 className="page-title mt-1">{session.title}</h1>
               {session.goal && (
                 <p className="mt-1.5 text-sm text-brand-muted">
                   <span className="font-medium text-navy">Ziel:</span> {session.goal}
@@ -366,7 +366,7 @@ export default function CoupleSessionPage() {
               : <ContextComposer sessionId={sessionId} disabled={closed} />}
 
             <div className="card">
-              <h2 className="text-sm font-bold text-navy">Was Echo weiß</h2>
+              <h2 className="card-title">Was Echo weiß</h2>
               {contexts.length === 0 ? (
                 <p className="mt-2 text-sm text-brand-muted">
                   Noch nichts. Echo kennt nur, was ihr hier ausdrücklich freigebt.
@@ -424,7 +424,7 @@ function SummaryCard({ sessionId, coupleId, hasMessages }: {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Zusammenfassung</h2>
+      <h2 className="card-title">Zusammenfassung</h2>
       <p className="mt-1 text-xs text-brand-muted">
         Echo hält fest, worum es ging, was deutlich wurde, was offen blieb – und schlägt
         Abmachungen vor.

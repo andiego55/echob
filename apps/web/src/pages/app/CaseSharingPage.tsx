@@ -31,10 +31,10 @@ export default function CaseSharingPage() {
   return (
     <AppShell>
       <CaseNav caseId={caseId!} />
-      <div className="mx-auto max-w-[900px] px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-[1100px] px-6 py-8 space-y-6">
         <div>
           <span className="label">Fall teilen</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">Freigaben</h1>
+          <h1 className="page-title mt-1">Freigaben</h1>
           <p className="mt-2 text-sm text-brand-muted max-w-2xl">
             Gib einzelne Inhalte dieses Falls gezielt an eine Fachperson frei. Nur ausgewählte Inhalte
             werden geteilt. Du kannst jede Freigabe jederzeit widerrufen.
@@ -47,7 +47,7 @@ export default function CaseSharingPage() {
 
         {/* Aktive Freigaben */}
         <div className="card">
-          <h2 className="text-sm font-bold text-navy mb-3">Bestehende Freigaben</h2>
+          <h2 className="card-title mb-3">Bestehende Freigaben</h2>
           {shares.length === 0 ? (
             <p className="text-sm text-brand-muted">Noch keine Freigaben für diesen Fall.</p>
           ) : (
@@ -140,7 +140,7 @@ function ConnectionsCard() {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy mb-1">Fachperson einladen</h2>
+      <h2 className="card-title mb-1">Fachperson einladen</h2>
       <p className="text-xs text-brand-muted mb-3">
         Lade eine Fachperson per E-Mail ein. Sie erhält deine Nachricht plus eine kurze Anleitung
         (Registrieren, Anmelden, Verbinden). Freigeben kannst du, sobald sie registriert ist.
@@ -262,7 +262,7 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   if (accepted.length === 0) {
     return (
       <div className="card">
-        <h2 className="text-sm font-bold text-navy mb-1">Inhalte freigeben</h2>
+        <h2 className="card-title mb-1">Inhalte freigeben</h2>
         <p className="text-sm text-brand-muted">
           Du hast noch keine verbundene Fachperson. Lade oben jemanden ein – sobald die Person registriert ist,
           kannst du hier Inhalte freigeben.
@@ -273,7 +273,7 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy mb-3">Inhalte freigeben</h2>
+      <h2 className="card-title mb-3">Inhalte freigeben</h2>
 
       <label className="block text-xs font-medium text-brand-text mb-1">Fachperson</label>
       <select

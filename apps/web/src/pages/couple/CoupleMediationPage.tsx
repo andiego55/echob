@@ -81,7 +81,7 @@ export default function CoupleMediationPage() {
       <AppShell>
         <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
-            <h1 className="text-sm font-bold text-navy">Thema lässt sich nicht öffnen</h1>
+            <h1 className="page-title">Thema lässt sich nicht öffnen</h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
             <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
@@ -101,7 +101,7 @@ export default function CoupleMediationPage() {
         <div className="mb-5">
           <Link to={`/app/paar/${topic.couple_id}`} className="text-xs text-brand-muted hover:text-navy">← Paarraum</Link>
           <span className="label mt-2 block">Mediation</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">{topic.title}</h1>
+          <h1 className="page-title mt-1">{topic.title}</h1>
           {topic.description && (
             <p className="mt-2 text-sm text-brand-muted">{topic.description}</p>
           )}
@@ -125,7 +125,7 @@ export default function CoupleMediationPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* ── Eigene Beiträge ──────────────────────────────────── */}
           <div className="card">
-            <h2 className="text-sm font-bold text-navy">Deine Sicht</h2>
+            <h2 className="card-title">Deine Sicht</h2>
 
             <label className="mt-4 block">
               <span className="text-xs font-semibold text-navy">Offen – das liest deine Partnerperson</span>
@@ -167,7 +167,7 @@ export default function CoupleMediationPage() {
 
           {/* ── Sicht der anderen Person ─────────────────────────── */}
           <div className="card">
-            <h2 className="text-sm font-bold text-navy">
+            <h2 className="card-title">
               {other ? `Sicht von ${other.name}` : 'Sicht deiner Partnerperson'}
             </h2>
             {other?.open_text ? (
@@ -185,7 +185,7 @@ export default function CoupleMediationPage() {
         <div className="card mt-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h2 className="text-sm font-bold text-navy">Echos Vorschlag</h2>
+              <h2 className="card-title">Echos Vorschlag</h2>
               <p className="mt-1 text-xs text-brand-muted">
                 Gemeinsame Interessen, beide Innensichten, drei konkrete Brücken – und ein
                 fairer Weg, falls keine trägt.

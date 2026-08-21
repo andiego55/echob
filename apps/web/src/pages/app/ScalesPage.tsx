@@ -97,7 +97,7 @@ export default function ScalesPage() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
           <div>
-            <h1 className="text-xl font-bold text-navy">Muster & Skalen</h1>
+            <h1 className="page-title">Muster & Skalen</h1>
             <p className="text-sm text-brand-muted mt-1 max-w-xl">
               KI-gestützte Einschätzung von Verhaltensmustern, Persönlichkeitsmerkmalen und Beziehungsdynamiken auf Basis deiner dokumentierten Szenen und Reflexionen.
             </p>
@@ -159,7 +159,7 @@ export default function ScalesPage() {
                   return (
                     <section key={group}>
                       <div className="mb-3">
-                        <h2 className="text-base font-bold text-navy">{cfg.label}</h2>
+                        <h2 className="card-title-lg">{cfg.label}</h2>
                         <p className="text-xs text-brand-muted mt-0.5">{cfg.description}</p>
                       </div>
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

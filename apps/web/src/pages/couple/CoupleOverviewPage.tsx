@@ -39,10 +39,10 @@ export default function CoupleOverviewPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[900px] px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-[1100px] px-6 py-8 space-y-6">
         <div>
           <span className="label">Für Paare</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">Paartherapie</h1>
+          <h1 className="page-title mt-1">Paartherapie</h1>
           {/* Ab hier gibt es keinen oder mehrere Räume – bei genau einem wurde oben
               weitergeleitet. */}
           <p className="mt-2 text-sm text-brand-muted max-w-2xl">
@@ -65,7 +65,7 @@ export default function CoupleOverviewPage() {
           <>
             {rooms.length > 1 && (
               <div className="space-y-3">
-                <h2 className="text-sm font-bold text-navy">Eure Paarräume</h2>
+                <h2 className="card-title">Eure Paarräume</h2>
                 {rooms.map(room => <RoomCard key={room.id} room={room} />)}
               </div>
             )}
@@ -143,7 +143,7 @@ function PendingInviteCard({ link }: { link: CoupleLink }) {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Einladung wartet</h2>
+      <h2 className="card-title">Einladung wartet</h2>
       <p className="mt-2 text-sm text-brand-muted">
         Gib diesen Code an die Person weiter, mit der du den Raum teilen möchtest.
         Sobald sie ihn einlöst, ist euer Raum offen.
@@ -187,7 +187,7 @@ function InviteCard({ hasPending }: { hasPending: boolean }) {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Partner:in einladen</h2>
+      <h2 className="card-title">Partner:in einladen</h2>
       <p className="mt-2 text-sm text-brand-muted">
         Du bekommst einen Kopplungscode zum Weitergeben.
       </p>
@@ -229,7 +229,7 @@ function JoinCard() {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Code einlösen</h2>
+      <h2 className="card-title">Code einlösen</h2>
       <p className="mt-2 text-sm text-brand-muted">
         Du hast einen Kopplungscode bekommen? Gib ihn hier ein.
       </p>
@@ -254,7 +254,7 @@ function JoinCard() {
 function LoadError({ error }: { error: unknown }) {
   return (
     <div className="card border-l-4 border-l-red-400">
-      <h2 className="text-sm font-bold text-navy">Paarräume konnten nicht geladen werden</h2>
+      <h2 className="card-title">Paarräume konnten nicht geladen werden</h2>
       <p className="mt-2 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
     </div>
   )

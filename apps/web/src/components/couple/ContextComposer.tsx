@@ -70,7 +70,7 @@ export default function ContextComposer({ sessionId, disabled = false }: Props) 
     <div className="card">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-navy">Dein Beitrag</h2>
+          <h2 className="card-title">Dein Beitrag</h2>
           <p className="mt-1 text-xs text-brand-muted">
             {ctx?.confirmed_at ? 'Freigegeben – Echo kennt ihn.' : 'Noch nicht freigegeben.'}
           </p>

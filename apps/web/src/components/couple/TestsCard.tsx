@@ -28,7 +28,7 @@ export default function TestsCard({ coupleId }: { coupleId: string }) {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Tests zu zweit</h2>
+      <h2 className="card-title">Tests zu zweit</h2>
       <p className="mt-1 text-xs text-brand-muted">
         Beide füllen denselben Test aus, danach legt ihr die Ergebnisse nebeneinander. Das
         Ergebnis der anderen Person siehst du erst, wenn du selbst geantwortet hast.

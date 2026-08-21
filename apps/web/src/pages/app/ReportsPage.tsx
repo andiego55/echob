@@ -49,12 +49,12 @@ export default function ReportsPage() {
     <AppShell>
       <CaseNav caseId={caseId!} />
 
-      <div className="mx-auto max-w-[900px] px-6 py-8">
+      <div className="mx-auto max-w-[1100px] px-6 py-8">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-xl font-bold text-navy">Berichte</h1>
+            <h1 className="page-title">Berichte</h1>
             <p className="text-sm text-brand-muted mt-0.5">
               Strukturierte Auswertungen für Selbstreflexion, Coaching oder professionelle Begleitung.
             </p>

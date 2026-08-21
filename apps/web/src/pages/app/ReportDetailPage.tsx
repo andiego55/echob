@@ -191,7 +191,7 @@ export default function ReportDetailPage() {
       <AppShell>
         <div className="no-print"><CaseNav caseId={caseId!} /></div>
 
-        <div className="mx-auto max-w-[820px] px-6 py-8 report-page">
+        <div className="mx-auto max-w-[780px] px-6 py-8 report-page">
 
           {/* Header */}
           <div className="report-header mb-6 pb-5 border-b border-brand-border">
@@ -200,7 +200,7 @@ export default function ReportDetailPage() {
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider mb-3 no-print ${cfg.bgColor} ${cfg.color} ${cfg.borderColor} border`}>
                   <span>{report.type_label}</span>
                 </div>
-                <h1 className="report-title text-[1.35rem] font-bold text-navy leading-snug">
+                <h1 className="page-title report-title text-[1.35rem] leading-snug">
                   {report.title ?? report.type_label}
                 </h1>
                 <p className="report-meta text-xs text-brand-muted mt-1.5">
@@ -240,7 +240,7 @@ export default function ReportDetailPage() {
                   {editValues.map((sec, i) => (
                     <div key={i} className={`rounded-brand border p-5 space-y-3 ${cfg.borderColor} ${cfg.bgColor}`}>
                       <input
-                        className="w-full text-sm font-bold text-navy bg-white border border-brand-border rounded-brand px-3 py-2 focus:outline-none focus:ring-1 focus:ring-accent"
+                        className="w-full card-title bg-white border border-brand-border rounded-brand px-3 py-2 focus:outline-none focus:ring-1 focus:ring-accent"
                         value={sec.heading}
                         onChange={e => { const n = [...editValues]; n[i] = { ...n[i], heading: e.target.value }; setEditValues(n) }}
                       />
@@ -384,7 +384,7 @@ function ScaleBarsSection({ scales, title, subtitle, mode }: {
     <div className="visual-block rounded-brand border border-brand-border bg-white overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-3 border-b border-brand-border bg-brand-bg">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-navy">{title}</p>
+          <p className="card-title">{title}</p>
           <p className="text-[10px] text-brand-muted mt-0.5">{subtitle}</p>
         </div>
       </div>
@@ -446,7 +446,7 @@ function PatternTagsSection({ tags, cfg }: { tags: TagCount[]; cfg: typeof DEFAU
       <div className="flex items-center gap-3 px-5 py-3 border-b border-brand-border bg-brand-bg">
         <span className="text-lg leading-none">🏷️</span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-navy">Erkannte Muster</p>
+          <p className="card-title">Erkannte Muster</p>
           <p className="text-[10px] text-brand-muted mt-0.5">Häufigkeit über alle Szenen · Größe entspricht der Häufigkeit</p>
         </div>
       </div>
@@ -501,7 +501,7 @@ function SceneTimelineSection({ timeline }: { timeline: ScenePoint[] }) {
       <div className="flex items-center gap-3 px-5 py-3 border-b border-brand-border bg-brand-bg">
         <span className="text-lg leading-none">📅</span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-navy">Szenen-Verlauf</p>
+          <p className="card-title">Szenen-Verlauf</p>
           <p className="text-[10px] text-brand-muted mt-0.5">Dokumentierte Szenen chronologisch · Farbe = Belastungsintensität</p>
         </div>
         <span className="text-[10px] font-medium text-brand-muted flex-shrink-0">
@@ -574,7 +574,7 @@ function ProfileScoresSection({ scores, title, subtitle, mode, patterns }: {
       <div className="flex items-center gap-3 px-5 py-3 border-b border-brand-border bg-brand-bg">
         <span className="text-lg leading-none">{icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-navy">{title}</p>
+          <p className="card-title">{title}</p>
           <p className="text-[10px] text-brand-muted mt-0.5">{subtitle}</p>
         </div>
       </div>

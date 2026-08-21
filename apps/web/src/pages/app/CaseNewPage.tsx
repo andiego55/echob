@@ -74,7 +74,7 @@ export default function CaseNewPage() {
       <div className="mx-auto max-w-[640px] px-6 py-10">
         <div className="mb-8">
           <span className="label">Fall anlegen</span>
-          <h1 className="mt-2 text-2xl font-bold text-navy">Welche Beziehung möchtest du reflektieren?</h1>
+          <h1 className="page-title mt-2">Welche Beziehung möchtest du reflektieren?</h1>
           <p className="mt-2 text-sm text-brand-muted">
             Beantworte drei kurze Fragen. Das dauert weniger als eine Minute.
           </p>

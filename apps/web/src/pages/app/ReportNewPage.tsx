@@ -118,7 +118,7 @@ export default function ReportNewPage() {
       <AppShell>
         <CaseNav caseId={caseId!} />
         <div className="mx-auto max-w-[640px] px-6 py-20 text-center">
-          <h2 className="text-lg font-bold text-navy mb-2">Bericht wird erstellt …</h2>
+          <h2 className="card-title-lg mb-2">Bericht wird erstellt …</h2>
           <p className="text-sm text-brand-muted max-w-sm mx-auto leading-relaxed">
             Echo analysiert deine Szenen und Daten. Das kann 15–30 Sekunden dauern.
           </p>
@@ -140,9 +140,9 @@ export default function ReportNewPage() {
     <AppShell>
       <CaseNav caseId={caseId!} />
 
-      <div className="mx-auto max-w-[820px] px-6 py-10">
+      <div className="mx-auto max-w-[780px] px-6 py-10">
         <span className="label">Bericht erstellen</span>
-        <h1 className="mt-2 text-xl font-bold text-navy mb-1">
+        <h1 className="page-title mt-2 mb-1">
           Welchen Bericht möchtest du erstellen?
         </h1>
         <p className="text-sm text-brand-muted mb-8">
@@ -169,7 +169,7 @@ export default function ReportNewPage() {
                 <div className="flex items-start gap-3 mb-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-navy leading-snug">{label}</p>
+                      <p className="card-title leading-snug">{label}</p>
                       {locked && (
                         <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">
                           Abo

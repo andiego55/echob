@@ -203,13 +203,13 @@ export default function OnboardingPage() {
     <AppShell>
       <CaseNav caseId={caseId!} />
 
-      <div className="mx-auto max-w-[680px] px-6 py-10">
+      <div className="mx-auto max-w-[640px] px-6 py-10">
         {/* Header */}
         <div className="mb-8">
           <span className="label">
             {isReturning ? 'Onboarding bearbeiten' : 'Onboarding'} · Schritt {currentStep + 1} von {STEPS.length}
           </span>
-          <h1 className="mt-2 text-xl font-bold text-navy">
+          <h1 className="page-title mt-2">
             {isReturning ? 'Deine Angaben aktualisieren' : 'Lass uns deinen Fall besser verstehen'}
           </h1>
           {isReturning && (

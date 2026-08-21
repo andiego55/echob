@@ -36,7 +36,7 @@ export default function AssignmentDialogSummary({
 
   return (
     <div className="card border-accent/30">
-      <h3 className="text-sm font-bold text-navy mb-1">Dialog zusammenfassen</h3>
+      <h3 className="card-title mb-1">Dialog zusammenfassen</h3>
       <p className="text-xs text-brand-muted mb-3">
         Fasse diesen Dialog zusammen und sende ihn an deine Fachperson. Die Zusammenfassung fließt
         nicht in Echos Fallkontext ein.

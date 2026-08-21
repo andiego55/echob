@@ -39,8 +39,8 @@ export default function ScenesPage() {
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold text-navy">Szenen & Beobachtungen</h1>
-            <p className="text-sm text-brand-muted mt-1 max-w-[560px]">
+            <h1 className="page-title">Szenen & Beobachtungen</h1>
+            <p className="mt-1 max-w-[62ch] text-sm text-brand-muted">
               Alles, was in den Kontext dieser Beziehung gehört: konkrete Situationen, Beobachtungen
               an dir selbst und der anderen Person, eigene Gedanken und Vermutungen.
             </p>
@@ -77,7 +77,7 @@ function SceneRow({ scene: s, caseId }: { scene: Scene; caseId: string }) {
     >
       {/* Belastungsscore */}
       <div className="flex-shrink-0 w-10 h-10 rounded-brand bg-brand-bg border border-brand-border flex items-center justify-center">
-        <span className="text-sm font-bold text-navy">{s.distress_score ?? '–'}</span>
+        <span className="card-title">{s.distress_score ?? '–'}</span>
       </div>
 
       <div className="flex-1 min-w-0">

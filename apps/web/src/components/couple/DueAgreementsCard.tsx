@@ -23,7 +23,7 @@ export default function DueAgreementsCard({ coupleId }: { coupleId: string }) {
 
   return (
     <div className="card border-l-4 border-l-green-400">
-      <h2 className="text-sm font-bold text-navy">
+      <h2 className="card-title">
         Wie lief es?
         {faellig.length > 1 && (
           <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-[0.65rem] font-semibold text-green-800">

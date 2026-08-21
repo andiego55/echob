@@ -62,7 +62,7 @@ export default function AgreementsCard({
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Eure Abmachungen</h2>
+      <h2 className="card-title">Eure Abmachungen</h2>
       <p className="mt-1 text-xs text-brand-muted">
         Klein genug, um sie wirklich einzuhalten. Sie gilt, sobald ihr beide zugestimmt habt.
       </p>

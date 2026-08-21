@@ -33,7 +33,7 @@ export default function TopicsCard({ coupleId }: { coupleId: string }) {
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Mediation</h2>
+      <h2 className="card-title">Mediation</h2>
       <p className="mt-1 text-xs text-brand-muted">
         Für Themen, bei denen ihr feststeckt. Jede:r schreibt eine offene und eine
         vertrauliche Sicht – Echo erarbeitet daraus einen Vorschlag.

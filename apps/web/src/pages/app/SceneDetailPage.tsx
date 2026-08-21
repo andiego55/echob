@@ -92,7 +92,7 @@ export default function SceneDetailPage() {
         <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
           <div>
             <span className="label mb-2">Beziehungsszene</span>
-            <h1 className="mt-1 text-xl font-bold text-navy">{scene.title}</h1>
+            <h1 className="page-title mt-1">{scene.title}</h1>
             {scene.scene_date && (
               <p className="text-sm text-brand-muted mt-1">
                 {new Date(scene.scene_date).toLocaleDateString('de-DE', {

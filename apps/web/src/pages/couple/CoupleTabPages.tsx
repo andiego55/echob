@@ -65,7 +65,7 @@ export function CoupleTopicsPage() {
       <div className="space-y-5">
         <TopicsCard coupleId={coupleId} />
         <div className="card bg-accent/[0.04] border-l-4 border-l-accent">
-          <h2 className="text-sm font-bold text-navy">Wie eine Mediation abläuft</h2>
+          <h2 className="card-title">Wie eine Mediation abläuft</h2>
           <ol className="mt-2.5 space-y-1.5 text-sm text-brand-muted">
             <li>
               <span className="font-medium text-navy">1. Beide schreiben zweimal.</span> Eine

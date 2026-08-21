@@ -473,7 +473,7 @@ function WelcomePrompt({ onTopic }: { onTopic: (t: string) => void }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z" />
         </svg>
       </div>
-      <h2 className="text-lg font-bold text-navy mb-2">Echo ist bereit</h2>
+      <h2 className="card-title-lg mb-2">Echo ist bereit</h2>
       <p className="text-sm text-brand-muted mb-6 max-w-md mx-auto">
         Du kannst frei schreiben oder ein Thema auswählen.
         Echo hilft dir, Gedanken zu sortieren und Muster zu reflektieren.

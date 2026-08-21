@@ -45,9 +45,9 @@ export default function ReviewPage() {
   return (
     <AppShell>
       <CaseNav caseId={caseId!} />
-      <div className="mx-auto max-w-[900px] px-6 py-6 space-y-5">
+      <div className="mx-auto max-w-[1100px] px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-xl font-bold text-navy">Verlauf &amp; Rückblick</h1>
+          <h1 className="page-title">Verlauf &amp; Rückblick</h1>
           <p className="text-sm text-brand-muted mt-1">
             Muster über die Zeit – die im Alltag zwischen einzelnen Szenen leicht untergehen.
           </p>
@@ -167,7 +167,7 @@ export default function ReviewPage() {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="card">
-      <h2 className="text-sm font-bold text-navy mb-3">{title}</h2>
+      <h2 className="card-title mb-3">{title}</h2>
       {children}
     </section>
   )

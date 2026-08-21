@@ -132,7 +132,7 @@ export default function PersonProfilePage() {
         {/* Header */}
         <div className="mb-6">
           <span className="label">Fremdeinschätzung</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">
+          <h1 className="page-title mt-1">
             Profil der anderen Person
             {relationshipLabel && <span className="text-lg font-normal text-brand-muted ml-2">– {relationshipLabel}</span>}
           </h1>
@@ -258,7 +258,7 @@ function PersonProfileModuleForm({
     <div className="card space-y-6">
       <div>
         <span className="label">{cfg.shortLabel}</span>
-        <h2 className="mt-1 text-lg font-bold text-navy">{cfg.label}</h2>
+        <h2 className="mt-1 card-title-lg">{cfg.label}</h2>
         <p className="mt-1 text-sm text-brand-muted">{cfg.description}</p>
       </div>
 
@@ -434,7 +434,7 @@ function PersonProfileSummaryView({
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
           <span className="label">Personenprofil</span>
-          <h1 className="mt-1 text-xl font-bold text-navy">
+          <h1 className="page-title mt-1">
             Deine Einschätzung
             {relationshipLabel && <span className="text-base font-normal text-brand-muted ml-2">– {relationshipLabel}</span>}
           </h1>

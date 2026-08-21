@@ -76,7 +76,15 @@
     @apply hover:shadow-brand hover:translate-y-0;
   }
 
-  /* ── Karten-Ueberschriften ───────────────────────────────────── */
+  /* ── Ueberschriften-Stufen ───────────────────────────────────
+     VIER Stufen, mehr nicht. Vor der Angleichung standen im Nutzerbereich fuenf
+     Groessen nebeneinander (sm, base, lg, xl, 2xl) ohne erkennbares System, und der
+     Paarraum hatte zwar Namen, benutzte sie aber nur in einem Viertel der Faelle.
+
+     Wer eine fuenfte Stufe braucht, braucht in Wahrheit eine andere Gliederung. */
+
+  /* Titel einer Seite - genau EINER je Ansicht, ganz oben. */
+  .page-title    { @apply text-2xl font-bold text-navy tracking-[-0.015em]; }
   .card-title    { @apply text-sm font-bold text-navy; }
   .card-title-lg { @apply text-[1.15rem] font-bold text-navy tracking-[-0.01em]; }
   .card-title-sm { @apply text-[0.8rem] font-semibold text-brand-muted; }

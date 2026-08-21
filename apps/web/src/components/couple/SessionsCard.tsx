@@ -47,7 +47,7 @@ export default function SessionsCard({ coupleId }: { coupleId: string }) {
     <div className="card">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-navy">Eure Gespräche</h2>
+          <h2 className="card-title">Eure Gespräche</h2>
           <p className="mt-1 text-xs text-brand-muted">
             Ein Gespräch, ein Thema, ein Ziel – so bleibt es überschaubar.
           </p>

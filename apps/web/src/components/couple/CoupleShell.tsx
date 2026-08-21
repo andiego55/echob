@@ -99,7 +99,7 @@ export default function CoupleShell({
       <AppShell>
         <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
-            <h1 className="card-title">Paarraum nicht gefunden</h1>
+            <h1 className="page-title card-title">Paarraum nicht gefunden</h1>
             <p className="mt-2 text-sm text-brand-muted">
               Dieser Raum existiert nicht oder wurde beendet.
             </p>
@@ -125,7 +125,7 @@ export default function CoupleShell({
               ← Für Paare
             </Link>
             <div className="mt-1.5 flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-bold text-navy">
+              <h1 className="page-title">
                 Mit {room.partner_display_name || 'deiner Partnerperson'}
               </h1>
               {/* Die fuenf Grundregeln: beim ersten Besuch offen, danach auf Zuruf. */}

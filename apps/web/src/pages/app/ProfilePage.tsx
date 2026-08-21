@@ -147,7 +147,7 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="mb-6">
           <span className="label">Selbstbeschreibung</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">Mein Beziehungsprofil</h1>
+          <h1 className="page-title mt-1">Mein Beziehungsprofil</h1>
           <p className="mt-2 text-sm text-brand-muted max-w-2xl">
             Dein Beziehungsprofil hilft EchoB, deine Beziehungssituationen besser einzuordnen.
             Es geht nicht darum, dich zu bewerten oder eine Diagnose zu stellen. Die Angaben helfen dabei,
@@ -312,7 +312,7 @@ function ModuleForm({
     <div className="card space-y-6">
       <div>
         <span className="label">{cfg.shortLabel}</span>
-        <h2 className="mt-1 text-lg font-bold text-navy">{cfg.label}</h2>
+        <h2 className="mt-1 card-title-lg">{cfg.label}</h2>
         <p className="mt-1 text-sm text-brand-muted">{cfg.description}</p>
         {cfg.intro && <p className="mt-2 text-xs text-brand-muted/80 italic">{cfg.intro}</p>}
       </div>
@@ -498,7 +498,7 @@ function SummaryView({
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
           <span className="label">Beziehungsprofil</span>
-          <h1 className="mt-1 text-xl font-bold text-navy">Deine vorläufige Selbstbeschreibung</h1>
+          <h1 className="page-title mt-1">Deine vorläufige Selbstbeschreibung</h1>
           <p className="text-xs text-brand-muted mt-1">
             Diese Einschätzung ist vorläufig und ersetzt keine professionelle Diagnostik.
           </p>

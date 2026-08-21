@@ -40,7 +40,7 @@ export default function EndRoomPanel({ coupleId, since }: { coupleId: string; si
 
   return (
     <div className="card">
-      <h2 className="text-sm font-bold text-navy">Verbindung</h2>
+      <h2 className="card-title">Verbindung</h2>
       <p className="mt-2 text-sm text-brand-muted">
         Ihr seid seit {new Date(since).toLocaleDateString('de-DE')} verbunden.
       </p>

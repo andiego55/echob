@@ -38,7 +38,7 @@ export default function PrivateEchoPanel({ sessionId }: { sessionId: string }) {
 
   return (
     <div className="card border-l-4 border-l-navy/30">
-      <h2 className="text-sm font-bold text-navy">Nur für dich</h2>
+      <h2 className="card-title">Nur für dich</h2>
       <p className="mt-1 text-xs text-brand-muted">
         Dieser Dialog ist vertraulich. Deine Partnerperson sieht ihn nicht – und Echo kennt
         hier deinen eigenen Zusammenhang.

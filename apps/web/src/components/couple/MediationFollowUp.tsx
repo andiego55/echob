@@ -53,7 +53,7 @@ export default function MediationFollowUp({ topicId }: { topicId: string }) {
 
   return (
     <div className="card mt-6">
-      <h2 className="text-sm font-bold text-navy">Wie weiter?</h2>
+      <h2 className="card-title">Wie weiter?</h2>
       <p className="mt-1 text-xs text-brand-muted">
         Ein Vorschlag ist ein Anfang, kein Ergebnis. Drei Wege, ihn zu etwas zu machen.
       </p>

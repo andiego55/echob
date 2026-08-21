@@ -69,7 +69,7 @@ export default function AppreciationCard({ coupleId }: { coupleId: string }) {
     <div className="card">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-navy">Wertschätzung</h2>
+          <h2 className="card-title">Wertschätzung</h2>
           <p className="mt-1 text-xs text-brand-muted">
             Ein Satz, der sonst ungesagt bleibt. Geht sofort an {wer}.
           </p>

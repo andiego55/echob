@@ -39,8 +39,8 @@ export default function InboxPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[760px] px-6 py-10">
-        <h1 className="text-2xl font-bold text-navy">Von deiner Fachperson</h1>
+      <div className="mx-auto max-w-[780px] px-6 py-10">
+        <h1 className="page-title">Von deiner Fachperson</h1>
         <p className="mt-1 text-sm text-brand-muted">
           Hier erscheinen Dialoge, Fragebögen, Nachrichten und Termine, die deine Fachperson für dich
           bereitstellt. Kein Notfallkanal – bei akuter Not wende dich an die Telefonseelsorge (0800 111 0 111).

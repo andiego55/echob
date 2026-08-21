@@ -79,7 +79,7 @@ export default function CaseDetailPage() {
               <Avatar value={c.avatar} size="lg" />
               <div>
                 <span className="label mb-2">{RELATIONSHIP_TYPE_LABELS[c.relationship_type]}</span>
-                <h1 className="mt-2 text-xl font-bold text-navy">
+                <h1 className="page-title mt-2">
                   {c.person_name?.trim() || RELATIONSHIP_STATUS_LABELS[c.relationship_status]}
                 </h1>
                 <p className="mt-1 text-sm text-brand-muted">
@@ -207,7 +207,7 @@ function NextStepCard({ caseId, sceneCount, topicCount }: {
       <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1.5">Einstieg</p>
-          <p className="text-sm text-navy max-w-[540px] leading-relaxed">
+          <p className="max-w-[60ch] text-sm leading-relaxed text-navy">
             Fang an, indem du eine konkrete Situation festhältst – was ist zuletzt passiert, das dich beschäftigt hat?
             Auch kleine Beobachtungen helfen Echo, deinen Fall zu verstehen.
           </p>
@@ -227,7 +227,7 @@ function NextStepCard({ caseId, sceneCount, topicCount }: {
       <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1.5">Nächster Schritt</p>
-          <p className="text-sm text-navy max-w-[540px] leading-relaxed">
+          <p className="max-w-[60ch] text-sm leading-relaxed text-navy">
             Du hast bereits Szenen dokumentiert – ein guter Start. Jetzt kannst du mit Echo in einem geführten Dialog tiefer einsteigen und deine Sichtweise strukturieren.
           </p>
         </div>
@@ -246,7 +246,7 @@ function NextStepCard({ caseId, sceneCount, topicCount }: {
       <div className="rounded-brand border border-emerald-200 bg-emerald-50 px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1.5">Guter Fortschritt</p>
-          <p className="text-sm text-navy max-w-[540px] leading-relaxed">
+          <p className="max-w-[60ch] text-sm leading-relaxed text-navy">
             {topicCount} von 4 Themendialogen abgeschlossen. Die gespeicherten Zusammenfassungen fließen bereits als Kontext in alle Echo-Gespräche ein.
           </p>
         </div>
@@ -264,7 +264,7 @@ function NextStepCard({ caseId, sceneCount, topicCount }: {
     <div className="rounded-brand border border-emerald-200 bg-emerald-50 px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
       <div>
         <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1.5">Vollständig</p>
-        <p className="text-sm text-navy max-w-[540px] leading-relaxed">
+        <p className="max-w-[60ch] text-sm leading-relaxed text-navy">
           Alle 4 Themendialoge abgeschlossen – Echo hat jetzt einen soliden Überblick über deine Situation und kann dir besonders gezielt helfen.
         </p>
       </div>

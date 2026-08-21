@@ -28,7 +28,7 @@ export default function ProgressCard({ coupleId }: { coupleId: string }) {
     <div className="card">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-navy">Euer Weg</h2>
+          <h2 className="card-title">Euer Weg</h2>
           <p className="mt-1 text-xs text-brand-muted">
             Punkte gibt es fürs Dranbleiben – am meisten fürs Einhalten.
           </p>
@@ -45,9 +45,9 @@ export default function ProgressCard({ coupleId }: { coupleId: string }) {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-[0.65rem] font-bold uppercase tracking-wide text-brand-muted">Stufe</p>
-            <p className="text-lg font-bold text-navy">{data.level.name}</p>
+            <p className="card-title-lg">{data.level.name}</p>
           </div>
-          <p className="text-lg font-bold text-navy">
+          <p className="card-title-lg">
             {data.total_points}
             <span className="ml-1 text-xs font-normal text-brand-muted">gemeinsam</span>
           </p>
@@ -67,7 +67,7 @@ export default function ProgressCard({ coupleId }: { coupleId: string }) {
         {data.members.map(m => (
           <div key={m.user_id} className="rounded-brand bg-brand-bg px-3.5 py-2.5">
             <p className="text-xs text-brand-muted">{m.name}</p>
-            <p className="text-sm font-bold text-navy">{m.points} Punkte</p>
+            <p className="card-title">{m.points} Punkte</p>
           </div>
         ))}
       </div>

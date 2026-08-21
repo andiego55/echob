@@ -15,7 +15,7 @@ export default function IsolationNotice({ compact = false }: { compact?: boolean
 
   return (
     <div className="card bg-accent/[0.04] border-l-4 border-l-accent">
-      <h2 className="text-sm font-bold text-navy">Was privat bleibt</h2>
+      <h2 className="card-title">Was privat bleibt</h2>
       <ul className="mt-2 space-y-1.5 text-sm text-brand-muted">
         <li>
           <span className="font-medium text-navy">Dein Fall bleibt deiner.</span> Die Verbindung

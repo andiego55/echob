@@ -142,9 +142,9 @@ export default function UpgradePage() {
   if (!mayOfferPurchase()) {
     return (
       <AppShell>
-        <div className="mx-auto max-w-[700px] px-6 py-10">
+        <div className="mx-auto max-w-[640px] px-6 py-10">
           <Link to="/app" className="text-sm text-brand-muted hover:text-navy">← Zurück</Link>
-          <h1 className="mt-4 text-2xl font-bold text-navy">Dein Zugang</h1>
+          <h1 className="page-title mt-4">Dein Zugang</h1>
           <div className="card mt-6">
             <p className="text-sm text-brand-muted">
               Deinen Zugang verwaltest du in deinem Konto auf{' '}
@@ -162,11 +162,11 @@ export default function UpgradePage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1000px] px-6 py-10">
+      <div className="mx-auto max-w-[1100px] px-6 py-10">
 
         <div className="mb-8">
           <Link to="/app" className="text-sm text-brand-muted hover:text-navy">← Zurück</Link>
-          <h1 className="mt-4 text-2xl font-bold text-navy">Pläne & Angebote</h1>
+          <h1 className="page-title mt-4">Pläne & Angebote</h1>
           <Fehlermeldung error={checkoutMutation.error ?? portalMutation.error ?? verifyMutation.error} className="mt-3" />
           <p className="mt-1 text-sm text-brand-muted max-w-xl">
             Sichere Zahlung über Stripe – Kreditkarte, SEPA, PayPal & mehr. Sofortige Freischaltung.
@@ -275,7 +275,7 @@ export default function UpgradePage() {
               }`}
             >
               <div className="flex items-start justify-between mb-3">
-                <span className="text-sm font-bold text-navy">{plan.name}</span>
+                <span className="card-title">{plan.name}</span>
                 {plan.badge && (
                   <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
                     plan.featured ? 'bg-accent text-white' : 'bg-navy/10 text-navy'

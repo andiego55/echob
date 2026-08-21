@@ -51,8 +51,8 @@ export default function SelfTestDialoguePage() {
     return (
       <AppShell>
         <CaseNav caseId={caseId} />
-        <div className="mx-auto max-w-[560px] px-6 py-16 text-center">
-          <h1 className="text-xl font-bold text-navy">Mach den Test zuerst</h1>
+        <div className="mx-auto max-w-[640px] px-6 py-16 text-center">
+          <h1 className="page-title">Mach den Test zuerst</h1>
           <p className="mt-2 text-sm text-brand-muted">
             Für den Ergebnis-Dialog brauchen wir deine Antworten. Fülle den Selbsttest kurz aus – danach besprichst du das Ergebnis hier mit Echo.
           </p>

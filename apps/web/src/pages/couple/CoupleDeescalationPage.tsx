@@ -161,9 +161,9 @@ function Ankommen({ onWeiter }: { onWeiter: () => void }) {
   const [atem, setAtem] = useState(false)
 
   return (
-    <div className="mx-auto max-w-[720px]">
+    <div className="mx-auto max-w-[640px]">
       <div className="card card-hero card-static text-center">
-        <h1 className="card-title-lg">Erst ankommen</h1>
+        <h1 className="page-title card-title-lg">Erst ankommen</h1>
         <p className="mx-auto mt-3 max-w-[52ch] text-sm leading-relaxed text-brand-text">
           Wenn es gerade eben war, ist dein Körper noch im Alarm. In dem Zustand klingt
           jeder Satz schärfer, als er gemeint ist – bei dir und bei ihr.

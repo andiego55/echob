@@ -40,7 +40,7 @@ export default function HelpPage() {
     <AppShell>
       <div className="mx-auto max-w-[1100px] px-6 py-10">
         <div className="mb-10">
-          <h1 className="text-2xl font-bold text-navy">Menschliche Hilfe</h1>
+          <h1 className="page-title">Menschliche Hilfe</h1>
           <p className="mt-2 text-sm text-brand-muted max-w-xl">
             EchoB ist eine Reflexionshilfe. Manchmal reicht eine App nicht aus.
             Hier findest du Coaching-Angebote, Fachpersonen und Sicherheitsressourcen.
@@ -49,7 +49,7 @@ export default function HelpPage() {
 
         {/* Sicherheitsressourcen – immer an erster Stelle */}
         <section className="mb-10">
-          <h2 className="text-base font-bold text-navy mb-4">Sicherheitsressourcen</h2>
+          <h2 className="card-title-lg mb-4">Sicherheitsressourcen</h2>
           <div className="rounded-brand border border-red-200 bg-red-50 overflow-hidden">
             <div className="px-4 py-3 border-b border-red-200">
               <p className="text-xs font-semibold text-red-800">
@@ -72,7 +72,7 @@ export default function HelpPage() {
 
         {/* Coaching */}
         <section className="mb-10">
-          <h2 className="text-base font-bold text-navy mb-1">Coaching-Angebote</h2>
+          <h2 className="card-title-lg mb-1">Coaching-Angebote</h2>
           <p className="text-xs text-brand-muted mb-4">
             Coaching ist keine Psychotherapie. Bei psychischen Erkrankungen oder akuten Krisen ist professionelle
             psychologische oder psychiatrische Hilfe wichtiger.
@@ -96,7 +96,7 @@ export default function HelpPage() {
 
         {/* Fachpersonen */}
         <section className="mb-10">
-          <h2 className="text-base font-bold text-navy mb-1">Fachpersonen finden</h2>
+          <h2 className="card-title-lg mb-1">Fachpersonen finden</h2>
           <p className="text-xs text-brand-muted mb-4">
             Psychotherapeut:innen, Beratungsstellen und Coaches in deiner Nähe.
             Dieses Verzeichnis ist in Vorbereitung.

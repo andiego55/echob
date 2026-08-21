@@ -66,7 +66,7 @@ export default function CoupleTestPage() {
       <AppShell>
         <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
-            <h1 className="text-sm font-bold text-navy">
+            <h1 className="page-title">
               {test ? 'Dieser Test gehört nicht in den Paarraum' : 'Test nicht gefunden'}
             </h1>
             {test && (
@@ -92,7 +92,7 @@ export default function CoupleTestPage() {
         <div className="mb-5">
           <Link to={`/app/paar/${coupleId}`} className="text-xs text-brand-muted hover:text-navy">← Paarraum</Link>
           <span className="label mt-2 block">Test zu zweit</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">{test.title}</h1>
+          <h1 className="page-title mt-1">{test.title}</h1>
           <p className="mt-2 text-sm text-brand-muted">{test.teaser}</p>
         </div>
 
@@ -150,7 +150,7 @@ export default function CoupleTestPage() {
                 ? <ResultColumn name={data.partner_name ?? 'Partnerperson'} result={data.partner.result} />
                 : (
                   <div className="card">
-                    <h2 className="text-sm font-bold text-navy">{data.partner_name ?? 'Deine Partnerperson'}</h2>
+                    <h2 className="card-title">{data.partner_name ?? 'Deine Partnerperson'}</h2>
                     <p className="mt-3 text-sm text-brand-muted">
                       Hat den Test noch nicht ausgefüllt. Sobald ihr beide fertig seid, könnt
                       ihr vergleichen.
@@ -162,7 +162,7 @@ export default function CoupleTestPage() {
             <div className="card">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <h2 className="text-sm font-bold text-navy">Echos Blick auf den Vergleich</h2>
+                  <h2 className="card-title">Echos Blick auf den Vergleich</h2>
                   <p className="mt-1 text-xs text-brand-muted">
                     Kein Zeugnis. Wo ihr euch ähnlich seid, wo ihr auseinandergeht – und
                     worüber sich zu reden lohnt.
@@ -241,7 +241,7 @@ function ResultColumn({ name, result, highlight = false }: {
 }) {
   return (
     <div className={`card ${highlight ? 'border-l-4 border-l-accent' : ''}`}>
-      <h2 className="text-sm font-bold text-navy">{name}</h2>
+      <h2 className="card-title">{name}</h2>
       {result.overall && (
         <p className="mt-2 text-2xl font-bold text-navy">
           {result.overall.score}

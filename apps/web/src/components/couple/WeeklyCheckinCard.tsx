@@ -71,7 +71,7 @@ export default function WeeklyCheckinCard({
     <div className="card">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-navy">Euer Wochen-Check-in</h2>
+          <h2 className="card-title">Euer Wochen-Check-in</h2>
           <p className="mt-1 text-xs text-brand-muted">
             {wochenLabel(data.week_start)} · drei Fragen, fünf Minuten
           </p>

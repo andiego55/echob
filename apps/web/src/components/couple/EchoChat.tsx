@@ -175,7 +175,7 @@ export default function EchoChat({
       {/* ── Kopfzeile: Titel, Verlauf, Abschließen ─────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3">
         <div className="min-w-0">
-          <p className="text-sm font-bold text-navy">
+          <p className="card-title">
             {gespraech?.thread.title || (liest ? 'Früheres Gespräch' : 'Neues Gespräch')}
           </p>
           <p className="mt-0.5 text-[0.7rem] text-brand-muted">

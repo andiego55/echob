@@ -97,7 +97,7 @@ export default function SceneNewPage() {
         <CaseNav caseId={caseId!} />
         <div className="mx-auto max-w-[640px] px-6 py-10">
           <span className="label">Szene anlegen</span>
-          <h1 className="mt-2 text-xl font-bold text-navy mb-2">Was möchtest du festhalten?</h1>
+          <h1 className="page-title mt-2 mb-2">Was möchtest du festhalten?</h1>
           <p className="text-sm text-brand-muted mb-4">
             Eine Szene kann alles sein, was zur Beziehung gehört: ein konkretes Ereignis, eine
             Beobachtung an dir selbst oder der anderen Person, ein Gedanke oder eine Vermutung.
@@ -134,7 +134,7 @@ export default function SceneNewPage() {
   return (
     <AppShell>
       <CaseNav caseId={caseId!} />
-      <div className="mx-auto max-w-[680px] px-6 py-10">
+      <div className="mx-auto max-w-[640px] px-6 py-10">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setMode(null)} className="text-sm text-brand-muted hover:text-navy transition-colors">
             ← Zurück

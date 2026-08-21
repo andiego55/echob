@@ -52,7 +52,7 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
       <div className="card">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold text-navy">Was sich verändert hat</h2>
+            <h2 className="card-title">Was sich verändert hat</h2>
             <p className="mt-1 text-xs text-brand-muted">
               {new Date(s.period_start).toLocaleDateString('de-DE')} bis{' '}
               {new Date(s.period_end).toLocaleDateString('de-DE')}
@@ -107,7 +107,7 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
       <div className="card">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold text-navy">Echos Bild dieser Wochen</h2>
+            <h2 className="card-title">Echos Bild dieser Wochen</h2>
             <p className="mt-1 text-xs text-brand-muted">
               Echo sieht nur diese Zahlen – keine Gesprächsinhalte, keine Beiträge.
             </p>

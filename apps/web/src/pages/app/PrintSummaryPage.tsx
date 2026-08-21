@@ -60,7 +60,7 @@ export default function PrintSummaryPage() {
                       print:my-0 print:max-w-none print:rounded-none print:shadow-none print:p-0">
         <header className="border-b border-brand-border pb-4 mb-6">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent">EchoB · Fall-Zusammenfassung</p>
-          <h1 className="text-2xl font-bold text-navy mt-1">
+          <h1 className="page-title mt-1">
             {caseData ? RELATIONSHIP_TYPE_LABELS[caseData.relationship_type] : 'Fall'}
           </h1>
           <p className="text-sm text-brand-muted mt-1">Erstellt am {today}{profile?.display_name ? ` · ${profile.display_name}` : ''}</p>

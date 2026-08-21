@@ -50,7 +50,7 @@ export default function BridgeBoard({
 
   return (
     <div className="card mt-6">
-      <h2 className="text-sm font-bold text-navy">Echos Brücken</h2>
+      <h2 className="card-title">Echos Brücken</h2>
       <p className="mt-1 text-xs text-brand-muted">
         Nehmt an, was passt. Ändert, was fast passt – das ist euer Gegenvorschlag. Verwerft,
         was nicht trägt.
@@ -70,7 +70,7 @@ export default function BridgeBoard({
 
       {/* ── Diskussion ───────────────────────────────────────────── */}
       <div className="mt-6 border-t border-brand-border pt-4">
-        <h3 className="text-sm font-bold text-navy">Darüber reden</h3>
+        <h3 className="card-title">Darüber reden</h3>
         <p className="mt-1 text-xs text-brand-muted">
           Beide sehen diesen Verlauf. Er bleibt gespeichert.
         </p>

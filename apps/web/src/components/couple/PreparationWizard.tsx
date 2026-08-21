@@ -61,7 +61,7 @@ export default function PreparationWizard({
   return (
     <div className="card">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-bold text-navy">Vorbereitung</h2>
+        <h2 className="card-title">Vorbereitung</h2>
         <span className="text-[0.7rem] text-brand-muted">
           Schritt {step + 1} von {STEPS.length} · {STEPS[step]}
         </span>

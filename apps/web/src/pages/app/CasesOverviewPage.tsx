@@ -149,7 +149,7 @@ export default function CasesOverviewPage() {
               </button>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-navy">
+              <h1 className="page-title">
                 {blogLabel
                   ? 'Fall auswählen'
                   : `${greeting()}${displayName ? `, ${displayName}` : ''}`}
@@ -199,7 +199,7 @@ export default function CasesOverviewPage() {
                 </p>
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <Link to={`/app/cases/${lastCase.id}`} className="no-underline">
-                    <p className="text-base font-bold text-navy">
+                    <p className="card-title-lg">
                       {lastCase.person_name?.trim()
                         || RELATIONSHIP_TYPE_LABELS[lastCase.relationship_type]
                         || lastCase.relationship_type}
@@ -267,7 +267,7 @@ export default function CasesOverviewPage() {
                     <StatIcon><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></StatIcon>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-lg font-bold text-navy leading-none">
+                    <p className="card-title-lg leading-none">
                       {profilePercent}<span className="text-sm font-semibold"> %</span>
                     </p>
                     <p className="mt-1 text-xs text-brand-muted truncate group-hover:text-accent transition-colors">
@@ -386,7 +386,7 @@ function StatTile({ icon, value, label }: { icon: ReactNode; value: ReactNode; l
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="text-lg font-bold text-navy leading-none">{value}</p>
+        <p className="card-title-lg leading-none">{value}</p>
         <p className="mt-1 text-xs text-brand-muted truncate">{label}</p>
       </div>
     </div>

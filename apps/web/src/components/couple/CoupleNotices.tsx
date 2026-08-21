@@ -28,7 +28,7 @@ export default function CoupleNotices() {
 
   return (
     <div className="card bg-accent/[0.04]">
-      <h2 className="text-sm font-bold text-navy">Neu für dich</h2>
+      <h2 className="card-title">Neu für dich</h2>
       <div className="mt-3 space-y-2">
         {items.map(n => (
           <div

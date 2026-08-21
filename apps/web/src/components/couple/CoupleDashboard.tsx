@@ -92,7 +92,7 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
       {/* ── Ball bei dir ──────────────────────────────────────────── */}
       {attention.length > 0 ? (
         <div className="card border-l-4 border-l-accent">
-          <h2 className="text-sm font-bold text-navy">
+          <h2 className="card-title">
             Das wartet auf dich
             <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-[0.65rem] text-white">
               {attention.length}
@@ -104,7 +104,7 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         </div>
       ) : (
         <div className="card">
-          <h2 className="text-sm font-bold text-navy">Nichts offen</h2>
+          <h2 className="card-title">Nichts offen</h2>
           <p className="mt-1.5 text-sm text-brand-muted">
             {waiting.length > 0
               ? `Bei dir ist gerade nichts zu tun – der Ball liegt bei ${partner}.`
@@ -142,7 +142,7 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
 
       {waiting.length > 0 && (
         <div className="card">
-          <h2 className="text-sm font-bold text-navy">Wartet auf {partner}</h2>
+          <h2 className="card-title">Wartet auf {partner}</h2>
           <div className="mt-3 space-y-2">
             {waiting.map((item, i) => <ItemRow key={i} item={item} />)}
           </div>
@@ -207,7 +207,7 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
       {/* ── Läuft gerade ──────────────────────────────────────────── */}
       {laufend.length > 0 || offeneThemen.length > 0 ? (
         <div className="card">
-          <h2 className="text-sm font-bold text-navy">Läuft gerade</h2>
+          <h2 className="card-title">Läuft gerade</h2>
           <div className="mt-3 space-y-2">
             {laufend.map(s => (
               <RowLink key={s.id} to={`/app/paar/sitzung/${s.id}`} title={s.title}
@@ -230,7 +230,7 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
         </div>
       ) : (
         <div className="card">
-          <h2 className="text-sm font-bold text-navy">Noch nichts begonnen</h2>
+          <h2 className="card-title">Noch nichts begonnen</h2>
           <p className="mt-1.5 text-sm text-brand-muted">
             Ein <strong className="text-navy">Gespräch</strong> ist gut für ein Thema, das ihr
             besprechen wollt. Eine <strong className="text-navy">Mediation</strong> ist für
@@ -357,7 +357,7 @@ function QuickAction({ to, title, text }: { to: string; title: string; text: str
       to={to}
       className="group rounded-brand-lg border border-brand-border bg-white p-4 no-underline shadow-brand-sm transition-all hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-brand"
     >
-      <p className="text-sm font-bold text-navy">{title}</p>
+      <p className="card-title">{title}</p>
       <p className="mt-1 text-[0.72rem] leading-snug text-brand-muted">{text}</p>
       <span className="mt-2 inline-flex items-center gap-1 text-[0.72rem] font-semibold text-accent">
         Öffnen<span className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -370,7 +370,7 @@ function Tile({ label, value, hint }: { label: string; value: string; hint?: str
   return (
     <div className="rounded-brand border border-brand-border bg-white px-3.5 py-3">
       <p className="text-[0.62rem] font-bold uppercase tracking-wide text-brand-muted">{label}</p>
-      <p className="mt-1 truncate text-lg font-bold text-navy">{value}</p>
+      <p className="mt-1 truncate card-title-lg">{value}</p>
       {hint && <p className="text-[0.65rem] text-brand-muted">{hint}</p>}
     </div>
   )

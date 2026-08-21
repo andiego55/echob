@@ -41,10 +41,10 @@ export default function CoupleJoinPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[700px] px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-[640px] px-6 py-8 space-y-6">
         <div>
           <span className="label">Für Paare</span>
-          <h1 className="mt-1 text-2xl font-bold text-navy">Verbindung annehmen</h1>
+          <h1 className="page-title mt-1">Verbindung annehmen</h1>
           <p className="mt-2 text-sm text-brand-muted">
             Code <span className="font-semibold text-navy tracking-[0.15em]">{formatCoupleCode(code.toUpperCase())}</span>
           </p>
@@ -54,7 +54,7 @@ export default function CoupleJoinPage() {
 
         {invalid && (
           <div className="card">
-            <h2 className="text-sm font-bold text-navy">Code nicht einlösbar</h2>
+            <h2 className="card-title">Code nicht einlösbar</h2>
             <p className="mt-2 text-sm text-brand-muted">
               Dieser Kopplungscode ist unbekannt, bereits verwendet oder zurückgezogen worden.
               Bitte die einladende Person um einen neuen Code.
@@ -71,7 +71,7 @@ export default function CoupleJoinPage() {
 
             {cases.length > 0 && (
               <div className="card">
-                <h2 className="text-sm font-bold text-navy">Bezug zu einem Fall (optional)</h2>
+                <h2 className="card-title">Bezug zu einem Fall (optional)</h2>
                 <select value={caseId} onChange={e => setCaseId(e.target.value)} className="input mt-3">
                   <option value="">Ohne Fallbezug</option>
                   {cases.map(c => (

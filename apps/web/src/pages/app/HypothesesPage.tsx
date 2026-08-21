@@ -32,9 +32,9 @@ export default function HypothesesPage() {
   return (
     <AppShell>
       <CaseNav caseId={caseId!} />
-      <div className="mx-auto max-w-[900px] px-6 py-8 space-y-5">
+      <div className="mx-auto max-w-[1100px] px-6 py-8 space-y-5">
         <header>
-          <h1 className="text-xl font-bold text-navy">Hypothesen</h1>
+          <h1 className="page-title">Hypothesen</h1>
           <p className="text-sm text-brand-muted mt-1 max-w-2xl">
             Geführte Dialoge mit Echo, um <strong className="text-navy">tastende Arbeitshypothesen</strong> zu Mustern,
             Persönlichkeitsstruktur, Bindung und Prägungen zu entwickeln. Echo kennt den vollen Fallkontext
@@ -51,7 +51,7 @@ export default function HypothesesPage() {
                   <div className="flex min-w-0 items-start gap-3">
                     <HypothesisIcon path={h.icon} />
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-navy">{h.label}</p>
+                      <p className="card-title">{h.label}</p>
                       <p className="text-xs text-brand-muted mt-0.5">{h.description}</p>
                     </div>
                   </div>

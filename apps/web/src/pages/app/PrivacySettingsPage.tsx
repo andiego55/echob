@@ -81,7 +81,7 @@ export default function PrivacySettingsPage() {
     <AppShell>
       <div className="mx-auto max-w-[640px] px-6 py-8 space-y-5">
         <header>
-          <h1 className="text-xl font-bold text-navy">Diskretion &amp; Schutz</h1>
+          <h1 className="page-title">Diskretion &amp; Schutz</h1>
           <p className="text-sm text-brand-muted mt-1">
             Zusätzlicher Schutz, falls andere Zugriff auf dein Gerät haben könnten – plus volle
             Kontrolle über deine Daten.
@@ -94,7 +94,7 @@ export default function PrivacySettingsPage() {
         {/* PIN-Sperre */}
         <section className="card">
           <div className="flex items-center justify-between gap-3 mb-1">
-            <h2 className="text-sm font-bold text-navy">PIN-Sperre</h2>
+            <h2 className="card-title">PIN-Sperre</h2>
             <span className={`text-xs font-medium ${enabled ? 'text-green-600' : 'text-brand-muted'}`}>
               {enabled ? '● Aktiv' : 'Inaktiv'}
             </span>
@@ -141,7 +141,7 @@ export default function PrivacySettingsPage() {
 
         {/* Schnell-Verlassen */}
         <section className="card">
-          <h2 className="text-sm font-bold text-navy mb-1">Schnell verlassen</h2>
+          <h2 className="card-title mb-1">Schnell verlassen</h2>
           <p className="text-sm text-brand-muted">
             Oben rechts findest du jederzeit den Button <span className="font-medium text-navy">„↪ Verlassen"</span>.
             Er bringt dich sofort auf eine neutrale Seite. Alternativ <span className="font-medium text-navy">zweimal kurz die Esc-Taste</span> drücken.
@@ -151,7 +151,7 @@ export default function PrivacySettingsPage() {
 
         {/* Deine Daten (DSGVO) */}
         <section className="card">
-          <h2 className="text-sm font-bold text-navy mb-1">Deine Daten</h2>
+          <h2 className="card-title mb-1">Deine Daten</h2>
           <p className="text-sm text-brand-muted mb-2">
             Du hast jederzeit Zugriff auf alle Daten, die EchoB über dich speichert – und kannst sie
             vollständig löschen.
