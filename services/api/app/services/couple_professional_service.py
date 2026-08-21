@@ -114,6 +114,22 @@ async def _out(conn, row: dict, *, names: dict[str, str] | None = None) -> dict[
     zustimmungen = await _consents_of(conn, row["id"])
     eintrag["consented_by"] = zustimmungen
     eintrag["consent_names"] = [names.get(u, "") for u in zustimmungen] if names else []
+
+    # Der Name gehoert AN die Freigabe, nicht in eine Liste daneben.
+    #
+    # Vorher suchte die Oberflaeche ihn in den eigenen Fachpersonen der abrufenden Person.
+    # Schlaegt Person A ihre Fachperson vor, steht die aber nur in As Liste - bei B blieb
+    # das Wort "Fachperson" stehen. B sollte also zustimmen, ohne zu erfahren, wem.
+    #
+    # Wer die Freigabe bekommt, IST der Inhalt der Zustimmung. Anzeigename und Titel sind
+    # die berufliche Identitaet und stehen so auch im oeffentlichen Verzeichnis; aus dem
+    # Fall der vorschlagenden Person faellt dabei nichts heraus.
+    profil = await conn.fetchrow(
+        "SELECT display_name, title FROM professional_profiles WHERE user_id = $1",
+        row["professional_user_id"],
+    )
+    eintrag["professional_name"] = (profil["display_name"] if profil else None) or "Fachperson"
+    eintrag["professional_title"] = profil["title"] if profil else None
     return eintrag
 
 

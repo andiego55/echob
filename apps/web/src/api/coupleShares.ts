@@ -11,6 +11,10 @@ export interface CoupleShare {
   id: string
   couple_id: string
   professional_user_id: string
+  /** Wer die Freigabe bekäme – steht an der Freigabe, damit auch die andere
+   *  Person den Namen sieht und nicht einer Nummer zustimmt. */
+  professional_name: string
+  professional_title: string | null
   status: 'pending' | 'active' | 'revoked'
   /** 'partner' = jemand hat vorgeschlagen, 'professional' = die Fachperson hat gebeten. */
   origin: 'partner' | 'professional'

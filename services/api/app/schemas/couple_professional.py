@@ -34,6 +34,10 @@ class CoupleShare(BaseModel):
     id: UUID
     couple_id: UUID
     professional_user_id: UUID
+    #: Wer die Freigabe bekaeme. Gehoert AN die Freigabe: Die andere Person hat sonst
+    #: keinen Weg, den Namen zu erfahren - und stimmte einer Nummer zu statt einem Menschen.
+    professional_name: str = "Fachperson"
+    professional_title: str | None = None
     status: str
     #: 'partner' = eine Person hat vorgeschlagen, 'professional' = die Fachperson hat gebeten.
     origin: str

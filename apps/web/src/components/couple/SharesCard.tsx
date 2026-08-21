@@ -118,7 +118,11 @@ function ShareRow({
 
   const person = view.professionals.find(
     p => p.professional_user_id === share.professional_user_id)
-  const name = person?.display_name ?? 'Fachperson'
+  // Der Name kommt jetzt VON der Freigabe. Vorher wurde er in den eigenen Fachpersonen
+  // gesucht - und die andere Person, die den Vorschlag nicht gemacht hat, fand dort nichts
+  // und las nur "Fachperson". Zustimmen kann man aber nur zu jemandem, den man kennt.
+  const name = share.professional_name || person?.display_name || 'Fachperson'
+  const titel = share.professional_title || person?.title || null
   const ichHabeZugestimmt = !!user?.id && share.consented_by.includes(user.id)
   const aktiv = share.status === 'active'
   const erweitert = auswahl.some(e => !share.elements.includes(e))
@@ -128,7 +132,7 @@ function ShareRow({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="card-title-lg">{name}</h2>
-          {person?.title && <p className="text-xs text-brand-muted">{person.title}</p>}
+          {titel && <p className="text-xs text-brand-muted">{titel}</p>}
           <p className="mt-1 text-xs text-brand-muted">
             {aktiv
               ? `Freigegeben seit ${new Date(share.updated_at).toLocaleDateString('de-DE')}`
