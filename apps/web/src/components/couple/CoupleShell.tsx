@@ -66,8 +66,20 @@ function aktiveGruppe(rest: string): Gruppe {
 }
 
 export default function CoupleShell({
-  children, subtitle,
-}: { children: React.ReactNode; subtitle?: string }) {
+  children, subtitle, aktion,
+}: {
+  children: React.ReactNode
+  subtitle?: string
+  /**
+   * Die Hauptaktion dieser Seite — bekommt einen festen Platz oben rechts.
+   *
+   * Das kann der Nutzerbereich seit jeher besser: Dort steht „+ Szene anlegen" immer an
+   * derselben Stelle. Im Paarraum lag die entsprechende Aktion irgendwo in einer Karte,
+   * mal oben, mal nach einem Formular, mal hinter einem Aufklapper — man musste jedes Mal
+   * suchen.
+   */
+  aktion?: React.ReactNode
+}) {
   const { coupleId = '' } = useParams<{ coupleId: string }>()
   const { pathname } = useLocation()
   const base = `/app/paar/${coupleId}`
@@ -136,6 +148,9 @@ export default function CoupleShell({
             {subtitle && <p className="mt-1 text-sm text-brand-muted">{subtitle}</p>}
           </div>
 
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+          {aktion}
+
           {/* Verwaltung gehört nicht in die Inhaltsreihe. */}
           <NavLink
             to={`${base}${EINSTELLUNGEN}`}
@@ -153,9 +168,17 @@ export default function CoupleShell({
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.43.64.79.79H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
           </NavLink>
+          </div>
         </div>
 
-        {/* ── Ebene 1: vier Gruppen ────────────────────────────────── */}
+      </div>
+
+      {/* ── Ebene 1: vier Gruppen ────────────────────────────────────
+          Eigenes, KLEBENDES Band. Vorher hing es mit der Identitaet in einem Kasten und
+          scrollte mit weg — auf einer langen Uebersicht musste man fuer jeden Wechsel
+          ganz nach oben. Der Nutzerbereich macht das seit jeher richtig; das Band ueber
+          den Reitern darf dagegen ruhig verschwinden, man liest es einmal beim Ankommen. */}
+      <div className="sticky top-14 z-30 border-b border-brand-border bg-white">
         <div className="mx-auto max-w-[1100px] px-6">
           {/* Vier kurze Woerter passen auf jeden Schirm; overflow-x bleibt als Netz,
               falls jemand die Schrift hochstellt. */}

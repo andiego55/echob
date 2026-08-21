@@ -80,9 +80,12 @@ export default function CaseDetailPage() {
               <Avatar value={c.avatar} size="lg" />
               <div>
                 <span className="label mb-2">{RELATIONSHIP_TYPE_LABELS[c.relationship_type]}</span>
-                <h1 className="page-title mt-2">
+                {/* Der Name steht jetzt auch im Band ueber den Reitern. Zweimal in
+                    derselben Groesse waere doppelt gemoppelt — hier die Kartenstufe,
+                    genau wie es der Paarraum zwischen Band und Heldenkarte macht. */}
+                <p className="card-title-lg mt-2">
                   {c.person_name?.trim() || RELATIONSHIP_STATUS_LABELS[c.relationship_status]}
-                </h1>
+                </p>
                 <p className="mt-1 text-sm text-brand-muted">
                   {c.person_name?.trim() && <>{RELATIONSHIP_STATUS_LABELS[c.relationship_status]} · </>}
                   Kontakt: {CONTACT_FREQUENCY_LABELS[c.contact_frequency]}

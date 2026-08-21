@@ -1,9 +1,23 @@
 /**
- * CaseNav – Tab-Navigation innerhalb eines Falls.
+ * Der Kopf eines Falls: wo bin ich, und wohin kann ich.
+ *
+ * **Was gefehlt hat.** Bis zur Angleichung standen hier nur die Reiter. Der Name der
+ * Fallperson stand ausschliesslich auf der Ueberblicksseite — wer zwei Faelle fuehrt, sah
+ * auf `/scenes` nicht, in welchem er gerade schreibt. Der Paarraum loest das seit jeher mit
+ * einem Band ueber den Reitern („Mit Lena"); das Band steht jetzt auch hier.
+ *
+ * **Warum nur die Reiter kleben.** Die Identitaet darf wegscrollen — man liest sie einmal
+ * beim Ankommen. Die Navigation soll bleiben, sonst muss man fuer jeden Wechsel ganz nach
+ * oben. Deshalb zwei Baender statt eines hohen: Band scrollt, Reiter kleben.
+ *
  * Wird auf allen /app/cases/:caseId/* Seiten angezeigt.
  */
 import { useRef, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import Avatar from '@/components/Avatar'
+import { casesApi } from '@/api/cases'
+import { RELATIONSHIP_STATUS_LABELS, RELATIONSHIP_TYPE_LABELS } from '@/types'
 
 interface Props {
   caseId: string
@@ -39,14 +53,48 @@ export default function CaseNav({ caseId }: Props) {
     }
   }
 
+  // Nur fuer den Namen im Band. Lange `staleTime`, weil sich ein Fallname praktisch nie
+  // aendert und die Abfrage sonst auf jeder Unterseite neu liefe.
+  const { data: fall } = useQuery({
+    queryKey: ['case', caseId],
+    queryFn: () => casesApi.get(caseId),
+    enabled: !!caseId,
+    staleTime: 5 * 60_000,
+    retry: false,
+  })
+
   const handleTopicClick = (id: string) => {
     setDropdownOpen(false)
     navigate(`${base}/topics/${id}`)
   }
 
   return (
-    <div className="border-b border-brand-border bg-white sticky top-14 z-30">
-      <div className="mx-auto max-w-[1100px] px-6 flex items-stretch">
+    <>
+      {/* Wo bin ich — scrollt bewusst weg, man liest es einmal beim Ankommen. */}
+      <div className="border-b border-brand-border bg-white">
+        <div className="mx-auto flex max-w-[1100px] items-center gap-3 px-6 pt-5 pb-3">
+          <Avatar value={fall?.avatar} size="sm" />
+          <div className="min-w-0">
+            <Link to="/app" className="text-xs text-brand-muted no-underline hover:text-navy">
+              ← Meine Fälle
+            </Link>
+            <p className="truncate text-lg font-bold leading-tight text-navy">
+              {fall?.person_name?.trim()
+                || (fall && RELATIONSHIP_STATUS_LABELS[fall.relationship_status])
+                || 'Fall'}
+            </p>
+          </div>
+          {fall && (
+            <span className="ml-auto hidden shrink-0 text-xs text-brand-muted sm:block">
+              {RELATIONSHIP_TYPE_LABELS[fall.relationship_type]}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Wohin kann ich — bleibt stehen, damit ein Wechsel nicht ans Seitenende zwingt. */}
+      <div className="sticky top-14 z-30 border-b border-brand-border bg-white">
+        <div className="mx-auto max-w-[1100px] px-6 flex items-stretch">
         {/* Scrollbare Tab-Links */}
         <nav className="flex gap-0 overflow-x-auto flex-1 min-w-0" aria-label="Fall-Navigation">
           {tabs.map(({ path, label }) => (
@@ -121,7 +169,8 @@ export default function CaseNav({ caseId }: Props) {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
