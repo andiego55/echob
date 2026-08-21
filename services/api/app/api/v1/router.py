@@ -37,6 +37,7 @@ from app.api.v1.routers import (
     person_profile,
     professional,
     professional_collab,
+    professional_couple_room,
     professional_couples,
     professional_echo,
     professional_notes,
@@ -98,6 +99,7 @@ v1_router.include_router(client_invites.router)
 v1_router.include_router(pseudonymous.router)
 v1_router.include_router(professional_echo.router)
 v1_router.include_router(professional_couples.router)
+v1_router.include_router(professional_couple_room.router)
 v1_router.include_router(professional_collab.router)
 v1_router.include_router(professional_notes.router)
 v1_router.include_router(professional_reports.router)

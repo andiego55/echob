@@ -343,3 +343,199 @@ async def list_own_professionals(conn, user_id) -> list[dict[str, Any]]:
         }
         for r in rows
     ]
+
+
+# ── Der Lesepfad ────────────────────────────────────────────────────────────
+# Bewusst alles in DIESER Datei: Wer wissen will, was eine Fachperson je aus einem
+# Paarraum sehen kann, liest eine Stelle statt zehn. Die Lader gehen absichtlich nicht
+# über die Mitglieder-Services — die prüfen auf Mitgliedschaft, und eine Fachperson ist
+# kein Mitglied. Jeder Lader ist nur über ``load_released`` erreichbar, und das geht
+# durch ``require_released``.
+
+
+async def _lade_summaries(conn, couple_id) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT s.id, s.summary_text, s.created_at, ses.title "
+        "FROM couple_session_summaries s "
+        "JOIN couple_sessions ses ON ses.id = s.session_id "
+        "WHERE ses.couple_id = $1 ORDER BY s.created_at DESC",
+        couple_id,
+    )
+    return [crypto.decrypt_fields(dict(r), "summary_text") for r in rows]
+
+
+async def _lade_agreements(conn, couple_id) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT id, body, status, due_at, reviewed_at, review_note, accepted_at, created_at "
+        "FROM couple_agreements WHERE couple_id = $1 ORDER BY created_at DESC",
+        couple_id,
+    )
+    return [crypto.decrypt_fields(dict(r), "body", "review_note") for r in rows]
+
+
+async def _lade_topics(conn, couple_id) -> list[dict]:
+    """Themen mit BEIDEN offenen Sichten — nie mit der vertraulichen.
+
+    Das ist die schärfste Stelle im ganzen Lesepfad. ``private_text`` steht in keiner
+    Abfrage dieser Funktion, und ein Test beweist es mit echten Daten. Wer die Spalte
+    hier ergänzt, bricht die Zusage, unter der die Menschen sie geschrieben haben.
+    """
+    themen = await conn.fetch(
+        "SELECT id, title, description, status, created_at FROM couple_topics "
+        "WHERE couple_id = $1 ORDER BY created_at DESC",
+        couple_id,
+    )
+    ergebnis = []
+    for t in themen:
+        eintrag = crypto.decrypt_fields(dict(t), "description")
+        sichten = await conn.fetch(
+            "SELECT user_id, open_text, updated_at FROM couple_perspectives "
+            "WHERE topic_id = $1 AND open_text IS NOT NULL",
+            t["id"],
+        )
+        eintrag["perspectives"] = [
+            crypto.decrypt_fields(dict(p), "open_text") for p in sichten
+        ]
+        vorschlaege = await conn.fetch(
+            "SELECT body, created_at FROM couple_mediations WHERE topic_id = $1 "
+            "ORDER BY created_at DESC",
+            t["id"],
+        )
+        eintrag["mediations"] = [crypto.decrypt_fields(dict(m), "body") for m in vorschlaege]
+        bruecken = await conn.fetch(
+            "SELECT title, body, status, note FROM couple_bridges WHERE topic_id = $1 "
+            "ORDER BY position",
+            t["id"],
+        )
+        eintrag["bridges"] = [
+            crypto.decrypt_fields(dict(b), "title", "body", "note") for b in bruecken
+        ]
+        ergebnis.append(eintrag)
+    return ergebnis
+
+
+async def _lade_history(conn, couple_id) -> dict[str, Any]:
+    """Barometer als PAAR-Durchschnitt je Woche, dazu die Check-in-Stimmungen.
+
+    Kein Tagesverlauf je Person: Diese Regel gilt schon zwischen den beiden
+    (``couple_barometer_service``) und wird durch eine Fachperson nicht lockerer.
+    """
+    barometer = await conn.fetch(
+        "SELECT date_trunc('week', created_at)::date AS woche, "
+        "       ROUND(AVG(value)::numeric, 1) AS schnitt, COUNT(*) AS werte "
+        "FROM couple_barometer_readings WHERE couple_id = $1 "
+        "GROUP BY 1 ORDER BY 1",
+        couple_id,
+    )
+    checkins = await conn.fetch(
+        "SELECT week_start, mood, COUNT(*) AS anzahl FROM couple_checkins "
+        "WHERE couple_id = $1 AND mood IS NOT NULL "
+        "GROUP BY 1, 2 ORDER BY 1",
+        couple_id,
+    )
+    return {
+        "barometer": [
+            {"week": r["woche"], "average": float(r["schnitt"]), "readings": r["werte"]}
+            for r in barometer
+        ],
+        "moods": [
+            {"week": r["week_start"], "mood": r["mood"], "count": r["anzahl"]}
+            for r in checkins
+        ],
+    }
+
+
+async def _lade_retrospectives(conn, couple_id) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT id, period_start, period_end, body, created_at FROM couple_retrospectives "
+        "WHERE couple_id = $1 ORDER BY created_at DESC",
+        couple_id,
+    )
+    return [crypto.decrypt_fields(dict(r), "body") for r in rows]
+
+
+async def _lade_tests(conn, couple_id) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT id, slug, body, created_at FROM couple_test_comparisons "
+        "WHERE couple_id = $1 ORDER BY created_at DESC",
+        couple_id,
+    )
+    return [crypto.decrypt_fields(dict(r), "body") for r in rows]
+
+
+async def _lade_transcripts(conn, couple_id) -> list[dict]:
+    """Die Gespräche im Wortlaut — nur wenn ausdrücklich freigegeben, nie vorausgewählt."""
+    sitzungen = await conn.fetch(
+        "SELECT id, title, created_at, closed_at FROM couple_sessions "
+        "WHERE couple_id = $1 AND status <> 'draft' ORDER BY created_at DESC",
+        couple_id,
+    )
+    ergebnis = []
+    for s in sitzungen:
+        eintrag = dict(s)
+        nachrichten = await conn.fetch(
+            "SELECT role, user_id, content, created_at FROM couple_session_messages "
+            "WHERE session_id = $1 ORDER BY created_at",
+            s["id"],
+        )
+        eintrag["messages"] = [
+            crypto.decrypt_fields(dict(m), "content") for m in nachrichten
+        ]
+        ergebnis.append(eintrag)
+    return ergebnis
+
+
+async def _lade_appreciation(conn, couple_id) -> dict[str, Any]:
+    """Nur Anzahl und Verlauf — nie die Sätze.
+
+    Ob es Wertschätzung gibt, ist fachlich aussagekräftig. Was darin steht, ist das
+    Einzige im Modul, das ausschließlich füreinander gedacht ist.
+    """
+    rows = await conn.fetch(
+        "SELECT date_trunc('month', created_at)::date AS monat, COUNT(*) AS anzahl "
+        "FROM couple_appreciations WHERE couple_id = $1 GROUP BY 1 ORDER BY 1",
+        couple_id,
+    )
+    gesamt = await conn.fetchval(
+        "SELECT COUNT(*) FROM couple_appreciations WHERE couple_id = $1", couple_id)
+    return {
+        "total": gesamt or 0,
+        "per_month": [{"month": r["monat"], "count": r["anzahl"]} for r in rows],
+    }
+
+
+#: Element -> Lader. Genau die Schluessel aus ELEMENTS, nichts darueber hinaus.
+LADER = {
+    "summaries": _lade_summaries,
+    "agreements": _lade_agreements,
+    "topics": _lade_topics,
+    "history": _lade_history,
+    "retrospectives": _lade_retrospectives,
+    "tests": _lade_tests,
+    "transcripts": _lade_transcripts,
+    "appreciation": _lade_appreciation,
+}
+
+
+async def load_released(conn, couple_id, professional_user_id, element: str) -> Any:
+    """Ein freigegebenes Element fuer eine Fachperson. Immer durch den Flaschenhals."""
+    await require_released(conn, couple_id, professional_user_id, element)
+    lader = LADER.get(element)
+    if lader is None:
+        raise HTTPException(status_code=404, detail="Nicht freigegeben.")
+    return await lader(conn, couple_id)
+
+
+async def load_overview(conn, couple_id, professional_user_id) -> dict[str, Any]:
+    """Wer, seit wann, was freigegeben ist — ohne jeden Inhalt."""
+    share = await require_released(conn, couple_id, professional_user_id)
+    link = await conn.fetchrow("SELECT * FROM couple_links WHERE id = $1", couple_id)
+    names = await load_member_names(conn, dict(link))
+    return {
+        "couple_id": str(couple_id),
+        "members": [{"user_id": str(uid), "name": name} for uid, name in names.items()],
+        "since": share["updated_at"],
+        "elements": share["elements"],
+        "catalogue": {k: v for k, v in ELEMENTS.items() if k in share["elements"]},
+        "room_since": link["accepted_at"] or link["created_at"],
+    }

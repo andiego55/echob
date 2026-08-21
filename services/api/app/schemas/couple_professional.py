@@ -59,3 +59,41 @@ class CoupleShareView(BaseModel):
     defaults: list[str]
     #: Was nie freigegeben werden kann - im Reiter sichtbar aufgezaehlt.
     never: list[str]
+
+
+# ── Sicht der Fachperson ────────────────────────────────────────────────────
+
+
+class CoupleRoomSummary(BaseModel):
+    """Ein Paarraum in der Liste der Fachperson - ohne jeden Inhalt."""
+
+    id: UUID
+    couple_id: UUID
+    status: str
+    origin: str
+    message: str | None = None
+    elements: list[str] = []
+    #: false = der Raum wurde beendet oder die Freigabe ruht noch.
+    readable: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class CoupleRoomMember(BaseModel):
+    user_id: str
+    name: str
+
+
+class CoupleRoomOverview(BaseModel):
+    couple_id: str
+    members: list[CoupleRoomMember]
+    since: datetime
+    room_since: datetime
+    elements: list[str]
+    #: Nur die freigegebenen Elemente, mit Klartext - die Oberflaeche zeigt den Rest gesperrt.
+    catalogue: dict[str, str]
+
+
+class CoupleRoomRequest(BaseModel):
+    elements: list[str] = Field(..., min_length=1)
+    message: str | None = Field(None, max_length=500)

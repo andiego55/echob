@@ -209,6 +209,90 @@ async def test_no_new_couple_module_reaches_into_a_case():
     )
 
 
+#: Der EINZIGE Weg, auf dem Raum-Daten zu einer Fachperson kommen duerfen.
+#: Steht hier jemals ein zweiter Name, ist das eine bewusste Entscheidung - keine
+#: Nebenwirkung, die niemandem auffaellt.
+BRUECKE_ZUR_FACHPERSON = "couple_professional_service"
+
+#: Paar-Module, die die BEZIEHUNG zu einer Fachperson lesen duerfen (case_shares) -
+#: nie einen Fall-Inhalt. Dass es eine Fachperson gibt, ist keine Fall-Information;
+#: ohne diese Liste muesste man eine Fachperson per ID eintragen.
+SHARE_AWARE_COUPLE_MODULES = {"couple_professional_service"}
+
+
+async def test_only_one_module_hands_room_data_to_a_professional():
+    """Struktur-Waechter, zweite Richtung.
+
+    Der erste Waechter prueft, dass aus dem Paarraum niemand in einen Fall greift.
+    Dieser prueft die Gegenrichtung: dass Raum-Daten nur ueber EINEN Weg zu einer
+    Fachperson gelangen. Jede fachpersonenseitige Route, die ein Paartherapie-Modul
+    einbindet, muss ueber diese Bruecke gehen - sonst umginge sie den Flaschenhals
+    ``require_released`` mitsamt Zustimmung und AVV.
+    """
+    from pathlib import Path
+
+    ordner = Path(__file__).resolve().parents[1] / "api" / "v1" / "routers"
+    verstoesse: list[str] = []
+
+    for pfad in sorted(ordner.glob("professional*.py")):
+        tree = ast.parse(pfad.read_text(encoding="utf-8"))
+        importiert: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                importiert.update(a.name for a in node.names)
+                importiert.add(node.module or "")
+            elif isinstance(node, ast.Import):
+                importiert.update(a.name for a in node.names)
+
+        paar_module = {
+            i for i in importiert
+            if i.startswith("couple_") and i not in NICHT_PAARTHERAPIE
+        }
+        fremd = paar_module - {BRUECKE_ZUR_FACHPERSON}
+        if fremd:
+            verstoesse.append(f"{pfad.name}: {', '.join(sorted(fremd))}")
+
+    assert not verstoesse, (
+        "Diese fachpersonenseitigen Router greifen an der Bruecke vorbei auf "
+        "Paartherapie-Module zu: " + " | ".join(verstoesse)
+        + ". Jeder Zugriff muss ueber couple_professional_service.require_released "
+          "laufen - sonst fehlen Zustimmung und AVV-Pruefung."
+    )
+
+
+async def test_the_bridge_never_reads_case_content():
+    """Die Bruecke darf die BEZIEHUNG lesen (case_shares), nie einen Inhalt."""
+    from pathlib import Path
+
+    pfad = (Path(__file__).resolve().parents[1] / "services"
+            / f"{BRUECKE_ZUR_FACHPERSON}.py")
+    tree = ast.parse(pfad.read_text(encoding="utf-8"))
+
+    # Docstrings ausnehmen: Sie sind ebenfalls String-Konstanten, und genau dort steht
+    # die Erklaerung, WARUM die vertrauliche Spalte fehlt. Sonst schlaegt der Waechter
+    # auf seiner eigenen Begruendung an.
+    erklaerungen = set()
+    for knoten in ast.walk(tree):
+        if isinstance(knoten, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef,
+                               ast.ClassDef)):
+            koerper = getattr(knoten, "body", [])
+            if (koerper and isinstance(koerper[0], ast.Expr)
+                    and isinstance(koerper[0].value, ast.Constant)
+                    and isinstance(koerper[0].value.value, str)):
+                erklaerungen.add(id(koerper[0].value))
+
+    sql = " ".join(
+        n.value.upper() for n in ast.walk(tree)
+        if isinstance(n, ast.Constant) and isinstance(n.value, str)
+        and id(n) not in erklaerungen
+    )
+    for tabelle in CASE_TABLES:
+        assert f"FROM {tabelle}" not in sql, tabelle
+    # Und die vertrauliche Spalte kommt in keiner Abfrage vor - nur in der Erklaerung,
+    # warum sie dort nicht steht.
+    assert "PRIVATE_TEXT" not in sql
+
+
 async def test_the_case_aware_list_is_not_stale():
     """Gegenprobe: Steht dort ein Modul, das gar keinen Fall mehr anfasst, gehoert es raus."""
     from pathlib import Path
@@ -2126,3 +2210,109 @@ async def test_a_stranger_consent_does_not_activate(db):
     row = await db.fetchrow(
         "SELECT status FROM couple_professional_shares WHERE id = $1", share["id"])
     assert row["status"] == "pending"
+
+
+# ── Der Lesepfad der Fachperson ─────────────────────────────────────────────
+
+
+async def _freigegeben(db, elements):
+    """Ein Paarraum mit Inhalt, aktiv freigegeben an eine Fachperson mit AVV."""
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    pro = await _mit_avv(db)
+    share = await cprof.propose(db, couple_id, user_a,
+                                professional_user_id=pro, elements=elements)
+    await cprof.consent(db, share["id"], user_b)
+    return user_a, user_b, couple_id, pro
+
+
+async def test_caucus_promise_survives_the_handover(db):
+    """Die schärfste Zusage im Modul: Die vertrauliche Sicht bleibt vertraulich —
+    auch gegenüber einer Fachperson, der beide zugestimmt haben."""
+    user_a, user_b, couple_id, pro = await _freigegeben(db, ["topics"])
+    topic = await cms.create_topic(db, couple_id, user_a, title="Geld")
+    await cms.save_perspective(db, topic["id"], user_a,
+                               open_text="OFFEN_VON_ALEX", private_text="GEHEIM_VON_ALEX")
+    await cms.save_perspective(db, topic["id"], user_b,
+                               open_text="OFFEN_VON_RIO", private_text="GEHEIM_VON_RIO")
+    await cms.save_mediation(db, topic["id"], user_a, "Echos Vorschlag")
+
+    daten = await cprof.load_released(db, couple_id, pro, "topics")
+    blob = str(daten)
+    assert "OFFEN_VON_ALEX" in blob and "OFFEN_VON_RIO" in blob   # beide Sichten
+    assert "Echos Vorschlag" in blob
+    assert "GEHEIM_VON_ALEX" not in blob                          # nie
+    assert "GEHEIM_VON_RIO" not in blob
+
+
+async def test_private_threads_never_appear_anywhere(db):
+    """Kein Lader gibt Einseitiges heraus — geprüft über ALLE Elemente auf einmal."""
+    user_a, user_b, couple_id, pro = await _freigegeben(db, sorted(cprof.ELEMENTS))
+    sitzung = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    await css.save_context(db, sitzung["id"], user_a,
+                           draft_text="ENTWURF_NIE", confirmed_text="GETEILT_JA")
+    await cps.add_private_message(db, sitzung["id"], user_a, role="user",
+                                  content="PRIVAT_NIE")
+    await cappr.leave(db, couple_id, user_a, "WERTSCHAETZUNG_NIE")
+
+    alles = ""
+    for element in sorted(cprof.ELEMENTS):
+        alles += str(await cprof.load_released(db, couple_id, pro, element))
+
+    for geheim in ("ENTWURF_NIE", "PRIVAT_NIE", "WERTSCHAETZUNG_NIE"):
+        assert geheim not in alles, geheim
+
+
+async def test_every_element_has_a_loader():
+    """Ein Element ohne Lader waere ein Versprechen ohne Deckung."""
+    assert set(cprof.LADER) == set(cprof.ELEMENTS)
+
+
+async def test_barometer_reaches_the_professional_only_as_an_average(db):
+    """Kein Tagesverlauf je Person — diese Regel wird durch eine Fachperson nicht lockerer."""
+    user_a, user_b, couple_id, pro = await _freigegeben(db, ["history"])
+    await cbar.set_value(db, couple_id, user_a, 9, "NOTIZ_VON_ALEX")
+    await cbar.set_value(db, couple_id, user_b, 3, "NOTIZ_VON_RIO")
+
+    daten = await cprof.load_released(db, couple_id, pro, "history")
+    assert len(daten["barometer"]) == 1
+    assert daten["barometer"][0]["average"] == 6.0        # (9 + 3) / 2
+    blob = str(daten)
+    assert "NOTIZ_VON_ALEX" not in blob and "NOTIZ_VON_RIO" not in blob
+    assert "9" not in str(daten["barometer"])             # keine Einzelwerte
+
+
+async def test_appreciation_reaches_the_professional_only_as_a_count(db):
+    """Ob es Wertschätzung gibt, ist aussagekräftig. Was darin steht, geht niemanden an."""
+    user_a, _, couple_id, pro = await _freigegeben(db, ["appreciation"])
+    await cappr.leave(db, couple_id, user_a, "DANKE_FUER_GESTERN")
+
+    daten = await cprof.load_released(db, couple_id, pro, "appreciation")
+    assert daten["total"] == 1
+    assert "DANKE_FUER_GESTERN" not in str(daten)
+
+
+async def test_transcripts_stay_shut_unless_chosen(db):
+    """Der Wortlaut ist nie vorausgewählt — und ohne Wahl auch nicht erreichbar."""
+    user_a, _, couple_id, pro = await _freigegeben(db, sorted(cprof.DEFAULT_ON))
+    sitzung = await css.create_session(db, couple_id, user_a, title="Sonntage")
+    await css.set_status(db, sitzung["id"], user_a, "open")
+    await css.add_message(db, sitzung["id"], user_id=user_a, role="partner",
+                          content="WORT_FUER_WORT")
+
+    with pytest.raises(HTTPException) as e:
+        await cprof.load_released(db, couple_id, pro, "transcripts")
+    assert e.value.status_code == 404
+
+    zusammen = await cprof.load_released(db, couple_id, pro, "summaries")
+    assert "WORT_FUER_WORT" not in str(zusammen)
+
+
+async def test_overview_carries_no_content(db):
+    user_a, _, couple_id, pro = await _freigegeben(db, ["summaries"])
+    topic = await cms.create_topic(db, couple_id, user_a, title="GEHEIMES_THEMA")
+
+    ueberblick = await cprof.load_overview(db, couple_id, pro)
+    assert len(ueberblick["members"]) == 2
+    assert ueberblick["elements"] == ["summaries"]
+    assert "GEHEIMES_THEMA" not in str(ueberblick)
+    assert topic is not None
