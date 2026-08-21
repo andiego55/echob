@@ -14,6 +14,7 @@ import AgreementsCard from '@/components/couple/AgreementsCard'
 import ProgressCard from '@/components/couple/ProgressCard'
 import ChronicleCard from '@/components/couple/ChronicleCard'
 import ReminderCard from '@/components/couple/ReminderCard'
+import SharesCard from '@/components/couple/SharesCard'
 import RetrospectCard from '@/components/couple/RetrospectCard'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
@@ -123,6 +124,15 @@ export function CoupleRetrospectPage() {
   return (
     <CoupleShell subtitle="Punkte zeigen, dass ihr arbeitet. Hier steht, was daraus geworden ist.">
       <RetrospectCard coupleId={coupleId} />
+    </CoupleShell>
+  )
+}
+
+export function CoupleSharesPage() {
+  const coupleId = useCoupleId()
+  return (
+    <CoupleShell subtitle="Wer aus eurem Raum was sieht – und was niemals hinausgeht.">
+      <SharesCard coupleId={coupleId} />
     </CoupleShell>
   )
 }

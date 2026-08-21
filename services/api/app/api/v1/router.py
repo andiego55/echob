@@ -20,6 +20,7 @@ from app.api.v1.routers import (
     couple_retrospect,
     couple_rhythm,
     couple_sessions,
+    couple_shares,
     couple_tests,
     directory,
     directory_admin,
@@ -112,6 +113,7 @@ v1_router.include_router(couple_tests.router)
 v1_router.include_router(couple_rhythm.router)
 v1_router.include_router(couple_retrospect.router)
 v1_router.include_router(couple_reminders.router)
+v1_router.include_router(couple_shares.router)
 
 # ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
 v1_router.include_router(institute.router)

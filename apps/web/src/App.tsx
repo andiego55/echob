@@ -68,7 +68,8 @@ import CoupleTestPage         from '@/pages/couple/CoupleTestPage'
 import {
   CoupleSessionsPage, CoupleTopicsPage, CoupleAgreementsPage,
   CoupleTestsPage, CoupleProgressPage,
-  CoupleRetrospectPage, CoupleSettingsPage,
+  CoupleRetrospectPage,
+  CoupleSharesPage, CoupleSettingsPage,
 } from '@/pages/couple/CoupleTabPages'
 // Nicht zu verwechseln mit der Paar-Analyse im Fachpersonenbereich (weiter unten).
 import CouplePartnerEchoPage  from '@/pages/couple/CoupleEchoPage'
@@ -269,6 +270,7 @@ export function AppRoutes() {
       <Route path="/app/paar/:coupleId/abmachungen" element={<ProtectedRoute><CoupleAgreementsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/tests" element={<ProtectedRoute><CoupleTestsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/rueckblick" element={<ProtectedRoute><CoupleRetrospectPage /></ProtectedRoute>} />
+      <Route path="/app/paar/:coupleId/freigaben" element={<ProtectedRoute><CoupleSharesPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/fortschritt" element={<ProtectedRoute><CoupleProgressPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/einstellungen" element={<ProtectedRoute><CoupleSettingsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/test/:slug" element={<ProtectedRoute><CoupleTestPage /></ProtectedRoute>} />

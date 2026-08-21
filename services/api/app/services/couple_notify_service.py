@@ -156,3 +156,31 @@ def barometer_dropped() -> tuple[str, str]:
     return ("couple_barometer_dropped",
             "Im Paarraum hat sich etwas verändert. Vielleicht ein guter Moment, "
             "kurz nachzufragen.")
+
+
+# ── Freigabe an eine Fachperson ─────────────────────────────────────────────
+# Der Name der Fachperson gehoert hier ausnahmsweise hinein: Die andere Person soll
+# wissen, WER gemeint ist, bevor sie zustimmt - nicht erst nach dem Klick.
+
+
+def share_proposed(fachperson: str) -> tuple[str, str]:
+    return ("couple_share_proposed",
+            f"Es liegt ein Vorschlag vor, euren Paarraum für {_kurz(fachperson, 40)} "
+            "freizugeben. Ohne deine Zustimmung passiert nichts.")
+
+
+def share_active() -> tuple[str, str]:
+    return ("couple_share_active",
+            "Die Freigabe eures Paarraums ist jetzt aktiv. Du kannst sie jederzeit "
+            "allein wieder beenden.")
+
+
+def share_widened() -> tuple[str, str]:
+    return ("couple_share_widened",
+            "Der Umfang einer Freigabe wurde erweitert. Sie ruht, bis du erneut "
+            "zustimmst.")
+
+
+def share_revoked() -> tuple[str, str]:
+    return ("couple_share_revoked",
+            "Eine Freigabe eures Paarraums wurde beendet. Die Fachperson sieht nichts mehr.")

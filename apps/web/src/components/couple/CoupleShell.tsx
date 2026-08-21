@@ -46,6 +46,7 @@ const GRUPPEN: Gruppe[] = [
       { path: '/rueckblick', label: 'Rückblick' },
       { path: '/fortschritt', label: 'Fortschritt' },
       { path: '/tests', label: 'Tests' },
+      { path: '/freigaben', label: 'Freigaben' },
     ],
   },
 ]

@@ -317,3 +317,29 @@ async def list_for_professional(conn, professional_user_id) -> list[dict[str, An
         eintrag["readable"] = r["status"] == "active" and r["room_status"] == "active"
         ergebnis.append(eintrag)
     return ergebnis
+
+
+async def list_own_professionals(conn, user_id) -> list[dict[str, Any]]:
+    """Die Fachpersonen, mit denen DIESE Person bereits einen Fall teilt.
+
+    **Zur Grenze:** Hier liest der Paarbereich ausnahmsweise ``case_shares`` — aber nur die
+    Beziehung, nie einen Inhalt. Dass es eine Fachperson gibt, ist keine Fall-Information.
+    Ohne diese Liste müsste man eine Fachperson per ID von Hand eintragen — und stimmte
+    damit einer Nummer zu statt einem Menschen.
+    """
+    rows = await conn.fetch(
+        "SELECT DISTINCT s.professional_user_id, p.display_name, p.title "
+        "FROM case_shares s "
+        "LEFT JOIN professional_profiles p ON p.user_id = s.professional_user_id "
+        "WHERE s.owner_user_id = $1 AND s.status = 'active' "
+        "ORDER BY p.display_name NULLS LAST",
+        user_id,
+    )
+    return [
+        {
+            "professional_user_id": str(r["professional_user_id"]),
+            "display_name": r["display_name"] or "Fachperson",
+            "title": r["title"],
+        }
+        for r in rows
+    ]

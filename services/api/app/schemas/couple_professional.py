@@ -1,0 +1,61 @@
+"""Schemas: Freigabe eines Paarraums an eine Fachperson.
+
+Freigeben braucht beide, widerrufen genuegt einer - deshalb traegt jede Freigabe die
+Liste der bereits erfolgten Zustimmungen mit sich.
+Siehe services/couple_professional_service.py.
+"""
+from __future__ import annotations
+
+from datetime import datetime
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+
+class CoupleShareProposal(BaseModel):
+    professional_user_id: UUID
+    elements: list[str] = Field(..., min_length=1)
+    message: str | None = Field(None, max_length=500)
+
+
+class CoupleShareElements(BaseModel):
+    elements: list[str] = Field(..., min_length=1)
+
+
+class CoupleProfessionalOption(BaseModel):
+    """Eine Fachperson zur Auswahl - nur, WER sie ist, nichts aus dem Fall."""
+
+    professional_user_id: str
+    display_name: str
+    title: str | None = None
+
+
+class CoupleShare(BaseModel):
+    id: UUID
+    couple_id: UUID
+    professional_user_id: UUID
+    status: str
+    #: 'partner' = eine Person hat vorgeschlagen, 'professional' = die Fachperson hat gebeten.
+    origin: str
+    initiated_by: UUID | None = None
+    message: str | None = None
+    elements: list[str] = []
+    #: Wer bereits zugestimmt hat. Zwei Eintraege = aktiv.
+    consented_by: list[str] = []
+    consent_names: list[str] = []
+    revoked_by: UUID | None = None
+    revoked_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class CoupleShareView(BaseModel):
+    shares: list[CoupleShare]
+    #: Zur Auswahl: Fachpersonen mit aktiver Fall-Freigabe dieser Person.
+    professionals: list[CoupleProfessionalOption]
+    #: Schluessel -> was die Fachperson damit sieht.
+    catalogue: dict[str, str]
+    #: Vorauswahl beim Vorschlagen.
+    defaults: list[str]
+    #: Was nie freigegeben werden kann - im Reiter sichtbar aufgezaehlt.
+    never: list[str]
