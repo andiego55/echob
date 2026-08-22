@@ -8,6 +8,7 @@ Prompt-Dateien: services/api/app/prompts/
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
 
@@ -815,7 +816,18 @@ class EchoService:
 
     # ── OpenAI-Implementierungen ──────────────────────────────────────────────
 
-    async def _openai_chat(self, **kwargs) -> str:  # type: ignore[override]
+    def _build_chat_messages(self, **kwargs) -> list[dict]:
+        """Der Prompt-Aufbau des freien Fall-Dialogs - EINMAL, fuer beide Wege.
+
+        `_openai_chat` (ganze Antwort) und `stream_chat` (stueckweise) benutzen ihn
+        gemeinsam. Zwei Abschriften waeren die schlimmste Art von Dopplung: Wer den
+        System-Prompt aendert und nur eine Seite anfasst, bekommt einen Echo, der beim
+        Streaming anders antwortet als ohne - und merkt es nie, weil beides plausibel
+        klingt.
+
+        Die Reihenfolge der Bloecke ist Absicht: Stabiles zuerst, damit OpenAI den Anfang
+        zwischenspeichern kann.
+        """
         system_prompt = _load_prompt("echo_system_prompt.md")
 
         # Block 1: Echo-Verhalten (stabil → OpenAI cached automatisch)
@@ -858,15 +870,57 @@ class EchoService:
 
         # Block 4: Aktuelle Nutzernachricht
         messages.append({"role": "user", "content": kwargs["user_message"]})
+        return messages
 
+    @staticmethod
+    def _chat_temperature(kwargs: dict) -> float:
         mode_temp = kwargs.get("mode_temperature")
+        return mode_temp if isinstance(mode_temp, (int, float)) else 0.4
+
+    async def _openai_chat(self, **kwargs) -> str:  # type: ignore[override]
         response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
-            messages=messages,
+            messages=self._build_chat_messages(**kwargs),
             max_tokens=1500,
-            temperature=mode_temp if isinstance(mode_temp, (int, float)) else 0.4,
+            temperature=self._chat_temperature(kwargs),
         )
         return response.choices[0].message.content or ""
+
+    async def stream_chat(self, **kwargs) -> AsyncIterator[str]:
+        """Wie `chat()`, nur stueckweise - fuer den freien Fall-Dialog.
+
+        **Warum nur dort.** Streaming lohnt sich, wo eine lange, zusammenhaengende Antwort
+        entsteht und jemand darauf wartet. Zusammenfassungen, Berichte und die
+        Szenen-Extraktion liefern strukturierte Ergebnisse, die man erst ganz gebrauchen
+        kann - dort waere es Aufwand ohne Gewinn.
+
+        **Ohne OpenAI** (Entwicklung, Mock) kommt die Antwort in einem Stueck. Der
+        Aufrufer merkt keinen Unterschied ausser der fehlenden Zwischenzeit.
+        """
+        if not self._use_openai:
+            yield self._mock_chat(
+                user_message=kwargs.get("user_message", ""),
+                thread_type=kwargs.get("thread_type", "topic"),
+                glossary_term=kwargs.get("glossary_term"),
+            )
+            return
+
+        strom = await self._client.chat.completions.create(  # type: ignore[union-attr]
+            model=self._model_fast,
+            messages=self._build_chat_messages(**kwargs),
+            stream=True,
+            **(
+                {"max_completion_tokens": 1500 + self._reasoning_headroom}
+                if self._reasoning
+                else {"max_tokens": 1500, "temperature": self._chat_temperature(kwargs)}
+            ),
+        )
+        async for teil in strom:
+            if not teil.choices:
+                continue
+            stueck = teil.choices[0].delta.content
+            if stueck:
+                yield stueck
 
     async def _openai_scene_chat(
         self, *, user_message: str, history: list[dict[str, str]], extra_context: str = ""
