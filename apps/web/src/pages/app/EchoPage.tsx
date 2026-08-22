@@ -20,6 +20,7 @@ import { echoStreamen, StreamNichtMoeglich } from '@/api/echoStream'
 import { useEntwurf } from '@/lib/entwurf'
 import EntwurfHinweis from '@/components/EntwurfHinweis'
 import { useGetakteterText } from '@/lib/textTakt'
+import type { EchoChatResponse, EchoMessage } from '@/types'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -127,6 +128,14 @@ export default function EchoPage() {
    */
   const [stromSafety, setStromSafety] = useState<'acute' | 'elevated' | null>(null)
 
+  /**
+   * Das fertige Ergebnis, solange die Anzeige noch aufholt.
+   *
+   * Zwischen „Echo ist fertig" und „der Text steht vollstaendig da" liegen ein paar
+   * Sekunden. In dieser Zeit darf sich am Verlauf nichts aendern.
+   */
+  const [uebergabe, setUebergabe] = useState<EchoChatResponse | null>(null)
+
   const abbruch = useRef<AbortController | null>(null)
 
   // Wer die Seite verlaesst, laesst sonst einen Strom weiterlaufen.
@@ -159,15 +168,10 @@ export default function EchoPage() {
       }
     },
     onSuccess: (data) => {
-      if (data.chat_session_id && data.chat_session_id !== selectedSession) {
-        setSelectedSession(data.chat_session_id)
-      }
-      qc.invalidateQueries({ queryKey: ['echo-history', caseId] })
-      qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
-      setInput('')
-      setPendingMessage(null)
-      // Der gestroemte Text bleibt stehen, bis der Verlauf nachgeladen ist - sonst waere
-      // die Antwort fuer einen Moment weg und blitzte dann wieder auf.
+      // Hier passiert bewusst NICHTS ausser Merken. Wuerde der Verlauf jetzt neu geladen,
+      // stuende die gespeicherte Antwort neben der noch aufholenden Anzeige - dieselbe
+      // Antwort zweimal. Den Wechsel macht der Effekt weiter unten, in einem Zug.
+      setUebergabe(data)
     },
     onError: (_fehler, variablen) => {
       // Der Text kommt zurueck ins Feld. Vorher war er weg: beim Absenden geloescht,
@@ -203,22 +207,53 @@ export default function EchoPage() {
    */
   const takt = useGetakteterText(stromText, mutation.isPending)
 
+  /**
+   * „Echo ist noch dabei" — bis der letzte Buchstabe steht.
+   *
+   * `mutation.isPending` allein reicht nicht: Es wird schon falsch, wenn die Antwort
+   * vollstaendig empfangen ist, waehrend die Anzeige noch aufholt. In dieser Luecke haette
+   * man erneut senden koennen — und die erste Antwort waere nie in den Verlauf gewandert.
+   */
+  const beschaeftigt = mutation.isPending || uebergabe !== null
+
   // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [history, takt.sichtbar])
 
-  // Erst wenn die gespeicherte Antwort im Verlauf angekommen ist, verschwindet der
-  // vorlaeufige Text. Andernfalls klaffte dazwischen eine Luecke.
+  /**
+   * Der Wechsel von der vorlaeufigen zur gespeicherten Nachricht — in EINEM Bild.
+   *
+   * Die beiden Nachrichten werden direkt in den Zwischenspeicher geschrieben statt
+   * nachgeladen. Nachladen hiesse warten, und in der Wartezeit waere die Antwort entweder
+   * doppelt zu sehen (wenn der vorlaeufige Text noch steht) oder gar nicht (wenn er schon
+   * weg ist). React fasst die Zustandsaenderungen hier zu einem Render zusammen.
+   */
   useEffect(() => {
-    if (!stromText || mutation.isPending || !takt.aufgeholt) return
+    if (!uebergabe || mutation.isPending || !takt.aufgeholt) return
+
+    const sitzung = uebergabe.chat_session_id ?? selectedSession
+    if (sitzung) {
+      qc.setQueryData<EchoMessage[]>(
+        ['echo-history', caseId, sitzung],
+        alt => [...(alt ?? []), uebergabe.user_message, uebergabe.assistant_message],
+      )
+    }
+    if (uebergabe.chat_session_id && uebergabe.chat_session_id !== selectedSession) {
+      setSelectedSession(uebergabe.chat_session_id)
+    }
+
     setStromText('')
     setStromSafety(null)
-  }, [history, stromText, mutation.isPending, takt.aufgeholt])
+    setPendingMessage(null)
+    setUebergabe(null)
+    // Die Seitenleiste darf ruhig kurz spaeter nachziehen.
+    qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
+  }, [uebergabe, mutation.isPending, takt.aufgeholt, selectedSession, caseId, qc])
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()
-    if (!input.trim() || mutation.isPending) return
+    if (!input.trim() || beschaeftigt) return
     const msg = input.trim()
     setInput('')
     eingabeEntwurf.loeschen()
@@ -245,13 +280,27 @@ export default function EchoPage() {
     mutation.mutate({ message: msg })
   }
 
-  const handleNewChat = () => {
-    setSelectedSession(null)
+  /**
+   * Chat wechseln oder neu beginnen — und dabei aufräumen.
+   *
+   * Wer das mitten in einer Antwort tut, nähme sonst den halben gestreamten Text mit in
+   * den anderen Chat: Er hängt an einem eigenen Zustand, nicht am Verlauf. Der Strom wird
+   * abgebrochen, das Angefangene verworfen.
+   */
+  const chatWechseln = (id: string | null) => {
+    abbruch.current?.abort()
+    setSelectedSession(id)
     setInput('')
     setPendingMessage(null)
+    setStromText('')
+    setStromSafety(null)
+    setUebergabe(null)
   }
 
-  const showEmptyState = (!selectedSession || history.length === 0) && !mutation.isPending
+  const handleNewChat = () => chatWechseln(null)
+
+  const showEmptyState = (!selectedSession || history.length === 0) && !beschaeftigt
+    && !pendingMessage
 
   return (
     <AppShell>
@@ -263,7 +312,7 @@ export default function EchoPage() {
           caseId={caseId!}
           sessions={sessions}
           selected={selectedSession ?? null}
-          onSelect={(id) => { setSelectedSession(id); setPendingMessage(null) }}
+          onSelect={chatWechseln}
           onNewChat={handleNewChat}
         />
 
@@ -274,7 +323,7 @@ export default function EchoPage() {
           <div className="md:hidden border-b border-brand-border bg-white px-4 py-2 flex gap-2 items-center">
             <select
               value={selectedSession ?? ''}
-              onChange={(e) => setSelectedSession(e.target.value || null)}
+              onChange={(e) => chatWechseln(e.target.value || null)}
               className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none"
             >
               <option value="">Neuer Chat</option>
@@ -309,7 +358,9 @@ export default function EchoPage() {
               ))}
 
               {/* Optimistische Nutzernachricht */}
-              {pendingMessage && mutation.isPending && (
+              {/* Bleibt bis zur Uebergabe stehen — vorher verschwand sie kurz, weil sie
+                  geleert wurde, bevor der Verlauf sie enthielt. */}
+              {pendingMessage && (
                 <ChatMessage content={pendingMessage} isUser />
               )}
 
@@ -319,13 +370,13 @@ export default function EchoPage() {
               {takt.sichtbar && (
                 <ChatMessage content={takt.sichtbar} isUser={false} safetyLevel={stromSafety} />
               )}
-              {mutation.isPending && !takt.sichtbar && <TypingIndicator />}
+              {beschaeftigt && !takt.sichtbar && <TypingIndicator />}
 
               {mutation.isError && (
                 <ChatErrorMessage text={apiErrorMessage(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
               )}
 
-              {assignmentId && selectedSession && history.length > 0 && !mutation.isPending && (
+              {assignmentId && selectedSession && history.length > 0 && !beschaeftigt && (
                 <AssignmentDialogSummary caseId={caseId!} assignmentId={assignmentId} />
               )}
 
@@ -369,7 +420,7 @@ export default function EchoPage() {
                 {keywords.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {keywords.map(kw => (
-                      <button key={kw} type="button" onClick={() => handleKeyword(kw)} disabled={mutation.isPending}
+                      <button key={kw} type="button" onClick={() => handleKeyword(kw)} disabled={beschaeftigt}
                         className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-50">
                         {kw}
                       </button>
@@ -389,7 +440,7 @@ export default function EchoPage() {
               value={input}
               onChange={setInput}
               onSend={handleSend}
-              pending={mutation.isPending}
+              pending={beschaeftigt}
               hint="Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung."
               leftAccessory={
                 <button
