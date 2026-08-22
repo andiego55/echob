@@ -4,9 +4,11 @@ from __future__ import annotations
 import json as _json
 import logging
 import re
+from dataclasses import dataclass, field
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app.core import crypto
@@ -36,18 +38,30 @@ def _get_echo_service(request: Request):
     return svc
 
 
-@router.post("/chat", response_model=EchoChatResponse)
-async def chat(
-    case_id: UUID,
-    body: EchoChatRequest,
-    request: Request,
-    current_user: dict = Depends(get_current_user),
-    pool=Depends(get_pool),
-) -> EchoChatResponse:
-    """Sendet eine Nachricht an Echo und erhält eine Antwort."""
-    user_id = current_user["user_id"]
-    echo_svc = _get_echo_service(request)
+@dataclass
+class ChatVorbereitung:
+    """Alles, was aus der Datenbank kommt, bevor Echo überhaupt gefragt wird."""
 
+    case_context: dict
+    onboarding: dict | None
+    scenes: list
+    scale_scores: list
+    topic_summaries: list
+    hypotheses: list
+    person_profile_row: object
+    chat_session_id: object
+    history: list
+    session_meta: str
+
+
+async def _vorbereiten(pool, case_id, user_id, body) -> ChatVorbereitung:
+    """Limit, Fall, Zeilen, Sitzung, Verlauf — für beide Antwortwege gleich.
+
+    Läuft VOR dem ersten gesendeten Byte. Das ist beim Streaming wesentlich: Was hier
+    fehlschlägt — erschöpftes Kontingent, fremder Fall — muss ein sauberer HTTP-Fehler
+    werden. Sobald der Strom läuft, stehen die Kopfzeilen und ein Fehler wäre nur noch
+    ein Ereignis mitten im Text.
+    """
     async with pool.acquire() as conn:
         # Kostenschutz Entwicklungsphase
         await enforce_echo_prompt_limit(user_id, conn)
@@ -147,81 +161,35 @@ async def chat(
         _meta["source"] = body.source
     session_meta = _json.dumps(_meta)
 
-    # ── Sonderfall: Beziehungskontext hinzufügen ──────────────────────────────
-    if body.message == "__add_context__" and body.thread_type == "scene" and body.scene_session_id:
-        # Profil laden
-        profile_row = None
-        async with pool.acquire() as conn:
-            profile_row = await conn.fetchrow(
-                "SELECT * FROM user_profiles WHERE user_id = $1", user_id
-            )
+    return ChatVorbereitung(
+        case_context=case_context,
+        onboarding=onboarding,
+        scenes=scenes,
+        scale_scores=scale_scores,
+        topic_summaries=topic_summaries,
+        hypotheses=hypotheses,
+        person_profile_row=person_profile_row,
+        chat_session_id=chat_session_id,
+        history=history,
+        session_meta=session_meta,
+    )
 
-        # Kontext-String aufbauen
-        context_text = build_case_context(
-            case=case_context,
-            onboarding=onboarding,
-            scenes=scenes,
-            scale_scores=scale_scores,
-        )
-        if profile_row:
-            profile_modules = profile_row.get("modules") or {}
-            if isinstance(profile_modules, str):
-                import json as _pj
-                profile_modules = _pj.loads(profile_modules)
-            context_text += "\n\n" + build_profile_context({
-                "modules": profile_modules,
-                "safety_status": profile_row.get("safety_status", "no_indication"),
-                "display_name": profile_row.get("display_name"),
-            })
 
-        if topic_summaries:
-            topic_ctx = build_topic_context(topic_summaries)
-            if topic_ctx:
-                context_text += "\n\n" + topic_ctx
+async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
+    """Selbstauskunft, Personenprofil, Zusammenfassungen, Hypothesen, Aussteuerung.
 
-        if hypotheses:
-            hyp_ctx = build_hypothesis_context(hypotheses)
-            if hyp_ctx:
-                context_text += "\n\n" + hyp_ctx
+    Wird bei JEDER Nachricht frisch gebaut — damit eine Änderung am Profil sofort im
+    nächsten Satz von Echo ankommt und nicht erst beim nächsten Gespräch.
 
-        context_meta = _json.dumps({
-            "scene_session_id": body.scene_session_id,
-            "context_marker": True,
-        })
-
-        # Kontext als System-Nachricht persistent speichern
-        async with pool.acquire() as conn:
-            await conn.execute(
-                """
-                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
-                VALUES ($1, $2, 'system', $3, 'scene', $4::jsonb)
-                """,
-                case_id, user_id, crypto.encrypt(context_text), context_meta,
-            )
-
-        # Echo bestätigt den Kontext
-        answer = await echo_svc.scene_confirm_context(context_text=context_text)
-
-        async with pool.acquire() as conn:
-            user_msg_row = await conn.fetchrow(
-                """
-                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
-                VALUES ($1, $2, 'user', '__add_context__', 'scene', $3::jsonb) RETURNING *
-                """,
-                case_id, user_id, session_meta,
-            )
-            assistant_msg_row = await conn.fetchrow(
-                """
-                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
-                VALUES ($1, $2, 'assistant', $3, 'scene', $4::jsonb) RETURNING *
-                """,
-                case_id, user_id, crypto.encrypt(answer), session_meta,
-            )
-
-        return EchoChatResponse(
-            user_message=_row_to_msg(user_msg_row),
-            assistant_message=_row_to_msg(assistant_msg_row),
-        )
+    Gibt zurück: ``(extra_context, mode_steering, mode_temperature)``.
+    """
+    case_context = v.case_context
+    onboarding = v.onboarding
+    scenes = v.scenes
+    scale_scores = v.scale_scores
+    topic_summaries = v.topic_summaries
+    hypotheses = v.hypotheses
+    person_profile_row = v.person_profile_row
 
     # ── Normaler Chat: Kontext bei jeder Nachricht frisch aus der DB bauen ────
     # (Änderungen an Selbstauskunft/Personenprofil wirken so sofort)
@@ -351,48 +319,19 @@ async def chat(
         crypto.decrypt(settings_row["echo_custom_steering"]) if settings_row else None,
     )
 
-    # ── Sicherheits-Triage ────────────────────────────────────────────────────
-    # Aktive Krisenerkennung statt passivem Disclaimer: Deutet die Nachricht auf
-    # eine akute Gefährdung hin, antwortet Echo mit konkreter Hilfe statt mit
-    # reflektierender Deutung. Steuertoken (__…__) und das geführte Szenen-
-    # gespräch sind ausgenommen.
-    async def _normal_answer() -> str:
-        return await echo_svc.chat(
-            user_message=body.message,
-            case_context=case_context,
-            thread_type=body.thread_type,
-            history=history,
-            glossary_term=body.glossary_term,
-            onboarding=onboarding,
-            scenes=scenes,
-            scale_scores=scale_scores,
-            extra_context=extra_context,
-            mode_steering=mode_steering,
-            mode_temperature=mode_temperature,
-        )
+    return extra_context, mode_steering, mode_temperature
 
-    safety_meta: dict = {}
-    is_control_msg = body.message.startswith("__")
-    if body.thread_type != "scene" and not is_control_msg:
-        from app.services.safety_service import build_safety_message
-        risk = await echo_svc.classify_risk(text=body.message)
-        level = risk.get("level", "none")
-        if level == "acute":
-            answer = build_safety_message("acute", category=risk.get("category"))
-            safety_meta = {"safety": {"level": "acute", "category": risk.get("category"), "mode": "intervention"}}
-        else:
-            answer = await _normal_answer()
-            if level == "elevated":
-                answer = answer.rstrip() + "\n\n" + build_safety_message("elevated", category=risk.get("category"))
-                safety_meta = {"safety": {"level": "elevated", "category": risk.get("category"), "mode": "appended"}}
-    else:
-        answer = await _normal_answer()
 
-    # Sicherheits-Markierung in die Metadaten der Assistenten-Nachricht mergen
-    assistant_meta = dict(_json.loads(session_meta))
-    assistant_meta.update(safety_meta)
-    assistant_meta_json = _json.dumps(assistant_meta)
+async def _nachrichten_speichern(
+    pool, case_id, user_id, body, *, antwort, session_meta, assistant_meta_json,
+    chat_session_id,
+):
+    """Frage und Antwort ablegen — verschlüsselt, in einem Rutsch.
 
+    Für beide Wege gleich. Beim Streaming passiert es NACH dem letzten Stück: Erst wenn
+    der Text vollständig ist, gehört er in die Datenbank — ein halb geschriebener Satz
+    wäre ein Gesprächsverlauf, der so nie stattgefunden hat.
+    """
     async with pool.acquire() as conn:
         user_msg_row = await conn.fetchrow(
             """
@@ -407,7 +346,7 @@ async def chat(
             INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, related_scene_id, metadata, session_id)
             VALUES ($1, $2, 'assistant', $3, $4, $5, $6::jsonb, $7) RETURNING *
             """,
-            case_id, user_id, crypto.encrypt(answer), body.thread_type,
+            case_id, user_id, crypto.encrypt(antwort), body.thread_type,
             body.related_scene_id, assistant_meta_json, chat_session_id,
         )
         if chat_session_id:
@@ -417,11 +356,330 @@ async def chat(
                 "title = COALESCE(title, LEFT($2, 60)) WHERE id = $1",
                 chat_session_id, body.message.strip(),
             )
+    return user_msg_row, assistant_msg_row
+
+
+def _ereignis(typ: str, **felder) -> str:
+    """Ein Server-Sent Event. Eine Zeile JSON, doppelter Zeilenumbruch als Trenner."""
+    return "data: " + _json.dumps({"typ": typ, **felder}, ensure_ascii=False) + "\n\n"
+
+
+@dataclass
+class Triage:
+    """Was die Sicherheitsprüfung über eine Nachricht entschieden hat.
+
+    **Die Entscheidung faellt hier, ausgefuehrt wird sie anderswo.** Genau ein Ort, an dem
+    steht, was bei welchem Risiko passiert - benutzt vom normalen Endpunkt UND vom
+    Streaming. Abgeschrieben waere das die gefaehrlichste Dopplung im ganzen Projekt: Wer
+    die Regel spaeter anfasst und eine Seite vergisst, baut einen Weg, auf dem jemand in
+    akuter Gefahr eine reflektierende Deutung statt einer Notrufnummer liest.
+    """
+
+    #: 'none' | 'unclear' | 'elevated' | 'acute'
+    level: str = "none"
+    #: Bei ``acute`` gesetzt: DIE Antwort. Echo wird dann gar nicht erst gefragt.
+    statt_echo: str | None = None
+    #: Bei ``elevated`` gesetzt: kommt ans Ende der normalen Antwort.
+    nachtrag: str | None = None
+    #: Wandert in die Metadaten der Assistenten-Nachricht.
+    meta: dict = field(default_factory=dict)
+
+
+async def _triage_pruefen(echo_svc, body) -> Triage:
+    """Aktive Krisenerkennung statt passivem Disclaimer.
+
+    Ausgenommen sind Steuertoken (``__…__``) und das gefuehrte Szenengespraech - dort
+    schreibt niemand frei, was eine Gefaehrdung erkennen liesse.
+
+    **Das laeuft VOR jeder Antwort**, auch vor einem Stream. Beim Streaming heisst das eine
+    kurze Wartezeit, bevor das erste Wort erscheint - und die ist richtig so: Wer in akuter
+    Not schreibt, darf keine reflektierende Antwort entgegenstroemen bekommen, waehrend im
+    Hintergrund noch geprueft wird.
+    """
+    if body.thread_type == "scene" or body.message.startswith("__"):
+        return Triage()
+
+    from app.services.safety_service import build_safety_message
+
+    risk = await echo_svc.classify_risk(text=body.message)
+    level = risk.get("level", "none")
+    kategorie = risk.get("category")
+
+    if level == "acute":
+        return Triage(
+            level=level,
+            statt_echo=build_safety_message("acute", category=kategorie),
+            meta={"safety": {"level": "acute", "category": kategorie, "mode": "intervention"}},
+        )
+    if level == "elevated":
+        return Triage(
+            level=level,
+            nachtrag=build_safety_message("elevated", category=kategorie),
+            meta={"safety": {"level": "elevated", "category": kategorie, "mode": "appended"}},
+        )
+    return Triage(level=level)
+
+
+@router.post("/chat", response_model=EchoChatResponse)
+async def chat(
+    case_id: UUID,
+    body: EchoChatRequest,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> EchoChatResponse:
+    """Sendet eine Nachricht an Echo und erhält eine Antwort."""
+    user_id = current_user["user_id"]
+    echo_svc = _get_echo_service(request)
+
+    v = await _vorbereiten(pool, case_id, user_id, body)
+    case_context = v.case_context
+    onboarding = v.onboarding
+    scenes = v.scenes
+    scale_scores = v.scale_scores
+    topic_summaries = v.topic_summaries
+    hypotheses = v.hypotheses
+    chat_session_id = v.chat_session_id
+    history = v.history
+    session_meta = v.session_meta
+
+    # ── Sonderfall: Beziehungskontext hinzufügen ──────────────────────────────
+    if body.message == "__add_context__" and body.thread_type == "scene" and body.scene_session_id:
+        # Profil laden
+        profile_row = None
+        async with pool.acquire() as conn:
+            profile_row = await conn.fetchrow(
+                "SELECT * FROM user_profiles WHERE user_id = $1", user_id
+            )
+
+        # Kontext-String aufbauen
+        context_text = build_case_context(
+            case=case_context,
+            onboarding=onboarding,
+            scenes=scenes,
+            scale_scores=scale_scores,
+        )
+        if profile_row:
+            profile_modules = profile_row.get("modules") or {}
+            if isinstance(profile_modules, str):
+                import json as _pj
+                profile_modules = _pj.loads(profile_modules)
+            context_text += "\n\n" + build_profile_context({
+                "modules": profile_modules,
+                "safety_status": profile_row.get("safety_status", "no_indication"),
+                "display_name": profile_row.get("display_name"),
+            })
+
+        if topic_summaries:
+            topic_ctx = build_topic_context(topic_summaries)
+            if topic_ctx:
+                context_text += "\n\n" + topic_ctx
+
+        if hypotheses:
+            hyp_ctx = build_hypothesis_context(hypotheses)
+            if hyp_ctx:
+                context_text += "\n\n" + hyp_ctx
+
+        context_meta = _json.dumps({
+            "scene_session_id": body.scene_session_id,
+            "context_marker": True,
+        })
+
+        # Kontext als System-Nachricht persistent speichern
+        async with pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
+                VALUES ($1, $2, 'system', $3, 'scene', $4::jsonb)
+                """,
+                case_id, user_id, crypto.encrypt(context_text), context_meta,
+            )
+
+        # Echo bestätigt den Kontext
+        answer = await echo_svc.scene_confirm_context(context_text=context_text)
+
+        async with pool.acquire() as conn:
+            user_msg_row = await conn.fetchrow(
+                """
+                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
+                VALUES ($1, $2, 'user', '__add_context__', 'scene', $3::jsonb) RETURNING *
+                """,
+                case_id, user_id, session_meta,
+            )
+            assistant_msg_row = await conn.fetchrow(
+                """
+                INSERT INTO echo_messages (case_id, user_id, role, content, thread_type, metadata)
+                VALUES ($1, $2, 'assistant', $3, 'scene', $4::jsonb) RETURNING *
+                """,
+                case_id, user_id, crypto.encrypt(answer), session_meta,
+            )
+
+        return EchoChatResponse(
+            user_message=_row_to_msg(user_msg_row),
+            assistant_message=_row_to_msg(assistant_msg_row),
+        )
+
+    extra_context, mode_steering, mode_temperature = await _kontext_bauen(
+        pool, case_id, user_id, body, v)
+
+    # ── Sicherheits-Triage ────────────────────────────────────────────────────
+    # Die Regel steht in `_triage_pruefen` — hier wird sie nur ausgeführt.
+    echo_argumente = {
+        "user_message": body.message,
+        "case_context": case_context,
+        "thread_type": body.thread_type,
+        "history": history,
+        "glossary_term": body.glossary_term,
+        "onboarding": onboarding,
+        "scenes": scenes,
+        "scale_scores": scale_scores,
+        "extra_context": extra_context,
+        "mode_steering": mode_steering,
+        "mode_temperature": mode_temperature,
+    }
+
+    triage = await _triage_pruefen(echo_svc, body)
+    if triage.statt_echo is not None:
+        answer = triage.statt_echo
+    else:
+        answer = await echo_svc.chat(**echo_argumente)
+        if triage.nachtrag:
+            answer = answer.rstrip() + "\n\n" + triage.nachtrag
+
+    # Sicherheits-Markierung in die Metadaten der Assistenten-Nachricht mergen
+    assistant_meta = dict(_json.loads(session_meta))
+    assistant_meta.update(triage.meta)
+    assistant_meta_json = _json.dumps(assistant_meta)
+
+    user_msg_row, assistant_msg_row = await _nachrichten_speichern(
+        pool, case_id, user_id, body,
+        antwort=answer, session_meta=session_meta,
+        assistant_meta_json=assistant_meta_json, chat_session_id=chat_session_id,
+    )
 
     return EchoChatResponse(
         user_message=_row_to_msg(user_msg_row),
         assistant_message=_row_to_msg(assistant_msg_row),
         chat_session_id=chat_session_id,
+    )
+
+
+@router.post("/chat/stream")
+async def chat_stream(
+    case_id: UUID,
+    body: EchoChatRequest,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+):
+    """Dieselbe Antwort wie ``/chat``, nur waehrend sie entsteht.
+
+    **Warum das etwas aendert.** Bisher sah man einen Tippindikator, bis die vollstaendige
+    Antwort ankam - bei einer laengeren Echo-Antwort gut zehn Sekunden Punkte. Das ist der
+    Unterschied zwischen "denkt nach" und "haengt".
+
+    **Was NICHT gestroemt wird und warum:**
+
+      * Steuerbefehle (``__…__``) - das sind Anweisungen der Oberflaeche, keine Fragen.
+      * Der gefuehrte Szenendialog und die Themen-/Hypothesen-Dialoge - sie benutzen
+        andere Prompts als der freie Reflexions-Chat. ``stream_chat`` kennt nur diesen
+        einen; alles andere ginge mit dem falschen Systemtext los.
+
+    In beiden Faellen antwortet der Endpunkt mit 409 und der Client nimmt ``/chat``.
+
+    **Die Sicherheits-Triage laeuft vollstaendig VOR dem ersten Byte.** Das kostet eine
+    kurze Wartezeit und ist genau richtig: Wer in akuter Not schreibt, darf keine
+    reflektierende Antwort entgegenstroemen bekommen, waehrend im Hintergrund noch geprueft
+    wird. Bei ``acute`` wird Echo gar nicht erst gefragt.
+
+    **Was schiefgehen kann, geht vor dem Strom schief.** Kontingent, fremder Fall,
+    unbekannte Sitzung - alles davor, damit es ein sauberer HTTP-Fehler wird. Sobald der
+    Strom laeuft, stehen die Kopfzeilen, und ein Fehler waere nur noch ein Ereignis im Text.
+    """
+    user_id = current_user["user_id"]
+    echo_svc = _get_echo_service(request)
+
+    if body.message.startswith("__") or body.thread_type != "topic":
+        raise HTTPException(
+            status_code=409,
+            detail="Diese Gesprächsform läuft ohne Streaming – bitte /chat verwenden.",
+        )
+
+    vorbereitung = await _vorbereiten(pool, case_id, user_id, body)
+    extra_context, mode_steering, mode_temperature = await _kontext_bauen(
+        pool, case_id, user_id, body, vorbereitung)
+    triage = await _triage_pruefen(echo_svc, body)
+
+    echo_argumente = {
+        "user_message": body.message,
+        "case_context": vorbereitung.case_context,
+        "thread_type": body.thread_type,
+        "history": vorbereitung.history,
+        "glossary_term": body.glossary_term,
+        "onboarding": vorbereitung.onboarding,
+        "scenes": vorbereitung.scenes,
+        "scale_scores": vorbereitung.scale_scores,
+        "extra_context": extra_context,
+        "mode_steering": mode_steering,
+        "mode_temperature": mode_temperature,
+    }
+
+    async def strom():
+        teile: list[str] = []
+        try:
+            if triage.statt_echo is not None:
+                # Akute Gefahr: die feste Hilfemeldung, in einem Stueck. Sie stueckweise
+                # erscheinen zu lassen waere hier Effekt an der falschen Stelle.
+                teile.append(triage.statt_echo)
+                yield _ereignis("delta", text=triage.statt_echo)
+            else:
+                async for stueck in echo_svc.stream_chat(**echo_argumente):
+                    teile.append(stueck)
+                    yield _ereignis("delta", text=stueck)
+                if triage.nachtrag:
+                    nachtrag = "\n\n" + triage.nachtrag
+                    teile.append(nachtrag)
+                    yield _ereignis("delta", text=nachtrag)
+
+            antwort = "".join(teile).strip()
+            assistant_meta = dict(_json.loads(vorbereitung.session_meta))
+            assistant_meta.update(triage.meta)
+
+            user_row, assistant_row = await _nachrichten_speichern(
+                pool, case_id, user_id, body,
+                antwort=antwort,
+                session_meta=vorbereitung.session_meta,
+                assistant_meta_json=_json.dumps(assistant_meta),
+                chat_session_id=vorbereitung.chat_session_id,
+            )
+
+            # Zum Schluss dasselbe Ergebnis wie bei /chat - mit echten Ids, damit die
+            # Oberflaeche den vorlaeufigen Text durch die gespeicherte Nachricht ersetzt.
+            fertig = EchoChatResponse(
+                user_message=_row_to_msg(user_row),
+                assistant_message=_row_to_msg(assistant_row),
+                chat_session_id=vorbereitung.chat_session_id,
+            )
+            yield _ereignis("fertig", **_json.loads(fertig.model_dump_json()))
+
+        except Exception:
+            # Ab hier ist kein HTTP-Fehler mehr moeglich - die Kopfzeilen sind lange raus.
+            logger.exception("Echo-Streaming fehlgeschlagen (Fall %s)", case_id)
+            yield _ereignis(
+                "fehler",
+                detail="Echo ist gerade nicht erreichbar. Bitte später noch einmal.",
+            )
+
+    return StreamingResponse(
+        strom(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            # Ohne das puffert der Reverse Proxy den Strom und liefert alles am Stueck -
+            # dann waere die ganze Arbeit hier wirkungslos.
+            "X-Accel-Buffering": "no",
+        },
     )
 
 

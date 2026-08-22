@@ -16,6 +16,7 @@ import { apiErrorMessage } from '@/api/errors'
 import type { EchoChatSession, ThreadType } from '@/types'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import { echoStreamen, StreamNichtMoeglich } from '@/api/echoStream'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -99,14 +100,32 @@ export default function EchoPage() {
     enabled: !!caseId && !!selectedSession,
   })
 
+  /**
+   * Die Antwort, waehrend sie entsteht.
+   *
+   * Vorher sah man einen Tippindikator, bis alles da war - bei einer laengeren Antwort gut
+   * zehn Sekunden Punkte. Das ist der Unterschied zwischen "denkt nach" und "haengt".
+   */
+  const [stromText, setStromText] = useState('')
+
   const mutation = useMutation({
-    mutationFn: (data: { message: string; glossary_term?: string; source?: string }) =>
-      echoApi.chat(caseId!, {
+    mutationFn: async (data: { message: string; glossary_term?: string; source?: string }) => {
+      const anfrage = {
         ...data,
         thread_type: threadType,
         chat_session_id: selectedSession ?? undefined,
         assignment_id: assignmentId ?? undefined,
-      }),
+      }
+      setStromText('')
+      try {
+        return await echoStreamen(caseId!, anfrage, teil => setStromText(t => t + teil))
+      } catch (e) {
+        // Gefuehrte Dialoge, Steuerbefehle, ein Proxy ohne Stream-Unterstuetzung: Der
+        // gewoehnliche Weg kann alles davon. Der Rueckfall ist Teil des Entwurfs.
+        if (e instanceof StreamNichtMoeglich) return echoApi.chat(caseId!, anfrage)
+        throw e
+      }
+    },
     onSuccess: (data) => {
       if (data.chat_session_id && data.chat_session_id !== selectedSession) {
         setSelectedSession(data.chat_session_id)
@@ -115,9 +134,11 @@ export default function EchoPage() {
       qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
       setInput('')
       setPendingMessage(null)
+      setStromText('')
     },
     onError: () => {
       setPendingMessage(null)
+      setStromText('')
     },
   })
 
@@ -236,8 +257,13 @@ export default function EchoPage() {
                 <ChatMessage content={pendingMessage} isUser />
               )}
 
-              {/* Tipp-Indikator */}
-              {mutation.isPending && <TypingIndicator />}
+              {/* Die Antwort, waehrend sie entsteht. Der Tippindikator bleibt nur, bis
+                  das erste Stueck da ist - danach waere er neben dem wachsenden Text
+                  eine zweite, widerspruechliche Auskunft. */}
+              {mutation.isPending && stromText && (
+                <ChatMessage content={stromText} isUser={false} />
+              )}
+              {mutation.isPending && !stromText && <TypingIndicator />}
 
               {mutation.isError && (
                 <ChatErrorMessage text={apiErrorMessage(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
