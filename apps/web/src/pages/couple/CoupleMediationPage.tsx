@@ -16,6 +16,7 @@ import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from '@/components/couple/EchoThinking'
 import MediationFollowUp from '@/components/couple/MediationFollowUp'
 import BridgeBoard from '@/components/couple/BridgeBoard'
+import Verlaufseintrag from '@/components/couple/Verlaufseintrag'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { useBestaetigen } from '@/components/Bestaetigung'
@@ -245,16 +246,20 @@ export default function CoupleMediationPage() {
           {mediations.length === 0 ? (
             <p className="mt-4 text-sm text-brand-muted">Noch kein Vorschlag.</p>
           ) : (
-            <div className="mt-4 space-y-4">
-              {mediations.map(m => (
-                <div key={m.id} className="rounded-brand border border-brand-border px-4 py-3.5">
-                  <p className="text-[0.65rem] text-brand-muted">
-                    {new Date(m.created_at).toLocaleString('de-DE')}
-                  </p>
-                  <div className="mt-2 text-sm text-brand-text">
+            /* „Neu erarbeiten" ersetzt den alten Vorschlag nicht, sondern legt einen
+               weiteren an – gut zum Vergleichen, aber nach dem dritten Mal scrollt man
+               an zwei vollen Vorschlaegen vorbei, um den zu finden, der gilt. */
+            <div className="mt-4 space-y-2.5">
+              {mediations.map((m, i) => (
+                <Verlaufseintrag
+                  key={m.id}
+                  aktuell={i === 0}
+                  titel={new Date(m.created_at).toLocaleString('de-DE')}
+                >
+                  <div className="text-sm text-brand-text">
                     <MarkdownMessage content={m.body} />
                   </div>
-                </div>
+                </Verlaufseintrag>
               ))}
             </div>
           )}

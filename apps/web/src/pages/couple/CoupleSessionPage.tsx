@@ -23,6 +23,7 @@ import EchoThinking from '@/components/couple/EchoThinking'
 import { SessionSkeleton } from '@/components/Skeleton'
 import { MOOD_EMOJI } from '@/components/couple/moods'
 import AgreementsCard from '@/components/couple/AgreementsCard'
+import Verlaufseintrag from '@/components/couple/Verlaufseintrag'
 import Weiterfuehren from '@/components/couple/Weiterfuehren'
 import { abmachungsvorschlaege } from '@/components/couple/abmachungsvorschlaege'
 import { coupleAgreementsApi } from '@/api/coupleAgreements'
@@ -442,29 +443,27 @@ function SummaryCard({ sessionId, coupleId, hasMessages }: {
       </button>
 
       {summaries.length > 0 && (
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-2.5">
           {summaries.map((s, i) => (
             <div key={s.id}>
-              <div className="rounded-brand border border-brand-border px-3.5 py-3">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-[0.65rem] text-brand-muted">
-                    {new Date(s.created_at).toLocaleString('de-DE')}
-                  </p>
-                  {/* Jeder Klick auf „zusammenfassen" legt eine NEUE an. Ohne diesen Knopf
-                      stapeln sich fast gleiche Texte, und der aelteste sieht so wichtig aus
-                      wie der neueste. */}
-                  <button
-                    onClick={async () => { if (await bestaetigen({ titel: 'Zusammenfassung löschen?', text: 'Ihr könnt das Gespräch jederzeit neu zusammenfassen lassen.', knopf: 'Löschen', gefahr: true })) entfernen.mutate(s.id) }}
-                    disabled={entfernen.isPending}
-                    className="shrink-0 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
-                  >
-                    Löschen
-                  </button>
-                </div>
-                <div className="mt-1.5 text-xs text-brand-text">
+              {/* Jeder Klick auf „zusammenfassen" legt eine NEUE an – gewollt, damit nichts
+                  verlorengeht. Zugeklappt bleiben die aelteren trotzdem erreichbar, ohne
+                  den Blick auf die zu verstellen, die gerade gilt. */}
+              <Verlaufseintrag
+                aktuell={i === 0}
+                titel={new Date(s.created_at).toLocaleString('de-DE')}
+              >
+                <div className="text-xs text-brand-text">
                   <MarkdownMessage content={s.summary_text} />
                 </div>
-              </div>
+                <button
+                  onClick={async () => { if (await bestaetigen({ titel: 'Zusammenfassung löschen?', text: 'Ihr könnt das Gespräch jederzeit neu zusammenfassen lassen.', knopf: 'Löschen', gefahr: true })) entfernen.mutate(s.id) }}
+                  disabled={entfernen.isPending}
+                  className="mt-3 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
+                >
+                  Löschen
+                </button>
+              </Verlaufseintrag>
 
               {/* Echo schlaegt im letzten Abschnitt konkrete Abmachungen vor. Bisher stand
                   das nur da - wer eine wollte, musste sie abtippen. Nur bei der neuesten

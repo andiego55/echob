@@ -13,6 +13,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import Verlaufseintrag from '@/components/couple/Verlaufseintrag'
 import { coupleRetrospectApi } from '@/api/coupleRetrospect'
 import type { CoupleRetrospective, CoupleRetrospectStats } from '@/api/coupleRetrospect'
 import EchoThinking from './EchoThinking'
@@ -213,13 +214,14 @@ function Rueckblick({
     onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-retrospect', coupleId] }),
   })
 
+  // Von hier stammt das Muster; seit es auch Mediationen, Zusammenfassungen und
+  // Vergleiche betrifft, steht es in `Verlaufseintrag` und wird hier nur noch benutzt.
   return (
-    <details open={offen} className="rounded-brand border border-brand-border px-4 py-3">
-      <summary className="cursor-pointer text-sm font-semibold text-navy">
-        {new Date(eintrag.period_start).toLocaleDateString('de-DE')} –{' '}
-        {new Date(eintrag.period_end).toLocaleDateString('de-DE')}
-      </summary>
-      <div className="mt-3 text-sm text-brand-text">
+    <Verlaufseintrag
+      aktuell={offen}
+      titel={`${new Date(eintrag.period_start).toLocaleDateString('de-DE')} – ${new Date(eintrag.period_end).toLocaleDateString('de-DE')}`}
+    >
+      <div className="text-sm text-brand-text">
         <MarkdownMessage content={eintrag.body} />
       </div>
       <button
@@ -230,6 +232,6 @@ function Rueckblick({
         {loeschen.isPending ? 'Lösche …' : 'Diesen Rückblick verwerfen'}
       </button>
       <Fehlermeldung error={loeschen.error} />
-    </details>
+    </Verlaufseintrag>
   )
 }

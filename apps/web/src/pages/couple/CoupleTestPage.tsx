@@ -10,6 +10,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import Verlaufseintrag from '@/components/couple/Verlaufseintrag'
 import QuestionCard from '@/components/selftests/QuestionCard'
 import { getSelfTest } from '@/selftests'
 import { isCoupleSafe } from '@/selftests/couple'
@@ -194,27 +195,26 @@ export default function CoupleTestPage() {
                   {data.both_done ? 'Noch kein Vergleich erstellt.' : 'Der Vergleich braucht beide Ergebnisse.'}
                 </p>
               ) : (
-                <div className="mt-4 space-y-4">
-                  {data.comparisons.map(c => (
-                    <div key={c.id} className="rounded-brand border border-brand-border px-4 py-3.5">
-                      <div className="flex items-baseline justify-between gap-3">
-                        <p className="text-[0.65rem] text-brand-muted">
-                          {new Date(c.created_at).toLocaleString('de-DE')}
-                        </p>
-                        {/* „Neu ansehen" legt jedes Mal einen weiteren an. Ohne Loeschen
-                            waechst die Seite mit jedem Klick. */}
-                        <button
-                          onClick={async () => { if (await bestaetigen({ titel: 'Vergleich löschen?', text: 'Eure beiden Testergebnisse bleiben – nur Echos Text dazu verschwindet.', knopf: 'Löschen', gefahr: true })) vergleichLoeschen.mutate(c.id) }}
-                          disabled={vergleichLoeschen.isPending}
-                          className="shrink-0 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
-                        >
-                          Löschen
-                        </button>
-                      </div>
-                      <div className="mt-2 text-sm text-brand-text">
+                <div className="mt-4 space-y-2.5">
+                  {/* „Neu ansehen" legt jedes Mal einen weiteren an. Zugeklappt waechst die
+                      Seite dadurch um eine Zeile statt um einen ganzen Text. */}
+                  {data.comparisons.map((c, i) => (
+                    <Verlaufseintrag
+                      key={c.id}
+                      aktuell={i === 0}
+                      titel={new Date(c.created_at).toLocaleString('de-DE')}
+                    >
+                      <div className="text-sm text-brand-text">
                         <MarkdownMessage content={c.body} />
                       </div>
-                    </div>
+                      <button
+                        onClick={async () => { if (await bestaetigen({ titel: 'Vergleich löschen?', text: 'Eure beiden Testergebnisse bleiben – nur Echos Text dazu verschwindet.', knopf: 'Löschen', gefahr: true })) vergleichLoeschen.mutate(c.id) }}
+                        disabled={vergleichLoeschen.isPending}
+                        className="mt-3 text-[0.65rem] text-brand-muted hover:text-navy disabled:opacity-50"
+                      >
+                        Löschen
+                      </button>
+                    </Verlaufseintrag>
                   ))}
                 </div>
               )}
