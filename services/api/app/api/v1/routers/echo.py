@@ -581,9 +581,10 @@ async def chat_stream(
     **Was NICHT gestroemt wird und warum:**
 
       * Steuerbefehle (``__…__``) - das sind Anweisungen der Oberflaeche, keine Fragen.
-      * Der gefuehrte Szenendialog und die Themen-/Hypothesen-Dialoge - sie benutzen
-        andere Prompts als der freie Reflexions-Chat. ``stream_chat`` kennt nur diesen
-        einen; alles andere ginge mit dem falschen Systemtext los.
+      * Der gefuehrte Szenendialog - er hat einen eigenen Ablauf mit Extraktion am Ende.
+
+    Themen-, Blog-, Hypothesen- und Wissensdialoge streamen dagegen mit; ``stream_chat``
+    verzweigt intern auf ihren Systemtext, genauso wie ``chat()`` es tut.
 
     In beiden Faellen antwortet der Endpunkt mit 409 und der Client nimmt ``/chat``.
 
@@ -599,7 +600,7 @@ async def chat_stream(
     user_id = current_user["user_id"]
     echo_svc = _get_echo_service(request)
 
-    if body.message.startswith("__") or body.thread_type != "topic":
+    if body.message.startswith("__") or body.thread_type == "scene":
         raise HTTPException(
             status_code=409,
             detail="Diese Gesprächsform läuft ohne Streaming – bitte /chat verwenden.",

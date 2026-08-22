@@ -19,6 +19,7 @@ import { useBestaetigen } from '@/components/Bestaetigung'
 import { echoStreamen, StreamNichtMoeglich } from '@/api/echoStream'
 import { useEntwurf } from '@/lib/entwurf'
 import EntwurfHinweis from '@/components/EntwurfHinweis'
+import { useGetakteterText } from '@/lib/textTakt'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -125,6 +126,7 @@ export default function EchoPage() {
    * bei dieser einen Nachricht Teil ihrer Wirkung, nicht Schmuck.
    */
   const [stromSafety, setStromSafety] = useState<'acute' | 'elevated' | null>(null)
+
   const abbruch = useRef<AbortController | null>(null)
 
   // Wer die Seite verlaesst, laesst sonst einen Strom weiterlaufen.
@@ -193,18 +195,26 @@ export default function EchoPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentSlug, caseId, assignmentId, sessionsLoaded])
 
+  /**
+   * Empfangen wird so schnell es geht, ANGEZEIGT wird in Lesegeschwindigkeit.
+   *
+   * Das Modell liefert seine Stuecke in Schueben - ungebremst springt der Text, statt zu
+   * entstehen, und ist schneller da, als man ihn lesen kann.
+   */
+  const takt = useGetakteterText(stromText, mutation.isPending)
+
   // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [history])
+  }, [history, takt.sichtbar])
 
   // Erst wenn die gespeicherte Antwort im Verlauf angekommen ist, verschwindet der
   // vorlaeufige Text. Andernfalls klaffte dazwischen eine Luecke.
   useEffect(() => {
-    if (!stromText || mutation.isPending) return
+    if (!stromText || mutation.isPending || !takt.aufgeholt) return
     setStromText('')
     setStromSafety(null)
-  }, [history, stromText, mutation.isPending])
+  }, [history, stromText, mutation.isPending, takt.aufgeholt])
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -306,10 +316,10 @@ export default function EchoPage() {
               {/* Die Antwort, waehrend sie entsteht. Der Tippindikator bleibt nur, bis
                   das erste Stueck da ist - danach waere er neben dem wachsenden Text
                   eine zweite, widerspruechliche Auskunft. */}
-              {stromText && (
-                <ChatMessage content={stromText} isUser={false} safetyLevel={stromSafety} />
+              {takt.sichtbar && (
+                <ChatMessage content={takt.sichtbar} isUser={false} safetyLevel={stromSafety} />
               )}
-              {mutation.isPending && !stromText && <TypingIndicator />}
+              {mutation.isPending && !takt.sichtbar && <TypingIndicator />}
 
               {mutation.isError && (
                 <ChatErrorMessage text={apiErrorMessage(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />

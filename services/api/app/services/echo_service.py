@@ -889,10 +889,12 @@ class EchoService:
     async def stream_chat(self, **kwargs) -> AsyncIterator[str]:
         """Wie `chat()`, nur stueckweise - fuer den freien Fall-Dialog.
 
-        **Warum nur dort.** Streaming lohnt sich, wo eine lange, zusammenhaengende Antwort
-        entsteht und jemand darauf wartet. Zusammenfassungen, Berichte und die
-        Szenen-Extraktion liefern strukturierte Ergebnisse, die man erst ganz gebrauchen
-        kann - dort waere es Aufwand ohne Gewinn.
+        Deckt den freien Reflexions-Chat UND die gefuehrten Dialoge ab (Themen, Blog,
+        Hypothesen, Wissensseiten) - mit je eigenem Systemtext, genau wie `chat()`.
+
+        **Nicht dabei:** der Szenendialog (eigener Ablauf mit Extraktion am Ende) sowie
+        Zusammenfassungen, Berichte und Auswertungen. Die liefern strukturierte Ergebnisse,
+        die man erst ganz gebrauchen kann - dort waere Streaming Aufwand ohne Gewinn.
 
         **Ohne OpenAI** (Entwicklung, Mock) kommt die Antwort in einem Stueck. Der
         Aufrufer merkt keinen Unterschied ausser der fehlenden Zwischenzeit.
@@ -905,14 +907,27 @@ class EchoService:
             )
             return
 
+        # Dieselbe Verzweigung wie in `chat()`: Ein gefuehrter Dialog hat einen anderen
+        # Systemtext als der freie Reflexions-Chat. Mit dem falschen ginge er inhaltlich
+        # daneben, ohne dass es auffiele - die Antwort klaenge nur "irgendwie anders".
+        art = kwargs.get("thread_type", "topic")
+        if art.startswith(("topic_", "blog_", "hyp_", "content_")):
+            nachrichten = self._build_topic_messages(topic=art, **kwargs)
+            grenzen = {"max_tokens": self._TOPIC_TOKENS, "temperature": self._TOPIC_TEMPERATUR}
+            kopfraum = self._TOPIC_TOKENS
+        else:
+            nachrichten = self._build_chat_messages(**kwargs)
+            grenzen = {"max_tokens": 1500, "temperature": self._chat_temperature(kwargs)}
+            kopfraum = 1500
+
         strom = await self._client.chat.completions.create(  # type: ignore[union-attr]
             model=self._model_fast,
-            messages=self._build_chat_messages(**kwargs),
+            messages=nachrichten,
             stream=True,
             **(
-                {"max_completion_tokens": 1500 + self._reasoning_headroom}
+                {"max_completion_tokens": kopfraum + self._reasoning_headroom}
                 if self._reasoning
-                else {"max_tokens": 1500, "temperature": self._chat_temperature(kwargs)}
+                else grenzen
             ),
         )
         async for teil in strom:
@@ -995,7 +1010,7 @@ class EchoService:
 
         return result
 
-    async def _openai_topic_chat(
+    def _build_topic_messages(
         self,
         *,
         topic: str,
@@ -1004,9 +1019,11 @@ class EchoService:
         case_context: dict[str, Any],
         onboarding: dict[str, Any] | None,
         scenes: list[dict[str, Any]],
-        scale_scores: list[dict[str, Any]] | None,
+        scale_scores: list[dict[str, Any]] | None = None,
         extra_context: str = "",
-    ) -> str:
+        **_rest,
+    ) -> list[dict]:
+        """Der Prompt-Aufbau der gefuehrten Dialoge - fuer beide Wege derselbe."""
         _TOPIC_PROMPTS = {
             "topic_self":               "topic_self_prompt.md",
             "topic_person":             "topic_person_prompt.md",
@@ -1044,12 +1061,19 @@ class EchoService:
         for h in history:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})
+        return messages
 
+    #: Themen-, Blog-, Hypothesen- und Wissensdialoge antworten kuerzer und etwas freier
+    #: als der Reflexions-Chat. Die Werte stehen hier, damit beide Wege sie teilen.
+    _TOPIC_TOKENS = 600
+    _TOPIC_TEMPERATUR = 0.6
+
+    async def _openai_topic_chat(self, **kwargs) -> str:
         response = await self._chat(  # type: ignore[union-attr]
             model=self._model_fast,
-            messages=messages,
-            max_tokens=600,
-            temperature=0.6,
+            messages=self._build_topic_messages(**kwargs),
+            max_tokens=self._TOPIC_TOKENS,
+            temperature=self._TOPIC_TEMPERATUR,
         )
         return response.choices[0].message.content or ""
 

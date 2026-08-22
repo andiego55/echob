@@ -118,16 +118,17 @@ Deutung — und bei genau dieser Nachricht ist die Aufmachung Teil der Wirkung.
 | Fall | Grund |
 |------|-------|
 | Steuerbefehle (`__…__`) | Anweisungen der Oberfläche, keine Fragen |
-| Szenendialog | eigener Prompt (`scene_capture_prompt.md`) |
-| Themen-, Blog-, Hypothesen-Dialoge | eigene Prompts |
-| Zusammenfassungen, Berichte, Szenen-Extraktion | strukturierte Ergebnisse, erst ganz brauchbar |
+| Szenendialog | eigener Ablauf mit Extraktion am Ende |
+| Zusammenfassungen, Berichte, Auswertungen | strukturierte Ergebnisse, erst ganz brauchbar |
+
+Themen-, Blog-, Hypothesen- und Wissensdialoge **streamen mit**. Sie haben einen anderen
+Systemtext, und `stream_chat` verzweigt intern darauf — genau wie `chat()`. Ohne diese
+Verzweigung liefe ein geführter Dialog mit dem Prompt des freien Chats: Er klänge nur
+„irgendwie anders", ohne dass etwas fehlschlüge.
 
 Der Endpunkt antwortet mit **409**, die Oberfläche nimmt dann `/chat`. Derselbe Rückfall
 greift, wenn ein Reverse Proxy den Strom nicht durchreicht. **Er ist Teil des Entwurfs,
 kein Notnagel** — es gibt keine Gesprächsform, die ohne Streaming nicht funktioniert.
-
-`stream_chat` kennt nur den Prompt des freien Dialogs. Ohne die 409-Grenze würde ein
-geführter Dialog mit dem falschen Systemtext beginnen.
 
 ### Fehler und Abbruch
 
@@ -139,6 +140,22 @@ Gespeichert wird **nach dem letzten Stück**. Bricht der Strom vorher ab, steht 
 der Datenbank: Ein halber Satz wäre ein Gesprächsverlauf, den es nie gab.
 
 `X-Accel-Buffering: no` ist nötig, sonst puffert Caddy und liefert alles am Stück.
+
+### Das Tempo der Anzeige
+
+Empfangen wird so schnell wie möglich, **angezeigt** wird in Lesegeschwindigkeit
+(`lib/textTakt.ts`). Ungebremst springt der Text in Schüben, statt zu entstehen — und ist
+schneller da, als man ihn lesen kann.
+
+Der Rückstand zwischen Empfangenem und Angezeigtem ist dabei **kein Problem, sondern der
+Puffer**, aus dem in ruhigem Tempo geschöpft wird. Der erste Anlauf holte zu stark auf und
+pendelte sich damit wieder auf die Liefergeschwindigkeit des Modells ein — also erneut zu
+schnell, nur mit Umschweifen. Jetzt bleibt die Anzeige ruhig, fällt bewusst zurück und
+zieht den Rest nach, wenn der Empfang beendet ist und niemand mehr wartet.
+
+Bei `prefers-reduced-motion: reduce` steht der Text sofort vollständig da.
+
+**Zum Nachjustieren genügt `GRUNDTEMPO`** in `lib/textTakt.ts` — kleiner ist ruhiger.
 
 ---
 
@@ -187,6 +204,8 @@ das die Umkehrung dessen, wofür der Knopf da ist.
 | Vollständiger Text gespeichert, bei Fehler gar nichts | `test_echo_stream_endpoint.py` |
 | Nicht streambare Formen → 409 | `test_echo_stream_endpoint.py` |
 | SSE-Format bleibt bei mehrzeiligem Text heil | `test_echo_stream_format.py` |
+| Geführte Dialoge streamen mit | `test_echo_stream_endpoint.py` · `test_gefuehrte_dialoge_streamen_mit` |
+| Anzeigetempo bleibt lesbar | `apps/web/tests/text-takt.test.ts` |
 | Keyword-Floor und Stufenlogik | `test_safety_service.py` |
 
 ---
@@ -207,9 +226,10 @@ nicht in der Entwicklung.
 **Neue Anlaufstellen gehören in `CRISIS_RESOURCES`, nirgendwo sonst.** Eine zweite Liste
 veraltet.
 
-**Ein neuer `thread_type` streamt nicht automatisch.** Er braucht entweder einen eigenen
-Streaming-Weg mit seinem Prompt oder muss in der 409-Grenze stehen — sonst antwortet Echo
-dort mit dem Systemtext des freien Dialogs.
+**Ein neuer `thread_type` braucht eine Zuordnung in `stream_chat`.** Entweder ein eigener
+Zweig mit seinem Prompt oder ein Platz in der 409-Grenze — sonst antwortet Echo dort mit
+dem Systemtext des freien Dialogs, und es fällt nur daran auf, dass die Antworten
+„irgendwie anders" klingen.
 
 **Der Schnellausstieg duldet keine Nachfrage.** Wer `beforeunload` irgendwo neu einführt,
 muss `fluchtLaeuft` aus `lib/entwurf.ts` berücksichtigen.

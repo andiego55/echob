@@ -178,7 +178,7 @@ async def test_ein_fehler_wird_ein_ereignis(bauen):
 @pytest.mark.parametrize("nachricht,art", [
     ("__add_context__", "topic"),
     ("Ganz normal.", "scene"),
-    ("Ganz normal.", "hyp_bindung"),
+
 ])
 async def test_nicht_streambare_formen_werden_abgelehnt(bauen, nachricht, art):
     """409, damit die Oberflaeche sauber auf den gewoehnlichen Weg zurueckfaellt."""
@@ -189,6 +189,20 @@ async def test_nicht_streambare_formen_werden_abgelehnt(bauen, nachricht, art):
             json={"message": nachricht, "thread_type": art},
         )
     assert antwort.status_code == 409
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("art", ["topic", "topic_self", "hyp_bindung", "content_gaslighting"])
+async def test_gefuehrte_dialoge_streamen_mit(bauen, art):
+    """Sie haben einen anderen Systemtext, aber denselben Weg -  verzweigt."""
+    app, gespeichert = bauen(FakeEcho(["Erzähl ", "mir mehr."]))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        antwort = await c.post(
+            f"/api/v1/cases/{FALL}/echo/chat/stream",
+            json={"message": "Ich denke oft daran.", "thread_type": art},
+        )
+    assert antwort.status_code == 200, f"{art}: {antwort.text}"
+    assert gespeichert["antwort"] == "Erzähl mir mehr."
 
 
 @pytest.mark.asyncio
