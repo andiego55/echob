@@ -15,6 +15,8 @@ import type { EchoChatRequest, EchoChatResponse } from '@/types'
 
 /** Ein Ereignis vom Server. */
 type Ereignis =
+  /** Kommt VOR dem ersten Text: Wie die Antwort einzuordnen ist. */
+  | { typ: 'beginn'; safety: 'acute' | 'elevated' | null }
   | { typ: 'delta'; text: string }
   | { typ: 'fertig'; user_message: unknown; assistant_message: unknown; chat_session_id: string | null }
   | { typ: 'fehler'; detail: string }
@@ -31,6 +33,8 @@ export async function echoStreamen(
   caseId: string,
   daten: EchoChatRequest,
   onStueck: (text: string) => void,
+  /** Wird einmal gerufen, bevor Text kommt – damit die Blase richtig aussieht. */
+  onEinstufung?: (safety: 'acute' | 'elevated' | null) => void,
   signal?: AbortSignal,
 ): Promise<EchoChatResponse> {
   const { data } = await supabase.auth.getSession()
@@ -79,7 +83,8 @@ export async function echoStreamen(
       let e: Ereignis
       try { e = JSON.parse(zeile.slice(6)) } catch { continue }
 
-      if (e.typ === 'delta') onStueck(e.text)
+      if (e.typ === 'beginn') onEinstufung?.(e.safety)
+      else if (e.typ === 'delta') onStueck(e.text)
       else if (e.typ === 'fertig') ergebnis = e as unknown as EchoChatResponse
       else if (e.typ === 'fehler') throw new Error(e.detail)
     }

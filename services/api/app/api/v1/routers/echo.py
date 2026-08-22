@@ -627,6 +627,15 @@ async def chat_stream(
     async def strom():
         teile: list[str] = []
         try:
+            # ZUERST die Einstufung, dann erst Text. Die Oberflaeche braucht sie, BEVOR
+            # das erste Wort erscheint: Eine akute Hilfemeldung ohne ihren roten Rahmen
+            # saehe aus wie eine gewoehnliche Deutung - und die Aufmachung ist bei dieser
+            # Nachricht Teil ihrer Wirkung, nicht Schmuck.
+            yield _ereignis(
+                "beginn",
+                safety=triage.level if triage.level in ("acute", "elevated") else None,
+            )
+
             if triage.statt_echo is not None:
                 # Akute Gefahr: die feste Hilfemeldung, in einem Stueck. Sie stueckweise
                 # erscheinen zu lassen waere hier Effekt an der falschen Stelle.

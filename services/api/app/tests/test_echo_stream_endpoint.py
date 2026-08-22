@@ -107,7 +107,8 @@ async def test_stueckweise_und_dann_fertig(bauen):
     app, gespeichert = bauen(FakeEcho(["Das ", "klingt ", "anstrengend."]))
     ereignisse = await _senden(app)
 
-    assert [e["typ"] for e in ereignisse] == ["delta", "delta", "delta", "fertig"]
+    assert [e["typ"] for e in ereignisse] == ["beginn", "delta", "delta", "delta", "fertig"]
+    assert ereignisse[0]["safety"] is None, "unauffaellig – keine Markierung"
     assert "".join(e["text"] for e in ereignisse if e["typ"] == "delta") == "Das klingt anstrengend."
     # Der VOLLSTAENDIGE Text landet in der Datenbank, nicht ein halber.
     assert gespeichert["antwort"] == "Das klingt anstrengend."
@@ -133,6 +134,9 @@ async def test_bei_akuter_gefahr_wird_echo_nicht_gefragt(bauen):
     ereignisse = await _senden(app, "Ich will nicht mehr leben.")
 
     assert echo.gefragt is False, "Echo darf hier gar nicht erst antworten"
+    # Die Markierung steht VOR dem Text: Die Oberflaeche muss die Blase rot rahmen
+    # koennen, bevor das erste Wort erscheint.
+    assert ereignisse[0] == {"typ": "beginn", "safety": "acute"}
     text = "".join(e["text"] for e in ereignisse if e["typ"] == "delta")
     assert "anstrengend" not in text
     assert any(n in text for n in ("110", "112", "0800", "116")), "Hilfenummern fehlen"
@@ -146,6 +150,7 @@ async def test_bei_erhoehtem_risiko_kommt_der_hinweis_ans_ende(bauen):
     ereignisse = await _senden(app, "Er wird manchmal laut.")
 
     assert echo.gefragt is True, "Echo antwortet normal"
+    assert ereignisse[0] == {"typ": "beginn", "safety": "elevated"}
     text = "".join(e["text"] for e in ereignisse if e["typ"] == "delta")
     assert text.startswith("Das klingt schwer.")
     assert len(text) > len("Das klingt schwer."), "der Hinweis fehlt"
@@ -163,7 +168,7 @@ async def test_ein_fehler_wird_ein_ereignis(bauen):
     app, gespeichert = bauen(Kaputt([]))
     ereignisse = await _senden(app)
 
-    assert [e["typ"] for e in ereignisse] == ["delta", "fehler"]
+    assert [e["typ"] for e in ereignisse] == ["beginn", "delta", "fehler"]
     assert "erreichbar" in ereignisse[-1]["detail"]
     # Nichts Halbes in der Datenbank.
     assert "antwort" not in gespeichert
@@ -184,3 +189,17 @@ async def test_nicht_streambare_formen_werden_abgelehnt(bauen, nachricht, art):
             json={"message": nachricht, "thread_type": art},
         )
     assert antwort.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_die_einstufung_kommt_vor_jedem_text(bauen):
+    """Die tragende Eigenschaft der Aufmachung.
+
+    Kaeme sie erst am Ende, saehe eine akute Hilfemeldung waehrend des Stroms aus wie eine
+    gewoehnliche Deutung - und genau dieser Nachricht nimmt das ihre Wirkung.
+    """
+    for risiko in ("none", "elevated", "acute"):
+        app, _ = bauen(FakeEcho(["Text."], risiko=risiko))
+        ereignisse = await _senden(app)
+        assert ereignisse[0]["typ"] == "beginn", risiko
+        assert all(e["typ"] != "delta" for e in ereignisse[:1]), risiko

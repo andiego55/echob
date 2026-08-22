@@ -17,6 +17,8 @@ import type { EchoChatSession, ThreadType } from '@/types'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { echoStreamen, StreamNichtMoeglich } from '@/api/echoStream'
+import { useEntwurf } from '@/lib/entwurf'
+import EntwurfHinweis from '@/components/EntwurfHinweis'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -106,7 +108,27 @@ export default function EchoPage() {
    * Vorher sah man einen Tippindikator, bis alles da war - bei einer laengeren Antwort gut
    * zehn Sekunden Punkte. Das ist der Unterschied zwischen "denkt nach" und "haengt".
    */
+  /**
+   * Auch das Ungesendete ist geschrieben. Wer einen langen Absatz formuliert und dabei
+   * zurueckwischt, soll ihn wiederfinden.
+   */
+  const eingabeEntwurf = useEntwurf(
+    caseId ? `echo:${caseId}:${threadType}` : null,
+    { input },
+    w => !w.input.trim(),
+  )
+
   const [stromText, setStromText] = useState('')
+  /**
+   * Die Einstufung kommt VOR dem ersten Text. Ohne sie saehe eine akute Hilfemeldung
+   * waehrend des Stroms aus wie eine gewoehnliche Deutung - und die rote Aufmachung ist
+   * bei dieser einen Nachricht Teil ihrer Wirkung, nicht Schmuck.
+   */
+  const [stromSafety, setStromSafety] = useState<'acute' | 'elevated' | null>(null)
+  const abbruch = useRef<AbortController | null>(null)
+
+  // Wer die Seite verlaesst, laesst sonst einen Strom weiterlaufen.
+  useEffect(() => () => abbruch.current?.abort(), [])
 
   const mutation = useMutation({
     mutationFn: async (data: { message: string; glossary_term?: string; source?: string }) => {
@@ -117,8 +139,16 @@ export default function EchoPage() {
         assignment_id: assignmentId ?? undefined,
       }
       setStromText('')
+      setStromSafety(null)
+      abbruch.current?.abort()
+      abbruch.current = new AbortController()
       try {
-        return await echoStreamen(caseId!, anfrage, teil => setStromText(t => t + teil))
+        return await echoStreamen(
+          caseId!, anfrage,
+          teil => setStromText(t => t + teil),
+          setStromSafety,
+          abbruch.current.signal,
+        )
       } catch (e) {
         // Gefuehrte Dialoge, Steuerbefehle, ein Proxy ohne Stream-Unterstuetzung: Der
         // gewoehnliche Weg kann alles davon. Der Rueckfall ist Teil des Entwurfs.
@@ -134,11 +164,18 @@ export default function EchoPage() {
       qc.invalidateQueries({ queryKey: ['echo-sessions', caseId] })
       setInput('')
       setPendingMessage(null)
-      setStromText('')
+      // Der gestroemte Text bleibt stehen, bis der Verlauf nachgeladen ist - sonst waere
+      // die Antwort fuer einen Moment weg und blitzte dann wieder auf.
     },
-    onError: () => {
+    onError: (_fehler, variablen) => {
+      // Der Text kommt zurueck ins Feld. Vorher war er weg: beim Absenden geloescht,
+      // durch den Fehler nie angekommen, nirgends gespeichert. Wer eine lange Nachricht
+      // geschrieben hatte, musste sie neu formulieren - ausgerechnet dann, wenn ohnehin
+      // gerade etwas nicht funktioniert.
+      setInput(vorher => vorher || variablen.message)
       setPendingMessage(null)
       setStromText('')
+      setStromSafety(null)
     },
   })
 
@@ -161,11 +198,20 @@ export default function EchoPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [history])
 
+  // Erst wenn die gespeicherte Antwort im Verlauf angekommen ist, verschwindet der
+  // vorlaeufige Text. Andernfalls klaffte dazwischen eine Luecke.
+  useEffect(() => {
+    if (!stromText || mutation.isPending) return
+    setStromText('')
+    setStromSafety(null)
+  }, [history, stromText, mutation.isPending])
+
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!input.trim() || mutation.isPending) return
     const msg = input.trim()
     setInput('')
+    eingabeEntwurf.loeschen()
     setPendingMessage(msg)
     mutation.mutate({ message: msg })
   }
@@ -260,8 +306,8 @@ export default function EchoPage() {
               {/* Die Antwort, waehrend sie entsteht. Der Tippindikator bleibt nur, bis
                   das erste Stueck da ist - danach waere er neben dem wachsenden Text
                   eine zweite, widerspruechliche Auskunft. */}
-              {mutation.isPending && stromText && (
-                <ChatMessage content={stromText} isUser={false} />
+              {stromText && (
+                <ChatMessage content={stromText} isUser={false} safetyLevel={stromSafety} />
               )}
               {mutation.isPending && !stromText && <TypingIndicator />}
 
@@ -322,6 +368,13 @@ export default function EchoPage() {
                 )}
               </div>
             )}
+            {/* Direkt ueber dem Feld, in das der Text zurueckkommt. */}
+            <EntwurfHinweis
+              entwurf={eingabeEntwurf}
+              was="Eine angefangene Nachricht"
+              onUebernehmen={w => setInput(w.input)}
+            />
+
             <ChatComposer
               value={input}
               onChange={setInput}
