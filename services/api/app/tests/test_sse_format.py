@@ -1,4 +1,4 @@
-"""Das Format der Stream-Ereignisse.
+"""Das Format der Stream-Ereignisse - fuer ALLE Stroeme.
 
 **Warum das eine eigene Pruefung verdient.** Server-Sent Events trennen Ereignisse durch
 eine LEERZEILE. Enthielte ein gesendeter Text einen doppelten Zeilenumbruch — und Echos
@@ -9,12 +9,15 @@ Dass es funktioniert, liegt an `json.dumps`: Es macht aus jedem Zeilenumbruch ei
 Das ist richtig, aber unsichtbar. Wer die Zeile spaeter umschreibt (etwa auf einen
 f-String, weil das "einfacher" aussieht), bricht das Protokoll auf eine Art, die erst bei
 mehrzeiligen Antworten auffaellt — also nicht in der Entwicklung, sondern beim Nutzer.
+
+Seit dem Paar-Begleiter gibt es zwei Stroeme. Beide benutzen `app.core.sse.ereignis`,
+und diese Datei ist ihre gemeinsame Pruefung.
 """
 from __future__ import annotations
 
 import json
 
-from app.api.v1.routers.echo import _ereignis
+from app.core.sse import ereignis as _ereignis
 
 
 def test_ereignis_hat_das_sse_format():

@@ -20,6 +20,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { coupleCompanionApi } from '@/api/coupleCompanion'
+import { begleiterStreamen, StreamNichtMoeglich } from '@/api/coupleEchoStream'
+import { useGetakteterText } from '@/lib/textTakt'
+import type { Einstufung } from '@/lib/sseLeser'
 import type { CoupleEchoConversation, CoupleThreadKind } from '@/api/coupleCompanion'
 import EchoThinking from './EchoThinking'
 import Weiterfuehren from './Weiterfuehren'
@@ -56,6 +59,23 @@ export default function EchoChat({
   const [festgehalten, setFestgehalten] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
 
+  /** Der Text, der gerade hereinkommt – noch nicht gespeichert. */
+  const [stromText, setStromText] = useState('')
+  /** Wie die entstehende Antwort einzuordnen ist. Kommt VOR dem ersten Wort. */
+  const [stromSafety, setStromSafety] = useState<Einstufung>(null)
+  /**
+   * Das fertige Gespräch, solange die Anzeige noch aufholt.
+   *
+   * Zwischen „Echo ist fertig" und „der Text steht vollständig da" liegen ein paar
+   * Sekunden. In dieser Zeit darf sich am Verlauf nichts ändern – sonst stünde die
+   * gespeicherte Antwort neben der noch laufenden, also zweimal.
+   */
+  const [uebergabe, setUebergabe] = useState<CoupleEchoConversation | null>(null)
+  const abbruch = useRef<AbortController | null>(null)
+
+  // Wer die Seite verlässt, ließe sonst einen Strom weiterlaufen.
+  useEffect(() => () => abbruch.current?.abort(), [])
+
   const schluessel = ['couple-chat', coupleId, kind]
 
   const aktuell = useQuery({
@@ -79,7 +99,27 @@ export default function EchoChat({
 
   // Eigene Nachricht sofort zeigen – Stille nach dem Absenden fühlt sich an wie ein Fehler.
   const send = useMutation({
-    mutationFn: (inhalt: string) => coupleCompanionApi.send(coupleId, inhalt, kind),
+    mutationFn: async (inhalt: string) => {
+      setStromText('')
+      setStromSafety(null)
+      abbruch.current?.abort()
+      abbruch.current = new AbortController()
+      try {
+        return await begleiterStreamen(
+          coupleId, kind, inhalt,
+          teil => setStromText(t => t + teil),
+          setStromSafety,
+          abbruch.current.signal,
+        )
+      } catch (e) {
+        // Ein Proxy, der Ströme nicht durchreicht: Der gewöhnliche Weg kann dasselbe,
+        // nur am Stück. Der Rückfall ist Teil des Entwurfs, kein Notnagel.
+        if (e instanceof StreamNichtMoeglich) {
+          return coupleCompanionApi.send(coupleId, inhalt, kind)
+        }
+        throw e
+      }
+    },
     onMutate: async (inhalt: string) => {
       await qc.cancelQueries({ queryKey: schluessel })
       const vorher = qc.getQueryData<CoupleEchoConversation>(schluessel)
@@ -98,11 +138,12 @@ export default function EchoChat({
     onError: (_e, _v, ctx) => {
       if (ctx?.vorher) qc.setQueryData(schluessel, ctx.vorher)
       if (ctx?.inhalt) setText(ctx.inhalt)
+      setStromText('')
+      setStromSafety(null)
     },
-    onSuccess: d => {
-      qc.setQueryData(schluessel, d)
-      qc.invalidateQueries({ queryKey: ['couple-chat-threads', coupleId, kind] })
-    },
+    // Hier passiert bewusst NICHTS außer Merken. Den Wechsel macht der Effekt weiter
+    // unten, sobald die Anzeige aufgeholt hat – in einem Zug.
+    onSuccess: d => setUebergabe(d),
   })
 
   const abschliessen = useMutation({
@@ -119,12 +160,46 @@ export default function EchoChat({
   const gespraech = ansicht === 'aktuell' ? aktuell.data : altes.data
   const messages = gespraech?.messages ?? []
   const liest = ansicht !== 'aktuell'
-  const busy = send.isPending || abschliessen.isPending
   const vergangene = (frueher.data ?? []).filter(t => t.closed_at)
+
+  /**
+   * Empfangen wird so schnell es geht, ANGEZEIGT wird in Lesegeschwindigkeit.
+   *
+   * Das Modell liefert seine Stücke in Schüben – ungebremst springt der Text, statt zu
+   * entstehen, und ist schneller da, als man ihn lesen kann.
+   */
+  const takt = useGetakteterText(stromText, send.isPending)
+
+  /**
+   * „Echo ist noch dabei" – bis der letzte Buchstabe steht.
+   *
+   * `send.isPending` allein reicht nicht: Es wird schon falsch, wenn die Antwort
+   * vollständig empfangen ist, während die Anzeige noch aufholt. In dieser Lücke
+   * könnte man erneut senden – und die erste Antwort wanderte nie in den Verlauf.
+   */
+  const busy = send.isPending || uebergabe !== null || abschliessen.isPending
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages.length])
+  }, [messages.length, takt.sichtbar])
+
+  /**
+   * Der Wechsel von der entstehenden zur gespeicherten Antwort – in EINEM Bild.
+   *
+   * Das fertige Gespräch wird direkt in den Zwischenspeicher geschrieben statt
+   * nachgeladen. Nachladen hieße warten, und in der Wartezeit wäre die Antwort
+   * entweder doppelt zu sehen (wenn der vorläufige Text noch steht) oder gar nicht
+   * (wenn er schon weg ist). React fasst die Änderungen hier zu einem Render zusammen.
+   */
+  useEffect(() => {
+    if (!uebergabe || send.isPending || !takt.aufgeholt) return
+    qc.setQueryData(['couple-chat', coupleId, kind], uebergabe)
+    setStromText('')
+    setStromSafety(null)
+    setUebergabe(null)
+    // Die Liste früherer Gespräche darf ruhig kurz später nachziehen.
+    qc.invalidateQueries({ queryKey: ['couple-chat-threads', coupleId, kind] })
+  }, [uebergabe, send.isPending, takt.aufgeholt, coupleId, kind, qc])
 
   const starten = (vorlage: string) => {
     if (busy) return
@@ -263,6 +338,13 @@ export default function EchoChat({
           )}
 
           {messages.map(m => <Blase key={m.id} role={m.role} content={m.content} safety={m.safety} />)}
+
+          {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment,
+              in dem die gespeicherte erscheint. */}
+          {takt.sichtbar && (
+            <Blase role="echo" content={takt.sichtbar} safety={stromSafety} />
+          )}
+
           <div ref={endRef} />
         </div>
 
@@ -295,7 +377,7 @@ export default function EchoChat({
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <button type="submit" disabled={!text.trim() || busy}
                 className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50">
-                {send.isPending ? <EchoThinking text="Echo liest …" size={32} /> : 'Senden'}
+                {busy ? <EchoThinking text="Echo liest …" size={32} /> : 'Senden'}
               </button>
               <span className="text-xs text-brand-muted">
                 Vertraulich – nur du liest das hier.

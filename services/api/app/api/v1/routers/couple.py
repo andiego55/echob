@@ -14,11 +14,16 @@ liest deshalb bewusst keinerlei Fall-Daten.
 """
 from __future__ import annotations
 
+import json as _json
+import logging
+from dataclasses import dataclass
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import StreamingResponse
 
 from app.core.dependencies import get_current_user, get_pool
+from app.core.sse import ereignis
 from app.schemas.couple import (
     CoupleDashboard,
     CoupleInvitePublic,
@@ -44,6 +49,8 @@ from app.services import couple_progress_service as progress
 from app.services import couple_therapy_service as cts
 from app.services.safety_service import triage_pruefen
 from app.services.subscription_service import enforce_echo_prompt_limit
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/couple", tags=["couple"])
 
@@ -255,6 +262,86 @@ async def get_companion(
         return await _conversation(conn, thread, user_id)
 
 
+# ── Der Begleiter: ein Unterbau, zwei Wege ──────────────────────────────────
+#
+# Es gibt die Antwort am Stueck (`/echo`) und dieselbe Antwort waehrend sie entsteht
+# (`/echo/stream`). Was beide brauchen, steht hier EINMAL. Kopiert liefen sie irgendwann
+# auseinander - ausgerechnet bei Kontingentpruefung und Zugehoerigkeit, wo eine vergessene
+# Zeile nicht auffaellt, sondern eine Luecke ist.
+
+
+@dataclass
+class _BegleiterLage:
+    """Alles fuer eine Antwort - beisammen, bevor das Modell gefragt wird."""
+
+    thread: dict
+    prompt: str
+    context: str
+    history: list[dict[str, str]]
+
+
+async def _begleiter_vorbereiten(conn, couple_id, user_id, kind: str,
+                                 inhalt: str) -> _BegleiterLage:
+    """Kontingent, Zugehoerigkeit, Faden, Kontext - und die eigene Nachricht ablegen.
+
+    Steht vollstaendig VOR jeder Modell-Anfrage. Beim Streamen ist das keine Feinheit,
+    sondern Bedingung: Sobald der Strom laeuft, sind die Kopfzeilen raus, und aus einem
+    sauberen 404 wuerde eine Fehlermeldung mitten im Text.
+    """
+    await enforce_echo_prompt_limit(user_id, conn)
+    link = await cts.require_couple_member(conn, couple_id, user_id)
+    thread = await companion.ensure_open_thread(conn, couple_id, user_id, kind)
+    await companion.add_message(conn, thread, user_id, role="user", content=inhalt)
+    verlauf = await companion.load_messages(conn, thread["id"], user_id)
+    return _BegleiterLage(
+        thread=thread,
+        prompt=companion.prompt_for(thread.get("kind")),
+        context=await cps.build_companion_context(conn, link, user_id),
+        # Die eigene Nachricht steckt schon im Verlauf und geht separat mit - sonst
+        # stuende sie zweimal da.
+        history=companion.build_history(verlauf)[:-1],
+    )
+
+
+async def _titel_geben(conn, svc, lage: _BegleiterLage, user_id,
+                       erste_nachricht: str) -> dict:
+    """Der erste Austausch gibt dem Gespräch seinen Namen.
+
+    Sonst heißen später alle gleich und man findet nichts wieder.
+    """
+    if lage.thread.get("title"):
+        return lage.thread
+    titel = await svc.professional_chat(
+        user_message=(
+            "Gib diesem Gespräch eine Überschrift von höchstens fünf Wörtern. "
+            "Nur die Überschrift, ohne Anführungszeichen.\n\n"
+            "Erste Nachricht: " + erste_nachricht
+        ),
+        shared_context="", history=[], prompt_file=lage.prompt,
+    )
+    sauber = titel.strip().strip(chr(34)).strip()[:160]
+    return await companion.rename_thread(
+        conn, lage.thread["id"], user_id,
+        sauber or companion.KIND_LABELS.get(lage.thread.get("kind"), "Gespräch"),
+    )
+
+
+async def _antwort_bauen(svc, lage: _BegleiterLage, inhalt: str, triage) -> str:
+    """Echos Antwort am Stueck, mit der Sicherheits-Triage davor und dahinter."""
+    if triage.statt_echo is not None:
+        # Akute Gefahr: Echo wird gar nicht erst gefragt.
+        return triage.statt_echo
+    reply = await svc.professional_chat(
+        user_message=inhalt,
+        shared_context=lage.context,
+        history=lage.history,
+        prompt_file=lage.prompt,
+    )
+    if triage.nachtrag:
+        reply = reply.rstrip() + "\n\n" + triage.nachtrag
+    return reply
+
+
 @router.post("/links/{couple_id}/echo", response_model=CoupleEchoConversation)
 async def talk_to_companion(
     couple_id: UUID,
@@ -264,58 +351,115 @@ async def talk_to_companion(
     current=Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CoupleEchoConversation:
-    """Echo kennt hier BEIDE Welten: deinen eigenen Fall und den Stand eures Raums."""
+    """Echo kennt hier BEIDE Welten: deinen eigenen Fall und den Stand eures Raums.
+
+    Der Weg am Stueck. Die Oberflaeche nimmt normalerweise `/echo/stream` und faellt
+    hierher zurueck, wenn ein Proxy den Strom nicht durchreicht.
+    """
     user_id = current["user_id"]
     svc = _echo_svc(request)
 
     async with pool.acquire() as conn:
-        await enforce_echo_prompt_limit(user_id, conn)
-        link = await cts.require_couple_member(conn, couple_id, user_id)
-        thread = await companion.ensure_open_thread(conn, couple_id, user_id, kind)
-        prompt = companion.prompt_for(thread.get("kind"))
-
-        await companion.add_message(conn, thread, user_id, role="user", content=body.content)
-        verlauf = await companion.load_messages(conn, thread["id"], user_id)
-        context = await cps.build_companion_context(conn, link, user_id)
-
-        # ── Sicherheits-Triage ────────────────────────────────────────────────
-        # Dieselbe Regel wie im Fall-Echo, aus derselben Funktion. Sie fehlte hier bislang
-        # ganz - und ausgerechnet hier ist sie am noetigsten: Der Faden "Nach einem Streit"
-        # ist fuer den Moment gemacht, in dem jemand aufgewuehlt schreibt.
+        lage = await _begleiter_vorbereiten(conn, couple_id, user_id, kind, body.content)
         triage = await triage_pruefen(svc, text=body.content)
-        if triage.statt_echo is not None:
-            reply = triage.statt_echo
-        else:
-            reply = await svc.professional_chat(
-                user_message=body.content,
-                shared_context=context,
-                history=companion.build_history(verlauf)[:-1],
-                prompt_file=prompt,
-            )
-            if triage.nachtrag:
-                reply = reply.rstrip() + "\n\n" + triage.nachtrag
+        reply = await _antwort_bauen(svc, lage, body.content, triage)
 
-        await companion.add_message(conn, thread, user_id, role="echo", content=reply,
-                                    metadata=triage.meta)
-
-        # Der erste Austausch gibt dem Gespräch seinen Namen — sonst heißen später alle
-        # gleich und man findet nichts wieder.
-        if not thread.get("title"):
-            titel = await svc.professional_chat(
-                user_message=(
-                    "Gib diesem Gespräch eine Überschrift von höchstens fünf Wörtern. "
-                    "Nur die Überschrift, ohne Anführungszeichen.\n\n"
-                    "Erste Nachricht: " + body.content
-                ),
-                shared_context="", history=[], prompt_file=prompt,
-            )
-            sauber = titel.strip().strip(chr(34)).strip()[:160]
-            thread = await companion.rename_thread(
-                conn, thread["id"], user_id,
-                sauber or companion.KIND_LABELS.get(thread.get("kind"), "Gespräch"),
-            )
-
+        await companion.add_message(conn, lage.thread, user_id, role="echo",
+                                    content=reply, metadata=triage.meta)
+        thread = await _titel_geben(conn, svc, lage, user_id, body.content)
         return await _conversation(conn, thread, user_id)
+
+
+@router.post("/links/{couple_id}/echo/stream")
+async def stream_companion(
+    couple_id: UUID,
+    body: CouplePrivateMessageCreate,
+    request: Request,
+    kind: str = "chat",
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+):
+    """Dieselbe Antwort wie `/echo`, nur waehrend sie entsteht.
+
+    **Warum das hier besonders zaehlt.** Der Faden "Nach einem Streit" wird von jemandem
+    benutzt, der gerade aufgewuehlt ist. Zehn Sekunden Punkte sind da keine Wartezeit,
+    sondern eine Stille - und Stille nach dem Absenden fuehlt sich an wie Ignoriertwerden.
+
+    **Die Sicherheits-Triage laeuft vollstaendig VOR dem ersten Byte.** Wer in akuter Not
+    schreibt, darf keine reflektierende Antwort entgegenstroemen bekommen, waehrend im
+    Hintergrund noch geprueft wird. Die Einstufung geht deshalb als erstes Ereignis raus,
+    bevor Text kommt: Die Oberflaeche braucht sie, um die Hilfemeldung zu rahmen.
+
+    **Was schiefgehen kann, geht vor dem Strom schief.** Kontingent, fremder Raum,
+    unbekannte Gespraechsart - alles davor, damit es ein sauberer HTTP-Fehler wird.
+    """
+    user_id = current["user_id"]
+    svc = _echo_svc(request)
+
+    async with pool.acquire() as conn:
+        lage = await _begleiter_vorbereiten(conn, couple_id, user_id, kind, body.content)
+    triage = await triage_pruefen(svc, text=body.content)
+
+    async def strom():
+        teile: list[str] = []
+        try:
+            # ZUERST die Einstufung, dann erst Text - eine akute Hilfemeldung ohne ihren
+            # roten Rahmen saehe aus wie eine gewoehnliche Deutung.
+            yield ereignis(
+                "beginn",
+                safety=triage.level if triage.level in ("acute", "elevated") else None,
+            )
+
+            if triage.statt_echo is not None:
+                # Die feste Hilfemeldung kommt in einem Stueck. Sie stueckweise
+                # erscheinen zu lassen waere Effekt an der falschen Stelle.
+                teile.append(triage.statt_echo)
+                yield ereignis("delta", text=triage.statt_echo)
+            else:
+                async for stueck in svc.stream_professional_chat(
+                    user_message=body.content,
+                    shared_context=lage.context,
+                    history=lage.history,
+                    prompt_file=lage.prompt,
+                ):
+                    teile.append(stueck)
+                    yield ereignis("delta", text=stueck)
+                if triage.nachtrag:
+                    nachtrag = "\n\n" + triage.nachtrag
+                    teile.append(nachtrag)
+                    yield ereignis("delta", text=nachtrag)
+
+            antwort = "".join(teile).strip()
+            # Eigene Verbindung: Die von oben ist laengst zurueckgegeben.
+            async with pool.acquire() as conn:
+                await companion.add_message(conn, lage.thread, user_id, role="echo",
+                                            content=antwort, metadata=triage.meta)
+                thread = await _titel_geben(conn, svc, lage, user_id, body.content)
+                fertig = await _conversation(conn, thread, user_id)
+
+            # Zum Schluss dasselbe Ergebnis wie bei `/echo` - mit echten Ids, damit die
+            # Oberflaeche den vorlaeufigen Text durch die gespeicherte Nachricht ersetzt.
+            yield ereignis("fertig", **_json.loads(fertig.model_dump_json()))
+
+        except Exception:
+            # Ab hier ist kein HTTP-Fehler mehr moeglich - die Kopfzeilen sind raus.
+            logger.exception("Paar-Begleiter: Streaming fehlgeschlagen (Raum %s)", couple_id)
+            yield ereignis(
+                "fehler",
+                detail="Echo ist gerade nicht erreichbar. Bitte später noch einmal.",
+            )
+
+    return StreamingResponse(
+        strom(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            # Ohne das puffert der Reverse Proxy den Strom und liefert alles am Stueck -
+            # dann waere die ganze Arbeit hier wirkungslos.
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.post("/links/{couple_id}/echo/summary", response_model=CoupleEchoSummary,

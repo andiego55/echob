@@ -1618,6 +1618,41 @@ class EchoService:
         mode_steering: str = "",
         prompt_file: str = "echo_professional_prompt.md",
     ) -> str:
+        response = await self._chat(  # type: ignore[union-attr]
+            model=self._model_fast,
+            messages=self._build_professional_messages(
+                user_message=user_message,
+                shared_context=shared_context,
+                history=history,
+                glossary_term=glossary_term,
+                glossary_definition=glossary_definition,
+                mode_steering=mode_steering,
+                prompt_file=prompt_file,
+            ),
+            max_tokens=self._PROF_TOKENS,
+            temperature=self._PROF_TEMPERATUR,
+        )
+        return response.choices[0].message.content or ""
+
+    # Beide Wege - am Stueck und stroemend - muessen denselben Systemtext, denselben
+    # Kontext und dieselben Grenzen benutzen. Stuenden sie doppelt da, liefen sie
+    # irgendwann auseinander, und die gestroemte Antwort waere eine ANDERE Antwort, ohne
+    # dass es jemandem auffiele.
+    _PROF_TOKENS = 1200
+    _PROF_TEMPERATUR = 0.4
+
+    def _build_professional_messages(
+        self,
+        *,
+        user_message: str,
+        shared_context: str,
+        history: list[dict[str, str]],
+        glossary_term: str | None = None,
+        glossary_definition: str | None = None,
+        mode_steering: str = "",
+        prompt_file: str = "echo_professional_prompt.md",
+    ) -> list[dict]:
+        """Systemtext, Kontext, Glossar, Verlauf, Frage - in dieser Reihenfolge."""
         system_prompt = _load_prompt(prompt_file)
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
         if mode_steering:
@@ -1634,13 +1669,56 @@ class EchoService:
         for h in history:
             messages.append(h)
         messages.append({"role": "user", "content": user_message})
-        response = await self._chat(  # type: ignore[union-attr]
+        return messages
+
+    async def stream_professional_chat(
+        self,
+        *,
+        user_message: str,
+        shared_context: str = "",
+        history: list[dict[str, str]] | None = None,
+        glossary_term: str | None = None,
+        glossary_definition: str | None = None,
+        mode_steering: str = "",
+        prompt_file: str = "echo_professional_prompt.md",
+    ) -> AsyncIterator[str]:
+        """Wie `professional_chat()`, nur stueckweise.
+
+        Benutzt wird das bisher nur vom Paar-Begleiter. Der Fachpersonen-Dialog koennte
+        folgen - ihm fehlt nur der Endpunkt, nicht diese Faehigkeit.
+
+        **Ohne OpenAI** (Entwicklung, Mock) kommt die Antwort in einem Stueck. Der
+        Aufrufer merkt keinen Unterschied ausser der fehlenden Zwischenzeit.
+        """
+        if not self._use_openai:
+            yield self._mock_professional_chat(glossary_term=glossary_term)
+            return
+
+        strom = await self._client.chat.completions.create(  # type: ignore[union-attr]
             model=self._model_fast,
-            messages=messages,
-            max_tokens=1200,
-            temperature=0.4,
+            messages=self._build_professional_messages(
+                user_message=user_message,
+                shared_context=shared_context,
+                history=history or [],
+                glossary_term=glossary_term,
+                glossary_definition=glossary_definition,
+                mode_steering=mode_steering,
+                prompt_file=prompt_file,
+            ),
+            stream=True,
+            **(
+                {"max_completion_tokens": self._PROF_TOKENS + self._reasoning_headroom}
+                if self._reasoning
+                else {"max_tokens": self._PROF_TOKENS,
+                      "temperature": self._PROF_TEMPERATUR}
+            ),
         )
-        return response.choices[0].message.content or ""
+        async for teil in strom:
+            if not teil.choices:
+                continue
+            stueck = teil.choices[0].delta.content
+            if stueck:
+                yield stueck
 
     def _mock_professional_chat(self, *, glossary_term: str | None = None) -> str:
         if glossary_term:

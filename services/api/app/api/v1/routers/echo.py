@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
+from app.core.sse import ereignis
 from app.schemas.echo import (
     EchoChatRequest,
     EchoChatResponse,
@@ -360,11 +361,6 @@ async def _nachrichten_speichern(
     return user_msg_row, assistant_msg_row
 
 
-def _ereignis(typ: str, **felder) -> str:
-    """Ein Server-Sent Event. Eine Zeile JSON, doppelter Zeilenumbruch als Trenner."""
-    return "data: " + _json.dumps({"typ": typ, **felder}, ensure_ascii=False) + "\n\n"
-
-
 @router.post("/chat", response_model=EchoChatResponse)
 async def chat(
     case_id: UUID,
@@ -587,7 +583,7 @@ async def chat_stream(
             # das erste Wort erscheint: Eine akute Hilfemeldung ohne ihren roten Rahmen
             # saehe aus wie eine gewoehnliche Deutung - und die Aufmachung ist bei dieser
             # Nachricht Teil ihrer Wirkung, nicht Schmuck.
-            yield _ereignis(
+            yield ereignis(
                 "beginn",
                 safety=triage.level if triage.level in ("acute", "elevated") else None,
             )
@@ -596,15 +592,15 @@ async def chat_stream(
                 # Akute Gefahr: die feste Hilfemeldung, in einem Stueck. Sie stueckweise
                 # erscheinen zu lassen waere hier Effekt an der falschen Stelle.
                 teile.append(triage.statt_echo)
-                yield _ereignis("delta", text=triage.statt_echo)
+                yield ereignis("delta", text=triage.statt_echo)
             else:
                 async for stueck in echo_svc.stream_chat(**echo_argumente):
                     teile.append(stueck)
-                    yield _ereignis("delta", text=stueck)
+                    yield ereignis("delta", text=stueck)
                 if triage.nachtrag:
                     nachtrag = "\n\n" + triage.nachtrag
                     teile.append(nachtrag)
-                    yield _ereignis("delta", text=nachtrag)
+                    yield ereignis("delta", text=nachtrag)
 
             antwort = "".join(teile).strip()
             assistant_meta = dict(_json.loads(vorbereitung.session_meta))
@@ -625,12 +621,12 @@ async def chat_stream(
                 assistant_message=_row_to_msg(assistant_row),
                 chat_session_id=vorbereitung.chat_session_id,
             )
-            yield _ereignis("fertig", **_json.loads(fertig.model_dump_json()))
+            yield ereignis("fertig", **_json.loads(fertig.model_dump_json()))
 
         except Exception:
             # Ab hier ist kein HTTP-Fehler mehr moeglich - die Kopfzeilen sind lange raus.
             logger.exception("Echo-Streaming fehlgeschlagen (Fall %s)", case_id)
-            yield _ereignis(
+            yield ereignis(
                 "fehler",
                 detail="Echo ist gerade nicht erreichbar. Bitte später noch einmal.",
             )
