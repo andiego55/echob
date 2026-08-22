@@ -575,6 +575,15 @@ export interface CaseCreate {
   relationship_status: RelationshipStatus
   contact_frequency: ContactFrequency
   main_concern?: string
+  /**
+   * Pseudonym und Avatar der Fallperson – nur beim ANLEGEN.
+   *
+   * Gespeichert werden sie in den Onboarding-Antworten, nicht am Fall; geändert wird
+   * beides dort. Deshalb nimmt `casesApi.update` sie ausdrücklich nicht an – sonst
+   * schickte man sie an einen Endpunkt, der sie stillschweigend verwirft.
+   */
+  person_name?: string
+  avatar?: string
 }
 
 // ── Szene ─────────────────────────────────────────────────────────────────────

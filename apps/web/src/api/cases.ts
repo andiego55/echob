@@ -11,7 +11,9 @@ export const casesApi = {
   create: (data: CaseCreate) =>
     apiClient.post<Case>('/cases', data).then(r => r.data),
 
-  update: (caseId: string, data: Partial<CaseCreate>) =>
+  // Ohne Pseudonym und Avatar: Die leben in den Onboarding-Antworten, und dieser
+  // Endpunkt wuerde sie kommentarlos verwerfen.
+  update: (caseId: string, data: Partial<Omit<CaseCreate, 'person_name' | 'avatar'>>) =>
     apiClient.patch<Case>(`/cases/${caseId}`, data).then(r => r.data),
 
   archive: (caseId: string) =>

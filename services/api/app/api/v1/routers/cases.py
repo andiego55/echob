@@ -60,23 +60,45 @@ async def create_case(
 ) -> CaseResponse:
     """Neuen Fall anlegen."""
     user_id = current_user["user_id"]
+    person_name = (body.person_name or "").strip() or None
+    avatar = (body.avatar or "").strip()[:16] or None
+
     async with pool.acquire() as conn:
         await enforce_trial_limits(user_id, conn, check_case=True)
-        row = await conn.fetchrow(
-            """
-            INSERT INTO cases (user_id, relationship_type, relationship_status,
-                               contact_frequency, main_concern)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING *
-            """,
-            user_id,
-            body.relationship_type,
-            body.relationship_status,
-            body.contact_frequency,
-            body.main_concern,
-        )
+        # Fall und Benennung gehoeren zusammen: Ein Fall ohne den Namen, den man ihm
+        # gerade gegeben hat, waere ein halbes Ergebnis - und die Uebersicht zeigte
+        # wieder nur "Partnerschaft".
+        async with conn.transaction():
+            row = await conn.fetchrow(
+                """
+                INSERT INTO cases (user_id, relationship_type, relationship_status,
+                                   contact_frequency, main_concern)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING *
+                """,
+                user_id,
+                body.relationship_type,
+                body.relationship_status,
+                body.contact_frequency,
+                body.main_concern,
+            )
+            if person_name or avatar:
+                # `completed_at` bleibt LEER. Einen Namen zu vergeben ist nicht dasselbe
+                # wie das Onboarding zu durchlaufen; sonst gaelte es als erledigt und die
+                # eigentlichen Fragen kaemen nie.
+                await conn.execute(
+                    """
+                    INSERT INTO onboarding_answers (case_id, user_id, person_name, avatar)
+                    VALUES ($1, $2, $3, $4)
+                    ON CONFLICT (case_id) DO NOTHING
+                    """,
+                    row["id"], user_id, crypto.encrypt(person_name), avatar,
+                )
+
     logger.info("Fall erstellt: case_id=%s user_id=%s", row["id"], user_id)
-    return CaseResponse(**dict(row))
+    # Mit Namen und Gesicht zurueck - die Oberflaeche zeigt den neuen Fall sofort so an,
+    # wie er gemeint war, ohne ihn nachzuladen.
+    return CaseResponse(**dict(row), person_name=person_name, avatar=avatar)
 
 
 @router.get("/{case_id}", response_model=CaseResponse)

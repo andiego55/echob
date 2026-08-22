@@ -32,6 +32,14 @@ class CaseCreate(BaseModel):
     contact_frequency: ContactFrequency
     main_concern: str | None = Field(None, max_length=2000)
 
+    # Pseudonym und Avatar der Fallperson. Sie gehoeren in die Onboarding-Antworten und
+    # werden von dort gelesen; hier stehen sie, weil man beides schon beim Anlegen
+    # vergeben kann. Sonst hiesse der frische Fall in der Uebersicht nur "Partnerschaft"
+    # und haette kein Gesicht - und genau die Uebersicht sieht man als erstes wieder.
+    # Beides freiwillig; nachtragen geht jederzeit im Onboarding.
+    person_name: str | None = Field(None, max_length=120)
+    avatar: str | None = Field(None, max_length=16)
+
 
 class CaseUpdate(BaseModel):
     relationship_type: RelationshipType | None = None

@@ -1,11 +1,26 @@
 /**
  * /app/cases/new — Neuen Fall anlegen
- * 3 Pflichtfragen + optionales Freitextfeld.
+ *
+ * Drei Pflichtfragen, dann ein Abschluss-Schritt: Pseudonym, Avatar und das zentrale
+ * Anliegen.
+ *
+ * **Warum das Benennen hierher gehört.** Pseudonym und Avatar leben in den
+ * Onboarding-Antworten und wurden früher auch erst dort erfragt. Bis dahin stand der
+ * frische Fall in der Übersicht als „Partnerschaft" ohne Gesicht — und die Übersicht ist
+ * das Erste, was man wiedersieht. Wer gerade beschrieben hat, um welche Beziehung es
+ * geht, hat die Person ohnehin im Kopf; das ist der günstigste Moment, ihr einen Namen zu
+ * geben.
+ *
+ * Beides bleibt freiwillig und jederzeit im Onboarding änderbar. Der Fall gilt dadurch
+ * NICHT als eingerichtet: Das Backend lässt `completed_at` leer, damit die eigentlichen
+ * Onboarding-Fragen noch kommen.
  */
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
+import Avatar from '@/components/Avatar'
+import AvatarPicker from '@/components/AvatarPicker'
 import { casesApi } from '@/api/cases'
 import {
   RELATIONSHIP_TYPE_LABELS,
@@ -25,6 +40,9 @@ export default function CaseNewPage() {
   const [relStatus, setRelStatus]         = useState<RelationshipStatus | ''>('')
   const [contactFreq, setContactFreq]     = useState<ContactFrequency | ''>('')
   const [mainConcern, setMainConcern]     = useState('')
+  const [personName, setPersonName]       = useState('')
+  const [avatar, setAvatar]               = useState<string | undefined>()
+  const [avatarOffen, setAvatarOffen]     = useState(false)
 
   const mutation = useMutation({
     mutationFn: casesApi.create,
@@ -66,6 +84,8 @@ export default function CaseNewPage() {
       relationship_status: relStatus,
       contact_frequency:   contactFreq,
       main_concern:        mainConcern || undefined,
+      person_name:         personName.trim() || undefined,
+      avatar:              avatar,
     })
   }
 
@@ -76,7 +96,8 @@ export default function CaseNewPage() {
           <span className="label">Fall anlegen</span>
           <h1 className="page-title mt-2">Welche Beziehung möchtest du reflektieren?</h1>
           <p className="mt-2 text-sm text-brand-muted">
-            Beantworte drei kurze Fragen. Das dauert weniger als eine Minute.
+            Drei kurze Fragen, dann gibst du der Person einen Namen. Das dauert weniger
+            als eine Minute.
           </p>
         </div>
 
@@ -115,7 +136,53 @@ export default function CaseNewPage() {
             </div>
           ))}
 
-          {/* Schritt 3: Freitext */}
+          {/* Schritt 3a: Wer ist gemeint? */}
+          {step >= 3 && (
+            <div>
+              <label htmlFor="person-name" className="block text-sm font-semibold text-navy mb-2">
+                Wie möchtest du die Person in dieser App nennen?{' '}
+                <span className="font-normal text-brand-muted">(optional)</span>
+              </label>
+              <div className="mb-3 flex items-start gap-2.5 rounded-brand border border-blue-200 bg-blue-50 px-4 py-3">
+                <span className="mt-0.5 flex-shrink-0 text-blue-500">ℹ</span>
+                <p className="text-xs text-blue-800">
+                  <strong>Nimm ein Pseudonym.</strong> Der echte Name wird nirgendwo
+                  gebraucht. Ein Pseudonym schützt die Privatsphäre der Person und macht
+                  es dir leichter, sachlich zu bleiben. Ändern kannst du es jederzeit.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                {/* Das Gesicht steht neben dem Namen, nicht darunter – die beiden
+                    gehören zusammen und werden zusammen gelesen. */}
+                <button
+                  type="button"
+                  onClick={() => setAvatarOffen(true)}
+                  title={avatar ? 'Avatar ändern' : 'Avatar wählen'}
+                  aria-label={avatar ? 'Avatar ändern' : 'Avatar wählen'}
+                  className="flex-shrink-0 rounded-full transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent"
+                >
+                  <Avatar value={avatar} size="lg" />
+                </button>
+                <input
+                  id="person-name"
+                  type="text"
+                  value={personName}
+                  onChange={(e) => setPersonName(e.target.value)}
+                  maxLength={120}
+                  placeholder={'z. B. „Alex“, „die Ex“, „Mutter“ …'}
+                  className="input flex-1"
+                />
+              </div>
+              {!avatar && (
+                <p className="mt-2 text-xs text-brand-muted">
+                  Tipp: Tippe auf das Bild, um ein Symbol zu wählen. Das hilft, Fälle
+                  später auseinanderzuhalten.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Schritt 3b: Freitext */}
           {step >= 3 && (
             <div>
               <label className="block text-sm font-semibold text-navy mb-2">
@@ -178,6 +245,15 @@ export default function CaseNewPage() {
             )
           })()}
         </form>
+
+        {avatarOffen && (
+          <AvatarPicker
+            value={avatar}
+            onSelect={(a) => setAvatar(a)}
+            onClose={() => setAvatarOffen(false)}
+            title="Avatar für die Person"
+          />
+        )}
       </div>
     </AppShell>
   )
