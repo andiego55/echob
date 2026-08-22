@@ -75,6 +75,10 @@ jobs:
         working-directory: apps/web
         run: npm run typecheck
 
+      - name: Tests
+        working-directory: apps/web
+        run: npm test
+
       - name: Build
         working-directory: apps/web
         run: npm run build

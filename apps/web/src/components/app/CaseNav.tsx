@@ -24,58 +24,10 @@ import { useQuery } from '@tanstack/react-query'
 import Avatar from '@/components/Avatar'
 import { casesApi } from '@/api/cases'
 import { RELATIONSHIP_STATUS_LABELS, RELATIONSHIP_TYPE_LABELS } from '@/types'
+import { GRUPPEN, gruppeFuer } from './caseNavGroups'
 
 interface Props {
   caseId: string
-}
-
-interface Reiter { path: string; label: string }
-interface Gruppe { label: string; kinder: Reiter[] }
-
-/**
- * Vier Gruppen entlang des Arbeitswegs, nicht entlang der Technik.
- *
- * „Überblick" steht allein, weil er kein Schritt ist, sondern der Ort, an dem man ankommt.
- */
-const GRUPPEN: Gruppe[] = [
-  { label: 'Überblick', kinder: [{ path: '', label: 'Überblick' }] },
-  {
-    label: 'Erfassen',
-    kinder: [
-      { path: '/scenes', label: 'Szenen' },
-      { path: '/person-profile', label: 'Die andere Person' },
-      { path: '/onboarding', label: 'Grunddaten' },
-    ],
-  },
-  {
-    label: 'Verstehen',
-    kinder: [
-      { path: '/echo', label: 'Echo' },
-      { path: '/scales', label: 'Muster' },
-      { path: '/review', label: 'Verlauf' },
-      { path: '/hypotheses', label: 'Hypothesen' },
-    ],
-  },
-  {
-    label: 'Zeigen',
-    kinder: [
-      { path: '/reports', label: 'Berichte' },
-      { path: '/share', label: 'Freigaben' },
-      { path: '/export', label: 'Zusammenfassung' },
-    ],
-  },
-]
-
-/**
- * Routen, die zu einer Gruppe gehören, aber keine eigene Pille bekommen.
- *
- * Ein Selbsttest ist kein Bereich, den man ansteuert — man landet dort aus „Muster"
- * heraus. Ohne diese Zuordnung fiele die Navigation dabei auf „Überblick" zurück, und
- * man stünde plötzlich woanders, als man gerade arbeitet.
- */
-const ANHAENGSEL: Record<string, string> = {
-  '/selbsttest': 'Verstehen',
-  '/topics': 'Verstehen',
 }
 
 /** Die vier geführten Themendialoge — sie hängen an „Verstehen". */
@@ -105,20 +57,7 @@ export default function CaseNav({ caseId }: Props) {
 
   const rest = pathname.startsWith(base) ? pathname.slice(base.length) : ''
   const inThemen = rest.startsWith('/topics')
-
-  // Die längste passende Kindroute gewinnt — sonst würde `/scenes` auch bei
-  // `/scenes/new` verlieren, wenn ein kürzerer Pfad zufällig früher steht.
-  const angehaengt = Object.entries(ANHAENGSEL)
-    .find(([pfad]) => rest === pfad || rest.startsWith(pfad + '/'))?.[1]
-
-  const gruppe =
-    (angehaengt ? GRUPPEN.find(g => g.label === angehaengt) : undefined)
-    ?? GRUPPEN.slice(1)
-      .filter(g => g.kinder.some(k => rest === k.path || rest.startsWith(k.path + '/')))
-      .sort((a, b) => Math.max(...b.kinder.map(k => k.path.length))
-                    - Math.max(...a.kinder.map(k => k.path.length)))[0]
-    ?? GRUPPEN[0]
-
+  const gruppe = gruppeFuer(rest)
   const zeigeUnterreiter = gruppe.kinder.length > 1
 
   useEffect(() => {
