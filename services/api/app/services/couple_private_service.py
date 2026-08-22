@@ -270,10 +270,17 @@ async def require_private_access(conn, session_id, user_id) -> tuple[dict, dict]
 
 
 def public_private_message(row: dict) -> dict[str, Any]:
+    meta = row.get("metadata") or {}
+    if isinstance(meta, str):
+        import json as _j
+        meta = _j.loads(meta)
     return {
         "id": row["id"],
         "role": row["role"],
         "kind": row["kind"],
         "content": row["content"],
         "created_at": row["created_at"],
+        # Traegt die Sicherheits-Markierung, damit eine Krisenmeldung auch nach dem
+        # Neuladen als solche gerahmt wird und nicht wie eine Deutung aussieht.
+        "safety": (meta.get("safety") or {}).get("level"),
     }

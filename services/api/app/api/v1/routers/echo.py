@@ -4,7 +4,7 @@ from __future__ import annotations
 import json as _json
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -24,6 +24,7 @@ from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import build_hypothesis_context
 from app.services.person_profile_service import build_person_context
 from app.services.profile_service import build_profile_context
+from app.services.safety_service import triage_pruefen
 from app.services.subscription_service import enforce_echo_prompt_limit
 from app.services.topic_summary_service import build_topic_context
 
@@ -364,62 +365,6 @@ def _ereignis(typ: str, **felder) -> str:
     return "data: " + _json.dumps({"typ": typ, **felder}, ensure_ascii=False) + "\n\n"
 
 
-@dataclass
-class Triage:
-    """Was die Sicherheitsprüfung über eine Nachricht entschieden hat.
-
-    **Die Entscheidung faellt hier, ausgefuehrt wird sie anderswo.** Genau ein Ort, an dem
-    steht, was bei welchem Risiko passiert - benutzt vom normalen Endpunkt UND vom
-    Streaming. Abgeschrieben waere das die gefaehrlichste Dopplung im ganzen Projekt: Wer
-    die Regel spaeter anfasst und eine Seite vergisst, baut einen Weg, auf dem jemand in
-    akuter Gefahr eine reflektierende Deutung statt einer Notrufnummer liest.
-    """
-
-    #: 'none' | 'unclear' | 'elevated' | 'acute'
-    level: str = "none"
-    #: Bei ``acute`` gesetzt: DIE Antwort. Echo wird dann gar nicht erst gefragt.
-    statt_echo: str | None = None
-    #: Bei ``elevated`` gesetzt: kommt ans Ende der normalen Antwort.
-    nachtrag: str | None = None
-    #: Wandert in die Metadaten der Assistenten-Nachricht.
-    meta: dict = field(default_factory=dict)
-
-
-async def _triage_pruefen(echo_svc, body) -> Triage:
-    """Aktive Krisenerkennung statt passivem Disclaimer.
-
-    Ausgenommen sind Steuertoken (``__…__``) und das gefuehrte Szenengespraech - dort
-    schreibt niemand frei, was eine Gefaehrdung erkennen liesse.
-
-    **Das laeuft VOR jeder Antwort**, auch vor einem Stream. Beim Streaming heisst das eine
-    kurze Wartezeit, bevor das erste Wort erscheint - und die ist richtig so: Wer in akuter
-    Not schreibt, darf keine reflektierende Antwort entgegenstroemen bekommen, waehrend im
-    Hintergrund noch geprueft wird.
-    """
-    if body.thread_type == "scene" or body.message.startswith("__"):
-        return Triage()
-
-    from app.services.safety_service import build_safety_message
-
-    risk = await echo_svc.classify_risk(text=body.message)
-    level = risk.get("level", "none")
-    kategorie = risk.get("category")
-
-    if level == "acute":
-        return Triage(
-            level=level,
-            statt_echo=build_safety_message("acute", category=kategorie),
-            meta={"safety": {"level": "acute", "category": kategorie, "mode": "intervention"}},
-        )
-    if level == "elevated":
-        return Triage(
-            level=level,
-            nachtrag=build_safety_message("elevated", category=kategorie),
-            meta={"safety": {"level": "elevated", "category": kategorie, "mode": "appended"}},
-        )
-    return Triage(level=level)
-
-
 @router.post("/chat", response_model=EchoChatResponse)
 async def chat(
     case_id: UUID,
@@ -538,7 +483,12 @@ async def chat(
         "mode_temperature": mode_temperature,
     }
 
-    triage = await _triage_pruefen(echo_svc, body)
+    triage = await triage_pruefen(
+        echo_svc, text=body.message,
+        # Steuertoken sind Anweisungen der Oberflaeche, und im gefuehrten Szenendialog
+        # beantwortet man Fragen, statt frei zu schreiben.
+        ausgenommen=body.thread_type == "scene" or body.message.startswith("__"),
+    )
     if triage.statt_echo is not None:
         answer = triage.statt_echo
     else:
@@ -609,7 +559,12 @@ async def chat_stream(
     vorbereitung = await _vorbereiten(pool, case_id, user_id, body)
     extra_context, mode_steering, mode_temperature = await _kontext_bauen(
         pool, case_id, user_id, body, vorbereitung)
-    triage = await _triage_pruefen(echo_svc, body)
+    triage = await triage_pruefen(
+        echo_svc, text=body.message,
+        # Steuertoken sind Anweisungen der Oberflaeche, und im gefuehrten Szenendialog
+        # beantwortet man Fragen, statt frei zu schreiben.
+        ausgenommen=body.thread_type == "scene" or body.message.startswith("__"),
+    )
 
     echo_argumente = {
         "user_message": body.message,

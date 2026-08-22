@@ -42,6 +42,7 @@ from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
 from app.services import couple_progress_service as progress
 from app.services import couple_therapy_service as cts
+from app.services.safety_service import triage_pruefen
 from app.services.subscription_service import enforce_echo_prompt_limit
 
 router = APIRouter(prefix="/couple", tags=["couple"])
@@ -277,13 +278,25 @@ async def talk_to_companion(
         verlauf = await companion.load_messages(conn, thread["id"], user_id)
         context = await cps.build_companion_context(conn, link, user_id)
 
-        reply = await svc.professional_chat(
-            user_message=body.content,
-            shared_context=context,
-            history=companion.build_history(verlauf)[:-1],
-            prompt_file=prompt,
-        )
-        await companion.add_message(conn, thread, user_id, role="echo", content=reply)
+        # ── Sicherheits-Triage ────────────────────────────────────────────────
+        # Dieselbe Regel wie im Fall-Echo, aus derselben Funktion. Sie fehlte hier bislang
+        # ganz - und ausgerechnet hier ist sie am noetigsten: Der Faden "Nach einem Streit"
+        # ist fuer den Moment gemacht, in dem jemand aufgewuehlt schreibt.
+        triage = await triage_pruefen(svc, text=body.content)
+        if triage.statt_echo is not None:
+            reply = triage.statt_echo
+        else:
+            reply = await svc.professional_chat(
+                user_message=body.content,
+                shared_context=context,
+                history=companion.build_history(verlauf)[:-1],
+                prompt_file=prompt,
+            )
+            if triage.nachtrag:
+                reply = reply.rstrip() + "\n\n" + triage.nachtrag
+
+        await companion.add_message(conn, thread, user_id, role="echo", content=reply,
+                                    metadata=triage.meta)
 
         # Der erste Austausch gibt dem Gespräch seinen Namen — sonst heißen später alle
         # gleich und man findet nichts wieder.

@@ -15,6 +15,7 @@ keine KI Telefonnummern halluzinieren.
 """
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Literal
 
 SafetyLevel = Literal["none", "unclear", "elevated", "acute"]
@@ -142,3 +143,60 @@ def build_safety_message(level: SafetyLevel, *, category: str | None = None) -> 
         "vertraulich:\n\n"
         f"{_resource_block(full=False)}"
     )
+
+
+# ── Triage: die Entscheidung, was bei welchem Risiko passiert ────────────────
+
+@dataclass
+class Triage:
+    """Was die Sicherheitsprüfung über eine Nachricht entschieden hat.
+
+    **Die Entscheidung faellt hier, ausgefuehrt wird sie anderswo.** Genau ein Ort, an dem
+    steht, was bei welchem Risiko passiert - benutzt vom normalen Endpunkt UND vom
+    Streaming. Abgeschrieben waere das die gefaehrlichste Dopplung im ganzen Projekt: Wer
+    die Regel spaeter anfasst und eine Seite vergisst, baut einen Weg, auf dem jemand in
+    akuter Gefahr eine reflektierende Deutung statt einer Notrufnummer liest.
+    """
+
+    #: 'none' | 'unclear' | 'elevated' | 'acute'
+    level: str = "none"
+    #: Bei ``acute`` gesetzt: DIE Antwort. Echo wird dann gar nicht erst gefragt.
+    statt_echo: str | None = None
+    #: Bei ``elevated`` gesetzt: kommt ans Ende der normalen Antwort.
+    nachtrag: str | None = None
+    #: Wandert in die Metadaten der Assistenten-Nachricht.
+    meta: dict = field(default_factory=dict)
+
+
+async def triage_pruefen(echo_svc, *, text: str, ausgenommen: bool = False) -> Triage:
+    """Aktive Krisenerkennung statt passivem Disclaimer.
+
+    ``ausgenommen`` schaltet sie ab, wo niemand frei schreibt: Steuertoken der Oberflaeche
+    und der gefuehrte Szenendialog. Der Aufrufer begruendet das, nicht diese Funktion -
+    die beiden Bereiche haben unterschiedliche Gruende.
+
+    **Das laeuft VOR jeder Antwort**, auch vor einem Stream. Beim Streaming heisst das eine
+    kurze Wartezeit, bevor das erste Wort erscheint - und die ist richtig so: Wer in akuter
+    Not schreibt, darf keine reflektierende Antwort entgegenstroemen bekommen, waehrend im
+    Hintergrund noch geprueft wird.
+    """
+    if ausgenommen:
+        return Triage()
+
+    risk = await echo_svc.classify_risk(text=text)
+    level = risk.get("level", "none")
+    kategorie = risk.get("category")
+
+    if level == "acute":
+        return Triage(
+            level=level,
+            statt_echo=build_safety_message("acute", category=kategorie),
+            meta={"safety": {"level": "acute", "category": kategorie, "mode": "intervention"}},
+        )
+    if level == "elevated":
+        return Triage(
+            level=level,
+            nachtrag=build_safety_message("elevated", category=kategorie),
+            meta={"safety": {"level": "elevated", "category": kategorie, "mode": "appended"}},
+        )
+    return Triage(level=level)

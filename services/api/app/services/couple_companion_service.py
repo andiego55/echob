@@ -10,6 +10,7 @@ Partnerperson kommt an nichts davon heran, auch nicht über eine erratene ID.
 """
 from __future__ import annotations
 
+import json as _json
 from typing import Any
 
 from fastapi import HTTPException
@@ -110,12 +111,20 @@ async def load_messages(conn, thread_id, user_id) -> list[dict]:
     return [crypto.decrypt_fields(dict(r), "content") for r in rows]
 
 
-async def add_message(conn, thread, user_id, *, role, content, kind="chat") -> dict:
+async def add_message(conn, thread, user_id, *, role, content, kind="chat",
+                      metadata: dict | None = None) -> dict:
+    """Eine Nachricht ablegen.
+
+    ``metadata`` traegt die Sicherheits-Markierung (``{"safety": {...}}``), damit die
+    Oberflaeche eine Krisenmeldung auch nach dem Neuladen als solche rahmt - genau wie im
+    Fall-Echo. Ohne sie saehe sie aus wie eine gewoehnliche Deutung.
+    """
     row = await conn.fetchrow(
         "INSERT INTO couple_private_messages "
-        "(couple_id, thread_id, user_id, role, kind, content) "
-        "VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+        "(couple_id, thread_id, user_id, role, kind, content, metadata) "
+        "VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb) RETURNING *",
         thread["couple_id"], thread["id"], user_id, role, kind, crypto.encrypt(content),
+        _json.dumps(metadata or {}),
     )
     await conn.execute(
         "UPDATE couple_echo_threads SET updated_at = NOW() WHERE id = $1", thread["id"],

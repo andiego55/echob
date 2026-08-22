@@ -262,7 +262,7 @@ export default function EchoChat({
             />
           )}
 
-          {messages.map(m => <Blase key={m.id} role={m.role} content={m.content} />)}
+          {messages.map(m => <Blase key={m.id} role={m.role} content={m.content} safety={m.safety} />)}
           <div ref={endRef} />
         </div>
 
@@ -313,8 +313,38 @@ export default function EchoChat({
 }
 
 /** Echo bekommt ein Gesicht: Wellenmarke und eigene Kante. Du sprichst rechts. */
-function Blase({ role, content }: { role: string; content: string }) {
+function Blase({ role, content, safety }: {
+  role: string
+  content: string
+  /** Gesetzt, wenn die Sicherheits-Triage eingegriffen hat. */
+  safety?: 'acute' | 'elevated' | null
+}) {
   if (role === 'echo') {
+    /**
+     * Eine Krisenmeldung sieht anders aus als eine Deutung.
+     *
+     * Bei akuter Gefahr antwortet nicht Echo, sondern eine feste Hilfemeldung mit
+     * Notrufnummern. Ungerahmt stünde sie da wie ein weiterer reflektierender Absatz —
+     * und bei genau dieser Nachricht ist die Aufmachung Teil der Wirkung. Dieselbe
+     * Rahmung wie im Fall-Echo, damit sie überall gleich erkannt wird.
+     */
+    if (safety === 'acute' || safety === 'elevated') {
+      return (
+        <div className={`beitrag-neu rounded-2xl border px-4 py-3.5 ${
+          safety === 'acute' ? 'border-red-300 bg-red-50/70' : 'border-amber-300 bg-amber-50/60'
+        }`}>
+          <p className={`mb-2 flex items-center gap-2 text-[0.8rem] font-bold ${
+            safety === 'acute' ? 'text-red-700' : 'text-amber-700'
+          }`}>
+            <span aria-hidden="true">{safety === 'acute' ? '🆘' : '⚠'}</span>
+            {safety === 'acute'
+              ? 'Sicherheit zuerst – Hilfe ist erreichbar'
+              : 'Sicherheitshinweis'}
+          </p>
+          <div className="text-sm text-brand-text"><MarkdownMessage content={content} /></div>
+        </div>
+      )
+    }
     return (
       <div className="beitrag-neu flex gap-3">
         <span className="mt-0.5 shrink-0 text-accent" aria-hidden>

@@ -20,6 +20,8 @@ class CouplePrivateMessage(BaseModel):
     role: str      # 'user' | 'echo'
     kind: str      # 'chat' | 'feedback'
     content: str
+    #: 'acute' | 'elevated', wenn die Sicherheits-Triage eingegriffen hat.
+    safety: str | None = None
     created_at: datetime
 
 

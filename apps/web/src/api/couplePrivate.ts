@@ -11,6 +11,8 @@ export interface CouplePrivateMessage {
   role: 'user' | 'echo'
   kind: 'chat' | 'feedback'
   content: string
+  /** 'acute' | 'elevated', wenn die Sicherheits-Triage eingegriffen hat. */
+  safety?: 'acute' | 'elevated' | null
   created_at: string
 }
 

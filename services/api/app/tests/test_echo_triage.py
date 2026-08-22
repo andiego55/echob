@@ -1,26 +1,19 @@
-"""Die Sicherheits-Triage des Echo-Chats.
+"""Die Sicherheits-Triage — die eine Regel, die alle Bereiche teilen.
 
-**Warum das geprueft gehoert.** `_triage_pruefen` entscheidet, ob jemand eine reflektierende
-Echo-Antwort bekommt oder eine Notrufnummer. Die Regel wurde aus dem Endpunkt
-herausgeloest, damit das Streaming sie mitbenutzen kann statt sie abzuschreiben - und
-genau deshalb braucht sie jetzt einen Waechter: Wer sie anfasst, soll es merken.
+`triage_pruefen` entscheidet, ob jemand eine reflektierende Echo-Antwort bekommt oder eine
+Notrufnummer. Sie lag zuerst als Helfer im Echo-Router und war damit faktisch dem Fall-Echo
+vorbehalten; der Paarbereich hatte gar keine aktive Krisenerkennung. Seit dem Umzug in den
+`safety_service` benutzen beide dieselbe Funktion — und genau deshalb braucht sie einen
+Waechter: Wer sie anfasst, aendert sie ueberall.
 
-Geprueft wird die ENTSCHEIDUNG, nicht die Formulierung der Hilfetexte. Die stehen im
-`safety_service` und haben dort ihre eigene Pruefung.
+Geprueft wird die ENTSCHEIDUNG, nicht die Formulierung der Hilfetexte. Die stehen daneben
+im selben Dienst und haben ihre eigene Pruefung.
 """
 from __future__ import annotations
 
 import pytest
 
-from app.api.v1.routers.echo import Triage, _triage_pruefen
-
-
-class FakeBody:
-    """Nur die drei Felder, die die Triage ansieht."""
-
-    def __init__(self, message: str, thread_type: str = "topic"):
-        self.message = message
-        self.thread_type = thread_type
+from app.services.safety_service import Triage, triage_pruefen
 
 
 class FakeEcho:
@@ -39,20 +32,20 @@ class FakeEcho:
 async def test_akut_ersetzt_die_antwort():
     """Bei akuter Gefahr wird Echo GAR NICHT gefragt."""
     echo = FakeEcho("acute", "suizid")
-    t = await _triage_pruefen(echo, FakeBody("Ich will nicht mehr leben."))
+    t = await triage_pruefen(echo, text="Ich will nicht mehr leben.")
 
     assert t.level == "acute"
     assert t.statt_echo, "Es muss eine feste Hilfemeldung geben"
     assert t.nachtrag is None, "Bei akut wird nichts angehaengt, sondern ersetzt"
     assert t.meta["safety"]["mode"] == "intervention"
     # Der eigentliche Punkt: In dieser Lage darf keine reflektierende Deutung entstehen.
-    assert "110" in t.statt_echo or "112" in t.statt_echo or "0800" in t.statt_echo
+    assert any(n in t.statt_echo for n in ("110", "112", "0800", "116"))
 
 
 @pytest.mark.asyncio
 async def test_erhoeht_haengt_an_statt_zu_ersetzen():
     echo = FakeEcho("elevated", "gewalt")
-    t = await _triage_pruefen(echo, FakeBody("Er wird manchmal laut und ich habe Angst."))
+    t = await triage_pruefen(echo, text="Er wird manchmal laut und ich habe Angst.")
 
     assert t.level == "elevated"
     assert t.statt_echo is None, "Echo antwortet normal"
@@ -62,8 +55,7 @@ async def test_erhoeht_haengt_an_statt_zu_ersetzen():
 
 @pytest.mark.asyncio
 async def test_unauffaellig_aendert_nichts():
-    echo = FakeEcho("none")
-    t = await _triage_pruefen(echo, FakeBody("Wir hatten gestern einen Streit ums Aufräumen."))
+    t = await triage_pruefen(FakeEcho("none"), text="Wir hatten Streit ums Aufräumen.")
 
     assert t.statt_echo is None
     assert t.nachtrag is None
@@ -74,29 +66,36 @@ async def test_unauffaellig_aendert_nichts():
 async def test_unklar_greift_nicht_ein():
     # 'unclear' ist bewusst kein Eingriff: Ein Hinweis bei jeder mehrdeutigen Formulierung
     # waere Laerm, und Laerm laesst Leute die echten Hinweise ueberlesen.
-    t = await _triage_pruefen(FakeEcho("unclear"), FakeBody("Mir geht es gerade nicht gut."))
+    t = await triage_pruefen(FakeEcho("unclear"), text="Mir geht es gerade nicht gut.")
     assert t.statt_echo is None
     assert t.nachtrag is None
 
 
 @pytest.mark.asyncio
-async def test_steuertoken_wird_nicht_eingestuft():
-    """`__…__` sind Befehle der Oberflaeche, keine Aeusserungen."""
+async def test_ausgenommen_fragt_das_modell_gar_nicht():
+    """Steuertoken und gefuehrte Dialoge - dort schreibt niemand frei.
+
+    Der Aufrufer entscheidet, was ausgenommen ist; die Triage fuehrt es nur aus. Wichtig
+    ist, dass dann auch KEINE Anfrage ans Modell geht: Sie waere Geld und Wartezeit fuer
+    eine Einstufung, die ohnehin verworfen wird.
+    """
     echo = FakeEcho("acute")
-    t = await _triage_pruefen(echo, FakeBody("__add_context__"))
+    t = await triage_pruefen(echo, text="__add_context__", ausgenommen=True)
 
     assert t == Triage(), "keine Einstufung, keine Meldung"
-    assert echo.aufrufe == 0, "und keine unnoetige Anfrage ans Modell"
+    assert echo.aufrufe == 0
 
 
 @pytest.mark.asyncio
-async def test_szenengespraech_wird_nicht_eingestuft():
-    """Im gefuehrten Szenendialog beantwortet man Fragen, man schreibt nicht frei."""
-    echo = FakeEcho("acute")
-    t = await _triage_pruefen(echo, FakeBody("Am Dienstag.", thread_type="scene"))
+async def test_ohne_ausnahme_wird_immer_eingestuft():
+    """Der Standard ist Pruefen. Wer sie abschalten will, muss es hinschreiben.
 
-    assert t == Triage()
-    assert echo.aufrufe == 0
+    Genau daran hing der Paarbereich: Dort lief die Triage nie, weil sie im Echo-Router
+    steckte statt an einer gemeinsamen Stelle.
+    """
+    echo = FakeEcho("none")
+    await triage_pruefen(echo, text="Irgendetwas.")
+    assert echo.aufrufe == 1
 
 
 @pytest.mark.asyncio
@@ -108,6 +107,6 @@ async def test_die_pruefung_laeuft_vor_der_antwort():
     reflektierenden Antwort, bevor die Hilfemeldung sie ersetzt.
     """
     echo = FakeEcho("acute", "suizid")
-    t = await _triage_pruefen(echo, FakeBody("Ich kann nicht mehr."))
+    t = await triage_pruefen(echo, text="Ich kann nicht mehr.")
     assert echo.aufrufe == 1
     assert t.statt_echo is not None
