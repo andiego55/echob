@@ -1,7 +1,16 @@
-"""Router: Nutzer-Inbox „Von deiner Fachperson" — Zuweisungen & Termine.
+"""Router: Das Postfach der nutzenden Person.
+
+Buendelt ALLES, was auf jemanden wartet: Zuweisungen und Termine der Fachperson sowie
+die Benachrichtigungen aus `client_notifications` — insbesondere die aus dem Paarraum.
+
+**Warum gebuendelt.** Die Paar-Meldungen lagen bis August 2026 nur in einem Banner auf der
+EINSTELLUNGEN-Seite und im Paarraum selbst. Beides war der falsche Ort: In den
+Einstellungen sucht niemand nach Nachrichten, und im Paarraum sieht man den Hinweis erst,
+wenn man ohnehin schon dort ist — die Meldung, die zum Zurueckkommen bewegen soll, kam also
+erst an, nachdem man zurueckgekommen war.
 
 Nutzerseitig (get_current_user). Liefert nur Items, die der eingeloggten Person
-gehören (user_id-gebunden); interne/Echo-only-Felder werden im Service entfernt.
+gehoeren (user_id-gebunden); interne/Echo-only-Felder werden im Service entfernt.
 """
 from __future__ import annotations
 
@@ -26,12 +35,25 @@ async def get_inbox(
     current: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> dict:
-    """Gebündelte Inbox: zugewiesene Items + anstehende Termine."""
+    """Alles, was wartet: Zuweisungen, Termine und ungelesene Benachrichtigungen."""
     async with pool.acquire() as conn:
         uid = current["user_id"]
         assignments = await collab_service.list_assignments_for_user(conn, user_id=uid)
         appointments = await collab_service.list_appointments_for_user(conn, user_id=uid)
-    return {"assignments": assignments, "appointments": appointments}
+        # Dieselbe Quelle wie /notifications — hier mitgeliefert, damit das Postfach
+        # nicht zwei Abfragen braucht und der Zaehler in der Navigation stimmt.
+        notifications = [
+            dict(r) for r in await conn.fetch(
+                "SELECT id, kind, body, created_at FROM client_notifications "
+                "WHERE user_id = $1 AND read_at IS NULL ORDER BY created_at DESC LIMIT 50",
+                uid,
+            )
+        ]
+    return {
+        "assignments": assignments,
+        "appointments": appointments,
+        "notifications": notifications,
+    }
 
 
 @router.patch("/assignments/{assignment_id}/seen")

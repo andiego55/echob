@@ -9,6 +9,7 @@ import MessageThread, { threadFromPayload } from '@/components/MessageThread'
 import QuestionnaireRenderer from '@/components/QuestionnaireRenderer'
 import type { Question } from '@/lib/questionnaire'
 import { collabApi, type Assignment, type Appointment } from '@/api/collab'
+import { notificationsApi, type ClientNotification } from '@/api/notifications'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { ListSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
@@ -35,16 +36,21 @@ export default function InboxPage() {
 
   const assignments = data?.assignments ?? []
   const appointments = data?.appointments ?? []
+  const meldungen = data?.notifications ?? []
+  const ausDemPaarraum = meldungen.filter(n => n.kind.startsWith('couple_'))
+  const sonstige = meldungen.filter(n => !n.kind.startsWith('couple_'))
   const isEmpty = !isLoading && assignments.length === 0 && appointments.length === 0
+    && meldungen.length === 0
   const unreadCount = assignments.filter(a => a.unread).length
 
   return (
     <AppShell>
       <div className="mx-auto max-w-[780px] px-6 py-10">
-        <h1 className="page-title">Von deiner Fachperson</h1>
-        <p className="mt-1 text-sm text-brand-muted">
-          Hier erscheinen Dialoge, Fragebögen, Nachrichten und Termine, die deine Fachperson für dich
-          bereitstellt. Kein Notfallkanal – bei akuter Not wende dich an die Telefonseelsorge (0800 111 0 111).
+        <h1 className="page-title">Postfach</h1>
+        <p className="mt-1 max-w-[62ch] text-sm text-brand-muted">
+          Alles, was auf dich wartet – aus eurem Paarraum und von deiner Fachperson.
+          Kein Notfallkanal: Bei akuter Not wende dich an die Telefonseelsorge
+          (0800 111 0 111).
         </p>
 
         {isLoading && <div className="mt-8"><ListSkeleton rows={3} label="Postfach wird geladen" /></div>}
@@ -53,10 +59,20 @@ export default function InboxPage() {
           <div className="mt-8 rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-12 text-center">
             <div className="text-4xl mb-3">📭</div>
             <h2 className="text-lg font-semibold text-navy mb-1">Noch nichts da</h2>
-            <p className="text-sm text-brand-muted">
-              Sobald eine Fachperson dir etwas zuweist, erscheint es hier.
+            <p className="mx-auto max-w-[46ch] text-sm text-brand-muted">
+              Hier sammelt sich, was auf dich wartet: Nachrichten aus eurem Paarraum und
+              alles, was eine Fachperson dir zuweist.
             </p>
           </div>
+        )}
+
+        {ausDemPaarraum.length > 0 && (
+          <section className="mt-8">
+            <h2 className="section-label mb-3">Aus eurem Paarraum</h2>
+            <div className="space-y-2.5">
+              {ausDemPaarraum.map(n => <MeldungsZeile key={n.id} meldung={n} />)}
+            </div>
+          </section>
         )}
 
         {appointments.length > 0 && (
@@ -80,6 +96,15 @@ export default function InboxPage() {
             </h2>
             <div className="space-y-3">
               {assignments.map(a => <AssignmentCard key={a.id} item={a} />)}
+            </div>
+          </section>
+        )}
+
+        {sonstige.length > 0 && (
+          <section className="mt-8">
+            <h2 className="section-label mb-3">Weitere Hinweise</h2>
+            <div className="space-y-2.5">
+              {sonstige.map(n => <MeldungsZeile key={n.id} meldung={n} />)}
             </div>
           </section>
         )}
@@ -239,6 +264,64 @@ function AssignmentCard({ item }: { item: Assignment }) {
         <button onClick={() => seen.mutate()} disabled={seen.isPending}
           className="mt-3 text-xs text-accent hover:underline">Als gelesen markieren</button>
       )}
+    </div>
+  )
+}
+
+/**
+ * Eine Benachrichtigung im Postfach.
+ *
+ * **Wo sie vorher lag.** Bis August 2026 nur in einem Banner auf der EINSTELLUNGEN-Seite
+ * und im Paarraum selbst. Beides war der falsche Ort: In den Einstellungen sucht niemand
+ * nach Nachrichten, und im Paarraum sieht man den Hinweis erst, wenn man ohnehin schon
+ * dort ist — die Meldung, die zum Zurückkommen bewegen soll, kam also erst an, nachdem man
+ * zurückgekommen war.
+ *
+ * **Der Text nennt nie den Inhalt.** „Im Paarraum wartet eine Frage auf dich" — nicht
+ * welche. Wer sie hier läse, beantwortete sie im Kopf und nie im Raum. Deshalb führt die
+ * Zeile immer weiter, statt zu erzählen.
+ */
+function MeldungsZeile({ meldung }: { meldung: ClientNotification }) {
+  const qc = useQueryClient()
+  const gelesen = useMutation({
+    mutationFn: () => notificationsApi.markRead(meldung.id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['inbox'] })
+      // Derselbe Bestand steckt hinter den Hinweisen im Paarraum.
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+    },
+  })
+
+  const ausPaarraum = meldung.kind.startsWith('couple_')
+
+  return (
+    <div className="card card-static border-l-4 border-l-accent">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm leading-relaxed text-brand-text">{meldung.body}</p>
+          <p className="mt-1 text-[0.7rem] text-brand-muted">
+            {new Date(meldung.created_at).toLocaleString('de-DE', {
+              day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+            })}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          {ausPaarraum && (
+            <Link to="/app/paar" className="text-xs font-medium text-accent hover:underline">
+              Zum Paarraum →
+            </Link>
+          )}
+          <button
+            onClick={() => gelesen.mutate()}
+            disabled={gelesen.isPending}
+            className="text-xs text-brand-muted transition-colors hover:text-navy disabled:opacity-50"
+            title="Aus dem Postfach nehmen"
+          >
+            Erledigt
+          </button>
+        </div>
+      </div>
+      <Fehlermeldung error={gelesen.error} />
     </div>
   )
 }

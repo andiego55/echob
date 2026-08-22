@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import type { ClientNotification } from './notifications'
 
 export type AssignmentType = 'dialog' | 'questionnaire' | 'message' | 'resource'
 
@@ -29,6 +30,8 @@ export interface Appointment {
 export interface InboxData {
   assignments: Assignment[]
   appointments: Appointment[]
+  /** Ungelesene Benachrichtigungen – vor allem aus dem Paarraum. */
+  notifications: ClientNotification[]
 }
 
 export const collabApi = {

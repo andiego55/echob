@@ -22,7 +22,9 @@ export default function AppShell({ children }: Props) {
   const { data: inboxUnread = 0 } = useQuery({
     queryKey: ['inbox'],
     queryFn: collabApi.inbox,
-    select: d => d.assignments.filter(a => a.unread).length,
+    // Zuweisungen UND Benachrichtigungen. Die Paar-Meldungen lagen frueher nur in einem
+    // Banner in den Einstellungen - der Zaehler kannte sie gar nicht.
+    select: d => d.assignments.filter(a => a.unread).length + d.notifications.length,
     staleTime: 30_000,
   })
 

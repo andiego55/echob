@@ -20,7 +20,12 @@ export default function CoupleNotices() {
   })
   const dismiss = useMutation({
     mutationFn: (id: string) => notificationsApi.markRead(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      // Dieselbe Meldung liegt im Postfach und zaehlt dort in den Navigations-Zaehler.
+      // Wer sie hier abhakt, soll sie nicht dort noch stehen haben.
+      qc.invalidateQueries({ queryKey: ['inbox'] })
+    },
   })
 
   const items = alle.filter(n => n.kind.startsWith('couple_'))

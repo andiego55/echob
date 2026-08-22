@@ -11,7 +11,6 @@ import SubscriptionCard from '@/components/settings/SubscriptionCard'
 import UsageCard from '@/components/settings/UsageCard'
 import PasswordCard from '@/components/settings/PasswordCard'
 import DataAccountCard from '@/components/settings/DataAccountCard'
-import NotificationsBanner from '@/components/NotificationsBanner'
 import { profileApi } from '@/api/profile'
 import { CardSkeleton } from '@/components/Skeleton'
 
@@ -62,7 +61,6 @@ export default function SettingsPage() {
           Hier stimmst du Echo auf dich ab. Weitere Einstellungen folgen.
         </p>
 
-        <NotificationsBanner />
 
         <div className="mt-8 card">
           <h2 className="text-lg font-semibold text-navy">Wie Echo mit dir spricht</h2>
