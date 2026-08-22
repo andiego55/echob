@@ -10,6 +10,8 @@ import CaseNav from '@/components/app/CaseNav'
 import QuickCapture from '@/components/app/QuickCapture'
 import { scenesApi } from '@/api/scenes'
 import type { InputMode, SceneDraft } from '@/types'
+import { useEntwurf } from '@/lib/entwurf'
+import EntwurfHinweis from '@/components/EntwurfHinweis'
 
 const GUIDED_QUESTIONS = [
   { key: 'what',   label: 'Was ist passiert?' },
@@ -40,14 +42,39 @@ export default function SceneNewPage() {
   const [tags, setTags]               = useState<string[]>([])
   const [quickOpen, setQuickOpen]     = useState(false)
 
+  /**
+   * Was hier steht, ist oft schwer geschrieben. Es soll nicht an einem versehentlichen
+   * Zurueckwischen haengen. Der Entwurf haelt alles, was Muehe gekostet hat - Modus, Tags
+   * und Belastungswert kommen mit, damit man wirklich weiterschreiben kann und nicht nur
+   * den Text zurueckbekommt.
+   */
+  const entwurfsWert = { mode, title, sceneDate, freetext, guidedAnswers, distressScore, tags }
+  const entwurf = useEntwurf(
+    caseId ? `szene-neu:${caseId}` : null,
+    entwurfsWert,
+    w => !w.title.trim() && !w.freetext.trim()
+      && !Object.values(w.guidedAnswers).some(a => a.trim()),
+  )
+
   const mutation = useMutation({
     mutationFn: (data: Parameters<typeof scenesApi.create>[1]) =>
       scenesApi.create(caseId!, data),
     onSuccess: (scene) => {
+      entwurf.loeschen()
       qc.invalidateQueries({ queryKey: ['scenes', caseId] })
       navigate(`/app/cases/${caseId}/scenes/${scene.id}`)
     },
   })
+
+  const entwurfUebernehmen = (w: typeof entwurfsWert) => {
+    setMode(w.mode)
+    setTitle(w.title)
+    setSceneDate(w.sceneDate)
+    setFreetext(w.freetext)
+    setGuided(w.guidedAnswers)
+    setDistress(w.distressScore)
+    setTags(w.tags)
+  }
 
   const toggleTag = (tag: string) => {
     setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
@@ -96,6 +123,8 @@ export default function SceneNewPage() {
       <AppShell>
         <CaseNav caseId={caseId!} />
         <div className="mx-auto max-w-[640px] px-6 py-10">
+          <EntwurfHinweis entwurf={entwurf} onUebernehmen={entwurfUebernehmen}
+            was="Eine angefangene Szene" />
           <span className="label">Szene anlegen</span>
           <h1 className="page-title mt-2 mb-2">Was möchtest du festhalten?</h1>
           <p className="text-sm text-brand-muted mb-4">

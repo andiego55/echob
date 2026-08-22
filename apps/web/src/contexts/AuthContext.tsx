@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, ReactNode } fro
 import type { Session, User } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { alleEntwuerfeLoeschen } from '@/lib/entwurf'
 
 interface AuthContextValue {
   session:  Session | null
@@ -46,6 +47,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut()
     queryClient.clear()
+    // Entwuerfe liegen unverschluesselt im Browser-Speicher. Das ist beim Schreiben die
+    // richtige Abwaegung - beim Abmelden nicht mehr, erst recht nicht auf einem geteilten
+    // Geraet.
+    alleEntwuerfeLoeschen()
   }
 
   return (

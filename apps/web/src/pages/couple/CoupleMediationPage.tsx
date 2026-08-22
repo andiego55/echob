@@ -19,6 +19,8 @@ import BridgeBoard from '@/components/couple/BridgeBoard'
 import type { CoupleTopicDetail } from '@/api/coupleMediation'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import { useEntwurf } from '@/lib/entwurf'
+import EntwurfHinweis from '@/components/EntwurfHinweis'
 
 export default function CoupleMediationPage() {
   const bestaetigen = useBestaetigen()
@@ -47,13 +49,24 @@ export default function CoupleMediationPage() {
     setPriv(own.private_text ?? '')
   }, [own, touched])
 
+  /**
+   * Die beiden Perspektiven sind das Schwerste, was im Modul geschrieben wird - eine offen,
+   * eine vertraulich, beide ueberlegt. Bis zum Klick auf "Speichern" stehen sie nur im
+   * Browser; ein Zurueckwischen kostete sie bisher vollstaendig.
+   */
+  const entwurf = useEntwurf(
+    topicId ? `mediation:${topicId}` : null,
+    { open, priv },
+    w => !w.open.trim() && !w.priv.trim(),
+  )
+
   const apply = (d: CoupleTopicDetail) => qc.setQueryData(['couple-topic', topicId], d)
 
   const save = useMutation({
     mutationFn: () => coupleMediationApi.savePerspective(topicId, {
       open_text: open.trim() || null, private_text: priv.trim() || null,
     }),
-    onSuccess: d => { apply(d); setTouched(false) },
+    onSuccess: d => { apply(d); setTouched(false); entwurf.loeschen() },
   })
   const mediate = useMutation({
     mutationFn: () => coupleMediationApi.mediate(topicId),
@@ -128,6 +141,12 @@ export default function CoupleMediationPage() {
           {/* ── Eigene Beiträge ──────────────────────────────────── */}
           <div className="card">
             <h2 className="card-title">Deine Sicht</h2>
+
+            <EntwurfHinweis
+              entwurf={entwurf}
+              was="Angefangene Perspektiven"
+              onUebernehmen={w => { setOpen(w.open); setPriv(w.priv); setTouched(true) }}
+            />
 
             <label className="mt-4 block">
               <span className="text-xs font-semibold text-navy">Offen – das liest deine Partnerperson</span>

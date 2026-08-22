@@ -4,11 +4,16 @@
  * Auslöser: sichtbarer Button oder Escape zweimal kurz hintereinander.
  */
 import { useEffect } from 'react'
+import { fluchtVorbereiten } from '@/lib/entwurf'
 
 const QUICK_EXIT_URL = 'https://www.wetter.com'
 
 /** Verlässt die Seite sofort und ersetzt den History-Eintrag (Zurück kehrt nicht zurück). */
 export function quickExit() {
+  // Zuerst: keine Rueckfrage mehr zulassen und liegengebliebene Entwuerfe loeschen. Ein
+  // `beforeunload`-Dialog wuerde den Bildschirm mit EchoB offen halten, und ein Entwurf
+  // im Browser-Speicher waere genau die Spur, die hier nicht bleiben darf.
+  fluchtVorbereiten()
   try {
     window.location.replace(QUICK_EXIT_URL)
   } catch {
