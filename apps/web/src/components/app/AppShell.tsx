@@ -10,6 +10,7 @@ import { collabApi } from '@/api/collab'
 import QuickExitButton from '@/components/app/QuickExit'
 import GearIcon from '@/components/icons/GearIcon'
 import EchoBLogo from '@/components/EchoBLogo'
+import MobileTabBar from './MobileTabBar'
 
 interface Props {
   children: React.ReactNode
@@ -35,7 +36,7 @@ export default function AppShell({ children }: Props) {
       {/* App-Header */}
       <header className="bg-gradient-to-b from-navy to-navy-dark border-b border-white/[0.08] shadow-[0_8px_24px_-12px_rgba(7,14,24,0.55)] sticky top-0 z-40">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 h-14">
-          <EchoBLogo to="/" />
+          <EchoBLogo to="/app" />
 
           <nav className="hidden md:flex items-center gap-1">
             {[
@@ -83,7 +84,7 @@ export default function AppShell({ children }: Props) {
             <span className="hidden sm:block text-xs text-white/40">{user?.email}</span>
             <button
               onClick={handleSignOut}
-              className="text-xs text-white/50 hover:text-white transition-colors"
+              className="hidden text-xs text-white/50 transition-colors hover:text-white sm:block"
             >
               Abmelden
             </button>
@@ -91,10 +92,12 @@ export default function AppShell({ children }: Props) {
         </div>
       </header>
 
-      {/* Inhalt */}
-      <main className="flex-1">
+      {/* Inhalt. Unten Platz fuer die Leiste am Telefon, damit sie das Letzte nicht deckt. */}
+      <main className="flex-1 pb-[76px] md:pb-0">
         {children}
       </main>
+
+      <MobileTabBar inboxUnread={inboxUnread} />
     </div>
   )
 }

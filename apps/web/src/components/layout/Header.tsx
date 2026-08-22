@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
+import MobileMenu, { MobileMenuButton } from './MobileMenu'
 import { useAuth } from '@/contexts/AuthContext'
 import { SCENE_COUNT, TEST_COUNT } from '@/content/counts.generated'
 
@@ -91,6 +93,7 @@ const LINK_CLS = (active: boolean) =>
 export default function Header() {
   const { session, signOut } = useAuth()
   const location = useLocation()
+  const [menueOffen, setMenueOffen] = useState(false)
   const wissenActive =
     location.pathname.startsWith('/wissen') ||
     location.pathname.startsWith('/glossar') ||
@@ -310,7 +313,8 @@ export default function Header() {
           </div>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
+          <div className="hidden items-center gap-3 sm:flex">
           {session ? (
             <>
               <Link to="/app" className="btn-outline !py-2 !px-4 !text-[0.85rem]">
@@ -333,8 +337,17 @@ export default function Header() {
               </Link>
             </>
           )}
+          </div>
+
+          <MobileMenuButton offen={menueOffen} onWechseln={() => setMenueOffen(o => !o)} />
         </div>
       </div>
+
+      <MobileMenu
+        offen={menueOffen}
+        onSchliessen={() => setMenueOffen(false)}
+        angemeldet={!!session}
+      />
     </header>
   )
 }
