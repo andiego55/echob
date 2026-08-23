@@ -24,13 +24,24 @@ import type { ScalesOverview } from '@/types'
 export default function PrintSummaryPage() {
   const { caseId } = useParams<{ caseId: string }>()
 
-  const { data: caseData } = useQuery({ queryKey: ['case', caseId], queryFn: () => casesApi.get(caseId!), enabled: !!caseId, retry: false })
-  const { data: scenesData } = useQuery({ queryKey: ['scenes', caseId], queryFn: () => scenesApi.list(caseId!), enabled: !!caseId, retry: false })
-  const { data: onboarding } = useQuery({ queryKey: ['onboarding', caseId], queryFn: () => onboardingApi.get(caseId!), enabled: !!caseId, retry: false })
-  const { data: profile } = useQuery({ queryKey: ['profile'], queryFn: () => profileApi.get(), retry: false })
-  const { data: personProfile } = useQuery({ queryKey: ['person-profile', caseId], queryFn: () => personProfileApi.get(caseId!), enabled: !!caseId, retry: false })
-  const { data: topicSummaries } = useQuery({ queryKey: ['topic-summaries', caseId], queryFn: () => topicSummariesApi.list(caseId!), enabled: !!caseId, retry: false })
+  /**
+   * Dieses Blatt wird bei jedem Aufruf frisch geholt.
+   *
+   * Global gelten 5 Minuten Zwischenspeicher — sinnvoll beim Blättern, falsch hier: Wer
+   * eben eine Szene angelegt hat und dann die Zusammenfassung öffnet, würde sie ohne
+   * diese Szene ausdrucken und zur Fachperson mitnehmen. Ein paar Anfragen mehr sind
+   * dafür der günstigere Preis.
+   */
+  const frisch = { staleTime: 0, refetchOnMount: 'always' } as const
+
+  const { data: caseData } = useQuery({ ...frisch, queryKey: ['case', caseId], queryFn: () => casesApi.get(caseId!), enabled: !!caseId, retry: false })
+  const { data: scenesData } = useQuery({ ...frisch, queryKey: ['scenes', caseId], queryFn: () => scenesApi.list(caseId!), enabled: !!caseId, retry: false })
+  const { data: onboarding } = useQuery({ ...frisch, queryKey: ['onboarding', caseId], queryFn: () => onboardingApi.get(caseId!), enabled: !!caseId, retry: false })
+  const { data: profile } = useQuery({ ...frisch, queryKey: ['profile'], queryFn: () => profileApi.get(), retry: false })
+  const { data: personProfile } = useQuery({ ...frisch, queryKey: ['person-profile', caseId], queryFn: () => personProfileApi.get(caseId!), enabled: !!caseId, retry: false })
+  const { data: topicSummaries } = useQuery({ ...frisch, queryKey: ['topic-summaries', caseId], queryFn: () => topicSummariesApi.list(caseId!), enabled: !!caseId, retry: false })
   const { data: scales } = useQuery({
+    ...frisch,
     queryKey: ['scales', caseId],
     queryFn: () => apiClient.get<ScalesOverview>(`/cases/${caseId}/scales`).then(r => r.data),
     enabled: !!caseId, retry: false,
@@ -39,7 +50,11 @@ export default function PrintSummaryPage() {
   const scenes = (scenesData?.scenes ?? []).filter(s => s.confirmed_by_user)
     .sort((a, b) => (a.scene_date ?? '').localeCompare(b.scene_date ?? ''))
   const relevantScales = (scales?.scores ?? []).filter(s => s.score > 0).sort((a, b) => b.score - a.score)
-  const today = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })
+  // Mit Uhrzeit: Das Blatt wird bei jedem Aufruf neu zusammengestellt, und wer es
+  // ausdruckt, soll sehen, von wann genau dieser Stand ist.
+  const today = new Date().toLocaleString('de-DE', {
+    day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  })
   const personName = onboarding?.person_name || 'die andere Person'
 
   return (
@@ -49,7 +64,9 @@ export default function PrintSummaryPage() {
         <div className="mx-auto max-w-[820px] px-6 py-3 flex items-center justify-between gap-4">
           <Link to={`/app/cases/${caseId}`} className="text-sm text-brand-muted hover:text-navy transition-colors">← Zurück zum Fall</Link>
           <div className="flex items-center gap-3">
-            <span className="hidden sm:block text-xs text-brand-muted">Im Druck-Dialog „Als PDF speichern" wählen</span>
+            <span className="hidden text-xs text-brand-muted sm:block">
+              Immer der aktuelle Stand – im Druck-Dialog „Als PDF speichern" wählen
+            </span>
             <button onClick={() => window.print()} className="btn-primary !py-2 !px-4 !text-sm">Drucken / Als PDF speichern</button>
           </div>
         </div>
@@ -63,11 +80,11 @@ export default function PrintSummaryPage() {
           <h1 className="page-title mt-1">
             {caseData ? RELATIONSHIP_TYPE_LABELS[caseData.relationship_type] : 'Fall'}
           </h1>
-          <p className="text-sm text-brand-muted mt-1">Erstellt am {today}{profile?.display_name ? ` · ${profile.display_name}` : ''}</p>
+          <p className="text-sm text-brand-muted mt-1">Stand: {today} Uhr{profile?.display_name ? ` · ${profile.display_name}` : ''}</p>
         </header>
 
         <p className="text-xs text-brand-muted bg-brand-bg border border-brand-border rounded-brand px-4 py-3 mb-7 print:bg-transparent">
-          Diese Zusammenfassung beruht auf den Selbstauskünften der nutzenden Person und dient der
+          Diese Zusammenfassung wird bei jedem Aufruf neu aus deinem Fall zusammengestellt – es gibt nichts zu erzeugen und nichts zu aktualisieren. Sie beruht auf den Selbstauskünften der nutzenden Person und dient der
           Orientierung. Sie enthält <strong>keine Diagnose</strong> und ersetzt keine professionelle
           Beurteilung. Beschreibungen der anderen Person sind subjektive Wahrnehmungen.
         </p>
