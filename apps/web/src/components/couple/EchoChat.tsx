@@ -58,6 +58,7 @@ export default function EchoChat({
   const [auswahlOffen, setAuswahlOffen] = useState(false)
   const [festgehalten, setFestgehalten] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
+  const eingabe = useRef<HTMLTextAreaElement>(null)
 
   /** Der Text, der gerade hereinkommt – noch nicht gespeichert. */
   const [stromText, setStromText] = useState('')
@@ -206,6 +207,24 @@ export default function EchoChat({
     setAnsicht('aktuell')
     setFestgehalten(null)
     send.mutate(vorlage)
+  }
+
+  /**
+   * Eine Anregung mitten im Gespräch übernehmen — ins Feld, nicht abgeschickt.
+   *
+   * Am Anfang schickt derselbe Satz sofort los; dort IST er der Einstieg. Später will man
+   * ihn zu Ende denken, bevor er rausgeht. Und steht schon etwas im Feld, wird angehängt
+   * statt ersetzt: Geschriebenes wird hier nie weggeworfen.
+   */
+  const uebernehmen = (satz: string) => {
+    setText(v => (v.trim() ? `${v.replace(/\s+$/, '')}\n\n${satz}` : satz))
+    // Nach dem Rendern fokussieren und den Zeiger ans Ende setzen.
+    requestAnimationFrame(() => {
+      const f = eingabe.current
+      if (!f) return
+      f.focus()
+      f.setSelectionRange(f.value.length, f.value.length)
+    })
   }
 
   // ── Nach dem Abschließen ────────────────────────────────────────
@@ -362,7 +381,19 @@ export default function EchoChat({
             onSubmit={e => { e.preventDefault(); if (text.trim()) send.mutate(text.trim()) }}
             className={messages.length > 0 ? 'mt-4 border-t border-brand-border pt-4' : 'mt-5'}
           >
+            {/* Sobald geredet wird, verschwindet der Leerzustand — und mit ihm die
+                Anregungen. Hier kommen sie zurück, kleiner und mit anderer Wirkung. */}
+            {messages.length > 0 && impulse.length > 0 && (
+              <Anregungen
+                impulse={impulse}
+                gesagt={messages.filter(m => m.role === 'user').map(m => m.content)}
+                onUebernehmen={uebernehmen}
+                aus={busy}
+              />
+            )}
+
             <textarea
+              ref={eingabe}
               value={text}
               onChange={e => setText(e.target.value)}
               onKeyDown={e => {
@@ -533,6 +564,114 @@ function Leerzustand({
                 {t}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Anregungen während des Gesprächs.
+ *
+ * **Warum es das braucht.** Im Leerzustand stehen dieselben Sätze groß da und schicken
+ * beim Antippen sofort los — dort sind sie der Einstieg. Sobald jemand schreibt, waren sie
+ * weg. Das war ein Verlust, denn die zweite Gruppe („Ehrlich werden") ist mitten im
+ * Gespräch WERTVOLLER als am Anfang: „Ich glaube, ich war auch nicht fair" trifft nach
+ * drei Beiträgen, wenn man den Streit erzählt hat — nicht, bevor man angefangen hat.
+ *
+ * **Zwei Unterschiede zum Leerzustand.** Erstens wird übernommen statt gesendet (siehe
+ * `uebernehmen`). Zweitens ist zugeklappt der Normalzustand: Wer schreibt, soll schreiben.
+ * Die Hilfe steht bereit, drängt sich aber nicht auf.
+ *
+ * **Schon Gesagtes wird still markiert.** Wer denselben Satz zweimal schickt, dreht sich
+ * im Kreis — und genau davor soll dieser Raum bewahren.
+ */
+function Anregungen({
+  impulse, gesagt, onUebernehmen, aus,
+}: {
+  impulse: Impulsgruppe[]
+  /** Die eigenen Beiträge – um Wiederholungen erkennbar zu machen. */
+  gesagt: string[]
+  onUebernehmen: (satz: string) => void
+  aus: boolean
+}) {
+  const [offen, setOffen] = useState(false)
+  const [gruppe, setGruppe] = useState(0)
+
+  useEffect(() => {
+    if (!offen) return
+    const zu = (e: KeyboardEvent) => { if (e.key === 'Escape') setOffen(false) }
+    document.addEventListener('keydown', zu)
+    return () => document.removeEventListener('keydown', zu)
+  }, [offen])
+
+  const aktiv = impulse[Math.min(gruppe, impulse.length - 1)]
+  const schonGesagt = (satz: string) =>
+    gesagt.some(g => g.toLowerCase().includes(satz.toLowerCase().slice(0, 40)))
+
+  return (
+    <div className="mb-3">
+      <button
+        type="button"
+        onClick={() => setOffen(o => !o)}
+        aria-expanded={offen}
+        className="flex items-center gap-1.5 text-xs text-brand-muted transition-colors hover:text-navy"
+      >
+        <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
+          <circle cx="5.5" cy="10" r="1.8" fill="currentColor" />
+          <path d="M9.4 6.6 A 5 5 0 0 1 9.4 13.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M12.6 4.4 A 8 8 0 0 1 12.6 15.6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity=".5" />
+        </svg>
+        {offen ? 'Anregungen ausblenden' : 'Anregungen'}
+      </button>
+
+      {offen && (
+        <div className="mt-2 rounded-brand border border-brand-border bg-brand-bg/60 p-3">
+          <p className="text-[0.7rem] leading-snug text-brand-muted">
+            Antippen setzt den Satz ins Feld – weiterschreiben kannst du selbst.
+          </p>
+
+          {impulse.length > 1 && (
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              {impulse.map((g, i) => (
+                <button
+                  key={g.gruppe}
+                  type="button"
+                  onClick={() => setGruppe(i)}
+                  className={`rounded-full px-2.5 py-1 text-[0.7rem] transition ${
+                    i === gruppe
+                      ? 'bg-accent/10 font-semibold text-accent'
+                      : 'text-brand-muted hover:bg-white hover:text-navy'
+                  }`}
+                >
+                  {g.gruppe}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-2 max-h-[40vh] space-y-1.5 overflow-y-auto">
+            {aktiv.eintraege.map(e => {
+              const wiederholung = schonGesagt(e.text)
+              return (
+                <button
+                  key={e.label}
+                  type="button"
+                  onClick={() => { onUebernehmen(e.text); setOffen(false) }}
+                  disabled={aus}
+                  className={`flex w-full items-start gap-2 rounded-brand border border-brand-border bg-white px-3 py-2 text-left text-xs transition hover:border-accent/50 hover:bg-accent/[0.04] disabled:opacity-50 ${
+                    wiederholung ? 'text-brand-muted' : 'text-brand-text'
+                  }`}
+                >
+                  {wiederholung && (
+                    <span className="mt-[0.15rem] text-[0.62rem] text-brand-muted/70"
+                          title="Das hast du hier schon gesagt">bereits</span>
+                  )}
+                  <span className="min-w-0">{e.label}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
       )}

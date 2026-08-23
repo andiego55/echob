@@ -81,7 +81,12 @@ export default function InfoPopover({
           id={id}
           role="dialog"
           aria-label={label}
-          className={`absolute top-9 z-30 w-[min(22rem,calc(100vw-2.5rem))] rounded-brand border border-brand-border bg-white p-4 shadow-brand-lg ${
+          /* z-[55]: ueber JEDER Leiste, unter jedem Vollbild-Fenster.
+             Mit z-30 lag der Popover gleichauf mit der klebenden Paar-Navigation —
+             und weil die spaeter im Dokument steht, gewann sie. Der Kasten war halb
+             verdeckt, ohne dass an ihm etwas falsch gewesen waere. Leisten gehen bis
+             z-50, Vollbild-Fenster beginnen bei z-[60]. */
+          className={`absolute top-9 z-[55] w-[min(22rem,calc(100vw-2.5rem))] rounded-brand border border-brand-border bg-white p-4 shadow-brand-lg ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
