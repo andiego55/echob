@@ -5,6 +5,7 @@ import { directoryApi, type DirectoryCard as Listing } from '@/api/directory'
 import { FORMATS, professionLabel } from '@/directory/taxonomy'
 import DirectoryCard from '@/components/directory/DirectoryCard'
 import ErstgespraechBanner from '@/components/directory/ErstgespraechBanner'
+import EchoWellen from '@/components/EchoWellen'
 
 export default function FachpersonenFindenPage() {
   const [q, setQ] = useState('')
@@ -52,8 +53,9 @@ export default function FachpersonenFindenPage() {
   return (
     <PageLayout>
       {/* Hero + Suche */}
-      <section className="bg-navy px-6 pb-12 pt-[calc(60px+3.5rem)] text-white">
-        <div className="mx-auto max-w-[820px] text-center">
+      <section className="relative overflow-hidden bg-navy px-6 pb-12 pt-[calc(60px+3.5rem)] text-white">
+        <EchoWellen />
+        <div className="relative mx-auto max-w-[820px] text-center">
           <span className="label mb-3 block !text-accent">Fachpersonen-Verzeichnis</span>
           <h1 className="text-[clamp(1.9rem,4.5vw,2.7rem)] font-extrabold leading-[1.14] tracking-[-0.02em]">
             Finde die passende Fachperson

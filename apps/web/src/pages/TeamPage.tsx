@@ -4,16 +4,18 @@
  */
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
+import EchoWellen from '@/components/EchoWellen'
 
 export default function TeamPage() {
   return (
     <PageLayout>
       {/* Hero */}
       <section
-        className="bg-navy text-white px-6 pt-[calc(60px+5rem)] pb-20"
+        className="relative overflow-hidden bg-navy text-white px-6 pt-[calc(60px+5rem)] pb-20"
         style={{ backgroundImage: 'radial-gradient(ellipse 65% 55% at 80% 40%, rgba(59,106,154,0.25) 0%, transparent 70%)' }}
       >
-        <div className="mx-auto max-w-[960px]">
+        <EchoWellen />
+        <div className="relative mx-auto max-w-[960px]">
           <span className="label">Über EchoB</span>
           <h1 className="mt-2 text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold leading-[1.2] tracking-[-0.02em] max-w-[560px]">
             Das Team hinter EchoB

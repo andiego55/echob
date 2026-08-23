@@ -4,6 +4,7 @@ import PageLayout from '@/components/layout/PageLayout'
 import FachpersonenExplainer from '@/components/landing/FachpersonenExplainer'
 import DirectoryWaitlistForm from '@/components/landing/DirectoryWaitlistForm'
 import ErstgespraechCTA from '@/components/coaching/ErstgespraechCTA'
+import EchoWellen from '@/components/EchoWellen'
 
 const iconCls = 'h-6 w-6'
 
@@ -213,13 +214,14 @@ export default function FachpersonenPage() {
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section
-        className="bg-navy text-white px-6 pt-[calc(60px+4.5rem)] pb-20"
+        className="relative overflow-hidden bg-navy text-white px-6 pt-[calc(60px+4.5rem)] pb-20"
         style={{
           backgroundImage:
             'radial-gradient(ellipse 65% 55% at 80% 35%, rgba(59,106,154,0.28) 0%, transparent 70%)',
         }}
       >
-        <div className="mx-auto max-w-[960px]">
+        <EchoWellen />
+        <div className="relative mx-auto max-w-[960px]">
           <span className="label">Für Fachpersonen · Therapie · Beratung · Coaching</span>
           <h1 className="mt-2 text-[clamp(1.9rem,4.2vw,2.8rem)] font-extrabold leading-[1.15] tracking-[-0.02em] max-w-3xl">
             Sie steigen <span className="text-accent">vorbereitet</span> ein.

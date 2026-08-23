@@ -3,6 +3,7 @@ import PageLayout from '@/components/layout/PageLayout'
 import CoupleExplainer from '@/components/couple/CoupleExplainer'
 import FaqCard from '@/components/landing/FaqCard'
 import { useAuth } from '@/contexts/AuthContext'
+import EchoWellen from '@/components/EchoWellen'
 
 /**
  * /paartherapie — öffentliche Seite zum Paartherapie-Modul.
@@ -186,11 +187,7 @@ export default function ZuZweitPage() {
     <PageLayout>
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-navy px-6 pt-[calc(60px+4.5rem)] pb-20 text-white">
-        <svg aria-hidden="true" className="pointer-events-none absolute -right-24 -top-10 h-[420px] w-[420px] opacity-[0.13]" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="90" fill="none" stroke="#e07b54" strokeWidth="1" />
-          <circle cx="100" cy="100" r="64" fill="none" stroke="#e07b54" strokeWidth="1.2" />
-          <circle cx="100" cy="100" r="38" fill="none" stroke="#e07b54" strokeWidth="1.5" />
-        </svg>
+        <EchoWellen />
 
         <div className="relative mx-auto max-w-[760px]">
           <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-accent">Paartherapie</span>

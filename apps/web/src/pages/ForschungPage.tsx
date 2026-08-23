@@ -1,5 +1,6 @@
 import PageLayout from '@/components/layout/PageLayout'
 import ResearchSignupForm from '@/components/landing/ResearchSignupForm'
+import EchoWellen from '@/components/EchoWellen'
 
 const iconCls = 'h-6 w-6'
 
@@ -56,12 +57,7 @@ export default function ForschungPage() {
     <PageLayout>
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-navy px-6 pt-[calc(60px+4.5rem)] pb-20 text-white">
-        <svg aria-hidden="true" className="pointer-events-none absolute -right-24 -top-10 h-[420px] w-[420px] opacity-[0.13]" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="90" fill="none" stroke="#e07b54" strokeWidth="1" />
-          <circle cx="100" cy="100" r="64" fill="none" stroke="#e07b54" strokeWidth="1.2" />
-          <circle cx="100" cy="100" r="38" fill="none" stroke="#e07b54" strokeWidth="1.5" />
-          <circle cx="100" cy="100" r="14" fill="#e07b54" />
-        </svg>
+        <EchoWellen />
         <div className="relative mx-auto max-w-[820px]">
           <span className="label">Forschung</span>
           <h1 className="mt-2 max-w-[18ch] text-[clamp(2rem,5vw,3.1rem)] font-extrabold leading-[1.12] tracking-[-0.02em]">

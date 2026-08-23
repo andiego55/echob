@@ -1,5 +1,9 @@
 /**
- * Die Echo-Wellen als Grundton des dunklen Hero.
+ * Die Echo-Wellen als Grundton dunkler Hero-Baender.
+ *
+ * Liegt auf Markenebene, nicht bei der Startseite: Alle Marken-Seiten tragen dasselbe
+ * Motiv. Rechtstexte und rein funktionale Seiten bewusst NICHT — der Unterschied ist,
+ * was das Motiv ueberhaupt zu einem Signal macht.
  *
  * **Der Weg hierher, in drei Fehlern.**
  *

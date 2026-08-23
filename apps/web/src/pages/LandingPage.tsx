@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
 import ExplainerSection from '@/components/landing/ExplainerSection'
-import EchoWellen from '@/components/landing/EchoWellen'
+import EchoWellen from '@/components/EchoWellen'
 
 const THOUGHTS = [
   '„Ich weiß nicht mehr, ob ich übertreibe."',
