@@ -113,7 +113,7 @@ export default function LandingPage() {
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section
-        className="relative overflow-hidden bg-navy text-white px-6 pt-[calc(60px+5rem)] pb-20 md:pb-28"
+        className="relative overflow-hidden bg-navy text-white px-6 pt-[calc(60px+2.5rem)] pb-16 sm:pt-[calc(60px+5rem)] sm:pb-20 md:pb-28"
         style={{
           backgroundImage:
             'radial-gradient(ellipse 65% 55% at 80% 40%, rgba(59,106,154,0.25) 0%, transparent 70%)',
