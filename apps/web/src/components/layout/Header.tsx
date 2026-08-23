@@ -314,6 +314,18 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-1 sm:gap-3">
+          {/* Auf schmalen Schirmen war hier nur der Burger: Wer sich anmelden wollte,
+              musste erst ein Menü öffnen. Ein Weg hinein gehört sichtbar in die Leiste. */}
+          {session ? (
+            <Link to="/app" className="text-[0.8rem] text-white/80 no-underline transition-colors hover:text-white sm:hidden">
+              Dashboard
+            </Link>
+          ) : (
+            <Link to="/auth" className="text-[0.8rem] text-white/80 no-underline transition-colors hover:text-white sm:hidden">
+              Anmelden
+            </Link>
+          )}
+
           <div className="hidden items-center gap-3 sm:flex">
           {session ? (
             <>

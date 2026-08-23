@@ -19,6 +19,16 @@ class CoupleLinkCreate(BaseModel):
     case_id: UUID | None = None
 
 
+class CoupleLinkCaseUpdate(BaseModel):
+    """Welcher eigene Fall zu diesem Paarraum gehoert — oder keiner mehr (None).
+
+    Reine Herkunftsangabe, KEIN Datenzugriff: Sie entscheidet nur, wohin eine im
+    Paarraum entstandene Szene gespeichert werden darf.
+    """
+
+    case_id: UUID | None = None
+
+
 class CoupleLinkAccept(BaseModel):
     """Einladung per Kopplungscode annehmen (optional mit eigenem Anker-Fall)."""
     code: str = Field(..., min_length=4, max_length=32)

@@ -15,10 +15,14 @@
  */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { casesApi } from '@/api/cases'
+import { coupleApi } from '@/api/couple'
 import { coupleCompanionApi } from '@/api/coupleCompanion'
 import type { CoupleSceneDraft, CoupleThreadKind } from '@/api/coupleCompanion'
 import { scenesApi } from '@/api/scenes'
+import Avatar from '@/components/Avatar'
+import { RELATIONSHIP_TYPE_LABELS } from '@/types'
 import EchoThinking from './EchoThinking'
 import Fehlermeldung from '@/components/Fehlermeldung'
 
@@ -193,12 +197,18 @@ export default function SceneFromChat({
     )
   }
 
+  // ── Kein Fall zugeordnet ──────────────────────────────────────────
+  // Frueher stand hier „Dafuer brauchst du einen eigenen Fall in EchoB" und der Knopf
+  // war tot. Das stimmte selten: Meistens HAT die Person einen Fall, sie hat ihn nur nie
+  // diesem Paarraum zugeordnet — waehlbar war das bis dahin allein beim Beitreten.
+  if (!caseId) return <FallWaehlen coupleId={coupleId} />
+
   // ── Anstoß ────────────────────────────────────────────────────────
   return (
     <div>
       <button
         onClick={() => bauen.mutate()}
-        disabled={!genugGesagt || !caseId || bauen.isPending}
+        disabled={!genugGesagt || bauen.isPending}
         className="rounded-brand border border-brand-border px-3.5 py-3 text-left transition hover:border-accent/50 disabled:opacity-50 w-full"
       >
         <p className="text-sm font-semibold text-navy">
@@ -207,12 +217,79 @@ export default function SceneFromChat({
             : 'Szene erstellen'}
         </p>
         <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
-          {caseId
-            ? 'Echo macht daraus einen Eintrag für deinen Fall – du prüfst ihn vorher.'
-            : 'Dafür brauchst du einen eigenen Fall in EchoB.'}
+          {'Echo macht daraus einen Eintrag für deinen Fall – du prüfst ihn vorher.'}
         </p>
       </button>
       <Fehlermeldung error={bauen.error} />
+    </div>
+  )
+}
+
+/**
+ * „Wohin soll die Szene?" — der fehlende Schritt.
+ *
+ * Der Anker-Fall sagt nur, wohin eine hier entstandene Szene gespeichert werden darf.
+ * Er gibt der Partnerperson keinerlei Zugriff und ihr wird auch nicht angezeigt, welcher
+ * es ist. Trotzdem ist die Wahl wichtig: Eine Szene über einen Streit mit der
+ * Partnerperson gehört nicht in einen Fall, der von jemand anderem handelt — sonst
+ * verfälscht sie dort Muster, Skalen und Berichte.
+ *
+ * Deshalb wird gefragt statt geraten, und deshalb steht die Frage hier, wo sie auftaucht,
+ * statt in einer Einstellung, die man erst suchen müsste.
+ */
+function FallWaehlen({ coupleId }: { coupleId: string }) {
+  const qc = useQueryClient()
+  const faelle = useQuery({ queryKey: ['cases'], queryFn: casesApi.list })
+
+  const zuordnen = useMutation({
+    mutationFn: (id: string) => coupleApi.setCase(coupleId, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['couple-link', coupleId] }),
+  })
+
+  const liste = (faelle.data?.cases ?? []).filter(c => !c.archived_at)
+
+  return (
+    <div className="rounded-brand border border-brand-border px-3.5 py-3">
+      <p className="text-sm font-semibold text-navy">Szene erstellen</p>
+
+      {faelle.isLoading ? (
+        <p className="mt-1 text-[0.72rem] text-brand-muted">Deine Fälle werden geladen …</p>
+      ) : liste.length === 0 ? (
+        <>
+          <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
+            Dafür brauchst du einen eigenen Fall – dort werden Szenen gesammelt.
+          </p>
+          <Link to="/app/cases/new" className="mt-2 inline-block text-xs font-semibold text-accent hover:underline">
+            Fall anlegen →
+          </Link>
+        </>
+      ) : (
+        <>
+          <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
+            Zu welchem deiner Fälle gehört dieser Paarraum? Dorthin werden Szenen von hier
+            gespeichert. Deine Partnerperson erfährt das nicht.
+          </p>
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            {liste.map(c => (
+              <button
+                key={c.id}
+                onClick={() => zuordnen.mutate(c.id)}
+                disabled={zuordnen.isPending}
+                className="flex items-center gap-2 rounded-brand border border-brand-border bg-white px-3 py-2 text-left text-xs transition-colors hover:border-accent/50 disabled:opacity-50"
+              >
+                <Avatar value={c.avatar} size="xs" />
+                <span className="font-medium text-navy">
+                  {c.person_name?.trim() || RELATIONSHIP_TYPE_LABELS[c.relationship_type]}
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-[0.68rem] leading-snug text-brand-muted">
+            Änderbar bleibt das jederzeit – die Zuordnung gibt keinen Zugriff auf den Fall.
+          </p>
+        </>
+      )}
+      <Fehlermeldung error={zuordnen.error ?? faelle.error} />
     </div>
   )
 }

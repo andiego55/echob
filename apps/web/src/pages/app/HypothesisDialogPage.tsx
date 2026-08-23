@@ -17,6 +17,7 @@ import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
 import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import DialogKopf, { DialogKopfKnopf } from '@/components/app/DialogKopf'
 
 export default function HypothesisDialogPage() {
   const bestaetigen = useBestaetigen()
@@ -121,33 +122,26 @@ export default function HypothesisDialogPage() {
 
       <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
         {/* Sub-Header */}
-        <div className="border-b border-brand-border bg-white px-6 py-3 flex items-center justify-between gap-4 flex-shrink-0">
-          <div>
-            <span className="label text-xs">Hypothese</span>
-            <p className="mt-0.5 flex items-center gap-2 text-sm font-semibold text-navy">
-              <HypothesisIcon path={hyp.icon} size="sm" /> {hyp.label}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={() => summaryMutation.mutate()}
-              disabled={summaryMutation.isPending || visibleMessages.length === 0}
-              className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-xs font-medium text-navy hover:bg-brand-bg transition-colors disabled:opacity-40"
-            >
-              {summaryMutation.isPending ? 'Wird erstellt …' : 'Hypothese zusammenfassen'}
-            </button>
-            <button
-              onClick={handleReset}
-              disabled={resetMutation.isPending || visibleMessages.length === 0}
-              className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40"
-            >
-              Zurücksetzen
-            </button>
-            <button onClick={() => navigate(`/app/cases/${caseId}/hypotheses`)} className="text-xs text-brand-muted hover:text-navy transition-colors ml-2">
-              ← Zurück
-            </button>
-          </div>
-        </div>
+        <DialogKopf
+          augenbraue="Hypothese"
+          titel={hyp.label}
+          symbol={<HypothesisIcon path={hyp.icon} size="sm" />}
+          onZurueck={() => navigate(`/app/cases/${caseId}/hypotheses`)}
+        >
+          <DialogKopfKnopf
+            onClick={() => summaryMutation.mutate()}
+            disabled={summaryMutation.isPending || visibleMessages.length === 0}
+          >
+            {summaryMutation.isPending ? 'Wird erstellt …' : 'Hypothese zusammenfassen'}
+          </DialogKopfKnopf>
+          <DialogKopfKnopf
+            onClick={handleReset}
+            disabled={resetMutation.isPending || visibleMessages.length === 0}
+            gefahr
+          >
+            Zurücksetzen
+          </DialogKopfKnopf>
+        </DialogKopf>
 
         {/* Chat-Bereich */}
         <div className="flex-1 overflow-y-auto">

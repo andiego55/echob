@@ -128,13 +128,21 @@ export default function PrintSummaryPage() {
             <p className="text-xs text-brand-muted mb-2">Skala 0–5, aus den dokumentierten Szenen geschätzt. Konfidenz in Klammern.</p>
             <div className="space-y-1.5">
               {relevantScales.map(s => (
-                <div key={s.scale_key} className="flex items-center gap-3 text-sm">
-                  <span className="w-52 flex-shrink-0">{SCALE_LABELS[s.scale_key] ?? s.label ?? s.scale_key}</span>
-                  <span className="flex-1 h-2 rounded-full border border-brand-border overflow-hidden">
-                    <span className="block h-full bg-accent print:bg-navy" style={{ width: `${(s.score / 5) * 100}%` }} />
+                <div key={s.scale_key}
+                     className="text-sm sm:flex sm:items-center sm:gap-3 print:flex print:items-center print:gap-3">
+                  <span className="block sm:w-52 sm:flex-shrink-0 print:w-52 print:flex-shrink-0">
+                    {SCALE_LABELS[s.scale_key] ?? s.label ?? s.scale_key}
                   </span>
-                  <span className="w-24 flex-shrink-0 text-right text-brand-muted tabular-nums">
-                    {s.score.toFixed(1)}/5 ({confidenceLabel(s.confidence)})
+                  {/* Auf schmalen Schirmen stehen Balken und Zahl unter dem Namen.
+                      Nebeneinander blieb dem Balken rechnerisch keine Breite. */}
+                  <span className="mt-1 flex items-center gap-3 sm:mt-0 sm:flex-1 print:mt-0 print:flex-1">
+                    <span className="h-2 flex-1 overflow-hidden rounded-full border border-brand-border">
+                      <span className="block h-full bg-accent print:bg-navy"
+                            style={{ width: `${(s.score / 5) * 100}%` }} />
+                    </span>
+                    <span className="flex-shrink-0 text-right text-brand-muted tabular-nums sm:w-24 print:w-24">
+                      {s.score.toFixed(1)}/5 ({confidenceLabel(s.confidence)})
+                    </span>
                   </span>
                 </div>
               ))}
@@ -189,9 +197,11 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex gap-3 text-sm py-0.5">
-      <span className="w-52 flex-shrink-0 text-brand-muted">{label}</span>
-      <span className="flex-1 text-brand-text">{value}</span>
+    <div className="py-0.5 text-sm sm:flex sm:gap-3 print:flex print:gap-3">
+      <span className="block text-brand-muted sm:w-52 sm:flex-shrink-0 print:w-52 print:flex-shrink-0">
+        {label}
+      </span>
+      <span className="block text-brand-text sm:flex-1 print:flex-1">{value}</span>
     </div>
   )
 }

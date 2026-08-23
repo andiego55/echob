@@ -47,7 +47,7 @@ export default function StudentHypothesesPage() {
             const s = byType[h.id]
             return (
               <div key={h.id} className="card">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                   <div className="flex min-w-0 items-start gap-3">
                     <HypothesisIcon path={h.icon} />
                     <div className="min-w-0">
@@ -57,7 +57,7 @@ export default function StudentHypothesesPage() {
                   </div>
                   <button
                     onClick={() => navigate(`/student/cases/${id}/hypotheses/${h.id}`)}
-                    className="shrink-0 text-xs font-semibold text-accent hover:underline"
+                    className="text-xs font-semibold text-accent hover:underline sm:shrink-0"
                   >
                     {s ? 'Dialog erneut führen →' : 'Dialog starten →'}
                   </button>

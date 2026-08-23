@@ -29,6 +29,7 @@ from app.schemas.couple import (
     CoupleInvitePublic,
     CoupleLinkAccept,
     CoupleLinkAcceptResponse,
+    CoupleLinkCaseUpdate,
     CoupleLinkCreate,
     CoupleLinkResponse,
     CoupleProgress,
@@ -151,6 +152,35 @@ async def accept_link(
         already=payload.get("already", False),
         couple_id=payload.get("couple_id"),
     )
+
+
+@router.patch("/links/{couple_id}", response_model=CoupleLinkResponse)
+async def set_link_case(
+    couple_id: UUID,
+    body: CoupleLinkCaseUpdate,
+    current=Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CoupleLinkResponse:
+    """Legt fest, zu welchem eigenen Fall dieser Paarraum gehoert.
+
+    **Warum es das gibt.** Der Anker-Fall liess sich bisher nur beim Anlegen oder
+    Annehmen waehlen. Wer damals keinen Fall hatte - oder einen ueber eine andere
+    Person -, kam nie wieder an die Einstellung heran und konnte „Szene erstellen"
+    dauerhaft nicht benutzen. Die Spalte war von Anfang an dafuer vorgesehen
+    (Migration 69: „kann spaeter gesetzt werden"), der Weg dorthin fehlte.
+
+    **Was der Fall NICHT bewirkt:** keinen Datenzugriff, in keine Richtung. Er
+    beantwortet allein die Frage, wohin eine im Paarraum entstandene Szene
+    gespeichert werden darf. Die Partnerperson erfaehrt nichts davon.
+
+    ``case_id: null`` loest die Zuordnung wieder.
+    """
+    user_id = current["user_id"]
+    async with pool.acquire() as conn:
+        link = await cts.require_couple_member(conn, couple_id, user_id)
+        await _require_owned_case(conn, body.case_id, user_id)
+        link = await cts.set_anchor_case(conn, link, user_id, body.case_id)
+        return await _to_response(conn, link, user_id)
 
 
 @router.delete("/links/{couple_id}")

@@ -114,6 +114,16 @@ export const coupleApi = {
     apiClient
       .get<CoupleInvitePublic>(`/couple/invites/${encodeURIComponent(code)}`)
       .then(r => r.data),
+
+  /**
+   * Legt fest, zu welchem eigenen Fall dieser Paarraum gehört.
+   *
+   * Reine Herkunftsangabe, kein Datenzugriff: Sie entscheidet nur, wohin eine im
+   * Paarraum entstandene Szene gespeichert werden darf. `null` löst die Zuordnung.
+   */
+  setCase: (coupleId: string, caseId: string | null) =>
+    apiClient.patch<CoupleLink>(`/couple/links/${coupleId}`, { case_id: caseId })
+      .then(r => r.data),
 }
 
 /** 8-stelligen Kopplungscode zur Anzeige gruppieren (XXXX-XXXX). */

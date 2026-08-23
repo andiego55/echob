@@ -154,6 +154,23 @@ async def require_couple_member(conn, couple_id, user_id) -> dict:
     return dict(row)
 
 
+async def set_anchor_case(conn, link: dict, user_id, case_id) -> dict:
+    """Setzt den Anker-Fall der ANFRAGENDEN Person — nie den der anderen.
+
+    Welche Spalte gilt, haengt an der Rolle. Die Zugehoerigkeit ist vom Aufrufer
+    bereits geprueft (`require_couple_member`), die Eigentuemerschaft am Fall vom
+    Router (`_require_owned_case`).
+    """
+    spalte = ("initiator_case_id"
+              if str(link["initiator_user_id"]) == str(user_id)
+              else "partner_case_id")
+    row = await conn.fetchrow(
+        f"UPDATE couple_links SET {spalte} = $2 WHERE id = $1 RETURNING *",  # noqa: S608
+        link["id"], case_id,
+    )
+    return dict(row)
+
+
 def partner_of(link: dict, user_id) -> str | None:
     """Die jeweils andere Person im Paarraum (oder None, solange die Einladung offen ist)."""
     if str(link["initiator_user_id"]) == str(user_id):
