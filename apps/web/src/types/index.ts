@@ -702,7 +702,7 @@ export interface ScaleScore {
   case_id: string
   scale_key: ScaleKey
   label: string
-  score: number     // 0-5
+  score: number     // 0–100 (seit Migration 06)
   scene_count: number
   confidence: Confidence
   source_scene_ids: string[]

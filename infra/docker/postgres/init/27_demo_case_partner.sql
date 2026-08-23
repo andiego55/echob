@@ -89,10 +89,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ── Skalen (Marcos Wahrnehmung von Lena) ─────────────────────────────────────
 INSERT INTO scale_scores (case_id, user_id, scale_key, score, scene_count, confidence, notes)
 VALUES
-('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'guilt_shifting',        3.6, 5, 'medium', 'Marco erlebt sich regelhaft als der Schuldige.'),
-('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'proximity_distance',    3.8, 5, 'medium', 'Erlebt Lenas Rückzüge und Trennungsandrohungen als Liebesentzug.'),
-('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'conflict_escalation',   3.2, 4, 'medium', 'Gut gemeinte Rückmeldungen kippen schnell in Streit.'),
-('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'perception_distortion', 2.8, 3, 'low',    'Fühlt seine Absichten (Sorge, Planung) systematisch umgedeutet.')
+('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'guilt_shifting',        72,  5, 'medium', 'Marco erlebt sich regelhaft als der Schuldige.'),
+('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'proximity_distance',    76,  5, 'medium', 'Erlebt Lenas Rückzüge und Trennungsandrohungen als Liebesentzug.'),
+('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'conflict_escalation',   64,  4, 'medium', 'Gut gemeinte Rückmeldungen kippen schnell in Streit.'),
+('dec01000-0000-4000-a000-0000000000cb', 'dec01000-0000-4000-a000-000000000002', 'perception_distortion', 56,  3, 'low',    'Fühlt seine Absichten (Sorge, Planung) systematisch umgedeutet.')
 ON CONFLICT (case_id, scale_key) DO NOTHING;
 
 -- ── Themen-Zusammenfassungen (Marcos Sicht) ──────────────────────────────────

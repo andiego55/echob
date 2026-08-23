@@ -275,10 +275,10 @@ export default function ReportDetailPage() {
                     return <PatternTagsSection key={`pt${i}`} tags={item.tags} cfg={cfg} />
                   }
                   if (item.kind === 'scales_dynamic') {
-                    return <ScaleBarsSection key={`sd${i}`} scales={item.scales} title="Beziehungsdynamiken — Skalenwerte" subtitle="Einschätzung auf Basis deiner Szenen · Skala 0–5" mode="dynamic" />
+                    return <ScaleBarsSection key={`sd${i}`} scales={item.scales} title="Beziehungsdynamiken — Skalenwerte" subtitle="Einschätzung auf Basis deiner Szenen · Skala 0–100" mode="dynamic" />
                   }
                   if (item.kind === 'scales_personality') {
-                    return <ScaleBarsSection key={`sp${i}`} scales={item.scales} title="Persönlichkeitsprofil der anderen Person" subtitle="Aus den Szenen abgeleitete Ausprägungen · Skala 0–5" mode="personality" />
+                    return <ScaleBarsSection key={`sp${i}`} scales={item.scales} title="Persönlichkeitsprofil der anderen Person" subtitle="Aus den Szenen abgeleitete Ausprägungen · Skala 0–100" mode="personality" />
                   }
                   if (item.kind === 'scene_timeline') {
                     return <SceneTimelineSection key={`tl${i}`} timeline={item.timeline} />
@@ -367,15 +367,18 @@ function ScaleBarsSection({ scales, title, subtitle, mode }: {
   if (!scales || scales.length === 0) return null
 
   const barColor = (score: number, m: typeof mode) => {
+    // Schwellen auf der 0–100-Skala. Vorher standen hier 4 / 3 / 2 – Werte aus der
+    // Zeit vor Migration 06. Seitdem war die oberste Stufe immer erfüllt und jede
+    // Skala rot, egal wie hoch sie wirklich lag.
     if (m === 'personality') {
-      if (score >= 4) return 'bg-blue-600'
-      if (score >= 3) return 'bg-blue-500'
-      if (score >= 2) return 'bg-blue-400'
+      if (score >= 80) return 'bg-blue-600'
+      if (score >= 60) return 'bg-blue-500'
+      if (score >= 40) return 'bg-blue-400'
       return 'bg-blue-300'
     }
-    if (score >= 4) return 'bg-red-500'
-    if (score >= 3) return 'bg-amber-400'
-    if (score >= 2) return 'bg-yellow-300'
+    if (score >= 80) return 'bg-red-500'
+    if (score >= 60) return 'bg-amber-400'
+    if (score >= 40) return 'bg-yellow-300'
     return 'bg-teal-300'
   }
 
@@ -401,13 +404,13 @@ function ScaleBarsSection({ scales, title, subtitle, mode }: {
                   <span className="text-xs font-medium text-navy">{s.label}</span>
                 </div>
                 <span className="text-xs font-bold text-brand-muted ml-3 flex-shrink-0 tabular-nums">
-                  {s.score.toFixed(1)}<span className="font-normal opacity-50">/5</span>
+                  {Math.round(s.score)}<span className="font-normal opacity-50">/100</span>
                 </span>
               </div>
               <div className="scale-track h-2.5 bg-brand-bg rounded-full overflow-hidden">
                 <div
                   className={`h-full ${barColor(s.score, mode)} rounded-full`}
-                  style={{ width: `${(s.score / 5) * 100}%` }}
+                  style={{ width: `${Math.min(100, Math.max(0, s.score))}%` }}
                 />
               </div>
             </div>
@@ -557,15 +560,15 @@ function ProfileScoresSection({ scores, title, subtitle, mode, patterns }: {
   const barColor = (score: number, m: typeof mode) => {
     if (m === 'user') {
       // Teal gradient — neutral, not alarm-coded
-      if (score >= 4.5) return 'bg-teal-600'
-      if (score >= 3.5) return 'bg-teal-500'
-      if (score >= 2.5) return 'bg-teal-400'
+      if (score >= 90) return 'bg-teal-600'
+      if (score >= 70) return 'bg-teal-500'
+      if (score >= 50) return 'bg-teal-400'
       return 'bg-teal-300'
     }
     // Person profile: orange/red gradient for concerning traits
-    if (score >= 4) return 'bg-orange-500'
-    if (score >= 3) return 'bg-amber-400'
-    if (score >= 2) return 'bg-yellow-300'
+    if (score >= 80) return 'bg-orange-500'
+    if (score >= 60) return 'bg-amber-400'
+    if (score >= 40) return 'bg-yellow-300'
     return 'bg-gray-200'
   }
 
@@ -605,13 +608,13 @@ function ProfileScoresSection({ scores, title, subtitle, mode, patterns }: {
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-medium text-navy">{s.label}</span>
                 <span className="text-xs font-bold text-brand-muted ml-2 flex-shrink-0 tabular-nums">
-                  {s.score.toFixed(1)}<span className="font-normal opacity-50">/5</span>
+                  {Math.round(s.score)}<span className="font-normal opacity-50">/100</span>
                 </span>
               </div>
               <div className="h-2.5 bg-brand-bg rounded-full overflow-hidden">
                 <div
                   className={`h-full ${barColor(s.score, mode)} rounded-full`}
-                  style={{ width: `${(s.score / 5) * 100}%` }}
+                  style={{ width: `${Math.min(100, Math.max(0, s.score))}%` }}
                 />
               </div>
             </div>

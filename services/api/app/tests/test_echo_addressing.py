@@ -36,3 +36,24 @@ def test_person_profile_context_uses_person_name():
 def test_person_profile_context_without_name_is_neutral():
     ctx = build_person_context({"modules": {}})
     assert "Pseudonym) der anderen Person" not in ctx
+
+
+def test_skalen_gehen_als_0_bis_100_an_echo():
+    """Der Wertebereich, den Echo genannt bekommt, muss der echte sein.
+
+    Migration 06 hat die Skala von 0-5 auf 0-100 gehoben; der Berechnungs-Prompt sagt
+    seither ausdruecklich "Alle Skalen laufen von 0 bis 100". Der Kontextbau blieb bei
+    "/5" stehen - Echo las also monatelang Werte wie "88.0/5". Ein unmoeglicher Wert im
+    Systemtext ist keine Schoenheitsfrage: Er verzerrt, wie stark das Modell eine
+    Auspraegung einschaetzt.
+    """
+    text = build_case_context(
+        case={"relationship_type": "partner", "relationship_status": "together",
+              "contact_frequency": "daily"},
+        onboarding=None,
+        scenes=[],
+        scale_scores=[{"scale_key": "guilt_shifting", "label": "Schuldumkehr",
+                       "score": 88.0, "confidence": "high", "scene_count": 8}],
+    )
+    assert "88/100" in text
+    assert "/5" not in text, "die alte Skala darf nirgends mehr auftauchen"

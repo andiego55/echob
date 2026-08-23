@@ -568,19 +568,21 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
               {bundle.scales.filter(s => (Number(s.score) || 0) > 0).map(s => {
                 const score = Number(s.score) || 0
                 const label = SCALE_LABELS[s.scale_key as ScaleKey] ?? s.scale_key
-                const tone = score >= 3.6
+                // 0–100-Skala (Migration 06). Mit den alten Schwellen 3.6 / 2.4 war
+                // jede Skala rot – für eine Fachperson die denkbar irreführendste Anzeige.
+                const tone = score >= 72
                   ? { bar: 'bg-red-500', text: 'text-red-600' }
-                  : score >= 2.4
+                  : score >= 48
                     ? { bar: 'bg-amber-400', text: 'text-amber-600' }
                     : { bar: 'bg-green-500', text: 'text-green-600' }
                 return (
                   <div key={s.scale_key} className="flex items-center gap-3">
                     <span className="w-36 shrink-0 truncate text-xs font-medium text-navy" title={label}>{label}</span>
                     <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-brand-border/70">
-                      <div className={`h-full rounded-full transition-all ${tone.bar}`} style={{ width: `${Math.min(100, Math.round((score / 5) * 100))}%` }} />
+                      <div className={`h-full rounded-full transition-all ${tone.bar}`} style={{ width: `${Math.min(100, Math.max(0, Math.round(score)))}%` }} />
                     </div>
                     <span className={`w-12 shrink-0 text-right text-sm font-bold tabular-nums ${tone.text}`}>
-                      {score.toFixed(1)}<span className="text-[10px] font-normal text-brand-muted">/5</span>
+                      {Math.round(score)}<span className="text-[10px] font-normal text-brand-muted">/100</span>
                     </span>
                   </div>
                 )

@@ -135,13 +135,13 @@ ON CONFLICT (id) DO NOTHING;
 -- ── Skalenwerte (aus den Szenen abgeleitet) ──────────────────────────────────
 INSERT INTO scale_scores (case_id, user_id, scale_key, score, scene_count, confidence, notes)
 VALUES
-('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'guilt_shifting',        4.6, 8, 'high',   'Konflikte enden regelhaft mit Lenas Entschuldigung.'),
-('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'perception_distortion', 4.4, 6, 'high',   'Wiederholtes Infragestellen ihrer Wahrnehmung und Erinnerung.'),
-('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'boundary_violation',    4.3, 7, 'high',   'Grenzen werden übergangen, Neins umgedeutet.'),
-('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'control_isolation',     4.0, 6, 'medium', 'Kontostruktur, Handy, Rückzug von Freundinnen.'),
-('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'proximity_distance',    3.8, 5, 'medium', 'Idealisierung und Liebesentzug im Wechsel.'),
-('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'conflict_escalation',   3.4, 4, 'medium', 'Eskalation aus Nichtigkeiten, dann eisige Stille.'),
-('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'safety_risk',           2.6, 3, 'low',    'Keine körperliche Gewalt geschildert; psychische Belastung hoch.')
+('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'guilt_shifting',        92,  8, 'high',   'Konflikte enden regelhaft mit Lenas Entschuldigung.'),
+('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'perception_distortion', 88,  6, 'high',   'Wiederholtes Infragestellen ihrer Wahrnehmung und Erinnerung.'),
+('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'boundary_violation',    86,  7, 'high',   'Grenzen werden übergangen, Neins umgedeutet.'),
+('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'control_isolation',     80,  6, 'medium', 'Kontostruktur, Handy, Rückzug von Freundinnen.'),
+('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'proximity_distance',    76,  5, 'medium', 'Idealisierung und Liebesentzug im Wechsel.'),
+('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'conflict_escalation',   68,  4, 'medium', 'Eskalation aus Nichtigkeiten, dann eisige Stille.'),
+('dec01000-0000-4000-a000-0000000000ca', 'dec01000-0000-4000-a000-000000000001', 'safety_risk',           52,  3, 'low',    'Keine körperliche Gewalt geschildert; psychische Belastung hoch.')
 ON CONFLICT (case_id, scale_key) DO NOTHING;
 
 -- ── Themen-Zusammenfassungen ─────────────────────────────────────────────────

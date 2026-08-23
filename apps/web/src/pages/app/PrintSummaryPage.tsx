@@ -125,7 +125,7 @@ export default function PrintSummaryPage() {
         {/* Muster / Skalen */}
         {relevantScales.length > 0 && (
           <Section title="Eingeschätzte Muster (Skalen)">
-            <p className="text-xs text-brand-muted mb-2">Skala 0–5, aus den dokumentierten Szenen geschätzt. Konfidenz in Klammern.</p>
+            <p className="text-xs text-brand-muted mb-2">Skala 0–100, aus den dokumentierten Szenen geschätzt. Konfidenz in Klammern.</p>
             <div className="space-y-1.5">
               {relevantScales.map(s => (
                 <div key={s.scale_key}
@@ -138,10 +138,10 @@ export default function PrintSummaryPage() {
                   <span className="mt-1 flex items-center gap-3 sm:mt-0 sm:flex-1 print:mt-0 print:flex-1">
                     <span className="h-2 flex-1 overflow-hidden rounded-full border border-brand-border">
                       <span className="block h-full bg-accent print:bg-navy"
-                            style={{ width: `${(s.score / 5) * 100}%` }} />
+                            style={{ width: `${Math.min(100, Math.max(0, s.score))}%` }} />
                     </span>
                     <span className="flex-shrink-0 text-right text-brand-muted tabular-nums sm:w-24 print:w-24">
-                      {s.score.toFixed(1)}/5 ({confidenceLabel(s.confidence)})
+                      {Math.round(s.score)}/100 ({confidenceLabel(s.confidence)})
                     </span>
                   </span>
                 </div>

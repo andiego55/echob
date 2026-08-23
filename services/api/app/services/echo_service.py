@@ -158,7 +158,7 @@ def build_case_context(
             for s in sorted(relevant, key=lambda x: x.get("score", 0), reverse=True):
                 label = s.get("label") or s.get("scale_key", "")
                 lines.append(
-                    f"- {label}: {s['score']:.1f}/5 "
+                    f"- {label}: {s['score']:.0f}/100 "
                     f"(Konfidenz: {s.get('confidence', '–')}, {s.get('scene_count', 0)} Szenen)"
                 )
             lines.append("")
