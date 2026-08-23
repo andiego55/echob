@@ -11,7 +11,7 @@ export interface CoupleCheckinEntry {
   name: string
   is_own: boolean
   done: boolean
-  mood: string | null
+  moods: string[]
   highlight: string | null
   wish: string | null
   visible: boolean
@@ -29,7 +29,7 @@ export interface CoupleCheckinWeek {
 
 export interface CoupleCheckinHistoryWeek {
   week_start: string
-  moods: { user_id: string; name: string; mood: string | null; is_own: boolean }[]
+  moods: { user_id: string; name: string; moods: string[]; is_own: boolean }[]
 }
 
 export const coupleRhythmApi = {
@@ -38,7 +38,7 @@ export const coupleRhythmApi = {
 
   saveCheckin: (
     coupleId: string,
-    body: { mood?: string | null; highlight?: string | null; wish?: string | null },
+    body: { moods?: string[]; highlight?: string | null; wish?: string | null },
   ) => apiClient.put<CoupleCheckinWeek>(`/couple/links/${coupleId}/checkin`, body).then(r => r.data),
 
   history: (coupleId: string) =>

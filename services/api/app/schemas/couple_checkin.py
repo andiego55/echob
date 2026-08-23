@@ -13,7 +13,8 @@ from pydantic import BaseModel, Field
 
 
 class CoupleCheckinSave(BaseModel):
-    mood: str | None = None
+    #: Mehrere sind erlaubt - eine Woche ist selten nur eines.
+    moods: list[str] | None = None
     highlight: str | None = Field(None, max_length=600)
     wish: str | None = Field(None, max_length=600)
 
@@ -23,7 +24,7 @@ class CoupleCheckinEntry(BaseModel):
     name: str
     is_own: bool
     done: bool
-    mood: str | None = None
+    moods: list[str] = []
     highlight: str | None = None
     wish: str | None = None
     #: false = ausgefuellt, aber noch verdeckt, weil du selbst noch nicht dran warst
@@ -42,7 +43,7 @@ class CoupleCheckinWeek(BaseModel):
 class CoupleCheckinMood(BaseModel):
     user_id: str
     name: str
-    mood: str | None = None
+    moods: list[str] = []
     is_own: bool
 
 

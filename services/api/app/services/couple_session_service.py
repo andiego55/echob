@@ -26,14 +26,31 @@ MAX_CONTEXT_CHARS = 6000
 # So viele Beiträge bekommt Echo als Verlauf mit.
 HISTORY_LIMIT = 40
 
-# Stimmungs-Check vor dem Gespräch (Kürzel → Klartext für Echo und Anzeige).
+# Der gemeinsame Stimmungs-Wortschatz (Kürzel → Klartext für Echo und Anzeige).
+#
+# Geteilt zwischen dem Stimmungs-Check VOR einem Gespräch (eine Angabe) und dem
+# wöchentlichen Check-in (mehrere). Eine Liste, damit Vorbereitung, Check-in, Rückblick
+# und Echo dieselbe Sprache sprechen.
+#
+# Die Reihenfolge ist die Anzeigereihenfolge und bewusst gewählt: von gesammelt über
+# angespannt zu schwer. Sie soll niemanden dazu bringen, gleich unten anzufangen.
 MOOD_LABELS: dict[str, str] = {
-    "ruhig":       "ruhig und offen",
-    "angespannt":  "angespannt",
-    "traurig":     "traurig",
-    "wuetend":     "wütend",
-    "erschoepft":  "erschöpft",
+    "ruhig":         "ruhig",
     "hoffnungsvoll": "hoffnungsvoll",
+    "verbunden":     "verbunden",
+    "dankbar":       "dankbar",
+    "erleichtert":   "erleichtert",
+    "unsicher":      "unsicher",
+    "angespannt":    "angespannt",
+    "gereizt":       "gereizt",
+    "ueberfordert":  "überfordert",
+    "erschoepft":    "erschöpft",
+    "traurig":       "traurig",
+    "einsam":        "einsam",
+    "enttaeuscht":   "enttäuscht",
+    "verletzt":      "verletzt",
+    "wuetend":       "wütend",
+    "leer":          "leer",
 }
 
 

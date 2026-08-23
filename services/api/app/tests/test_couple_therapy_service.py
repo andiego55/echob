@@ -722,7 +722,7 @@ async def _fill_room(db, user_a, user_b, couple_id):
     await ctest.save_run(db, couple_id, user_a, slug="bindung", title="B",
                          answers={}, result={})
     await cps.add_private_message(db, session["id"], user_a, role="user", content="PRIVAT")
-    await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="CHECKIN_VON_ALEX",
+    await cchk.save(db, couple_id, user_a, moods=["ruhig"], highlight="CHECKIN_VON_ALEX",
                     wish="MEHR ZEIT")
     await cappr.leave(db, couple_id, user_a, "DANKE_VON_ALEX")
     await cbar.set_value(db, couple_id, user_a, 7, "BAROMETER_VON_ALEX")
@@ -1294,16 +1294,16 @@ async def test_context_length_is_capped(db):
 async def test_checkin_hidden_until_you_wrote_your_own(db):
     """Erst schreiben, dann sehen — wie überall im Modul."""
     user_a, _, user_b, _, couple_id = await _linked_pair(db)
-    await cchk.save(db, couple_id, user_b, mood="ruhig", highlight="SPAZIERGANG",
+    await cchk.save(db, couple_id, user_b, moods=["ruhig"], highlight="SPAZIERGANG",
                     wish="MEHR ZEIT")
 
     verdeckt = await cchk.load_week(db, couple_id, user_a)
     fremd = next(e for e in verdeckt["entries"] if not e["is_own"])
     assert fremd["done"] is True          # dass sie da war, sieht man
     assert fremd["visible"] is False      # was sie schrieb, noch nicht
-    assert fremd["highlight"] is None and fremd["wish"] is None and fremd["mood"] is None
+    assert fremd["highlight"] is None and fremd["wish"] is None and fremd["moods"] == []
 
-    await cchk.save(db, couple_id, user_a, mood="hoffnungsvoll", highlight="KAFFEE")
+    await cchk.save(db, couple_id, user_a, moods=["hoffnungsvoll"], highlight="KAFFEE")
     offen = await cchk.load_week(db, couple_id, user_a)
     fremd = next(e for e in offen["entries"] if not e["is_own"])
     assert fremd["visible"] is True
@@ -1314,7 +1314,7 @@ async def test_checkin_hidden_until_you_wrote_your_own(db):
 async def test_checkin_is_one_entry_per_person_and_week(db):
     """Zweimal antworten ergänzt denselben Eintrag, statt einen zweiten anzulegen."""
     user_a, _, _, _, couple_id = await _linked_pair(db)
-    await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="ERSTES")
+    await cchk.save(db, couple_id, user_a, moods=["ruhig"], highlight="ERSTES")
     await cchk.save(db, couple_id, user_a, wish="ZWEITES")
 
     anzahl = await db.fetchval(
@@ -1340,13 +1340,13 @@ async def test_checkin_free_text_is_encrypted_at_rest(db):
 async def test_checkin_history_groups_by_week_and_names_both(db):
     """Der Zeitstrahl zeigt beide Stimmungen je Woche — und keinen Freitext."""
     user_a, _, user_b, _, couple_id = await _linked_pair(db)
-    await cchk.save(db, couple_id, user_a, mood="ruhig", highlight="NICHT IM VERLAUF")
-    await cchk.save(db, couple_id, user_b, mood="erschoepft")
+    await cchk.save(db, couple_id, user_a, moods=["ruhig"], highlight="NICHT IM VERLAUF")
+    await cchk.save(db, couple_id, user_b, moods=["erschoepft"])
 
     verlauf = await cchk.load_history(db, couple_id, user_a)
     assert len(verlauf) == 1                       # eine Woche, beide darin
     woche = verlauf[0]
-    assert {m["mood"] for m in woche["moods"]} == {"ruhig", "erschoepft"}
+    assert {tuple(m["moods"]) for m in woche["moods"]} == {("ruhig",), ("erschoepft",)}
     assert [m["is_own"] for m in woche["moods"]].count(True) == 1
     assert all(m["name"] for m in woche["moods"])  # Anzeigenamen aufgeloest
     assert "NICHT IM VERLAUF" not in str(verlauf)  # bewusst nur Stimmungen
@@ -1371,10 +1371,67 @@ async def test_checkin_closed_to_outsiders(db):
 
 
 async def test_checkin_rejects_unknown_mood(db):
+    """Eine unbekannte Angabe kippt die GANZE Auswahl - nicht nur sich selbst."""
     user_a, _, _, _, couple_id = await _linked_pair(db)
     with pytest.raises(HTTPException) as e:
-        await cchk.save(db, couple_id, user_a, mood="euphorisch")
+        await cchk.save(db, couple_id, user_a, moods=["ruhig", "euphorisch"])
     assert e.value.status_code == 400
+
+
+async def test_checkin_nimmt_mehrere_stimmungen(db):
+    """Der eigentliche Punkt der Aenderung.
+
+    Eine Woche ist selten nur eines. Genau das Nebeneinander - angespannt UND
+    hoffnungsvoll - ist die interessante Auskunft, fuer die Partnerperson wie fuer
+    den Rueckblick.
+    """
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await cchk.save(db, couple_id, user_a,
+                    moods=["angespannt", "hoffnungsvoll", "erschoepft"])
+
+    woche = await cchk.load_week(db, couple_id, user_a)
+    eigener = next(e for e in woche["entries"] if e["is_own"])
+    assert eigener["moods"] == ["angespannt", "hoffnungsvoll", "erschoepft"]
+
+
+async def test_checkin_entfernt_doppelte_und_haelt_die_reihenfolge(db):
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    zeile = await cchk.save(db, couple_id, user_a,
+                            moods=["traurig", "ruhig", "traurig"])
+    assert zeile["moods"] == ["traurig", "ruhig"]
+
+
+async def test_checkin_altzeile_ohne_liste_bleibt_lesbar(db):
+    """Bestandszeilen haben nur die alte Einzelspalte - sie duerfen nicht verschwinden.
+
+    Migration 92 macht keinen Backfill; gelesen wird ueber COALESCE. Ohne diese
+    Zusicherung faellt so eine Zeile still aus Anzeige und Rueckblick heraus.
+    """
+    user_a, _, _, _, couple_id = await _linked_pair(db)
+    await db.execute(
+        "INSERT INTO couple_checkins (couple_id, user_id, week_start, mood) "
+        "VALUES ($1, $2, date_trunc('week', CURRENT_DATE)::date, 'wuetend')",
+        couple_id, user_a)
+
+    woche = await cchk.load_week(db, couple_id, user_a)
+    eigener = next(e for e in woche["entries"] if e["is_own"])
+    assert eigener["moods"] == ["wuetend"]
+
+    verlauf = await cchk.load_history(db, couple_id, user_a)
+    assert ["wuetend"] in [m["moods"] for w in verlauf for m in w["moods"]]
+
+    stimmungen = (await cretro.load_stats(db, couple_id, user_a))["moods"]
+    assert {s["mood"] for s in stimmungen} == {"wuetend"}
+
+
+async def test_rueckblick_zaehlt_jede_stimmung_einzeln(db):
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    await cchk.save(db, couple_id, user_a, moods=["ruhig", "dankbar"])
+    await cchk.save(db, couple_id, user_b, moods=["dankbar"])
+
+    stimmungen = {s["mood"]: s["anzahl"]
+                  for s in (await cretro.load_stats(db, couple_id, user_a))["moods"]}
+    assert stimmungen == {"dankbar": 2, "ruhig": 1}
 
 
 # ── Rhythmus: Nachfrage zu Abmachungen ──────────────────────────────────────
@@ -1833,7 +1890,7 @@ async def test_retrospect_counts_what_happened(db):
     abm = await cas.propose(db, couple_id, user_a, body="Handy weg beim Essen")
     await cas.accept(db, abm["id"], user_b)
     await cappr.leave(db, couple_id, user_a, "Danke")
-    await cchk.save(db, couple_id, user_a, mood="ruhig")
+    await cchk.save(db, couple_id, user_a, moods=["ruhig"])
 
     stats = await cretro.load_stats(db, couple_id, user_a)
     assert stats["sessions_started"] == 1

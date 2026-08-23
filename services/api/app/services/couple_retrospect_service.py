@@ -63,9 +63,12 @@ async def load_stats(conn, couple_id, user_id, days: int = DEFAULT_DAYS) -> dict
     stimmungen = [
         {"mood": r["mood"], "anzahl": r["n"]}
         for r in await conn.fetch(
-            "SELECT mood, COUNT(*) AS n FROM couple_checkins "
-            "WHERE couple_id = $1 AND week_start >= $2 AND mood IS NOT NULL "
-            "GROUP BY mood ORDER BY n DESC", couple_id, von)
+            # Seit Migration 92 sind es mehrere je Woche. `COALESCE` holt
+            # Bestandszeilen mit, die nur die alte Einzelspalte haben.
+            "SELECT m AS mood, COUNT(*) AS n FROM couple_checkins, "
+            "  LATERAL unnest(COALESCE(moods, ARRAY[mood])) AS m "
+            "WHERE couple_id = $1 AND week_start >= $2 AND m IS NOT NULL "
+            "GROUP BY m ORDER BY n DESC, m", couple_id, von)
     ]
 
     # ── Gespräche, Themen, Abmachungen, Wertschätzung ────────────────────────

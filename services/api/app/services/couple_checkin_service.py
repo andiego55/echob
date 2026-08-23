@@ -41,24 +41,48 @@ def week_start(tag: date | None = None) -> date:
 
 
 def _decrypt(row: dict) -> dict:
-    return crypto.decrypt_fields(dict(row), "highlight", "wish")
+    d = crypto.decrypt_fields(dict(row), "highlight", "wish")
+    # Bestandszeilen haben nur `mood`. Nach aussen gibt es nur noch `moods`.
+    if not d.get("moods"):
+        d["moods"] = [d["mood"]] if d.get("mood") else []
+    return d
 
 
-async def save(conn, couple_id, user_id, *, mood=None, highlight=None, wish=None) -> dict:
-    """Legt den eigenen Check-in der laufenden Woche an oder aktualisiert ihn."""
+async def save(conn, couple_id, user_id, *, moods=None, highlight=None, wish=None) -> dict:
+    """Legt den eigenen Check-in der laufenden Woche an oder aktualisiert ihn.
+
+    ``moods`` ist eine Liste — eine Woche ist selten nur eines. Doppelte werden
+    entfernt, die Reihenfolge der Auswahl bleibt erhalten.
+
+    Die alte Spalte ``mood`` wird als ERSTER Eintrag mitgeschrieben. Sie ist damit
+    abgeleitet, nicht mehr die Wahrheit; sie existiert nur noch für Bestandszeilen
+    und Leser, die sie noch erwarten (siehe Migration 92).
+    """
     await require_couple_member(conn, couple_id, user_id)
-    if mood is not None and mood not in MOOD_LABELS:
-        raise HTTPException(status_code=400, detail="Unbekannte Stimmungsangabe.")
+
+    liste: list[str] | None = None
+    if moods is not None:
+        # Reihenfolge erhalten, Doppelte raus.
+        liste = list(dict.fromkeys(m for m in moods if m))
+        unbekannt = [m for m in liste if m not in MOOD_LABELS]
+        if unbekannt:
+            raise HTTPException(status_code=400, detail="Unbekannte Stimmungsangabe.")
+        if len(liste) > len(MOOD_LABELS):
+            raise HTTPException(status_code=400, detail="Zu viele Stimmungsangaben.")
+        liste = liste or None
+
     woche = week_start()
     row = await conn.fetchrow(
-        "INSERT INTO couple_checkins (couple_id, user_id, week_start, mood, highlight, wish) "
-        "VALUES ($1, $2, $3, $4, $5, $6) "
+        "INSERT INTO couple_checkins "
+        "  (couple_id, user_id, week_start, moods, mood, highlight, wish) "
+        "VALUES ($1, $2, $3, $4::text[], $5, $6, $7) "
         "ON CONFLICT (couple_id, user_id, week_start) DO UPDATE SET "
+        "  moods = COALESCE(EXCLUDED.moods, couple_checkins.moods), "
         "  mood = COALESCE(EXCLUDED.mood, couple_checkins.mood), "
         "  highlight = COALESCE(EXCLUDED.highlight, couple_checkins.highlight), "
         "  wish = COALESCE(EXCLUDED.wish, couple_checkins.wish) "
         "RETURNING *",
-        couple_id, user_id, woche, mood,
+        couple_id, user_id, woche, liste, (liste[0] if liste else None),
         crypto.encrypt((highlight or "").strip()[:MAX_CHARS]) if highlight else None,
         crypto.encrypt((wish or "").strip()[:MAX_CHARS]) if wish else None,
     )
@@ -81,7 +105,8 @@ async def load_week(conn, couple_id, user_id, woche: date | None = None) -> dict
     names = await load_member_names(conn, link)
 
     eigener = eintraege.get(str(user_id))
-    fertig = bool(eigener and (eigener.get("highlight") or eigener.get("wish") or eigener.get("mood")))
+    fertig = bool(eigener and (eigener.get("highlight") or eigener.get("wish")
+                               or eigener.get("moods")))
 
     ergebnis = []
     for uid, name in names.items():
@@ -93,7 +118,7 @@ async def load_week(conn, couple_id, user_id, woche: date | None = None) -> dict
             "name": name,
             "is_own": ist_eigen,
             "done": bool(eintrag),
-            "mood": eintrag.get("mood") if (eintrag and sichtbar) else None,
+            "moods": (eintrag.get("moods") or []) if (eintrag and sichtbar) else [],
             "highlight": eintrag.get("highlight") if (eintrag and sichtbar) else None,
             "wish": eintrag.get("wish") if (eintrag and sichtbar) else None,
             "visible": sichtbar,
@@ -117,7 +142,8 @@ async def load_history(conn, couple_id, user_id, limit: int = 12) -> list[dict]:
     """
     link = await require_couple_member(conn, couple_id, user_id)
     rows = await conn.fetch(
-        "SELECT week_start, user_id, mood FROM couple_checkins "
+        "SELECT week_start, user_id, COALESCE(moods, ARRAY[mood]) AS moods "
+        "FROM couple_checkins "
         "WHERE couple_id = $1 ORDER BY week_start DESC LIMIT $2",
         couple_id, limit * 2,
     )
@@ -128,7 +154,7 @@ async def load_history(conn, couple_id, user_id, limit: int = 12) -> list[dict]:
         w["moods"].append({
             "user_id": str(r["user_id"]),
             "name": names.get(str(r["user_id"])) or names.get(r["user_id"]) or "",
-            "mood": r["mood"],
+            "moods": [m for m in (r["moods"] or []) if m],
             "is_own": str(r["user_id"]) == str(user_id),
         })
     return sorted(wochen.values(), key=lambda w: w["week_start"], reverse=True)[:limit]

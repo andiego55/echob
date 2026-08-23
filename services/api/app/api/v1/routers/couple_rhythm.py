@@ -55,7 +55,7 @@ async def save_checkin(
     async with pool.acquire() as conn:
         await ccs.save(
             conn, couple_id, user_id,
-            mood=body.mood, highlight=body.highlight, wish=body.wish,
+            moods=body.moods, highlight=body.highlight, wish=body.wish,
         )
         woche = ccs.week_start()
         await progress.award(conn, couple_id, user_id, "checkin_done", woche.isoformat())

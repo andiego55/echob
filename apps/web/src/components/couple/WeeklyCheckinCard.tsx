@@ -28,7 +28,13 @@ export default function WeeklyCheckinCard({
   coupleId, ownAvatar, partnerAvatar,
 }: { coupleId: string; ownAvatar?: string | null; partnerAvatar?: string | null }) {
   const qc = useQueryClient()
-  const [mood, setMood] = useState<string | null>(null)
+  /**
+   * Mehrere Stimmungen, Reihenfolge der Auswahl.
+   *
+   * Eine Woche ist selten nur eines — angespannt UND hoffnungsvoll ist die
+   * ehrlichere Auskunft als beides gegeneinander abzuwägen.
+   */
+  const [moods, setMoods] = useState<string[]>([])
   const [highlight, setHighlight] = useState('')
   const [wish, setWish] = useState('')
   const [offen, setOffen] = useState(false)
@@ -49,7 +55,7 @@ export default function WeeklyCheckinCard({
 
   const save = useMutation({
     mutationFn: () => coupleRhythmApi.saveCheckin(coupleId, {
-      mood, highlight: highlight.trim() || null, wish: wish.trim() || null,
+      moods, highlight: highlight.trim() || null, wish: wish.trim() || null,
     }),
     onSuccess: (d: CoupleCheckinWeek) => {
       qc.setQueryData(['couple-checkin', coupleId], d)
@@ -64,7 +70,7 @@ export default function WeeklyCheckinCard({
   const fragen = data.questions
   const eigen = data.entries.find(e => e.is_own)
   const fremd = data.entries.find(e => !e.is_own)
-  const kannSpeichern = !!mood || !!highlight.trim() || !!wish.trim()
+  const kannSpeichern = moods.length > 0 || !!highlight.trim() || !!wish.trim()
   const formularZeigen = !data.own_done || offen
 
   return (
@@ -88,20 +94,29 @@ export default function WeeklyCheckinCard({
         <div className="mt-4 space-y-4">
           <div>
             <p className="text-sm font-medium text-navy">{fragen.mood}</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {Object.entries(data.moods).map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setMood(m => (m === key ? null : key))}
-                  className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                    mood === key
-                      ? 'border-accent bg-accent/10 font-medium text-accent'
-                      : 'border-brand-border text-brand-muted hover:border-accent/40'
-                  }`}
-                >
-                  <span className="mr-1">{MOOD_EMOJI[key] ?? '•'}</span>{label}
-                </button>
-              ))}
+            <p className="mt-0.5 text-[0.7rem] text-brand-muted">
+              Mehreres ist möglich – und meistens ehrlicher.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={fragen.mood}>
+              {Object.entries(data.moods).map(([key, label]) => {
+                const gewaehlt = moods.includes(key)
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={gewaehlt}
+                    onClick={() => setMoods(m =>
+                      m.includes(key) ? m.filter(x => x !== key) : [...m, key])}
+                    className={`rounded-full border px-2.5 py-1.5 text-[0.7rem] transition sm:px-3 sm:text-xs ${
+                      gewaehlt
+                        ? 'border-accent bg-accent/10 font-medium text-accent'
+                        : 'border-brand-border text-brand-muted hover:border-accent/40'
+                    }`}
+                  >
+                    <span className="mr-1">{MOOD_EMOJI[key] ?? '•'}</span>{label}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
@@ -179,8 +194,16 @@ export default function WeeklyCheckinCard({
               <div key={w.week_start} className="text-center">
                 <div className="flex gap-0.5">
                   {w.moods.map(m => (
-                    <span key={m.user_id} className="text-sm" title={`${m.name}: ${m.mood ?? '–'}`}>
-                      {m.mood ? MOOD_EMOJI[m.mood] ?? '•' : '·'}
+                    <span
+                      key={m.user_id}
+                      className="text-sm"
+                      title={`${m.name}: ${m.moods.length ? m.moods.join(', ') : '–'}`}
+                    >
+                      {/* Höchstens zwei Zeichen je Person, sonst zerfasert der
+                          Zeitstrahl. Der Titel nennt vollständig, was gewählt wurde. */}
+                      {m.moods.length
+                        ? m.moods.slice(0, 2).map(x => MOOD_EMOJI[x] ?? '•').join('')
+                        : '·'}
                     </span>
                   ))}
                 </div>
@@ -206,8 +229,11 @@ function Antwort({ entry, avatar }: { entry?: CoupleCheckinEntry; avatar?: strin
         <p className="min-w-0 truncate text-sm font-semibold text-navy">
           {entry.is_own ? 'Du' : entry.name}
         </p>
-        {entry.mood && entry.visible && (
-          <span className="ml-auto text-base" aria-hidden>{MOOD_EMOJI[entry.mood] ?? '•'}</span>
+        {entry.visible && entry.moods.length > 0 && (
+          <span className="ml-auto shrink-0 text-base"
+                title={entry.moods.join(', ')} aria-hidden>
+            {entry.moods.map(m => MOOD_EMOJI[m] ?? '•').join('')}
+          </span>
         )}
       </div>
 
