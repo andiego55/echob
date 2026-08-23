@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
 import ExplainerSection from '@/components/landing/ExplainerSection'
+import EchoWellen from '@/components/landing/EchoWellen'
 
 const THOUGHTS = [
   '„Ich weiß nicht mehr, ob ich übertreibe."',
@@ -112,13 +113,16 @@ export default function LandingPage() {
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section
-        className="bg-navy text-white px-6 pt-[calc(60px+5rem)] pb-20 md:pb-28"
+        className="relative overflow-hidden bg-navy text-white px-6 pt-[calc(60px+5rem)] pb-20 md:pb-28"
         style={{
           backgroundImage:
             'radial-gradient(ellipse 65% 55% at 80% 40%, rgba(59,106,154,0.25) 0%, transparent 70%)',
         }}
       >
-        <div className="mx-auto max-w-[960px]">
+        <EchoWellen />
+
+        {/* Über den Ringen: Der Satz zählt, das Motiv trägt nur. */}
+        <div className="relative z-10 mx-auto max-w-[960px]">
           <span className="label">Erkenne, was sich wiederholt.</span>
           <h1 className="mt-2 text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold leading-[1.2] tracking-[-0.02em] max-w-2xl">
             Wenn Beziehungen schwer einzuordnen sind.

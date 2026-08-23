@@ -16,6 +16,7 @@
  */
 import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Ziel {
   to: string
@@ -50,6 +51,7 @@ const MEHR = [
 
 export default function MobileTabBar({ inboxUnread = 0 }: { inboxUnread?: number }) {
   const { pathname } = useLocation()
+  const { user, signOut } = useAuth()
   const [mehrOffen, setMehrOffen] = useState(false)
 
   useEffect(() => { setMehrOffen(false) }, [pathname])
@@ -93,6 +95,28 @@ export default function MobileTabBar({ inboxUnread = 0 }: { inboxUnread?: number
               {m.label}
             </NavLink>
           ))}
+
+          {/* Abmelden gab es unter 640 px NIRGENDS: In der Kopfzeile steht es
+              `hidden sm:block`, und hier fehlte es. In einer Anwendung, die man auf einem
+              Telefon benutzt, das auch anderen in die Hand fällt, ist das kein
+              Schönheitsfehler.
+
+              Abgesetzt durch eine Linie, weil es keine Navigation ist, sondern ein
+              Verlassen — und der Name daneben, damit man sieht, wen man abmeldet. */}
+          <div className="mt-1 border-t border-brand-border pt-1">
+            <button
+              type="button"
+              onClick={() => { setMehrOffen(false); void signOut() }}
+              className="flex min-h-11 w-full items-center justify-between gap-3 rounded-brand px-4 text-sm text-brand-text transition-colors hover:bg-brand-bg"
+            >
+              <span>Abmelden</span>
+              {user?.email && (
+                <span className="min-w-0 truncate text-[0.68rem] text-brand-muted">
+                  {user.email}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       )}
 
