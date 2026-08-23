@@ -31,9 +31,14 @@ export default function EchoWellen() {
   const cy = -18
 
   /**
-   * Radien so gewählt, dass sich die sichtbaren Bögen über die Fläche verteilen:
-   * Der linkeste Punkt eines Kreises liegt bei `cx - r`, also bei 53, 23, −12, −52, −102.
-   * Die ersten beiden ziehen oben rechts durch, die weiten laufen quer über das Bild.
+   * **Der nutzbare Radiusbereich ist 33 bis 144** — nachgemessen, auf Telefon wie Desktop
+   * fast gleich. Darunter liegt der Kreis rechts außerhalb des Bildes, darüber jenseits
+   * der linken unteren Ecke. Drei frühere Ringe (180, 230, 290) wurden nie gezeichnet;
+   * sie standen im Code und kosteten nichts als Verwirrung.
+   *
+   * Innerhalb dieses Bandes geometrisch verteilt (Faktor ~1,25): Der engste sitzt ganz in
+   * der oberen rechten Ecke und berührt keinen Text, die weiteren öffnen sich nach links
+   * unten über die Seite.
    *
    * `w` ist die Strichbreite in ECHTEN Bildschirmpixeln, nicht in viewBox-Einheiten —
    * dafür sorgt `vectorEffect="non-scaling-stroke"`. Ohne das war der Fehler, der das
@@ -47,12 +52,15 @@ export default function EchoWellen() {
    * blassesten Bögen liegen.
    */
   const wellen = [
-    { r: 75, w: 1.4, o: 0.38 },
-    { r: 105, w: 1.2, o: 0.27 },
-    { r: 140, w: 1.1, o: 0.19 },
-    { r: 180, w: 1.0, o: 0.13 },
-    { r: 230, w: 0.9, o: 0.085 },
-    { r: 290, w: 0.8, o: 0.055 },
+    // Der engste Bogen. Er bleibt ganz in der oberen rechten Ecke und berührt keinen
+    // Text — nah an der Quelle liegen Wellen dichter, das ist hier nicht nur hübsch,
+    // sondern richtig. Er gibt dem Motiv einen Anfang, statt es einfach beginnen zu lassen.
+    { r: 40, w: 2.0, o: 0.42 },
+    { r: 54, w: 1.8, o: 0.34 },
+    { r: 70, w: 1.6, o: 0.27 },
+    { r: 89, w: 1.45, o: 0.20 },
+    { r: 110, w: 1.3, o: 0.145 },
+    { r: 133, w: 1.15, o: 0.10 },
   ]
 
   return (
