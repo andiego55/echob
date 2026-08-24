@@ -19,6 +19,7 @@ import pytest
 from fastapi import HTTPException
 
 from app.services import couple_honest_service as honest
+from app.services import couple_notify_service as notify
 from app.services import couple_therapy_service as cts
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
@@ -203,6 +204,118 @@ async def test_nach_dem_abschluss_beginnt_eine_neue_runde(db):
 
     sicht = await honest.load_round(db, raum, a)
     assert sicht["round_number"] == 2, "und sie ist sichtbar die zweite"
+
+
+# ── Die Zeile auf der Übersicht ────────────────────────────────────
+
+async def test_uebersicht_zeigt_immer_der_richtigen_person_etwas(db):
+    """Der Ball liegt zu jedem Zeitpunkt bei genau einer Person – und die soll es sehen.
+
+    Ohne diese Zeile erfährt man nur über eine Benachrichtigung, dass man dran ist; wer
+    die App ohnehin offen hat, sieht dann gar nichts.
+    """
+    a, b, raum = await _paar(db)
+
+    async def zeile(wer):
+        mich, sie = await honest.dashboard_items(db, raum, wer)
+        return (mich[0]["kind"] if mich else None, sie[0]["kind"] if sie else None)
+
+    assert await zeile(a) == (None, None), "ohne Runde steht dort nichts"
+
+    await honest.ensure_open_round(db, raum, a)
+    assert await zeile(a) == ("honest_arrive", None)
+    assert await zeile(b) == ("honest_arrive", None), "beide muessen ankommen"
+
+    await honest.arrive(db, raum, a, "Bin da.")
+    assert await zeile(a) == (None, "honest_waiting_arrival")
+    assert await zeile(b) == ("honest_arrive", None)
+
+    await honest.arrive(db, raum, b, "Auch da.")
+    assert await zeile(a) == ("honest_turn", None), "offen: beide duerfen anfangen"
+
+    sicht = await honest.share(db, raum, a, body="Etwas Wahres.")
+    assert await zeile(a) == (None, "honest_waiting")
+    assert await zeile(b) == ("honest_unread", None), "erst lesen ist Bs Zug"
+
+    await honest.mark_heard(db, raum, b, sicht["shares"][0]["id"])
+    assert await zeile(b) == ("honest_turn", None)
+
+    await honest.close_round(db, raum, a)
+    assert await zeile(a) == (None, None), "nach dem Abschluss ist nichts mehr dran"
+
+
+async def test_uebersicht_verraet_keinen_inhalt(db):
+    """Dieselbe Regel wie bei den Benachrichtigungen – die Übersicht ist noch sichtbarer."""
+    a, b, raum = await _paar(db)
+    await _beide_ankommen(db, a, b, raum)
+    geheim = "Ich habe an Trennung gedacht."
+    await honest.share(db, raum, a, body=geheim)
+
+    mich, sie = await honest.dashboard_items(db, raum, b)
+    text = " ".join(e["title"] + e["detail"] for e in mich + sie)
+    assert "Trennung" not in text and geheim not in text
+
+
+# ── Benachrichtigungen ───────────────────────────────────────
+
+async def _meldungen(db, user_id) -> list[str]:
+    return [r["body"] for r in await db.fetch(
+        "SELECT body FROM client_notifications WHERE user_id = $1 ORDER BY created_at",
+        user_id)]
+
+
+async def test_die_andere_person_erfaehrt_dass_sie_dran_ist(db):
+    """Ohne das verhungert die Runde still – man sieht die Meldung erst, wenn man
+    ohnehin hineingeschaut hat."""
+    a, b, raum = await _paar(db)
+    await _beide_ankommen(db, a, b, raum)
+    await honest.share(db, raum, a, body="Ich vermisse dich.")
+    await notify.to_partner(db, raum, a, notify.honest_shared())
+
+    assert any("Ehrlichen Mitteilen liegt etwas" in m for m in await _meldungen(db, b))
+    assert await _meldungen(db, a) == [], "die schreibende Person bekommt nichts"
+
+
+async def test_in_der_meldung_steht_niemals_der_inhalt(db):
+    """Das Versprechen des Moduls lautet: der Text erreicht niemanden ausser die beiden.
+
+    Eine Vorschau auf einem Sperrbildschirm wäre genau dessen Bruch – auch die Angabe,
+    WIE etwas angekommen ist, gehört nicht in eine Benachrichtigung.
+    """
+    a, b, raum = await _paar(db)
+    await _beide_ankommen(db, a, b, raum)
+    geheim = "Ich habe an Trennung gedacht."
+    sicht = await honest.share(db, raum, a, body=geheim)
+    await notify.to_partner(db, raum, a, notify.honest_shared())
+    await honest.mark_heard(db, raum, b, sicht["shares"][0]["id"], kind="schwer")
+    await notify.to_partner(db, raum, b, notify.honest_heard())
+
+    alle = await _meldungen(db, a) + await _meldungen(db, b)
+    assert alle, "es wurde ueberhaupt benachrichtigt"
+    for m in alle:
+        assert geheim not in m
+        assert "Trennung" not in m
+        for wort in notify.GEHOERT_WOERTER:
+            assert wort not in m, f"verraet die Art der Rueckmeldung: {m}"
+
+
+async def test_zweimal_beginnen_meldet_nur_einmal(db):
+    """Der Knopf ist idempotent – die Benachrichtigung muss es auch sein."""
+    a, _, raum = await _paar(db)
+    erste = await honest.ensure_open_round(db, raum, a)
+    zweite = await honest.ensure_open_round(db, raum, a)
+    assert erste["neu"] is True and zweite["neu"] is False
+
+
+async def test_ankommen_meldet_nur_beim_uebergang(db):
+    """Wer sein Ankommen nachtraeglich aendert, laeutet nicht noch einmal."""
+    a, b, raum = await _paar(db)
+    d = await honest.arrive(db, raum, a, "Bin da.")
+    assert d["just_opened"] is False, "allein ist die Runde noch nicht offen"
+    d = await honest.arrive(db, raum, b, "Auch da.")
+    assert d["just_opened"] is True, "jetzt geht sie auf"
+    d = await honest.arrive(db, raum, b, "Doch eher muede.")
+    assert d["just_opened"] is False, "eine zweite Aenderung ist kein Anlass"
 
 
 # ── Sicherheit und Abschottung ───────────────────────────────────────────────

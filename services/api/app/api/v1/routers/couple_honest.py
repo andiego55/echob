@@ -12,6 +12,14 @@ Sätze hervorlockt. Sie läuft, aber nur mit dem **deterministischen Stichwort-B
 das ist der bewusst gezahlte Preis für das Versprechen oben. Dafür steht in der Oberfläche
 dauerhaft ein Krisen-Hinweis, der nicht davon abhängt, dass eine Erkennung anschlägt.
 
+**Benachrichtigt wird trotzdem – und das ist kein Widerspruch.** Das Modul ist auf
+Züge gebaut: mitteilen, hören, dran sein. Wer nicht erfährt, dass er dran ist, lässt
+die Runde still verhungern. In die Meldung kommt aber **nie**, was geschrieben wurde –
+nicht einmal, wie es angekommen ist. Eine Vorschau auf einem Sperrbildschirm wäre der
+Bruch genau des Versprechens, das dieses Modul gibt. Die Meldungen tragen den Präfix
+``couple_``; damit erinnert `couple_reminder_service` von selbst per Mail nach, wenn
+etwas liegen bleibt.
+
 Und das Ergebnis sieht **nur die schreibende Person**. Eine Markierung an fremdem Text
 wäre ein Urteil über die andere und hätte in diesem Raum nichts verloren.
 """
@@ -30,6 +38,7 @@ from app.schemas.couple_honest import (
     HonestShare,
 )
 from app.services import couple_honest_service as honest
+from app.services import couple_notify_service as notify
 from app.services.safety_service import build_safety_message, classify_keywords
 
 router = APIRouter(prefix="/couple/links/{couple_id}/mitteilen", tags=["couple-honest"])
@@ -70,7 +79,10 @@ async def begin_round(
 ) -> HonestRoundView:
     """Eine Runde eröffnen. Idempotent – eine offene Runde bleibt die offene Runde."""
     async with pool.acquire() as conn:
-        await honest.ensure_open_round(conn, couple_id, current["user_id"])
+        runde = await honest.ensure_open_round(conn, couple_id, current["user_id"])
+        if runde["neu"]:
+            await notify.to_partner(conn, couple_id, current["user_id"],
+                                    notify.honest_opened())
         daten = await honest.load_round(conn, couple_id, current["user_id"])
         daten["history"] = await honest.load_history(conn, couple_id, current["user_id"])
         return HonestRoundView(**daten)
@@ -87,6 +99,9 @@ async def arrive(
     meta, hinweis = _sicherheit(body.body)
     async with pool.acquire() as conn:
         daten = await honest.arrive(conn, couple_id, current["user_id"], body.body, meta)
+        if daten.get("just_opened"):
+            await notify.to_partner(conn, couple_id, current["user_id"],
+                                    notify.honest_started())
         daten["history"] = await honest.load_history(conn, couple_id, current["user_id"])
         return HonestRoundView(**daten, notice=hinweis)
 
@@ -107,6 +122,7 @@ async def add_share(
     async with pool.acquire() as conn:
         daten = await honest.share(conn, couple_id, current["user_id"],
                                    body=body.body, impulse=body.impulse, meta=meta)
+        await notify.to_partner(conn, couple_id, current["user_id"], notify.honest_shared())
         daten["history"] = await honest.load_history(conn, couple_id, current["user_id"])
         return HonestRoundView(**daten, notice=hinweis)
 
@@ -123,6 +139,8 @@ async def mark_heard(
     async with pool.acquire() as conn:
         daten = await honest.mark_heard(conn, couple_id, current["user_id"], share_id,
                                         kind=(body.kind if body else "gehoert"))
+        # Geht an die SCHREIBENDE Person: dass es angekommen ist, ist die Nachricht.
+        await notify.to_partner(conn, couple_id, current["user_id"], notify.honest_heard())
         daten["history"] = await honest.load_history(conn, couple_id, current["user_id"])
         return HonestRoundView(**daten)
 
@@ -136,6 +154,7 @@ async def close_round(
     """Die Runde beenden – ohne Ergebnis, ohne Zusammenfassung, ohne Bitte."""
     async with pool.acquire() as conn:
         daten = await honest.close_round(conn, couple_id, current["user_id"])
+        await notify.to_partner(conn, couple_id, current["user_id"], notify.honest_closed())
         daten["history"] = await honest.load_history(conn, couple_id, current["user_id"])
         return HonestRoundView(**daten)
 

@@ -13,10 +13,14 @@ from __future__ import annotations
 from typing import Any
 
 from app.core import crypto
+from app.core.logging import get_logger
 from app.services.couple_companion_service import list_summaries
+from app.services.couple_honest_service import dashboard_items as honest_items
 from app.services.couple_progress_service import load_progress
 from app.services.couple_question_service import load_open_for_dashboard
 from app.services.couple_therapy_service import load_partner_profile, require_couple_member
+
+logger = get_logger(__name__)
 
 
 async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
@@ -86,8 +90,21 @@ async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
          "target": f"/app/paar/{couple_id}/fragen"}
         for f in fragen if f["is_mine"]
     ]
-    attention = fuer_mich + attention
-    waiting = fuer_sie + waiting
+    # Ehrliches Mitteilen läuft über Züge; wer nicht sieht, dass er dran ist, lässt die
+    # Runde verhungern. Direkt hinter den Fragen – vor den schwereren Posten, aber nach
+    # dem, was am schnellsten etwas bewegt.
+    #
+    # Fehlertolerant, und das ist kein Schludern: Das Frontend geht bei jedem Push
+    # automatisch live, das Backend von Hand. Wer hier ohne Migration 94 landet, soll
+    # nicht die meistbesuchte Seite des Paarraums verlieren, nur weil ein Zusatz fehlt.
+    try:
+        h_mich, h_sie = await honest_items(conn, couple_id, user_id)
+    except Exception:  # noqa: BLE001
+        logger.warning("Ehrliches Mitteilen konnte nicht in die Übersicht aufgenommen werden.")
+        h_mich, h_sie = [], []
+
+    attention = fuer_mich + h_mich + attention
+    waiting = fuer_sie + h_sie + waiting
 
     # Eigene Echo-Zusammenfassungen — sie gehören auf die Übersicht, aber nur der
     # Person, die sie geführt hat.

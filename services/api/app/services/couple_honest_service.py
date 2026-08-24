@@ -122,14 +122,19 @@ async def _round_row(conn, couple_id) -> dict | None:
 
 
 async def ensure_open_round(conn, couple_id, user_id) -> dict:
-    """Die laufende Runde – oder eine neue, wenn keine offen ist."""
+    """Die laufende Runde – oder eine neue, wenn keine offen ist.
+
+    Der Rückgabewert trägt zusätzlich ``neu``: Nur eine wirklich eröffnete Runde ist ein
+    Anlass, die andere Person zu benachrichtigen – der zweite Klick auf denselben Knopf
+    nicht.
+    """
     await require_couple_member(conn, couple_id, user_id)
     vorhanden = await _round_row(conn, couple_id)
     if vorhanden:
-        return vorhanden
+        return {**vorhanden, "neu": False}
     row = await conn.fetchrow(
         "INSERT INTO couple_honest_rounds (couple_id) VALUES ($1) RETURNING *", couple_id)
-    return dict(row)
+    return {**dict(row), "neu": True}
 
 
 def darf_mitteilen(beitraege: list[dict], user_id) -> tuple[bool, str | None]:
@@ -266,12 +271,18 @@ async def arrive(conn, couple_id, user_id, body: str, meta: dict | None = None) 
 
     anzahl = await conn.fetchval(
         "SELECT count(*) FROM couple_honest_arrivals WHERE round_id = $1", runde["id"])
-    if anzahl == 2 and runde["status"] == "arriving":
+    # Genau EINMAL ein Anlass: beim Übergang von "arriving" auf "open". Wer sein Ankommen
+    # später noch einmal speichert, löst nichts aus.
+    gerade_geoeffnet = anzahl == 2 and runde["status"] == "arriving"
+    if gerade_geoeffnet:
         await conn.execute(
             "UPDATE couple_honest_rounds SET status = 'open', opened_at = clock_timestamp() "
             "WHERE id = $1", runde["id"])
 
-    return await load_round(conn, couple_id, user_id)
+    daten = await load_round(conn, couple_id, user_id)
+    # Wandert nicht ins Schema (Pydantic lässt Unbekanntes fallen) – nur der Router liest es.
+    daten["just_opened"] = gerade_geoeffnet
+    return daten
 
 
 async def share(conn, couple_id, user_id, *, body: str, impulse: str | None = None,
@@ -355,6 +366,55 @@ async def close_round(conn, couple_id, user_id) -> dict:
         "UPDATE couple_honest_rounds SET status = 'closed', closed_at = clock_timestamp(), "
         "closed_by = $2 WHERE id = $1", runde["id"], user_id)
     return await load_round(conn, couple_id, user_id)
+
+
+async def dashboard_items(conn, couple_id, user_id) -> tuple[list[dict], list[dict]]:
+    """Was die Übersicht über diesen Bereich zeigt: (für mich, wartet auf die andere).
+
+    **Warum das überhaupt sein muss.** Eine Runde läuft über Züge, und wer nicht sieht,
+    dass er dran ist, lässt sie still verhungern. Die Benachrichtigung erwischt nur, wer
+    die App gerade nicht offen hat – auf der Übersicht steht es für alle anderen.
+
+    Beide Listen enthalten höchstens einen Eintrag: Es gibt immer nur eine offene Runde,
+    und mehr als eine Zeile wäre in einer Liste, die „was ist heute dran" beantwortet,
+    schon zu viel.
+    """
+    runde = await _round_row(conn, couple_id)
+    if not runde:
+        return [], []
+
+    ziel = f"/app/paar/{couple_id}/mitteilen"
+
+    if runde["status"] == "arriving":
+        da = await conn.fetchval(
+            "SELECT count(*) FROM couple_honest_arrivals "
+            "WHERE round_id = $1 AND user_id = $2", runde["id"], user_id)
+        if not da:
+            return [{"kind": "honest_arrive", "title": "Ehrliches Mitteilen",
+                     "detail": "Eine Runde ist eröffnet – sag kurz, wie es dir gerade geht.",
+                     "target": ziel}], []
+        return [], [{"kind": "honest_waiting_arrival", "title": "Ehrliches Mitteilen",
+                     "detail": "Du bist angekommen. Die Runde beginnt, sobald ihr beide da seid.",
+                     "target": ziel}]
+
+    rows = await conn.fetch(
+        "SELECT id, user_id, heard_at FROM couple_honest_shares "
+        "WHERE round_id = $1 ORDER BY created_at", runde["id"])
+    beitraege = [dict(r) for r in rows]
+    dran, grund = darf_mitteilen(beitraege, user_id)
+
+    if grund == "gehoert":
+        return [{"kind": "honest_unread", "title": "Ehrliches Mitteilen",
+                 "detail": "Es liegt etwas für dich. Lies es, wenn du Ruhe dafür hast.",
+                 "target": ziel}], []
+    if dran:
+        return [{"kind": "honest_turn", "title": "Ehrliches Mitteilen",
+                 "detail": "Du bist dran." if beitraege
+                           else "Die Runde ist offen – fang an, wenn du magst.",
+                 "target": ziel}], []
+    return [], [{"kind": "honest_waiting", "title": "Ehrliches Mitteilen",
+                 "detail": "Deine Mitteilung steht. Jetzt ist die andere Person dran.",
+                 "target": ziel}]
 
 
 async def load_history(conn, couple_id, user_id, limit: int = 10) -> list[dict]:

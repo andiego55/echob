@@ -31,6 +31,7 @@ import CoupleShell from '@/components/couple/CoupleShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Verlaufseintrag from '@/components/couple/Verlaufseintrag'
+import Vorlesen from '@/components/couple/Vorlesen'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { coupleHonestApi } from '@/api/coupleHonest'
 import type { HonestShare, HonestView } from '@/api/coupleHonest'
@@ -65,6 +66,10 @@ export default function CoupleHonestPage() {
    *  die Runde aus der laufenden Sicht verschwunden. */
   const [abschluss, setAbschluss] = useState<
     { beitraege: number; nummer: number; id: string } | null>(null)
+
+  /** Welche abgeschlossene Runde gerade vorgelesen wird. Der Modus liegt über
+   *  allem: keine Navigation, kein Menü, kein Echo – nur der Satz auf dem Tisch. */
+  const [vorlesen, setVorlesen] = useState<string | null>(null)
 
   const beginnen = useMutation({
     mutationFn: () => coupleHonestApi.begin(coupleId), onSuccess: uebernehmen })
@@ -110,6 +115,7 @@ export default function CoupleHonestPage() {
           <Abschluss
             {...abschluss}
             coupleId={coupleId}
+            onVorlesen={() => setVorlesen(abschluss.id)}
             onNeu={() => { setAbschluss(null); beginnen.mutate() }}
             busy={beginnen.isPending}
           />
@@ -120,6 +126,7 @@ export default function CoupleHonestPage() {
             nummer={data?.round_number ?? 1}
             verlauf={data?.history ?? []}
             coupleId={coupleId}
+            onVorlesen={setVorlesen}
             fehler={beginnen.error}
           />
         ) : (
@@ -176,7 +183,13 @@ export default function CoupleHonestPage() {
         {hinweis && <Sicherheitshinweis text={hinweis} onSchliessen={() => setHinweis(null)} />}
 
         {runde && (data?.history.length ?? 0) > 0 && (
-          <FrueherRunden verlauf={data!.history} coupleId={coupleId} />
+          <FrueherRunden verlauf={data!.history} coupleId={coupleId}
+                         onVorlesen={setVorlesen} />
+        )}
+
+        {vorlesen && (
+          <VorlesenLader coupleId={coupleId} roundId={vorlesen}
+                         onEnde={() => setVorlesen(null)} />
         )}
       </div>
     </CoupleShell>
@@ -186,11 +199,12 @@ export default function CoupleHonestPage() {
 /* ── Einstieg ──────────────────────────────────────────────────────────── */
 
 function Einladung({
-  onStart, busy, nummer, verlauf, coupleId, fehler,
+  onStart, busy, nummer, verlauf, coupleId, onVorlesen, fehler,
 }: {
   onStart: () => void; busy: boolean; nummer: number
   verlauf: { id: string; closed_at: string | null; share_count: number }[]
   coupleId: string
+  onVorlesen: (id: string) => void
   fehler: unknown
 }) {
   return (
@@ -231,7 +245,9 @@ function Einladung({
         <Fehlermeldung error={fehler} className="mt-3" />
       </div>
 
-      {verlauf.length > 0 && <FrueherRunden verlauf={verlauf} coupleId={coupleId} />}
+      {verlauf.length > 0 && (
+        <FrueherRunden verlauf={verlauf} coupleId={coupleId} onVorlesen={onVorlesen} />
+      )}
     </>
   )
 }
@@ -584,10 +600,10 @@ function Warten({ grund, name }: { grund: string | null; name: string | null }) 
  * eigentliche Ziel; die App war nur das Übungsgeländer.
  */
 function Abschluss({
-  beitraege, nummer, id, coupleId, onNeu, busy,
+  beitraege, nummer, id, coupleId, onNeu, onVorlesen, busy,
 }: {
   beitraege: number; nummer: number; id: string
-  coupleId: string; onNeu: () => void; busy: boolean
+  coupleId: string; onNeu: () => void; onVorlesen: () => void; busy: boolean
 }) {
   const [nachlesen, setNachlesen] = useState(false)
 
@@ -616,6 +632,12 @@ function Abschluss({
           Darauf läuft die Übung hinaus – irgendwann sagt ihr es einander direkt, und dieser
           Raum wird überflüssig.
         </p>
+        {beitraege > 0 && (
+          <button onClick={onVorlesen}
+                  className="mt-3 rounded-full bg-navy px-5 py-2 text-xs font-medium text-white transition hover:bg-navy/90">
+            Jetzt vorlesen
+          </button>
+        )}
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -663,10 +685,11 @@ function Sicherheitshinweis({ text, onSchliessen }: { text: string; onSchliessen
 /* ── Frühere Runden ────────────────────────────────────────────────────── */
 
 function FrueherRunden({
-  verlauf, coupleId,
+  verlauf, coupleId, onVorlesen,
 }: {
   verlauf: { id: string; closed_at: string | null; share_count: number }[]
   coupleId: string
+  onVorlesen: (id: string) => void
 }) {
   return (
     <div className="card card-quiet mt-6">
@@ -681,6 +704,12 @@ function FrueherRunden({
             aktuell={i === 0}
             titel={`${r.closed_at ? new Date(r.closed_at).toLocaleDateString('de-DE') : '–'} · ${r.share_count} Beiträge`}
           >
+            {r.share_count > 0 && (
+              <button onClick={() => onVorlesen(r.id)}
+                      className="mb-3 rounded-full border border-brand-border px-3.5 py-1.5 text-[0.7rem] text-brand-text transition hover:border-accent/50 hover:text-accent">
+                Vorlesen
+              </button>
+            )}
             <RundeNachlesen coupleId={coupleId} roundId={r.id} />
           </Verlaufseintrag>
         ))}
@@ -708,5 +737,36 @@ function RundeNachlesen({ coupleId, roundId }: { coupleId: string; roundId: stri
         </div>
       ))}
     </div>
+  )
+}
+
+
+/**
+ * Lädt eine abgeschlossene Runde und übergibt sie dem Vorlese-Modus.
+ *
+ * Bewusst derselbe Abfrage-Schlüssel wie beim Nachlesen: Wer eine Runde aufgeklappt hat
+ * und dann vorliest, holt sie nicht zweimal.
+ */
+function VorlesenLader({
+  coupleId, roundId, onEnde,
+}: { coupleId: string; roundId: string; onEnde: () => void }) {
+  const { data } = useQuery({
+    queryKey: ['couple-honest-round', roundId],
+    queryFn: () => coupleHonestApi.readRound(coupleId, roundId),
+    retry: false,
+  })
+  if (!data) return null
+  return (
+    <Vorlesen
+      onEnde={onEnde}
+      beitraege={data.shares.map(b => ({
+        id: b.id,
+        // Auf einem Gerät zwischen zwei Menschen wäre „Du" mehrdeutig – hier steht
+        // immer der Name, auch am eigenen Beitrag.
+        name: b.name,
+        impulse_label: b.impulse_label,
+        body: b.body,
+      }))}
+    />
   )
 }

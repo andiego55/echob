@@ -203,3 +203,38 @@ def share_widened() -> tuple[str, str]:
 def share_revoked() -> tuple[str, str]:
     return ("couple_share_revoked",
             "Eine Freigabe eures Paarraums wurde beendet. Die Fachperson sieht nichts mehr.")
+
+
+# Ehrliches Mitteilen. Hier gilt die Zurueckhaltung von oben nicht nur, sie ist der Kern:
+# Das ganze Modul verspricht, dass der Text niemanden ausser die beiden erreicht. Eine
+# Vorschau auf dem Sperrbildschirm waere der Bruch dieses Versprechens. Es steht deshalb
+# NIE etwas ueber den Inhalt darin - auch nicht, wie eine Mitteilung angekommen ist.
+def honest_opened() -> tuple[str, str]:
+    return ("couple_honest_opened",
+            "Im Ehrlichen Mitteilen ist eine Runde eröffnet. Sie beginnt, sobald ihr "
+            "beide angekommen seid.")
+
+
+def honest_started() -> tuple[str, str]:
+    return ("couple_honest_started",
+            "Ihr seid beide angekommen — die Runde Ehrliches Mitteilen ist offen.")
+
+
+def honest_shared() -> tuple[str, str]:
+    return ("couple_honest_shared",
+            "Im Ehrlichen Mitteilen liegt etwas für dich. Lies es, wenn du Ruhe dafür hast.")
+
+
+def honest_heard() -> tuple[str, str]:
+    # Kein Handlungsaufruf: Wer gerade mitgeteilt hat, ist nicht dran. Die Nachricht ist
+    # der Punkt selbst - dass es angekommen ist.
+    return ("couple_honest_heard", "Deine Mitteilung ist angekommen.")
+
+
+#: Woerter, die verraten wuerden, WIE eine Mitteilung angekommen ist. Ein Test haelt
+#: sie aus allen Benachrichtigungen heraus.
+GEHOERT_WOERTER = ("berührt", "schwer zu hören")
+
+
+def honest_closed() -> tuple[str, str]:
+    return ("couple_honest_closed", "Die Runde Ehrliches Mitteilen ist beendet. Es steht.")

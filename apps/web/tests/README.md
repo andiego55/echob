@@ -1,6 +1,6 @@
 # Tests
 
-Fünf Prüfungen für die fünf Stellen im Frontend, an denen eine **Entscheidung** fällt und
+Prüfungen für die Stellen im Frontend, an denen eine **Entscheidung** fällt und
 ein falsches Ergebnis lautlos bleibt: kein Absturz, kein Typfehler, kein roter Build.
 
 | Datei | Was schiefgehen kann, ohne dass es auffällt |
@@ -9,6 +9,8 @@ ein falsches Ergebnis lautlos bleibt: kein Absturz, kein Typfehler, kein roter B
 | `testauswertung.test.ts` | Eine Skala kippt. Das Ergebnis sieht plausibel aus, ist aber falsch, und jemand liest es über die eigene Beziehung. |
 | `fehlermeldungen.test.ts` | Ein neuer Fehler-Code rutscht durch die Übersetzung, und der Nutzer liest wörtlich `ECHO_LIMIT_REACHED`. |
 | `abmachungsvorschlaege.test.ts` | Der Prompt wird umformuliert, der Parser findet nichts mehr — die Ein-Klick-Übernahme verschwindet, ohne dass etwas fehlschlägt. |
+| `text-takt.test.ts` | Das Tempo von Echos Antwort verrutscht — vier Zahlen, die man nur am Gefühl bemerkt. |
+| `vorlese-stille.test.ts` | Die erzwungene Pause zwischen zwei vorgelesenen Mitteilungen verschwindet. Der Vorlese-Modus läuft weiter — ohne das, wofür es ihn gibt. |
 | `fall-navigation.test.ts` | Der falsche Reiter leuchtet, oder man steht auf „Überblick", während man in einem Selbsttest arbeitet. |
 
 ## Was hier bewusst **nicht** steht
