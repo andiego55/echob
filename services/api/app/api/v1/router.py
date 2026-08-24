@@ -14,6 +14,7 @@ from app.api.v1.routers import (
     contact,
     couple,
     couple_agreements,
+    couple_honest,
     couple_impulses,
     couple_mediation,
     couple_private,
@@ -116,6 +117,7 @@ v1_router.include_router(couple_mediation.router)
 v1_router.include_router(couple_tests.router)
 v1_router.include_router(couple_rhythm.router)
 v1_router.include_router(couple_retrospect.router)
+v1_router.include_router(couple_honest.router)
 v1_router.include_router(couple_questions.router)
 v1_router.include_router(couple_impulses.router)
 v1_router.include_router(couple_reminders.router)

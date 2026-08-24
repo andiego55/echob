@@ -31,6 +31,7 @@ const GRUPPEN: Gruppe[] = [
     label: 'Reden',
     kinder: [
       { path: '/echo', label: 'Echo' },
+      { path: '/mitteilen', label: 'Ehrlich mitteilen' },
       { path: '/fragen', label: 'Fragen' },
       { path: '/gespraeche', label: 'Gespräche' },
       { path: '/streit', label: 'Nach einem Streit' },
