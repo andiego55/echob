@@ -18,6 +18,12 @@ class HonestShare(BaseModel):
     impulse: str | None = None
 
 
+class HonestHeard(BaseModel):
+    #: Eine von drei festen Aussagen: gehoert | beruehrt | schwer. Kein Freitext -
+    #: sonst wuerde aus der Quittung eine Antwort, und genau die soll es nicht geben.
+    kind: str = "gehoert"
+
+
 class HonestRound(BaseModel):
     id: UUID
     #: arriving | open | closed
@@ -45,6 +51,9 @@ class HonestShareView(BaseModel):
     impulse_label: str | None = None
     body: str
     heard: bool
+    #: Wie es angekommen ist – sichtbar für beide, das ist der Sinn der Quittung.
+    heard_as: str | None = None
+    heard_as_label: str | None = None
     created_at: datetime
     safety: dict | None = None
 
@@ -66,7 +75,12 @@ class HonestRoundView(BaseModel):
     my_turn: bool = False
     #: "gehoert" = lies erst · "gegenueber" = die andere ist dran · None = du bist dran
     blocked_reason: str | None = None
-    impulses: dict[str, str] = {}
+    #: Schlüssel → {label, hint}. Die Schreibhilfe steht im Katalog, nicht in der
+    #: Oberfläche – sie gehört zur Methode, nicht zum Layout.
+    impulses: dict[str, dict[str, str]] = {}
+    acknowledgements: dict[str, str] = {}
+    #: Die wievielte Runde – damit sich die Übung wie eine Übung anfühlt.
+    round_number: int = 1
     partner_name: str | None = None
     history: list[HonestHistoryEntry] = []
     #: Sicherheitshinweis an die SCHREIBENDE Person, sofern der Stichwort-Boden anschlug.

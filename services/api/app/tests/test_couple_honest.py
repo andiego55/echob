@@ -126,6 +126,25 @@ async def test_erst_hoeren_dann_sprechen(db):
     await honest.share(db, raum, b, body="Ich habe das gar nicht gemerkt.")
 
 
+async def test_quittung_ist_eine_geschlossene_auswahl(db):
+    """Freitext würde aus der Quittung eine Antwort machen – und die soll es nicht geben."""
+    a, b, raum = await _paar(db)
+    await _beide_ankommen(db, a, b, raum)
+    sicht = await honest.share(db, raum, a, body="Ich vermisse dich.")
+    beitrag = sicht["shares"][0]["id"]
+
+    with pytest.raises(HTTPException) as e:
+        await honest.mark_heard(db, raum, b, beitrag, kind="Das sehe ich anders")
+    assert e.value.status_code == 400
+
+    sicht = await honest.mark_heard(db, raum, b, beitrag, kind="beruehrt")
+    # Wie es angekommen ist, sieht auch die schreibende Person – das ist der Sinn.
+    eigen = await honest.load_round(db, raum, a)
+    assert eigen["shares"][0]["heard_as"] == "beruehrt"
+    assert eigen["shares"][0]["heard_as_label"] == honest.GEHOERT["beruehrt"]
+    assert sicht["my_turn"] is True, "quittiert heißt: jetzt darf B sprechen"
+
+
 async def test_den_eigenen_beitrag_kann_man_nicht_hoeren(db):
     a, b, raum = await _paar(db)
     await _beide_ankommen(db, a, b, raum)
@@ -146,7 +165,7 @@ async def test_eine_vollstaendige_runde(db):
     sicht = await honest.share(db, raum, a, body="A zwei.")
 
     assert [s["body"] for s in sicht["shares"]] == ["A eins.", "B eins.", "A zwei."]
-    assert sicht["shares"][0]["impulse_label"] == honest.IMPULSE["gefuehl"]
+    assert sicht["shares"][0]["impulse_label"] == honest.IMPULSE["gefuehl"]["label"]
 
 
 # ── Der Abschluss ────────────────────────────────────────────────────────────
@@ -181,6 +200,9 @@ async def test_nach_dem_abschluss_beginnt_eine_neue_runde(db):
 
     neu = await honest.ensure_open_round(db, raum, a)
     assert neu["status"] == "arriving", "die neue Runde beginnt wieder beim Ankommen"
+
+    sicht = await honest.load_round(db, raum, a)
+    assert sicht["round_number"] == 2, "und sie ist sichtbar die zweite"
 
 
 # ── Sicherheit und Abschottung ───────────────────────────────────────────────

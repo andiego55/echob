@@ -13,9 +13,16 @@
  * da. Serverseitig hängt dieselbe Regel noch einmal (`darf_mitteilen`); ein fehlendes Feld
  * ist eine Einladung, keine Zusicherung.
  *
+ * **Warum hier so viel erklärt wird.** Eine Regel, deren Grund man nicht kennt, liest sich
+ * als Gängelung — „warum darf ich nicht antworten?" ist die naheliegendste Reaktion, und
+ * wer sie sich stellt, hört auf. Deshalb steht neben jeder Regel ihr Grund und neben jeder
+ * Frage eine Schreibhilfe. Die Erklärung ist nicht Beiwerk, sie ist die halbe Methode.
+ *
  * **Was hier bewusst fehlt.** Kein Weiterführen-Block, keine Zusammenfassung, keine
  * Abmachung, keine Bitte. Überall sonst habe ich Ausgänge eingebaut, damit nichts blind
- * endet — hier wäre ein Ausgang der Fehler. Die Runde endet mit „Es steht."
+ * endet — hier wäre ein Ausgang der Fehler. Die Runde endet mit „Es steht." Was danach
+ * kommt, steht im Abschluss: sich das Geschriebene beim nächsten Mal laut vorlesen. Der
+ * eigentliche Schritt passiert nicht in der App.
  */
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -27,6 +34,9 @@ import Verlaufseintrag from '@/components/couple/Verlaufseintrag'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { coupleHonestApi } from '@/api/coupleHonest'
 import type { HonestShare, HonestView } from '@/api/coupleHonest'
+
+/** Beim ersten Mal steht die Erklärung offen, danach zusammengeklappt. */
+const GESEHEN = 'echob.mitteilen.erklaert'
 
 export default function CoupleHonestPage() {
   const { coupleId = '' } = useParams<{ coupleId: string }>()
@@ -51,6 +61,11 @@ export default function CoupleHonestPage() {
     setHinweis(d.notice ?? null)
   }
 
+  /** Was gerade abgeschlossen wurde – für den Abschluss festgehalten, denn danach ist
+   *  die Runde aus der laufenden Sicht verschwunden. */
+  const [abschluss, setAbschluss] = useState<
+    { beitraege: number; nummer: number; id: string } | null>(null)
+
   const beginnen = useMutation({
     mutationFn: () => coupleHonestApi.begin(coupleId), onSuccess: uebernehmen })
   const ankommen = useMutation({
@@ -59,7 +74,8 @@ export default function CoupleHonestPage() {
     mutationFn: (v: { text: string; impuls: string | null }) =>
       coupleHonestApi.share(coupleId, v.text, v.impuls), onSuccess: uebernehmen })
   const gehoert = useMutation({
-    mutationFn: (id: string) => coupleHonestApi.markHeard(coupleId, id), onSuccess: uebernehmen })
+    mutationFn: (v: { id: string; art: string }) =>
+      coupleHonestApi.markHeard(coupleId, v.id, v.art), onSuccess: uebernehmen })
   const abschliessen = useMutation({
     mutationFn: () => coupleHonestApi.close(coupleId), onSuccess: uebernehmen })
 
@@ -67,23 +83,48 @@ export default function CoupleHonestPage() {
   const laeuft = runde?.status === 'open'
   const ankommensphase = runde?.status === 'arriving'
 
+  const rundeBeenden = async () => {
+    if (!data?.round) return
+    const ok = await bestaetigen({
+      titel: 'Runde beenden?',
+      text: 'Es bleibt stehen, wie es ist – es wird nichts zusammengefasst und nichts '
+          + 'daraus abgeleitet. Nachlesen könnt ihr sie später jederzeit.',
+      knopf: 'Es steht',
+    })
+    if (!ok) return
+    setAbschluss({
+      beitraege: data.shares.length,
+      nummer: data.round_number,
+      id: data.round.id,
+    })
+    abschliessen.mutate()
+  }
+
   return (
     <CoupleShell subtitle="Ihr sprecht miteinander. Echo hält nur den Rahmen.">
       <div className="mx-auto max-w-[780px] px-6 py-6">
 
         {isLoading ? (
           <p className="text-sm text-brand-muted">Wird geladen …</p>
+        ) : !runde && abschluss ? (
+          <Abschluss
+            {...abschluss}
+            coupleId={coupleId}
+            onNeu={() => { setAbschluss(null); beginnen.mutate() }}
+            busy={beginnen.isPending}
+          />
         ) : !runde ? (
           <Einladung
             onStart={() => beginnen.mutate()}
             busy={beginnen.isPending}
+            nummer={data?.round_number ?? 1}
             verlauf={data?.history ?? []}
             coupleId={coupleId}
             fehler={beginnen.error}
           />
         ) : (
           <>
-            <Regeln />
+            <Rahmen nummer={data!.round_number} />
 
             {ankommensphase && (
               <Ankommen
@@ -98,13 +139,14 @@ export default function CoupleHonestPage() {
               <>
                 <Kreis
                   data={data!}
-                  onGehoert={id => gehoert.mutate(id)}
+                  onGehoert={(id, art) => gehoert.mutate({ id, art })}
                   busy={gehoert.isPending}
                 />
 
                 {data!.my_turn ? (
                   <Mitteilen
                     impulse={data!.impulses}
+                    erster={data!.shares.length === 0}
                     onSenden={(text, impuls) => mitteilen.mutate({ text, impuls })}
                     busy={mitteilen.isPending}
                     fehler={mitteilen.error}
@@ -115,19 +157,15 @@ export default function CoupleHonestPage() {
 
                 <div className="mt-6 border-t border-brand-border pt-4">
                   <button
-                    onClick={async () => {
-                      if (await bestaetigen({
-                        titel: 'Runde beenden?',
-                        text: 'Es bleibt stehen, wie es ist – es wird nichts zusammengefasst '
-                            + 'und nichts daraus abgeleitet. Nachlesen könnt ihr sie später.',
-                        knopf: 'Es steht',
-                      })) abschliessen.mutate()
-                    }}
+                    onClick={rundeBeenden}
                     disabled={abschliessen.isPending}
                     className="btn-quiet !py-2 !px-5 !text-sm disabled:opacity-50"
                   >
                     Runde beenden
                   </button>
+                  <span className="ml-3 text-xs text-brand-muted">
+                    Wann ihr wollt. Es muss zu nichts gekommen sein.
+                  </span>
                   <Fehlermeldung error={abschliessen.error} className="mt-3" />
                 </div>
               </>
@@ -148,9 +186,9 @@ export default function CoupleHonestPage() {
 /* ── Einstieg ──────────────────────────────────────────────────────────── */
 
 function Einladung({
-  onStart, busy, verlauf, coupleId, fehler,
+  onStart, busy, nummer, verlauf, coupleId, fehler,
 }: {
-  onStart: () => void; busy: boolean
+  onStart: () => void; busy: boolean; nummer: number
   verlauf: { id: string; closed_at: string | null; share_count: number }[]
   coupleId: string
   fehler: unknown
@@ -180,10 +218,16 @@ function Einladung({
           Überall sonst hilft Echo beim Formulieren. <strong>Hier nicht.</strong> Das ist
           der Sinn: irgendwann sollt ihr das wieder ohne Übersetzer können.
         </p>
+
+        <Ablauf />
+
         <button onClick={onStart} disabled={busy}
                 className="btn-primary mt-6 disabled:opacity-50">
-          {busy ? 'Einen Moment …' : 'Runde beginnen'}
+          {busy ? 'Einen Moment …' : nummer > 1 ? `${nummer}. Runde beginnen` : 'Runde beginnen'}
         </button>
+        <p className="mt-2 text-xs text-brand-muted">
+          Dauert so lange, wie ihr wollt. Ihr müsst nicht gleichzeitig da sein.
+        </p>
         <Fehlermeldung error={fehler} className="mt-3" />
       </div>
 
@@ -192,23 +236,105 @@ function Einladung({
   )
 }
 
-/* ── Die Regeln, dauerhaft sichtbar ────────────────────────────────────── */
+/** Was gleich passiert. Ohne das startet man in etwas hinein, dessen Regeln man erst
+ *  merkt, wenn man an sie stößt – und eine Regel, gegen die man gerade gelaufen ist,
+ *  liest sich als Fehler der Software. */
+function Ablauf() {
+  const schritte: [string, string][] = [
+    ['Ankommen', 'Ein Satz, wie es euch gerade geht. Ihr seht beide gleichzeitig – so richtet '
+      + 'sich keiner am anderen aus.'],
+    ['Mitteilen', 'Einer sagt etwas von sich. Fragen zum Anfangen stehen bereit, ihr müsst '
+      + 'sie nicht nehmen.'],
+    ['Hören', 'Die andere liest und sagt, wie es angekommen ist. Antworten geht nicht – es '
+      + 'gibt kein Feld dafür.'],
+    ['Es steht', 'Ihr hört auf, wann ihr wollt. Kein Ergebnis, keine Abmachung, keine Aufgabe.'],
+  ]
+  return (
+    <ol className="mx-auto mt-6 max-w-[52ch] space-y-2.5 text-left">
+      {schritte.map(([titel, text], i) => (
+        <li key={titel} className="flex gap-3">
+          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-[0.65rem] font-semibold text-accent">
+            {i + 1}
+          </span>
+          <p className="text-xs leading-relaxed text-brand-muted">
+            <span className="font-semibold text-navy">{titel}.</span> {text}
+          </p>
+        </li>
+      ))}
+    </ol>
+  )
+}
 
-function Regeln() {
+/* ── Der Rahmen: Regeln mit ihren Gründen ──────────────────────────────── */
+
+function Rahmen({ nummer }: { nummer: number }) {
+  // Beim ersten Mal offen. Wer die Methode kennt, klappt sie zu und sie bleibt zu.
+  const [offen, setOffen] = useState(
+    () => typeof window === 'undefined' || !window.localStorage.getItem(GESEHEN))
+
+  const umschalten = () => {
+    if (offen && typeof window !== 'undefined') window.localStorage.setItem(GESEHEN, '1')
+    setOffen(o => !o)
+  }
+
   return (
     <div className="rounded-brand border border-brand-border bg-brand-bg/60 px-4 py-3">
-      <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
-        So läuft eine Runde
-      </p>
-      <ul className="mt-2 space-y-1 text-xs leading-relaxed text-brand-text">
-        <li>Einer teilt mit, die andere liest – <strong>ohne zu antworten</strong>.</li>
-        <li>Sprich von dir: was du wahrnimmst, fühlst, denkst. Nicht über die andere.</li>
-        <li>Nichts muss geklärt werden. Es darf stehenbleiben.</li>
-      </ul>
-      <p className="mt-2.5 border-t border-brand-border pt-2 text-[0.68rem] text-brand-muted">
+      <button
+        onClick={umschalten}
+        className="flex w-full items-center justify-between gap-3 text-left"
+        aria-expanded={offen}
+      >
+        <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
+          Worum es geht{nummer > 1 ? ` · ${nummer}. Runde` : ''}
+        </span>
+        <span className="shrink-0 text-xs text-brand-muted">
+          {offen ? 'Zuklappen' : 'Aufklappen'}
+        </span>
+      </button>
+
+      {offen && (
+        <div className="mt-3 space-y-3 border-t border-brand-border pt-3">
+          {/* Jede Regel mit ihrem Grund. Eine Regel ohne Grund liest sich als Gängelung –
+              und wer sich fragt „warum darf ich nicht antworten?", hört auf. */}
+          <Regel titel="Wer zuhört, antwortet nicht.">
+            Das klingt hart und ist doch das Geschenk. Wenn du weißt, dass gleich eine
+            Antwort kommt, formulierst du schon beim Schreiben mit halbem Ohr auf die
+            Verteidigung. Fällt die Antwort weg, kannst du zum ersten Mal seit Langem
+            einfach sagen, wie es ist.
+          </Regel>
+          <Regel titel="Sprich von dir.">
+            „Du hörst mir nie zu" ist ein Vorwurf – und Vorwürfe werden beantwortet, nicht
+            gehört. „Ich fühle mich allein, wenn ich rede und nichts zurückkommt" ist
+            dasselbe Erleben. Nur kommt es an.
+          </Regel>
+          <Regel titel="Nichts muss geklärt werden.">
+            Der Druck, am Ende eine Lösung zu haben, ist der Grund, warum das Wahre oft
+            ungesagt bleibt. Hier gibt es keine Lösung, keine Abmachung, keine Bitte.
+          </Regel>
+          <Regel titel="Und warum Echo hier schweigt.">
+            Überall sonst hilft Echo beim Formulieren, Sortieren, Übersetzen. Hier nicht:
+            Was ihr euch sagt, geht an keine KI. Der Sinn der Übung ist, dass ihr das
+            irgendwann wieder ohne Übersetzer könnt – und das übt man nur, indem man es tut.
+          </Regel>
+        </div>
+      )}
+
+      {/* Bleibt sichtbar, auch zugeklappt: Weil Echo den Text nicht liest, läuft die
+          Krisen-Erkennung hier nur auf dem Stichwort-Boden. Was der nicht erkennt, erkennt
+          niemand – deshalb steht der Hinweis dauerhaft und nicht erst bei einem Treffer. */}
+      <p className="mt-2.5 border-t border-brand-border pt-2 text-[0.68rem] leading-relaxed text-brand-muted">
         Was du hier schreibst, geht an <strong>keine KI</strong> – es bleibt zwischen euch.
         Bei akuter Not: Telefonseelsorge 0800 111 0 111, rund um die Uhr und kostenlos.
       </p>
+    </div>
+  )
+}
+
+function Regel({ titel, children }: { titel: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-navy">{titel}</p>
+      <p className="mt-0.5 text-xs leading-relaxed text-brand-muted">{children}</p>
     </div>
   )
 }
@@ -224,8 +350,9 @@ function Ankommen({
     <div className="card mt-4">
       <h2 className="card-title">Ankommen</h2>
       <p className="mt-1 text-xs leading-relaxed text-brand-muted">
-        Ein Satz, bevor es losgeht: Wie geht es dir gerade? Ihr seht es gleichzeitig –
-        erst wenn ihr beide da seid.
+        Ein Satz, bevor es losgeht: Wie geht es dir gerade? Ihr seht beide Sätze
+        gleichzeitig – erst wenn ihr beide da seid. So richtet keiner sein „mir geht es …"
+        an dem der anderen aus.
       </p>
 
       {data.arrival_own ? (
@@ -255,10 +382,11 @@ function Ankommen({
         </>
       )}
 
-      <p className="mt-3 text-xs text-brand-muted">
+      <p className="mt-3 text-xs leading-relaxed text-brand-muted">
         {data.arrival_other_done
           ? `${data.partner_name ?? 'Die andere Person'} ist da.`
-          : `${data.partner_name ?? 'Die andere Person'} ist noch nicht da.`}
+          : `${data.partner_name ?? 'Die andere Person'} ist noch nicht da. Ihr müsst nicht `
+            + 'gleichzeitig hier sein – es geht weiter, sobald beide angekommen sind.'}
       </p>
       <Fehlermeldung error={fehler} className="mt-3" />
     </div>
@@ -269,7 +397,7 @@ function Ankommen({
 
 function Kreis({
   data, onGehoert, busy,
-}: { data: HonestView; onGehoert: (id: string) => void; busy: boolean }) {
+}: { data: HonestView; onGehoert: (id: string, art: string) => void; busy: boolean }) {
   const ende = useRef<HTMLDivElement>(null)
   useEffect(() => { ende.current?.scrollIntoView({ behavior: 'smooth' }) }, [data.shares.length])
 
@@ -283,7 +411,8 @@ function Kreis({
       )}
 
       {data.shares.map(s => (
-        <Beitrag key={s.id} share={s} onGehoert={onGehoert} busy={busy} />
+        <Beitrag key={s.id} share={s} quittungen={data.acknowledgements}
+                 onGehoert={onGehoert} busy={busy} />
       ))}
       <div ref={ende} />
     </div>
@@ -291,8 +420,13 @@ function Kreis({
 }
 
 function Beitrag({
-  share, onGehoert, busy,
-}: { share: HonestShare; onGehoert: (id: string) => void; busy: boolean }) {
+  share, quittungen, onGehoert, busy,
+}: {
+  share: HonestShare
+  quittungen: Record<string, string>
+  onGehoert: (id: string, art: string) => void
+  busy: boolean
+}) {
   return (
     <div className={`rounded-brand border px-4 py-3.5 ${
       share.is_own ? 'border-brand-border bg-brand-bg/50' : 'border-accent/30 bg-white'
@@ -310,22 +444,35 @@ function Beitrag({
         {share.body}
       </p>
 
-      {/* Kein Antwortfeld. Nur die Bestätigung, dass es angekommen ist – mehr ist an
-          dieser Stelle nicht vorgesehen, und genau das ist die Übung. */}
+      {/* Kein Antwortfeld – nur die Quittung, und die ist eine GESCHLOSSENE Auswahl.
+          Freitext würde daraus sofort wieder ein Gespräch machen. Alle drei sind Aussagen
+          über das eigene Erleben, nie über die andere Person. */}
       {!share.is_own && !share.heard && (
-        <button
-          onClick={() => onGehoert(share.id)}
-          disabled={busy}
-          className="btn-quiet !py-1.5 !px-4 !text-xs mt-3 disabled:opacity-50"
-        >
-          Ich habe es gehört
-        </button>
+        <div className="mt-3 border-t border-brand-border pt-3">
+          <p className="text-[0.68rem] leading-relaxed text-brand-muted">
+            Lies es in Ruhe. Wenn es angekommen ist, sag es – dann bist du dran.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {Object.entries(quittungen).map(([k, label]) => (
+              <button
+                key={k}
+                onClick={() => onGehoert(share.id, k)}
+                disabled={busy}
+                className="rounded-full border border-brand-border px-3 py-1.5 text-[0.7rem] text-brand-text transition hover:border-accent/50 hover:text-accent disabled:opacity-50"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
-      {!share.is_own && share.heard && (
-        <p className="mt-2 text-[0.68rem] text-brand-muted">Gehört.</p>
-      )}
-      {share.is_own && share.heard && (
-        <p className="mt-2 text-[0.68rem] text-brand-muted">Angekommen.</p>
+
+      {share.heard && (
+        <p className="mt-2.5 border-t border-brand-border pt-2 text-[0.68rem] text-brand-muted">
+          {share.is_own
+            ? share.heard_as_label ? `Angekommen: „${share.heard_as_label}"` : 'Angekommen.'
+            : share.heard_as_label ?? 'Gehört.'}
+        </p>
       )}
     </div>
   )
@@ -334,25 +481,30 @@ function Beitrag({
 /* ── Mitteilen ─────────────────────────────────────────────────────────── */
 
 function Mitteilen({
-  impulse, onSenden, busy, fehler,
+  impulse, erster, onSenden, busy, fehler,
 }: {
-  impulse: Record<string, string>
+  impulse: Record<string, { label: string; hint: string }>
+  erster: boolean
   onSenden: (text: string, impuls: string | null) => void
   busy: boolean
   fehler: unknown
 }) {
   const [text, setText] = useState('')
   const [gewaehlt, setGewaehlt] = useState<string | null>(null)
+  const hilfe = gewaehlt ? impulse[gewaehlt] : null
 
   return (
     <div className="card mt-5">
       <h2 className="card-title">Du bist dran</h2>
       <p className="mt-1 text-xs leading-relaxed text-brand-muted">
-        Sprich von dir. Es muss nicht gut formuliert sein und es muss zu nichts führen.
+        {erster
+          ? 'Fang irgendwo an. Es muss nicht das Wichtigste sein und nicht gut formuliert – '
+            + 'es muss nur von dir handeln.'
+          : 'Sprich von dir. Es muss nicht auf das Vorherige eingehen und zu nichts führen.'}
       </p>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
-        {Object.entries(impulse).map(([k, label]) => (
+        {Object.entries(impulse).map(([k, i]) => (
           <button
             key={k}
             type="button"
@@ -363,20 +515,29 @@ function Mitteilen({
                 : 'border-brand-border text-brand-muted hover:border-accent/40'
             }`}
           >
-            {label}
+            {i.label}
           </button>
         ))}
       </div>
-      <p className="mt-1.5 text-[0.68rem] text-brand-muted">
-        Ein Impuls ist ein Angebot, kein Pflichtfeld – frei schreiben ist genauso richtig.
-      </p>
+
+      {/* Die Schreibhilfe ist der Unterschied zwischen einer Frageliste und einer Übung:
+          Sie sagt, woran man die ehrliche Fassung erkennt. */}
+      {hilfe ? (
+        <p className="mt-2 rounded-brand border border-accent/25 bg-accent/5 px-3 py-2 text-[0.7rem] leading-relaxed text-brand-text">
+          {hilfe.hint}
+        </p>
+      ) : (
+        <p className="mt-1.5 text-[0.68rem] leading-relaxed text-brand-muted">
+          Eine Frage ist ein Angebot, kein Pflichtfeld – frei schreiben ist genauso richtig.
+        </p>
+      )}
 
       <textarea
         value={text}
         onChange={e => setText(e.target.value)}
         rows={5}
         maxLength={1500}
-        placeholder={gewaehlt ? impulse[gewaehlt] : 'Was möchtest du mitteilen?'}
+        placeholder={hilfe ? hilfe.label : 'Was möchtest du mitteilen?'}
         className="input mt-3 w-full resize-y"
       />
       <button
@@ -397,13 +558,84 @@ function Warten({ grund, name }: { grund: string | null; name: string | null }) 
   // Ein fehlendes Eingabefeld ohne Begründung liest sich als Fehler. Also steht hier,
   // warum es fehlt – und dass das Absicht ist.
   const text = grund === 'gehoert'
-    ? 'Lies erst in Ruhe, was oben steht. Wenn du es gehört hast, bist du dran.'
-    : `Jetzt ist ${name ?? 'die andere Person'} dran. Du bekommst hier keine Antwortmöglichkeit `
-      + '– das ist der Sinn der Übung.'
+    ? 'Lies erst in Ruhe, was oben steht. Sobald du sagst, dass es angekommen ist, bist du dran.'
+    : `Jetzt ist ${name ?? 'die andere Person'} dran. Hier gibt es bewusst kein Antwortfeld – `
+      + 'wenn dir gerade etwas kommt, halt es fest, bis du wieder an der Reihe bist.'
 
   return (
     <div className="mt-5 rounded-brand border border-dashed border-brand-border px-4 py-4 text-center">
-      <p className="text-sm text-brand-muted">{text}</p>
+      <p className="mx-auto max-w-[48ch] text-sm leading-relaxed text-brand-muted">{text}</p>
+    </div>
+  )
+}
+
+/* ── Abschluss ─────────────────────────────────────────────────────────── */
+
+/**
+ * Was nach „Es steht" kommt — und warum überhaupt etwas kommt.
+ *
+ * Ein Ergebnis wäre hier der Fehler: Zusammenfassung, Abmachung oder Bitte würden genau
+ * den Druck zurückholen, den die Methode wegnimmt. Aber gar nichts zu zeigen war auch
+ * falsch — wer eben etwas Schweres ausgesprochen hat, landete wieder auf der Startkarte,
+ * als wäre nichts gewesen.
+ *
+ * Also: benennen, was geschehen ist, ohne es zu bewerten — und auf den nächsten Schritt
+ * zeigen, der nicht in der App liegt. Sich das Geschriebene laut vorzulesen ist das
+ * eigentliche Ziel; die App war nur das Übungsgeländer.
+ */
+function Abschluss({
+  beitraege, nummer, id, coupleId, onNeu, busy,
+}: {
+  beitraege: number; nummer: number; id: string
+  coupleId: string; onNeu: () => void; busy: boolean
+}) {
+  const [nachlesen, setNachlesen] = useState(false)
+
+  return (
+    <div className="card card-static">
+      <div className="text-center">
+        <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
+          {nummer}. Runde
+        </p>
+        <h2 className="card-title-lg mt-1">Es steht.</h2>
+        <p className="mx-auto mt-2 max-w-[52ch] text-sm leading-relaxed text-brand-muted">
+          {beitraege === 0
+            ? 'Ihr habt diesmal nichts gesagt. Auch das ist eine Runde.'
+            : `Ihr habt euch ${beitraege === 1 ? 'eine Sache' : `${beitraege} Dinge`} gesagt, `
+              + 'ohne eine davon zu verhandeln. Es muss jetzt nichts damit passieren.'}
+        </p>
+      </div>
+
+      <div className="mt-5 rounded-brand border border-accent/25 bg-accent/5 px-4 py-3.5">
+        <p className="text-xs font-semibold text-navy">
+          Der nächste Schritt liegt nicht in der App.
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-brand-text">
+          Wenn ihr euch das nächste Mal seht: Lest euch vor, was ihr geschrieben habt. Laut,
+          nacheinander, ohne zu antworten. Genau so wie hier, nur ohne Bildschirm dazwischen.
+          Darauf läuft die Übung hinaus – irgendwann sagt ihr es einander direkt, und dieser
+          Raum wird überflüssig.
+        </p>
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <button onClick={onNeu} disabled={busy}
+                className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50">
+          {busy ? 'Einen Moment …' : 'Neue Runde beginnen'}
+        </button>
+        {beitraege > 0 && (
+          <button onClick={() => setNachlesen(n => !n)}
+                  className="text-xs text-brand-muted underline hover:text-navy">
+            {nachlesen ? 'Zuklappen' : 'Runde nachlesen'}
+          </button>
+        )}
+      </div>
+
+      {nachlesen && (
+        <div className="mt-4 border-t border-brand-border pt-4">
+          <RundeNachlesen coupleId={coupleId} roundId={id} />
+        </div>
+      )}
     </div>
   )
 }
@@ -418,7 +650,7 @@ function Sicherheitshinweis({ text, onSchliessen }: { text: string; onSchliessen
       </p>
       <div className="text-sm text-brand-text"><MarkdownMessage content={text} /></div>
       <p className="mt-2 text-[0.68rem] text-brand-muted">
-        Das sieht nur du. Deine Mitteilung ist trotzdem abgeschickt.
+        Das siehst nur du. Deine Mitteilung ist trotzdem abgeschickt.
       </p>
       <button onClick={onSchliessen}
               className="mt-2 text-xs text-brand-muted hover:text-navy">

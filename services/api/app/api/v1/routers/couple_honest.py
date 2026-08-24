@@ -24,6 +24,7 @@ from fastapi import APIRouter, Depends
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.couple_honest import (
     HonestArrive,
+    HonestHeard,
     HonestHistoryEntry,
     HonestRoundView,
     HonestShare,
@@ -114,12 +115,14 @@ async def add_share(
 async def mark_heard(
     couple_id: UUID,
     share_id: UUID,
+    body: HonestHeard | None = None,
     current=Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> HonestRoundView:
-    """„Ich habe es gehört." Erst danach bist du selbst wieder dran."""
+    """Quittieren, dass es angekommen ist. Erst danach bist du selbst wieder dran."""
     async with pool.acquire() as conn:
-        daten = await honest.mark_heard(conn, couple_id, current["user_id"], share_id)
+        daten = await honest.mark_heard(conn, couple_id, current["user_id"], share_id,
+                                        kind=(body.kind if body else "gehoert"))
         daten["history"] = await honest.load_history(conn, couple_id, current["user_id"])
         return HonestRoundView(**daten)
 

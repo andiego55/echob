@@ -18,6 +18,9 @@ export interface HonestShare {
   impulse_label: string | null
   body: string
   heard: boolean
+  /** Wie es angekommen ist – sichtbar für beide, das ist der Sinn der Quittung. */
+  heard_as: string | null
+  heard_as_label: string | null
   created_at: string
   /** Nur am eigenen Beitrag gesetzt – nie am fremden. */
   safety: { level?: string; source?: string } | null
@@ -46,7 +49,12 @@ export interface HonestView {
   shares: HonestShare[]
   my_turn: boolean
   blocked_reason: HonestBlock
-  impulses: Record<string, string>
+  /** Schlüssel → Frage + Schreibhilfe. Die Hilfe gehört zur Methode, nicht zum Layout. */
+  impulses: Record<string, { label: string; hint: string }>
+  /** Die drei festen Quittungen. Kein Freitext – sonst würde daraus eine Antwort. */
+  acknowledgements: Record<string, string>
+  /** Die wievielte Runde – damit sich die Übung wie eine Übung anfühlt. */
+  round_number: number
   partner_name: string | null
   history: HonestHistoryEntry[]
   /** Sicherheitshinweis – nur an die schreibende Person, nur beim Absenden. */
@@ -75,8 +83,8 @@ export const coupleHonestApi = {
     apiClient.post<HonestView>(`${basis(coupleId)}/beitrag`, { body, impulse })
       .then(r => r.data),
 
-  markHeard: (coupleId: string, shareId: string) =>
-    apiClient.post<HonestView>(`${basis(coupleId)}/beitraege/${shareId}/gehoert`)
+  markHeard: (coupleId: string, shareId: string, kind: string) =>
+    apiClient.post<HonestView>(`${basis(coupleId)}/beitraege/${shareId}/gehoert`, { kind })
       .then(r => r.data),
 
   close: (coupleId: string) =>

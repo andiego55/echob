@@ -16,6 +16,9 @@
 --
 -- BEWUSSTE ENTSCHEIDUNGEN:
 --
+--   * Zuhoeren ist aktiv: Es wird quittiert, mit einer von drei festen Aussagen ueber
+--     das EIGENE Erleben. Eine bewusste Anpassung an das schriftliche, zeitversetzte
+--     Medium - im Kreis sitzt man einander gegenueber und sieht, dass es ankommt.
 --   * Strikt abwechselnd. Wer zuletzt mitgeteilt hat, ist erst wieder dran, wenn die
 --     andere Person mitgeteilt hat - und mitteilen darf nur, wer den letzten Beitrag der
 --     anderen als gehoert markiert hat. Ohne diese zwei Regeln wird es ein Chat.
@@ -71,6 +74,12 @@ CREATE TABLE IF NOT EXISTS couple_honest_shares (
     -- Wann die ANDERE Person markiert hat, dass sie es gehoert hat. Der Raum hat genau
     -- zwei Mitglieder, eine eigene Empfaengerspalte waere eine zweite Wahrheit.
     heard_at    TIMESTAMPTZ,
+    -- WIE es angekommen ist. Streng genommen sagt die zuhoerende Person in der Methode
+    -- gar nichts - schriftlich und zeitversetzt saehe der Sprecher seine Mitteilung aber
+    -- ins Leere gehen, und das ist schlimmer als eine knappe Rueckmeldung. Deshalb eine
+    -- GESCHLOSSENE Auswahl von drei Aussagen ueber das eigene Erleben. Kein Freitext:
+    -- damit daraus keine Antwort und kein Gespraech werden kann.
+    heard_as    TEXT CHECK (heard_as IN ('gehoert', 'beruehrt', 'schwer')),
     metadata    JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );

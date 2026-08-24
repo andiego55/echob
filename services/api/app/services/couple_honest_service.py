@@ -40,14 +40,58 @@ MAX_ARRIVAL_CHARS = 300
 # Was hier NICHT steht, ist der wichtigere Teil: keine Bitte, kein Wunsch, keine Frage an
 # die andere Person. Die Methode hoert beim Ausdruck auf. Genau das unterscheidet sie von
 # GFK und von der Mediation, die beide zur Bitte fuehren.
-IMPULSE: dict[str, str] = {
-    "jetzt":       "Wie geht es mir gerade?",
-    "beobachtung": "Was beobachte ich?",
-    "gefuehl":     "Wie fühle ich mich dabei?",
-    "beruehrt":    "Was berührt mich?",
-    "gedanke":     "Was denke ich – und ich weiß, dass es ein Gedanke ist",
-    "wichtig":     "Was ist mir wichtig?",
-    "beziehung":   "Was erlebe ich in unserer Beziehung?",
+IMPULSE: dict[str, dict[str, str]] = {
+    "jetzt": {
+        "label": "Wie geht es mir gerade?",
+        "hint":  "Der Moment, nicht die Woche. Was ist in dir, während du das schreibst?",
+    },
+    "beobachtung": {
+        "label": "Was beobachte ich?",
+        "hint":  "Was eine Kamera aufgenommen hätte – ohne Deutung, ohne Warum. "
+                 "„Du hast zweimal auf dein Handy geschaut“ statt „dich "
+                 "interessiert es nicht“.",
+    },
+    "gefuehl": {
+        "label": "Wie fühle ich mich dabei?",
+        "hint":  "Ein Wort reicht oft: traurig, wütend, erleichtert, leer, erschöpft. "
+                 "„Ich fühle, dass du …“ ist ein Gedanke, kein Gefühl.",
+    },
+    "beruehrt": {
+        "label": "Was berührt mich?",
+        "hint":  "Was hat etwas in dir bewegt – im Schönen wie im Schweren?",
+    },
+    "gedanke": {
+        "label": "Was denke ich – und ich weiß, dass es ein Gedanke ist",
+        "hint":  "Sag ihn als Gedanken, nicht als Tatsache: „Ich denke, dass …“ "
+                 "statt „Du bist …“. Der Unterschied entscheidet, ob es "
+                 "ankommt oder beantwortet wird.",
+    },
+    "wichtig": {
+        "label": "Was ist mir wichtig?",
+        "hint":  "Wonach sehnst du dich? Sag es als Sehnsucht, nicht als Forderung – "
+                 "hier wird nichts verhandelt.",
+    },
+    "beziehung": {
+        "label": "Was erlebe ich in unserer Beziehung?",
+        "hint":  "Was DU erlebst – nicht, was die andere Person tun sollte.",
+    },
+}
+
+
+def label_of(key: str | None) -> str | None:
+    eintrag = IMPULSE.get(key or "")
+    return eintrag["label"] if eintrag else None
+
+
+# Wie ein Beitrag angekommen ist. Streng genommen sagt die zuhoerende Person in der Methode
+# gar nichts. Schriftlich und zeitversetzt saehe die sprechende Person ihre Mitteilung aber
+# ins Leere gehen - und das ist schlimmer als eine knappe Rueckmeldung. Deshalb eine
+# GESCHLOSSENE Auswahl: kein Freitext, damit daraus keine Antwort werden kann, und alle drei
+# sind Aussagen ueber das EIGENE Erleben, nie ueber die andere Person.
+GEHOERT: dict[str, str] = {
+    "gehoert":  "Ich habe es gehört.",
+    "beruehrt": "Das hat mich berührt.",
+    "schwer":   "Das war schwer zu hören.",
 }
 
 
@@ -113,6 +157,17 @@ def darf_mitteilen(beitraege: list[dict], user_id) -> tuple[bool, str | None]:
     return True, None
 
 
+async def _round_number(conn, couple_id) -> int:
+    """Die wievielte Runde ist das?
+
+    Nicht als Punktestand gemeint, sondern damit sich die Übung wie eine Übung anfühlt.
+    Wer zum dritten Mal hier sitzt, soll das sehen: es ist etwas, das man wiederholt.
+    """
+    return await conn.fetchval(
+        "SELECT count(*) FROM couple_honest_rounds "
+        "WHERE couple_id = $1 AND status = 'closed'", couple_id) + 1
+
+
 async def load_round(conn, couple_id, user_id) -> dict[str, Any]:
     """Die laufende Runde aus der Sicht einer Person.
 
@@ -126,7 +181,8 @@ async def load_round(conn, couple_id, user_id) -> dict[str, Any]:
     partner = partner_of(link, user_id)
 
     if not runde:
-        return {"round": None, "impulses": IMPULSE,
+        return {"round": None, "impulses": IMPULSE, "acknowledgements": GEHOERT,
+                "round_number": await _round_number(conn, couple_id),
                 "names": namen, "partner_name": namen.get(str(partner)) if partner else None}
 
     ank_rows = await conn.fetch(
@@ -163,9 +219,12 @@ async def load_round(conn, couple_id, user_id) -> dict[str, Any]:
             "is_own": str(b["user_id"]) == str(user_id),
             "name": namen.get(str(b["user_id"])) or "",
             "impulse": b["impulse"],
-            "impulse_label": IMPULSE.get(b["impulse"] or "", None),
+            "impulse_label": label_of(b["impulse"]),
             "body": b["body"],
             "heard": b["heard_at"] is not None,
+            # Wie es angekommen ist, sehen BEIDE - es ist ja der Sinn der Quittung.
+            "heard_as": b["heard_as"],
+            "heard_as_label": GEHOERT.get(b["heard_as"] or ""),
             "created_at": b["created_at"],
             # Die Markierung sieht NUR, wer den Satz geschrieben hat. Ein Urteil über die
             # andere Person wäre hier ein Übergriff.
@@ -175,6 +234,8 @@ async def load_round(conn, couple_id, user_id) -> dict[str, Any]:
         "my_turn": dran and runde["status"] == "open",
         "blocked_reason": grund,
         "impulses": IMPULSE,
+        "acknowledgements": GEHOERT,
+        "round_number": await _round_number(conn, couple_id),
         "names": namen,
         "partner_name": namen.get(str(partner)) if partner else None,
     }
@@ -253,11 +314,13 @@ async def share(conn, couple_id, user_id, *, body: str, impulse: str | None = No
     return await load_round(conn, couple_id, user_id)
 
 
-async def mark_heard(conn, couple_id, user_id, share_id: UUID) -> dict:
-    """„Ich habe es gehört."
+async def mark_heard(conn, couple_id, user_id, share_id: UUID,
+                     kind: str = "gehoert") -> dict:
+    """Quittieren, dass es angekommen ist – mit einer von drei festen Aussagen.
 
     Nur die ANDERE Person kann das setzen – den eigenen Beitrag zu hören ist keine
-    Leistung. Setzt sich nur einmal; ein zweites Mal ändert nichts.
+    Leistung. Setzt sich nur einmal; ein zweites Mal ändert nichts. Und es ist die
+    Bedingung dafür, selbst wieder dran zu sein: erst hören, dann sprechen.
     """
     await require_couple_member(conn, couple_id, user_id)
     row = await conn.fetchrow(
@@ -268,10 +331,12 @@ async def mark_heard(conn, couple_id, user_id, share_id: UUID) -> dict:
         raise HTTPException(status_code=404, detail="Beitrag nicht gefunden.")
     if str(row["user_id"]) == str(user_id):
         raise HTTPException(status_code=400, detail="Das ist dein eigener Beitrag.")
+    if kind not in GEHOERT:
+        raise HTTPException(status_code=400, detail="Unbekannte Rückmeldung.")
 
     await conn.execute(
-        "UPDATE couple_honest_shares SET heard_at = COALESCE(heard_at, clock_timestamp()) "
-        "WHERE id = $1", share_id)
+        "UPDATE couple_honest_shares SET heard_at = COALESCE(heard_at, clock_timestamp()), "
+        "  heard_as = COALESCE(heard_as, $2) WHERE id = $1", share_id, kind)
     return await load_round(conn, couple_id, user_id)
 
 
@@ -324,7 +389,7 @@ async def load_round_by_id(conn, couple_id, user_id, round_id: UUID) -> dict:
             "id": b["id"],
             "is_own": str(b["user_id"]) == str(user_id),
             "name": namen.get(str(b["user_id"])) or "",
-            "impulse_label": IMPULSE.get(b["impulse"] or "", None),
+            "impulse_label": label_of(b["impulse"]),
             "body": _klar(b, "body")["body"],
             "created_at": b["created_at"],
         } for b in rows],
