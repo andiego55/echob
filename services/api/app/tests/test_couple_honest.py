@@ -298,6 +298,44 @@ async def test_teaser_holt_die_ab_die_den_bereich_nicht_kennen(db):
     assert zweiter["question"] != erster["question"], "die Frage wandert mit den Runden"
 
 
+async def test_die_felder_ueberleben_das_antwortmodell(db):
+    """Die Fehlerklasse, die hier schon zugeschlagen hat.
+
+    Dienst und Frontend-Typ waren fertig, das Pydantic-Antwortmodell nicht – und FastAPI
+    streicht wortlos alles, was dort nicht steht. Der Teaser wäre nie erschienen, die
+    Rückblick-Kachel leer geblieben. Kein Absturz, kein roter Test, nur ein Feature, das
+    es nicht gibt. Deshalb wird hier durch das ECHTE Antwortmodell geprüft, nicht gegen
+    das Dienst-Ergebnis.
+    """
+    from app.schemas.couple import CoupleDashboard
+    from app.schemas.couple_retrospect import CoupleRetrospectStats
+    from app.services.couple_dashboard_service import load_dashboard
+    from app.services.couple_retrospect_service import has_substance, load_stats
+
+    a, b, raum = await _paar(db)
+
+    sicht = CoupleDashboard(**await load_dashboard(db, raum, a))
+    assert sicht.honest_teaser is not None, "der kalte Start fällt sonst aus der Antwort"
+    assert sicht.honest_teaser.question and sicht.honest_teaser.first is True
+
+    # Läuft eine Runde, verstummt der Teaser – dafür steht die Zeile in `attention`.
+    await honest.ensure_open_round(db, raum, a)
+    sicht = CoupleDashboard(**await load_dashboard(db, raum, a))
+    assert sicht.honest_teaser is None
+    assert any(i.kind.startswith("honest_") for i in sicht.attention)
+
+    await _beide_ankommen(db, a, b, raum)
+    await honest.share(db, raum, a, body="Etwas Wahres.")
+    await honest.close_round(db, raum, a)
+
+    # Genau wie der Router es tut: `names` raus, `has_substance` dazu.
+    roh = await load_stats(db, raum, a)
+    werte = CoupleRetrospectStats(
+        **{k: v for k, v in roh.items() if k != "names"},
+        has_substance=has_substance(roh))
+    assert werte.honest_rounds == 1, "die Spur im Rückblick fällt sonst aus der Antwort"
+
+
 # ── Benachrichtigungen ───────────────────────────────────────
 
 async def _meldungen(db, user_id) -> list[str]:

@@ -145,6 +145,15 @@ class CoupleEchoSummarySnippet(BaseModel):
     created_at: datetime
 
 
+class CoupleHonestTeaser(BaseModel):
+    """Der kalte Start für Ehrliches Mitteilen – ``None``, solange eine Runde läuft."""
+    question: str
+    hint: str
+    #: Noch nie eine Runde abgeschlossen: dann erklärt der Anreißer, worum es geht.
+    first: bool
+    target: str
+
+
 class CoupleDashboard(BaseModel):
     """Was im Paarraum gerade dran ist — serverseitig sortiert nach „wer ist am Zug“."""
     partner_name: str | None = None
@@ -152,6 +161,7 @@ class CoupleDashboard(BaseModel):
     own_name: str = "Du"
     own_avatar: str | None = None
     echo_summaries: list[CoupleEchoSummarySnippet] = []
+    honest_teaser: CoupleHonestTeaser | None = None
     attention: list[CoupleDashboardItem] = []
     waiting_for_partner: list[CoupleDashboardItem] = []
     sessions: list[CoupleDashboardSession] = []

@@ -35,6 +35,9 @@ class CoupleRetrospectStats(BaseModel):
     agreements_kept: int
     agreements_dropped: int
     appreciations: int
+    #: Abgeschlossene Runden Ehrliches Mitteilen. Kein Ergebnis – eine Tatsache
+    #: über die Praxis, wie die Check-in-Wochen daneben.
+    honest_rounds: int = 0
     #: Reicht die Datenlage fuer einen sinnvollen Text?
     has_substance: bool
 
