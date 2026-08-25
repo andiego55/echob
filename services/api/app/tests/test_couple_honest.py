@@ -206,6 +206,29 @@ async def test_nach_dem_abschluss_beginnt_eine_neue_runde(db):
     assert sicht["round_number"] == 2, "und sie ist sichtbar die zweite"
 
 
+async def test_vorlesen_geht_auch_mitten_in_der_runde(db):
+    """Der Vorlese-Modus hing zuerst nur am Abschluss – wer nie eine Runde beendet hatte,
+    fand ihn also nie. Er liest über `load_round_by_id`, und das muss auch bei einer
+    OFFENEN Runde tragen.
+    """
+    a, b, raum = await _paar(db)
+    await _beide_ankommen(db, a, b, raum)
+    await honest.share(db, raum, a, body="Ich vermisse dich.", impulse="beruehrt")
+
+    runde = await honest.load_round(db, raum, a)
+    offen = await honest.load_round_by_id(db, raum, a, runde["round"]["id"])
+
+    assert offen["round"]["status"] == "open", "die Runde läuft noch"
+    assert len(offen["shares"]) == 1
+    # Auf einem Gerät zwischen zwei Menschen wäre „Du" mehrdeutig – es braucht den Namen.
+    assert offen["shares"][0]["name"] == "Alex"
+    assert offen["shares"][0]["body"] == "Ich vermisse dich."
+
+    # Und die andere Person sieht dieselbe Runde mit denselben Namen.
+    fremd = await honest.load_round_by_id(db, raum, b, runde["round"]["id"])
+    assert fremd["shares"][0]["name"] == "Alex"
+
+
 # ── Die Zeile auf der Übersicht ────────────────────────────────────
 
 async def test_uebersicht_zeigt_immer_der_richtigen_person_etwas(db):

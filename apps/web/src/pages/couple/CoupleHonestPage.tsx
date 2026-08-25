@@ -162,18 +162,37 @@ export default function CoupleHonestPage() {
                   <Warten grund={data!.blocked_reason} name={data!.partner_name} />
                 )}
 
-                <div className="mt-6 border-t border-brand-border pt-4">
-                  <button
-                    onClick={rundeBeenden}
-                    disabled={abschliessen.isPending}
-                    className="btn-quiet !py-2 !px-5 !text-sm disabled:opacity-50"
-                  >
-                    Runde beenden
-                  </button>
-                  <span className="ml-3 text-xs text-brand-muted">
-                    Wann ihr wollt. Es muss zu nichts gekommen sein.
-                  </span>
-                  <Fehlermeldung error={abschliessen.error} className="mt-3" />
+                <div className="mt-6 space-y-3 border-t border-brand-border pt-4">
+                  {/* Vorlesen geht auch MITTEN in der Runde. Erst stand es nur auf dem
+                      Abschluss – wer noch nie eine Runde beendet hatte, fand es also nie,
+                      und wer gerade zusammensitzt, ist genau dann im richtigen Moment. */}
+                  {data!.shares.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <button
+                        onClick={() => setVorlesen(runde!.id)}
+                        className="btn-quiet !py-2 !px-5 !text-sm"
+                      >
+                        Vorlesen
+                      </button>
+                      <span className="text-xs leading-relaxed text-brand-muted">
+                        Sitzt ihr zusammen? Legt das Gerät zwischen euch und lest euch vor,
+                        was hier steht.
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <button
+                      onClick={rundeBeenden}
+                      disabled={abschliessen.isPending}
+                      className="btn-quiet !py-2 !px-5 !text-sm disabled:opacity-50"
+                    >
+                      Runde beenden
+                    </button>
+                    <span className="text-xs leading-relaxed text-brand-muted">
+                      Wann ihr wollt. Es muss zu nichts gekommen sein.
+                    </span>
+                  </div>
+                  <Fehlermeldung error={abschliessen.error} />
                 </div>
               </>
             )}
@@ -263,7 +282,9 @@ function Ablauf() {
       + 'sie nicht nehmen.'],
     ['Hören', 'Die andere liest und sagt, wie es angekommen ist. Antworten geht nicht – es '
       + 'gibt kein Feld dafür.'],
-    ['Es steht', 'Ihr hört auf, wann ihr wollt. Kein Ergebnis, keine Abmachung, keine Aufgabe.'],
+    ['Es steht', 'Ihr hört auf, wann ihr wollt. Kein Ergebnis, keine Abmachung, keine '
+      + 'Aufgabe. Danach könnt ihr euch vorlesen, was ihr geschrieben habt – darauf läuft '
+      + 'die Übung hinaus.'],
   ]
   return (
     <ol className="mx-auto mt-6 max-w-[52ch] space-y-2.5 text-left">
