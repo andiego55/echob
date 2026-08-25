@@ -31,6 +31,15 @@ DEFAULT_DAYS = 30
 MIN_DAYS = 14
 
 
+async def _honest_rounds(conn, couple_id, von) -> int:
+    try:
+        return await conn.fetchval(
+            "SELECT COUNT(*) FROM couple_honest_rounds WHERE couple_id = $1 "
+            "AND status = 'closed' AND closed_at >= $2", couple_id, von) or 0
+    except Exception:  # noqa: BLE001
+        return 0
+
+
 def _round(wert: float | None) -> float | None:
     return round(float(wert), 1) if wert is not None else None
 
@@ -97,6 +106,12 @@ async def load_stats(conn, couple_id, user_id, days: int = DEFAULT_DAYS) -> dict
         "appreciations": await zahl(
             "SELECT COUNT(*) FROM couple_appreciations WHERE couple_id = $1 "
             "AND created_at >= $2", couple_id, von),
+        # Ehrliches Mitteilen. Kein Ergebnis – eine Tatsache über die Praxis, genau wie
+        # die Check-in-Wochen daneben. Was IN den Runden stand, taucht nirgends auf.
+        #
+        # Fehlertolerant wie auf der Übersicht: Wird die API vor Migration 94 neu gebaut,
+        # soll der Rückblick nicht ausfallen, weil eine Zahl fehlt.
+        "honest_rounds": await _honest_rounds(conn, couple_id, von),
         "checkin_weeks": wochen,
     }
 

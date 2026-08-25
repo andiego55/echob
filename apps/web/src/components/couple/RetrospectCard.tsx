@@ -78,7 +78,7 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
 
         <Barometer stats={s} />
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
           <Kachel label="Gespräche" wert={s.sessions_started}
             hinweis={`${s.sessions_closed} abgeschlossen`} />
           <Kachel label="Themen" wert={s.topics_opened}
@@ -87,6 +87,12 @@ export default function RetrospectCard({ coupleId }: { coupleId: string }) {
             hinweis={`${s.agreements_kept} gehalten`} />
           <Kachel label="Wertschätzung" wert={s.appreciations}
             hinweis={`${s.checkin_weeks} Wochen Check-in`} />
+          {/* Fünfte Kachel: auf dem Handy über die volle Breite, sonst stünde sie
+              allein in der letzten Zeile. */}
+          <div className="col-span-2 sm:col-span-1">
+            <Kachel label="Ehrlich mitteilen" wert={s.honest_rounds}
+              hinweis={s.honest_rounds === 1 ? 'Runde ohne Echo' : 'Runden ohne Echo'} />
+          </div>
         </div>
 
         {s.moods.length > 0 && (

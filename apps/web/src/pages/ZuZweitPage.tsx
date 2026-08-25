@@ -64,6 +64,23 @@ const TOOLS = [
   },
 ]
 
+// Der eine Bereich ohne KI. Steht bewusst nicht in TOOLS: Dort wäre es die siebte von
+// sieben Karten und damit gleichwertig zu sechs Funktionen, die genau das Gegenteil tun.
+const OHNE_ECHO = [
+  {
+    title: 'Wer zuhört, antwortet nicht',
+    text: 'Solange die andere Person dran ist, gibt es kein Eingabefeld – nicht als Bitte, es ist schlicht nicht da. Wer weiß, dass gleich eine Antwort kommt, formuliert schon beim Schreiben defensiv.',
+  },
+  {
+    title: 'Nichts davon liest eine KI',
+    text: 'In diesem Bereich läuft kein einziger Modellaufruf. Was ihr euch dort sagt, bleibt zwischen euch – auch die Benachrichtigung an die andere Person verrät nie den Inhalt.',
+  },
+  {
+    title: 'Am Ende legt ihr das Handy zwischen euch',
+    text: 'Ein eigener Modus zeigt eure Sätze einzeln und groß, mit einer Stille dazwischen. Ihr lest sie euch laut vor. Darauf läuft die Übung hinaus: dass ihr es wieder ohne Übersetzer könnt.',
+  },
+]
+
 const PRIVACY = [
   {
     icon: (
@@ -140,6 +157,10 @@ const VERGLEICH = [
 ]
 
 const FAQ = [
+  {
+    q: 'Redet die KI bei allem mit?',
+    a: 'Nein. Es gibt einen Bereich, in dem gar keine KI läuft: Ehrliches Mitteilen. Dort sagt ihr einander reihum, wie es euch geht, und die zuhörende Person antwortet nicht – dafür gibt es kein Eingabefeld. Kein Modellaufruf, keine Zusammenfassung, keine Deutung. Am Ende könnt ihr euch die Sätze in einem eigenen Modus laut vorlesen. Das ist Absicht: Echo soll euch helfen, wieder ohne Übersetzer miteinander zu reden.',
+  },
   {
     q: 'Ist das eine echte Paartherapie?',
     a: 'Nein. EchoB ersetzt keine Paartherapie und keine Behandlung. Echo moderiert eure Gespräche, stellt keine Diagnosen und spricht keine Schuld zu. Es ist ein Werkzeug, das euch hilft, besser miteinander zu reden – und das euch den Weg zu einer Fachperson erleichtert, wenn das sinnvoll ist.',
@@ -277,6 +298,42 @@ export default function ZuZweitPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Der Raum ohne Echo ────────────────────────────────────────
+          Bewusst ein eigener Abschnitt statt einer siebten Kachel oben: Als Karte unter
+          sechs KI-Werkzeugen ginge genau das unter, was EchoB von jedem anderen Angebot
+          unterscheidet — und was auf den häufigsten Einwand antwortet („da sitzt eine
+          Maschine mitten in unserer Beziehung"). Dunkel wie der Vorlese-Modus selbst. */}
+      <section className="bg-navy px-6 py-20 text-white">
+        <div className="mx-auto max-w-[860px]">
+          <span className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-accent">
+            Und ein Raum ohne
+          </span>
+          <h2 className="mt-3 text-[1.7rem] font-extrabold tracking-[-0.01em]">
+            Der Teil, in dem Echo schweigt
+          </h2>
+          <p className="mt-5 max-w-[620px] text-[0.95rem] leading-relaxed text-white/75">
+            Sechs Werkzeuge, in denen Echo mitarbeitet – und einen Raum, in dem es nichts zu
+            suchen hat. <strong className="font-semibold text-white">Ehrliches Mitteilen</strong>{' '}
+            ist eine Runde, in der ihr einander sagt, wie es euch geht, und in der niemand
+            antwortet. Kein Klären, kein Aushandeln, keine Bitte.
+          </p>
+
+          <div className="mt-9 grid gap-5 sm:grid-cols-3">
+            {OHNE_ECHO.map((o) => (
+              <div key={o.title} className="rounded-brand-lg border border-white/15 bg-white/5 p-5">
+                <p className="text-[0.95rem] font-bold">{o.title}</p>
+                <p className="mt-1.5 text-[0.84rem] leading-relaxed text-white/60">{o.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-7 max-w-[620px] text-[0.9rem] leading-relaxed text-white/55">
+            Ein Werkzeug, das darauf zielt, an dieser Stelle überflüssig zu werden. Das ist
+            kein Widerspruch – das ist der Punkt.
+          </p>
         </div>
       </section>
 

@@ -61,6 +61,15 @@ export interface CoupleEchoSummarySnippet {
   created_at: string
 }
 
+/** Der kalte Start für Ehrliches Mitteilen – `null`, solange eine Runde läuft. */
+export interface CoupleHonestTeaser {
+  question: string
+  hint: string
+  /** Noch nie eine Runde abgeschlossen: dann erklärt der Anreißer, worum es geht. */
+  first: boolean
+  target: string
+}
+
 export interface CoupleDashboard {
   partner_name: string | null
   partner_avatar: string | null
@@ -69,6 +78,7 @@ export interface CoupleDashboard {
   /** Eigene Begleiter-Zusammenfassungen – nur du siehst sie. */
   echo_summaries: CoupleEchoSummarySnippet[]
   /** Liegt bei dir. */
+  honest_teaser: CoupleHonestTeaser | null
   attention: CoupleDashboardItem[]
   /** Liegt bei der anderen Person. */
   waiting_for_partner: CoupleDashboardItem[]

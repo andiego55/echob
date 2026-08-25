@@ -15,6 +15,9 @@ export interface CoupleRetrospectStats {
   barometer_avg_before: number | null
   barometer_delta: number | null
   moods: { mood: string; anzahl: number }[]
+  /** Abgeschlossene Runden Ehrliches Mitteilen. Kein Ergebnis – eine Tatsache
+   *  über die Praxis, wie die Check-in-Wochen daneben. */
+  honest_rounds: number
   checkin_weeks: number
   sessions_started: number
   sessions_closed: number

@@ -417,6 +417,36 @@ async def dashboard_items(conn, couple_id, user_id) -> tuple[list[dict], list[di
                  "target": ziel}]
 
 
+async def teaser(conn, couple_id, user_id) -> dict | None:
+    """Der kalte Start – was auf der Übersicht steht, wenn gerade KEINE Runde läuft.
+
+    **Warum eine Frage und keine Kachel.** Der Impuls-Anreißer nebenan begründet es schon:
+    „Impulse ansehen" bewegt niemanden, eine konkrete Frage schon – man beantwortet sie im
+    Kopf, bevor man geklickt hat, und dann ist der Klick nur noch die Formsache. Ohne das
+    findet den Bereich nur, wer ohnehin weiß, dass es ihn gibt.
+
+    Die Frage wandert mit der Zahl der Runden, damit dort nicht monatelang dasselbe steht.
+    """
+    await require_couple_member(conn, couple_id, user_id)
+    row = await conn.fetchrow(
+        "SELECT count(*) FILTER (WHERE status = 'closed')  AS zu, "
+        "       count(*) FILTER (WHERE status <> 'closed') AS offen "
+        "FROM couple_honest_rounds WHERE couple_id = $1", couple_id)
+    # Läuft eine Runde, spricht die Zeile weiter oben. Zwei Hinweise auf dieselbe Sache
+    # wären einer zu viel.
+    if row["offen"]:
+        return None
+
+    fragen = list(IMPULSE.values())
+    frage = fragen[row["zu"] % len(fragen)]
+    return {
+        "question": frage["label"],
+        "hint": frage["hint"],
+        "first": row["zu"] == 0,
+        "target": f"/app/paar/{couple_id}/mitteilen",
+    }
+
+
 async def load_history(conn, couple_id, user_id, limit: int = 10) -> list[dict]:
     """Frühere Runden – zum Nachlesen, nicht zum Auswerten."""
     link = await require_couple_member(conn, couple_id, user_id)

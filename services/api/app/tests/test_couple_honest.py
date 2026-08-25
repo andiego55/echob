@@ -256,6 +256,25 @@ async def test_uebersicht_verraet_keinen_inhalt(db):
     assert "Trennung" not in text and geheim not in text
 
 
+async def test_teaser_holt_die_ab_die_den_bereich_nicht_kennen(db):
+    """Der kalte Start. Ohne ihn findet den Bereich nur, wer schon weiß, dass es ihn gibt."""
+    a, b, raum = await _paar(db)
+
+    erster = await honest.teaser(db, raum, a)
+    assert erster["first"] is True
+    assert erster["question"] and erster["hint"], "eine konkrete Frage, keine Kachel"
+    assert erster["target"].endswith("/mitteilen")
+
+    # Läuft eine Runde, spricht die Zeile weiter oben – zwei Hinweise wären einer zu viel.
+    await honest.ensure_open_round(db, raum, a)
+    assert await honest.teaser(db, raum, a) is None
+
+    await honest.close_round(db, raum, a)
+    zweiter = await honest.teaser(db, raum, a)
+    assert zweiter["first"] is False
+    assert zweiter["question"] != erster["question"], "die Frage wandert mit den Runden"
+
+
 # ── Benachrichtigungen ───────────────────────────────────────
 
 async def _meldungen(db, user_id) -> list[str]:

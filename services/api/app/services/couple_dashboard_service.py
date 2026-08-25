@@ -16,6 +16,7 @@ from app.core import crypto
 from app.core.logging import get_logger
 from app.services.couple_companion_service import list_summaries
 from app.services.couple_honest_service import dashboard_items as honest_items
+from app.services.couple_honest_service import teaser as honest_teaser
 from app.services.couple_progress_service import load_progress
 from app.services.couple_question_service import load_open_for_dashboard
 from app.services.couple_therapy_service import load_partner_profile, require_couple_member
@@ -99,9 +100,10 @@ async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
     # nicht die meistbesuchte Seite des Paarraums verlieren, nur weil ein Zusatz fehlt.
     try:
         h_mich, h_sie = await honest_items(conn, couple_id, user_id)
+        h_teaser = await honest_teaser(conn, couple_id, user_id)
     except Exception:  # noqa: BLE001
         logger.warning("Ehrliches Mitteilen konnte nicht in die Übersicht aufgenommen werden.")
-        h_mich, h_sie = [], []
+        h_mich, h_sie, h_teaser = [], [], None
 
     attention = fuer_mich + h_mich + attention
     waiting = fuer_sie + h_sie + waiting
@@ -122,6 +124,7 @@ async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
             }
             for s in zusammenfassungen
         ],
+        "honest_teaser": h_teaser,
         "attention": attention,
         "waiting_for_partner": waiting,
         "sessions": [

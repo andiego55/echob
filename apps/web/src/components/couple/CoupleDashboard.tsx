@@ -27,6 +27,7 @@ import { DashboardSkeleton } from '@/components/Skeleton'
 import DueAgreementsCard from './DueAgreementsCard'
 import WeeklyCheckinCard from './WeeklyCheckinCard'
 import ImpulseTeaser from './ImpulseTeaser'
+import HonestTeaser from './HonestTeaser'
 
 export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
   const { data, isLoading, isError, error } = useQuery({
@@ -139,6 +140,9 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
       <ImpulseTeaser coupleId={coupleId} />
 
       <AppreciationCard coupleId={coupleId} />
+
+      {/* Ans Ende des Rhythmus: die Übung, auf die alles andere hinausläuft. */}
+      <HonestTeaser teaser={data.honest_teaser} />
 
       {waiting.length > 0 && (
         <div className="card">
