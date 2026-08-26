@@ -1,3 +1,8 @@
+# Shell-Skripte IMMER mit Unix-Zeilenenden. Ein .sh mit CRLF scheitert auf dem Server
+# mit "bad interpreter: /usr/bin/env bash^M" - und zwar lautlos im Cron, also genau
+# dort, wo es niemand sieht. Betrifft Backup, Wiederherstellungs-Test und Waechter.
+*.sh    text eol=lf
+
 # Binärdateien nie zeilenende-konvertieren (autocrlf) – sonst korrupte Assets
 # beim Checkout (z. B. PDF/Fonts/Bilder auf dem Cloudflare-Build).
 *.pdf   binary
