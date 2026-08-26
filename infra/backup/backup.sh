@@ -12,6 +12,39 @@
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
+# Der Alarmweg. Ohne ihn ist dieses Skript ein Backup, das lautlos aufhoert zu laufen:
+# `set -e` bricht sauber ab, der Cron haengt die Meldung an eine Datei, die niemand liest,
+# und man erfaehrt es an dem Tag, an dem man das Backup braucht.
+ALARM="${ECHOB_ALARM:-/opt/echob/infra/monitor/alarm.sh}"
+
+# stderr wird mitgeschnitten, damit im Alarm der ECHTE Fehler steht und nicht nur
+# "fehlgeschlagen". fd 3 haelt den urspruenglichen Kanal fest, damit der Cron-Log am Ende
+# trotzdem alles sieht.
+FEHLERSCHNITT="$(mktemp)"
+exec 3>&2
+exec 2>"$FEHLERSCHNITT"
+
+melde_ergebnis() {
+  rc=$?
+  exec 2>&3                                  # stderr zurueckgeben
+  [ -s "$FEHLERSCHNITT" ] && cat "$FEHLERSCHNITT" >&2
+  if [ "$rc" -ne 0 ]; then
+    text="Das taegliche Backup ist mit Rueckgabewert $rc abgebrochen."$'
+
+'
+    text+="Letzte Ausgaben:"$'
+'"$(tail -20 "$FEHLERSCHNITT" 2>/dev/null)"$'
+
+'
+    text+="Verzeichnis: $BACKUP_DIR"$'
+'
+    text+="Bis das behoben ist, gibt es KEIN frisches Backup."
+    [ -x "$ALARM" ] && "$ALARM" "Backup FEHLGESCHLAGEN" "$text"
+  fi
+  rm -f "$FEHLERSCHNITT"
+}
+trap melde_ergebnis EXIT
+
 COMPOSE_DIR="/opt/echob"
 COMPOSE_FILE="docker-compose.prod.yml"
 BACKUP_DIR="/opt/echob/backups"

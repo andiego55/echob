@@ -20,6 +20,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infra/docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    # Ohne das waechst das Docker-JSON-Log unbegrenzt - der einzige Posten auf der Platte,
+    # der kein Ende kennt. Laeuft sie voll, hoert Postgres auf zu schreiben UND das Backup
+    # schlaegt fehl; die beiden schlimmsten Faelle treffen dann gleichzeitig ein.
+    # 3 x 10 MB je Dienst = hoechstens 90 MB fuer den ganzen Stapel.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -43,6 +52,29 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    # Ohne das waechst das Docker-JSON-Log unbegrenzt - der einzige Posten auf der Platte,
+    # der kein Ende kennt. Laeuft sie voll, hoert Postgres auf zu schreiben UND das Backup
+    # schlaegt fehl; die beiden schlimmsten Faelle treffen dann gleichzeitig ein.
+    # 3 x 10 MB je Dienst = hoechstens 90 MB fuer den ganzen Stapel.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Ein Container kann laufen und trotzdem nichts mehr beantworten. Ohne diese Pruefung
+    # steht er in `docker compose ps` als "Up" - und restart: unless-stopped fasst ihn nie
+    # an, weil er ja laeuft.
+    #
+    # WICHTIG: Docker startet einen "unhealthy" Container von sich aus NICHT neu. Diese
+    # Pruefung macht den Zustand sichtbar; das Anschlagen erledigt infra/monitor/watch.sh.
+    # urllib statt curl, weil im schlanken Python-Abbild kein curl liegt.
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request as u, sys; sys.exit(0 if u.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=5).status == 200 else 1)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
 
   caddy:
     image: caddy:2-alpine
@@ -56,6 +88,15 @@ services:
       - caddy_config:/config
     depends_on:
       - api
+    # Ohne das waechst das Docker-JSON-Log unbegrenzt - der einzige Posten auf der Platte,
+    # der kein Ende kennt. Laeuft sie voll, hoert Postgres auf zu schreiben UND das Backup
+    # schlaegt fehl; die beiden schlimmsten Faelle treffen dann gleichzeitig ein.
+    # 3 x 10 MB je Dienst = hoechstens 90 MB fuer den ganzen Stapel.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   postgres_data:
