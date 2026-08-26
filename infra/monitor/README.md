@@ -49,9 +49,16 @@ chmod +x /opt/echob/infra/monitor/*.sh /opt/echob/infra/backup/*.sh
 /opt/echob/infra/monitor/alarm.sh "Testalarm" "Wenn diese Mail ankommt, funktioniert der Weg."
 ```
 
-Empfänger ist voreingestellt `andreasw5583@gmail.com` — bewusst ein Postfach **außerhalb**
-der eigenen Domain: Wenn Resend, die Domain oder der Server das Problem *sind*, kommt die
-Warnung trotzdem an. Änderbar über `ALARM_TO_EMAIL` in der `.env.docker`.
+Der Empfänger steht in `/opt/echob/.env.docker` — **nicht im Repo**, denn das ist
+öffentlich:
+
+```
+ALARM_TO_EMAIL=deine-adresse@example.com
+```
+
+Sinnvoll ist ein Postfach **außerhalb** der eigenen Domain: Wenn Resend, die Domain oder
+der Server das Problem *sind*, kommt die Warnung trotzdem an. Fehlt der Eintrag, schreibt
+`alarm.sh` das deutlich ins Protokoll, statt still nichts zu tun.
 
 ## Cron — alles auf einen Blick
 

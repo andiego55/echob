@@ -34,7 +34,7 @@ erste Kopie außer Haus:
 
 ```bash
 mkdir -p ~/echob-restore && cd ~/echob-restore
-scp root@162.55.44.26:/var/backups/echob/echob-JJJJ-MM-TT_HHMM.sql.gz.age .
+scp root@<SERVER-IP>:/var/backups/echob/echob-JJJJ-MM-TT_HHMM.sql.gz.age .
 # privaten Schluessel aus dem Passwortmanager in eine temporaere Datei schreiben
 /pfad/zum/repo/infra/backup/restore-pruefen.sh echob-JJJJ-MM-TT_HHMM.sql.gz.age schluessel.txt
 ```
@@ -49,7 +49,7 @@ Am Ende nennt es den Befehl, mit dem der Beweis auf dem Server vermerkt wird —
 der Wächter ihn nach 45 Tagen an:
 
 ```bash
-ssh root@162.55.44.26 'date +%s > /var/backups/echob/.restore-test-ok'
+ssh root@<SERVER-IP> 'date +%s > /var/backups/echob/.restore-test-ok'
 ```
 
 ## Was als Beweis gilt

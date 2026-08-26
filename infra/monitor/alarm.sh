@@ -27,7 +27,10 @@ BETREFF="${1:?alarm.sh \"Betreff\" \"Text\"}"
 TEXT="${2:-}"
 
 ENV_FILE="${ECHOB_ENV_FILE:-/opt/echob/.env.docker}"
-EMPFAENGER="${ALARM_TO_EMAIL:-andreasw5583@gmail.com}"
+# Kommt aus der .env.docker. Bewusst OHNE Vorgabewert: Das Repo ist oeffentlich, und
+# eine private Adresse darin waere ein Geschenk an jeden Adress-Sammler. Fehlt sie,
+# wird das laut ins Protokoll geschrieben statt still nichts zu tun.
+EMPFAENGER="${ALARM_TO_EMAIL:-}"
 # Neben die uebrigen echob-Logs. Frueher zeigte das auf /opt/echob/backups - ein
 # Verzeichnis, das seinen Zweck verlor, als klar wurde, dass die Backups nach
 # /var/backups/echob gehen.
@@ -54,6 +57,10 @@ notiz "$BETREFF — ${TEXT//$'\n'/ }"
 if [ -z "$SCHLUESSEL" ]; then
   notiz "KEIN RESEND_API_KEY in $ENV_FILE — nicht versendet."
   exit 0    # Ein fehlgeschlagener Alarm darf den Aufrufer nie mitreissen.
+fi
+if [ -z "$EMPFAENGER" ]; then
+  notiz "KEIN ALARM_TO_EMAIL in $ENV_FILE — niemand wird benachrichtigt."
+  exit 0
 fi
 
 # JSON von Hand zu bauen ist fehleranfällig, sobald der Text Anführungszeichen oder

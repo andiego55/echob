@@ -33,7 +33,7 @@ if [ -z "$DATEI" ] || [ -z "$SCHLUESSEL" ]; then
 Aufruf: restore-pruefen.sh <backup.sql.gz.age> <age-schluesseldatei>
 
   <backup.sql.gz.age>    vom Server geholt:
-      scp root@162.55.44.26:/var/backups/echob/echob-JJJJ-MM-TT_HHMM.sql.gz.age .
+      scp root@<SERVER-IP>:/var/backups/echob/echob-JJJJ-MM-TT_HHMM.sql.gz.age .
 
   <age-schluesseldatei>  Textdatei mit der Zeile AGE-SECRET-KEY-1...
       Aus dem Passwortmanager in eine temporaere Datei schreiben und danach loeschen.
@@ -146,7 +146,7 @@ sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen und entha
 sagen ""
 sagen "Bitte noch erledigen:"
 sagen "  1. Auf dem Server vermerken, damit der Waechter Ruhe gibt:"
-sagen "     ssh root@162.55.44.26 'date +%s > /var/backups/echob/.restore-test-ok'"
+sagen "     ssh root@<SERVER-IP> 'date +%s > /var/backups/echob/.restore-test-ok'"
 sagen "  2. Die heruntergeladene Datei loeschen - sie enthaelt echte Nutzerdaten:"
 sagen "     rm -f \"$DATEI\""
 sagen "  3. Die temporaere Schluesseldatei loeschen:"
