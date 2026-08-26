@@ -36,7 +36,7 @@ zusätzlich DNS, Zertifikat und Proxy, also die Kette, die auch der Nutzer erleb
 Eine Warnung, die alle vier Stunden kommt, wird nach dem dritten Mal weggeklickt — und dann
 auch die vierte, die echt war. Gemeldet wird deshalb nur der **Übergang**: ok → knapp,
 knapp → kritisch, und die Entwarnung zurück. Der Zustand liegt in
-`/opt/echob/backups/.watch/`.
+`/var/backups/echob/.watch/`.
 
 **Und trotzdem ein Wochenbericht:** Stille ist zweideutig. Sie kann „alles in Ordnung"
 heißen oder „der Wächter läuft seit drei Wochen nicht mehr". Einmal pro Woche eine Mail mit

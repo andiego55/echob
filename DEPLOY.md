@@ -64,33 +64,43 @@ ersten Start automatisch. Caddy holt das TLS-Zertifikat selbstständig
 
 ## 6. Updates deployen
 
-> ⚠️ **Der laufende Prod-Server `/opt/echob` ist KEINE Git-Auscheckung, sondern eine Dateikopie.**
-> `git pull` funktioniert dort **nicht**. Code wird von der Dev-Maschine übertragen (in **Git-Bash**,
-> nicht `cmd` – cmd zerbricht die Quotes) und das `api`-Image neu gebaut. Das Frontend deployt separat
-> über Cloudflare beim Push auf `main`.
+`/opt/echob` **ist** eine Git-Auscheckung. Ein Update ist deshalb ein `git pull` plus ein
+Neubau des `api`-Abbilds. Das Frontend deployt getrennt über Cloudflare beim Push auf `main`
+und braucht hier gar nichts.
+
+> **Die Reihenfolge ist nicht beliebig: erst Migration, dann Neubau.** Umgekehrt startet die
+> neue API gegen ein altes Schema und fällt mit `UndefinedColumnError` um — schon passiert.
+
+**Ohne neue Migration:**
 
 ```bash
-# Vorher Backup (auf dem Server):
-ssh root@<SERVER-IP> 'cp -r /opt/echob/services/api/app /opt/echob/services/api/app.bak.$(date +%F-%H%M)'
-
-# 1) Backend-Code uebertragen (aus dem Repo-Root der Dev-Maschine):
-tar czf - --exclude='__pycache__' --exclude='*.pyc' -C services/api app \
-  | ssh root@<SERVER-IP> 'tar xzf - -C /opt/echob/services/api'
-
-# 2) Neue Init-SQL-Skripte uebertragen (falls vorhanden):
-scp infra/docker/postgres/init/NN_*.sql root@<SERVER-IP>:/opt/echob/infra/docker/postgres/init/
-
-# 3) Auf dem Server: ggf. Schema einspielen + API neu bauen:
-ssh root@<SERVER-IP> 'cd /opt/echob \
-  && docker compose -f docker-compose.prod.yml exec -T postgres psql -U echob -d echob < infra/docker/postgres/init/NN_*.sql \
-  && docker compose -f docker-compose.prod.yml up -d --build api'
+cd /opt/echob && git pull && docker compose -f docker-compose.prod.yml up -d --build api && sleep 15 && curl -s -o /dev/null -w '%{http_code}\n' https://api.echo-b.de/api/v1/health
 ```
 
-> **Neue DB-Init-Skripte** laufen nur bei einem frischen Postgres-Volume automatisch; auf der bestehenden
-> Prod-DB einmalig wie oben (Schritt 3) einspielen. Die Skripte sind idempotent (`CREATE TABLE IF NOT EXISTS`).
->
-> **Empfehlung:** den Prod-Host künftig als echte Git-Auscheckung aufsetzen (`git clone` nach `/opt/echob`),
-> dann gilt wieder der einfache `git pull`-Flow.
+**Mit neuer Migration** — Dateiname ausschreiben, nie `NN_*.sql`; ein Glob spielt sonst
+irgendwann versehentlich alle Skripte erneut ein:
+
+```bash
+cd /opt/echob && git pull && set -a && . ./.env.docker && set +a && docker compose -f docker-compose.prod.yml exec -T postgres psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" < infra/docker/postgres/init/94_couple_honest.sql && docker compose -f docker-compose.prod.yml up -d --build api && sleep 15 && curl -s -o /dev/null -w '%{http_code}\n' https://api.echo-b.de/api/v1/health
+```
+
+`ON_ERROR_STOP=1` sorgt dafür, dass die Kette abbricht, statt bei einem SQL-Fehler
+weiterzulaufen und die API gegen ein halbes Schema zu starten. Erwartete Ausgabe am Ende:
+`200`. Die Init-Skripte sind idempotent (`CREATE TABLE IF NOT EXISTS`), ein zweiter Lauf
+schadet also nicht.
+
+> **Warum hier nichts kopiert und nichts gesichert wird.** Früher stand an dieser Stelle ein
+> `tar | ssh`-Transfer plus ein `cp -r … app.bak.$(date …)` „zur Sicherheit". Beides ist weg:
+> Der Code liegt in Git, ein Backup davon auf demselben Server ist keins — und die Kopien
+> wurden nie aufgeräumt. Sie sind der Grund, warum sich auf dem Prod-Host über zwanzig
+> `app.bak.*`-Verzeichnisse angesammelt haben. Zurück geht es mit `git checkout <commit>`.
+
+**Nach dem Deploy prüfen, ob ein neues Antwortfeld wirklich ankommt** — FastAPI streicht
+lautlos alles, was nicht im `response_model` steht:
+
+```bash
+curl -s https://api.echo-b.de/openapi.json | grep -c "feldname"
+```
 
 ## 7. Betrieb
 

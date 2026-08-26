@@ -87,7 +87,7 @@ Wenn die Platte voll laeuft, hoert Postgres auf zu schreiben UND das Backup schl
 Sofort Platz schaffen:
 
   docker image prune -af && docker builder prune -af
-  du -sh /opt/echob/backups /var/lib/docker /var/log | sort -h"
+  du -sh /var/backups/echob /var/lib/docker /var/log | sort -h"
   elif [ "$frei_mb" -lt "$knapp_mb" ]; then
     pruefe platte warn \
       "Noch $frei_mb MB frei (Grenze $knapp_mb MB). Kein Notfall, aber es wird eng.
@@ -116,7 +116,7 @@ Datei: $juengstes
 
 Der taegliche Lauf kommt nicht mehr durch. Nachsehen:
   tail -30 /var/log/echob-backup.log
-  tail -30 /opt/echob/backups/alarm.log"
+  tail -30 /var/log/echob-alarm.log"
   else
     pruefe backup ok "Juengstes Backup ist $alter_std Std. alt."
   fi

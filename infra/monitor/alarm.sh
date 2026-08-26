@@ -28,7 +28,10 @@ TEXT="${2:-}"
 
 ENV_FILE="${ECHOB_ENV_FILE:-/opt/echob/.env.docker}"
 EMPFAENGER="${ALARM_TO_EMAIL:-andreasw5583@gmail.com}"
-LOG="${ALARM_LOG:-/opt/echob/backups/alarm.log}"
+# Neben die uebrigen echob-Logs. Frueher zeigte das auf /opt/echob/backups - ein
+# Verzeichnis, das seinen Zweck verlor, als klar wurde, dass die Backups nach
+# /var/backups/echob gehen.
+LOG="${ALARM_LOG:-/var/log/echob-alarm.log}"
 
 zeit() { date '+%Y-%m-%d %H:%M:%S'; }
 notiz() { echo "[$(zeit)] $*" >> "$LOG" 2>/dev/null || true; }
