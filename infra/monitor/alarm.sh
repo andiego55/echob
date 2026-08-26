@@ -18,6 +18,10 @@
 # Ausfall hilft nur eine Prüfung von AUSSEN (Uptime-Dienst). Das hier deckt alles ab, was
 # den Server erreicht, aber nicht umbringt — und das sind fast alle Fälle.
 #
+# RUECKGABEWERT: 0 nur bei echter Zustellung. Wer den Alarm ausloest, muss unterscheiden
+# koennen zwischen „gemeldet“ und „versucht“ — sonst gilt ein Zustandswechsel als erledigt,
+# den niemand gesehen hat.
+#
 # Absender: ALARM_FROM_EMAIL, sonst LEAD_FROM_EMAIL aus der .env.docker. Beide liegen auf
 # der bei Resend verifizierten Domain, es braucht also nichts Zusätzliches.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -56,11 +60,11 @@ notiz "$BETREFF — ${TEXT//$'\n'/ }"
 
 if [ -z "$SCHLUESSEL" ]; then
   notiz "KEIN RESEND_API_KEY in $ENV_FILE — nicht versendet."
-  exit 0    # Ein fehlgeschlagener Alarm darf den Aufrufer nie mitreissen.
+  exit 1
 fi
 if [ -z "$EMPFAENGER" ]; then
   notiz "KEIN ALARM_TO_EMAIL in $ENV_FILE — niemand wird benachrichtigt."
-  exit 0
+  exit 1
 fi
 
 # JSON von Hand zu bauen ist fehleranfällig, sobald der Text Anführungszeichen oder
@@ -80,7 +84,7 @@ print(json.dumps({
 
 if [ -z "$NUTZLAST" ]; then
   notiz "Konnte die Nachricht nicht als JSON bauen — nicht versendet."
-  exit 0
+  exit 1
 fi
 
 ANTWORT="$(curl -sS --max-time 20 -o /tmp/alarm-antwort.$$ -w '%{http_code}' \
@@ -95,4 +99,9 @@ else
   notiz "Versand fehlgeschlagen (HTTP $ANTWORT): $(head -c 300 /tmp/alarm-antwort.$$ 2>/dev/null)"
 fi
 rm -f /tmp/alarm-antwort.$$
-exit 0
+
+# Der Rueckgabewert sagt, ob ZUGESTELLT wurde. Der Waechter merkt sich einen
+# Zustandswechsel sonst als gemeldet, obwohl niemand ihn je gesehen hat - die Warnung
+# waere fuer immer verloren. Aufrufer duerfen daran nicht scheitern: backup.sh ruft das
+# in einem trap, watch.sh laeuft ohne "set -e".
+[ "$ANTWORT" = "200" ] && exit 0 || exit 1

@@ -57,14 +57,27 @@ pruefe() {
   local datei="$ZUSTAND_DIR/$name"
   local vorher="ok"
   [ -f "$datei" ] && vorher="$(cat "$datei" 2>/dev/null)"
-  echo "$jetzt" > "$datei" 2>/dev/null || true
 
-  [ "$jetzt" = "$vorher" ] && return 0
+  if [ "$jetzt" = "$vorher" ]; then
+    echo "$jetzt" > "$datei" 2>/dev/null || true
+    return 0
+  fi
+
+  local zugestellt=1
   case "$jetzt" in
-    kritisch) melden "KRITISCH: $name" "$text" ;;
-    warn)     melden "Achtung: $name"  "$text" ;;
-    ok)       melden "Entwarnung: $name" "Wieder im gruenen Bereich."$'\n\n'"$text" ;;
+    kritisch) melden "KRITISCH: $name" "$text" && zugestellt=0 ;;
+    warn)     melden "Achtung: $name"  "$text" && zugestellt=0 ;;
+    ok)       melden "Entwarnung: $name" "Wieder im gruenen Bereich."$'\n\n'"$text" && zugestellt=0 ;;
   esac
+
+  # Den neuen Zustand NUR merken, wenn die Meldung wirklich rausging. Sonst gilt der
+  # Wechsel beim naechsten Lauf als bekannt, obwohl ihn niemand gesehen hat - genau so
+  # waere am 26.08. die Warnung 'Restore noch nie gelaufen' spurlos verschwunden, weil
+  # ALARM_TO_EMAIL fehlte. Bleibt der alte Zustand stehen, wird es in vier Stunden
+  # erneut versucht.
+  if [ "$zugestellt" -eq 0 ]; then
+    echo "$jetzt" > "$datei" 2>/dev/null || true
+  fi
 }
 
 notiz "EchoB-Waechter $(date '+%Y-%m-%d %H:%M')"
