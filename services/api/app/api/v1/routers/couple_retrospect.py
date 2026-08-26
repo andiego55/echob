@@ -77,13 +77,18 @@ async def write_retrospect(
                        "Fangt mit dem Barometer oder einem Check-in an.",
             )
 
-        text = await echo_svc.professional_chat(
-            user_message=(
-                "Schreib den Rückblick nach den vorgegebenen vier Abschnitten. "
-                "Nur aus diesen Zahlen, nichts hinzuerfinden.\n\n" + crs.build_input(stats)
-            ),
-            shared_context="", history=[], prompt_file=_PROMPT,
-        )
+
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    text = await echo_svc.professional_chat(
+        user_message=(
+            "Schreib den Rückblick nach den vorgegebenen vier Abschnitten. "
+            "Nur aus diesen Zahlen, nichts hinzuerfinden.\n\n" + crs.build_input(stats)
+        ),
+        shared_context="", history=[], prompt_file=_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         row = await crs.save(
             conn, couple_id, user_id, body=text,
             period_start=stats["period_start"], period_end=stats["period_end"],

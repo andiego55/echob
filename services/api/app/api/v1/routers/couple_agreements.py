@@ -64,15 +64,19 @@ async def create_summary(
         contexts = await css.load_confirmed_contexts(conn, session_id)
         transcript = css.build_transcript(messages, names)
 
-        text = await echo_svc.professional_chat(
-            user_message=(
-                "Fasse dieses gemeinsame Gespräch nach den vier vorgegebenen Abschnitten "
-                f"zusammen.\n\nGesprächsverlauf:\n{transcript}"
-            ),
-            shared_context=css.build_session_context(session, contexts, names),
-            history=[],
-            prompt_file=_SUMMARY_PROMPT,
-        )
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    text = await echo_svc.professional_chat(
+        user_message=(
+            "Fasse dieses gemeinsame Gespräch nach den vier vorgegebenen Abschnitten "
+            f"zusammen.\n\nGesprächsverlauf:\n{transcript}"
+        ),
+        shared_context=css.build_session_context(session, contexts, names),
+        history=[],
+        prompt_file=_SUMMARY_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         summary = await cas.save_summary(conn, session_id, user_id, text)
         await progress.award(conn, session["couple_id"], user_id,
                              "session_summarized", session_id)

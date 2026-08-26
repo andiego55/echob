@@ -81,3 +81,90 @@ def test_the_guard_would_catch_the_original_bug():
         "    return Detail(members=m)\n"
     )
     assert _verwendungen_ausserhalb(heil) == []
+
+
+# ── Zweiter Wächter: der teuerste Aufruf blockiert die knappste Ressource ────
+
+#: Bezeichner, hinter denen ein Aufruf zum Sprachmodell steckt.
+ECHO_EMPFAENGER = {"echo_svc", "echo_service"}
+
+
+def _echo_aufrufe_im_verbindungsblock(quelle: str) -> list[tuple[str, int]]:
+    """Jeder Aufruf ans Sprachmodell, der dabei eine Verbindung festhält."""
+    baum = ast.parse(quelle)
+    treffer: list[tuple[str, int]] = []
+
+    for fn in ast.walk(baum):
+        if not isinstance(fn, ast.AsyncFunctionDef | ast.FunctionDef):
+            continue
+        bloecke = [
+            (node.lineno, node.end_lineno)
+            for node in ast.walk(fn)
+            if isinstance(node, ast.AsyncWith)
+            for item in node.items
+            if isinstance(item.optional_vars, ast.Name)
+            and item.optional_vars.id == "conn"
+        ]
+        if not bloecke:
+            continue
+
+        for node in ast.walk(fn):
+            if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
+                continue
+            if getattr(node.func.value, "id", "") not in ECHO_EMPFAENGER:
+                continue
+            if any(a <= node.lineno <= e for a, e in bloecke):
+                treffer.append((fn.name, node.lineno))
+    return treffer
+
+
+def test_kein_modellaufruf_haelt_eine_verbindung_fest():
+    """Der teuerste Aufruf darf nicht die knappste Ressource blockieren.
+
+    Der Pool fasst 10 Verbindungen je Arbeitsprozess, bei zwei Prozessen also 20. Ein
+    Aufruf ans Sprachmodell dauert 2 bis 20 Sekunden. Wer die Verbindung solange hält,
+    macht aus zwanzig gleichzeitigen Nutzern einen Totalausfall — und zwar einen, bei dem
+    auch Anmeldung und Übersicht stehen, nicht nur die KI-Funktion.
+
+    Das ist keine Missbrauchsfrage. Zwanzig gleichzeitig arbeitende Menschen an einem
+    Dienstagabend genügen.
+
+    Richtig ist: Kontext unter einer Verbindung laden, Verbindung freigeben, Modell fragen,
+    Verbindung neu holen, Ergebnis speichern. Zwischen den beiden Blöcken liegen nur Daten,
+    keine offene Verbindung — deshalb ist das Aufteilen unbedenklich, solange keine
+    Transaktion darüber läuft (in diesen Routern läuft keine).
+    """
+    fehler: list[str] = []
+    for pfad in sorted(ROUTERS.glob("*.py")):
+        for fn_name, zeile in _echo_aufrufe_im_verbindungsblock(
+            pfad.read_text(encoding="utf-8")
+        ):
+            fehler.append(f"{pfad.name}:{zeile} in {fn_name}()")
+
+    assert not fehler, (
+        "Diese Stellen fragen das Sprachmodell, während sie eine Datenbankverbindung "
+        "halten:\n  " + "\n  ".join(fehler)
+        + "\n\nDen Verbindungsblock vor dem Aufruf schließen und danach neu öffnen."
+    )
+
+
+def test_auch_dieser_waechter_wuerde_greifen():
+    """Gegenprobe: erkennt das Muster und lässt die richtige Lösung durch."""
+    kaputt = (
+        "async def mediate(pool, echo_svc):\n"
+        "    async with pool.acquire() as conn:\n"
+        "        kontext = await lade(conn)\n"
+        "        text = await echo_svc.professional_chat(kontext)\n"
+        "        await speichere(conn, text)\n"
+    )
+    assert _echo_aufrufe_im_verbindungsblock(kaputt) == [("mediate", 4)]
+
+    heil = (
+        "async def mediate(pool, echo_svc):\n"
+        "    async with pool.acquire() as conn:\n"
+        "        kontext = await lade(conn)\n"
+        "    text = await echo_svc.professional_chat(kontext)\n"
+        "    async with pool.acquire() as conn:\n"
+        "        await speichere(conn, text)\n"
+    )
+    assert _echo_aufrufe_im_verbindungsblock(heil) == []

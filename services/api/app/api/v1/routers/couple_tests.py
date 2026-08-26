@@ -94,15 +94,20 @@ async def compare(
         data = await cts_test.load_runs(conn, couple_id, slug, user_id)
         context = cts_test.build_comparison_input(data, slug)
 
-        body = await echo_svc.professional_chat(
-            user_message=(
-                "Lege die beiden Ergebnisse nach den vorgegebenen Abschnitten nebeneinander. "
-                "Kein Zeugnis, keine Bewertung, wer besser abgeschnitten hat."
-            ),
-            shared_context=context,
-            history=[],
-            prompt_file=_TEST_PROMPT,
-        )
+
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    body = await echo_svc.professional_chat(
+        user_message=(
+            "Lege die beiden Ergebnisse nach den vorgegebenen Abschnitten nebeneinander. "
+            "Kein Zeugnis, keine Bewertung, wer besser abgeschnitten hat."
+        ),
+        shared_context=context,
+        history=[],
+        prompt_file=_TEST_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         await cts_test.save_comparison(conn, couple_id, user_id, slug, body)
         await progress.award(conn, couple_id, user_id, "test_compared", slug)
         return await _state(conn, couple_id, slug, user_id)

@@ -108,6 +108,11 @@ class Settings(BaseSettings):
 
     # ── Monitoring (Sentry) ────────────────────────────────────────────
     # Leer = aus. PII-frei konfiguriert (siehe main.py). EU-Region empfohlen.
+    #: Wie lange eine Anfrage auf eine freie Datenbankverbindung wartet, bevor sie mit
+    #: 503 abgewiesen wird. Ohne Grenze wartet asyncpg unbegrenzt und die ganze App
+    #: friert bei Ueberlast ein, statt einzelne Anfragen abzuweisen.
+    db_acquire_timeout: float = 15.0
+
     sentry_dsn: str = ""
 
     # ── Logging ────────────────────────────────────────────────────────

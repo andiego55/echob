@@ -200,12 +200,16 @@ async def draft_context(
         material = await ccs.collect_material(conn, body.case_id, user_id, body.elements)
         instruction = ccs.build_draft_instruction(session, body.focus)
 
-        draft = await echo_svc.professional_chat(
-            user_message=instruction,
-            shared_context=f"# Mein eigenes Material (nur für den Entwurf)\n\n{material}",
-            history=[],
-            prompt_file=_CONTEXT_PROMPT,
-        )
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    draft = await echo_svc.professional_chat(
+        user_message=instruction,
+        shared_context=f"# Mein eigenes Material (nur für den Entwurf)\n\n{material}",
+        history=[],
+        prompt_file=_CONTEXT_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         ctx = await css.save_context(
             conn, session_id, user_id,
             draft_text=draft, source_elements=body.elements,
@@ -257,12 +261,16 @@ async def rephrase(
     async with pool.acquire() as conn:
         await enforce_echo_prompt_limit(user_id, conn)
         await css.require_session(conn, session_id, user_id)
-        suggestion = await echo_svc.professional_chat(
-            user_message=body.text,
-            shared_context="",
-            history=[],
-            prompt_file=_REPHRASE_PROMPT,
-        )
+
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    suggestion = await echo_svc.professional_chat(
+        user_message=body.text,
+        shared_context="",
+        history=[],
+        prompt_file=_REPHRASE_PROMPT,
+    )
+
     return CoupleRephraseResponse(suggestion=suggestion)
 
 

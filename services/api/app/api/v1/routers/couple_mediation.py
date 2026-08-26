@@ -152,28 +152,42 @@ async def mediate(
             )
 
         context = await cms.build_mediation_input(conn, topic, link, perspectives)
-        body = await echo_svc.professional_chat(
-            user_message=(
-                "Erarbeite jetzt den Mediationsvorschlag nach den vorgegebenen Abschnitten. "
-                "Denk an die eiserne Regel zu den vertraulichen Beiträgen."
-            ),
-            shared_context=context,
-            history=[],
-            prompt_file=_MEDIATION_PROMPT,
-        )
+
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    body = await echo_svc.professional_chat(
+        user_message=(
+            "Erarbeite jetzt den Mediationsvorschlag nach den vorgegebenen Abschnitten. "
+            "Denk an die eiserne Regel zu den vertraulichen Beiträgen."
+        ),
+        shared_context=context,
+        history=[],
+        prompt_file=_MEDIATION_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         await cms.save_mediation(conn, topic_id, user_id, body)
 
-        # Aus dem Fliesstext werden verhandelbare Brücken. Ein eigener, kleiner Aufruf —
-        # so bleibt der Vorschlag gut lesbar UND maschinell greifbar.
-        try:
-            raw = await echo_svc.professional_chat(
-                user_message=cms.BRIDGE_EXTRACT_INSTRUCTION + body,
-                shared_context="", history=[], prompt_file=_MEDIATION_PROMPT,
-            )
-            await cms.save_bridges(conn, topic_id, cms.parse_bridges(raw))
-        except Exception:  # noqa: BLE001 - ohne Brücken bleibt der Vorschlag trotzdem nutzbar
-            logger.warning("Brücken konnten nicht extrahiert werden (topic=%s).",
-                           str(topic_id)[:8])
+    # Aus dem Fließtext werden verhandelbare Brücken. Ein eigener, kleiner Aufruf —
+    # so bleibt der Vorschlag gut lesbar UND maschinell greifbar. Auch er läuft ohne
+    # gehaltene Verbindung; das Ergebnis wird erst danach gespeichert.
+    bruecken = None
+    try:
+        raw = await echo_svc.professional_chat(
+            user_message=cms.BRIDGE_EXTRACT_INSTRUCTION + body,
+            shared_context="", history=[], prompt_file=_MEDIATION_PROMPT,
+        )
+        bruecken = cms.parse_bridges(raw)
+    except Exception:  # noqa: BLE001 - ohne Brücken bleibt der Vorschlag trotzdem nutzbar
+        logger.warning("Brücken konnten nicht extrahiert werden (topic=%s).",
+                       str(topic_id)[:8])
+
+    async with pool.acquire() as conn:
+        # Bewusst NICHT mehr in der Fehlertoleranz oben: Vorher verschluckte sie auch einen
+        # Schreibfehler der Datenbank, und die Brücken verschwanden lautlos. Ein
+        # Datenbankfehler gehört gemeldet — die Nachsicht gilt dem Modell, nicht dem Speichern.
+        if bruecken:
+            await cms.save_bridges(conn, topic_id, bruecken)
 
         await progress.award(conn, topic["couple_id"], user_id, "mediation_done", topic_id)
         return await _detail(conn, topic, link, user_id)
@@ -341,10 +355,15 @@ async def post_topic_private(
             await cps.load_topic_private_messages(conn, topic_id, user_id)
         )
         context = await cps.build_topic_private_context(conn, topic, link, user_id)
-        reply = await echo_svc.professional_chat(
-            user_message=body.content, shared_context=context,
-            history=history[:-1], prompt_file=_PRIVATE_PROMPT,
-        )
+
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    reply = await echo_svc.professional_chat(
+        user_message=body.content, shared_context=context,
+        history=history[:-1], prompt_file=_PRIVATE_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         await cps.add_topic_private_message(conn, topic_id, user_id, role="echo", content=reply)
         msgs = await cps.load_topic_private_messages(conn, topic_id, user_id)
     return CouplePrivateThread(messages=[cps.public_private_message(m) for m in msgs])
@@ -373,16 +392,20 @@ async def summarize_topic_private(
         verlauf = "\n".join(
             f"{'Echo' if m['role'] == 'echo' else 'Ich'}: {m['content']}" for m in msgs
         )
-        draft = await echo_svc.professional_chat(
-            user_message=(
-                f"Thema: {topic['title']}\n\nMein privater Verlauf mit dir:\n{verlauf}\n\n"
-                "Fasse daraus in höchstens 150 Wörtern zusammen, was ich meiner Partnerperson "
-                "sagen möchte — in Ich-Botschaften, ohne Vorwürfe und ohne etwas aus diesem "
-                "Dialog preiszugeben, das ich für mich behalten will. Nur der Text, keine "
-                "Einleitung."
-            ),
-            shared_context="", history=[], prompt_file=_PRIVATE_PROMPT,
-        )
+
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    draft = await echo_svc.professional_chat(
+        user_message=(
+            f"Thema: {topic['title']}\n\nMein privater Verlauf mit dir:\n{verlauf}\n\n"
+            "Fasse daraus in höchstens 150 Wörtern zusammen, was ich meiner Partnerperson "
+            "sagen möchte — in Ich-Botschaften, ohne Vorwürfe und ohne etwas aus diesem "
+            "Dialog preiszugeben, das ich für mich behalten will. Nur der Text, keine "
+            "Einleitung."
+        ),
+        shared_context="", history=[], prompt_file=_PRIVATE_PROMPT,
+    )
+
     return CoupleShareDraft(text=draft)
 
 

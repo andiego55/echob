@@ -63,12 +63,16 @@ async def post_private(
         )
         context = await cps.build_private_context(conn, session, link, user_id)
 
-        reply = await echo_svc.professional_chat(
-            user_message=body.content,
-            shared_context=context,
-            history=history[:-1],   # die eigene neue Nachricht steckt schon in user_message
-            prompt_file=_PRIVATE_PROMPT,
-        )
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    reply = await echo_svc.professional_chat(
+        user_message=body.content,
+        shared_context=context,
+        history=history[:-1],   # die eigene neue Nachricht steckt schon in user_message
+        prompt_file=_PRIVATE_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         await cps.add_private_message(conn, session_id, user_id, role="echo", content=reply)
         messages = await cps.load_private_messages(conn, session_id, user_id)
     return CouplePrivateThread(messages=[cps.public_private_message(m) for m in messages])
@@ -96,16 +100,20 @@ async def private_feedback(
         own_name = names.get(str(user_id), "Person")
         context = await cps.build_private_context(conn, session, link, user_id)
 
-        reply = await echo_svc.professional_chat(
-            user_message=(
-                f"Bitte gib mir Feedback zu meinem eigenen Anteil an diesem Gespräch. "
-                f"Ich bin '{own_name}'.\n\n"
-                f"Gesprächsverlauf:\n{transcript}"
-            ),
-            shared_context=context,
-            history=[],
-            prompt_file=_PRIVATE_PROMPT,
-        )
+    # Verbindung vor dem Modellaufruf freigegeben: Er dauert Sekunden bis Minuten,
+    # und solange darf er keine der 20 Verbindungen belegen.
+    reply = await echo_svc.professional_chat(
+        user_message=(
+            f"Bitte gib mir Feedback zu meinem eigenen Anteil an diesem Gespräch. "
+            f"Ich bin '{own_name}'.\n\n"
+            f"Gesprächsverlauf:\n{transcript}"
+        ),
+        shared_context=context,
+        history=[],
+        prompt_file=_PRIVATE_PROMPT,
+    )
+
+    async with pool.acquire() as conn:
         await cps.add_private_message(
             conn, session_id, user_id, role="echo", content=reply, kind="feedback",
         )
