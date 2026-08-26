@@ -97,6 +97,45 @@ crontab -e
 
 Die übrigen Cron-Einträge stehen in [`../monitor/README.md`](../monitor/README.md).
 
+## Schlüsselwechsel (wenn der private Schlüssel verloren oder kompromittiert ist)
+
+Ohne den privaten Schlüssel sind vorhandene Backups mathematisch wertlos — daran lässt
+sich nichts reparieren. Der Datenbestand selbst ist davon **nicht** betroffen: Die
+Datenbank läuft weiter, verloren ist nur die Rückfalloption.
+
+Die richtige Reaktion ist deshalb nicht Suchen bis zur Erschöpfung, sondern schnell wieder
+in einen beweisbaren Zustand kommen:
+
+```bash
+# 1. Auf DEINEM Rechner (nicht auf dem Server) ein neues Paar erzeugen
+age-keygen -o echob-age-identity.txt
+# Ausgabe: "Public key: age1..."  <- das ist der oeffentliche Teil
+
+# 2. Den INHALT von echob-age-identity.txt sofort in den Passwortmanager,
+#    Eintrag z.B. "EchoB Backup - age private key (ab JJJJ-MM-TT)".
+#    Erst danach weiterarbeiten.
+
+# 3. Oeffentlichen Schluessel auf dem Server hinterlegen - ohne das Skript zu aendern:
+#    (in /opt/echob/.env.docker ergaenzen)
+#    ECHOB_AGE_RECIPIENT=age1...
+
+# 4. Sofort ein Backup ziehen und beweisen
+/opt/echob/infra/backup/backup.sh
+#    dann auf deinem Rechner: restore-pruefen.sh mit dem NEUEN Schluessel
+```
+
+**Alte Backups.** Sie bleiben mit dem alten Schlüssel verschlüsselt. Ist der weg, sind sie
+Datenmüll: Sie belegen Platz und täuschen Sicherheit vor. Nach einer bewussten
+Entscheidung löschen — die Rotation nach 14 Tagen erledigt es sonst von allein.
+
+**Warum `ECHOB_AGE_RECIPIENT` und nicht das Skript ändern:** Der Empfänger ist eine
+Betriebs-Einstellung, keine Programmlogik. In der `.env.docker` steht er neben allem
+anderen Umgebungsabhängigen und ein Wechsel braucht kein Deployment.
+
+**Der private Schlüssel gehört nie auf den Server** — auch nicht kurz, auch nicht in einer
+Datei, die man danach löscht. `age-keygen` läuft auf deinem Rechner; der Server bekommt nur
+die öffentliche Hälfte zu sehen.
+
 ## Offen
 
 1. **Off-site-Kopie** — die Backups liegen auf derselben Platte wie die Datenbank. Ein
