@@ -7,18 +7,30 @@ name = "echob-api"
 version = "0.1.0"
 description = "EchoB API – Python/FastAPI Backend"
 requires-python = ">=3.12"
+# OBERGRENZEN, und warum sie so gesetzt sind.
+#
+# Was tatsaechlich installiert wird, steht in `requirements.lock.txt` — die Grenzen hier
+# sind die ZWEITE Absicherung: Sie greifen, wenn jemand die Sperrliste neu erzeugt. Ohne
+# sie koennte dabei stillschweigend eine Hauptversion hereinrutschen.
+#
+# Regel: Bei 0.x-Paketen wirkt die MINOR-Stelle wie eine Hauptversion (so sieht es auch
+# semver vor), deshalb dort `<0.x+1`. Ab 1.0 die naechste Hauptversion.
+#
+# Ehrlich dazugesagt: Die Grenze bei fastapi haette den Bruch von damals NICHT verhindert —
+# 0.114 auf 0.115 war ein Minor-Sprung und liegt innerhalb jeder vernuenftigen Spanne.
+# Davor schuetzt allein die Sperrliste. Die Grenzen hier verhindern das Groebere.
 dependencies = [
-    "fastapi>=0.115",
-    "uvicorn[standard]>=0.30",
-    "pydantic[email]>=2.7",
-    "pydantic-settings>=2.3",
-    "asyncpg>=0.29",
-    "supabase>=2.4",
-    "openai>=1.30",
-    "stripe>=10",
-    "python-multipart>=0.0.9",   # Form/File-Uploads (Schnellerfassung: Audio)
-    "cryptography>=42",          # Feldverschlüsselung sensibler Freitexte (Art. 32)
-    "sentry-sdk[fastapi]>=2.0",  # Error-Monitoring (Prod), PII-frei konfiguriert
+    "fastapi>=0.141,<0.142",     # 0.115 brach die 204-Antworten - hier bewusst eng
+    "uvicorn[standard]>=0.52,<0.53",
+    "pydantic[email]>=2.13,<3",
+    "pydantic-settings>=2.15,<3",
+    "asyncpg>=0.31,<0.32",
+    "supabase>=2.31,<3",
+    "openai>=3.3,<4",
+    "stripe>=15.5,<16",
+    "python-multipart>=0.0.32,<0.1",  # Form/File-Uploads (Schnellerfassung: Audio)
+    "cryptography>=50,<51",           # Feldverschluesselung sensibler Freitexte (Art. 32)
+    "sentry-sdk[fastapi]>=2.68,<3",   # Error-Monitoring (Prod), PII-frei konfiguriert
     # "python-jose[cryptography]>=3.3",
     # Ab Phase 3:
     # "anthropic>=0.25",
@@ -29,12 +41,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Werkzeuge fuer Entwicklung und CI. Sie stehen NICHT in der Sperrliste - der
+# Produktionscontainer installiert sie gar nicht. CI loest sie frisch auf; die Grenzen
+# verhindern, dass ein Hauptversionssprung die Testlaeufe ueber Nacht rot faerbt.
 dev = [
-    "pytest>=8",
-    "pytest-asyncio>=0.23",
-    "httpx>=0.27",
-    "ruff>=0.5",
-    "mypy>=1.10",
+    "pytest>=8,<9",
+    "pytest-asyncio>=0.23,<1",
+    "httpx>=0.28,<0.29",
+    "ruff>=0.5,<1",         # neue Minor-Versionen bringen neue Lint-Regeln mit
+    "mypy>=1.10,<2",
 ]
 
 [tool.setuptools.packages.find]

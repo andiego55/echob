@@ -1,0 +1,97 @@
+# EchoB API — festgenagelte Abhängigkeiten
+#
+# WAS DAS IST. Genau die Versionen, die am 2026-08-26 in Produktion liefen, abgelesen mit
+# `pip freeze` im laufenden Container. Der Docker-Build installiert ausschließlich hieraus.
+# Damit ergibt jeder Neubau dasselbe Ergebnis wie der letzte — auf demselben Rechner, auf
+# einem anderen, heute und in einem halben Jahr.
+#
+# WARUM AUS DER PRODUKTION ABGELESEN und nicht frisch aufgelöst. Eine frische Auflösung
+# hätte neuere Versionen gezogen als die laufenden. Dann wäre das „Festnageln" in Wahrheit
+# ein unangekündigtes Upgrade gewesen — das Risiko nicht beseitigt, sondern einmal ausgelöst.
+#
+# WAS OHNE DIESE DATEI PASSIERTE. `pyproject.toml` deklariert `fastapi>=0.115` ohne
+# Obergrenze. Tatsächlich lief 0.141.1 — sechsundzwanzig Minor-Versionen weiter, ohne dass
+# es irgendwo stand. Genau so kam FastAPI 0.115 herein und brachte die 204-Antworten zu
+# Fall: Die App startete nach einem Rebuild nicht mehr, und niemand hatte etwas geändert.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# WIE MAN SIE ERNEUERT — bitte regelmäßig, etwa vierteljährlich.
+#
+# Eine Sperrliste, die niemand zu erneuern wagt, wird selbst zum Sicherheitsproblem: Man
+# sitzt dann auf Bibliotheken mit bekannten Lücken. Der Weg ist deshalb kurz gehalten:
+#
+#   1. Neu auflösen, in einem Wegwerf-Container, gegen die Grenzen aus pyproject.toml:
+#        cd services/api
+#        docker run --rm -v "$PWD":/w -w /w python:3.12-slim sh -c \
+#          "pip install --quiet . && pip freeze --exclude echob-api" > requirements.lock.new
+#
+#   2. Ansehen, was sich ändert — das ist der eigentliche Prüfschritt:
+#        diff requirements.lock.txt requirements.lock.new
+#
+#   3. Tests gegen den neuen Stand laufen lassen, DANN übernehmen:
+#        mv requirements.lock.new requirements.lock.txt
+#
+# Springt dabei eine Hauptversion, gehört die Obergrenze in `pyproject.toml` bewusst
+# angehoben — nicht stillschweigend.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# `echob-api` selbst steht hier NICHT: Das Anwendungspaket wird im Dockerfile getrennt
+# installiert (`pip install --no-deps .`), sonst würde es sich selbst auflösen wollen.
+
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.14.2
+asyncpg==0.31.0
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.5.1
+click==8.4.2
+cryptography==50.0.0
+deprecation==2.1.0
+dnspython==2.8.0
+email-validator==2.3.0
+fastapi==0.141.1
+h11==0.16.0
+h2==4.4.1
+hpack==4.2.0
+httpcore==1.0.9
+httpcore2==2.12.0
+httptools==0.8.0
+httpx==0.28.1
+httpx2==2.12.0
+hyperframe==6.1.0
+idna==3.19
+jiter==0.16.0
+multidict==6.7.1
+openai==3.3.1
+packaging==26.3
+postgrest==2.31.0
+propcache==0.5.2
+pycparser==3.0
+pydantic==2.13.4
+pydantic-settings==2.15.0
+pydantic_core==2.46.4
+PyJWT==2.13.0
+python-dotenv==1.2.3
+python-multipart==0.0.32
+PyYAML==6.0.3
+realtime==2.31.0
+requests==2.34.2
+sentry-sdk==2.68.1
+sniffio==1.3.1
+starlette==1.6.0
+storage3==2.31.0
+StrEnum==0.4.15
+stripe==15.5.1
+supabase==2.31.0
+supabase-auth==2.31.0
+supabase-functions==2.31.0
+truststore==0.10.4
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+urllib3==2.7.0
+uvicorn==0.52.4
+uvloop==0.22.1
+watchfiles==1.2.0
+websockets==15.0.1
+yarl==1.24.5
