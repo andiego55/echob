@@ -108,6 +108,10 @@ class Settings(BaseSettings):
 
     # ── Monitoring (Sentry) ────────────────────────────────────────────
     # Leer = aus. PII-frei konfiguriert (siehe main.py). EU-Region empfohlen.
+    #: Anfragebegrenzung an/aus. Die Grenzen selbst stehen in core/rate_limit.py -
+    #: sie sind Programmlogik mit Begruendung, keine Betriebseinstellung.
+    rate_limit_enabled: bool = True
+
     #: Wie lange eine Anfrage auf eine freie Datenbankverbindung wartet, bevor sie mit
     #: 503 abgewiesen wird. Ohne Grenze wartet asyncpg unbegrenzt und die ganze App
     #: friert bei Ueberlast ein, statt einzelne Anfragen abzuweisen.

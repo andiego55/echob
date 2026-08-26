@@ -9,6 +9,7 @@ from app.api.v1.router import v1_router
 from app.core.config import settings
 from app.core.database import create_pool, create_supabase_admin
 from app.core.logging import get_logger, setup_logging
+from app.core.rate_limit import rate_limit_middleware
 from app.services.echo_service import create_echo_service
 
 
@@ -137,6 +138,10 @@ def create_app() -> FastAPI:
         else ["*"]
     )
     allow_headers = ["Content-Type", "Authorization"] if settings.is_production else ["*"]
+
+    # Vor CORS eingehaengt, damit eine abgewiesene Anfrage gar nicht erst weiterlaeuft.
+    # Starlette fuehrt Middleware in umgekehrter Reihenfolge der Registrierung aus.
+    app.middleware("http")(rate_limit_middleware)
 
     app.add_middleware(
         CORSMiddleware,

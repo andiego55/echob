@@ -16,6 +16,14 @@ import { AxiosError } from 'axios'
  * Kontingent stieß, las deshalb wörtlich „ECHO_LIMIT_REACHED“.
  */
 export const CODE_TEXTS: Record<string, string> = {
+  // Technische Grenzen, nicht fachliche: Sie treffen niemanden, der normal arbeitet.
+  // Trotzdem übersetzt — ein 'RATE_LIMIT' im Klartext ist für Nutzende sinnlos.
+  RATE_LIMIT:
+    'Das ging gerade sehr schnell hintereinander. Warte einen Moment und versuche es noch '
+    + 'einmal — in der Regel genügt eine Minute.',
+  DB_BUSY:
+    'Gerade ist viel los und die Anfrage hat zu lange gewartet. Bitte gleich noch einmal '
+    + 'versuchen.',
   ECHO_LIMIT_REACHED:
     'Dein Echo-Kontingent ist gerade erschöpft. Bitte versuche es etwas später noch einmal. ' +
     'Wenn du dauerhaft mehr brauchst, melde dich unter kontakt@echo-b.de.',
