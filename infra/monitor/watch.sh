@@ -26,7 +26,8 @@
 set -uo pipefail
 
 ECHOB_DIR="${ECHOB_DIR:-/opt/echob}"
-BACKUP_DIR="${ECHOB_BACKUP_DIR:-$ECHOB_DIR/backups}"
+# Dorthin schreibt das Backup wirklich - nicht nach /opt/echob/backups.
+BACKUP_DIR="${ECHOB_BACKUP_DIR:-/var/backups/echob}"
 ALARM="${ECHOB_ALARM:-$ECHOB_DIR/infra/monitor/alarm.sh}"
 ZUSTAND_DIR="${ECHOB_STATE_DIR:-$BACKUP_DIR/.watch}"
 # Ueber die oeffentliche Adresse, nicht ueber 127.0.0.1: Der api-Container
@@ -40,7 +41,7 @@ API_URL="${ECHOB_API_URL:-https://api.echo-b.de/api/v1/health}"
 PLATTE_KNAPP_GB="${ECHOB_DISK_WARN_GB:-3}"
 PLATTE_KRITISCH_GB="${ECHOB_DISK_CRIT_GB:-1.5}"
 BACKUP_MAX_STD="${ECHOB_BACKUP_MAX_H:-36}"      # täglich um 03:30 → 36 Std. = zwei verpasst
-RESTORE_MAX_TAGE="${ECHOB_RESTORE_MAX_D:-10}"   # wöchentlich → 10 Tage = einer verpasst
+RESTORE_MAX_TAGE="${ECHOB_RESTORE_MAX_D:-45}"   # der Beweis laeuft von Hand, monatlich reicht
 BERICHT_ALLE_TAGE="${ECHOB_REPORT_EVERY_D:-7}"
 
 mkdir -p "$ZUSTAND_DIR" 2>/dev/null || true
@@ -99,7 +100,7 @@ else
 fi
 
 # ── Backup: die Datei zaehlt, nicht der Vermerk ──────────────────────────────
-juengstes="$(ls -1t "$BACKUP_DIR"/echob-*.dump.enc 2>/dev/null | head -1)"
+juengstes="$(ls -1t "$BACKUP_DIR"/echob-*.sql.gz.age 2>/dev/null | head -1)"
 if [ -z "$juengstes" ]; then
   notiz "Backup:   KEINES vorhanden"
   pruefe backup kritisch \
@@ -114,8 +115,8 @@ else
 Datei: $juengstes
 
 Der taegliche Lauf kommt nicht mehr durch. Nachsehen:
-  tail -30 $BACKUP_DIR/backup.log
-  tail -30 $BACKUP_DIR/alarm.log"
+  tail -30 /var/log/echob-backup.log
+  tail -30 /opt/echob/backups/alarm.log"
   else
     pruefe backup ok "Juengstes Backup ist $alter_std Std. alt."
   fi
@@ -128,17 +129,21 @@ if [ -f "$status" ]; then
   notiz "Restore:  zuletzt vor $tage Tagen bewiesen"
   if [ "$tage" -gt "$RESTORE_MAX_TAGE" ]; then
     pruefe restore warn \
-      "Der Wiederherstellungs-Test lief seit $tage Tagen nicht mehr erfolgreich.
-Von Hand: /opt/echob/infra/backup/restore-test.sh"
+      "Der Wiederherstellungs-Beweis ist $tage Tage alt.
+
+Er laeuft NICHT auf dem Server: Das Backup ist asymmetrisch verschluesselt, der private
+Schluessel gehoert nicht hierher. Auf deinem Rechner:
+  infra/backup/restore-pruefen.sh <backup.sql.gz.age> <schluesseldatei>"
   else
     pruefe restore ok "Zuletzt vor $tage Tagen bewiesen."
   fi
 else
   notiz "Restore:  noch nie gelaufen"
   pruefe restore warn \
-    "Es gibt noch keinen erfolgreichen Wiederherstellungs-Test.
-Ein Backup, das nie zurueckgespielt wurde, ist eine Vermutung:
-  /opt/echob/infra/backup/restore-test.sh"
+    "Es gibt noch keinen Wiederherstellungs-Beweis.
+
+Ein Backup, das nie zurueckgespielt wurde, ist eine Vermutung. Auf deinem Rechner:
+  infra/backup/restore-pruefen.sh <backup.sql.gz.age> <schluesseldatei>"
 fi
 
 # ── API: laeuft sie noch, oder laeuft sie nur? ───────────────────────────────

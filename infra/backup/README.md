@@ -1,92 +1,106 @@
 # EchoB — Datenbank-Backups
 
-Täglicher, **verschlüsselter** `pg_dump` der Produktions-Postgres (`echob`) auf dem
-Hetzner-Server, plus ein **wöchentlicher Beweis**, dass sich das Backup zurückspielen lässt.
+Täglicher, **asymmetrisch verschlüsselter** Dump der Produktions-Postgres auf dem
+Hetzner-Server.
 
-Stufe 1: lokal verschlüsselt. Off-site und asymmetrische Verschlüsselung folgen (unten).
-
-| Datei | Was sie tut |
-|---|---|
-| `backup.sh` | Täglich: `pg_dump -Fc` → AES-256 → `/opt/echob/backups/`, 14 Tage Rotation. Schlägt bei Fehlschlag **Alarm**. |
-| `restore-test.sh` | Wöchentlich: spielt das jüngste Backup in eine Wegwerf-Datenbank und prüft, ob Daten drin sind. Löscht sie danach. |
-
-> **Die Skripte laufen direkt aus dem Git-Checkout.** `/opt/echob` *ist* das Repo — ein
-> `git pull` aktualisiert sie mit. Die frühere Anleitung kopierte sie per `scp` nach
-> `/opt/echob/backup/`; diese Kopie driftet vom Repo weg und ist nicht mehr nötig. Nur die
-> **Passphrase** liegt weiterhin außerhalb des Repos unter `/opt/echob/backup/`.
-
-## Einrichtung (einmalig, auf dem Server)
-
-```bash
-mkdir -p /opt/echob/backup /opt/echob/backups
-chmod +x /opt/echob/infra/backup/*.sh /opt/echob/infra/monitor/*.sh
-openssl rand -base64 48 > /opt/echob/backup/.backup_passphrase
-chmod 600 /opt/echob/backup/.backup_passphrase
-chmod 700 /opt/echob/backups
+```
+pg_dump → gzip → age (öffentlicher Schlüssel) → /var/backups/echob/
 ```
 
-> ⚠️ **Die Passphrase zusätzlich außerhalb des Servers ablegen** (Passwortmanager). Ohne
-> sie sind die Backups **unwiederbringlich** — spätestens wenn Off-site-Kopien dazukommen
-> oder der Server verloren geht.
+| Datei | Läuft wo | Was sie tut |
+|---|---|---|
+| `backup.sh` | Server, täglich 03:30 | Dump, verschlüsseln, 14 Tage Rotation. **Alarm bei Fehlschlag.** |
+| `restore-pruefen.sh` | **Dein Rechner**, monatlich | Beweist, dass ein Backup entschlüsselbar, einspielbar und gefüllt ist. |
 
-Danach einmal von Hand prüfen:
+## Warum `age` und nicht eine Passphrase
+
+`age -r <öffentlicher Schlüssel>` verschlüsselt gegen einen **öffentlichen** Schlüssel; der
+private liegt nicht auf dem Server. Wer die Maschine übernimmt, bekommt die Backups nicht
+auf. Eine symmetrische Passphrase neben den Dateien hätte diese Eigenschaft nicht.
+
+> Der öffentliche Schlüssel steht im Skript und ist **kein Geheimnis** — er kann nur
+> verschlüsseln. Der **private** gehört in den Passwortmanager und **nie** auf den Server,
+> auch nicht kurz auf der Kommandozeile: Er landet sonst in `~/.bash_history` und hebt die
+> ganze Eigenschaft auf.
+
+## Der Preis dieser Stärke — und warum der Beweis auf deinem Rechner läuft
+
+Ein *automatischer* Wiederherstellungs-Test auf dem Server ist damit unmöglich: Er bräuchte
+den privaten Schlüssel dort. Das wäre kein Detail, sondern die Aufgabe genau des Schutzes,
+für den `age` da ist.
+
+Der Beweis gehört deshalb dorthin, wo der Schlüssel ohnehin ist — und erzeugt nebenbei die
+erste Kopie außer Haus:
 
 ```bash
-/opt/echob/infra/backup/backup.sh && ls -lh /opt/echob/backups/
-/opt/echob/infra/backup/restore-test.sh
+mkdir -p ~/echob-restore && cd ~/echob-restore
+scp root@162.55.44.26:/var/backups/echob/echob-JJJJ-MM-TT_HHMM.sql.gz.age .
+# privaten Schluessel aus dem Passwortmanager in eine temporaere Datei schreiben
+/pfad/zum/repo/infra/backup/restore-pruefen.sh echob-JJJJ-MM-TT_HHMM.sql.gz.age schluessel.txt
 ```
 
-Die Cron-Einträge für beides stehen gesammelt in [`../monitor/README.md`](../monitor/README.md).
+Das Skript startet einen Wegwerf-Postgres im Container, spielt den Dump hinein, zählt
+Zeilen und räumt alles wieder ab — auch bei Abbruch. Es braucht `docker`, `age` und `gunzip`.
 
-## Der wöchentliche Beweis (`restore-test.sh`)
+**Danach: heruntergeladene Datei und Schlüsseldatei löschen.** Entschlüsselt sind das echte
+Nutzerdaten, inklusive Art.-9-Daten.
 
-Ein Backup, das nie zurückgespielt wurde, ist eine Vermutung. Die Datei kann da sein, die
-richtige Größe haben, sich sogar entschlüsseln lassen — und trotzdem beim `pg_restore`
-scheitern oder eine leere Hülle enthalten.
+Am Ende nennt es den Befehl, mit dem der Beweis auf dem Server vermerkt wird — sonst mahnt
+der Wächter ihn nach 45 Tagen an:
 
-**Was als Beweis gilt:** nicht der Rückgabewert von `pg_restore` (der meldet auch bei
-harmlosen Warnungen einen Fehler), sondern dass die zurückgespielte Datenbank die erwarteten
-Tabellen hat **und** die Kerntabellen Zeilen enthalten. Zusätzlich wird das jüngste Datum
-gemeldet — eine Datei von heute Nacht mit Daten von vor drei Wochen wäre der stillste aller
-Fehler.
+```bash
+ssh root@162.55.44.26 'date +%s > /var/backups/echob/.restore-test-ok'
+```
 
-Geprüft wurde das Skript gegen vier Schadensbilder, jedes wird erkannt:
+## Was als Beweis gilt
+
+Nicht, dass `psql` ohne Fehler durchlief — bei einem SQL-Dump laufen fast immer Meldungen
+mit. Bewiesen ist es, wenn die Datenbank die erwarteten Tabellen hat **und** die
+Kerntabellen (`user_profiles`, `cases`, `echo_messages`) Zeilen enthalten. Zusätzlich wird
+das jüngste Datum gemeldet: Eine Datei von heute Nacht mit Daten von vor drei Wochen wäre
+der stillste aller Fehler.
+
+Der Ansatz wurde gegen vier Schadensbilder geprüft, jedes wird erkannt:
 
 | Fall | Erkannt woran |
 |---|---|
 | Datei abgeschnitten | Zu wenige Tabellen |
-| Falsche Passphrase | Entschlüsselung scheitert, 0 Tabellen |
-| Kein Backup vorhanden | Abbruch vor dem Restore |
-| **Restore läuft sauber, Kerntabelle ist leer** | Zeilenzählung — `pg_restore` meldete hier `rc=0` |
+| Falscher Schlüssel | Entschlüsselung scheitert, bevor ein Container startet |
+| Kein Backup vorhanden | Abbruch vor dem Einspielen |
+| **Restore läuft sauber, Kerntabelle ist leer** | Zeilenzählung — hier meldete der Restore Erfolg |
 
 Der letzte Fall ist der Grund für die Zeilenzählung: Eine Prüfung auf den Rückgabewert hätte
-ihn als Erfolg durchgewinkt.
+ihn durchgewinkt.
 
-**Sicherungen gegen das Schlimmste:** Der Zielname (`echob_restore_test`) ist fest verdrahtet
-und wird gegen den Produktionsnamen geprüft; es wird nie mit `--clean` gearbeitet; und vorher
-wird gerechnet, ob der Platz reicht — sonst würde ausgerechnet die Sicherheitsprüfung den
-vollen Datenträger auslösen, den sie verhindern soll.
+## Herkunft dieses Skripts
 
-## Restore im Ernstfall (von Hand)
+`backup.sh` lief monatelang unversioniert als `/root/echob-backup.sh` und hat dort
+zuverlässig gearbeitet — 20 aufeinanderfolgende erfolgreiche Läufe im Protokoll. Es steht
+jetzt im Repo, weil ein Backup-Skript, das nur auf dem Server existiert, mit dem Server
+stirbt. Der Kern ist unverändert; ergänzt wurden Alarm bei Fehlschlag, `chmod 600` auf die
+Dateien und das Aufräumen liegengebliebener `.tmp`-Reste.
+
+Eine frühere, **symmetrisch** verschlüsselte Fassung (`openssl enc` mit Passphrase) wurde
+entfernt: Sie war dem Vorhandenen unterlegen, und zwei Backup-Skripte nebeneinander sind
+genau die Drift, die solche Zustände erzeugt.
+
+## Umstellung auf die versionierte Fassung
+
+Der Cron zeigt noch auf `/root/echob-backup.sh`. Umstellen (das alte Skript bleibt als
+Sicherheitsnetz liegen, bis der erste versionierte Lauf durch ist):
 
 ```bash
-# In die ECHTE Datenbank zurückspielen. --clean --if-exists ersetzt bestehende Objekte.
-openssl enc -d -aes-256-cbc -pbkdf2 -pass file:/opt/echob/backup/.backup_passphrase \
-  -in /opt/echob/backups/echob-YYYYMMDD-HHMMSS.dump.enc \
-  | docker compose -f /opt/echob/docker-compose.prod.yml exec -T postgres \
-      pg_restore -U echob -d echob --clean --if-exists
+crontab -e
+# Zeile ersetzen durch:
+# 30 3 * * * /opt/echob/infra/backup/backup.sh >> /var/log/echob-backup.log 2>&1
 ```
 
-Vorher die API stoppen (`docker compose -f … stop api`), damit nicht parallel geschrieben
-wird, und danach wieder starten.
+Die übrigen Cron-Einträge stehen in [`../monitor/README.md`](../monitor/README.md).
 
-## Nächste Härtungsstufen
+## Offen
 
-1. **Off-site-Kopie** — sonst sind bei Server- oder Ransomware-Verlust auch die Backups weg.
-   Ziel z. B. Hetzner Storage Box (EU) via `rsync`/`rclone`, im Cron nach dem Dump. *Vorteil
-   Hetzner: schon Auftragsverarbeiter — kein zusätzlicher AVV, kein neuer VVT-Eintrag.*
-2. **Asymmetrische Verschlüsselung** (`age`/`gpg`) — nur der *öffentliche* Schlüssel liegt
-   auf dem Server, der *private* off-server. Dann sind Backups auch bei Server-Kompromit­
-   tierung für Angreifer wertlos.
-3. **DSGVO:** Backups enthalten personenbezogene (Art.-9-)Daten → ins Verzeichnis der
-   Verarbeitungstätigkeiten und ins Löschkonzept; Off-site-Ziel als Auftragsverarbeiter.
+1. **Off-site-Kopie** — die Backups liegen auf derselben Platte wie die Datenbank. Ein
+   Serververlust nimmt beides mit. Ziel z. B. Hetzner Storage Box (EU); *Vorteil: schon
+   Auftragsverarbeiter — kein zusätzlicher AVV, kein neuer VVT-Eintrag.*
+2. **DSGVO** — Backups enthalten personenbezogene (Art.-9-)Daten → ins Verzeichnis der
+   Verarbeitungstätigkeiten und ins Löschkonzept.

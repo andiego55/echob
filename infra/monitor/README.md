@@ -20,8 +20,8 @@ niemand gemerkt. Man erfährt so etwas an dem Tag, an dem man das Backup braucht
 | Prüfung | Grenzen | Warum |
 |---|---|---|
 | **Platte** | knapp < 3 GB, kritisch < 1,5 GB | Der einzige Posten, der unbemerkt und unbegrenzt wächst. Ist sie voll, hört Postgres auf zu schreiben **und** das Backup schlägt fehl — die beiden schlimmsten Fälle gleichzeitig. |
-| **Backup** | älter als 36 Std. | Täglich um 03:30; 36 Stunden heißt: zwei Läufe verpasst. Geprüft wird die **Datei**, nicht ein Erfolgsvermerk. |
-| **Restore** | länger als 10 Tage nicht bewiesen | Wöchentlich; 10 Tage heißt: einer verpasst. |
+| **Backup** | älter als 36 Std. | Täglich um 03:30 nach `/var/backups/echob/`; 36 Stunden heißt: zwei Läufe verpasst. Geprüft wird die **Datei**, nicht ein Erfolgsvermerk. |
+| **Restore** | länger als 45 Tage nicht bewiesen | Der Beweis läuft **von Hand auf deinem Rechner** (asymmetrische Verschlüsselung, siehe [`../backup/README.md`](../backup/README.md)). Monatlich reicht. |
 | **API** | HTTP ≠ 200 | Ein Container kann laufen und trotzdem nichts beantworten. `restart: unless-stopped` fasst so einen nie an, weil er ja „läuft". |
 
 Absolute Grenzen statt Prozente: Bei 40 GB Platte sind „10 % frei" noch 4 GB, bei 400 GB
@@ -58,14 +58,14 @@ Warnung trotzdem an. Änderbar über `ALARM_TO_EMAIL` in der `.env.docker`.
 `crontab -e` und einfügen:
 
 ```
-30 3 * * *   /opt/echob/infra/backup/backup.sh       >> /opt/echob/backups/cron.log 2>&1
-15 4 * * 0   /opt/echob/infra/backup/restore-test.sh >> /opt/echob/backups/cron.log 2>&1
-0  */4 * * * /opt/echob/infra/monitor/watch.sh       >> /opt/echob/backups/cron.log 2>&1
+30 3 * * *   /opt/echob/infra/backup/backup.sh >> /var/log/echob-backup.log 2>&1
+0  */4 * * * /opt/echob/infra/monitor/watch.sh >> /var/log/echob-watch.log 2>&1
 ```
 
-Reihenfolge mit Absicht: Das Backup läuft um 03:30, der Beweis sonntags um 04:15 — also
-gegen ein frisches Backup und außerhalb der Nutzungszeiten, weil ein Restore die Datenbank
-kurzzeitig doppelt auf der Platte hält.
+Nur zwei Einträge. Ein dritter für den Wiederherstellungs-Test wäre falsch: Er bräuchte
+den privaten `age`-Schlüssel auf dem Server und würde damit genau den Schutz aufheben, den
+die Verschlüsselung leistet. Dieser Beweis gehört auf deinen Rechner — siehe
+[`../backup/README.md`](../backup/README.md).
 
 ## Was das *nicht* leistet
 
