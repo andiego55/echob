@@ -55,3 +55,16 @@ logs/
 
 # Lokale Secrets (niemals committen)
 __private/
+
+# ── Schluesselmaterial: NIE ins Repo ─────────────────────────────────────────
+# Der private age-Schluessel entschluesselt saemtliche Datenbank-Backups. Landet er hier,
+# ist mit einem einzigen "git push" die gesamte Nutzerdatenbank offengelegt - rueckwirkend
+# und fuer jeden, der den Verlauf liest. Einmal beinahe passiert: Die Datei lag als
+# schluessel.txt in infra/backup/ und war von keiner Regel gedeckt.
+*.age-key
+*.agekey
+schluessel*.txt
+key.txt
+*.pem
+*.key
+.backup_passphrase
