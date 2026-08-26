@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fec0ad14-00e3-4641-bc0a-42210263c3ac" name="Changes" comment="Works with AI">
+      <change beforePath="$PROJECT_DIR$/.claude/launch.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/launch.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/FachpersonenPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/FachpersonenPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/components/couple/SessionsCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/components/couple/SessionsCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/components/couple/TopicsCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/components/couple/TopicsCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/LandingPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/LandingPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/web/src/pages/couple/CoupleOverviewPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/web/src/pages/couple/CoupleOverviewPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,24 +34,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Projekte\\echob\\apps\\web\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Projekte\\echob\\apps\\web\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-PY-242.21829.153" />
-        <option value="bundled-python-sdk-464836ebc622-b74155a9e76b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.21829.153" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.21829.153" />
+        <option value="bundled-python-sdk-9f73701ac511-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.21829.153" />
       </set>
     </attachedChunks>
   </component>
@@ -63,6 +67,10 @@
       <workItem from="1781069856317" duration="24549000" />
       <workItem from="1781415545602" duration="50542000" />
       <workItem from="1782279257466" duration="109260000" />
+      <workItem from="1784710521626" duration="64644000" />
+      <workItem from="1786259981423" duration="2341000" />
+      <workItem from="1786264998988" duration="4162000" />
+      <workItem from="1786773353990" duration="59670000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -267,7 +275,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="feat/cluster-eifersucht" />
                       </list>
                     </value>
                   </entry>

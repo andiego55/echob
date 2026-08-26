@@ -2,40 +2,15 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "echob-web",
+      "name": "web",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "--prefix",
-        "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Projekte\\echob\\apps\\web",
+        "apps/web",
         "run",
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "echob-preview",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Projekte\\echob\\apps\\web",
-        "run",
-        "preview",
-        "--",
-        "--port",
-        "4173"
-      ],
-      "port": 4173
-    },
-    {
-      "name": "new-hp-preview",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "C:\\Users\\andre\\Desktop\\dataScienceArchitect\\Homepage\\new_hp",
-        "run",
-        "preview"
-      ],
-      "port": 4321
     }
   ]
 }
