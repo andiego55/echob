@@ -68,3 +68,11 @@ key.txt
 *.pem
 *.key
 .backup_passphrase
+
+# ── Arbeitsdateien, die nie ins Repo gehoeren ────────────────────────────
+# Einmal versehentlich mit "git add -A" mitgenommen und in ein OEFFENTLICHES Repo
+# gepusht. Die Regel ersetzt keine Sorgfalt, aber sie faengt genau diesen Griff ab.
+b.js
+*.pdf
+.idea/
+.claude/launch.json
