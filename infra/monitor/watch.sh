@@ -70,34 +70,54 @@ pruefe() {
 notiz "EchoB-Waechter $(date '+%Y-%m-%d %H:%M')"
 notiz ""
 
-# ── Platte ───────────────────────────────────────────────────────────────────
-frei_kb="$(df -P "$ECHOB_DIR" 2>/dev/null | awk 'NR==2 {print $4}')"
-if [ -n "${frei_kb:-}" ]; then
-  frei_mb=$(( frei_kb / 1024 ))
-  # Schwellen in MB, damit ganzzahlig gerechnet werden kann (1.5 GB → 1536 MB).
-  knapp_mb=$(  awk -v g="$PLATTE_KNAPP_GB"    'BEGIN{printf "%d", g*1024}')
-  krit_mb=$(   awk -v g="$PLATTE_KRITISCH_GB" 'BEGIN{printf "%d", g*1024}')
-  notiz "Platte:   $(( frei_mb / 1024 )).$(( (frei_mb % 1024) * 10 / 1024 )) GB frei"
+# ── Platten ────────────────────────────────────────────────────────────────
+# MEHRERE Dateisysteme, und das ist der Punkt: Die erste Fassung schaute nur auf
+# /opt/echob - also auf die 38-GB-Systemplatte, auf der reichlich Platz ist. Docker legt
+# seine Daten aber auf dem verschluesselten Datentraeger ab (10 GB, /mnt/echob-data), und
+# dort wird es eng. Eine Ueberwachung, die auf die falsche Platte sieht, meldet nie etwas
+# und wiegt genau dadurch in Sicherheit.
+#
+# Geprueft wird deshalb jedes Dateisystem, auf dem etwas liegt, das uns interessiert:
+# das Docker-Datenverzeichnis, die Backups und das Programmverzeichnis. Mehrfach
+# eingehaengte Pfade werden ueber den Einhaengepunkt zusammengefasst.
+docker_root="$(docker info --format '{{.DockerRootDir}}' 2>/dev/null || echo /var/lib/docker)"
+knapp_mb=$(  awk -v g="$PLATTE_KNAPP_GB"    'BEGIN{printf "%d", g*1024}')
+krit_mb=$(   awk -v g="$PLATTE_KRITISCH_GB" 'BEGIN{printf "%d", g*1024}')
+
+gesehen=""
+for pfad in "$docker_root" "$BACKUP_DIR" "$ECHOB_DIR" /; do
+  [ -d "$pfad" ] || continue
+  zeile="$(df -P "$pfad" 2>/dev/null | awk 'NR==2')"
+  [ -z "$zeile" ] && continue
+  # Vom Zeilenende gezaehlt: Der Dateisystemname in Spalte 1 kann Leerzeichen enthalten
+  # und verschiebt dann alle festen Positionen. "Mounted on" ist immer das letzte Feld,
+  # "Available" das drittletzte.
+  einhaengepunkt="$(echo "$zeile" | awk '{print $NF}')"
+  case " $gesehen " in *" $einhaengepunkt "*) continue ;; esac
+  gesehen="$gesehen $einhaengepunkt"
+
+  frei_mb=$(( $(echo "$zeile" | awk '{print $(NF-2)}') / 1024 ))
+  # Der Name der Pruefung enthaelt den Einhaengepunkt, damit jede Platte ihren eigenen
+  # Zustand behaelt - sonst wuerde eine volle Platte die Entwarnung der anderen ausloesen.
+  name="platte$(echo "$einhaengepunkt" | tr -c 'A-Za-z0-9' '_')"
+  notiz "Platte:   $einhaengepunkt — $(( frei_mb / 1024 )).$(( (frei_mb % 1024) * 10 / 1024 )) GB frei"
 
   if   [ "$frei_mb" -lt "$krit_mb" ]; then
-    pruefe platte kritisch \
-      "Nur noch $frei_mb MB frei (Grenze $krit_mb MB).
+    pruefe "$name" kritisch       "Auf $einhaengepunkt sind nur noch $frei_mb MB frei (Grenze $krit_mb MB).
 
-Wenn die Platte voll laeuft, hoert Postgres auf zu schreiben UND das Backup schlaegt fehl.
+Laeuft diese Platte voll, hoert Postgres auf zu schreiben UND das Backup schlaegt fehl.
 Sofort Platz schaffen:
 
   docker image prune -af && docker builder prune -af
-  du -sh /var/backups/echob /var/lib/docker /var/log | sort -h"
+  journalctl --vacuum-size=200M
+  du -sh $einhaengepunkt/* 2>/dev/null | sort -h | tail"
   elif [ "$frei_mb" -lt "$knapp_mb" ]; then
-    pruefe platte warn \
-      "Noch $frei_mb MB frei (Grenze $knapp_mb MB). Kein Notfall, aber es wird eng.
-Aufraeumen: docker image prune -af && docker builder prune -af"
+    pruefe "$name" warn       "Auf $einhaengepunkt sind noch $frei_mb MB frei (Grenze $knapp_mb MB). Kein Notfall,
+aber es wird eng. Aufraeumen: docker image prune -af && docker builder prune -af"
   else
-    pruefe platte ok "$frei_mb MB frei."
+    pruefe "$name" ok "$einhaengepunkt: $frei_mb MB frei."
   fi
-else
-  notiz "Platte:   nicht ermittelbar"
-fi
+done
 
 # ── Backup: die Datei zaehlt, nicht der Vermerk ──────────────────────────────
 juengstes="$(ls -1t "$BACKUP_DIR"/echob-*.sql.gz.age 2>/dev/null | head -1)"
