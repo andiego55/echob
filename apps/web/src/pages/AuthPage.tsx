@@ -97,6 +97,46 @@ export default function AuthPage() {
     }
   }
 
+  /**
+   * Passwort vergessen.
+   *
+   * Die empfangende Seite gab es laengst: Der Callback erkennt `type=recovery` und leitet
+   * zum Passwort-Setzen. Es fehlte nur der Ausloeser - die Tuer war da, die Klingel nicht.
+   * Wer sein Passwort vergessen hatte, haette den Magic Link finden muessen, und wer den
+   * nicht fand, hielt sich fuer ausgesperrt.
+   *
+   * **Die Meldung ist absichtlich immer dieselbe**, egal ob es das Konto gibt. Sonst waere
+   * dieses Formular eine Auskunftsstelle: Man koennte durchprobieren, ob eine bestimmte
+   * Person hier ein Konto hat. Bei einer App fuer Paarthemen ist schon diese Tatsache
+   * intim - sie verraet, dass jemand an seiner Beziehung arbeitet.
+   */
+  const handlePasswordReset = async () => {
+    const adresse = email.trim()
+    if (!adresse) {
+      setMessage({
+        type: 'error',
+        text: 'Trag zuerst deine E-Mail-Adresse ein — dann schicken wir dir den Link dorthin.',
+      })
+      return
+    }
+    setLoading(true)
+    setMessage(null)
+    try {
+      await supabase.auth.resetPasswordForEmail(adresse, {
+        redirectTo: `${window.location.origin}/auth`,
+      })
+    } catch {
+      // Bewusst verschluckt: Auch ein Fehler darf nicht verraten, ob es das Konto gibt.
+    } finally {
+      setLoading(false)
+      setMessage({
+        type: 'success',
+        text: 'Wenn es zu dieser Adresse ein Konto gibt, ist der Link unterwegs. '
+            + 'Schau bitte auch im Spam-Ordner nach.',
+      })
+    }
+  }
+
   const handleGoogle = async () => {
     setLoading(true)
     persistInviteCode()
@@ -231,6 +271,16 @@ export default function AuthPage() {
                     placeholder={tab === 'signup' ? 'Mindestens 8 Zeichen' : '••••••••'}
                     className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm text-brand-text placeholder-brand-muted/50 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
                   />
+                  {tab === 'login' && (
+                    <button
+                      type="button"
+                      onClick={handlePasswordReset}
+                      disabled={loading}
+                      className="mt-1.5 text-xs text-brand-muted underline transition hover:text-accent disabled:opacity-50"
+                    >
+                      Passwort vergessen?
+                    </button>
+                  )}
                 </div>
               )}
 
