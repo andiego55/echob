@@ -275,6 +275,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "emotionale-affaere",
+    "title": "Emotionale Affäre – Nähe ohne Berührung",
+    "description": "Eine emotionale Affäre ist eine Verbindung, die eigentlich in die Beziehung gehörte. Woran du sie erkennst, warum sie oft mehr verletzt als Sex und wo die Grenze verläuft.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "emotionale Affäre Anzeichen Freundschaft oder mehr emotionale Untreue",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es eine Verbindung – deine oder die deines Gegenübers –, bei der du dir unsicher bist, wo sie steht? Magst du das sortieren?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Darf man keine engen Freundschaften mehr haben?",
+        "answer": "Natürlich. Enge Freundschaften sind wertvoll und keine Bedrohung. Der Unterschied liegt nicht in der Nähe, sondern in drei Dingen: ob es Heimlichkeit gibt, ob die Verbindung Energie abzieht, die vorher der Beziehung gehörte, und ob dein Gegenüber die Gespräche unverändert mitlesen dürfte."
+      },
+      {
+        "question": "Mein Gegenüber sagt, es sei doch nichts passiert.",
+        "answer": "Formal stimmt das oft. Der Schmerz entsteht auch nicht durch eine Handlung, sondern durch eine Verschiebung: dass jemand anders zuerst erfährt, wie es dir geht. Wer das mit dem Hinweis abtut, es sei ja nichts passiert, beantwortet eine Frage, die niemand gestellt hat."
+      }
+    ],
+    "url": "/glossar/emotionale-affaere"
+  },
+  {
+    "type": "glossary",
     "slug": "emotionale-erpressung",
     "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
     "description": "Emotionale Erpressung wirkt über Furcht, Verpflichtung und Schuld (FOG). Wie man erkennt, dass Zustimmung erzwungen statt frei gegeben ist – und warum das kein böser Wille sein muss. Ohne Diagnose.",
@@ -412,6 +446,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/enabling"
+  },
+  {
+    "type": "glossary",
+    "slug": "entdeckungstag",
+    "title": "Entdeckungstag – der Tag, an dem du es erfährst",
+    "description": "Der Tag der Entdeckung hat eine eigene Wucht: Schock, körperliche Reaktionen, Erinnerungen, die sich rückwirkend verändern. Was in diesen Stunden normal ist und was du zuerst brauchst.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "Betrug herausgefunden was tun erster Tag Schock Affäre entdeckt",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn du magst, erzähl mir, wie du es erfahren hast. Du musst nichts entscheiden – wir sortieren erst einmal nur.",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Muss ich jetzt sofort etwas entscheiden?",
+        "answer": "Nein, und du solltest es auch nicht. In den ersten Tagen arbeitet dein Nervensystem im Ausnahmezustand; Entscheidungen aus diesem Zustand halten selten. Fast alle Fachleute empfehlen, für einige Wochen gar nichts Endgültiges zu tun. Was du in dieser Zeit brauchst, ist Boden, nicht Klarheit."
+      },
+      {
+        "question": "Warum geht es mir körperlich so schlecht?",
+        "answer": "Weil dein Körper das als Bedrohung verarbeitet, nicht als Information. Schlaflosigkeit, Übelkeit, Zittern, kein Hunger, das Gefühl, neben sich zu stehen – all das ist eine normale Stressreaktion und kein Zeichen von Schwäche. Sie lässt in den meisten Fällen nach einigen Wochen deutlich nach."
+      }
+    ],
+    "url": "/glossar/entdeckungstag"
   },
   {
     "type": "glossary",
@@ -1180,6 +1248,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "mikro-untreue",
+    "title": "Mikro-Untreue – die kleinen Grenzüberschreitungen",
+    "description": "Ein Like zu viel, ein gelöschter Chat, ein Ring, der abgelegt wird. Mikro-Untreue beschreibt Verhalten in der Grauzone – und warum Paare darüber so heftig streiten.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "Micro Cheating Bedeutung kleine Untreue Grauzone Beziehung",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es etwas in der Grauzone, das dich beschäftigt? Magst du es benennen, ohne es gleich bewerten zu müssen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Bin ich zu eifersüchtig, wenn mich so etwas stört?",
+        "answer": "Nicht automatisch. Die brauchbarere Frage ist, ob es Heimlichkeit gibt. Etwas, das offen geschieht, kann unangenehm sein und trotzdem harmlos. Etwas, das verborgen wird, sagt schon durch das Verbergen etwas aus. Wenn du allerdings merkst, dass fast alles dich beunruhigt, geht es weniger um das Verhalten deines Gegenübers als um deine eigene Unsicherheit – und die verdient genauso Aufmerksamkeit."
+      },
+      {
+        "question": "Wie redet man darüber, ohne zu kontrollieren?",
+        "answer": "Indem ihr über Regeln redet statt über Vorfälle. Nicht wer hat was falsch gemacht, sondern was wollen wir eigentlich vereinbaren. Diese Verabredung ist gemeinsam und nicht einseitig – sonst wird aus Klärung Überwachung."
+      }
+    ],
+    "url": "/glossar/mikro-untreue"
+  },
+  {
+    "type": "glossary",
     "slug": "narzisstische-zufuhr",
     "title": "Narzisstische Zufuhr (Narcissistic Supply)",
     "description": "Narzisstische Zufuhr ist die ständige Bestätigung von außen, die ein zerbrechlicher Selbstwert zu brauchen scheint – Bewunderung, Aufmerksamkeit, manchmal auch dein schlechtes Gewissen. Warum das die Dynamik erklärt. Ohne Diagnose.",
@@ -1211,6 +1313,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/narzisstische-zufuhr"
+  },
+  {
+    "type": "glossary",
+    "slug": "offenlegung",
+    "title": "Offenlegung – warum die Wahrheit in Raten am meisten schadet",
+    "description": "Nach einem Vertrauensbruch entscheidet weniger die Tat als die Art, wie ausgepackt wird. Warum die scheibchenweise Wahrheit den größten Schaden anrichtet.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "Wahrheit nach Betrug scheibchenweise alles erfahren wollen Details",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Hast du das Gefühl, immer noch nicht alles zu wissen? Magst du anschauen, was dir das Warten auf die nächste Enthüllung macht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Soll ich wirklich alles wissen wollen?",
+        "answer": "Nicht alles. Fachleute unterscheiden zwischen Fakten und Bildern: Wie lange, wie oft, wer wusste davon, gab es Risiken für deine Gesundheit – das sind Fakten, auf die du ein Recht hast und die du brauchst, um dich zu orientieren. Bildhafte Einzelheiten dagegen prägen sich ein und tauchen später ungefragt wieder auf. Du darfst Fragen stellen und Antworten begrenzen."
+      },
+      {
+        "question": "Was, wenn immer wieder etwas Neues herauskommt?",
+        "answer": "Dann beginnt der Prozess jedes Mal von vorn, und das ist der Grund, warum Beziehungen daran häufiger scheitern als an der ursprünglichen Tat. Wer noch etwas zurückhält, sollte es nicht für sich behalten, um zu schonen – dieses Schonen richtet mehr an als die Wahrheit."
+      }
+    ],
+    "url": "/glossar/offenlegung"
   },
   {
     "type": "glossary",
@@ -1658,6 +1794,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "stonewalling",
+    "title": "Stonewalling – die verschlossene Tür im selben Haus",
+    "description": "Stonewalling ist der vollständige Rückzug aus dem Gespräch: keine Antwort, kein Blick, manchmal tagelang. Warum es sich für beide Seiten so unterschiedlich anfühlt und was hilft.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "Stonewalling Bedeutung Partner schweigt tagelang Mauern Beziehung",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Schweigen, gegen das nichts ankommt? Magst du beschreiben, wie es dir dabei geht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Schweigen nicht manchmal besser als weiterstreiten?",
+        "answer": "Eine Pause ist sogar sehr sinnvoll – aber sie unterscheidet sich vom Mauern durch eine Kleinigkeit: Sie wird angekündigt und hat ein Ende. Ich brauche eine halbe Stunde, dann reden wir weiter ist Selbstfürsorge. Wortloses Abdrehen für zwei Tage ist etwas anderes, auch wenn es sich innerlich gleich anfühlt."
+      },
+      {
+        "question": "Was, wenn ich derjenige bin, der zumacht?",
+        "answer": "Dann steckst du wahrscheinlich in einem Zustand, in dem Reden körperlich nicht mehr geht – Herzrasen, Enge, alles zu viel. Das ist real und keine Ausrede. Der Unterschied liegt darin, ob du das ankündigst und zurückkommst. Ein Satz genügt: Ich kann gerade nicht, ich melde mich heute Abend. Und dann meldest du dich."
+      }
+    ],
+    "url": "/glossar/stonewalling"
+  },
+  {
+    "type": "glossary",
     "slug": "taeter-opfer-umkehr",
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose.",
@@ -1689,6 +1859,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/taeter-opfer-umkehr"
+  },
+  {
+    "type": "glossary",
+    "slug": "trennungsdrohung",
+    "title": "Trennungsdrohung – wenn das Ganze zur Disposition steht",
+    "description": "Dann geh doch. Warum Trennungsdrohungen im Streit mehr anrichten, als sie sollen, und was den Unterschied zwischen einem Satz im Affekt und einem Druckmittel ausmacht.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "Trennungsdrohung Streit Partner droht mit Trennung Bedeutung",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Ist in einem eurer Streits schon einmal die Trennung im Raum gestanden? Magst du anschauen, was das mit dir gemacht hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist es schlimm, wenn ich das selbst schon gesagt habe?",
+        "answer": "Fast jeder hat so etwas schon einmal gesagt. Entscheidend ist, was danach kam. Wer den Satz bereut, zurücknimmt und beim nächsten Streit anders reagiert, hat eine Verletzung verursacht und wieder gutgemacht. Zum Muster wird es erst, wenn die Drohung wiederkehrt, weil sie zuverlässig wirkt."
+      },
+      {
+        "question": "Was mache ich, wenn mein Gegenüber das regelmäßig sagt?",
+        "answer": "Nicht im Streit darüber reden – dort verpufft es. Sondern in einem ruhigen Moment, an einer konkreten Situation entlang und mit der Wirkung statt mit dem Vorwurf: Als du am Sonntag gesagt hast, du weißt nicht, ob du das noch willst, habe ich danach zwei Tage nichts mehr angesprochen. Wenn das mehrmals nicht ankommt, ist das selbst eine Antwort."
+      }
+    ],
+    "url": "/glossar/trennungsdrohung"
   },
   {
     "type": "glossary",
@@ -2369,6 +2573,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "dann-geh-doch",
+    "title": "Dann geh doch",
+    "description": "Eine fiktive Szene: Im Streit fällt der Satz, der alles zur Disposition stellt. Am nächsten Tag ist er zurückgenommen — und trotzdem verändert sich, was sie noch anspricht.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Julias Sicht",
+    "pull_quote": "Er hat es zurückgenommen. Ich habe es trotzdem behalten.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Ist in einem Streit bei euch schon einmal die Trennung im Raum gestanden? Magst du anschauen, was das verändert hat?"
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "drohung",
+      "streit",
+      "sicherheit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/dann-geh-doch"
+  },
+  {
+    "type": "scene",
     "slug": "darf-ich-erleichtert-sein",
     "title": "Darf ich erleichtert sein?",
     "description": "Eine fiktive Szene: Nach der Trennung erwartet er Trauer – und findet vor allem Erleichterung, die sich verboten anfühlt. Über die Schuldgefühle, wenn das Ende sich weniger nach Verlust anfühlt als nach Aufatmen.",
@@ -2591,6 +2823,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-konto-von-dem-ich-nichts-wusste",
+    "title": "Das Konto, von dem ich nichts wusste",
+    "description": "Eine fiktive Szene: Ein Brief bringt ans Licht, dass es einen Bereich gab, aus dem sie herausgehalten wurde. Über Vertrauensbruch ohne Affäre.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Anjas Sicht",
+    "pull_quote": "Es geht nicht um die achtzehntausend Euro. Es geht darum, dass es ein Zimmer gab, in dem ich nie war.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gab es etwas, das dein Gegenüber vor dir verborgen hat? Magst du anschauen, was dieses Verbergen mit dir gemacht hat?"
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "geheimnis",
+      "geld",
+      "sicherheit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/das-konto-von-dem-ich-nichts-wusste"
+  },
+  {
+    "type": "scene",
     "slug": "das-nein-das-ich-zurueckgenommen-habe",
     "title": "Das Nein, das ich zurückgenommen habe",
     "description": "Eine fiktive Szene: Sie hat abgesagt, zum ersten Mal seit Jahren. Zwei Stunden später ruft sie zurück und sagt zu. Über die Schwerkraft, die ein Nein zurückzieht.",
@@ -2728,6 +2988,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/der-beste-mensch-im-raum"
+  },
+  {
+    "type": "scene",
+    "slug": "der-bildschirm-leuchtet-auf",
+    "title": "Der Bildschirm leuchtet auf",
+    "description": "Eine fiktive Szene: Sein Handy liegt auf der Küchenzeile, eine Nachricht kommt herein, und in dem einen Satz auf dem Sperrbildschirm verschiebt sich das ganze Leben. Über den Moment, in dem alles kippt.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Katjas Sicht",
+    "pull_quote": "Ich habe die Nachricht dreimal gelesen. Beim dritten Mal wusste ich, dass ich sie nicht falsch verstanden hatte.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn du magst, erzähl mir, wie du es erfahren hast. Du musst nichts entscheiden – wir sortieren nur."
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "schock",
+      "sicherheit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-bildschirm-leuchtet-auf"
   },
   {
     "type": "scene",
@@ -3371,6 +3659,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/drei-uhr-nachts"
+  },
+  {
+    "type": "scene",
+    "slug": "dritter-tag-ohne-antwort",
+    "title": "Dritter Tag ohne Antwort",
+    "description": "Eine fiktive Szene: Sie wohnen zusammen und sie bekommt keine Antwort — nicht heute, nicht gestern, nicht vorgestern. Über die Ohnmacht vor einer Tür, hinter der jemand steht.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Leonies Sicht",
+    "pull_quote": "Man kann sich nicht versöhnen mit jemandem, der nicht da ist. Auch wenn er im Nebenzimmer sitzt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du ein Schweigen, gegen das nichts ankommt? Magst du beschreiben, wie es dir dabei geht?"
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "schweigen",
+      "ohnmacht",
+      "streit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/dritter-tag-ohne-antwort"
   },
   {
     "type": "scene",
@@ -4048,6 +4364,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-habe-es-ihr-gesagt",
+    "title": "Ich habe es ihr gesagt",
+    "description": "Eine fiktive Szene: Er hat gestanden, und statt Erleichterung kommt etwas anderes. Über die Stunde nach dem Geständnis und die Erkenntnis, dass Ehrlichkeit nichts leichter macht.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Martins Sicht",
+    "pull_quote": "Ich hatte mir vorgestellt, dass es leichter wird, wenn ich es sage. Es wurde nicht leichter. Es wurde nur wahr.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast etwas gesagt, das schwer war. Magst du erzählen, wie es dir seitdem geht – ohne dass ich dich verurteile?"
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "scham",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-habe-es-ihr-gesagt"
+  },
+  {
+    "type": "scene",
     "slug": "ich-habe-seinen-arzttermin-gemacht",
     "title": "Ich habe seinen Arzttermin gemacht",
     "description": "Eine fiktive Szene: Sie ruft für ihn beim Arzt an, wie schon so oft. Über den schmalen Grat zwischen helfen und stellvertretend leben.",
@@ -4102,6 +4446,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/ich-habe-wieder-musik-gehoert"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-lese-mit-und-hasse-mich-dafuer",
+    "title": "Ich lese mit und hasse mich dafür",
+    "description": "Eine fiktive Szene: Sechs Wochen danach prüft sie nachts sein Handy und verachtet sich für den Menschen, zu dem sie geworden ist. Über Wachsamkeit, die sich nicht abstellen lässt.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ninas Sicht",
+    "pull_quote": "Ich war nie ein Mensch, der in Handys schaut. Jetzt bin ich ein Mensch, der in Handys schaut.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Prüfst du Dinge nach, obwohl du es nicht willst? Magst du anschauen, was dabei in dir vorgeht?"
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "hypervigilanz",
+      "selbstwert",
+      "gruebeln"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-lese-mit-und-hasse-mich-dafuer"
   },
   {
     "type": "scene",
@@ -5144,6 +5517,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "sie-hat-die-kinder-erwaehnt",
+    "title": "Sie hat die Kinder erwähnt",
+    "description": "Eine fiktive Szene: Mitten im Streit fällt ein Satz über die Kinder, und ab da ist die Auseinandersetzung vorbei. Über eine Drohung, gegen die es keine Verhandlung gibt.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Stefans Sicht",
+    "pull_quote": "Ab diesem Satz habe ich nicht mehr diskutiert. Ich habe nur noch zugestimmt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Ist bei euch schon einmal der Kontakt zu den Kindern in einen Streit hineingezogen worden? Magst du erzählen, was das mit dir gemacht hat?"
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "drohung",
+      "kind-im-elternkonflikt",
+      "ohnmacht"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/sie-hat-die-kinder-erwaehnt"
+  },
+  {
+    "type": "scene",
     "slug": "sie-hat-es-gehoert",
     "title": "Sie hat es gehört",
     "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation.",
@@ -5567,6 +5968,35 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/wieder-dieser-traum"
+  },
+  {
+    "type": "scene",
+    "slug": "wir-haben-normal-gefruehstueckt",
+    "title": "Wir haben normal gefrühstückt",
+    "description": "Eine fiktive Szene: Ein Jahr danach, ein völlig gewöhnlicher Samstagmorgen — und dann eine Kleinigkeit, die alles wieder aufreißt. Über Rückschläge und die Frage, ob das Fortschritt ist.",
+    "cluster": "vertrauensbruch",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sabines Sicht",
+    "pull_quote": "Ein Jahr Arbeit, und eine Nummer ohne Namen wirft mich zurück in eine Küche im September.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Gibt es etwas, das dich immer wieder zurückwirft? Magst du erzählen, was dann in dir passiert?"
+    },
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "trigger",
+      "hoffnung",
+      "sicherheit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/wir-haben-normal-gefruehstueckt"
   },
   {
     "type": "scene",
@@ -6771,6 +7201,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "ich-war-untreu",
+    "title": "Ich war untreu: was jetzt wirklich zählt",
+    "description": "Du hast Vertrauen gebrochen und weißt nicht wohin damit. Dieser Text verurteilt nicht und beschönigt nichts – er sagt dir, was du schuldest, warum Scham der falsche Antrieb ist und was Reparatur tatsächlich verlangt.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "ich habe betrogen was tun schuldgefühle fremdgegangen gestehen",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast etwas getan, das Vertrauen gebrochen hat. Magst du erzählen, wie es dazu kam – ohne dass ich dich dafür verurteile und ohne dass wir es kleiner machen, als es ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "scham",
+      "verantwortung",
+      "selbstwert"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "offenlegung",
+        "emotionale-affaere",
+        "entdeckungstag",
+        "beduerfnis-und-strategie"
+      ],
+      "related": [
+        "vertrauensbruch",
+        "untreue",
+        "vertrauen-wieder-aufbauen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Soll ich es überhaupt sagen, wenn es niemand erfahren würde?",
+        "answer": "Dazu gibt es keine einfache Antwort, und wer eine anbietet, macht es sich zu leicht. Für das Gestehen spricht, dass eine Beziehung auf einem verschwiegenen Bereich nicht wirklich weitergeht und dass ein Geheimnis über Jahre Distanz erzeugt, die niemand erklären kann. Dagegen spricht, dass ein Geständnis manchmal vor allem dich entlastet und die andere Person eine Last trägt, die du dir ausgesucht hast. Eine gute Prüfung: Wem soll dieses Gespräch dienen? Wenn die ehrliche Antwort mir lautet, ist es noch nicht der richtige Zeitpunkt."
+      },
+      {
+        "question": "Wie lange dauert es, bis wieder Ruhe einkehrt?",
+        "answer": "Länger, als du hoffst. In der Paarberatung wird von einem bis zwei Jahren gesprochen, bis Vertrauen wieder trägt – mit Rückschlägen, oft an Jahrestagen oder in ähnlichen Situationen. Wer nach drei Monaten fragt, wann es endlich gut sein darf, hat den Prozess nicht verstanden. Das ist hart und ehrlicher als jede Ermutigung."
+      },
+      {
+        "question": "Ich schäme mich so, dass ich gar nicht darüber reden kann.",
+        "answer": "Das ist verständlich und der gefährlichste Zustand. Scham sagt ich bin schlecht und führt dazu, dass man sich versteckt – oft in genau die Vermeidung, die zur Untreue geführt hat. Schuld sagt ich habe etwas Schlechtes getan und führt zur Wiedergutmachung. Der Unterschied klingt akademisch und entscheidet praktisch alles."
+      },
+      {
+        "question": "Darf ich auch traurig sein wegen der Affäre?",
+        "answer": "Ja, und fast niemand sagt das. Wenn eine Verbindung endet, entsteht Verlust, auch wenn sie falsch war. Dieser Schmerz ist echt. Er gehört nur nicht in die Gespräche mit der Person, die du verletzt hast – dort wäre er eine Zumutung. Er gehört zu einer Fachperson, in ein Tagebuch oder an einen anderen geschützten Ort."
+      }
+    ],
+    "url": "/wissen/ich-war-untreu"
+  },
+  {
+    "type": "topic",
     "slug": "kodependenz",
     "title": "Kodependenz: wenn Fürsorge zur Falle wird",
     "description": "Kodependenz beschreibt ein Muster, in dem sich alles um den anderen dreht und die eigenen Bedürfnisse verschwinden. Woher der Begriff kommt, woran du das Muster erkennst – und warum er mit Vorsicht zu genießen ist.",
@@ -7168,6 +7665,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/nach-dem-gaslighting"
+  },
+  {
+    "type": "topic",
+    "slug": "nach-der-affaere",
+    "title": "Nach der Affäre: die drei Phasen und was sie brauchen",
+    "description": "Die Wochen und Monate nach einem Vertrauensbruch verlaufen in Phasen. Was in welcher Phase hilft, welche Fehler fast alle Paare machen und woran du merkst, dass ihr feststeckt.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "nach affäre wie weiter phasen aufarbeiten wie lange dauert es",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wo stehst du gerade – noch mitten im Ausnahmezustand oder schon beim Sortieren? Magst du erzählen, wie deine letzten Tage waren?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "gruebeln",
+      "sicherheit",
+      "ambivalenz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "entdeckungstag",
+        "offenlegung",
+        "gruebeln",
+        "hypervigilanz",
+        "trigger"
+      ],
+      "related": [
+        "untreue",
+        "vertrauen-wieder-aufbauen",
+        "vertrauensbruch"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie lange dauert das insgesamt?",
+        "answer": "In der Paarberatung wird von ein bis zwei Jahren gesprochen, bis Vertrauen wieder trägt. Der akute Ausnahmezustand lässt meist nach einigen Wochen deutlich nach, die kreisenden Gedanken nach Monaten. Rückschläge an Jahrestagen oder in ähnlichen Situationen gehören dazu und bedeuten nicht, dass alles umsonst war."
+      },
+      {
+        "question": "Wir reden nicht mehr darüber, ist das gut?",
+        "answer": "Meistens nicht. Der Pakt, nie wieder davon anzufangen, wirkt kurzfristig entlastend und ist der häufigste Grund, warum Beziehungen Jahre später doch daran zerbrechen. Was nicht besprochen wird, verschwindet nicht, sondern wird zu einem Raum, den beide umgehen – und der mit der Zeit größer wird."
+      },
+      {
+        "question": "Ich verzeihe und bin trotzdem wütend. Passt das zusammen?",
+        "answer": "Ja. Verzeihen ist kein Schalter, sondern eine Richtung. Menschen können verziehen haben und trotzdem an manchen Tagen von Wut überrollt werden. Problematisch wird es erst, wenn Verzeihen behauptet wird, um Ruhe zu haben – die Wut bleibt dann trotzdem und sucht sich andere Wege."
+      },
+      {
+        "question": "Wann brauchen wir professionelle Hilfe?",
+        "answer": "Spätestens, wenn ihr euch monatelang im Kreis dreht, wenn jedes Gespräch eskaliert oder wenn einer von beiden das Thema komplett vermeidet. Auch dann, wenn du selbst nach Monaten kaum schlafen kannst oder die Gedanken sich nicht beruhigen. Das ist kein Scheitern, sondern eine vernünftige Reaktion auf etwas, das viele Paare allein nicht schaffen."
+      }
+    ],
+    "url": "/wissen/nach-der-affaere"
   },
   {
     "type": "topic",
@@ -7638,6 +8203,79 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "untreue",
+    "title": "Untreue: warum es passiert und was es mit dir macht",
+    "description": "Betrogen worden – und plötzlich stimmt nichts mehr, auch nicht die eigene Erinnerung. Warum Untreue geschieht, warum es fast nie an dir lag und was in den ersten Wochen wirklich hilft.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "betrogen worden was tun untreue partner warum fremdgehen verarbeiten",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn du magst, erzähl mir, wie es bei dir ist. Du musst nichts entscheiden – wir schauen erst einmal nur, was gerade in dir los ist.",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "gruebeln",
+      "selbstwert",
+      "sicherheit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "entdeckungstag",
+        "offenlegung",
+        "emotionale-affaere",
+        "mikro-untreue",
+        "gruebeln",
+        "hypervigilanz"
+      ],
+      "related": [
+        "vertrauensbruch",
+        "nach-der-affaere",
+        "ich-war-untreu"
+      ]
+    },
+    "faq": [
+      {
+        "question": "War ich nicht genug?",
+        "answer": "Das ist die Frage, die fast alle zuerst stellen, und sie hat eine überraschend klare Antwort: Untreue sagt in aller Regel mehr über die Person aus, die sie begangen hat, als über die Beziehung – und noch weniger über dich. Untersuchungen finden Untreue auch in Beziehungen, die beide als glücklich beschreiben. Menschen gehen fremd, weil ihnen etwas an sich selbst fehlt, nicht weil ihnen etwas an dir fehlte. Das nimmt den Schmerz nicht, aber es korrigiert eine falsche Rechnung."
+      },
+      {
+        "question": "Muss ich mich jetzt entscheiden?",
+        "answer": "Nein, und die meisten Fachleute raten ausdrücklich davon ab. In den ersten Wochen arbeitet dein Nervensystem im Ausnahmezustand; Entscheidungen aus diesem Zustand halten selten. Gib dir mehrere Wochen, in denen nichts Endgültiges passiert. Was du in dieser Zeit brauchst, ist Boden, nicht Klarheit."
+      },
+      {
+        "question": "Ich denke ständig daran und kann nicht aufhören. Ist das normal?",
+        "answer": "Ja. Kreisende Gedanken, aufdringliche Bilder, Schlafstörungen, ständiges Prüfen von Nachrichten – das ist eine typische Stressreaktion und kein Zeichen dafür, dass du dich anstellst. Sie lässt bei den meisten Menschen nach einigen Wochen deutlich nach. Wenn sie das nach Monaten nicht tut, ist das ein guter Grund, dir Unterstützung zu holen."
+      },
+      {
+        "question": "Soll ich alle Einzelheiten wissen wollen?",
+        "answer": "Fakten ja, Bilder nein. Wie lange, wie oft, wer davon wusste, ob es gesundheitliche Risiken gab, ob noch Kontakt besteht – das brauchst du zur Orientierung. Bildhafte Einzelheiten dagegen prägen sich ein und kommen später ungefragt wieder. Du darfst Fragen stellen und Antworten begrenzen."
+      },
+      {
+        "question": "Kann eine Beziehung das überstehen?",
+        "answer": "Ja, das kommt häufiger vor, als man denkt – und es hängt weniger von der Schwere der Tat ab als davon, wie danach damit umgegangen wird. Entscheidend sind vollständige Offenlegung statt Wahrheit in Raten, echte Reue statt Rechtfertigung und Geduld über Monate. Manche Paare beschreiben ihre Beziehung danach als ehrlicher als vorher. Andere trennen sich, und das ist genauso in Ordnung."
+      }
+    ],
+    "url": "/wissen/untreue"
+  },
+  {
+    "type": "topic",
     "slug": "verdeckter-narzissmus",
     "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
     "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose.",
@@ -7732,6 +8370,149 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/verlustangst"
+  },
+  {
+    "type": "topic",
+    "slug": "vertrauen-wieder-aufbauen",
+    "title": "Vertrauen wieder aufbauen: was tatsächlich wirkt",
+    "description": "Vertrauen kehrt nicht durch Entschuldigungen zurück, sondern durch Wiederholung. Was beide Seiten konkret tun müssen, warum Kontrolle ein Enddatum braucht und woran du erkennst, dass es nicht funktioniert.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "vertrauen wieder aufbauen nach betrug beziehung retten kontrolle loslassen",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was müsste passieren, damit du dich in dieser Beziehung wieder sicher fühlst? Magst du das so konkret wie möglich machen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "vertrauensbruch",
+      "sicherheit",
+      "veraenderung",
+      "kontrolle",
+      "hoffnung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "offenlegung",
+        "hypervigilanz",
+        "trennungsdrohung",
+        "stonewalling",
+        "emotionaler-kontostand"
+      ],
+      "related": [
+        "nach-der-affaere",
+        "vertrauensbruch",
+        "ich-war-untreu"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Muss ich das Handy meines Gegenübers kontrollieren dürfen?",
+        "answer": "Als befristete Maßnahme kann Transparenz entlasten, vor allem in den ersten Wochen. Als Dauerzustand richtet sie Schaden an: Sie macht die eine Person zur Aufseherin und die andere zur Überwachten, und in diesen Rollen kann Vertrauen nicht wachsen. Wichtig ist deshalb, von Anfang an über ein Enddatum zu sprechen – nicht als Frist, sondern als gemeinsames Ziel."
+      },
+      {
+        "question": "Wie lange soll ich es versuchen?",
+        "answer": "Eine feste Zahl gibt es nicht, aber es gibt eine bessere Frage: Bewegt sich etwas? Wenn nach sechs Monaten ernsthafter Arbeit keinerlei Veränderung spürbar ist – kein wachsendes Sicherheitsgefühl, keine verlässlicheren Handlungen –, dann sagt das mehr als jede weitere Anstrengung. Zeit allein heilt hier nichts."
+      },
+      {
+        "question": "Kann Vertrauen wirklich wieder so werden wie vorher?",
+        "answer": "Meistens nicht wie vorher, und das ist keine schlechte Nachricht. Was entsteht, ist oft ein anderes Vertrauen: weniger selbstverständlich, dafür bewusster. Viele Paare beschreiben ihre Beziehung danach als ehrlicher, weil beide gelernt haben, Dinge auszusprechen, die sie vorher umgangen haben."
+      },
+      {
+        "question": "Gilt das auch, wenn es keine Untreue war?",
+        "answer": "Ja, alles auf dieser Seite gilt für jede Form von Vertrauensbruch – auch für Drohungen im Streit, verschwiegene Bereiche oder tagelanges Schweigen. Der Mechanismus ist derselbe: Vorhersagbarkeit wurde zerstört und kann nur durch Wiederholung zurückkommen."
+      }
+    ],
+    "url": "/wissen/vertrauen-wieder-aufbauen"
+  },
+  {
+    "type": "topic",
+    "slug": "vertrauensbruch",
+    "title": "Vertrauensbruch: die sechs Ebenen, die kaum jemand benennt",
+    "description": "Vertrauensbruch ist mehr als Untreue. Auch eine Trennungsdrohung im Streit, das Drohen mit den Kindern oder tagelanges Schweigen brechen etwas. Die sechs Ebenen, was sie gemeinsam haben und woran du erkennst, ob Reparatur möglich ist.",
+    "cluster": "vertrauensbruch",
+    "search_intent": "vertrauensbruch beziehung was ist das vertrauen zerstört drohung streit",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über die Ebenen des Vertrauensbruchs gelesen. Gibt es eine Situation, nach der etwas zwischen euch nicht mehr dasselbe war? Magst du sie anschauen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "vertrauensbruch",
+      "drohung",
+      "schweigen",
+      "kind-im-elternkonflikt",
+      "sicherheit"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "glossary": [
+        "trennungsdrohung",
+        "stonewalling",
+        "offenlegung",
+        "emotionale-affaere",
+        "mikro-untreue",
+        "entdeckungstag"
+      ],
+      "related": [
+        "untreue",
+        "vertrauen-wieder-aufbauen",
+        "emotionale-manipulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist eine Trennungsdrohung wirklich ein Vertrauensbruch?",
+        "answer": "Es kommt darauf an, was danach passiert. Ein Satz im Affekt, der bereut und zurückgenommen wird, ist eine Verletzung – schmerzhaft, aber heilbar. Dieselbe Drohung immer wieder, weil sie zuverlässig wirkt, ist etwas anderes: Dann ist sie kein Ausrutscher mehr, sondern ein Mittel. Und ein Mittel, das die Grundlage der Beziehung als Druckmittel benutzt, bricht genau diese Grundlage."
+      },
+      {
+        "question": "Mein Gegenüber sagt, ich sei zu empfindlich. Stimmt das?",
+        "answer": "Diese Frage lässt sich von außen nicht beantworten, aber du kannst sie dir selbst anders stellen: Nicht war es schlimm genug, sondern was hat sich seitdem verändert. Wenn du seither vorsichtiger bist, weniger sagst oder Situationen vermeidest, hat etwas Wirkung gehabt – unabhängig davon, wie groß der Anlass von außen wirkt."
+      },
+      {
+        "question": "Kann Vertrauen nach so etwas überhaupt zurückkommen?",
+        "answer": "Oft ja, aber nicht durch eine Entschuldigung. Was Vertrauen wieder aufbaut, ist Verlässlichkeit über Zeit – viele kleine Male, in denen jemand genau das tut, was er gesagt hat. Der schwierigste Teil ist, dass die Person, die verletzt hat, das Tempo nicht bestimmen darf. Ausführlich hier: Vertrauen wieder aufbauen."
+      },
+      {
+        "question": "Wo ist die Grenze zu emotionalem Missbrauch?",
+        "answer": "Bei der Wiederholung und der Absicht. Ein Vertrauensbruch geschieht, oft aus Überforderung, Angst oder Egoismus. Emotionaler Missbrauch nutzt dieselben Handlungen planvoll als Steuerung – wenn Drohungen immer dann kommen, wenn du etwas einforderst, und immer dann verschwinden, wenn du nachgibst. Wenn du das wiedererkennst, geht es nicht mehr um Vertrauensarbeit."
+      },
+      {
+        "question": "Zählt es auch, wenn nichts Konkretes passiert ist?",
+        "answer": "Ja. Vertrauen bricht nicht nur durch Taten, sondern auch durch anhaltende Unberechenbarkeit – wenn du nie weißt, welche Version deines Gegenübers heute nach Hause kommt. Das ist schwerer zu benennen und wirkt genauso."
+      }
+    ],
+    "url": "/wissen/vertrauensbruch"
   },
   {
     "type": "topic",
@@ -7898,6 +8679,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
     "description": "Ein Double Bind ist eine Zwickmühle aus zwei widersprüchlichen Botschaften, bei der jede Reaktion falsch ist – und das Benennen des Widerspruchs verboten scheint. Warum das so tief verunsichert. Ohne Diagnose."
   },
+  "/glossar/emotionale-affaere": {
+    "title": "Emotionale Affäre – Nähe ohne Berührung",
+    "description": "Eine emotionale Affäre ist eine Verbindung, die eigentlich in die Beziehung gehörte. Woran du sie erkennst, warum sie oft mehr verletzt als Sex und wo die Grenze verläuft."
+  },
   "/glossar/emotionale-erpressung": {
     "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
     "description": "Emotionale Erpressung wirkt über Furcht, Verpflichtung und Schuld (FOG). Wie man erkennt, dass Zustimmung erzwungen statt frei gegeben ist – und warum das kein böser Wille sein muss. Ohne Diagnose."
@@ -7913,6 +8698,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/enabling": {
     "title": "Enabling – wenn Helfen das Problem am Leben hält",
     "description": "Enabling bezeichnet Verhalten, das aus Fürsorge entsteht und ein schädliches Muster ungewollt stützt. Woran du es erkennst und was der Unterschied zu echter Unterstützung ist."
+  },
+  "/glossar/entdeckungstag": {
+    "title": "Entdeckungstag – der Tag, an dem du es erfährst",
+    "description": "Der Tag der Entdeckung hat eine eigene Wucht: Schock, körperliche Reaktionen, Erinnerungen, die sich rückwirkend verändern. Was in diesen Stunden normal ist und was du zuerst brauchst."
   },
   "/glossar/eskalationsspirale": {
     "title": "Eskalationsspirale – wie aus einer Kleinigkeit ein großer Streit wird",
@@ -8002,9 +8791,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Metakommunikation – über das Reden reden",
     "description": "Was Metakommunikation bedeutet und warum es oft der Ausweg ist, wenn ein Gespräch sich festfährt: nicht das Thema, sondern das Miteinander ansprechen. Ohne Diagnose."
   },
+  "/glossar/mikro-untreue": {
+    "title": "Mikro-Untreue – die kleinen Grenzüberschreitungen",
+    "description": "Ein Like zu viel, ein gelöschter Chat, ein Ring, der abgelegt wird. Mikro-Untreue beschreibt Verhalten in der Grauzone – und warum Paare darüber so heftig streiten."
+  },
   "/glossar/narzisstische-zufuhr": {
     "title": "Narzisstische Zufuhr (Narcissistic Supply)",
     "description": "Narzisstische Zufuhr ist die ständige Bestätigung von außen, die ein zerbrechlicher Selbstwert zu brauchen scheint – Bewunderung, Aufmerksamkeit, manchmal auch dein schlechtes Gewissen. Warum das die Dynamik erklärt. Ohne Diagnose."
+  },
+  "/glossar/offenlegung": {
+    "title": "Offenlegung – warum die Wahrheit in Raten am meisten schadet",
+    "description": "Nach einem Vertrauensbruch entscheidet weniger die Tat als die Art, wie ausgepackt wird. Warum die scheibchenweise Wahrheit den größten Schaden anrichtet."
   },
   "/glossar/parentifizierung": {
     "title": "Parentifizierung – wenn Kinder die Erwachsenen tragen",
@@ -8058,9 +8855,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
     "description": "Beim spirituellen Narzissmus wird Spiritualität zum Podest: mehr Bewusstheit, höhere Schwingung, weiter entwickelt. Deine Gefühle werden als Ego abgetan. Woran du das erkennst und wie es verunsichert. Ohne Diagnose."
   },
+  "/glossar/stonewalling": {
+    "title": "Stonewalling – die verschlossene Tür im selben Haus",
+    "description": "Stonewalling ist der vollständige Rückzug aus dem Gespräch: keine Antwort, kein Blick, manchmal tagelang. Warum es sich für beide Seiten so unterschiedlich anfühlt und was hilft."
+  },
   "/glossar/taeter-opfer-umkehr": {
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose."
+  },
+  "/glossar/trennungsdrohung": {
+    "title": "Trennungsdrohung – wenn das Ganze zur Disposition steht",
+    "description": "Dann geh doch. Warum Trennungsdrohungen im Streit mehr anrichten, als sie sollen, und was den Unterschied zwischen einem Satz im Affekt und einem Druckmittel ausmacht."
   },
   "/glossar/trennungsschmerz": {
     "title": "Trennungsschmerz – warum Liebeskummer wie Entzug wirkt",
@@ -8146,6 +8951,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Bis hierhin und nicht weiter",
     "description": "Eine Szene über eine Grenze, die getestet wird – und den ruhigen Moment, in dem man sie zum ersten Mal wirklich hält. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/dann-geh-doch": {
+    "title": "Dann geh doch",
+    "description": "Eine fiktive Szene: Im Streit fällt der Satz, der alles zur Disposition stellt. Am nächsten Tag ist er zurückgenommen — und trotzdem verändert sich, was sie noch anspricht."
+  },
   "/szenen/darf-ich-erleichtert-sein": {
     "title": "Darf ich erleichtert sein?",
     "description": "Eine fiktive Szene: Nach der Trennung erwartet er Trauer – und findet vor allem Erleichterung, die sich verboten anfühlt. Über die Schuldgefühle, wenn das Ende sich weniger nach Verlust anfühlt als nach Aufatmen."
@@ -8178,6 +8987,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das ist nur deine alte Wunde",
     "description": "Eine fiktive Szene: Er spricht an, dass sie eine Verabredung vergessen hat – und hört, das sei bloß seine Bindungswunde aus der Kindheit. Über Therapie-Sprache, die als Waffe dient und jede Verantwortung abwehrt."
   },
+  "/szenen/das-konto-von-dem-ich-nichts-wusste": {
+    "title": "Das Konto, von dem ich nichts wusste",
+    "description": "Eine fiktive Szene: Ein Brief bringt ans Licht, dass es einen Bereich gab, aus dem sie herausgehalten wurde. Über Vertrauensbruch ohne Affäre."
+  },
   "/szenen/das-nein-das-ich-zurueckgenommen-habe": {
     "title": "Das Nein, das ich zurückgenommen habe",
     "description": "Eine fiktive Szene: Sie hat abgesagt, zum ersten Mal seit Jahren. Zwei Stunden später ruft sie zurück und sagt zu. Über die Schwerkraft, die ein Nein zurückzieht."
@@ -8197,6 +9010,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/der-beste-mensch-im-raum": {
     "title": "Der beste Mensch im Raum",
     "description": "Eine fiktive Szene: Beim Benefiz sind alle hingerissen, wie großzügig und selbstlos sie ist. Nur er weiß, wie wenig von dieser Wärme zu Hause ankommt. Über kommunalen Narzissmus – Größe über Güte."
+  },
+  "/szenen/der-bildschirm-leuchtet-auf": {
+    "title": "Der Bildschirm leuchtet auf",
+    "description": "Eine fiktive Szene: Sein Handy liegt auf der Küchenzeile, eine Nachricht kommt herein, und in dem einen Satz auf dem Sperrbildschirm verschiebt sich das ganze Leben. Über den Moment, in dem alles kippt."
   },
   "/szenen/der-daumen-ueber-dem-profil": {
     "title": "Der Daumen über dem Profil",
@@ -8289,6 +9106,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/drei-uhr-nachts": {
     "title": "Drei Uhr nachts",
     "description": "Eine fiktive Szene: die leere Seite des Betts, das Handy in der Hand, ein Chat, der offen ist. Über die Nächte nach einer Trennung, in denen die Sehnsucht am lautesten ist."
+  },
+  "/szenen/dritter-tag-ohne-antwort": {
+    "title": "Dritter Tag ohne Antwort",
+    "description": "Eine fiktive Szene: Sie wohnen zusammen und sie bekommt keine Antwort — nicht heute, nicht gestern, nicht vorgestern. Über die Ohnmacht vor einer Tür, hinter der jemand steht."
   },
   "/szenen/du-bist-noch-nicht-so-weit": {
     "title": "Du bist da noch nicht so weit",
@@ -8386,6 +9207,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich habe es doch gezeigt",
     "description": "Eine fiktive Szene: Nach dem Streit versteht er nicht, was ihr fehlt. Er hat doch alles getan. Über die Verzweiflung, die entsteht, wenn Mühe nicht ankommt."
   },
+  "/szenen/ich-habe-es-ihr-gesagt": {
+    "title": "Ich habe es ihr gesagt",
+    "description": "Eine fiktive Szene: Er hat gestanden, und statt Erleichterung kommt etwas anderes. Über die Stunde nach dem Geständnis und die Erkenntnis, dass Ehrlichkeit nichts leichter macht."
+  },
   "/szenen/ich-habe-seinen-arzttermin-gemacht": {
     "title": "Ich habe seinen Arzttermin gemacht",
     "description": "Eine fiktive Szene: Sie ruft für ihn beim Arzt an, wie schon so oft. Über den schmalen Grat zwischen helfen und stellvertretend leben."
@@ -8393,6 +9218,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-habe-wieder-musik-gehoert": {
     "title": "Ich habe wieder Musik gehört",
     "description": "Eine fiktive Szene: Wochen nach dem Auszug ertappt er sich beim lauten Mitsingen im Auto – und merkt, wie lange das weg war. Über die stille Wiederentdeckung des eigenen Ich nach einer Trennung."
+  },
+  "/szenen/ich-lese-mit-und-hasse-mich-dafuer": {
+    "title": "Ich lese mit und hasse mich dafür",
+    "description": "Eine fiktive Szene: Sechs Wochen danach prüft sie nachts sein Handy und verachtet sich für den Menschen, zu dem sie geworden ist. Über Wachsamkeit, die sich nicht abstellen lässt."
   },
   "/szenen/ich-muss-fragen": {
     "title": "Ich muss fragen",
@@ -8542,6 +9371,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Schau, wie geduldig ich mit dir bin",
     "description": "Eine fiktive Szene: Vor Freunden lobt sie sich selbst dafür, wie viel sie mit ihm aushält – und macht ihn so zum schwierigen Fall, den sie großmütig erträgt. Über kommunalen Narzissmus als moralische Überlegenheit."
   },
+  "/szenen/sie-hat-die-kinder-erwaehnt": {
+    "title": "Sie hat die Kinder erwähnt",
+    "description": "Eine fiktive Szene: Mitten im Streit fällt ein Satz über die Kinder, und ab da ist die Auseinandersetzung vorbei. Über eine Drohung, gegen die es keine Verhandlung gibt."
+  },
   "/szenen/sie-hat-es-gehoert": {
     "title": "Sie hat es gehört",
     "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation."
@@ -8601,6 +9434,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/wieder-dieser-traum": {
     "title": "Wieder dieser Traum",
     "description": "Eine fiktive Szene: Um kurz nach vier wacht er auf, das Herz rast, das Kissen ist nass – schon wieder derselbe Traum. Über Albträume, die die Nacht zurückerobern, lange nachdem alles vorbei ist."
+  },
+  "/szenen/wir-haben-normal-gefruehstueckt": {
+    "title": "Wir haben normal gefrühstückt",
+    "description": "Eine fiktive Szene: Ein Jahr danach, ein völlig gewöhnlicher Samstagmorgen — und dann eine Kleinigkeit, die alles wieder aufreißt. Über Rückschläge und die Frage, ob das Fortschritt ist."
   },
   "/szenen/wir-sind-seelenverwandt": {
     "title": "Wir sind Seelenverwandte",
@@ -8718,6 +9555,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Human Magnet Syndrome: die Thesen von Ross Rosenberg",
     "description": "Warum ziehen sich ausgerechnet fürsorgliche und ich-bezogene Menschen an? Ross Rosenbergs Modell vom menschlichen Magnetismus, seine zentralen Thesen – und eine ehrliche Einordnung, was daran trägt."
   },
+  "/wissen/ich-war-untreu": {
+    "title": "Ich war untreu: was jetzt wirklich zählt",
+    "description": "Du hast Vertrauen gebrochen und weißt nicht wohin damit. Dieser Text verurteilt nicht und beschönigt nichts – er sagt dir, was du schuldest, warum Scham der falsche Antrieb ist und was Reparatur tatsächlich verlangt."
+  },
   "/wissen/kodependenz": {
     "title": "Kodependenz: wenn Fürsorge zur Falle wird",
     "description": "Kodependenz beschreibt ein Muster, in dem sich alles um den anderen dreht und die eigenen Bedürfnisse verschwinden. Woher der Begriff kommt, woran du das Muster erkennst – und warum er mit Vorsicht zu genießen ist."
@@ -8749,6 +9590,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/nach-dem-gaslighting": {
     "title": "Nach dem Gaslighting: der Wahrnehmung wieder vertrauen",
     "description": "Wenn das Gaslighting vorbei ist, bleibt oft der Zweifel: Stimmt, was ich fühle? Warum das eigene Urteil so lange nachhallt und wie du deinen Realitätssinn Schritt für Schritt zurückgewinnst. Behutsam, ohne Diagnose."
+  },
+  "/wissen/nach-der-affaere": {
+    "title": "Nach der Affäre: die drei Phasen und was sie brauchen",
+    "description": "Die Wochen und Monate nach einem Vertrauensbruch verlaufen in Phasen. Was in welcher Phase hilft, welche Fehler fast alle Paare machen und woran du merkst, dass ihr feststeckt."
   },
   "/wissen/nach-toxischer-beziehung": {
     "title": "Nach einer toxischen Beziehung: warum die Angst bleibt – und wie Heilung geht",
@@ -8790,6 +9635,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Trennen oder bleiben? Woran du Orientierung findest",
     "description": "Kein Test entscheidet für dich – aber diese Fragen und Merkmale helfen dir, ehrlicher hinzuschauen, ob Bleiben oder Gehen deiner Wahrheit näherkommt."
   },
+  "/wissen/untreue": {
+    "title": "Untreue: warum es passiert und was es mit dir macht",
+    "description": "Betrogen worden – und plötzlich stimmt nichts mehr, auch nicht die eigene Erinnerung. Warum Untreue geschieht, warum es fast nie an dir lag und was in den ersten Wochen wirklich hilft."
+  },
   "/wissen/verdeckter-narzissmus": {
     "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
     "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose."
@@ -8797,6 +9646,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/verlustangst": {
     "title": "Verlustangst in Beziehungen verstehen",
     "description": "Woher die Angst kommt, verlassen zu werden, wie sie sich in Beziehungen zeigt und was dir hilft, ihr weniger ausgeliefert zu sein – ohne Selbstverurteilung."
+  },
+  "/wissen/vertrauen-wieder-aufbauen": {
+    "title": "Vertrauen wieder aufbauen: was tatsächlich wirkt",
+    "description": "Vertrauen kehrt nicht durch Entschuldigungen zurück, sondern durch Wiederholung. Was beide Seiten konkret tun müssen, warum Kontrolle ein Enddatum braucht und woran du erkennst, dass es nicht funktioniert."
+  },
+  "/wissen/vertrauensbruch": {
+    "title": "Vertrauensbruch: die sechs Ebenen, die kaum jemand benennt",
+    "description": "Vertrauensbruch ist mehr als Untreue. Auch eine Trennungsdrohung im Streit, das Drohen mit den Kindern oder tagelanges Schweigen brechen etwas. Die sechs Ebenen, was sie gemeinsam haben und woran du erkennst, ob Reparatur möglich ist."
   },
   "/wissen/wege-aus-der-kodependenz": {
     "title": "Wege aus der Kodependenz: was wirklich hilft",

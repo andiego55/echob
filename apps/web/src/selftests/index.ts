@@ -16,10 +16,12 @@ import { erlebeIchGaslighting } from './tests/erlebe-ich-gaslighting'
 import { narzisstischeMuster } from './tests/narzisstische-muster'
 import { wieLiebeBeiMirAnkommt } from './tests/wie-liebe-bei-mir-ankommt'
 import { kodependenteMuster } from './tests/kodependente-muster'
+import { nachDemVertrauensbruch } from './tests/nach-dem-vertrauensbruch'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
   wieLiebeBeiMirAnkommt,
+  nachDemVertrauensbruch,
   emotionalerMissbrauch,
   erlebeIchGaslighting,
   narzisstischeMuster,
