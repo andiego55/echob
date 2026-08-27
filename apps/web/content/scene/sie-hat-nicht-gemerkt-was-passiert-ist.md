@@ -9,7 +9,7 @@ author:
   name: EchoB-Redaktion
 reviewed_by:
   name: EchoB-Redaktion
-perspective: "Aus Malteser Sicht"
+perspective: "Aus Maltes Sicht"
 pull_quote: "Von außen war das gar nichts. Von innen war es das erste Mal seit vierzig Jahren."
 echo:
   mode: clarity
