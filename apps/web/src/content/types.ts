@@ -25,12 +25,14 @@ export const CLUSTERS = [
   'narzissmus', // Narzissmus in Beziehungen (narzisstische Missbrauchsdynamik)
   'narzissmus-spielarten', // Spielarten des Narzissmus (grandios, verdeckt/vulnerabel, spirituell, kommunal)
   'trauma', // Trauma & PTBS-Belastung durch Beziehungen
+  'kodependenz', // Kodependenz & Selbstliebe-Defizit (Ross Rosenberg, Human Magnet Syndrome)
   'bindung', // Bindung & Nähe
   'trennung', // Trennung
   'liebeskummer', // Liebeskummer & Trennungsschmerz
   'selbstreflexion', // Selbstreflexion
   'therapie', // Therapie & Coaching
   'kommunikation', // Kommunikation
+  'liebessprachen', // Liebessprachen (Gary Chapman) – wie Zuneigung ankommt
   'grenzen', // Grenzen setzen
   'konflikt', // Konflikt & Streit
   'gefuehle', // Gefühle verstehen
@@ -130,12 +132,14 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   narzissmus: 'Narzissmus',
   'narzissmus-spielarten': 'Narzissmus-Spielarten',
   trauma: 'Trauma & PTBS',
+  kodependenz: 'Kodependenz',
   bindung: 'Bindung & Nähe',
   trennung: 'Trennung',
   liebeskummer: 'Liebeskummer',
   selbstreflexion: 'Selbstreflexion',
   therapie: 'Therapie & Coaching',
   kommunikation: 'Kommunikation',
+  liebessprachen: 'Liebessprachen',
   grenzen: 'Grenzen setzen',
   konflikt: 'Konflikt & Streit',
   gefuehle: 'Gefühle verstehen',

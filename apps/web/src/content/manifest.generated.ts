@@ -69,6 +69,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "beduerfnis-und-strategie",
+    "title": "Bedürfnis und Strategie – zwei Dinge, die oft verwechselt werden",
+    "description": "Ein Bedürfnis ist das, was du brauchst. Eine Strategie ist ein Weg, es zu erfüllen. Warum die Unterscheidung Streit auflöst, der sonst unlösbar wirkt.",
+    "cluster": "liebessprachen",
+    "search_intent": "Bedürfnis Strategie Unterschied Beziehung GFK",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es einen Streit, der bei euch immer wiederkommt? Magst du schauen, welches Bedürfnis darunter liegt – und ob es vielleicht mehrere Wege dorthin gibt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Woran erkenne ich, ob etwas ein Bedürfnis oder eine Strategie ist?",
+        "answer": "Eine einfache Prüfung: Gibt es mehr als einen Weg dorthin? Ich brauche jeden Samstag deine Zeit ist eine Strategie, denn es gibt viele Wege zu Verbundenheit. Ich brauche das Gefühl, dass ich dir wichtig bin ist ein Bedürfnis. Strategien sind verhandelbar, Bedürfnisse nicht – deshalb lohnt es sich, sie auseinanderzuhalten."
+      },
+      {
+        "question": "Was, wenn unsere Bedürfnisse wirklich unvereinbar sind?",
+        "answer": "Das kommt vor, ist aber seltener als es im Streit aussieht. Meistens kollidieren nicht die Bedürfnisse, sondern die Strategien. Wenn nach ehrlicher Prüfung tatsächlich zwei Grundbedürfnisse gegeneinanderstehen – etwa Nähe und Freiraum in sehr unterschiedlichem Maß – ist das eine wichtige Erkenntnis. Sie sagt nichts über Schuld, aber viel über Passung."
+      }
+    ],
+    "url": "/glossar/beduerfnis-und-strategie"
+  },
+  {
+    "type": "glossary",
+    "slug": "beziehungssucht",
+    "title": "Beziehungssucht – wenn Bindung wie Entzug wirkt",
+    "description": "Manche Beziehungen fühlen sich weniger nach Liebe an als nach Sucht: Rausch, Entzug, Rückfall. Was hinter diesem Muster steckt und warum es kein Charakterfehler ist.",
+    "cluster": "kodependenz",
+    "search_intent": "Beziehungssucht Symptome abhängig von Partner emotional süchtig",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Fühlt sich das Getrenntsein von deinem Gegenüber manchmal körperlich an? Magst du beschreiben, was dann in dir passiert?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Beziehungssucht dasselbe wie starke Verliebtheit?",
+        "answer": "Nein, auch wenn sich beides ähnlich anfühlen kann. Verliebtheit macht weit: Man hat Lust auf die Welt und auf andere Menschen. Das Suchtmuster macht eng: Alles kreist um eine Person, die Angst vor Verlust ist ständig da, und gute Phasen bringen Erleichterung statt Freude. Der beste Prüfstein ist nicht die Intensität, sondern ob dein Leben weiter oder schmaler wird."
+      },
+      {
+        "question": "Ist das eine anerkannte Suchterkrankung?",
+        "answer": "Nein. Beziehungssucht ist keine Diagnose in ICD-11 oder DSM-5. Der Begriff beschreibt eine Ähnlichkeit im Erleben, keine medizinische Kategorie. Ernst nehmen solltest du das Erleben trotzdem – gerade wenn du merkst, dass du gegen dein eigenes Urteil handelst."
+      }
+    ],
+    "url": "/glossar/beziehungssucht"
+  },
+  {
+    "type": "glossary",
     "slug": "bindungsangst",
     "title": "Bindungsangst – Definition und Anzeichen",
     "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt.",
@@ -276,6 +344,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/emotionale-ueberflutung"
+  },
+  {
+    "type": "glossary",
+    "slug": "emotionaler-kontostand",
+    "title": "Emotionaler Kontostand – warum kleine Gesten zählen",
+    "description": "Das Bild vom emotionalen Konto beschreibt, wie sich Zuwendung über die Zeit aufbaut oder abträgt. Warum viele kleine Einzahlungen mehr tragen als eine große und woran man einen leeren Stand merkt.",
+    "cluster": "liebessprachen",
+    "search_intent": "emotionales Konto Beziehung Liebestank leer",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "base",
+      "opening_question": "Wie voll fühlt sich dein emotionaler Kontostand gerade an? Und was war die letzte Einzahlung, die du wirklich gespürt hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist das nicht ein bisschen kalt – Liebe als Buchhaltung?",
+        "answer": "Das Bild ist bewusst schlicht. Es soll nichts aufrechnen, sondern etwas sichtbar machen, das sonst unsichtbar bleibt: dass Zuwendung sich über Zeit aufbaut und abträgt. Gefährlich wird es erst, wenn jemand anfängt, wirklich Buch zu führen und Gesten gegeneinander aufzuwiegen. Dann ist aus dem Bild ein Streitwerkzeug geworden."
+      },
+      {
+        "question": "Kann ein leerer Kontostand wieder voll werden?",
+        "answer": "Meistens ja, aber nicht durch eine große Geste. Was trägt, sind viele kleine, verlässliche Einzahlungen über Wochen. Genau das ist die schwierige Nachricht: Wer viel abgetragen hat, kann das nicht an einem Wochenende ausgleichen."
+      }
+    ],
+    "url": "/glossar/emotionaler-kontostand"
+  },
+  {
+    "type": "glossary",
+    "slug": "enabling",
+    "title": "Enabling – wenn Helfen das Problem am Leben hält",
+    "description": "Enabling bezeichnet Verhalten, das aus Fürsorge entsteht und ein schädliches Muster ungewollt stützt. Woran du es erkennst und was der Unterschied zu echter Unterstützung ist.",
+    "cluster": "kodependenz",
+    "search_intent": "Enabling Bedeutung Beziehung mitverantwortlich Verhalten decken",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es etwas, das du regelmäßig auffängst oder geradebiegst? Magst du überlegen, was passieren würde, wenn du es einmal stehen ließest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Bin ich schuld am Verhalten meines Gegenübers, wenn ich es ermögliche?",
+        "answer": "Nein. Verantwortung für sein Verhalten trägt jeder Mensch selbst. Enabling beschreibt nicht Schuld, sondern eine Wechselwirkung: dass gut gemeinte Fürsorge manchmal die Folgen wegnimmt, an denen jemand sonst etwas ändern würde. Das zu sehen ist kein Selbstvorwurf, sondern eine Möglichkeit."
+      },
+      {
+        "question": "Wie unterscheide ich Unterstützung von Enabling?",
+        "answer": "Unterstützung hilft jemandem, etwas selbst zu tun. Enabling tut es an seiner Stelle. Ein einfacher Prüfstein: Wird dein Gegenüber durch deine Hilfe mit der Zeit selbständiger oder abhängiger? Und ein zweiter: Verheimlichst du etwas nach außen, damit es keine Folgen gibt? Dann ist die Grenze meistens schon überschritten."
+      }
+    ],
+    "url": "/glossar/enabling"
   },
   {
     "type": "glossary",
@@ -912,6 +1048,70 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "liebesdialekt",
+    "title": "Liebesdialekt – die konkrete Form zählt",
+    "description": "Zwei Menschen können dieselbe Liebessprache sprechen und sich trotzdem verfehlen, weil ihnen die konkrete Form nicht passt. Warum der Dialekt oft wichtiger ist als die Sprache.",
+    "cluster": "liebessprachen",
+    "search_intent": "Liebesdialekt Bedeutung Liebessprache Unterschied",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "base",
+      "opening_question": "Gibt es etwas, das dein Gegenüber für dich tut, das eigentlich lieb gemeint ist – aber bei dir nicht ankommt? Magst du erzählen, woran das liegen könnte?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie finde ich den Dialekt meines Gegenübers heraus?",
+        "answer": "Am ehesten, indem du fragst, statt zu raten – und zwar nach konkreten Situationen. Nicht welche Liebessprache hast du, sondern welche Sache habe ich in den letzten Wochen gemacht, bei der du dich wirklich gemeint gefühlt hast. Antworten auf diese Frage sind brauchbar. Antworten auf Typfragen selten."
+      }
+    ],
+    "url": "/glossar/liebesdialekt"
+  },
+  {
+    "type": "glossary",
+    "slug": "liebessprache",
+    "title": "Liebessprache – wie Zuneigung bei dir ankommt",
+    "description": "Eine Liebessprache ist die Form, in der sich Zuneigung für dich echt anfühlt. Woher das Modell stammt, was es taugt und wo seine Grenzen liegen. Ohne Etikett und ohne Versprechen.",
+    "cluster": "liebessprachen",
+    "search_intent": "Liebessprache Bedeutung 5 Sprachen der Liebe Definition",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "base",
+      "opening_question": "Du hast über Liebessprachen gelesen. Woran merkst du eigentlich, dass jemand dich gern hat – ganz konkret, an einer echten Situation?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist das wissenschaftlich belegt?",
+        "answer": "Nur eingeschränkt. Das Modell stammt aus der Paarberatungspraxis des Autors Gary Chapman, nicht aus der Forschung. Studien finden bisher keine belastbaren Hinweise darauf, dass Menschen sich sauber in fünf Typen einteilen lassen oder dass gleiche Sprachen glücklicher machen. Was gut belegt ist: Paare, die einander verstehen und passend antworten, sind zufriedener. Nimm das Modell also als Gesprächshilfe, nicht als Diagnose."
+      },
+      {
+        "question": "Kann sich meine Liebessprache ändern?",
+        "answer": "Ja. Was du gerade am meisten brauchst, hängt von deiner Lebensphase ab. Wer viel arbeitet, sehnt sich oft nach Zeit; wer sich unsicher fühlt, nach Worten; wer erschöpft ist, nach Entlastung. Das Modell beschreibt eher ein Bedürfnis im Moment als einen festen Charakterzug."
+      }
+    ],
+    "url": "/glossar/liebessprache"
+  },
+  {
+    "type": "glossary",
     "slug": "love-bombing",
     "title": "Love Bombing – der überwältigende Anfang",
     "description": "Love Bombing ist eine Flut aus Zuneigung, Aufmerksamkeit und Zukunftsversprechen ganz am Anfang – so intensiv, dass sie schnell bindet und später als Druckmittel dient. Woran du es erkennst. Ohne Diagnose.",
@@ -1254,6 +1454,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "rettersyndrom",
+    "title": "Rettersyndrom – helfen, um gebraucht zu werden",
+    "description": "Beim Rettersyndrom wird Helfen zur Rolle. Woran du merkst, dass aus Fürsorge ein Muster geworden ist, und warum Retten und Retten-Wollen der anderen Person oft schadet.",
+    "cluster": "kodependenz",
+    "search_intent": "Rettersyndrom Beziehung Helfersyndrom retten wollen Partner",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, jemanden retten zu wollen? Magst du anschauen, was passieren würde, wenn du es nicht tätest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Helfen denn falsch?",
+        "answer": "Überhaupt nicht. Der Unterschied liegt nicht im Helfen, sondern in der Frage, was passiert, wenn du es einmal nicht tust. Hilfst du, weil du helfen möchtest, kannst du auch aufhören. Hilfst du, weil du sonst nicht weißt, wer du in dieser Beziehung bist, ist es eine Rolle geworden – und Rollen kann man nicht ablegen, ohne dass etwas ins Wanken gerät."
+      },
+      {
+        "question": "Wie merke ich, dass ich in dieser Rolle stecke?",
+        "answer": "Ein verlässliches Zeichen: Du weißt genauer, was dein Gegenüber braucht, als was du selbst brauchst. Ein zweites: Erfolge des anderen lösen bei dir neben Freude auch ein leises Unbehagen aus, weil du weniger gebraucht wirst. Das ist unangenehm zu bemerken und dennoch ein guter Anfang."
+      }
+    ],
+    "url": "/glossar/rettersyndrom"
+  },
+  {
+    "type": "glossary",
     "slug": "scham",
     "title": "Scham – das Gefühl, nicht zu genügen",
     "description": "Was Scham von Schuld unterscheidet, warum sie so isoliert und lähmt und wie man ihr begegnen kann, ohne sich in ihr zu verlieren. Ohne Diagnose.",
@@ -1353,6 +1587,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/selbstfuersorge"
+  },
+  {
+    "type": "glossary",
+    "slug": "selbstliebe-defizit",
+    "title": "Selbstliebe-Defizit – Kodependenz neu gedacht",
+    "description": "Der Psychotherapeut Ross Rosenberg schlägt vor, Kodependenz als Selbstliebe-Defizit zu verstehen: nicht als Charakterschwäche, sondern als Folge früher Verletzungen. Was das ändert und wo die Grenzen liegen.",
+    "cluster": "kodependenz",
+    "search_intent": "Self Love Deficit Disorder Rosenberg Kodependenz Selbstliebe",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über das Selbstliebe-Defizit gelesen. Gibt es einen Bereich, in dem du für andere selbstverständlich sorgst und für dich selbst nicht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist das eine offizielle Diagnose?",
+        "answer": "Nein. Weder Kodependenz noch das Selbstliebe-Defizit stehen in ICD-11 oder DSM-5. Es sind Begriffe aus der Beratungs- und Ratgeberliteratur, keine anerkannten Krankheitsbilder. Das macht sie nicht wertlos – viele Menschen erkennen sich darin wieder –, aber du solltest wissen, dass du hier ein Denkmodell liest und keine medizinische Kategorie."
+      },
+      {
+        "question": "Heißt das, ich liebe mich einfach zu wenig?",
+        "answer": "So verkürzt wäre es ein Vorwurf, und genau das will der Begriff vermeiden. Gemeint ist nicht mangelnder Wille, sondern etwas Erlerntes: Wer als Kind vor allem für Anpassung und Fürsorge Zuwendung bekam, hat schlicht nie geübt, die eigenen Bedürfnisse für gleich wichtig zu halten. Das ist eine Erklärung, kein Tadel."
+      }
+    ],
+    "url": "/glossar/selbstliebe-defizit"
   },
   {
     "type": "glossary",
@@ -2323,6 +2591,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-nein-das-ich-zurueckgenommen-habe",
+    "title": "Das Nein, das ich zurückgenommen habe",
+    "description": "Eine fiktive Szene: Sie hat abgesagt, zum ersten Mal seit Jahren. Zwei Stunden später ruft sie zurück und sagt zu. Über die Schwerkraft, die ein Nein zurückzieht.",
+    "cluster": "kodependenz",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Elenas Sicht",
+    "pull_quote": "Das Nein hat elf Minuten gehalten. Danach hat mein Körper es widerrufen, bevor mein Kopf mitreden konnte.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Hast du schon einmal ein Nein zurückgenommen, das richtig war? Magst du anschauen, was in dir dabei passiert ist?"
+    },
+    "scene_tags": [
+      "grenzen",
+      "selbstaufgabe",
+      "schuldgefuehl",
+      "selbstwert"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/das-nein-das-ich-zurueckgenommen-habe"
+  },
+  {
+    "type": "scene",
     "slug": "das-schlechte-gewissen",
     "title": "Das schlechte Gewissen",
     "description": "Eine Szene über die Schuldwelle, die nach einer gehaltenen Grenze kommt – und die Erkenntnis, dass sie ein alter Reflex ist, kein Urteil. Aus der Ich-Perspektive, fiktiv.",
@@ -2740,6 +3036,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/die-gekraenkte-stille"
+  },
+  {
+    "type": "scene",
+    "slug": "die-hand-in-meinem-nacken",
+    "title": "Die Hand in meinem Nacken",
+    "description": "Eine fiktive Szene: Eine beiläufige Berührung in der Küche, und plötzlich ist alles wieder da. Über die Sprache des Körpers, die keine Worte braucht und trotzdem verlernt werden kann.",
+    "cluster": "liebessprachen",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tobias' Sicht",
+    "pull_quote": "Drei Sekunden ihre Hand, und ich war zurück in einem Leben, das ich vermisst hatte, ohne es zu wissen.",
+    "echo": {
+      "mode": "base",
+      "opening_question": "Wann hast du dich zuletzt körperlich verbunden gefühlt, ganz ohne Anlass? Magst du erzählen, wie das war?"
+    },
+    "scene_tags": [
+      "liebessprachen",
+      "koerperkontakt",
+      "naehe",
+      "sehnsucht"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/die-hand-in-meinem-nacken"
+  },
+  {
+    "type": "scene",
+    "slug": "die-kueche-die-niemand-sieht",
+    "title": "Die Küche, die niemand sieht",
+    "description": "Eine fiktive Szene: Sie räumt seit Wochen die Küche auf, bevor er nach Hause kommt. Er sagt nie etwas dazu. Über Zuwendung, die unsichtbar bleibt, weil sie in der falschen Sprache gegeben wird.",
+    "cluster": "liebessprachen",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Meikes Sicht",
+    "pull_quote": "Ich habe nicht auf ein Lob gewartet. Ich habe darauf gewartet, dass er es überhaupt bemerkt.",
+    "echo": {
+      "mode": "base",
+      "opening_question": "Gibt es etwas, das du regelmäßig für dein Gegenüber tust und das nie erwähnt wird? Magst du erzählen, wie sich das anfühlt?"
+    },
+    "scene_tags": [
+      "liebessprachen",
+      "wertschaetzung",
+      "missverstaendnis",
+      "alltag"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/die-kueche-die-niemand-sieht"
   },
   {
     "type": "scene",
@@ -3274,6 +3626,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "er-sagt-es-nie",
+    "title": "Er sagt es nie",
+    "description": "Eine fiktive Szene: Er tut alles für sie, aber er sagt nichts. Über die Sehnsucht nach einem Satz, der nie kommt, und die Frage, ob man um Worte bitten darf.",
+    "cluster": "liebessprachen",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sarahs Sicht",
+    "pull_quote": "Er hat mein Auto zur Werkstatt gebracht. Ich wollte einen Satz.",
+    "echo": {
+      "mode": "base",
+      "opening_question": "Fehlen dir Worte, die dein Gegenüber nicht sagt? Magst du überlegen, was genau du gern hören würdest?"
+    },
+    "scene_tags": [
+      "liebessprachen",
+      "anerkennung",
+      "wertschaetzung",
+      "sehnsucht"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/er-sagt-es-nie"
+  },
+  {
+    "type": "scene",
     "slug": "erst-der-rausch-dann-die-kaelte",
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv.",
@@ -3640,6 +4020,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-habe-es-doch-gezeigt",
+    "title": "Ich habe es doch gezeigt",
+    "description": "Eine fiktive Szene: Nach dem Streit versteht er nicht, was ihr fehlt. Er hat doch alles getan. Über die Verzweiflung, die entsteht, wenn Mühe nicht ankommt.",
+    "cluster": "liebessprachen",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Andreas' Sicht",
+    "pull_quote": "Ich weiß nicht mehr, was ich noch tun soll. Ich mache doch alles.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, dich anzustrengen und trotzdem nicht anzukommen? Magst du erzählen, wie das für dich ist?"
+    },
+    "scene_tags": [
+      "liebessprachen",
+      "missverstaendnis",
+      "erschoepfung",
+      "wertschaetzung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-habe-es-doch-gezeigt"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-seinen-arzttermin-gemacht",
+    "title": "Ich habe seinen Arzttermin gemacht",
+    "description": "Eine fiktive Szene: Sie ruft für ihn beim Arzt an, wie schon so oft. Über den schmalen Grat zwischen helfen und stellvertretend leben.",
+    "cluster": "kodependenz",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Petras Sicht",
+    "pull_quote": "Ich habe es nicht getan, weil er es nicht kann. Ich habe es getan, weil ich das Warten nicht aushalte.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es etwas, das du regelmäßig für dein Gegenüber erledigst, das eigentlich seine Sache wäre? Magst du überlegen, was passieren würde, wenn du es lässt?"
+    },
+    "scene_tags": [
+      "fuersorge",
+      "selbstaufgabe",
+      "grenzen",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-habe-seinen-arzttermin-gemacht"
+  },
+  {
+    "type": "scene",
     "slug": "ich-habe-wieder-musik-gehoert",
     "title": "Ich habe wieder Musik gehört",
     "description": "Eine fiktive Szene: Wochen nach dem Auszug ertappt er sich beim lauten Mitsingen im Auto – und merkt, wie lange das weg war. Über die stille Wiederentdeckung des eigenen Ich nach einer Trennung.",
@@ -3861,6 +4297,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "sich-nicht-gehoert-fuehlen"
     ],
     "url": "/szenen/ich-wollte-doch-nur-reden"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-wusste-es-bevor-sie-anrief",
+    "title": "Ich wusste es, bevor sie anrief",
+    "description": "Eine fiktive Szene: Er spürt an der Art, wie das Telefon klingelt, in welcher Stimmung seine Schwester ist. Über eine Antenne, die man als Kind entwickelt und als Erwachsener nicht abstellen kann.",
+    "cluster": "kodependenz",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jonas' Sicht",
+    "pull_quote": "Ich habe für andere ein Frühwarnsystem. Für mich selbst nicht einmal ein Thermometer.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Merkst du sehr früh, wie es anderen geht? Magst du schauen, wie gut du dasselbe bei dir selbst kannst?"
+    },
+    "scene_tags": [
+      "selbstaufgabe",
+      "fuersorge",
+      "beziehungsmuster",
+      "kindheit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-wusste-es-bevor-sie-anrief"
   },
   {
     "type": "scene",
@@ -4339,6 +4803,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/mein-sohn-entschuldigt-sich"
+  },
+  {
+    "type": "scene",
+    "slug": "mein-teller-blieb-voll",
+    "title": "Mein Teller blieb voll",
+    "description": "Eine fiktive Szene: Beim Familienessen sorgt sie für alle — nachschenken, holen, vermitteln. Am Ende hat sie nichts gegessen und weiß nicht, wann sie zuletzt gesessen hat.",
+    "cluster": "kodependenz",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Beates Sicht",
+    "pull_quote": "Als alle satt waren, war mein Essen kalt. Und niemandem ist es aufgefallen, mir am wenigsten.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, für alle zu sorgen und dabei selbst leer auszugehen? Magst du erzählen, wann dir das zuletzt passiert ist?"
+    },
+    "scene_tags": [
+      "selbstaufgabe",
+      "fuersorge",
+      "erschoepfung",
+      "familie"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/mein-teller-blieb-voll"
   },
   {
     "type": "scene",
@@ -4909,6 +5401,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "was-moechtest-du-eigentlich",
+    "title": "Was möchtest du eigentlich?",
+    "description": "Eine fiktive Szene: Eine Freundin stellt eine harmlose Frage, und er merkt, dass er keine Antwort hat. Über den Moment, in dem auffällt, wie lange die eigenen Wünsche schon nicht mehr vorkommen.",
+    "cluster": "kodependenz",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Bernds Sicht",
+    "pull_quote": "Sie hat gefragt, was ich gern machen würde. Ich habe geantwortet, was wir machen könnten. Sie hat gesagt: Nein, du.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Weißt du, was du gerade gern hättest, ganz für dich? Magst du dem einmal in Ruhe nachgehen?"
+    },
+    "scene_tags": [
+      "selbstaufgabe",
+      "selbstfuersorge",
+      "selbstwert",
+      "beduerfnisse"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/was-moechtest-du-eigentlich"
+  },
+  {
+    "type": "scene",
     "slug": "wenn-du-mich-lieben-wuerdest",
     "title": "Wenn du mich lieben würdest",
     "description": "Eine Szene über emotionale Erpressung – wenn Liebe zum Hebel wird und ein Nein plötzlich einen Preis hat. Aus der Ich-Perspektive, fiktiv.",
@@ -4934,6 +5454,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "sich-klein-fuehlen"
     ],
     "url": "/szenen/wenn-du-mich-lieben-wuerdest"
+  },
+  {
+    "type": "scene",
+    "slug": "wenn-es-ihm-gut-geht",
+    "title": "Wenn es ihm gut geht",
+    "description": "Eine fiktive Szene: Ihr Partner hat eine gute Phase, und sie ertappt sich bei einem Gefühl, das sie sich kaum eingestehen kann. Über die unbequemste Erkenntnis in einer Helferrolle.",
+    "cluster": "kodependenz",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Miriams Sicht",
+    "pull_quote": "Es ging ihm besser, und ich wusste nicht mehr, wozu ich da bin.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es ein Gefühl in deiner Beziehung, das du dir selbst kaum eingestehst? Magst du behutsam hinschauen?"
+    },
+    "scene_tags": [
+      "fuersorge",
+      "selbstwert",
+      "beziehungsmuster",
+      "ambivalenz"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/wenn-es-ihm-gut-geht"
   },
   {
     "type": "scene",
@@ -5106,6 +5654,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "zwanzig-minuten-ohne-bildschirm",
+    "title": "Zwanzig Minuten ohne Bildschirm",
+    "description": "Eine fiktive Szene: Sie sitzen jeden Abend nebeneinander auf dem Sofa, jeder mit seinem Gerät. Über den Unterschied zwischen zusammen sein und miteinander sein.",
+    "cluster": "liebessprachen",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Claudias Sicht",
+    "pull_quote": "Wir verbringen jeden Abend zusammen. Wir haben uns seit Wochen nicht gesehen.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wann wart ihr zuletzt wirklich miteinander, ohne Ablenkung? Magst du überlegen, was dem im Weg steht?"
+    },
+    "scene_tags": [
+      "liebessprachen",
+      "zeit",
+      "einsamkeit-zu-zweit",
+      "alltag"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/zwanzig-minuten-ohne-bildschirm"
+  },
+  {
+    "type": "scene",
     "slug": "zwei-wochen-ohne-sie",
     "title": "Zwei Wochen ohne sie",
     "description": "Eine fiktive Szene: Sie ist verreist, und in der Stille bemerkt er, wie sehr sein Körper sich entspannt. Die Erleichterung ist keine Laune – sie ist eine Information. Über Dauerstress, Ambivalenz und die Klarheit der Abwesenheit.",
@@ -5190,6 +5766,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "naehe-distanz"
     ],
     "url": "/szenen/zwischen-himmel-und-abgrund"
+  },
+  {
+    "type": "scene",
+    "slug": "zwoelf-rosen-und-kein-satz",
+    "title": "Zwölf Rosen und kein Satz",
+    "description": "Eine fiktive Szene: Zum Jahrestag bringt er zwölf Rosen mit und einen gut reservierten Tisch. Sie hätte sich ein Gespräch gewünscht. Über Geschenke, die alles richtig machen und trotzdem nichts erreichen.",
+    "cluster": "liebessprachen",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ninas Sicht",
+    "pull_quote": "Alles war perfekt. Und ich saß da und war einsamer als am Dienstag.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, dass etwas objektiv schön war und trotzdem etwas gefehlt hat? Magst du dem nachgehen?"
+    },
+    "scene_tags": [
+      "liebessprachen",
+      "zeit",
+      "missverstaendnis",
+      "einsamkeit-zu-zweit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/zwoelf-rosen-und-kein-satz"
   },
   {
     "type": "topic",
@@ -6100,6 +6704,141 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "human-magnet-syndrome",
+    "title": "Human Magnet Syndrome: die Thesen von Ross Rosenberg",
+    "description": "Warum ziehen sich ausgerechnet fürsorgliche und ich-bezogene Menschen an? Ross Rosenbergs Modell vom menschlichen Magnetismus, seine zentralen Thesen – und eine ehrliche Einordnung, was daran trägt.",
+    "cluster": "kodependenz",
+    "search_intent": "human magnet syndrome ross rosenberg deutsch kodependenz narzissmus anziehung",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über das Magnet-Modell gelesen. Erkennst du ein Muster darin, zu wem du dich hingezogen fühlst? Magst du das anschauen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "bindung"
+    ],
+    "scene_tags": [
+      "selbstaufgabe",
+      "anziehung",
+      "beziehungsmuster",
+      "selbstwert",
+      "wiederholung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "selbstliebe-defizit",
+        "beziehungssucht",
+        "rettersyndrom",
+        "intermittierende-verstaerkung"
+      ],
+      "related": [
+        "kodependenz",
+        "wege-aus-der-kodependenz",
+        "narzissmus-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Heißt das, ich ziehe zwangsläufig Narzissten an?",
+        "answer": "Nein, und diese Lesart ist die schädlichste. Das Magnet-Bild beschreibt eine Neigung, kein Schicksal. Es sagt: Vertrautes fühlt sich richtig an, auch wenn es nicht guttut. Wer das bemerkt, kann anders wählen – nicht sofort und nicht mühelos, aber grundsätzlich. Ein Modell, das dir Unausweichlichkeit einredet, hast du falsch verstanden oder es sich selbst."
+      },
+      {
+        "question": "Ist das wissenschaftlich abgesichert?",
+        "answer": "Nein. Rosenberg ist Psychotherapeut und Autor, sein Modell stammt aus jahrzehntelanger Praxis. Es ist nicht in kontrollierten Studien geprüft, und Begriffe wie Selbstliebe-Defizit oder das Kontinuum des Selbst sind keine anerkannten Konstrukte. Einzelne Beobachtungen decken sich mit gut belegter Bindungsforschung, das Gesamtmodell nicht."
+      },
+      {
+        "question": "Bin ich schuld, wenn ich immer wieder an ähnliche Partner gerate?",
+        "answer": "Nein. Eine Neigung erklärt, warum jemand bleibt oder sich hingezogen fühlt. Sie erklärt nicht und entschuldigt nicht, wie jemand anders sich verhält. Verantwortung für Herabsetzung, Kontrolle oder Grenzverletzung trägt immer die Person, die sie ausübt."
+      },
+      {
+        "question": "Muss ich das Buch lesen, um etwas davon zu haben?",
+        "answer": "Nein. Die zentralen Gedanken stehen in diesem Text. Wenn dich das Thema packt, ist die Lektüre eine Möglichkeit – nützlicher ist meistens, die eigene Beziehungsgeschichte einmal aufzuschreiben und zu schauen, was sich wiederholt."
+      }
+    ],
+    "url": "/wissen/human-magnet-syndrome"
+  },
+  {
+    "type": "topic",
+    "slug": "kodependenz",
+    "title": "Kodependenz: wenn Fürsorge zur Falle wird",
+    "description": "Kodependenz beschreibt ein Muster, in dem sich alles um den anderen dreht und die eigenen Bedürfnisse verschwinden. Woher der Begriff kommt, woran du das Muster erkennst – und warum er mit Vorsicht zu genießen ist.",
+    "cluster": "kodependenz",
+    "search_intent": "kodependenz co-abhängigkeit beziehung anzeichen test selbstaufgabe",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Kodependenz gelesen. Magst du an eine Situation denken, in der du dich um jemanden gekümmert hast, obwohl du selbst gerade nichts mehr übrig hattest?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "selbstaufgabe",
+      "fuersorge",
+      "selbstwert",
+      "grenzen",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "selbstliebe-defizit",
+        "rettersyndrom",
+        "beziehungssucht",
+        "enabling",
+        "parentifizierung"
+      ],
+      "related": [
+        "human-magnet-syndrome",
+        "wege-aus-der-kodependenz",
+        "grenzen-setzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Kodependenz eine anerkannte Diagnose?",
+        "answer": "Nein. Weder ICD-11 noch DSM-5 kennen Kodependenz als Störung. Es ist ein Begriff aus der Selbsthilfe- und Ratgeberliteratur, der sich in den 1980er Jahren aus der Suchthilfe entwickelt hat. Das macht ihn nicht wertlos, aber du solltest wissen: Du liest hier ein Denkmodell, keine medizinische Kategorie – und niemand kann dir Kodependenz attestieren."
+      },
+      {
+        "question": "Bin ich mitschuldig, wenn ich kodependent bin?",
+        "answer": "Nein, und dieser Gedanke ist die gefährlichste Verwendung des Begriffs. Wer schlecht behandelt wird, ist dafür nicht verantwortlich – auch dann nicht, wenn er fürsorglich, loyal oder anpassungsbereit ist. Diese Eigenschaften erklären vielleicht, warum jemand länger bleibt. Sie erklären niemals, warum jemand anders sich schlecht verhält."
+      },
+      {
+        "question": "Ist starke Fürsorge immer Kodependenz?",
+        "answer": "Überhaupt nicht. Für jemanden zu sorgen, den man liebt, ist gesund und normal – gerade in Krisen, bei Krankheit, mit kleinen Kindern. Zum Muster wird es erst, wenn die Fürsorge dauerhaft einseitig ist, wenn du dich selbst dabei verlierst und wenn du nicht mehr aufhören kannst, ohne dass Angst entsteht."
+      },
+      {
+        "question": "Kann sich das ändern?",
+        "answer": "Ja, aber selten durch Vorsätze. Wer über Jahrzehnte gelernt hat, dass er über Nützlichkeit dazugehört, ändert das nicht durch den Entschluss, öfter Nein zu sagen. Was hilft, ist meist Begleitung – Therapie, Beratung, manchmal eine Gruppe. Und der erste Schritt ist kleiner, als viele denken: überhaupt zu bemerken, was man selbst gerade bräuchte."
+      }
+    ],
+    "url": "/wissen/kodependenz"
+  },
+  {
+    "type": "topic",
     "slug": "kommunikation-konflikte",
     "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
     "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft.",
@@ -6272,6 +7011,72 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/liebeskummer"
+  },
+  {
+    "type": "topic",
+    "slug": "liebessprachen",
+    "title": "Die 5 Liebessprachen: warum Liebe oft nicht ankommt",
+    "description": "Zwei Menschen lieben sich und fühlen sich beide ungeliebt. Die fünf Liebessprachen nach Gary Chapman erklären, woran das liegen kann – mit einer ehrlichen Einordnung, was das Modell taugt und was nicht.",
+    "cluster": "liebessprachen",
+    "search_intent": "5 liebessprachen chapman welche liebessprache habe ich beziehung",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "base",
+      "opening_question": "Du hast über die Liebessprachen gelesen. Magst du an eine Situation denken, in der du dir Mühe gegeben hast und es trotzdem nicht angekommen ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "bindung"
+    ],
+    "scene_tags": [
+      "liebessprachen",
+      "wertschaetzung",
+      "naehe",
+      "missverstaendnis"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "liebessprache",
+        "liebesdialekt",
+        "emotionaler-kontostand",
+        "beduerfnis-und-strategie"
+      ],
+      "related": [
+        "wenn-liebe-nicht-ankommt",
+        "kommunikation-konflikte",
+        "grenzen-setzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Welche Liebessprache habe ich?",
+        "answer": "Statt dich auf eine festzulegen, hilft eine konkretere Frage: Welche Sache hat dein Gegenüber in den letzten Wochen getan, bei der du dich wirklich gemeint gefühlt hast? Und welche Situation hat wehgetan, obwohl sie objektiv harmlos war? Die Antworten darauf sagen mehr als jede Typzuordnung – und sie sind besprechbar."
+      },
+      {
+        "question": "Ist das Modell wissenschaftlich belegt?",
+        "answer": "Nur schwach. Es stammt aus der Paarberatungspraxis, nicht aus der Forschung. Studien finden bisher keine belastbaren Hinweise darauf, dass Menschen sich in fünf Typen einteilen lassen oder dass gleiche Sprachen glücklicher machen. Gut belegt ist dagegen etwas anderes: Paare, die aufeinander eingehen und passend antworten, sind zufriedener. Das Modell ist also eine brauchbare Gesprächshilfe und keine Diagnose."
+      },
+      {
+        "question": "Was, wenn mein Gegenüber nicht mitmachen will?",
+        "answer": "Dann bringt Drängen nichts. Du kannst aber einseitig anfangen: herausfinden, was bei deinem Gegenüber ankommt, und es geben, ohne eine Gegenleistung zu erwarten. Oft verändert das etwas. Wenn nach längerer Zeit gar nichts zurückkommt, ist auch das eine Antwort – dann geht es nicht mehr um Sprachen, sondern um Bereitschaft."
+      },
+      {
+        "question": "Kann man mehrere Liebessprachen haben?",
+        "answer": "Ja, und die meisten Menschen haben mehrere. Auch verschiebt sich, was gerade zählt: In stressigen Phasen wird Entlastung wichtiger, in unsicheren Phasen Zuspruch. Die Vorstellung von der einen festen Sprache ist die größte Schwäche des Modells."
+      }
+    ],
+    "url": "/wissen/liebessprachen"
   },
   {
     "type": "topic",
@@ -6927,6 +7732,136 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/verlustangst"
+  },
+  {
+    "type": "topic",
+    "slug": "wege-aus-der-kodependenz",
+    "title": "Wege aus der Kodependenz: was wirklich hilft",
+    "description": "Öfter Nein sagen reicht nicht. Was tatsächlich hilft, wenn die eigenen Bedürfnisse über Jahre unsichtbar waren – in Schritten, die klein genug sind, um sie zu gehen.",
+    "cluster": "kodependenz",
+    "search_intent": "kodependenz überwinden aus co-abhängigkeit lösen selbstfürsorge lernen",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn heute Abend niemand etwas von dir wollte – wüsstest du, was du dann gern tun würdest? Magst du darüber nachdenken?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "selbstaufgabe",
+      "grenzen",
+      "selbstfuersorge",
+      "veraenderung",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "rettersyndrom",
+        "enabling",
+        "selbstliebe-defizit",
+        "beduerfnis-und-strategie"
+      ],
+      "related": [
+        "kodependenz",
+        "human-magnet-syndrome",
+        "grenzen-setzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie lange dauert das?",
+        "answer": "Länger, als die meisten Ratgeber versprechen. Ein Muster, das über Jahrzehnte gewachsen ist, verschwindet nicht in Wochen. Realistischer ist: Erste Veränderungen im eigenen Erleben nach einigen Monaten, spürbare Veränderungen im Verhalten nach einem Jahr oder länger. Das klingt entmutigend, ist aber ehrlicher als jedes Sieben-Schritte-Programm – und es nimmt den Druck, sofort anders sein zu müssen."
+      },
+      {
+        "question": "Muss ich dafür meine Beziehung beenden?",
+        "answer": "Nicht zwangsläufig. Manche Beziehungen verändern sich mit, wenn einer anfängt, sich anders zu verhalten – vor allem, wenn beide daran interessiert sind. Andere geraten unter Druck, weil das alte Gleichgewicht auf deiner Anpassung beruhte. Was passiert, lässt sich vorher nicht sagen. Sicher ist nur: Sich selbst weiter zu übergehen, damit die Beziehung bleibt, wie sie ist, hat auch einen Preis."
+      },
+      {
+        "question": "Brauche ich unbedingt eine Therapie?",
+        "answer": "Nicht in jedem Fall, aber häufiger, als man selbst denkt. Wenn das Muster bis in die Kindheit reicht, hilft Begleitung sehr – allein deshalb, weil ein Gegenüber bemerkt, was du selbst überspringst. Auch Beratungsstellen, Gruppen oder ein längeres, ehrliches Gespräch mit einem Menschen, der nichts von dir braucht, können ein Anfang sein."
+      },
+      {
+        "question": "Was, wenn mein Umfeld ärgerlich reagiert?",
+        "answer": "Damit ist zu rechnen, und es ist kein Zeichen, dass du falsch liegst. Wer über Jahre verlässlich verfügbar war, verändert mit seinem Verhalten auch die Erwartungen anderer. Die ersten Reaktionen sind oft Irritation oder Vorwürfe. Das ist unangenehm und geht meistens vorbei – und es sagt dir nebenbei einiges darüber, worauf die Beziehung beruhte."
+      }
+    ],
+    "url": "/wissen/wege-aus-der-kodependenz"
+  },
+  {
+    "type": "topic",
+    "slug": "wenn-liebe-nicht-ankommt",
+    "title": "Wenn Liebe nicht ankommt: woran es liegt und was hilft",
+    "description": "Ihr gebt euch beide Mühe, und trotzdem fühlt sich niemand gemeint. Wie du herausfindest, wo Zuneigung bei euch verloren geht – und woran du erkennst, dass es nicht mehr am Übersetzen liegt.",
+    "cluster": "liebessprachen",
+    "search_intent": "partner zeigt keine liebe fühle mich ungeliebt trotz beziehung",
+    "updated": "2026-08-26",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wann hast du dich zuletzt in deiner Beziehung wirklich gemeint gefühlt? Und was war da anders als sonst?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "liebessprachen",
+      "missverstaendnis",
+      "naehe",
+      "wertschaetzung",
+      "einsamkeit-zu-zweit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "liebesdialekt",
+        "emotionaler-kontostand",
+        "beduerfnis-und-strategie",
+        "liebessprache"
+      ],
+      "related": [
+        "liebessprachen",
+        "kommunikation-konflikte",
+        "emotionale-vernachlaessigung"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie sage ich, was ich brauche, ohne zu fordern?",
+        "answer": "Beschreibe eine Situation statt einer Eigenschaft. Nicht du bist nie aufmerksam, sondern gestern am Küchentisch, als ich von dem Gespräch erzählt habe – da hätte ich mir gewünscht, dass du das Handy weglegst. Eine Situation kann man annehmen, ohne sich als Mensch abgelehnt zu fühlen. Ein Urteil über den Charakter kann das niemand."
+      },
+      {
+        "question": "Was, wenn mein Gegenüber sagt, ich sei zu bedürftig?",
+        "answer": "Prüfe zuerst, ob das eine Rückmeldung oder eine Abwehr ist. Eine Rückmeldung klingt nach einem Aushandeln: Das ist mir zu viel, lass uns einen Mittelweg finden. Eine Abwehr macht dein Bedürfnis zum Fehler und beendet damit das Gespräch. Wenn jedes Ansprechen dazu führt, dass mit dir etwas nicht stimmt, ist das Thema nicht mehr deine Bedürftigkeit."
+      },
+      {
+        "question": "Kann sich das noch ändern, wenn wir uns seit Jahren verfehlen?",
+        "answer": "Oft ja, aber nicht durch eine große Aussprache. Was trägt, sind kleine, verlässliche Veränderungen über Wochen – und die Bereitschaft beider, sich für die Sicht des anderen ehrlich zu interessieren. Wenn nur einer übersetzt, entsteht keine Verständigung, sondern Erschöpfung."
+      }
+    ],
+    "url": "/wissen/wenn-liebe-nicht-ankommt"
   }
 ]
 
@@ -6938,6 +7873,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/ambivalenz": {
     "title": "Ambivalenz – wenn du hin- und hergerissen bist",
     "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist."
+  },
+  "/glossar/beduerfnis-und-strategie": {
+    "title": "Bedürfnis und Strategie – zwei Dinge, die oft verwechselt werden",
+    "description": "Ein Bedürfnis ist das, was du brauchst. Eine Strategie ist ein Weg, es zu erfüllen. Warum die Unterscheidung Streit auflöst, der sonst unlösbar wirkt."
+  },
+  "/glossar/beziehungssucht": {
+    "title": "Beziehungssucht – wenn Bindung wie Entzug wirkt",
+    "description": "Manche Beziehungen fühlen sich weniger nach Liebe an als nach Sucht: Rausch, Entzug, Rückfall. Was hinter diesem Muster steckt und warum es kein Charakterfehler ist."
   },
   "/glossar/bindungsangst": {
     "title": "Bindungsangst – Definition und Anzeichen",
@@ -6962,6 +7905,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/emotionale-ueberflutung": {
     "title": "Emotionale Überflutung – wenn das Gefühl das Denken überrollt",
     "description": "Was emotionale Überflutung (Flooding) ist, warum man in diesem Zustand nicht mehr klar denken oder streiten kann und was dann wirklich hilft. Ohne Diagnose."
+  },
+  "/glossar/emotionaler-kontostand": {
+    "title": "Emotionaler Kontostand – warum kleine Gesten zählen",
+    "description": "Das Bild vom emotionalen Konto beschreibt, wie sich Zuwendung über die Zeit aufbaut oder abträgt. Warum viele kleine Einzahlungen mehr tragen als eine große und woran man einen leeren Stand merkt."
+  },
+  "/glossar/enabling": {
+    "title": "Enabling – wenn Helfen das Problem am Leben hält",
+    "description": "Enabling bezeichnet Verhalten, das aus Fürsorge entsteht und ein schädliches Muster ungewollt stützt. Woran du es erkennst und was der Unterschied zu echter Unterstützung ist."
   },
   "/glossar/eskalationsspirale": {
     "title": "Eskalationsspirale – wie aus einer Kleinigkeit ein großer Streit wird",
@@ -7035,6 +7986,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kontaktabbruch (No Contact) – warum Abstand nach der Trennung hilft",
     "description": "Kontaktabbruch bedeutet, nach einer Trennung bewusst keinen Kontakt zu halten. Warum das keine Strafe ist, sondern hilft zu heilen – und wie man es mit gemeinsamen Kindern handhabt. Ohne Diagnose."
   },
+  "/glossar/liebesdialekt": {
+    "title": "Liebesdialekt – die konkrete Form zählt",
+    "description": "Zwei Menschen können dieselbe Liebessprache sprechen und sich trotzdem verfehlen, weil ihnen die konkrete Form nicht passt. Warum der Dialekt oft wichtiger ist als die Sprache."
+  },
+  "/glossar/liebessprache": {
+    "title": "Liebessprache – wie Zuneigung bei dir ankommt",
+    "description": "Eine Liebessprache ist die Form, in der sich Zuneigung für dich echt anfühlt. Woher das Modell stammt, was es taugt und wo seine Grenzen liegen. Ohne Etikett und ohne Versprechen."
+  },
   "/glossar/love-bombing": {
     "title": "Love Bombing – der überwältigende Anfang",
     "description": "Love Bombing ist eine Flut aus Zuneigung, Aufmerksamkeit und Zukunftsversprechen ganz am Anfang – so intensiv, dass sie schnell bindet und später als Druckmittel dient. Woran du es erkennst. Ohne Diagnose."
@@ -7075,6 +8034,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Retrospektive Eifersucht – wenn dich die Vergangenheit deines Gegenübers quält",
     "description": "Retrospektive Eifersucht ist die Eifersucht auf frühere Partner:innen des Gegenübers. Warum sie so quälend ist, obwohl sie sich gegen Unveränderbares richtet – und was hilft. Ohne Diagnose."
   },
+  "/glossar/rettersyndrom": {
+    "title": "Rettersyndrom – helfen, um gebraucht zu werden",
+    "description": "Beim Rettersyndrom wird Helfen zur Rolle. Woran du merkst, dass aus Fürsorge ein Muster geworden ist, und warum Retten und Retten-Wollen der anderen Person oft schadet."
+  },
   "/glossar/scham": {
     "title": "Scham – das Gefühl, nicht zu genügen",
     "description": "Was Scham von Schuld unterscheidet, warum sie so isoliert und lähmt und wie man ihr begegnen kann, ohne sich in ihr zu verlieren. Ohne Diagnose."
@@ -7086,6 +8049,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/selbstfuersorge": {
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
     "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose."
+  },
+  "/glossar/selbstliebe-defizit": {
+    "title": "Selbstliebe-Defizit – Kodependenz neu gedacht",
+    "description": "Der Psychotherapeut Ross Rosenberg schlägt vor, Kodependenz als Selbstliebe-Defizit zu verstehen: nicht als Charakterschwäche, sondern als Folge früher Verletzungen. Was das ändert und wo die Grenzen liegen."
   },
   "/glossar/spiritueller-narzissmus": {
     "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
@@ -7211,6 +8178,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das ist nur deine alte Wunde",
     "description": "Eine fiktive Szene: Er spricht an, dass sie eine Verabredung vergessen hat – und hört, das sei bloß seine Bindungswunde aus der Kindheit. Über Therapie-Sprache, die als Waffe dient und jede Verantwortung abwehrt."
   },
+  "/szenen/das-nein-das-ich-zurueckgenommen-habe": {
+    "title": "Das Nein, das ich zurückgenommen habe",
+    "description": "Eine fiktive Szene: Sie hat abgesagt, zum ersten Mal seit Jahren. Zwei Stunden später ruft sie zurück und sagt zu. Über die Schwerkraft, die ein Nein zurückzieht."
+  },
   "/szenen/das-schlechte-gewissen": {
     "title": "Das schlechte Gewissen",
     "description": "Eine Szene über die Schuldwelle, die nach einer gehaltenen Grenze kommt – und die Erkenntnis, dass sie ein alter Reflex ist, kein Urteil. Aus der Ich-Perspektive, fiktiv."
@@ -7270,6 +8241,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-gekraenkte-stille": {
     "title": "Die gekränkte Stille",
     "description": "Eine fiktive Szene: Eine harmlose Bemerkung, und sie zieht sich tagelang beleidigt zurück – bis er hinterherläuft und sich für ihre Kränkung entschuldigt. Über den verdeckt-vulnerablen Typ, der über Rückzug und Opferrolle bestraft."
+  },
+  "/szenen/die-hand-in-meinem-nacken": {
+    "title": "Die Hand in meinem Nacken",
+    "description": "Eine fiktive Szene: Eine beiläufige Berührung in der Küche, und plötzlich ist alles wieder da. Über die Sprache des Körpers, die keine Worte braucht und trotzdem verlernt werden kann."
+  },
+  "/szenen/die-kueche-die-niemand-sieht": {
+    "title": "Die Küche, die niemand sieht",
+    "description": "Eine fiktive Szene: Sie räumt seit Wochen die Küche auf, bevor er nach Hause kommt. Er sagt nie etwas dazu. Über Zuwendung, die unsichtbar bleibt, weil sie in der falschen Sprache gegeben wird."
   },
   "/szenen/die-leere-seite-vom-bett": {
     "title": "Die leere Seite vom Bett",
@@ -7347,6 +8326,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Entwurf gelöscht",
     "description": "Eine fiktive Szene: Zum dritten Mal an diesem Abend tippt sie eine Nachricht an ihn, liest sie, und löscht sie wieder Buchstabe für Buchstabe. Über das Ringen mit dem Handy und den Drang, den Kontakt doch nicht zu lassen."
   },
+  "/szenen/er-sagt-es-nie": {
+    "title": "Er sagt es nie",
+    "description": "Eine fiktive Szene: Er tut alles für sie, aber er sagt nichts. Über die Sehnsucht nach einem Satz, der nie kommt, und die Frage, ob man um Worte bitten darf."
+  },
   "/szenen/erst-der-rausch-dann-die-kaelte": {
     "title": "Erst der Rausch, dann die Kälte",
     "description": "Eine Szene über Love Bombing und Entwertung – wenn du erst auf einen Sockel gehoben und dann fallen gelassen wirst, immer wieder. Ich-Perspektive, fiktiv."
@@ -7399,6 +8382,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich hab mich geändert",
     "description": "Eine Szene über Hoovering – die Nachricht Wochen nach der Trennung, in der plötzlich alles anders sein soll. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/ich-habe-es-doch-gezeigt": {
+    "title": "Ich habe es doch gezeigt",
+    "description": "Eine fiktive Szene: Nach dem Streit versteht er nicht, was ihr fehlt. Er hat doch alles getan. Über die Verzweiflung, die entsteht, wenn Mühe nicht ankommt."
+  },
+  "/szenen/ich-habe-seinen-arzttermin-gemacht": {
+    "title": "Ich habe seinen Arzttermin gemacht",
+    "description": "Eine fiktive Szene: Sie ruft für ihn beim Arzt an, wie schon so oft. Über den schmalen Grat zwischen helfen und stellvertretend leben."
+  },
   "/szenen/ich-habe-wieder-musik-gehoert": {
     "title": "Ich habe wieder Musik gehört",
     "description": "Eine fiktive Szene: Wochen nach dem Auszug ertappt er sich beim lauten Mitsingen im Auto – und merkt, wie lange das weg war. Über die stille Wiederentdeckung des eigenen Ich nach einer Trennung."
@@ -7430,6 +8421,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-wollte-doch-nur-reden": {
     "title": "Ich wollte doch nur reden",
     "description": "Eine Szene über den Versuch, ein Bedürfnis anzusprechen, der sofort zum Streit über den Streit wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-wusste-es-bevor-sie-anrief": {
+    "title": "Ich wusste es, bevor sie anrief",
+    "description": "Eine fiktive Szene: Er spürt an der Art, wie das Telefon klingelt, in welcher Stimmung seine Schwester ist. Über eine Antenne, die man als Kind entwickelt und als Erwachsener nicht abstellen kann."
   },
   "/szenen/ihr-name-in-meinem-kopf": {
     "title": "Ihr Name in meinem Kopf",
@@ -7498,6 +8493,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/mein-sohn-entschuldigt-sich": {
     "title": "Mein Sohn entschuldigt sich",
     "description": "Eine fiktive Szene: Der kleine Junge sagt „Entschuldigung\", noch bevor klar ist, ob etwas passiert ist – genau wie sein Vater. Über weitergegebene Muster und den Moment, in dem man das eigene Verhalten im Kind wiedererkennt."
+  },
+  "/szenen/mein-teller-blieb-voll": {
+    "title": "Mein Teller blieb voll",
+    "description": "Eine fiktive Szene: Beim Familienessen sorgt sie für alle — nachschenken, holen, vermitteln. Am Ende hat sie nichts gegessen und weiß nicht, wann sie zuletzt gesessen hat."
   },
   "/szenen/mein-zimmer-im-haus": {
     "title": "Mein Zimmer im Haus",
@@ -7579,9 +8578,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Was habe ich gerade gesagt?",
     "description": "Eine fiktive Szene: Ihre Worte sagen Ja, ihr Gesicht sagt Nein – und als er auf das Nein reagiert, soll er ihre Worte wiederholen. Über den Double Bind und das Zweifeln an der eigenen Wahrnehmung."
   },
+  "/szenen/was-moechtest-du-eigentlich": {
+    "title": "Was möchtest du eigentlich?",
+    "description": "Eine fiktive Szene: Eine Freundin stellt eine harmlose Frage, und er merkt, dass er keine Antwort hat. Über den Moment, in dem auffällt, wie lange die eigenen Wünsche schon nicht mehr vorkommen."
+  },
   "/szenen/wenn-du-mich-lieben-wuerdest": {
     "title": "Wenn du mich lieben würdest",
     "description": "Eine Szene über emotionale Erpressung – wenn Liebe zum Hebel wird und ein Nein plötzlich einen Preis hat. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/wenn-es-ihm-gut-geht": {
+    "title": "Wenn es ihm gut geht",
+    "description": "Eine fiktive Szene: Ihr Partner hat eine gute Phase, und sie ertappt sich bei einem Gefühl, das sie sich kaum eingestehen kann. Über die unbequemste Erkenntnis in einer Helferrolle."
   },
   "/szenen/wenn-hausarbeit-liebe-beweisen-soll": {
     "title": "Wenn Hausarbeit Liebe beweisen soll",
@@ -7607,6 +8614,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Er hebt nur die Hand",
     "description": "Eine fiktive Szene: Ein Kollege greift nach einem Buch im Regal über ihm – und er zuckt zusammen, als käme ein Schlag. Über den Schreck, der im Körper geblieben ist, obwohl die Gefahr vorbei ist."
   },
+  "/szenen/zwanzig-minuten-ohne-bildschirm": {
+    "title": "Zwanzig Minuten ohne Bildschirm",
+    "description": "Eine fiktive Szene: Sie sitzen jeden Abend nebeneinander auf dem Sofa, jeder mit seinem Gerät. Über den Unterschied zwischen zusammen sein und miteinander sein."
+  },
   "/szenen/zwei-wochen-ohne-sie": {
     "title": "Zwei Wochen ohne sie",
     "description": "Eine fiktive Szene: Sie ist verreist, und in der Stille bemerkt er, wie sehr sein Körper sich entspannt. Die Erleichterung ist keine Laune – sie ist eine Information. Über Dauerstress, Ambivalenz und die Klarheit der Abwesenheit."
@@ -7618,6 +8629,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/zwischen-himmel-und-abgrund": {
     "title": "Zwischen Himmel und Abgrund",
     "description": "Eine Szene über intensive Beziehungsdynamik – Idealisierung, Angst vorm Verlassenwerden und plötzliche Kälte, an einem einzigen Tag. Ich-Perspektive, fiktiv, keine Diagnose."
+  },
+  "/szenen/zwoelf-rosen-und-kein-satz": {
+    "title": "Zwölf Rosen und kein Satz",
+    "description": "Eine fiktive Szene: Zum Jahrestag bringt er zwölf Rosen mit und einen gut reservierten Tisch. Sie hätte sich ein Gespräch gewünscht. Über Geschenke, die alles richtig machen und trotzdem nichts erreichen."
   },
   "/wissen/beduerfnisse-aeussern": {
     "title": "Bedürfnisse äußern statt Vorwürfe: die Kunst der Ich-Botschaft",
@@ -7699,6 +8714,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Grenzen setzen lernen: der Anfang liegt bei dir selbst",
     "description": "Wie man Grenzen setzt, ohne die Beziehung zu riskieren – warum eine Grenze zuerst innere Klarheit braucht, wie man sie freundlich, aber bestimmt kommuniziert, und was der Unterschied zu einer Mauer ist. Ohne Diagnose."
   },
+  "/wissen/human-magnet-syndrome": {
+    "title": "Human Magnet Syndrome: die Thesen von Ross Rosenberg",
+    "description": "Warum ziehen sich ausgerechnet fürsorgliche und ich-bezogene Menschen an? Ross Rosenbergs Modell vom menschlichen Magnetismus, seine zentralen Thesen – und eine ehrliche Einordnung, was daran trägt."
+  },
+  "/wissen/kodependenz": {
+    "title": "Kodependenz: wenn Fürsorge zur Falle wird",
+    "description": "Kodependenz beschreibt ein Muster, in dem sich alles um den anderen dreht und die eigenen Bedürfnisse verschwinden. Woher der Begriff kommt, woran du das Muster erkennst – und warum er mit Vorsicht zu genießen ist."
+  },
   "/wissen/kommunikation-konflikte": {
     "title": "Kommunikation und Konflikte: warum Gespräche eskalieren",
     "description": "Welche Muster Gespräche kippen lassen – von Gottmans „vier Reitern\" bis zu Eskalationszyklen – und was beim De-Eskalieren wirklich hilft."
@@ -7714,6 +8737,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/liebeskummer": {
     "title": "Liebeskummer: warum er so weh tut – und wie du durchkommst",
     "description": "Warum Liebeskummer körperlich wehtut, fast wie ein Entzug, und keine Schwäche ist. Was in dir passiert, warum die Erinnerung lügt und was dir wirklich durch die schwerste Zeit hilft. Warm und ehrlich, ohne Ratgeber-Floskeln."
+  },
+  "/wissen/liebessprachen": {
+    "title": "Die 5 Liebessprachen: warum Liebe oft nicht ankommt",
+    "description": "Zwei Menschen lieben sich und fühlen sich beide ungeliebt. Die fünf Liebessprachen nach Gary Chapman erklären, woran das liegen kann – mit einer ehrlichen Einordnung, was das Modell taugt und was nicht."
   },
   "/wissen/loslassen-nach-trennung": {
     "title": "Loslassen lernen: über eine Trennung hinwegkommen",
@@ -7770,5 +8797,13 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/verlustangst": {
     "title": "Verlustangst in Beziehungen verstehen",
     "description": "Woher die Angst kommt, verlassen zu werden, wie sie sich in Beziehungen zeigt und was dir hilft, ihr weniger ausgeliefert zu sein – ohne Selbstverurteilung."
+  },
+  "/wissen/wege-aus-der-kodependenz": {
+    "title": "Wege aus der Kodependenz: was wirklich hilft",
+    "description": "Öfter Nein sagen reicht nicht. Was tatsächlich hilft, wenn die eigenen Bedürfnisse über Jahre unsichtbar waren – in Schritten, die klein genug sind, um sie zu gehen."
+  },
+  "/wissen/wenn-liebe-nicht-ankommt": {
+    "title": "Wenn Liebe nicht ankommt: woran es liegt und was hilft",
+    "description": "Ihr gebt euch beide Mühe, und trotzdem fühlt sich niemand gemeint. Wie du herausfindest, wo Zuneigung bei euch verloren geht – und woran du erkennst, dass es nicht mehr am Übersetzen liegt."
   }
 }

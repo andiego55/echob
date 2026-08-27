@@ -14,9 +14,12 @@ import { beziehungstrauma } from './tests/beziehungstrauma'
 import { liebeskummer } from './tests/liebeskummer'
 import { erlebeIchGaslighting } from './tests/erlebe-ich-gaslighting'
 import { narzisstischeMuster } from './tests/narzisstische-muster'
+import { wieLiebeBeiMirAnkommt } from './tests/wie-liebe-bei-mir-ankommt'
+import { kodependenteMuster } from './tests/kodependente-muster'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
+  wieLiebeBeiMirAnkommt,
   emotionalerMissbrauch,
   erlebeIchGaslighting,
   narzisstischeMuster,
@@ -29,6 +32,7 @@ export const SELF_TESTS: SelfTest[] = [
   eifersuchtVertrauen,
   bindungsstil,
   verliereIchMich,
+  kodependenteMuster,
   eigenerAnteil,
 ]
 
