@@ -17,6 +17,8 @@ import { narzisstischeMuster } from './tests/narzisstische-muster'
 import { wieLiebeBeiMirAnkommt } from './tests/wie-liebe-bei-mir-ankommt'
 import { kodependenteMuster } from './tests/kodependente-muster'
 import { nachDemVertrauensbruch } from './tests/nach-dem-vertrauensbruch'
+import { wieRedeIchMitMir } from './tests/wie-rede-ich-mit-mir'
+import { wieEhrlichBinIchMitMir } from './tests/wie-ehrlich-bin-ich-mit-mir'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
@@ -33,6 +35,8 @@ export const SELF_TESTS: SelfTest[] = [
   streitmuster,
   eifersuchtVertrauen,
   bindungsstil,
+  wieRedeIchMitMir,
+  wieEhrlichBinIchMitMir,
   verliereIchMich,
   kodependenteMuster,
   eigenerAnteil,

@@ -656,6 +656,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "gemeinsames-menschsein",
+    "title": "Gemeinsames Menschsein – der unterschätzte Teil",
+    "description": "Der zweite Bestandteil von Selbstmitgefühl: die Einsicht, dass Scheitern zum Menschsein gehört. Warum Scham eine besondere Einsamkeit erzeugt und was dagegen hilft.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "gemeinsames menschsein common humanity selbstmitgefühl allein damit scham",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Hast du gerade das Gefühl, dass so etwas nur dir passiert? Magst du erzählen, was es ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist das nicht nur der Spruch anderen geht es auch so?",
+        "answer": "Der Unterschied liegt darin, wer es sagt und wozu. Von außen dient der Satz oft dazu, ein Gespräch zu beenden – dann relativiert er und lässt jemanden allein. Von innen erkannt korrigiert er einen tatsächlichen Denkfehler: Scham erzeugt den Eindruck, ausgerechnet man selbst sei so, während alle anderen ihr Leben im Griff haben. Das stimmt nachweislich nicht."
+      },
+      {
+        "question": "Warum ist ausgerechnet dieser Teil so wichtig?",
+        "answer": "Weil er den Vergleich auflöst, der Selbstwertgefühl instabil macht. Wer sich gut fühlt, weil er besser ist als andere, braucht ständig andere, die schlechter sind. Die Einsicht, dass Schwierigkeiten zur Ausstattung gehören, macht diesen Vergleich überflüssig – und trägt deshalb auch an Tagen, an denen nichts gelingt."
+      }
+    ],
+    "url": "/glossar/gemeinsames-menschsein"
+  },
+  {
+    "type": "glossary",
     "slug": "grandioser-narzissmus",
     "title": "Grandioser Narzissmus – die laute, dominante Form",
     "description": "Der grandiose Narzissmus ist die offene, selbstsichere Ausprägung: Bewunderung als Bedürfnis, wenig Mitgefühl, alles dreht sich um die eigene Größe. Woran du das erkennst und wie es sich anfühlt. Ohne Diagnose.",
@@ -898,6 +932,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "innerer-antreiber",
+    "title": "Innerer Antreiber – der Motor, der keiner ist",
+    "description": "Sei perfekt, sei stark, mach schnell, mach es allen recht: die inneren Regeln, die Leistung versprechen und Erschöpfung liefern. Woher sie kommen und wie man sie entschärft.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "innere antreiber sei perfekt sei stark mach es allen recht transaktionsanalyse",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Welcher Satz treibt dich an, auch wenn du längst müde bist? Magst du ihn mir wörtlich sagen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Sind innere Antreiber grundsätzlich schlecht?",
+        "answer": "Nein. In gemäßigter Form sind sie brauchbare Arbeitshaltungen – Sorgfalt, Ausdauer, Rücksicht. Zum Problem werden sie, wenn sie unbedingt gelten: wenn Sorgfalt zu keinen Fehler machen dürfen wird und Rücksicht zu niemals jemanden enttäuschen. Der Unterschied liegt nicht im Inhalt, sondern darin, ob es eine Ausnahme geben darf."
+      },
+      {
+        "question": "Wie werde ich einen Antreiber los?",
+        "answer": "Meistens gar nicht, und das ist auch nicht nötig. Was sich verändern lässt, ist seine Unbedingtheit. Jedem Antreiber steht eine Erlaubnis gegenüber – gegen sei perfekt zum Beispiel du darfst Fehler machen. Wirksam wird sie nicht durch Wiederholen, sondern durch Ausprobieren: etwas bewusst nicht perfekt machen und erleben, dass die befürchtete Folge ausbleibt."
+      }
+    ],
+    "url": "/glossar/innerer-antreiber"
+  },
+  {
+    "type": "glossary",
+    "slug": "intellektualisierung",
+    "title": "Intellektualisierung – über ein Gefühl reden statt es zu haben",
+    "description": "Wer sein eigenes Verhalten fachlich einordnet, wirkt reflektiert und kann sich damit am elegantesten aus der Sache ziehen. Woran man den Unterschied erkennt.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "intellektualisierung abwehrmechanismus über gefühle reden statt fühlen bindungsstil ausrede",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du mir eine Sache erzählen, ohne sie zu erklären? Nur, was war und wie es dir dabei ging.",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist es schlecht, psychologische Begriffe über sich zu verwenden?",
+        "answer": "Nein – sie ordnen und entlasten oft. Der Unterschied liegt darin, was danach passiert. Wenn der Begriff zu einer Veränderung führt, war es Einsicht. Wenn er die Sache abschließt, war es ein Ausweichen mit gutem Vokabular: Ich bin halt vermeidend gebunden erklärt nichts, es beendet nur das Gespräch."
+      },
+      {
+        "question": "Wie merke ich das bei mir selbst?",
+        "answer": "An der Temperatur. Wenn du über eine schwere Sache sprichst und dabei nichts spürst, obwohl sie dich betrifft, bist du vermutlich gerade daneben statt darin. Ein einfacher Test: Erzähl dieselbe Sache noch einmal, ohne einen einzigen Fachbegriff und ohne zu erklären, warum es dazu kam."
+      }
+    ],
+    "url": "/glossar/intellektualisierung"
+  },
+  {
+    "type": "glossary",
     "slug": "intermittierende-verstaerkung",
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
     "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose.",
@@ -933,6 +1035,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/intermittierende-verstaerkung"
+  },
+  {
+    "type": "glossary",
+    "slug": "introspektions-illusion",
+    "title": "Introspektions-Illusion – warum du deine Gründe nicht kennst",
+    "description": "Wir glauben, unsere eigenen Beweggründe zu kennen. Tatsächlich konstruieren wir sie im Nachhinein – überzeugend und oft falsch. Was daraus für Selbsterkenntnis folgt.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "introspektion illusion eigene motive kennen warum tue ich das selbstwahrnehmung fehler",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Erzähl mir eine Sache, die du getan hast und bei der du deine Gründe genau zu kennen glaubst. Dann schauen wir gemeinsam, was noch dabei gewesen sein könnte.",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Heißt das, Selbstreflexion ist sinnlos?",
+        "answer": "Im Gegenteil – es heißt nur, dass sie anders funktioniert, als die meisten annehmen. Nicht durch Hineinhorchen, sondern durch Beobachtung: das eigene Verhalten über Zeit betrachten, Muster suchen, Rückmeldung einholen. Was wenig bringt, ist das Erraten von Motiven im stillen Kämmerlein, weil dabei zuverlässig etwas Plausibles entsteht."
+      },
+      {
+        "question": "Woran merke ich, dass ich mir gerade eine Erklärung baue?",
+        "answer": "An der Glätte. Erklärungen, die sofort da sind, vollständig wirken und einen selbst gut aussehen lassen, sind verdächtig. Echte Einsicht kommt meistens zögernd, ist lückenhaft und angenehm ist sie selten."
+      }
+    ],
+    "url": "/glossar/introspektions-illusion"
+  },
+  {
+    "type": "glossary",
+    "slug": "johari-fenster",
+    "title": "Johari-Fenster – vier Felder für Selbstbild und Fremdbild",
+    "description": "Ein einfaches Modell dafür, was du über dich weißt, was andere wissen und was in der Lücke dazwischen liegt. Und wie man das blinde Feld tatsächlich verkleinert.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "johari fenster erklärung blinder fleck selbstbild fremdbild modell",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Was wissen Menschen, die dich gut kennen, über dich – von dem du glaubst, dass sie es nicht wissen? Magst du das prüfen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie verkleinert man das blinde Feld?",
+        "answer": "Nur über Rückmeldung von außen, und die kommt nicht von selbst. Entscheidend ist die Art der Frage: Bin ich schwierig lässt sich nicht ehrlich beantworten, wann war ich zuletzt schwer zu ertragen und was habe ich da gemacht schon. Situationen kann man erzählen, ohne jemanden zu verletzen – Urteile nicht."
+      },
+      {
+        "question": "Und das verborgene Feld?",
+        "answer": "Das verkleinert sich dadurch, dass man etwas von sich zeigt – und das ist eine Entscheidung, keine Pflicht. Nicht alles gehört in jede Beziehung, und es gibt Situationen, in denen Zurückhaltung klug ist. Siehe Verletzlichkeit zeigen."
+      }
+    ],
+    "url": "/glossar/johari-fenster"
   },
   {
     "type": "glossary",
@@ -1484,6 +1654,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "rationalisierung",
+    "title": "Rationalisierung – der bessere Grund im Nachhinein",
+    "description": "Der nachträgliche gute Grund für etwas, das andere Ursachen hatte. Wie man sie von echter Einsicht unterscheidet und warum sie meistens Scham vermeidet.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "rationalisierung abwehrmechanismus ausreden vor sich selbst rechtfertigen",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Nenn mir einen Grund, den du dir zuletzt für etwas gegeben hast. Magst du schauen, ob es der einzige war?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie unterscheide ich Rationalisierung von einer echten Erklärung?",
+        "answer": "An drei Merkmalen. Eine Rationalisierung ist sofort da, sie lässt einen gut aussehen, und sie führt zu keiner Veränderung. Eine echte Erklärung kommt zögernder, ist meist unangenehm und hat Folgen – man macht danach etwas anders. Die brauchbarste Frage lautet: Würde ich diese Erklärung auch vor jemandem vertreten, der die Sache genau kennt?"
+      },
+      {
+        "question": "Ist es schlimm, dass ich das mache?",
+        "answer": "Es ist normal und tut jeder. Rationalisierung schützt vor Scham, und ohne diesen Schutz wäre der Alltag schwer erträglich. Sie wird erst zum Problem, wenn sie an einer Stelle sitzt, an der eine Entscheidung fällig wäre – und diese Entscheidung dadurch ausbleibt."
+      }
+    ],
+    "url": "/glossar/rationalisierung"
+  },
+  {
+    "type": "glossary",
     "slug": "realitaetsverdrehung",
     "title": "Realitätsverdrehung – wenn deine Erinnerung zum Streitpunkt wird",
     "description": "Realitätsverdrehung ist der Kern von Gaslighting: Fakten, Erinnerungen und Gefühle werden umgedeutet oder geleugnet, bis du an dir selbst zweifelst. Wie sie funktioniert und was hilft. Ohne Diagnose.",
@@ -1692,6 +1896,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "selbstfreundlichkeit",
+    "title": "Selbstfreundlichkeit – der Ton, nicht der Inhalt",
+    "description": "Der erste Bestandteil von Selbstmitgefühl nach Kristin Neff. Was er meint, warum er nichts mit Beschönigen zu tun hat und wie man ihn im Alltag prüft.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "selbstfreundlichkeit bedeutung freundlich zu sich sein neff",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Sag mir einen Satz, den du heute zu dir gesagt hast. Wörtlich. Wie klingt er, wenn du ihn laut hörst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Heißt Selbstfreundlichkeit, dass ich mir alles durchgehen lasse?",
+        "answer": "Nein, und der Unterschied ist überprüfbar. Selbstfreundlichkeit verändert den Ton, nicht den Inhalt. Der Satz du hättest früher anfangen sollen darf stehen bleiben – er muss nur nicht klingen wie von jemandem, der dich loswerden will. Wer beim Ton bleibt und den Inhalt streicht, macht etwas anderes: Er beruhigt sich."
+      },
+      {
+        "question": "Ich bin gern hart zu mir, das hält mich auf Spur. Was spricht dagegen?",
+        "answer": "Vermutlich weniger, als du denkst, und mehr, als es sich anfühlt. Härte gegen sich selbst geht in Untersuchungen nicht mit besserer Leistung einher, sondern mit mehr Aufschieben und Vermeidung – weil Anfangen unter Beobachtung teuer wird. Was tatsächlich antreibt, sind Interesse und Verbindlichkeit. Die Härte war meistens nur dabei, nicht die Ursache."
+      }
+    ],
+    "url": "/glossar/selbstfreundlichkeit"
+  },
+  {
+    "type": "glossary",
     "slug": "selbstfuersorge",
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
     "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose.",
@@ -1757,6 +1995,108 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/selbstliebe-defizit"
+  },
+  {
+    "type": "glossary",
+    "slug": "selbstoffenbarung",
+    "title": "Selbstoffenbarung – wie Nähe schrittweise entsteht",
+    "description": "Nähe wächst durch gegenseitiges, dosiertes Zeigen. Warum die Erwiderung wichtiger ist als die Menge und woran man ein Ungleichgewicht erkennt.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "selbstoffenbarung nähe aufbauen sich öffnen beziehung gegenseitigkeit",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wie ist das bei euch verteilt – wer zeigt mehr von sich? Magst du dem einen Moment nachgehen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Muss immer alles auf den Tisch?",
+        "answer": "Nein. Nähe entsteht nicht durch Vollständigkeit, sondern durch Gegenseitigkeit und passendes Tempo. Es gibt Dinge, die in keine Beziehung gehören, und es gibt einen Zeitpunkt, zu dem etwas verfrüht wäre. Entscheidend ist weniger, wie viel gesagt wird, als ob beide Seiten sich in vergleichbarem Maß zeigen."
+      },
+      {
+        "question": "Was bedeutet ein dauerhaftes Ungleichgewicht?",
+        "answer": "Meist eine schiefe Rollenverteilung. Wer immer erzählt und nie erfährt, wird zum Fall statt zum Gegenüber; wer immer zuhört und nie etwas zeigt, bleibt unangreifbar. Beide Rollen fühlen sich zunächst bequem an und erzeugen mit der Zeit Distanz – die eine durch Scham, die andere durch Unerreichbarkeit."
+      }
+    ],
+    "url": "/glossar/selbstoffenbarung"
+  },
+  {
+    "type": "glossary",
+    "slug": "selbsttaeuschung",
+    "title": "Selbsttäuschung – kein Lügen, sondern Nichthinsehen",
+    "description": "Selbsttäuschung ist selten eine bewusste Lüge. Sie ist die Fähigkeit, etwas zu wissen und gleichzeitig nicht zu wissen – und sie hat eine Schutzfunktion.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "selbsttäuschung sich selbst belügen verdrängen nicht wahrhaben wollen beziehung",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es etwas, das du eigentlich weißt und lieber nicht zu Ende denkst? Wir müssen nicht hin – aber magst du merken, ob dir sofort etwas eingefallen ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wenn ich mich täusche, wie soll ich das dann bemerken?",
+        "answer": "Nicht am Inhalt, sondern an Begleiterscheinungen. Die zuverlässigsten Hinweise sind: eine Reaktion, die zu groß für den Anlass ist; eine auffällig ausführliche Begründung; der Drang, das Thema zu wechseln; und plötzliche Müdigkeit bei bestimmten Fragen. Keiner davon ist ein Beweis, aber alle sind gute Stellen zum Langsamerwerden."
+      },
+      {
+        "question": "Ist Selbsttäuschung nicht manchmal auch gesund?",
+        "answer": "Ja, das ist der unbequeme Teil. Sie hat eine Schutzfunktion: Sie hält Erkenntnisse fern, die man gerade nicht tragen kann. Wer in einer Lage ist, aus der es keinen Ausweg gibt, hält es mit einer geschönten Version oft besser aus. Problematisch wird es, wenn der Schutz länger bleibt als die Not – und Entscheidungen verhindert, die inzwischen möglich wären."
+      }
+    ],
+    "url": "/glossar/selbsttaeuschung"
+  },
+  {
+    "type": "glossary",
+    "slug": "selbstverurteilung",
+    "title": "Selbstverurteilung – wenn aus einem Fehler ein Urteil wird",
+    "description": "Der Unterschied zwischen ich habe etwas Schlechtes getan und ich bin schlecht – und warum die zweite Variante Veränderung nicht befeuert, sondern verhindert.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "selbstverurteilung selbsthass ich bin schlecht scham schuld unterschied",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn du gerade an dich denkst – geht es um etwas, das du getan hast, oder um das, was du bist? Der Unterschied ist größer, als er klingt.",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Selbstverurteilung nicht einfach ein hohes Gewissen?",
+        "answer": "Nein, und die beiden führen zu gegensätzlichem Verhalten. Ein waches Gewissen bezieht sich auf Handlungen und erzeugt Wiedergutmachung. Selbstverurteilung bezieht sich auf die Person und erzeugt Verstecken – man kann eine Handlung wiedergutmachen, aber kein Urteil über sich selbst. Wer sich verurteilt, entschuldigt sich deshalb im Durchschnitt seltener, nicht häufiger."
+      },
+      {
+        "question": "Ich verurteile mich, seit ich denken kann. Ist das noch normal?",
+        "answer": "Verbreitet ist es. Wenn es aber dauerhaft ist, dich am Alltag hindert oder mit Gedanken einhergeht, nicht mehr da sein zu wollen, ist es kein Fall für Selbsthilfe. Dann ist eine Fachperson der richtige nächste Schritt – dafür gibt es wirksame Verfahren. Bei akuten Krisengedanken: Telefonseelsorge 0800 111 0 111, rund um die Uhr und kostenfrei."
+      }
+    ],
+    "url": "/glossar/selbstverurteilung"
   },
   {
     "type": "glossary",
@@ -1859,6 +2199,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/taeter-opfer-umkehr"
+  },
+  {
+    "type": "glossary",
+    "slug": "toxische-positivitaet",
+    "title": "Toxische Positivität – wenn gute Laune zur Pflicht wird",
+    "description": "Der Druck, jedes schwere Gefühl sofort umzudeuten. Warum das die Last verdoppelt statt sie zu nehmen, und wie sich echter Trost davon unterscheidet.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "toxische positivität positiv denken zwang alles hat einen sinn sprüche nerven",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Musstest du schon einmal so tun, als ginge es dir besser, damit es für andere leichter wird? Magst du erzählen, wie das war?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist positiv denken denn schlecht?",
+        "answer": "Nicht als Angebot, sondern als Pflicht. Der Unterschied liegt darin, ob ein Gefühl vorher vorkommen durfte. Wer erst gehört wird und dann eine zuversichtliche Sicht angeboten bekommt, erlebt Trost. Wer sofort umgedeutet wird, erlebt eine Zurückweisung mit freundlichem Gesicht."
+      },
+      {
+        "question": "Wie reagiere ich besser, wenn es jemandem schlecht geht?",
+        "answer": "Meistens reicht, das Gefühl stehen zu lassen und da zu bleiben: das klingt schwer, erzähl mir mehr. Die Versuchung, sofort eine Lösung oder eine gute Seite anzubieten, kommt oft aus der eigenen Hilflosigkeit – man will das unangenehme Gefühl beenden, das man beim Zuhören selbst bekommt. Aushalten ist unbequemer und wirkt deutlich mehr."
+      }
+    ],
+    "url": "/glossar/toxische-positivitaet"
   },
   {
     "type": "glossary",
@@ -1995,6 +2369,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/verachtung"
+  },
+  {
+    "type": "glossary",
+    "slug": "verletzlichkeit",
+    "title": "Verletzlichkeit – Einsatz, nicht Inhalt",
+    "description": "Sich verletzlich zu zeigen heißt nicht, viel zu erzählen. Es heißt, etwas zu zeigen, mit dem man verletzt werden könnte – ohne zu wissen, was daraufhin passiert.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "verletzlichkeit bedeutung sich verletzlich zeigen unterschied offenheit",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was würdest du sagen, wenn du sicher wüsstest, dass es nicht gegen dich verwendet wird?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Verletzlichkeit immer gut?",
+        "answer": "Nein. Sie setzt ein Gegenüber voraus, das damit umgehen kann. Wo Gezeigtes im Streit als Argument zurückkommt oder vor anderen erwähnt wird, ist Zurückhaltung keine Blockade, sondern eine Schlussfolgerung. Verletzlichkeit ist eine Möglichkeit, keine Tugend, die man immer üben sollte."
+      },
+      {
+        "question": "Warum fällt es manchen so leicht und anderen so schwer?",
+        "answer": "Weil die Erfahrung unterschiedlich war. Wer früh erlebt hat, dass Gefühle lästig, unpassend oder gefährlich waren, hat einen guten Grund für seine Vorsicht – der Grund ist nur alt und wird auf neue Menschen übertragen, die nichts damit zu tun haben."
+      }
+    ],
+    "url": "/glossar/verletzlichkeit"
   },
   {
     "type": "glossary",
@@ -2656,6 +3064,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-dritte-mal-derselbe-satz",
+    "title": "Das dritte Mal derselbe Satz",
+    "description": "Eine fiktive Szene: Drei Frauen aus drei Beziehungen haben ihm dasselbe gesagt, und er hat es dreimal erklärt. Über den Moment, in dem eine Wiederholung zur Information wird.",
+    "cluster": "selbsterkenntnis",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Christophs Sicht",
+    "pull_quote": "Drei Frauen, die sich nicht kennen, zwölf Jahre auseinander. Die einzige Konstante bin ich.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es eine Rückmeldung, die du von mehreren Menschen bekommen hast? Magst du sie einmal ernst nehmen, ohne sie zu erklären?"
+    },
+    "scene_tags": [
+      "selbstreflexion",
+      "beziehungsmuster",
+      "ehrlichkeit",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/das-dritte-mal-derselbe-satz"
+  },
+  {
+    "type": "scene",
+    "slug": "das-foto-von-mir-mit-neun",
+    "title": "Das Foto von mir mit neun",
+    "description": "Eine fiktive Szene: Beim Ausräumen findet er ein Kinderfoto von sich und merkt, dass er zu diesem Kind völlig anders reden würde als zu sich selbst. Über eine Übung, die albern klingt und trifft.",
+    "cluster": "selbstmitgefuehl",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Simons Sicht",
+    "pull_quote": "Ich würde ihm nie sagen, was ich mir seit dreißig Jahren sage. Ich würde mich schämen, wenn er es hören würde.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn du ein Foto von dir als Kind vor dir hättest – was würdest du diesem Kind sagen? Magst du das versuchen?"
+    },
+    "scene_tags": [
+      "selbstwert",
+      "scham",
+      "selbstfuersorge",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/das-foto-von-mir-mit-neun"
+  },
+  {
+    "type": "scene",
     "slug": "das-habe-ich-nie-gesagt",
     "title": "Das habe ich nie gesagt",
     "description": "Eine Szene über Gaslighting – wenn deine Erinnerung Stück für Stück in Frage gestellt wird, bis du an dir selbst zweifelst. Aus der Ich-Perspektive, fiktiv.",
@@ -3216,6 +3680,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-satz-den-ich-zu-marie-gesagt-haette",
+    "title": "Der Satz, den ich zu Marie gesagt hätte",
+    "description": "Eine fiktive Szene: Sie hat einen Fehler im Quartalsbericht übersehen und sagt sich Dinge, die sie ihrer besten Freundin nie sagen würde. Über den Unterschied zwischen zwei Tonlagen für dieselbe Sache.",
+    "cluster": "selbstmitgefuehl",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Rebekkas Sicht",
+    "pull_quote": "Beide Sätze stimmen. Nur einer davon hilft mir, morgen zur Arbeit zu gehen.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wie klingt die Stimme in dir, wenn dir etwas misslingt? Magst du sie mir wörtlich sagen?"
+    },
+    "scene_tags": [
+      "selbstwert",
+      "innerer-kritiker",
+      "scham",
+      "selbstfuersorge"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-satz-den-ich-zu-marie-gesagt-haette"
+  },
+  {
+    "type": "scene",
     "slug": "der-schluessel-im-schloss",
     "title": "Der Schlüssel im Schloss",
     "description": "Eine fiktive Szene: Am Geräusch des Heimkommens liest er schon ab, welcher Abend es wird. Über Hypervigilanz, das ständige Lesen der Stimmung und einen Alltag auf Habachtstellung.",
@@ -3662,6 +4154,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "dreiundzwanzig-uhr-die-liste",
+    "title": "Dreiundzwanzig Uhr, die Liste",
+    "description": "Eine fiktive Szene: Jeden Abend beim Zähneputzen geht er durch, was er falsch gemacht hat. Über eine Gewohnheit, die sich wie Gewissenhaftigkeit anfühlt und keine ist.",
+    "cluster": "selbstmitgefuehl",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tobias' Sicht",
+    "pull_quote": "Ich habe das vierzehn Jahre lang für Gewissenhaftigkeit gehalten. Es ist eine Abrechnung, und ich verliere sie jeden Abend.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Gibt es eine Abendgewohnheit, in der du mit dir abrechnest? Magst du erzählen, was da genau passiert?"
+    },
+    "scene_tags": [
+      "innerer-kritiker",
+      "gruebeln",
+      "selbstwert",
+      "scham"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/dreiundzwanzig-uhr-die-liste"
+  },
+  {
+    "type": "scene",
     "slug": "dritter-tag-ohne-antwort",
     "title": "Dritter Tag ohne Antwort",
     "description": "Eine fiktive Szene: Sie wohnen zusammen und sie bekommt keine Antwort — nicht heute, nicht gestern, nicht vorgestern. Über die Ohnmacht vor einer Tür, hinter der jemand steht.",
@@ -4024,6 +4544,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/erst-wenn-ich-liefere"
+  },
+  {
+    "type": "scene",
+    "slug": "es-fuehlt-sich-falsch-an-nett-zu-mir-zu-sein",
+    "title": "Es fühlt sich falsch an, nett zu mir zu sein",
+    "description": "Eine fiktive Szene: Sie soll in der Therapie einen freundlichen Satz zu sich selbst sagen und wird stattdessen wütend. Über eine Reaktion, die mehr erklärt als jede Übung.",
+    "cluster": "selbstmitgefuehl",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jasmins Sicht",
+    "pull_quote": "Ich sollte etwas Nettes zu mir sagen und wurde wütend. Nicht traurig. Wütend.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Löst Freundlichkeit dir gegenüber manchmal Abwehr aus? Magst du dem nachgehen, ohne dass wir es sofort erklären?"
+    },
+    "scene_tags": [
+      "selbstwert",
+      "scham",
+      "veraenderung",
+      "innerer-kritiker"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/es-fuehlt-sich-falsch-an-nett-zu-mir-zu-sein"
   },
   {
     "type": "scene",
@@ -4392,6 +4940,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-habe-es-zugegeben-und-nichts-ist-passiert",
+    "title": "Ich habe es zugegeben, und nichts ist passiert",
+    "description": "Eine fiktive Szene: Er sagt nach Jahren zum ersten Mal 'Du hast recht, das war mein Fehler' – und die befürchtete Abrechnung bleibt aus. Über den Preis, den man erwartet, und den, der tatsächlich fällig wird.",
+    "cluster": "selbsterkenntnis",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Andrés Sicht",
+    "pull_quote": "Ich hatte dreißig Jahre lang Angst vor etwas, das vier Sekunden gedauert hat.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was befürchtest du, wenn du einen Fehler zugibst? Magst du prüfen, ob das schon einmal wirklich eingetreten ist?"
+    },
+    "scene_tags": [
+      "ehrlichkeit",
+      "verantwortung",
+      "scham",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-habe-es-zugegeben-und-nichts-ist-passiert"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-mir-ein-bad-eingelassen",
+    "title": "Ich habe mir ein Bad eingelassen",
+    "description": "Eine fiktive Szene: Sie tut alles, was in den Beiträgen über Selbstfürsorge steht, und fühlt sich danach genauso erschöpft. Über den Unterschied zwischen einem Bad und einem Nein.",
+    "cluster": "selbstmitgefuehl",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Kathrins Sicht",
+    "pull_quote": "Ich habe ein Bad genommen, weil ich das Gespräch nicht führen wollte. Das Bad war nicht das Problem.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was tust du für dich – und was hast du stattdessen eigentlich nötig? Magst du das nebeneinanderlegen?"
+    },
+    "scene_tags": [
+      "selbstfuersorge",
+      "selbstwert",
+      "beduerfnisse",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-habe-mir-ein-bad-eingelassen"
+  },
+  {
+    "type": "scene",
     "slug": "ich-habe-seinen-arzttermin-gemacht",
     "title": "Ich habe seinen Arzttermin gemacht",
     "description": "Eine fiktive Szene: Sie ruft für ihn beim Arzt an, wie schon so oft. Über den schmalen Grat zwischen helfen und stellvertretend leben.",
@@ -4446,6 +5050,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/ich-habe-wieder-musik-gehoert"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-zu-viel-gesagt-und-zu-frueh",
+    "title": "Ich habe zu viel gesagt, und zu früh",
+    "description": "Eine fiktive Szene: Nach dem dritten Date hat sie alles erzählt und fühlt sich am nächsten Morgen nicht näher, sondern bloßgestellt. Über den Unterschied zwischen Zeigen und Ausschütten.",
+    "cluster": "selbsterkenntnis",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Leas Sicht",
+    "pull_quote": "Ich habe ihm alles gegeben und nichts riskiert. Es hat sich nur so angefühlt.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, nach einem offenen Gespräch nicht näher, sondern entblößt zu sein? Magst du dem nachgehen?"
+    },
+    "scene_tags": [
+      "verletzlichkeit",
+      "naehe",
+      "scham",
+      "ehrlichkeit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-habe-zu-viel-gesagt-und-zu-frueh"
   },
   {
     "type": "scene",
@@ -5574,6 +6206,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "sie-hat-nicht-gemerkt-was-passiert-ist",
+    "title": "Sie hat nicht gemerkt, was passiert ist",
+    "description": "Eine fiktive Szene: Er sagt zum ersten Mal einen freundlichen Satz über sich selbst, und seine Partnerin bemerkt es nicht einmal. Über einen Moment, der von außen nach nichts aussieht.",
+    "cluster": "selbstmitgefuehl",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Malteser Sicht",
+    "pull_quote": "Von außen war das gar nichts. Von innen war es das erste Mal seit vierzig Jahren.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Fällt dir ein Moment ein, in dem du überraschend freundlich mit dir warst? Magst du erzählen, was da anders war?"
+    },
+    "scene_tags": [
+      "selbstwert",
+      "veraenderung",
+      "selbstfuersorge",
+      "naehe"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/sie-hat-nicht-gemerkt-was-passiert-ist"
+  },
+  {
+    "type": "scene",
+    "slug": "sie-hat-recht-gehabt-und-ich-wusste-es-sofort",
+    "title": "Sie hat recht gehabt, und ich wusste es sofort",
+    "description": "Eine fiktive Szene: Eine Kritik trifft, sie widerspricht drei Tage lang – und weiß von der ersten Sekunde an, dass sie stimmt. Über den Abstand zwischen Erkennen und Zugeben.",
+    "cluster": "selbsterkenntnis",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Miriams Sicht",
+    "pull_quote": "Es waren nicht drei Tage Nachdenken. Es waren drei Tage Verhandeln mit einer Sache, die schon feststand.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gab es etwas, das du sofort wusstest und trotzdem lange bestritten hast? Magst du schauen, was dazwischen lag?"
+    },
+    "scene_tags": [
+      "ehrlichkeit",
+      "selbstreflexion",
+      "scham",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/sie-hat-recht-gehabt-und-ich-wusste-es-sofort"
+  },
+  {
+    "type": "scene",
     "slug": "sie-uebersetzt-fuer-uns",
     "title": "Sie übersetzt für uns",
     "description": "Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden.",
@@ -5745,6 +6433,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "warum-habe-ich-das-gesagt",
+    "title": "Warum habe ich das gesagt",
+    "description": "Eine fiktive Szene: Sie sucht seit vier Tagen nach der Erklärung für einen Satz, den sie im Streit gesagt hat – und findet immer neue. Über die Frage, die keine Antwort hat.",
+    "cluster": "selbsterkenntnis",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Elenas Sicht",
+    "pull_quote": "Ich habe vier Erklärungen. Jede klingt gut. Wenn eine davon stimmen würde, wäre ich weiter.",
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Drehst du dich bei einer Frage über dich im Kreis? Magst du sie mal anders stellen – nicht warum, sondern was genau passiert ist?"
+    },
+    "scene_tags": [
+      "selbstreflexion",
+      "gruebeln",
+      "ehrlichkeit",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/warum-habe-ich-das-gesagt"
+  },
+  {
+    "type": "scene",
     "slug": "warum-ich-bleibe",
     "title": "Warum ich bleibe",
     "description": "Eine Szene über Trauma-Bindung – wenn der Wechsel aus Verletzung und großer Versöhnung eine Nähe schafft, aus der man kaum herausfindet. Ich-Perspektive, fiktiv.",
@@ -5799,6 +6515,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/was-habe-ich-gerade-gesagt"
+  },
+  {
+    "type": "scene",
+    "slug": "was-habe-ich-uebersehen",
+    "title": "Was habe ich übersehen",
+    "description": "Eine fiktive Szene: Nach der Trennung geht sie die ersten Wochen noch einmal durch und findet die Hinweise, die von Anfang an da waren. Über den Unterschied zwischen nicht sehen und nicht sehen wollen.",
+    "cluster": "selbsterkenntnis",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Doreens Sicht",
+    "pull_quote": "Ich habe es nicht übersehen. Ich habe es gesehen und weggelegt, weil ich wollte, dass es gut wird.",
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Was hast du am Anfang bemerkt und beiseitegelegt? Magst du das anschauen – ohne dich dafür fertigzumachen?"
+    },
+    "scene_tags": [
+      "selbstreflexion",
+      "ehrlichkeit",
+      "beziehungsmuster",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/was-habe-ich-uebersehen"
   },
   {
     "type": "scene",
@@ -6451,6 +7195,72 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "blinde-flecken",
+    "title": "Blinde Flecken: das, was alle sehen außer dir",
+    "description": "Jeder hat Anteile, die andere kennen und er selbst nicht. Wie das Johari-Fenster funktioniert, welche blinden Flecken in Beziehungen am häufigsten sind und wie man Rückmeldung bekommt, die wirklich etwas zeigt.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "blinde flecken beziehung johari fenster selbstbild fremdbild feedback annehmen",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was haben verschiedene Menschen dir über dich gesagt, das du jedes Mal abgewehrt hast? Magst du das eine Mal ernst nehmen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "selbstreflexion",
+      "ehrlichkeit",
+      "beziehungsmuster",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "johari-fenster",
+        "selbsttaeuschung",
+        "projektion",
+        "introspektions-illusion"
+      ],
+      "related": [
+        "ehrlich-zu-sich-selbst-sein",
+        "eingestehen-koennen",
+        "selbstmitgefuehl"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie finde ich meine blinden Flecken, wenn ich sie doch nicht sehen kann?",
+        "answer": "Über zwei Umwege. Erstens über Rückmeldung von außen – aber nur, wenn man konkret fragt: nicht bin ich schwierig, sondern wann war ich zuletzt schwer zu ertragen und was habe ich da gemacht. Zweitens über Wiederholungen: Wenn dieselbe Rückmeldung aus verschiedenen Beziehungen kommt, die nichts miteinander zu tun haben, ist der gemeinsame Nenner meist nicht die Zufälligkeit der anderen."
+      },
+      {
+        "question": "Woran erkenne ich, dass jemand einen wunden Punkt getroffen hat?",
+        "answer": "Am zuverlässigsten an der Größe deiner Reaktion. Wenn ein beiläufiger Satz unverhältnismäßig trifft, liegt dort etwas – nicht unbedingt Wahrheit, aber Bedeutung. Ein zweiter Hinweis ist die Ausführlichkeit deiner Erklärung: Wer sicher ist, braucht wenige Sätze."
+      },
+      {
+        "question": "Was, wenn die Rückmeldung einfach nicht stimmt?",
+        "answer": "Das kommt vor, und du musst nichts glauben, nur weil es jemand sagt. Die brauchbare Zwischenposition heißt aufheben statt annehmen oder ablehnen: Du musst nicht sofort entscheiden. Notiere es und schau in drei Monaten, ob es noch einmal aufgetaucht ist. Was einmal kommt, kann Zufall sein. Was dreimal kommt, ist Information."
+      },
+      {
+        "question": "Kann man auch positive blinde Flecken haben?",
+        "answer": "Ja, und sie werden fast immer übersehen. Viele Menschen unterschätzen systematisch, wie verlässlich, großzügig oder aufmerksam sie wirken. Wer nur nach Fehlern sucht, bekommt ein verzerrtes Bild in die andere Richtung – und übersieht dabei Stärken, auf denen sich aufbauen ließe."
+      }
+    ],
+    "url": "/wissen/blinde-flecken"
+  },
+  {
+    "type": "topic",
     "slug": "co-regulation",
     "title": "Co-Regulation: warum wir uns aneinander beruhigen",
     "description": "Wie Menschen sich gegenseitig beruhigen, warum ein ruhiges Gegenüber ein aufgewühltes Nervensystem besänftigt und wieso Co-Regulation kein Zeichen von Abhängigkeit ist. Ohne Diagnose.",
@@ -6482,6 +7292,72 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/co-regulation"
+  },
+  {
+    "type": "topic",
+    "slug": "der-innere-kritiker",
+    "title": "Der innere Kritiker: woher die Stimme kommt und was gegen sie hilft",
+    "description": "Die Stimme, die dich abwertet, ist kein Feind und lässt sich nicht wegdiskutieren. Woher sie stammt, warum Bekämpfen sie lauter macht und welche vier Schritte den Ton verändern.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "innerer kritiker innere stimme abwertend selbstkritik stoppen negative gedanken über mich",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wenn diese Stimme in dir eine Person wäre – wessen Stimme wäre es? Magst du dem einen Moment nachgehen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "innerer-kritiker",
+      "selbstwert",
+      "scham",
+      "gruebeln"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "selbstverurteilung",
+        "innerer-antreiber",
+        "scham",
+        "selbstfreundlichkeit"
+      ],
+      "related": [
+        "selbstmitgefuehl",
+        "selbstliebe",
+        "wenn-selbstliebe-nicht-funktioniert"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wenn ich den inneren Kritiker verliere, verliere ich dann meinen Antrieb?",
+        "answer": "Das ist die Befürchtung, die fast alle haben, und sie beruht auf einer Verwechslung von Ursache und Begleitung. Die Stimme war jahrelang dabei, wenn du etwas geschafft hast – daraus folgt nicht, dass sie es bewirkt hat. Was tatsächlich antreibt, sind Interesse, Verbindlichkeit und die Aussicht auf ein Ergebnis. Angst treibt auch an, aber schlechter: Sie führt zu Aufschieben, Perfektionismus und Vermeidung, weil Anfangen teuer wird."
+      },
+      {
+        "question": "Warum wird die Stimme lauter, wenn ich sie bekämpfe?",
+        "answer": "Weil Bekämpfen Aufmerksamkeit ist und weil der innere Kritiker eine Schutzfunktion hat. Er ist meistens aus dem Versuch entstanden, Kritik von außen zuvorzukommen: Wenn ich mich selbst zuerst abwerte, trifft es mich weniger, wenn es jemand anders tut. Ein Schutzmechanismus, den man angreift, verteidigt sich. Wirksamer ist, ihn zu erkennen und nicht zu befolgen, statt ihn zum Schweigen bringen zu wollen."
+      },
+      {
+        "question": "Meine Stimme klingt genau wie mein Vater. Ist das Zufall?",
+        "answer": "Eher nicht. Der Ton stammt fast immer von jemandem – aus der Familie, der Schule, einer prägenden Beziehung. Manchmal erkennt man die Person sofort wieder, manchmal ist es eine Mischung. Das zu bemerken ist häufig ein Wendepunkt, weil eine übernommene Stimme etwas anderes ist als eine eigene Erkenntnis: Man kann ihr widersprechen, ohne sich selbst zu widersprechen."
+      },
+      {
+        "question": "Ich habe die Stimme seit dreißig Jahren. Geht das überhaupt noch weg?",
+        "answer": "Ganz weg meistens nicht, und das ist auch nicht das Ziel. Was sich verändert, ist ihr Rang: Sie wird von der Wahrheit zu einer Meinung, dann zu einer alten Gewohnheit, die man kommen hört. Viele beschreiben nach längerer Arbeit daran, dass die Sätze noch auftauchen, aber nicht mehr entscheiden, was als Nächstes passiert."
+      }
+    ],
+    "url": "/wissen/der-innere-kritiker"
   },
   {
     "type": "topic",
@@ -6520,6 +7396,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/die-vier-reiter"
+  },
+  {
+    "type": "topic",
+    "slug": "ehrlich-zu-sich-selbst-sein",
+    "title": "Ehrlich zu sich selbst sein: warum Nachdenken allein nicht reicht",
+    "description": "Sich selbst zu kennen ist schwerer, als es klingt – und viel Grübeln macht es eher schlechter. Warum die Warum-Frage in die Irre führt, welche Frage stattdessen trägt und woran du Selbsttäuschung erkennst.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "ehrlich zu sich selbst sein selbsterkenntnis selbstreflexion lernen sich selbst besser kennen",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es etwas, das du über dich weißt und lieber nicht wüsstest? Du musst es mir nicht sagen – aber magst du schauen, was passiert, wenn du daran denkst?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "selbstreflexion",
+      "ehrlichkeit",
+      "gruebeln",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "introspektions-illusion",
+        "selbsttaeuschung",
+        "rationalisierung",
+        "kognitive-dissonanz"
+      ],
+      "related": [
+        "blinde-flecken",
+        "eingestehen-koennen",
+        "verletzlichkeit-zeigen",
+        "selbstmitgefuehl"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ich denke ständig über mich nach. Warum kenne ich mich trotzdem nicht besser?",
+        "answer": "Weil Häufigkeit und Genauigkeit zwei verschiedene Dinge sind. Viel über sich nachzudenken geht nicht verlässlich mit gutem Selbstkenntnis einher – manchmal sogar umgekehrt, weil intensives Grübeln vor allem Erklärungen erzeugt, die sich stimmig anfühlen. Entscheidend ist die Art der Frage: Warum-Fragen laden zum Erfinden plausibler Gründe ein, Was-Fragen führen zu Beobachtungen, die man prüfen kann."
+      },
+      {
+        "question": "Was ist der Unterschied zwischen Selbstreflexion und Grübeln?",
+        "answer": "Die Richtung. Selbstreflexion endet bei etwas, das man tun oder anders sehen kann, und hört dann auf. Grübeln dreht dieselbe Frage immer weiter, kommt zu keinem Ergebnis und fühlt sich trotzdem wie Arbeit an. Eine brauchbare Prüfung nach zwanzig Minuten: Weiß ich jetzt etwas, das ich vorher nicht wusste? Wenn nein, war es Grübeln."
+      },
+      {
+        "question": "Kann man sich selbst überhaupt objektiv sehen?",
+        "answer": "Nicht wirklich, und das ist keine Ausrede, sondern eine Arbeitsanweisung. Wir haben keinen direkten Zugang zu unseren Beweggründen, sondern konstruieren sie im Nachhinein – oft überzeugend und falsch. Deshalb bleibt Selbsterkenntnis unvollständig, solange sie allein stattfindet. Es braucht Rückmeldung von außen und Beobachtung des eigenen Verhaltens über Zeit."
+      },
+      {
+        "question": "Ist zu viel Selbstprüfung nicht auch gefährlich?",
+        "answer": "Ja, an zwei Stellen. Erstens, wenn sie zur Selbstverurteilung wird – dann schaut man irgendwann weg, weil Hinsehen zu teuer wird. Zweitens, wenn jemand die Bereitschaft zur Selbstprüfung ausnutzt: Menschen, die ehrlich mitdenken, sind leichter davon zu überzeugen, dass alles an ihnen liegt. Ehrlichkeit mit sich schließt Ehrlichkeit darüber ein, was nicht deins ist."
+      }
+    ],
+    "url": "/wissen/ehrlich-zu-sich-selbst-sein"
   },
   {
     "type": "topic",
@@ -6608,6 +7551,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/eifersucht-oder-bauchgefuehl"
+  },
+  {
+    "type": "topic",
+    "slug": "eingestehen-koennen",
+    "title": "Eingestehen können: warum Zugeben so schwer ist",
+    "description": "Ein Fehler zuzugeben kostet fast nichts und fühlt sich an wie Selbstaufgabe. Warum das so ist, woran man ein echtes Eingeständnis erkennt und welche fünf Formen es nur so aussehen lassen.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "fehler zugeben können entschuldigen fällt schwer eingestehen einsicht partner gibt nie zu",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es etwas, das du zugeben müsstest und bisher nicht getan hast? Wir müssen nicht dorthin – aber magst du schauen, was dich abhält?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "ehrlichkeit",
+      "verantwortung",
+      "scham",
+      "selbstreflexion"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "rationalisierung",
+        "selbstverurteilung",
+        "scham",
+        "kognitive-dissonanz"
+      ],
+      "related": [
+        "ehrlich-zu-sich-selbst-sein",
+        "blinde-flecken",
+        "verletzlichkeit-zeigen",
+        "selbstmitgefuehl"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum fällt es manchen Menschen so extrem schwer, Fehler zuzugeben?",
+        "answer": "Meist nicht aus Sturheit, sondern weil ein Fehler bei ihnen nicht als Handlung, sondern als Urteil über die Person ankommt. Wer innerlich mit Scham reagiert – ich bin schlecht statt ich habe etwas Schlechtes getan –, muss jedes Eingeständnis abwehren, weil es sich anfühlt wie Selbstaufgabe. Deshalb ist ein harter, verurteilender Umgang mit sich selbst der schlechteste Boden für Einsicht."
+      },
+      {
+        "question": "Woran erkenne ich, ob eine Entschuldigung echt ist?",
+        "answer": "An drei Dingen: Sie benennt die konkrete Handlung, nicht nur das Gefühl des anderen. Sie enthält kein aber. Und ihr folgt eine Veränderung im Verhalten, nicht nur eine Zusicherung. Das dritte ist das wichtigste und braucht Zeit – deshalb lässt sich eine Entschuldigung im Moment selbst nie abschließend beurteilen."
+      },
+      {
+        "question": "Mein Gegenüber gibt nie etwas zu. Was kann ich tun?",
+        "answer": "Wenig direkt, und das ist die ehrliche Antwort. Was manchmal hilft: den Preis senken. Viele Menschen geben nichts zu, weil sie erwarten, dass danach abgerechnet wird. Wer ein Eingeständnis nicht als Sieg behandelt, bekommt eher weitere. Was nicht hilft: Beweisführung. Wer in die Enge getrieben wird, verteidigt sich, auch wenn er weiß, dass er falsch liegt. Wenn über Jahre nichts zugegeben wird und stattdessen jedes Thema zu dir zurückkommt, geht es allerdings nicht mehr um Eingeständnisfähigkeit."
+      },
+      {
+        "question": "Kann man zu viel zugeben?",
+        "answer": "Ja. Wer aus Angst vor Streit sofort alle Schuld übernimmt, klärt nichts, sondern beendet nur das Gespräch. Das ist keine Einsicht, sondern eine Beschwichtigung – und es hat Folgen, weil der tatsächliche Anteil des anderen damit unbesprochen bleibt. Siehe Fawning."
+      }
+    ],
+    "url": "/wissen/eingestehen-koennen"
   },
   {
     "type": "topic",
@@ -8077,6 +9087,139 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "selbstliebe",
+    "title": "Selbstliebe lernen: was davon trägt und was nur Deko ist",
+    "description": "Selbstliebe ist zum Werbewort geworden. Was der Begriff ursprünglich meint, warum Bäder und Affirmationen wenig ändern und welche vier Dinge tatsächlich etwas bewirken.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "selbstliebe lernen was ist selbstliebe wie fange ich an sich selbst lieben",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was würdest du für dich tun, wenn du sicher wüsstest, dass niemand es mitbekommt und niemand es gut findet?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "selbstwert",
+      "selbstfuersorge",
+      "beduerfnisse",
+      "veraenderung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "selbstfreundlichkeit",
+        "toxische-positivitaet",
+        "innerer-antreiber",
+        "selbstliebe-defizit"
+      ],
+      "related": [
+        "selbstmitgefuehl",
+        "der-innere-kritiker",
+        "wenn-selbstliebe-nicht-funktioniert"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Muss ich mich erst selbst lieben, bevor ich jemanden lieben kann?",
+        "answer": "Nein, und dieser Satz hat viel Schaden angerichtet. Menschen mit brüchigem Selbstwert führen tragfähige Beziehungen, und Menschen mit stabilem Selbstwert scheitern in ihnen. Richtig ist etwas Bescheideneres: Wer sich selbst gering schätzt, übersieht eher Verhalten, das nicht in Ordnung ist, und nennt seltener, was er braucht. Das erschwert Beziehungen, es verbietet sie nicht. Selbstliebe ist keine Zugangsvoraussetzung, sondern etwas, das mitwächst."
+      },
+      {
+        "question": "Warum wirken Affirmationen bei mir nicht?",
+        "answer": "Weil sie bei geringem Selbstwert oft das Gegenteil bewirken. Wer den Satz ich bin liebenswert vor dem Spiegel sagt und ihm nicht glaubt, führt sich vor allem den Abstand zwischen Anspruch und Empfinden vor – und fühlt sich danach schlechter. Sätze, die nur ein wenig über dem liegen, was du gerade glauben kannst, tragen dagegen: nicht ich bin großartig, sondern das war schwer, und ich habe es trotzdem gemacht."
+      },
+      {
+        "question": "Ist Selbstliebe nicht einfach Egoismus?",
+        "answer": "Die beiden sehen sich nur oberflächlich ähnlich. Egoismus heißt, die eigenen Bedürfnisse über die anderer zu stellen. Selbstliebe heißt, sie überhaupt mitzuzählen. Wer von einem Zustand kommt, in dem die eigenen Bedürfnisse gar nicht vorkamen, empfindet den Übergang oft als Egoismus – und das Umfeld manchmal auch, vor allem, wenn es von der bisherigen Verfügbarkeit profitiert hat."
+      },
+      {
+        "question": "Kann man Selbstliebe wirklich lernen, oder hat man sie oder nicht?",
+        "answer": "Sie ist keine Eigenschaft, die feststeht. Der Weg dorthin führt aber selten über Gefühle, sondern über Handlungen: Wer sich wiederholt so behandelt, wie man jemanden behandelt, der zählt, verändert mit der Zeit auch das Empfinden. Die Reihenfolge ist umgekehrt zu der, die man erwartet – erst das Tun, dann das Fühlen."
+      }
+    ],
+    "url": "/wissen/selbstliebe"
+  },
+  {
+    "type": "topic",
+    "slug": "selbstmitgefuehl",
+    "title": "Selbstmitgefühl: die drei Teile und der eine Denkfehler",
+    "description": "Selbstmitgefühl ist nicht Nachsicht und nicht Selbstwertgefühl. Was Kristin Neffs drei Bestandteile wirklich meinen, warum härtere Selbstkritik nachweislich weniger verändert und wo die Grenze zur Ausrede verläuft.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "selbstmitgefühl lernen bedeutung kristin neff unterschied selbstwert selbstliebe",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wie klingt die Stimme in dir, wenn dir etwas misslingt? Magst du sie mir wörtlich sagen – so, wie sie wirklich redet?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "selbstwert",
+      "scham",
+      "innerer-kritiker",
+      "selbstfuersorge"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "selbstfreundlichkeit",
+        "gemeinsames-menschsein",
+        "selbstverurteilung",
+        "scham"
+      ],
+      "related": [
+        "selbstliebe",
+        "der-innere-kritiker",
+        "wenn-selbstliebe-nicht-funktioniert",
+        "ehrlich-zu-sich-selbst-sein"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Macht Selbstmitgefühl nicht faul und nachlässig?",
+        "answer": "Das ist der häufigste Einwand, und die Forschung deutet in die andere Richtung. Menschen mit hohem Selbstmitgefühl übernehmen eher Verantwortung für Fehler, nicht seltener – vermutlich, weil sie es sich leisten können, hinzusehen. Wer sich für jeden Fehler fertigmacht, hat einen starken Anreiz, Fehler gar nicht erst zu bemerken. Nachlässigkeit entsteht nicht aus Freundlichkeit, sondern aus Vermeidung."
+      },
+      {
+        "question": "Ist das nicht dasselbe wie Selbstwertgefühl?",
+        "answer": "Nein, und der Unterschied ist praktisch bedeutsam. Selbstwertgefühl beruht auf Bewertung: Ich bin gut, weil ich etwas kann, gut aussehe oder gebraucht werde. Es braucht Erfolge und hält deshalb genau dann nicht, wenn du es am dringendsten brauchst. Selbstmitgefühl beruht nicht auf Bewertung, sondern auf Zugehörigkeit: Mir geht es schlecht, und Menschen, denen es schlecht geht, verdienen Freundlichkeit. Das gilt auch an einem Tag, an dem du versagt hast."
+      },
+      {
+        "question": "Wo hört Selbstmitgefühl auf und wo fängt die Ausrede an?",
+        "answer": "An einer klaren Stelle: Selbstmitgefühl bezieht sich auf dein Leiden, nicht auf dein Verhalten. Es sagt nie das war schon in Ordnung. Es sagt das war nicht in Ordnung, und ich bin trotzdem ein Mensch, mit dem man reden kann. Wenn ein Satz dazu führt, dass du weniger genau hinschaust, ist es keine Selbstfreundlichkeit mehr, sondern Selbstberuhigung."
+      },
+      {
+        "question": "Ich fühle mich lächerlich dabei. Ist das normal?",
+        "answer": "Sehr. Viele Menschen empfinden bei den ersten Versuchen Peinlichkeit oder sogar Widerwillen, manche werden regelrecht wütend. Das ist gut untersucht und hat einen Namen: Rückschlag der Selbstfreundlichkeit. Wer Freundlichkeit früh nur unter Bedingungen bekommen hat, erlebt sie als Bedrohung, weil sie an das erinnert, was gefehlt hat. Wenn das bei dir passiert, ist das kein Zeichen, dass du es falsch machst – eher eines, dass es wichtig ist."
+      }
+    ],
+    "url": "/wissen/selbstmitgefuehl"
+  },
+  {
+    "type": "topic",
     "slug": "sich-selbst-verlieren",
     "title": "Sich selbst verlieren in der Beziehung – und den Weg zurückfinden",
     "description": "Wenn du nur noch funktionierst, dich ständig anpasst und kaum noch spürst, was du selbst willst: woran Selbstverlust erkennbar ist, wie es dazu kommt und welche ersten Schritte zurück zu dir führen. Ohne Diagnose.",
@@ -8327,6 +9470,72 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/verdeckter-narzissmus"
+  },
+  {
+    "type": "topic",
+    "slug": "verletzlichkeit-zeigen",
+    "title": "Verletzlichkeit zeigen: und wann man es besser lässt",
+    "description": "Sich zu zeigen ist die Voraussetzung für Nähe – und nicht immer klug. Der Unterschied zwischen Verletzlichkeit und Preisgabe, warum sie sich nicht erzwingen lässt und woran du erkennst, dass sie gerade unsicher ist.",
+    "cluster": "selbsterkenntnis",
+    "search_intent": "verletzlichkeit zeigen sich öffnen beziehung gefühle zeigen angst sich zu öffnen",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was würdest du sagen, wenn du sicher wüsstest, dass es nicht gegen dich verwendet wird? Du musst es mir nicht verraten – aber magst du merken, ob dir sofort etwas eingefallen ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "bindung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "verletzlichkeit",
+      "naehe",
+      "ehrlichkeit",
+      "sicherheit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "verletzlichkeit",
+        "selbstoffenbarung",
+        "intellektualisierung",
+        "fawning"
+      ],
+      "related": [
+        "ehrlich-zu-sich-selbst-sein",
+        "eingestehen-koennen",
+        "blinde-flecken"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen Verletzlichkeit und einfach viel erzählen?",
+        "answer": "Der Einsatz. Verletzlichkeit heißt, etwas zu zeigen, mit dem man verletzt werden könnte, ohne Sicherheit darüber, was daraufhin passiert. Viel erzählen kann auch das Gegenteil sein: Manche Menschen berichten sehr offen über schwere Erfahrungen und bleiben dabei völlig unbeteiligt – die Erzählung ist dann fertig, geordnet und ungefährlich. Der Satz, bei dem einem die Stimme kippt, ist meist der verletzliche."
+      },
+      {
+        "question": "Ich habe mich geöffnet und es wurde gegen mich verwendet. War es ein Fehler?",
+        "answer": "Nicht unbedingt deiner. Verletzlichkeit setzt ein Gegenüber voraus, das damit umgehen kann – wenn dieses Gegenüber es gegen dich verwendet, hat es einen Vertrauensbruch begangen, und du hast nicht zu viel gefühlt. Sinnvoll ist trotzdem, danach vorsichtiger zu dosieren: nicht weil du falsch warst, sondern weil Vertrauen ab jetzt begründet werden muss."
+      },
+      {
+        "question": "Kann man sich zu früh öffnen?",
+        "answer": "Ja, und es passiert häufiger, als man denkt. Sehr frühe, sehr tiefe Offenbarungen erzeugen ein Gefühl von Nähe, das noch keine Grundlage hat – man kennt die Geschichte des anderen, aber nicht sein Verhalten über Zeit. Manche Dynamiken bauen genau darauf auf. Siehe Love Bombing."
+      },
+      {
+        "question": "Mein Gegenüber zeigt nie etwas. Wie komme ich ran?",
+        "answer": "Nicht durch Fragen und schon gar nicht durch Drängen – Druck erzeugt zuverlässig Rückzug. Was am ehesten wirkt, ist zweierlei: selbst etwas zeigen, ohne eine Gegenleistung zu erwarten, und die Reaktion beim ersten Mal so gestalten, dass es sich gelohnt hat. Viele Menschen haben genau einmal etwas gezeigt und daraus eine Regel gemacht."
+      }
+    ],
+    "url": "/wissen/verletzlichkeit-zeigen"
   },
   {
     "type": "topic",
@@ -8643,6 +9852,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/wenn-liebe-nicht-ankommt"
+  },
+  {
+    "type": "topic",
+    "slug": "wenn-selbstliebe-nicht-funktioniert",
+    "title": "Wenn Selbstliebe nicht funktioniert: die ehrliche Gegenrede",
+    "description": "Manchmal hilft mehr Selbstliebe nicht – weil das Problem nicht in dir liegt. Über Ratschläge, die Verantwortung umdrehen, Affirmationen die nach hinten losgehen, und was stattdessen zählt.",
+    "cluster": "selbstmitgefuehl",
+    "search_intent": "selbstliebe funktioniert nicht affirmationen wirken nicht ich kann mich nicht lieben",
+    "updated": "2026-08-27",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Ist dir schon einmal gesagt worden, du müsstest nur mehr an dir arbeiten? Magst du erzählen, in welcher Lage du damals warst?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "selbstwert",
+      "ohnmacht",
+      "scham",
+      "sicherheit"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "glossary": [
+        "toxische-positivitaet",
+        "selbstverurteilung",
+        "taeter-opfer-umkehr",
+        "coercive-control"
+      ],
+      "related": [
+        "selbstliebe",
+        "selbstmitgefuehl",
+        "ehrlich-zu-sich-selbst-sein"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Selbstliebe also doch Unsinn?",
+        "answer": "Nein. Der Einwand richtet sich nicht gegen Selbstmitgefühl, sondern gegen seine Verwendung als Erklärung für alles. Freundlich mit sich umzugehen ist gut und hilft. Es ersetzt nur keine Veränderung der Umstände, und es ist kein Werkzeug gegen das Verhalten anderer Menschen."
+      },
+      {
+        "question": "Warum fühle ich mich nach Selbstliebe-Inhalten oft schlechter?",
+        "answer": "Häufig, weil eine Aufgabe dazugekommen ist. Wenn Wohlbefinden zur eigenen Zuständigkeit erklärt wird, wird jedes anhaltende schlechte Gefühl zum persönlichen Versäumnis – man leidet dann nicht mehr nur an der Lage, sondern zusätzlich daran, sie nicht wegzubekommen. Bei geringem Selbstwert kommt hinzu, dass positive Selbstaussagen den Abstand zwischen Anspruch und Empfinden sichtbar machen und die Stimmung dadurch sinken kann."
+      },
+      {
+        "question": "Mein Partner sagt, ich hätte ein Selbstwertproblem. Kann das stimmen?",
+        "answer": "Es kann stimmen, und es kann eine Verschiebung sein. Die entscheidende Frage ist, ob dieses Urteil dazu führt, dass über sein Verhalten nicht mehr gesprochen wird. Wenn jedes Thema, das du ansprichst, bei deinem Selbstwert endet, ist das ein Muster – unabhängig davon, wie es um deinen Selbstwert tatsächlich steht. Siehe Täter-Opfer-Umkehr."
+      },
+      {
+        "question": "Was hilft denn, wenn Selbstliebe nicht hilft?",
+        "answer": "Meist etwas Unbequemeres: die Umstände ändern statt der Einstellung. Ein Gespräch führen, das man aufgeschoben hat. Eine Grenze ziehen. Eine Beratungsstelle anrufen. Geld, Wohnung, Betreuung klären. Das klingt weniger nach Heilung und wirkt in vielen Fällen schneller als jede innere Arbeit."
+      }
+    ],
+    "url": "/wissen/wenn-selbstliebe-nicht-funktioniert"
   }
 ]
 
@@ -8723,6 +10000,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Gaslighting durch Dritte (Gaslighting by Proxy)",
     "description": "Beim Gaslighting durch Dritte werden andere Menschen benutzt, um deine Wahrnehmung zu untergraben. Warum das so verunsichert und wie du dich davon löst. Ohne Diagnose."
   },
+  "/glossar/gemeinsames-menschsein": {
+    "title": "Gemeinsames Menschsein – der unterschätzte Teil",
+    "description": "Der zweite Bestandteil von Selbstmitgefühl: die Einsicht, dass Scheitern zum Menschsein gehört. Warum Scham eine besondere Einsamkeit erzeugt und was dagegen hilft."
+  },
   "/glossar/grandioser-narzissmus": {
     "title": "Grandioser Narzissmus – die laute, dominante Form",
     "description": "Der grandiose Narzissmus ist die offene, selbstsichere Ausprägung: Bewunderung als Bedürfnis, wenig Mitgefühl, alles dreht sich um die eigene Größe. Woran du das erkennst und wie es sich anfühlt. Ohne Diagnose."
@@ -8751,9 +10032,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Idealisierung und Abwertung – von der Wolke in den Keller",
     "description": "Der Wechsel von überschwänglicher Idealisierung zu plötzlicher Abwertung ist ein Kernmuster narzisstischer Dynamiken. Warum dieses Auf und Ab so stark bindet und was hilft. Ohne Diagnose."
   },
+  "/glossar/innerer-antreiber": {
+    "title": "Innerer Antreiber – der Motor, der keiner ist",
+    "description": "Sei perfekt, sei stark, mach schnell, mach es allen recht: die inneren Regeln, die Leistung versprechen und Erschöpfung liefern. Woher sie kommen und wie man sie entschärft."
+  },
+  "/glossar/intellektualisierung": {
+    "title": "Intellektualisierung – über ein Gefühl reden statt es zu haben",
+    "description": "Wer sein eigenes Verhalten fachlich einordnet, wirkt reflektiert und kann sich damit am elegantesten aus der Sache ziehen. Woran man den Unterschied erkennt."
+  },
   "/glossar/intermittierende-verstaerkung": {
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
     "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose."
+  },
+  "/glossar/introspektions-illusion": {
+    "title": "Introspektions-Illusion – warum du deine Gründe nicht kennst",
+    "description": "Wir glauben, unsere eigenen Beweggründe zu kennen. Tatsächlich konstruieren wir sie im Nachhinein – überzeugend und oft falsch. Was daraus für Selbsterkenntnis folgt."
+  },
+  "/glossar/johari-fenster": {
+    "title": "Johari-Fenster – vier Felder für Selbstbild und Fremdbild",
+    "description": "Ein einfaches Modell dafür, was du über dich weißt, was andere wissen und was in der Lücke dazwischen liegt. Und wie man das blinde Feld tatsächlich verkleinert."
   },
   "/glossar/kognitive-dissonanz": {
     "title": "Kognitive Dissonanz – wenn zwei Wahrheiten nicht zusammenpassen",
@@ -8819,6 +10116,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Posttraumatische Belastungsstörung (PTBS) – einfach erklärt",
     "description": "Was eine posttraumatische Belastungsstörung ist, welche vier Symptomgruppen typisch sind und warum sie eine normale Reaktion auf eine unnormale Belastung ist. Ohne Ferndiagnose."
   },
+  "/glossar/rationalisierung": {
+    "title": "Rationalisierung – der bessere Grund im Nachhinein",
+    "description": "Der nachträgliche gute Grund für etwas, das andere Ursachen hatte. Wie man sie von echter Einsicht unterscheidet und warum sie meistens Scham vermeidet."
+  },
   "/glossar/realitaetsverdrehung": {
     "title": "Realitätsverdrehung – wenn deine Erinnerung zum Streitpunkt wird",
     "description": "Realitätsverdrehung ist der Kern von Gaslighting: Fakten, Erinnerungen und Gefühle werden umgedeutet oder geleugnet, bis du an dir selbst zweifelst. Wie sie funktioniert und was hilft. Ohne Diagnose."
@@ -8843,6 +10144,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Selbst-Gaslighting – wenn du dir selbst nicht mehr glaubst",
     "description": "Selbst-Gaslighting ist die verinnerlichte Stimme des Zweifels: Du redest dir dein eigenes Erleben klein, noch bevor es jemand tut. Woher es kommt und wie du dir wieder glaubst. Ohne Diagnose."
   },
+  "/glossar/selbstfreundlichkeit": {
+    "title": "Selbstfreundlichkeit – der Ton, nicht der Inhalt",
+    "description": "Der erste Bestandteil von Selbstmitgefühl nach Kristin Neff. Was er meint, warum er nichts mit Beschönigen zu tun hat und wie man ihn im Alltag prüft."
+  },
   "/glossar/selbstfuersorge": {
     "title": "Selbstfürsorge – warum gut für sich zu sorgen kein Egoismus ist",
     "description": "Was Selbstfürsorge wirklich bedeutet – jenseits von Wellness –, warum sie oft mit Egoismus verwechselt wird und wieso sie die Grundlage dafür ist, auch für andere da sein zu können. Ohne Diagnose."
@@ -8850,6 +10155,18 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/selbstliebe-defizit": {
     "title": "Selbstliebe-Defizit – Kodependenz neu gedacht",
     "description": "Der Psychotherapeut Ross Rosenberg schlägt vor, Kodependenz als Selbstliebe-Defizit zu verstehen: nicht als Charakterschwäche, sondern als Folge früher Verletzungen. Was das ändert und wo die Grenzen liegen."
+  },
+  "/glossar/selbstoffenbarung": {
+    "title": "Selbstoffenbarung – wie Nähe schrittweise entsteht",
+    "description": "Nähe wächst durch gegenseitiges, dosiertes Zeigen. Warum die Erwiderung wichtiger ist als die Menge und woran man ein Ungleichgewicht erkennt."
+  },
+  "/glossar/selbsttaeuschung": {
+    "title": "Selbsttäuschung – kein Lügen, sondern Nichthinsehen",
+    "description": "Selbsttäuschung ist selten eine bewusste Lüge. Sie ist die Fähigkeit, etwas zu wissen und gleichzeitig nicht zu wissen – und sie hat eine Schutzfunktion."
+  },
+  "/glossar/selbstverurteilung": {
+    "title": "Selbstverurteilung – wenn aus einem Fehler ein Urteil wird",
+    "description": "Der Unterschied zwischen ich habe etwas Schlechtes getan und ich bin schlecht – und warum die zweite Variante Veränderung nicht befeuert, sondern verhindert."
   },
   "/glossar/spiritueller-narzissmus": {
     "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
@@ -8862,6 +10179,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/taeter-opfer-umkehr": {
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose."
+  },
+  "/glossar/toxische-positivitaet": {
+    "title": "Toxische Positivität – wenn gute Laune zur Pflicht wird",
+    "description": "Der Druck, jedes schwere Gefühl sofort umzudeuten. Warum das die Last verdoppelt statt sie zu nehmen, und wie sich echter Trost davon unterscheidet."
   },
   "/glossar/trennungsdrohung": {
     "title": "Trennungsdrohung – wenn das Ganze zur Disposition steht",
@@ -8878,6 +10199,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/verachtung": {
     "title": "Verachtung – das gefährlichste Gift für eine Beziehung",
     "description": "Warum Verachtung – Spott, Augenrollen, Herabsetzung – laut Paarforschung der stärkste Vorbote einer Trennung ist, und was ihr entgegenwirkt. Ohne Diagnose."
+  },
+  "/glossar/verletzlichkeit": {
+    "title": "Verletzlichkeit – Einsatz, nicht Inhalt",
+    "description": "Sich verletzlich zu zeigen heißt nicht, viel zu erzählen. Es heißt, etwas zu zeigen, mit dem man verletzt werden könnte – ohne zu wissen, was daraufhin passiert."
   },
   "/glossar/vulnerabler-narzissmus": {
     "title": "Vulnerabler Narzissmus – die verletzliche Seite",
@@ -8963,6 +10288,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das Augenrollen",
     "description": "Eine Szene über Verachtung – kein lauter Streit, sondern ein steter Nieselregen aus Augenrollen, Seufzern und Spott, der einen kleiner macht. Ich-Perspektive, fiktiv."
   },
+  "/szenen/das-dritte-mal-derselbe-satz": {
+    "title": "Das dritte Mal derselbe Satz",
+    "description": "Eine fiktive Szene: Drei Frauen aus drei Beziehungen haben ihm dasselbe gesagt, und er hat es dreimal erklärt. Über den Moment, in dem eine Wiederholung zur Information wird."
+  },
+  "/szenen/das-foto-von-mir-mit-neun": {
+    "title": "Das Foto von mir mit neun",
+    "description": "Eine fiktive Szene: Beim Ausräumen findet er ein Kinderfoto von sich und merkt, dass er zu diesem Kind völlig anders reden würde als zu sich selbst. Über eine Übung, die albern klingt und trifft."
+  },
   "/szenen/das-habe-ich-nie-gesagt": {
     "title": "Das habe ich nie gesagt",
     "description": "Eine Szene über Gaslighting – wenn deine Erinnerung Stück für Stück in Frage gestellt wird, bis du an dir selbst zweifelst. Aus der Ich-Perspektive, fiktiv."
@@ -9043,6 +10376,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Der perfekte Tag",
     "description": "Eine Szene über intermittierende Verstärkung – ein einziger wunderbarer Tag, der Monate der Kälte auslöscht und die Hoffnung zurücksetzt. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/der-satz-den-ich-zu-marie-gesagt-haette": {
+    "title": "Der Satz, den ich zu Marie gesagt hätte",
+    "description": "Eine fiktive Szene: Sie hat einen Fehler im Quartalsbericht übersehen und sagt sich Dinge, die sie ihrer besten Freundin nie sagen würde. Über den Unterschied zwischen zwei Tonlagen für dieselbe Sache."
+  },
   "/szenen/der-schluessel-im-schloss": {
     "title": "Der Schlüssel im Schloss",
     "description": "Eine fiktive Szene: Am Geräusch des Heimkommens liest er schon ab, welcher Abend es wird. Über Hypervigilanz, das ständige Lesen der Stimmung und einen Alltag auf Habachtstellung."
@@ -9107,6 +10444,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Drei Uhr nachts",
     "description": "Eine fiktive Szene: die leere Seite des Betts, das Handy in der Hand, ein Chat, der offen ist. Über die Nächte nach einer Trennung, in denen die Sehnsucht am lautesten ist."
   },
+  "/szenen/dreiundzwanzig-uhr-die-liste": {
+    "title": "Dreiundzwanzig Uhr, die Liste",
+    "description": "Eine fiktive Szene: Jeden Abend beim Zähneputzen geht er durch, was er falsch gemacht hat. Über eine Gewohnheit, die sich wie Gewissenhaftigkeit anfühlt und keine ist."
+  },
   "/szenen/dritter-tag-ohne-antwort": {
     "title": "Dritter Tag ohne Antwort",
     "description": "Eine fiktive Szene: Sie wohnen zusammen und sie bekommt keine Antwort — nicht heute, nicht gestern, nicht vorgestern. Über die Ohnmacht vor einer Tür, hinter der jemand steht."
@@ -9158,6 +10499,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/erst-wenn-ich-liefere": {
     "title": "Erst wenn ich liefere",
     "description": "Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen."
+  },
+  "/szenen/es-fuehlt-sich-falsch-an-nett-zu-mir-zu-sein": {
+    "title": "Es fühlt sich falsch an, nett zu mir zu sein",
+    "description": "Eine fiktive Szene: Sie soll in der Therapie einen freundlichen Satz zu sich selbst sagen und wird stattdessen wütend. Über eine Reaktion, die mehr erklärt als jede Übung."
   },
   "/szenen/es-ging-nie-um-mich": {
     "title": "Es ging nie um mich",
@@ -9211,6 +10556,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich habe es ihr gesagt",
     "description": "Eine fiktive Szene: Er hat gestanden, und statt Erleichterung kommt etwas anderes. Über die Stunde nach dem Geständnis und die Erkenntnis, dass Ehrlichkeit nichts leichter macht."
   },
+  "/szenen/ich-habe-es-zugegeben-und-nichts-ist-passiert": {
+    "title": "Ich habe es zugegeben, und nichts ist passiert",
+    "description": "Eine fiktive Szene: Er sagt nach Jahren zum ersten Mal 'Du hast recht, das war mein Fehler' – und die befürchtete Abrechnung bleibt aus. Über den Preis, den man erwartet, und den, der tatsächlich fällig wird."
+  },
+  "/szenen/ich-habe-mir-ein-bad-eingelassen": {
+    "title": "Ich habe mir ein Bad eingelassen",
+    "description": "Eine fiktive Szene: Sie tut alles, was in den Beiträgen über Selbstfürsorge steht, und fühlt sich danach genauso erschöpft. Über den Unterschied zwischen einem Bad und einem Nein."
+  },
   "/szenen/ich-habe-seinen-arzttermin-gemacht": {
     "title": "Ich habe seinen Arzttermin gemacht",
     "description": "Eine fiktive Szene: Sie ruft für ihn beim Arzt an, wie schon so oft. Über den schmalen Grat zwischen helfen und stellvertretend leben."
@@ -9218,6 +10571,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-habe-wieder-musik-gehoert": {
     "title": "Ich habe wieder Musik gehört",
     "description": "Eine fiktive Szene: Wochen nach dem Auszug ertappt er sich beim lauten Mitsingen im Auto – und merkt, wie lange das weg war. Über die stille Wiederentdeckung des eigenen Ich nach einer Trennung."
+  },
+  "/szenen/ich-habe-zu-viel-gesagt-und-zu-frueh": {
+    "title": "Ich habe zu viel gesagt, und zu früh",
+    "description": "Eine fiktive Szene: Nach dem dritten Date hat sie alles erzählt und fühlt sich am nächsten Morgen nicht näher, sondern bloßgestellt. Über den Unterschied zwischen Zeigen und Ausschütten."
   },
   "/szenen/ich-lese-mit-und-hasse-mich-dafuer": {
     "title": "Ich lese mit und hasse mich dafür",
@@ -9379,6 +10736,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sie hat es gehört",
     "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation."
   },
+  "/szenen/sie-hat-nicht-gemerkt-was-passiert-ist": {
+    "title": "Sie hat nicht gemerkt, was passiert ist",
+    "description": "Eine fiktive Szene: Er sagt zum ersten Mal einen freundlichen Satz über sich selbst, und seine Partnerin bemerkt es nicht einmal. Über einen Moment, der von außen nach nichts aussieht."
+  },
+  "/szenen/sie-hat-recht-gehabt-und-ich-wusste-es-sofort": {
+    "title": "Sie hat recht gehabt, und ich wusste es sofort",
+    "description": "Eine fiktive Szene: Eine Kritik trifft, sie widerspricht drei Tage lang – und weiß von der ersten Sekunde an, dass sie stimmt. Über den Abstand zwischen Erkennen und Zugeben."
+  },
   "/szenen/sie-uebersetzt-fuer-uns": {
     "title": "Sie übersetzt für uns",
     "description": "Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden."
@@ -9403,6 +10768,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "War das wirklich so?",
     "description": "Eine fiktive Szene: Die Beziehung ist vorbei, aber die zweifelnde Stimme bleibt. Er redet sich selbst klein, bevor es jemand tut. Über Selbst-Gaslighting – die fremde Stimme, die sich inzwischen wie die eigene anhört."
   },
+  "/szenen/warum-habe-ich-das-gesagt": {
+    "title": "Warum habe ich das gesagt",
+    "description": "Eine fiktive Szene: Sie sucht seit vier Tagen nach der Erklärung für einen Satz, den sie im Streit gesagt hat – und findet immer neue. Über die Frage, die keine Antwort hat."
+  },
   "/szenen/warum-ich-bleibe": {
     "title": "Warum ich bleibe",
     "description": "Eine Szene über Trauma-Bindung – wenn der Wechsel aus Verletzung und großer Versöhnung eine Nähe schafft, aus der man kaum herausfindet. Ich-Perspektive, fiktiv."
@@ -9410,6 +10779,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/was-habe-ich-gerade-gesagt": {
     "title": "Was habe ich gerade gesagt?",
     "description": "Eine fiktive Szene: Ihre Worte sagen Ja, ihr Gesicht sagt Nein – und als er auf das Nein reagiert, soll er ihre Worte wiederholen. Über den Double Bind und das Zweifeln an der eigenen Wahrnehmung."
+  },
+  "/szenen/was-habe-ich-uebersehen": {
+    "title": "Was habe ich übersehen",
+    "description": "Eine fiktive Szene: Nach der Trennung geht sie die ersten Wochen noch einmal durch und findet die Hinweise, die von Anfang an da waren. Über den Unterschied zwischen nicht sehen und nicht sehen wollen."
   },
   "/szenen/was-moechtest-du-eigentlich": {
     "title": "Was möchtest du eigentlich?",
@@ -9491,13 +10864,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Bindungsstile: sicher, ängstlich, vermeidend, desorganisiert",
     "description": "Wie frühe Bindungserfahrungen unser Beziehungsverhalten als Erwachsene prägen – die vier Bindungsstile verständlich erklärt, ohne Menschen zu etikettieren."
   },
+  "/wissen/blinde-flecken": {
+    "title": "Blinde Flecken: das, was alle sehen außer dir",
+    "description": "Jeder hat Anteile, die andere kennen und er selbst nicht. Wie das Johari-Fenster funktioniert, welche blinden Flecken in Beziehungen am häufigsten sind und wie man Rückmeldung bekommt, die wirklich etwas zeigt."
+  },
   "/wissen/co-regulation": {
     "title": "Co-Regulation: warum wir uns aneinander beruhigen",
     "description": "Wie Menschen sich gegenseitig beruhigen, warum ein ruhiges Gegenüber ein aufgewühltes Nervensystem besänftigt und wieso Co-Regulation kein Zeichen von Abhängigkeit ist. Ohne Diagnose."
   },
+  "/wissen/der-innere-kritiker": {
+    "title": "Der innere Kritiker: woher die Stimme kommt und was gegen sie hilft",
+    "description": "Die Stimme, die dich abwertet, ist kein Feind und lässt sich nicht wegdiskutieren. Woher sie stammt, warum Bekämpfen sie lauter macht und welche vier Schritte den Ton verändern."
+  },
   "/wissen/die-vier-reiter": {
     "title": "Die vier apokalyptischen Reiter: was Beziehungen von innen zersetzt",
     "description": "Kritik, Verachtung, Rechtfertigung und Mauern – die vier Kommunikationsmuster, die laut Paarforschung (Gottman) Beziehungen zerstören, und ihre Gegenmittel. Ohne Diagnose."
+  },
+  "/wissen/ehrlich-zu-sich-selbst-sein": {
+    "title": "Ehrlich zu sich selbst sein: warum Nachdenken allein nicht reicht",
+    "description": "Sich selbst zu kennen ist schwerer, als es klingt – und viel Grübeln macht es eher schlechter. Warum die Warum-Frage in die Irre führt, welche Frage stattdessen trägt und woran du Selbsttäuschung erkennst."
   },
   "/wissen/eifersucht": {
     "title": "Eifersucht verstehen: woher sie kommt und was sie mit dir macht",
@@ -9506,6 +10891,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/eifersucht-oder-bauchgefuehl": {
     "title": "Eifersucht oder berechtigtes Bauchgefühl?",
     "description": "Nicht jede Eifersucht ist unbegründet – und nicht jedes Misstrauen trifft zu. Diese Merkmale helfen dir, ehrlicher hinzuschauen, ohne dich oder den anderen vorzuverurteilen."
+  },
+  "/wissen/eingestehen-koennen": {
+    "title": "Eingestehen können: warum Zugeben so schwer ist",
+    "description": "Ein Fehler zuzugeben kostet fast nichts und fühlt sich an wie Selbstaufgabe. Warum das so ist, woran man ein echtes Eingeständnis erkennt und welche fünf Formen es nur so aussehen lassen."
   },
   "/wissen/emotionale-gewalt-gegen-maenner": {
     "title": "Wenn Männer emotionale Gewalt erleben",
@@ -9623,6 +11012,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Schwierige Gespräche führen: heikle Themen ansprechen, ohne dass es eskaliert",
     "description": "Wie man ein belastendes Thema anspricht, ohne dass es in Streit oder Rückzug kippt – mit einem klaren Einstieg, Timing und dem Unterschied zwischen Vorwurf und Bitte. Ohne Diagnose."
   },
+  "/wissen/selbstliebe": {
+    "title": "Selbstliebe lernen: was davon trägt und was nur Deko ist",
+    "description": "Selbstliebe ist zum Werbewort geworden. Was der Begriff ursprünglich meint, warum Bäder und Affirmationen wenig ändern und welche vier Dinge tatsächlich etwas bewirken."
+  },
+  "/wissen/selbstmitgefuehl": {
+    "title": "Selbstmitgefühl: die drei Teile und der eine Denkfehler",
+    "description": "Selbstmitgefühl ist nicht Nachsicht und nicht Selbstwertgefühl. Was Kristin Neffs drei Bestandteile wirklich meinen, warum härtere Selbstkritik nachweislich weniger verändert und wo die Grenze zur Ausrede verläuft."
+  },
   "/wissen/sich-selbst-verlieren": {
     "title": "Sich selbst verlieren in der Beziehung – und den Weg zurückfinden",
     "description": "Wenn du nur noch funktionierst, dich ständig anpasst und kaum noch spürst, was du selbst willst: woran Selbstverlust erkennbar ist, wie es dazu kommt und welche ersten Schritte zurück zu dir führen. Ohne Diagnose."
@@ -9643,6 +11040,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
     "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose."
   },
+  "/wissen/verletzlichkeit-zeigen": {
+    "title": "Verletzlichkeit zeigen: und wann man es besser lässt",
+    "description": "Sich zu zeigen ist die Voraussetzung für Nähe – und nicht immer klug. Der Unterschied zwischen Verletzlichkeit und Preisgabe, warum sie sich nicht erzwingen lässt und woran du erkennst, dass sie gerade unsicher ist."
+  },
   "/wissen/verlustangst": {
     "title": "Verlustangst in Beziehungen verstehen",
     "description": "Woher die Angst kommt, verlassen zu werden, wie sie sich in Beziehungen zeigt und was dir hilft, ihr weniger ausgeliefert zu sein – ohne Selbstverurteilung."
@@ -9662,5 +11063,9 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/wenn-liebe-nicht-ankommt": {
     "title": "Wenn Liebe nicht ankommt: woran es liegt und was hilft",
     "description": "Ihr gebt euch beide Mühe, und trotzdem fühlt sich niemand gemeint. Wie du herausfindest, wo Zuneigung bei euch verloren geht – und woran du erkennst, dass es nicht mehr am Übersetzen liegt."
+  },
+  "/wissen/wenn-selbstliebe-nicht-funktioniert": {
+    "title": "Wenn Selbstliebe nicht funktioniert: die ehrliche Gegenrede",
+    "description": "Manchmal hilft mehr Selbstliebe nicht – weil das Problem nicht in dir liegt. Über Ratschläge, die Verantwortung umdrehen, Affirmationen die nach hinten losgehen, und was stattdessen zählt."
   }
 }

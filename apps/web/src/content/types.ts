@@ -30,6 +30,8 @@ export const CLUSTERS = [
   'bindung', // Bindung & Nähe
   'trennung', // Trennung
   'liebeskummer', // Liebeskummer & Trennungsschmerz
+  'selbstmitgefuehl', // Selbstliebe & Selbstmitgefuehl (Kristin Neff) - wie du mit dir umgehst
+  'selbsterkenntnis', // Selbsterkenntnis & Ehrlichkeit mit sich - Introspektion, Eingestaendnisse, Verletzlichkeit
   'selbstreflexion', // Selbstreflexion
   'therapie', // Therapie & Coaching
   'kommunikation', // Kommunikation
@@ -138,6 +140,8 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   bindung: 'Bindung & Nähe',
   trennung: 'Trennung',
   liebeskummer: 'Liebeskummer',
+  selbstmitgefuehl: 'Selbstliebe & Selbstmitgefühl',
+  selbsterkenntnis: 'Selbsterkenntnis & Ehrlichkeit',
   selbstreflexion: 'Selbstreflexion',
   therapie: 'Therapie & Coaching',
   kommunikation: 'Kommunikation',

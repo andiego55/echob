@@ -76,6 +76,7 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   'gehoert-werden': 'Gehört werden',
   'nein-sagen': 'Nein sagen',
   selbstfuersorge: 'Selbstfürsorge',
+  veraenderung: 'Veränderung',
   // Konflikt & Gefühle
   'emotionale-ueberflutung': 'Emotionale Überflutung',
   'co-regulation': 'Co-Regulation',

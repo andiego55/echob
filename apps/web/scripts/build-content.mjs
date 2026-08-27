@@ -14,7 +14,7 @@ const contentDir = path.join(webRoot, 'content')
 const outFile = path.join(webRoot, 'src', 'content', 'manifest.generated.ts')
 
 const CONTENT_TYPES = ['topic', 'problem', 'glossary', 'guide', 'case-example', 'comparison', 'therapy-prep', 'scene']
-const CLUSTERS = ['dynamiken', 'vertrauensbruch', 'emotionaler-missbrauch', 'gaslighting', 'narzissmus', 'narzissmus-spielarten', 'trauma', 'kodependenz', 'bindung', 'trennung', 'liebeskummer', 'selbstreflexion', 'therapie', 'kommunikation', 'liebessprachen', 'grenzen', 'konflikt', 'gefuehle']
+const CLUSTERS = ['dynamiken', 'vertrauensbruch', 'emotionaler-missbrauch', 'gaslighting', 'narzissmus', 'narzissmus-spielarten', 'trauma', 'kodependenz', 'bindung', 'trennung', 'liebeskummer', 'selbstmitgefuehl', 'selbsterkenntnis', 'selbstreflexion', 'therapie', 'kommunikation', 'liebessprachen', 'grenzen', 'konflikt', 'gefuehle']
 const ECHO_MODES = ['base', 'stabilize', 'clarity', 'radical', 'analysis']
 const CTA_POSITIONS = ['after-intro', 'after-reflection', 'end']
 const URL_PREFIX = {
