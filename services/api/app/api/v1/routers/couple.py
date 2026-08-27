@@ -48,6 +48,7 @@ from app.services import couple_privacy_service as privacy
 from app.services import couple_private_service as cps
 from app.services import couple_progress_service as progress
 from app.services import couple_therapy_service as cts
+from app.services.pattern_tags import normalize_pattern_tags
 from app.services.safety_service import triage_pruefen
 from app.services.subscription_service import enforce_echo_prompt_limit
 
@@ -589,7 +590,7 @@ async def draft_scene_from_thread(
         user_reaction=entwurf.get("user_reaction"),
         scene_date=entwurf.get("scene_date"),
         distress_score=entwurf.get("distress_score"),
-        pattern_tags=entwurf.get("pattern_tags") or [],
+        pattern_tags=normalize_pattern_tags(entwurf.get("pattern_tags")),
     )
 
 

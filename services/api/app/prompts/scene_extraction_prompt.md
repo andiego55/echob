@@ -68,19 +68,44 @@ Bewertet, ob die Szene Sicherheitsrisiken enthält.
 Standard wenn kein Kriterium erkennbar: "none"
 
 **pattern_tags** (Liste, max. 5):
-Mögliche Beziehungsmuster als Tags. Nur aus dieser Liste:
-- Schuldumkehr
-- Grenzverletzung
-- Kontrolle
-- Isolation
-- Nähe-Distanz-Wechsel
-- Abwertung
-- Idealisierung
-- Wahrnehmungsverunsicherung
-- Konflikteskalation
-- Schweigen/Rückzug
-- Drohung
+Mögliche Beziehungsmuster als Tags. **Nur** aus dieser Liste, exakt so geschrieben.
+Die kursiven Überschriften sind Gruppen und selbst KEINE gültigen Tags.
 
+*Wirklichkeit umdeuten*
+- Wahrnehmungsverunsicherung – Erinnerung oder Wahrnehmung wird bestritten oder für ungültig erklärt
+- Schuldumkehr – die Verantwortung wird auf die verletzte Person geschoben
+
+*Herabsetzen*
+- Abwertung – der Wert der Person wird herabgesetzt
+- Verachtung – Spott, Sarkasmus, Nachäffen, Augenrollen – Herabsetzung mit Überlegenheit
+
+*Einengen*
+- Kontrolle – bestimmen oder überwachen: Aufenthalt, Zeit, Kontakte, Geld, Papiere, Schlüssel
+- Isolation – Kontakte zu Dritten werden erschwert, verhindert oder schlechtgemacht
+- Übergriffigkeit – körperliche, räumliche oder sexuelle Grenze gegen den erkennbaren Willen
+
+*Unter Druck setzen*
+- Drohung – Ankündigung eines Nachteils, um Verhalten zu erzwingen
+- Kinder als Druckmittel – Kontakt zu den Kindern, Sorgerecht oder Elternrolle als Hebel
+
+*Ausweichen*
+- Schweigen/Rückzug – Nicht-Antworten oder Sich-Entziehen ALS REAKTION – es gab einen Auslöser
+- Rechtfertigung/Abwehr – auf eine Ansprache folgt Verteidigung statt Eingehen
+- Anpassung – die schreibende Person gibt gegen die eigene Position nach, um Konflikt zu vermeiden
+
+*Ausbleiben lassen*
+- Emotionale Vernachlässigung – anhaltendes Ausbleiben von Zuwendung OHNE Auslöser – nicht Rückzug
+- Wortbruch – Zusagen werden wiederholt oder in bedeutsamer Sache nicht gehalten
+
+*Zuwenden*
+- Reparaturversuch – Versuch zu deeskalieren oder wiedergutzumachen – auch von der schreibenden Person
+- Idealisierung – auffällig übersteigerte Zuwendung oder Vereinnahmung
+
+Die beiden häufigsten Verwechslungen:
+- **Schweigen/Rückzug** hat einen Auslöser (nach dem Streit drei Tage nicht geredet).
+  **Emotionale Vernachlässigung** hat keinen (er fragt nie, wie es mir geht).
+- **Schuldumkehr** dreht die Rollen um (du bist schuld, dass ich so reagiere).
+  **Rechtfertigung/Abwehr** verteidigt nur (ich habe das nicht so gemeint, weil …).
 Tags sind Hypothesen, keine Diagnosen. Wenn unsicher: leere Liste.
 
 ## Ausgabe

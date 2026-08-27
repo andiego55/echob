@@ -23,6 +23,7 @@ from app.schemas.echo import (
 )
 from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import build_hypothesis_context
+from app.services.pattern_tags import normalize_pattern_tags
 from app.services.person_profile_service import build_person_context
 from app.services.profile_service import build_profile_context
 from app.services.safety_service import triage_pruefen
@@ -814,7 +815,7 @@ async def finalize_scene(
     user_reaction = extracted.get("user_reaction")
     distress_score = extracted.get("distress_score")
     safety_level = extracted.get("safety_level", "none")
-    pattern_tags = extracted.get("pattern_tags") or []
+    pattern_tags = normalize_pattern_tags(extracted.get("pattern_tags"))
     scene_date = extracted.get("scene_date")
 
     import json as _json
