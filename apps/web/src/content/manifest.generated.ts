@@ -39,6 +39,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "akzeptanz-und-veraenderung",
+    "title": "Akzeptanz und Veränderung – die Unterscheidung, die entlastet",
+    "description": "Manches zwischen zwei Menschen lässt sich ändern, manches nicht. Warum der Kampf gegen das Unveränderliche oft mehr anrichtet als der Unterschied selbst – und wo die Grenze liegt.",
+    "cluster": "paartherapie",
+    "search_intent": "akzeptanz beziehung unterschiede aushalten ibct akzeptanzarbeit",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Welchen Unterschied zwischen euch versuchst du seit Jahren wegzuverhandeln? Magst du prüfen, ob er verhandelbar ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wo hört Akzeptanz auf?",
+        "answer": "An einer klaren Stelle: Akzeptanz gilt Unterschieden, nicht Verhalten. Dass jemand mehr Alleinsein braucht als du, ist ein Unterschied. Dass jemand Zusagen nicht einhält, dich abwertet oder kontrolliert, ist Verhalten – und Verhalten wird verändert, nicht angenommen. Wer diese Grenze verwischt, macht aus einem entlastenden Gedanken eine Anleitung zur Selbstaufgabe."
+      },
+      {
+        "question": "Woran erkenne ich, ob etwas ein Unterschied oder Verhalten ist?",
+        "answer": "Eine brauchbare Prüfung: Wäre es bei einem anderen Partner genauso? Der Bedarf an Ruhe, das Tempo bei Entscheidungen, die Art zu streiten – solche Eigenschaften bringt jemand mit. Ob er Absprachen einhält oder verletzend wird, hängt dagegen von der Beziehung ab und ist beeinflussbar. Eine zweite Prüfung: Würde eine unbeteiligte Person es als Eigenart oder als Verhalten beschreiben?"
+      }
+    ],
+    "url": "/glossar/akzeptanz-und-veraenderung"
+  },
+  {
+    "type": "glossary",
     "slug": "ambivalenz",
     "title": "Ambivalenz – wenn du hin- und hergerissen bist",
     "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist.",
@@ -1144,6 +1178,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "kollusion",
+    "title": "Kollusion – das unbewusste Zusammenspiel zweier Rollen",
+    "description": "Jürg Willis Begriff für Paare, die dieselbe ungelöste Frage von entgegengesetzten Seiten bearbeiten. Warum es sich anfangs wie Ergänzung anfühlt und später wie ein Gefängnis.",
+    "cluster": "paartherapie",
+    "search_intent": "kollusion willi paartherapie unbewusstes zusammenspiel rollen beziehung",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Welche Rolle hast du in dieser Beziehung – und was passiert, wenn du sie einmal nicht ausfüllst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Heißt Kollusion, dass beide gleich beteiligt sind?",
+        "answer": "Am Zustandekommen des Musters ja, an einzelnen Handlungen nicht. Der Begriff beschreibt, wie zwei Menschen sich zu passenden Rollen zusammenfinden – er sagt nichts darüber, ob das, was einer tut, in Ordnung ist. Bei Abwertung, Kontrolle oder Gewalt ist die Rede vom gemeinsamen Zusammenspiel fehl am Platz und verschiebt Verantwortung dorthin, wo sie nicht hingehört."
+      },
+      {
+        "question": "Wie löst man so ein Muster?",
+        "answer": "Meistens nicht dadurch, dass eine Person ihre Rolle ablegt – das erzeugt zunächst eine Krise, weil das ganze Gefüge daran hängt. Wirksamer ist, dass beide erkennen, welche eigene Frage sie über den anderen bearbeiten. Wer merkt, dass er die Fürsorge braucht, um sich nicht selbst um seine Bedürftigkeit kümmern zu müssen, hat etwas gewonnen, das nicht vom Verhalten des anderen abhängt."
+      }
+    ],
+    "url": "/glossar/kollusion"
+  },
+  {
+    "type": "glossary",
     "slug": "kommunaler-narzissmus",
     "title": "Kommunaler Narzissmus – Größe über Güte",
     "description": "Der kommunale Narzissmus bezieht seine Größe nicht aus Macht, sondern aus Hilfsbereitschaft: der selbstloseste, gütigste Mensch für alle – während zu Hause wenig davon ankommt. Woran du das erkennst. Ohne Diagnose.",
@@ -1452,6 +1520,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "modus",
+    "title": "Modus – der Zustand, in den man im Streit kippt",
+    "description": "Warum manche Menschen im Konflikt plötzlich wie ausgewechselt wirken, welche Zustände typisch sind und warum es hilft, ihnen im Moment einen Namen zu geben.",
+    "cluster": "paartherapie",
+    "search_intent": "modus schematherapie verletztes kind strafender elternteil beschützer streit",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wie alt fühlst du dich, wenn ein Streit bei euch am schlimmsten ist? Die erste Zahl, die dir kommt.",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist das nicht nur ein anderes Wort für Stimmung?",
+        "answer": "Es meint mehr. Eine Stimmung färbt, wie man etwas erlebt. Ein Modus verändert kurzzeitig, wie jemand denkt, fühlt und handelt – Menschen sagen und tun in solchen Zuständen Dinge, die ihnen hinterher fremd sind. Genau dieses hinterher verstehe ich mich selbst nicht ist das Erkennungszeichen."
+      },
+      {
+        "question": "Wie hilft es, den Zustand zu benennen?",
+        "answer": "Es schafft Abstand. Da ist gerade nicht meine Frau, da ist ihr verletztes Kind ist etwas anderes als sie rastet schon wieder aus – und es lässt einen anders reagieren. Manche Paare verabreden ein Wort dafür. Wichtig ist, dass beide es benutzen dürfen und dass es keine Diagnose wird, mit der man den anderen abstempelt."
+      }
+    ],
+    "url": "/glossar/modus"
+  },
+  {
+    "type": "glossary",
     "slug": "narzisstische-zufuhr",
     "title": "Narzisstische Zufuhr (Narcissistic Supply)",
     "description": "Narzisstische Zufuhr ist die ständige Bestätigung von außen, die ein zerbrechlicher Selbstwert zu brauchen scheint – Bewunderung, Aufmerksamkeit, manchmal auch dein schlechtes Gewissen. Warum das die Dynamik erklärt. Ohne Diagnose.",
@@ -1483,6 +1585,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/narzisstische-zufuhr"
+  },
+  {
+    "type": "glossary",
+    "slug": "negative-interaktionsschleife",
+    "title": "Negativer Kreislauf – wenn zwei Reaktionen einander erzeugen",
+    "description": "Das Muster, in dem beide auf den anderen reagieren und dadurch genau das auslösen, was sie vermeiden wollen. Der zentrale Begriff der emotionsfokussierten Paartherapie.",
+    "cluster": "paartherapie",
+    "search_intent": "negativer kreislauf beziehung verfolger rückzieher muster eft",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Beschreib mir euren letzten Streit rückwärts: Was war der allerletzte Auslöser – und was kam davor?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum hilft es, den Kreislauf zum gemeinsamen Gegner zu erklären?",
+        "answer": "Weil sich niemand ändert, während er sich verteidigt. Solange jeder den anderen für die Ursache hält, ist jedes Gespräch ein Prozess mit Anklage und Verteidigung. Sobald das Muster selbst benannt ist – und beide erkennen, dass es sie beide im Griff hat –, entsteht zum ersten Mal eine gemeinsame Seite. Das ist kein rhetorischer Trick, sondern die Voraussetzung dafür, dass überhaupt jemand etwas zugeben kann."
+      },
+      {
+        "question": "Gibt es nur das Muster Verfolgen und Rückzug?",
+        "answer": "Es ist das häufigste, aber nicht das einzige. Es gibt auch das gegenseitige Angreifen, bei dem beide lauter werden, und den beidseitigen Rückzug, in dem zwei Menschen nebeneinander verstummen. Der beidseitige Rückzug ist der stillste und oft der weiteste fortgeschrittene, weil es keinen Streit mehr gibt, an dem etwas sichtbar würde."
+      }
+    ],
+    "url": "/glossar/negative-interaktionsschleife"
   },
   {
     "type": "glossary",
@@ -1859,6 +1995,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/scham"
+  },
+  {
+    "type": "glossary",
+    "slug": "schema",
+    "title": "Schema – ein früh erworbenes Muster, das mitreist",
+    "description": "Überzeugungen, Erinnerungen und Körperempfindungen, die sich früh gebildet haben und im Erwachsenenleben weiterwirken. Was der Begriff meint und wo seine Grenzen liegen.",
+    "cluster": "paartherapie",
+    "search_intent": "schema schematherapie bedeutung young lebensfalle beziehung",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Gibt es eine Überzeugung über dich, die du kennst, seit du denken kannst? Magst du sie aussprechen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist ein Schema dasselbe wie ein Glaubenssatz?",
+        "answer": "Verwandt, aber weiter gefasst. Ein Glaubenssatz ist ein Gedanke. Ein Schema umfasst zusätzlich Erinnerungen, Gefühle und Körperempfindungen – deshalb lässt es sich auch nicht wegdiskutieren. Wer weiß, dass er liebenswert ist, und es trotzdem nicht spürt, hat genau diesen Unterschied erlebt."
+      },
+      {
+        "question": "Kann man ein Schema loswerden?",
+        "answer": "Vollständig meist nicht. Was sich verändert, ist sein Gewicht: Es meldet sich seltener, wird schneller erkannt und bestimmt weniger, was als Nächstes passiert. Viele beschreiben nach längerer Arbeit, dass der alte Satz noch auftaucht, aber nicht mehr geglaubt wird."
+      }
+    ],
+    "url": "/glossar/schema"
   },
   {
     "type": "glossary",
@@ -2440,6 +2610,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "wiederholungszwang",
+    "title": "Wiederholung – warum sich alte Muster neue Bühnen suchen",
+    "description": "Warum Menschen erstaunlich verlässlich in Beziehungen geraten, die früheren ähneln – und warum das nicht Selbstschädigung ist, sondern Vertrautheit.",
+    "cluster": "paartherapie",
+    "search_intent": "wiederholungszwang beziehung immer der gleiche typ muster kindheit",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Was hatten deine letzten Beziehungen gemeinsam? Nicht die Menschen – das, was du in ihnen erlebt hast.",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Heißt das, ich bin selbst schuld an der Auswahl?",
+        "answer": "Nein. Eine Erklärung dafür, warum jemand länger bleibt oder wen er anziehend findet, ist keine Erklärung dafür, warum jemand anders sich schlecht verhält. Beides getrennt zu halten ist wichtig, weil sonst aus einer Erkenntnis über dich ein Urteil über dich wird – und dann hörst du auf hinzuschauen."
+      },
+      {
+        "question": "Warum fühlt sich das Vertraute richtig an, auch wenn es schlecht war?",
+        "answer": "Weil Vertrautheit und Wohlbefinden zwei verschiedene Dinge sind. Was man früh gelernt hat, ist erwartbar, und Erwartbarkeit fühlt sich nach Sicherheit an – selbst wenn das Erwartete unangenehm ist. Umgekehrt kann sich verlässliche Zuwendung bei jemandem, der sie nicht kennt, zunächst fremd und sogar langweilig anfühlen."
+      }
+    ],
+    "url": "/glossar/wiederholungszwang"
+  },
+  {
+    "type": "glossary",
     "slug": "wut",
     "title": "Wut – der missverstandene Bote",
     "description": "Warum Wut kein Feind ist, sondern ein Signal, was oft unter ihr liegt und wie man ihre Energie nutzen kann, ohne von ihr überrollt zu werden. Ohne Diagnose.",
@@ -2471,6 +2675,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/wut"
+  },
+  {
+    "type": "glossary",
+    "slug": "zirkulaere-frage",
+    "title": "Zirkuläre Frage – über die Sicht eines Dritten sprechen",
+    "description": "Das bekannteste Werkzeug der systemischen Arbeit: nicht fragen, wie es dir geht, sondern was ein anderer über dich sagen würde. Warum das Gespräche öffnet, die frontal blockiert sind.",
+    "cluster": "paartherapie",
+    "search_intent": "zirkuläre fragen beispiele systemisch was würde ihr partner sagen",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Was würde dein Gegenüber antworten, wenn ich ihn fragte, was du gerade brauchst? Rate ruhig.",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum nicht einfach direkt fragen?",
+        "answer": "Weil die direkte Frage oft an der Abwehr scheitert. Auf wie geht es Ihnen damit folgt eine Antwort, die auf Wirkung geprüft ist. Der Umweg über einen Dritten senkt den Einsatz: Man spricht über eine Vermutung, nicht über ein Geständnis. Und die andere Person hört zu, ohne sich verteidigen zu müssen, weil sie gerade nicht angesprochen ist."
+      },
+      {
+        "question": "Ist das nicht manipulativ?",
+        "answer": "Die Sorge ist berechtigt und der Unterschied liegt in der Absicht. Eine zirkuläre Frage soll etwas sichtbar machen, nicht jemanden irgendwohin führen. Wer damit eine gewünschte Antwort erzeugen will – etwa: Was würde Ihre Tochter sagen, wie sehr Ihr Trinken sie belastet – benutzt die Form als Vorwurf mit Fragezeichen. Das merken die Beteiligten, und es zerstört das Vertrauen schnell."
+      }
+    ],
+    "url": "/glossar/zirkulaere-frage"
   },
   {
     "type": "problem",
@@ -7887,6 +8125,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "emotionsfokussierte-paartherapie",
+    "title": "Emotionsfokussierte Paartherapie (EFT): das Gefühl unter dem Streit",
+    "description": "EFT arbeitet mit der Bindungstheorie: Hinter Vorwurf und Rückzug stehen verletzliche Gefühle, die niemand ausspricht. Wie der Ansatz vorgeht, wie gut er belegt ist und für wen er passt.",
+    "cluster": "paartherapie",
+    "search_intent": "emotionsfokussierte paartherapie eft sue johnson ablauf wirksamkeit",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was passiert in dir, kurz bevor du dich zurückziehst oder laut wirst? Nicht der Gedanke – das Gefühl.",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "bindung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "naehe-distanz",
+      "rueckzug",
+      "verletzlichkeit",
+      "sehnsucht"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "negative-interaktionsschleife",
+        "verletzlichkeit",
+        "bindungsangst",
+        "reparaturversuch"
+      ],
+      "related": [
+        "paartherapie",
+        "integrative-verhaltenstherapie-fuer-paare",
+        "systemische-paartherapie",
+        "bindungsstile"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist EFT dasselbe wie emotionsfokussierte Einzeltherapie?",
+        "answer": "Nein, und die Verwechslung ist verbreitet. Beide gehen auf dieselben Wurzeln zurück – Sue Johnson und Les Greenberg entwickelten den Paaransatz gemeinsam, Greenberg baute später ein eigenes Verfahren für Einzeltherapie aus. Der Paaransatz stützt sich auf die Bindungstheorie und arbeitet am Kreislauf zwischen zwei Menschen; die Einzelvariante arbeitet an der Verarbeitung von Emotionen innerhalb einer Person. Wer eine Fachperson sucht, sollte nachfragen, welche der beiden gemeint ist."
+      },
+      {
+        "question": "Muss ich dafür gefühlsbetont sein?",
+        "answer": "Nein. EFT ist gerade für Menschen entwickelt worden, die im Konflikt dichtmachen – der Rückzug ist kein Hindernis, sondern eines der beiden Hauptthemen. Wer wenig Zugang zu seinen Gefühlen hat, wird nicht zum Reden gedrängt, sondern langsam dorthin geführt. Manche empfinden das trotzdem als unangenehm nah; das ist ein legitimer Grund, einen anderen Ansatz zu wählen."
+      },
+      {
+        "question": "Wie lange dauert eine EFT-Paartherapie?",
+        "answer": "In den Studien liegen die Behandlungen meist im Bereich von rund acht bis zwanzig Sitzungen, in der Praxis oft etwas länger. Damit gehört EFT zu den eher kurzen Verfahren. Bei tiefen Verletzungen wie einem Vertrauensbruch dauert es in aller Regel länger – dafür gibt es innerhalb des Ansatzes ein eigenes Vorgehen."
+      },
+      {
+        "question": "Wirkt EFT auch nach einer Affäre?",
+        "answer": "Es gibt dafür ein eigenes, ausgearbeitetes Vorgehen, das den Vertrauensbruch als Bindungsverletzung behandelt: Die verletzte Person soll den Schmerz vollständig ausdrücken können, und die andere soll ihn aushalten, ohne sich zu verteidigen oder zu erklären. Das ist der schwerste Teil und zugleich der wirksame. Ohne diesen Schritt bleiben Vereinbarungen an der Oberfläche."
+      }
+    ],
+    "url": "/wissen/emotionsfokussierte-paartherapie"
+  },
+  {
+    "type": "topic",
     "slug": "emotionsregulation",
     "title": "Emotionsregulation: das Toleranzfenster und was Gefühle steuert",
     "description": "Warum manche Menschen Gefühle schwer regulieren können, was das Toleranzfenster ist und wie sich Dysregulation auf Beziehungen auswirkt – erklärend, nicht entschuldigend.",
@@ -8064,6 +8369,68 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/gaslighting-oder-missverstaendnis"
+  },
+  {
+    "type": "topic",
+    "slug": "gottman-methode",
+    "title": "Die Gottman-Methode: aus der Beobachtung echter Paare",
+    "description": "Jahrzehntelange Beobachtungsforschung mit erstaunlich treffsicheren Vorhersagen – und eine daraus abgeleitete Therapie, deren Belege schwächer sind als die der Forschung. Beides erklärt.",
+    "cluster": "paartherapie",
+    "search_intent": "gottman methode paartherapie vier reiter 5 zu 1 verhältnis wirksamkeit",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Wenn du an euren letzten Streit denkst – gab es einen Moment, in dem einer versucht hat, ihn zu unterbrechen? Und was ist damit passiert?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "konflikt",
+      "verachtung",
+      "rueckzug",
+      "reparatur"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "verachtung",
+        "reparaturversuch",
+        "eskalationsspirale",
+        "stonewalling"
+      ],
+      "related": [
+        "paartherapie",
+        "verhaltenstherapeutische-paartherapie",
+        "die-vier-reiter"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Stimmt es, dass Gottman Trennungen mit über 90 Prozent Treffsicherheit vorhersagen konnte?",
+        "answer": "Diese Zahl kursiert überall und ist mit Vorsicht zu genießen. Die hohen Trefferquoten stammen überwiegend aus Modellen, die im Nachhinein an bereits bekannte Verläufe angepasst wurden – das ist etwas anderes als eine Vorhersage bei einem neuen Paar. Der belastbare Kern bleibt trotzdem beachtlich: Bestimmte beobachtbare Verhaltensweisen im Streit, allen voran Verachtung, hängen zuverlässig mit dem späteren Verlauf zusammen."
+      },
+      {
+        "question": "Was ist das Verhältnis von fünf zu eins?",
+        "answer": "Eine Beobachtung aus den Konfliktaufnahmen: Bei Paaren, die stabil und zufrieden blieben, kamen im Streit etwa fünfmal so viele positive wie negative Äußerungen vor – ein Blick, ein Scherz, eine Zustimmung zählen dabei mit. Der Wert ist ein grober Anhaltspunkt und keine Regel, die man nachrechnen sollte. Als Faustregel taugt er trotzdem: Es geht weniger darum, Streit zu vermeiden, als darum, wie viel Zuwendung daneben noch stattfindet."
+      },
+      {
+        "question": "Ist die Gottman-Methode so gut belegt wie EFT?",
+        "answer": "Nein, und dieser Unterschied wird oft verwischt. Die Beobachtungsforschung, aus der die Methode stammt, ist außergewöhnlich umfangreich. Die daraus abgeleitete Therapie ist deutlich weniger in kontrollierten Studien geprüft worden als EFT oder IBCT. Das heißt nicht, dass sie nicht hilft – es heißt, dass wir dazu weniger wissen, als die Bekanntheit vermuten lässt."
+      }
+    ],
+    "url": "/wissen/gottman-methode"
   },
   {
     "type": "topic",
@@ -8275,6 +8642,67 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/ich-war-untreu"
+  },
+  {
+    "type": "topic",
+    "slug": "integrative-verhaltenstherapie-fuer-paare",
+    "title": "Integrative Verhaltenstherapie für Paare (IBCT): Akzeptanz neben Veränderung",
+    "description": "IBCT geht davon aus, dass manche Unterschiede zwischen zwei Menschen bleiben – und dass der Kampf dagegen mehr anrichtet als der Unterschied selbst. Vorgehen, Belege und Eignung.",
+    "cluster": "paartherapie",
+    "search_intent": "integrative verhaltenstherapie paare ibct akzeptanz christensen jacobson",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Welcher Unterschied zwischen euch wird sich vermutlich nie auflösen? Magst du dem einen Moment nachgehen, ohne ihn zu lösen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "konflikt",
+      "veraenderung",
+      "akzeptanz",
+      "wiederkehrendes-muster"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "akzeptanz-und-veraenderung",
+        "negative-interaktionsschleife",
+        "reparaturversuch"
+      ],
+      "related": [
+        "paartherapie",
+        "verhaltenstherapeutische-paartherapie",
+        "emotionsfokussierte-paartherapie"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Heißt Akzeptanz, dass ich alles hinnehmen muss?",
+        "answer": "Nein, und das ist die häufigste Fehldeutung. Gemeint ist nicht, schlechtes Verhalten zu dulden, sondern zu unterscheiden, was sich ändern lässt und was zur Person gehört. Dass jemand gern früh aufsteht und der andere spät, ist ein Unterschied; dass jemand Zusagen nicht einhält, ist Verhalten. Das erste anzunehmen entlastet. Das zweite anzunehmen wäre Selbstaufgabe – IBCT verlangt das nicht."
+      },
+      {
+        "question": "Was unterscheidet IBCT von klassischer Verhaltenstherapie für Paare?",
+        "answer": "Die klassische Variante setzt auf Veränderung: bessere Kommunikation, mehr angenehmes Verhalten, Problemlösetechniken. IBCT übernimmt das und stellt die Akzeptanzarbeit daneben, weil sich zeigte, dass viele Paare kurzfristig deutlich profitieren und die Wirkung später nachlässt. Die Annahme dahinter: Was ein Paar auf Dauer trägt, ist nicht nur, mehr richtig zu machen, sondern auch, weniger gegen Unveränderliches anzurennen."
+      },
+      {
+        "question": "Für welche Paare eignet sich IBCT besonders?",
+        "answer": "Für Paare mit sehr verfestigten Streitthemen, die sich seit Jahren wiederholen und bei denen beide das Gefühl haben, alles schon versucht zu haben. Auch für Paare, deren Unterschiede in Temperament oder Bedürfnissen groß sind. Weniger geeignet ist der Ansatz, wenn das Hauptthema eine akute Verletzung ist, die zuerst emotional bearbeitet werden muss."
+      }
+    ],
+    "url": "/wissen/integrative-verhaltenstherapie-fuer-paare"
   },
   {
     "type": "topic",
@@ -8971,6 +9399,137 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "paartherapie",
+    "title": "Paartherapie: die Ansätze im Vergleich – und was davon belegt ist",
+    "description": "EFT, IBCT, Verhaltenstherapie, systemisch, Gottman: was die Ansätze unterscheidet, wie gut sie belegt sind und was den Erfolg tatsächlich stärker vorhersagt als die Methode.",
+    "cluster": "paartherapie",
+    "search_intent": "welche paartherapie ist die beste ansätze vergleich wirkt paartherapie wirklich",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Wenn ihr zu zweit in einem Raum säßet und jemand fragte, worum es eigentlich geht – was würdest du antworten?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "veraenderung",
+      "klarheit",
+      "konflikt",
+      "hoffnung"
+    ],
+    "safety_tags": [
+      "gewalt"
+    ],
+    "links": {
+      "glossary": [
+        "negative-interaktionsschleife",
+        "akzeptanz-und-veraenderung",
+        "zirkulaere-frage",
+        "reparaturversuch"
+      ],
+      "related": [
+        "emotionsfokussierte-paartherapie",
+        "integrative-verhaltenstherapie-fuer-paare",
+        "systemische-paartherapie",
+        "paartherapie-finden"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Welche Paartherapie ist die beste?",
+        "answer": "Diese Frage führt in die Irre, so verständlich sie ist. Am besten untersucht sind die emotionsfokussierte Paartherapie, die integrative Verhaltenstherapie für Paare und die verhaltenstherapeutische Paartherapie – und die Unterschiede zwischen ihnen sind in den Ergebnissen klein. Deutlich stärker hängt der Erfolg an anderem: ob beide wirklich mitmachen, wie tragfähig die Beziehung zur Therapeutin ist und wie früh ihr geht. Die Methode ist nicht egal, aber sie ist nicht der Hebel, für den viele sie halten."
+      },
+      {
+        "question": "Wirkt Paartherapie überhaupt?",
+        "answer": "Ja, im Durchschnitt deutlich – aber nicht bei allen. Über die Studienlage hinweg verbessert sich die Mehrheit der Paare spürbar, ein erheblicher Teil jedoch nicht, und ein Teil der Verbesserung verliert sich über die Jahre wieder. Das ist keine schlechte Bilanz für eine Behandlung, aber es ist etwas anderes als eine Garantie. Wer mit der Erwartung hingeht, dass Therapie die Beziehung repariert, während man selbst zuschaut, wird enttäuscht."
+      },
+      {
+        "question": "Zahlt die Krankenkasse Paartherapie?",
+        "answer": "In der Regel nicht. Die gesetzliche Krankenversicherung bezahlt Psychotherapie zur Behandlung einer Krankheit bei einer Person – Beziehungsprobleme allein sind keine Diagnose. Paartherapie zahlt ihr also meist selbst. Es gibt Ausnahmen und Umwege, und es gibt Beratungsstellen mit einkommensabhängigen Beiträgen. Mehr dazu auf der Seite zur Suche."
+      },
+      {
+        "question": "Gibt es Situationen, in denen Paartherapie nicht ratsam ist?",
+        "answer": "Ja, und das ist wichtig. Bei fortdauernder Gewalt oder systematischer Kontrolle ist eine gemeinsame Sitzung nicht nur wenig hilfreich, sondern kann gefährlich sein: Was jemand dort ausspricht, kann er danach büßen. Auch die Grundannahme, beide trügen zur Dynamik bei, ist dann falsch und schadet. In solchen Lagen ist Einzelberatung der richtige erste Schritt."
+      }
+    ],
+    "url": "/wissen/paartherapie"
+  },
+  {
+    "type": "topic",
+    "slug": "paartherapie-finden",
+    "title": "Paartherapie finden: Kosten, Kasse, Qualifikation, erste Stunde",
+    "description": "Was Paartherapie in Deutschland kostet, warum die Kasse sie meist nicht zahlt, warum die Berufsbezeichnung nicht geschützt ist und woran du eine gute Fachperson erkennst.",
+    "cluster": "paartherapie",
+    "search_intent": "paartherapie kosten krankenkasse zahlt paartherapeut finden qualifikation",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Was hält euch bisher davon ab, einen Termin zu machen? Geld, Zeit, Scham – oder ist einer von euch nicht so weit?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "veraenderung",
+      "klarheit",
+      "hoffnung",
+      "scham"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "reparaturversuch"
+      ],
+      "related": [
+        "paartherapie",
+        "professionelle-hilfe",
+        "emotionsfokussierte-paartherapie"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Zahlt die Krankenkasse Paartherapie?",
+        "answer": "In aller Regel nein. Die gesetzliche Krankenversicherung bezahlt Psychotherapie zur Behandlung einer Krankheit bei einer versicherten Person. Beziehungsprobleme allein sind keine Diagnose. Es gibt einen Umweg: Ist eine Person wegen einer Erkrankung in Psychotherapie, kann die Partnerin in begrenztem Umfang in Sitzungen einbezogen werden. Das ist keine Paartherapie, kann aber im Einzelfall vieles klären. Private Versicherungen und Beihilfe handhaben es unterschiedlich – dort lohnt die Nachfrage."
+      },
+      {
+        "question": "Was kostet eine Sitzung?",
+        "answer": "Für selbst gezahlte Paartherapie liegen die üblichen Sätze grob zwischen 90 und 200 Euro für 60 bis 90 Minuten, in Großstädten eher am oberen Rand. Viele Paare brauchen zehn bis zwanzig Sitzungen. Deutlich günstiger sind kirchliche und kommunale Ehe-, Familien- und Lebensberatungsstellen: Sie arbeiten mit einkommensabhängigen Beiträgen, manchmal kostenfrei, und sind unabhängig von der Konfession offen für alle."
+      },
+      {
+        "question": "Ist Paartherapeut eine geschützte Berufsbezeichnung?",
+        "answer": "Nein. Jede Person darf sich in Deutschland Paartherapeut oder Paartherapeutin nennen, ohne jede Ausbildung. Geschützt ist allein die Bezeichnung Psychotherapeutin oder Psychotherapeut, die eine Approbation voraussetzt. Das heißt nicht, dass nur Approbierte gute Arbeit leisten – viele sehr erfahrene Paartherapeutinnen sind Sozialpädagoginnen oder Beraterinnen mit langer Zusatzausbildung. Es heißt: Du musst selbst nachfragen, welche Ausbildung dahintersteht."
+      },
+      {
+        "question": "Mein Partner will nicht mitkommen. Was dann?",
+        "answer": "Das ist häufig, und es ist kein Ausschlussgrund. Erstens lohnt es, die Ablehnung genauer anzuschauen – oft steckt die Befürchtung dahinter, vor einer dritten Person als der Schuldige dazustehen; das Angebot, ein einziges Erstgespräch auszuprobieren, senkt die Hürde erheblich. Zweitens gibt es Einzelberatung mit Beziehungsfokus, die tatsächlich etwas verändert: Wenn eine Person ihren Anteil an einem Muster verändert, verändert sich das Muster."
+      }
+    ],
+    "url": "/wissen/paartherapie-finden"
+  },
+  {
+    "type": "topic",
     "slug": "persoenlichkeit-verhalten",
     "title": "Persönlichkeit und Verhalten verstehen – ohne Ferndiagnose",
     "description": "Was Persönlichkeitsmerkmale sind und was nicht: Big Five, Narzissmus und das Dunkle Dreieck – verständlich erklärt, ohne andere zu etikettieren.",
@@ -9045,6 +9604,68 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/professionelle-hilfe"
+  },
+  {
+    "type": "topic",
+    "slug": "schematherapie-fuer-paare",
+    "title": "Schematherapie für Paare: wenn zwei Kindheiten aufeinandertreffen",
+    "description": "Schematherapie arbeitet mit früh erworbenen Mustern und den Zuständen, in die Menschen im Konflikt kippen. Für Paare noch ein junges Feld – was das für die Belege bedeutet.",
+    "cluster": "paartherapie",
+    "search_intent": "schematherapie paare schema modi young paartherapie borderline",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Gibt es einen Moment im Streit, in dem du dich fühlst wie ein Kind? Magst du beschreiben, was kurz davor passiert?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "bindung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "wiederkehrendes-muster",
+      "verlustangst",
+      "scham",
+      "konflikt"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "schema",
+        "modus",
+        "verlustangst",
+        "projektion"
+      ],
+      "related": [
+        "paartherapie",
+        "tiefenpsychologische-paartherapie",
+        "emotionsfokussierte-paartherapie"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Schematherapie nicht für Persönlichkeitsstörungen gedacht?",
+        "answer": "Dort hat sie ihren Ursprung und ihre stärksten Belege – besonders bei der Borderline-Persönlichkeitsstörung. Die Anwendung auf Paare ist eine spätere Weiterentwicklung und ein deutlich jüngeres Feld. Man sollte die gute Studienlage für die Einzeltherapie nicht auf die Paarvariante übertragen; das sind zwei verschiedene Fragen."
+      },
+      {
+        "question": "Was ist ein Modus?",
+        "answer": "Ein Zustand, in den jemand im Konflikt kippt und der sich von seinem sonstigen Verhalten deutlich unterscheidet. Typisch benannte Zustände sind das verletzte Kind, der strafende innere Anteil oder der distanzierte Beschützer, der sich abschottet. Für Paare ist der Nutzen praktisch: Wenn beide erkennen und benennen können, welcher Zustand gerade am Steuer sitzt, verliert der Streit einen Teil seiner Wucht."
+      },
+      {
+        "question": "Für wen ist der Ansatz besonders geeignet?",
+        "answer": "Häufig für Paare, bei denen die Reaktionen im Konflikt sehr heftig ausfallen und sich schwer bremsen lassen, oder in denen eine Person mit einer Persönlichkeitsstörung diagnostiziert ist und beide verstehen wollen, was im Zusammenspiel passiert. Für alltäglich unzufriedene Paare ohne diese Zuspitzung ist der Aufwand meist größer als der Nutzen."
+      }
+    ],
+    "url": "/wissen/schematherapie-fuer-paare"
   },
   {
     "type": "topic",
@@ -9304,6 +9925,130 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/sich-trennen"
   },
   {
+    "type": "topic",
+    "slug": "systemische-paartherapie",
+    "title": "Systemische Paartherapie: das Problem liegt zwischen euch, nicht in einem",
+    "description": "Systemische Arbeit fragt nach Mustern, Rollen und Umfeld statt nach Schuld. Zirkuläre Fragen, Allparteilichkeit, Umdeutung – und wie belastbar die Forschungslage ist.",
+    "cluster": "paartherapie",
+    "search_intent": "systemische paartherapie ablauf zirkuläre fragen wirksamkeit systemisch",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "Wenn eine dritte Person eure Streits über ein Jahr beobachtet hätte – welches Muster würde sie beschreiben?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "wiederkehrendes-muster",
+      "konflikt",
+      "familie",
+      "klarheit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "zirkulaere-frage",
+        "negative-interaktionsschleife",
+        "eskalationsspirale"
+      ],
+      "related": [
+        "paartherapie",
+        "integrative-verhaltenstherapie-fuer-paare",
+        "tiefenpsychologische-paartherapie"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Bedeutet systemisch, dass niemand Verantwortung trägt?",
+        "answer": "Nein, auch wenn der Eindruck entstehen kann. Systemisches Arbeiten verzichtet auf die Suche nach dem Schuldigen, weil sie im Konflikt nichts löst – nicht auf Verantwortung. Eine gute systemische Therapeutin benennt sehr wohl, wenn jemand sich schädigend verhält. Der Unterschied liegt darin, wonach gefragt wird: nicht wer angefangen hat, sondern was das Verhalten im Zusammenspiel bewirkt und aufrechterhält."
+      },
+      {
+        "question": "Was ist eine zirkuläre Frage?",
+        "answer": "Eine Frage, die jemanden bittet, über die Sicht eines Dritten zu sprechen: Was glauben Sie, wie Ihr Sohn Ihre Streits erlebt? Oder: Was würde Ihre Frau sagen, wenn ich sie fragte, was Sie brauchen? Der Nutzen liegt in dem, was dabei passiert – man hört, wie man selbst gesehen wird, ohne dass es ein Vorwurf ist, und das öffnet Gespräche, die frontal blockiert wären."
+      },
+      {
+        "question": "Ist systemische Therapie in Deutschland anerkannt?",
+        "answer": "Als Psychotherapieverfahren für Erwachsene ist die systemische Therapie inzwischen sozialrechtlich anerkannt – das betrifft aber die Behandlung einer Erkrankung bei einer Person. Paartherapie als solche bleibt davon unberührt und ist in aller Regel keine Kassenleistung. Praktisch heißt das: Der Ansatz ist etabliert, die Paarsitzung zahlt ihr trotzdem selbst."
+      }
+    ],
+    "url": "/wissen/systemische-paartherapie"
+  },
+  {
+    "type": "topic",
+    "slug": "tiefenpsychologische-paartherapie",
+    "title": "Tiefenpsychologische Paartherapie: warum ausgerechnet dieser Mensch",
+    "description": "Was frühere Beziehungserfahrungen und unbewusste Erwartungen im heutigen Konflikt bewirken. Das Konzept der Kollusion, das Vorgehen – und warum die Forschungslage dünner ist.",
+    "cluster": "paartherapie",
+    "search_intent": "tiefenpsychologische paartherapie psychoanalytisch kollusion willi unbewusst",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "analysis",
+      "opening_question": "An wen erinnert dich sein Verhalten, wenn du ehrlich bist? Auch wenn der Gedanke unangenehm ist.",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "bindung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "wiederkehrendes-muster",
+      "familie",
+      "beziehungsmuster",
+      "selbsterkenntnis"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "projektion",
+        "kollusion",
+        "parentifizierung",
+        "wiederholungszwang"
+      ],
+      "related": [
+        "paartherapie",
+        "systemische-paartherapie",
+        "schematherapie-fuer-paare",
+        "immer-derselbe-typ"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Dauert tiefenpsychologische Paartherapie nicht sehr lang?",
+        "answer": "In der Regel länger als verhaltensbezogene oder emotionsfokussierte Verfahren, ja. Statt zehn bis zwanzig Sitzungen sind es oft deutlich mehr, teils über ein Jahr. Für manche Paare ist genau das passend – für andere ist es der Grund, sich anders zu entscheiden, zumal die Sitzungen meist selbst gezahlt werden."
+      },
+      {
+        "question": "Was ist mit Kollusion gemeint?",
+        "answer": "Ein Begriff des Schweizer Paartherapeuten Jürg Willi: das unbewusste Zusammenspiel zweier Menschen, in dem beide dieselbe ungelöste Frage von entgegengesetzten Seiten bearbeiten. Eine Person übernimmt die eine Rolle, die andere die dazu passende – etwa Fürsorge und Bedürftigkeit, oder Kontrolle und Freiheitsdrang. Es fühlt sich anfangs wie Ergänzung an und wird später zum Gefängnis, weil beide auf ihre Rolle festgelegt sind."
+      },
+      {
+        "question": "Ist der Ansatz wissenschaftlich anerkannt?",
+        "answer": "Für Einzeltherapie sind psychodynamische Verfahren gut untersucht und anerkannt. Speziell für Paartherapie ist die Studienlage deutlich dünner als bei EFT, IBCT oder der verhaltenstherapeutischen Richtung – es gibt einzelne beachtenswerte Arbeiten mit langer Nachbeobachtung, aber wenige. Das ist kein Beleg gegen die Wirksamkeit, sondern schlicht weniger Wissen."
+      }
+    ],
+    "url": "/wissen/tiefenpsychologische-paartherapie"
+  },
+  {
     "type": "comparison",
     "slug": "trennen-oder-bleiben",
     "title": "Trennen oder bleiben? Woran du Orientierung findest",
@@ -9470,6 +10215,69 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/verdeckter-narzissmus"
+  },
+  {
+    "type": "topic",
+    "slug": "verhaltenstherapeutische-paartherapie",
+    "title": "Verhaltenstherapeutische Paartherapie (CBCT): konkret, überprüfbar, üben",
+    "description": "Der älteste und am längsten untersuchte Zweig der Paartherapie: Gesprächsregeln, Problemlösetraining, Arbeit an Erwartungen. Was er leistet, wo seine Grenzen liegen.",
+    "cluster": "paartherapie",
+    "search_intent": "verhaltenstherapeutische paartherapie cbct kommunikationstraining problemlösetraining",
+    "updated": "2026-08-28",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Beschreib mir eine Situation der letzten Woche ganz genau: Was wurde gesagt, und was ist danach passiert?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "konflikt",
+      "kommunikation",
+      "veraenderung",
+      "klarheit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "glossary": [
+        "ich-botschaft",
+        "aktives-zuhoeren",
+        "reparaturversuch",
+        "beobachtung-gefuehl"
+      ],
+      "related": [
+        "paartherapie",
+        "integrative-verhaltenstherapie-fuer-paare",
+        "gottman-methode",
+        "schwierige-gespraeche-fuehren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das nicht bloß Kommunikationstraining?",
+        "answer": "Das ist ein Teil davon und nicht alles. Die kognitiv-verhaltenstherapeutische Variante arbeitet zusätzlich an dem, was jeder über den anderen denkt: Zuschreibungen (er macht das absichtlich), Erwartungen (wer sich liebt, muss das merken) und Maßstäbe (so gehört sich das in einer Beziehung). Diese Gedanken entscheiden oft mehr über den Verlauf eines Abends als das Verhalten selbst."
+      },
+      {
+        "question": "Warum wirkt es bei manchen Paaren nur kurz?",
+        "answer": "Weil Techniken tragen, solange beide sie anwenden – und im Streit greift man auf das Eingeübte zurück, nicht auf das Erlernte. Genau diese Beobachtung führte zur Entwicklung der integrativen Variante, die Akzeptanzarbeit danebenstellt. Für viele Paare ist die verhaltensbezogene Arbeit trotzdem der richtige Einstieg, weil sie schnell spürbare Entlastung bringt."
+      },
+      {
+        "question": "Bekommt man Hausaufgaben?",
+        "answer": "In der Regel ja, und das ist Teil der Wirkung. Typisch sind Übungen zum Zuhören, verabredete Gesprächszeiten oder das Beobachten und Notieren von Situationen. Wer Aufgaben zwischen den Sitzungen ablehnt, sollte das vorher sagen – dann passt ein anderer Ansatz vermutlich besser."
+      }
+    ],
+    "url": "/wissen/verhaltenstherapeutische-paartherapie"
   },
   {
     "type": "topic",
@@ -9928,6 +10736,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Aktives Zuhören – verstehen wollen, statt schon zu antworten",
     "description": "Was aktives Zuhören wirklich bedeutet, warum es mehr ist als Schweigen und Nicken, und wie es in Beziehungen Nähe herstellt. Ohne Diagnose."
   },
+  "/glossar/akzeptanz-und-veraenderung": {
+    "title": "Akzeptanz und Veränderung – die Unterscheidung, die entlastet",
+    "description": "Manches zwischen zwei Menschen lässt sich ändern, manches nicht. Warum der Kampf gegen das Unveränderliche oft mehr anrichtet als der Unterschied selbst – und wo die Grenze liegt."
+  },
   "/glossar/ambivalenz": {
     "title": "Ambivalenz – wenn du hin- und hergerissen bist",
     "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist."
@@ -10056,6 +10868,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kognitive Dissonanz – wenn zwei Wahrheiten nicht zusammenpassen",
     "description": "Warum der Kopf die Realität umschreibt, um in einer widersprüchlichen Beziehung bleiben zu können: das Spannungsprinzip hinter Ausreden, Beschönigen und Selbstzweifel. Ohne Diagnose."
   },
+  "/glossar/kollusion": {
+    "title": "Kollusion – das unbewusste Zusammenspiel zweier Rollen",
+    "description": "Jürg Willis Begriff für Paare, die dieselbe ungelöste Frage von entgegengesetzten Seiten bearbeiten. Warum es sich anfangs wie Ergänzung anfühlt und später wie ein Gefängnis."
+  },
   "/glossar/kommunaler-narzissmus": {
     "title": "Kommunaler Narzissmus – Größe über Güte",
     "description": "Der kommunale Narzissmus bezieht seine Größe nicht aus Macht, sondern aus Hilfsbereitschaft: der selbstloseste, gütigste Mensch für alle – während zu Hause wenig davon ankommt. Woran du das erkennst. Ohne Diagnose."
@@ -10092,9 +10908,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Mikro-Untreue – die kleinen Grenzüberschreitungen",
     "description": "Ein Like zu viel, ein gelöschter Chat, ein Ring, der abgelegt wird. Mikro-Untreue beschreibt Verhalten in der Grauzone – und warum Paare darüber so heftig streiten."
   },
+  "/glossar/modus": {
+    "title": "Modus – der Zustand, in den man im Streit kippt",
+    "description": "Warum manche Menschen im Konflikt plötzlich wie ausgewechselt wirken, welche Zustände typisch sind und warum es hilft, ihnen im Moment einen Namen zu geben."
+  },
   "/glossar/narzisstische-zufuhr": {
     "title": "Narzisstische Zufuhr (Narcissistic Supply)",
     "description": "Narzisstische Zufuhr ist die ständige Bestätigung von außen, die ein zerbrechlicher Selbstwert zu brauchen scheint – Bewunderung, Aufmerksamkeit, manchmal auch dein schlechtes Gewissen. Warum das die Dynamik erklärt. Ohne Diagnose."
+  },
+  "/glossar/negative-interaktionsschleife": {
+    "title": "Negativer Kreislauf – wenn zwei Reaktionen einander erzeugen",
+    "description": "Das Muster, in dem beide auf den anderen reagieren und dadurch genau das auslösen, was sie vermeiden wollen. Der zentrale Begriff der emotionsfokussierten Paartherapie."
   },
   "/glossar/offenlegung": {
     "title": "Offenlegung – warum die Wahrheit in Raten am meisten schadet",
@@ -10139,6 +10963,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/scham": {
     "title": "Scham – das Gefühl, nicht zu genügen",
     "description": "Was Scham von Schuld unterscheidet, warum sie so isoliert und lähmt und wie man ihr begegnen kann, ohne sich in ihr zu verlieren. Ohne Diagnose."
+  },
+  "/glossar/schema": {
+    "title": "Schema – ein früh erworbenes Muster, das mitreist",
+    "description": "Überzeugungen, Erinnerungen und Körperempfindungen, die sich früh gebildet haben und im Erwachsenenleben weiterwirken. Was der Begriff meint und wo seine Grenzen liegen."
   },
   "/glossar/selbst-gaslighting": {
     "title": "Selbst-Gaslighting – wenn du dir selbst nicht mehr glaubst",
@@ -10208,9 +11036,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Vulnerabler Narzissmus – die verletzliche Seite",
     "description": "Der vulnerable Narzissmus ist die leise, empfindliche Ausprägung: unsicher, kränkbar, oft in der Opferrolle – und dennoch stark ich-bezogen. Wie er sich vom grandiosen Typ unterscheidet. Ohne Diagnose."
   },
+  "/glossar/wiederholungszwang": {
+    "title": "Wiederholung – warum sich alte Muster neue Bühnen suchen",
+    "description": "Warum Menschen erstaunlich verlässlich in Beziehungen geraten, die früheren ähneln – und warum das nicht Selbstschädigung ist, sondern Vertrautheit."
+  },
   "/glossar/wut": {
     "title": "Wut – der missverstandene Bote",
     "description": "Warum Wut kein Feind ist, sondern ein Signal, was oft unter ihr liegt und wie man ihre Energie nutzen kann, ohne von ihr überrollt zu werden. Ohne Diagnose."
+  },
+  "/glossar/zirkulaere-frage": {
+    "title": "Zirkuläre Frage – über die Sicht eines Dritten sprechen",
+    "description": "Das bekannteste Werkzeug der systemischen Arbeit: nicht fragen, wie es dir geht, sondern was ein anderer über dich sagen würde. Warum das Gespräche öffnet, die frontal blockiert sind."
   },
   "/hilfe/an-eigener-wahrnehmung-zweifeln": {
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
@@ -10916,6 +11752,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Emotionen regulieren: mit starken Gefühlen umgehen, ohne sie wegzudrücken",
     "description": "Was Emotionsregulation wirklich bedeutet – nicht Gefühle unterdrücken, sondern sie halten können –, warum Wegdrücken nicht funktioniert und welche Wege im Alltag helfen. Ohne Diagnose."
   },
+  "/wissen/emotionsfokussierte-paartherapie": {
+    "title": "Emotionsfokussierte Paartherapie (EFT): das Gefühl unter dem Streit",
+    "description": "EFT arbeitet mit der Bindungstheorie: Hinter Vorwurf und Rückzug stehen verletzliche Gefühle, die niemand ausspricht. Wie der Ansatz vorgeht, wie gut er belegt ist und für wen er passt."
+  },
   "/wissen/emotionsregulation": {
     "title": "Emotionsregulation: das Toleranzfenster und was Gefühle steuert",
     "description": "Warum manche Menschen Gefühle schwer regulieren können, was das Toleranzfenster ist und wie sich Dysregulation auf Beziehungen auswirkt – erklärend, nicht entschuldigend."
@@ -10932,6 +11772,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Gaslighting oder Missverständnis? Woran du den Unterschied merkst",
     "description": "Nicht jeder Streit ist Manipulation. Diese Merkmale helfen dir, ein echtes Missverständnis von systematischem Gaslighting zu unterscheiden – ohne vorschnelles Urteil."
   },
+  "/wissen/gottman-methode": {
+    "title": "Die Gottman-Methode: aus der Beobachtung echter Paare",
+    "description": "Jahrzehntelange Beobachtungsforschung mit erstaunlich treffsicheren Vorhersagen – und eine daraus abgeleitete Therapie, deren Belege schwächer sind als die der Forschung. Beides erklärt."
+  },
   "/wissen/grenzen-setzen": {
     "title": "Grenzen setzen: was sie sind und warum sie so schwerfallen",
     "description": "Was Grenzen wirklich sind, warum sie so schwer zu setzen sind und wie du sie klar kommunizierst – ohne Angriff und ohne Rechtfertigungsdruck."
@@ -10947,6 +11791,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/ich-war-untreu": {
     "title": "Ich war untreu: was jetzt wirklich zählt",
     "description": "Du hast Vertrauen gebrochen und weißt nicht wohin damit. Dieser Text verurteilt nicht und beschönigt nichts – er sagt dir, was du schuldest, warum Scham der falsche Antrieb ist und was Reparatur tatsächlich verlangt."
+  },
+  "/wissen/integrative-verhaltenstherapie-fuer-paare": {
+    "title": "Integrative Verhaltenstherapie für Paare (IBCT): Akzeptanz neben Veränderung",
+    "description": "IBCT geht davon aus, dass manche Unterschiede zwischen zwei Menschen bleiben – und dass der Kampf dagegen mehr anrichtet als der Unterschied selbst. Vorgehen, Belege und Eignung."
   },
   "/wissen/kodependenz": {
     "title": "Kodependenz: wenn Fürsorge zur Falle wird",
@@ -11000,6 +11848,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",
     "description": "Woher die Angst vor dem Nein kommt, warum ein Ja aus Angst niemandem hilft und wie man freundlich Nein sagt, ohne sich endlos zu rechtfertigen. Ohne Diagnose."
   },
+  "/wissen/paartherapie": {
+    "title": "Paartherapie: die Ansätze im Vergleich – und was davon belegt ist",
+    "description": "EFT, IBCT, Verhaltenstherapie, systemisch, Gottman: was die Ansätze unterscheidet, wie gut sie belegt sind und was den Erfolg tatsächlich stärker vorhersagt als die Methode."
+  },
+  "/wissen/paartherapie-finden": {
+    "title": "Paartherapie finden: Kosten, Kasse, Qualifikation, erste Stunde",
+    "description": "Was Paartherapie in Deutschland kostet, warum die Kasse sie meist nicht zahlt, warum die Berufsbezeichnung nicht geschützt ist und woran du eine gute Fachperson erkennst."
+  },
   "/wissen/persoenlichkeit-verhalten": {
     "title": "Persönlichkeit und Verhalten verstehen – ohne Ferndiagnose",
     "description": "Was Persönlichkeitsmerkmale sind und was nicht: Big Five, Narzissmus und das Dunkle Dreieck – verständlich erklärt, ohne andere zu etikettieren."
@@ -11007,6 +11863,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/professionelle-hilfe": {
     "title": "Wann professionelle Hilfe sinnvoll ist",
     "description": "Woran du erkennst, dass professionelle Unterstützung sinnvoll ist, was Therapie, Beratung und Coaching leisten – und wie du die Hürde zum ersten Gespräch überwindest."
+  },
+  "/wissen/schematherapie-fuer-paare": {
+    "title": "Schematherapie für Paare: wenn zwei Kindheiten aufeinandertreffen",
+    "description": "Schematherapie arbeitet mit früh erworbenen Mustern und den Zuständen, in die Menschen im Konflikt kippen. Für Paare noch ein junges Feld – was das für die Belege bedeutet."
   },
   "/wissen/schwierige-gespraeche-fuehren": {
     "title": "Schwierige Gespräche führen: heikle Themen ansprechen, ohne dass es eskaliert",
@@ -11028,6 +11888,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",
     "description": "Warum die Trennungsfrage so schwer ist, welche Zweifel dazugehören und wie du Schritt für Schritt zu mehr Klarheit findest – ohne dass dir jemand die Entscheidung abnimmt."
   },
+  "/wissen/systemische-paartherapie": {
+    "title": "Systemische Paartherapie: das Problem liegt zwischen euch, nicht in einem",
+    "description": "Systemische Arbeit fragt nach Mustern, Rollen und Umfeld statt nach Schuld. Zirkuläre Fragen, Allparteilichkeit, Umdeutung – und wie belastbar die Forschungslage ist."
+  },
+  "/wissen/tiefenpsychologische-paartherapie": {
+    "title": "Tiefenpsychologische Paartherapie: warum ausgerechnet dieser Mensch",
+    "description": "Was frühere Beziehungserfahrungen und unbewusste Erwartungen im heutigen Konflikt bewirken. Das Konzept der Kollusion, das Vorgehen – und warum die Forschungslage dünner ist."
+  },
   "/wissen/trennen-oder-bleiben": {
     "title": "Trennen oder bleiben? Woran du Orientierung findest",
     "description": "Kein Test entscheidet für dich – aber diese Fragen und Merkmale helfen dir, ehrlicher hinzuschauen, ob Bleiben oder Gehen deiner Wahrheit näherkommt."
@@ -11039,6 +11907,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/verdeckter-narzissmus": {
     "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
     "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose."
+  },
+  "/wissen/verhaltenstherapeutische-paartherapie": {
+    "title": "Verhaltenstherapeutische Paartherapie (CBCT): konkret, überprüfbar, üben",
+    "description": "Der älteste und am längsten untersuchte Zweig der Paartherapie: Gesprächsregeln, Problemlösetraining, Arbeit an Erwartungen. Was er leistet, wo seine Grenzen liegen."
   },
   "/wissen/verletzlichkeit-zeigen": {
     "title": "Verletzlichkeit zeigen: und wann man es besser lässt",

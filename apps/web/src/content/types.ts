@@ -33,6 +33,7 @@ export const CLUSTERS = [
   'selbstmitgefuehl', // Selbstliebe & Selbstmitgefuehl (Kristin Neff) - wie du mit dir umgehst
   'selbsterkenntnis', // Selbsterkenntnis & Ehrlichkeit mit sich - Introspektion, Eingestaendnisse, Verletzlichkeit
   'selbstreflexion', // Selbstreflexion
+  'paartherapie', // Paartherapie: Ansaetze, Wirksamkeit, Zugang
   'therapie', // Therapie & Coaching
   'kommunikation', // Kommunikation
   'liebessprachen', // Liebessprachen (Gary Chapman) – wie Zuneigung ankommt
@@ -143,6 +144,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   selbstmitgefuehl: 'Selbstliebe & Selbstmitgefühl',
   selbsterkenntnis: 'Selbsterkenntnis & Ehrlichkeit',
   selbstreflexion: 'Selbstreflexion',
+  paartherapie: 'Paartherapie',
   therapie: 'Therapie & Coaching',
   kommunikation: 'Kommunikation',
   liebessprachen: 'Liebessprachen',
