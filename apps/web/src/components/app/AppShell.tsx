@@ -38,7 +38,11 @@ export default function AppShell({ children }: Props) {
       {/* App-Header */}
       <header className="bg-gradient-to-b from-navy to-navy-dark border-b border-white/[0.08] shadow-[0_8px_24px_-12px_rgba(7,14,24,0.55)] sticky top-0 z-40">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 h-14">
-          <EchoBLogo to="/app" />
+          {/* Standardziel `/` – wie in allen anderen Bereichen (Institut, Fachperson,
+              Ausbildung). Vorher zeigte das Logo hier auf /app und war damit doppelt
+              („Meine Fälle“ steht direkt daneben) und der Nutzerbereich hatte keinen
+              Ausgang: Man kam ohne Abmelden nicht zurück zu Wissen, Szenen oder Glossar. */}
+          <EchoBLogo />
 
           <nav className="hidden md:flex items-center gap-1">
             {[

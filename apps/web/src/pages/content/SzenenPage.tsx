@@ -21,6 +21,15 @@ const TAG_COUNTS: { tag: string; count: number }[] = (() => {
   return orderSceneTags(counts.keys()).map((tag) => ({ tag, count: counts.get(tag) ?? 0 }))
 })()
 
+/**
+ * Standardmäßig werden nur Schlagworte gezeigt, die genug Szenen haben, um als Filter zu
+ * taugen. Von den über 200 Tags kommt gut ein Drittel in genau EINER Szene vor — ein Chip,
+ * der ein Ergebnis liefert, ist kein Filter, sondern ein Link mit Umweg. Der Rest bleibt
+ * über „Alle Themen“ und die Suche erreichbar.
+ */
+const HAEUFIG_MIN = 5
+const HAEUFIGE_TAGS = TAG_COUNTS.filter((t) => t.count >= HAEUFIG_MIN)
+
 export default function SzenenPage() {
   const [params] = useSearchParams()
   const initialTag = params.get('tag')
@@ -42,6 +51,20 @@ export default function SzenenPage() {
   }, [active])
 
   const [filterOpen, setFilterOpen] = useState(!!initialTag)
+  const [alleTags, setAlleTags] = useState(false)
+  const [suche, setSuche] = useState('')
+
+  /** Aktive Schlagworte stehen immer vorn und verschwinden nie – sonst könnte man sie
+   *  nach einer Suche nicht mehr abwählen. */
+  const angezeigteTags = useMemo(() => {
+    const q = suche.trim().toLowerCase()
+    const basis = q || alleTags ? TAG_COUNTS : HAEUFIGE_TAGS
+    const gefiltert = q
+      ? basis.filter(({ tag }) => sceneTagLabel(tag).toLowerCase().includes(q))
+      : basis
+    const aktiv = TAG_COUNTS.filter(({ tag }) => active.has(tag))
+    return [...aktiv, ...gefiltert.filter(({ tag }) => !active.has(tag))]
+  }, [alleTags, suche, active])
 
   return (
     <PageLayout>
@@ -114,10 +137,36 @@ export default function SzenenPage() {
             </div>
           )}
 
-          {/* Volle Schlagwortliste */}
+          {/* Volle Schlagwortliste.
+              Die Höhe ist begrenzt und der Block scrollt für sich: Die Leiste ist `sticky`,
+              eine ungebremste Liste aus 200 Chips wuchs deshalb über den Bildschirm hinaus –
+              die unteren Schlagworte waren nicht erreichbar, weil die Seite darunter
+              wegscrollte statt der Liste. */}
           {filterOpen && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {TAG_COUNTS.map(({ tag, count }) => {
+            <div className="mt-3">
+              <div className="mb-3 flex flex-wrap items-center gap-3">
+                <input
+                  type="search"
+                  value={suche}
+                  onChange={(e) => setSuche(e.target.value)}
+                  placeholder="Schlagwort suchen …"
+                  aria-label="Schlagwort suchen"
+                  className="w-full max-w-[240px] rounded-full border border-brand-border bg-white px-4 py-1.5 text-[0.85rem] text-navy placeholder:text-brand-muted/60 focus:border-accent focus:outline-none"
+                />
+                {!suche.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => setAlleTags((a) => !a)}
+                    className="text-xs font-medium text-accent hover:underline"
+                  >
+                    {alleTags
+                      ? `Nur häufige Themen (${HAEUFIGE_TAGS.length})`
+                      : `Alle Themen anzeigen (${TAG_COUNTS.length})`}
+                  </button>
+                )}
+              </div>
+              <div className="flex max-h-[min(45vh,22rem)] flex-wrap gap-2 overflow-y-auto pr-1">
+              {angezeigteTags.map(({ tag, count }) => {
                 const on = active.has(tag)
                 return (
                   <button
@@ -134,6 +183,10 @@ export default function SzenenPage() {
                   </button>
                 )
               })}
+              </div>
+              {suche.trim() && angezeigteTags.length === 0 && (
+                <p className="py-3 text-sm text-brand-muted">Kein Schlagwort passt zu „{suche}“.</p>
+              )}
             </div>
           )}
         </div>
