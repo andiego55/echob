@@ -19,6 +19,7 @@ import { kodependenteMuster } from './tests/kodependente-muster'
 import { nachDemVertrauensbruch } from './tests/nach-dem-vertrauensbruch'
 import { wieRedeIchMitMir } from './tests/wie-rede-ich-mit-mir'
 import { wieEhrlichBinIchMitMir } from './tests/wie-ehrlich-bin-ich-mit-mir'
+import { meineGrenzen } from './tests/meine-grenzen'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
@@ -26,6 +27,7 @@ export const SELF_TESTS: SelfTest[] = [
   nachDemVertrauensbruch,
   emotionalerMissbrauch,
   erlebeIchGaslighting,
+  meineGrenzen,
   narzisstischeMuster,
   beziehungstrauma,
   bleibenOderGehen,

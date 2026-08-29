@@ -81,31 +81,39 @@ Die kursiven Überschriften sind Gruppen und selbst KEINE gültigen Tags.
 
 *Einengen*
 - Kontrolle – bestimmen oder überwachen: Aufenthalt, Zeit, Kontakte, Geld, Papiere, Schlüssel
-- Isolation – Kontakte zu Dritten werden erschwert, verhindert oder schlechtgemacht
+- Isolation – Kontakte zu DRITTEN werden erschwert oder schlechtgemacht – nicht: selbst seltener hingehen
 - Übergriffigkeit – körperliche, räumliche oder sexuelle Grenze gegen den erkennbaren Willen
 
 *Unter Druck setzen*
-- Drohung – Ankündigung eines Nachteils, um Verhalten zu erzwingen
+- Drohung – AUSGESPROCHENE Ankündigung eines Nachteils, um Verhalten zu erzwingen
 - Kinder als Druckmittel – Kontakt zu den Kindern, Sorgerecht oder Elternrolle als Hebel
+- Stimmung als Druckmittel – Druck OHNE Ankündigung – die Reaktion wird erwartbar gemacht, nicht angedroht
+
+*Im Konflikt*
+- Konflikteskalation – der Streit schaukelt sich stufenweise hoch, weg vom Anlass zu alten Themen
+- Rechtfertigung/Abwehr – auf eine Ansprache folgt Verteidigung statt Eingehen
 
 *Ausweichen*
 - Schweigen/Rückzug – Nicht-Antworten oder Sich-Entziehen ALS REAKTION – es gab einen Auslöser
-- Rechtfertigung/Abwehr – auf eine Ansprache folgt Verteidigung statt Eingehen
 - Anpassung – die schreibende Person gibt gegen die eigene Position nach, um Konflikt zu vermeiden
 
-*Ausbleiben lassen*
+*Vorenthalten*
 - Emotionale Vernachlässigung – anhaltendes Ausbleiben von Zuwendung OHNE Auslöser – nicht Rückzug
-- Wortbruch – Zusagen werden wiederholt oder in bedeutsamer Sache nicht gehalten
+- Wortbruch – ZUSAGEN werden wiederholt oder in bedeutsamer Sache nicht gehalten
+- Verschwiegener Bereich – ein Teil des Lebens wurde VERBORGEN – Konto, Kontakt, Beziehung
+- Reparatur bleibt aus – nach einem Bruch kommt nichts: keine Entschuldigung, keine Klärung
 
 *Zuwenden*
 - Reparaturversuch – Versuch zu deeskalieren oder wiedergutzumachen – auch von der schreibenden Person
+- Zugewandtheit – Zuwendung OHNE vorangegangenen Konflikt – zuhören, da sein, mitschwingen
 - Idealisierung – auffällig übersteigerte Zuwendung oder Vereinnahmung
 
-Die beiden häufigsten Verwechslungen:
-- **Schweigen/Rückzug** hat einen Auslöser (nach dem Streit drei Tage nicht geredet).
-  **Emotionale Vernachlässigung** hat keinen (er fragt nie, wie es mir geht).
-- **Schuldumkehr** dreht die Rollen um (du bist schuld, dass ich so reagiere).
-  **Rechtfertigung/Abwehr** verteidigt nur (ich habe das nicht so gemeint, weil …).
+Die häufigsten Verwechslungen:
+- **Schweigen/Rückzug** hat einen Auslöser. **Emotionale Vernachlässigung** hat keinen.
+- **Schuldumkehr** dreht die Rollen um. **Rechtfertigung/Abwehr** verteidigt nur.
+- **Wortbruch** = Zusage gebrochen. **Verschwiegener Bereich** = nie erwähnt.
+- **Drohung** wird ausgesprochen. **Stimmung als Druckmittel** nicht.
+- **Reparaturversuch** setzt einen Bruch voraus. **Zugewandtheit** nicht.
 Tags sind Hypothesen, keine Diagnosen. Wenn unsicher: leere Liste.
 
 ## Ausgabe

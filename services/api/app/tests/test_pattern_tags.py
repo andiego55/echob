@@ -32,7 +32,10 @@ def _prompt_tags() -> set[str]:
     """
     text = PROMPT.read_text(encoding="utf-8")
     start = text.index("**pattern_tags**")
-    ende = text.index("Die beiden häufigsten Verwechslungen")
+    # Nicht auf den vollen Satz ankern — die Formulierung ändert sich, die Klassenliste
+    # nicht. Ein Wächter, der an einer Überschrift zerbricht, meldet einen Fehler, den es
+    # nicht gibt, und verdeckt damit den, den es gibt.
+    ende = text.index("Verwechslungen", start)
     tags = set()
     for zeile in text[start:ende].splitlines():
         zeile = zeile.strip()

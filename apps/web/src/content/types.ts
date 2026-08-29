@@ -22,6 +22,7 @@ export const CLUSTERS = [
   'dynamiken', // Belastende Dynamiken
   'vertrauensbruch', // Vertrauensbruch (Untreue, Drohungen, Schweigen – alle Ebenen)
   'emotionaler-missbrauch', // Emotionaler Missbrauch (Coercive Control, Vernachlässigung, subtile Gewalt)
+  'grenzverletzung', // Grenzen & Uebergriffigkeit (koerperlich, raeumlich, digital, sexuell)
   'gaslighting', // Gaslighting Deep Dive (Realitätsverdrehung)
   'narzissmus', // Narzissmus in Beziehungen (narzisstische Missbrauchsdynamik)
   'narzissmus-spielarten', // Spielarten des Narzissmus (grandios, verdeckt/vulnerabel, spirituell, kommunal)
@@ -133,6 +134,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   dynamiken: 'Belastende Dynamiken',
   vertrauensbruch: 'Vertrauensbruch',
   'emotionaler-missbrauch': 'Emotionaler Missbrauch',
+  grenzverletzung: 'Grenzen & Übergriffigkeit',
   gaslighting: 'Gaslighting',
   narzissmus: 'Narzissmus',
   'narzissmus-spielarten': 'Narzissmus-Spielarten',

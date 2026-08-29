@@ -1,11 +1,12 @@
 -- 95: Musterklassen auf das neue Vokabular ziehen (Altbestand in scenes.pattern_tags).
 --
--- Drei der ursprünglich elf Klassen fallen weg:
+-- Zwei der ursprünglich elf Klassen fallen weg:
 --   Grenzverletzung      -> Übergriffigkeit   (war ein Oberbegriff neben den eigenen
 --                                              Unterfällen: Kontrolle, Isolation und
 --                                              Drohung sind alle Grenzverletzungen)
---   Konflikteskalation   -> entfällt          (traf auf fast jede festgehaltene Szene zu
---                                              und trennte damit nichts)
+--   Konflikteskalation   -> BLEIBT             (in einer früheren Fassung dieser Migration
+--                                              gestrichen; ein Durchlauf gegen 30 echte
+--                                              Szenen hat die Begründung widerlegt)
 --   Nähe-Distanz-Wechsel -> entfällt          (braucht zwei Zeitpunkte, in einer einzelnen
 --                                              Szene nicht beobachtbar; gehört auf die
 --                                              Fallebene, aus der Abfolge berechnet)
@@ -27,9 +28,9 @@ SET pattern_tags = (
                      ELSE elem #>> '{}'
                    END AS neu
             FROM jsonb_array_elements(scenes.pattern_tags) AS elem
-            WHERE elem #>> '{}' NOT IN ('Konflikteskalation', 'Nähe-Distanz-Wechsel')
+            WHERE elem #>> '{}' <> 'Nähe-Distanz-Wechsel'
         ) AS uebersetzt
     ),
     updated_at = NOW()
 WHERE jsonb_typeof(pattern_tags) = 'array'
-  AND pattern_tags ?| ARRAY['Grenzverletzung', 'Konflikteskalation', 'Nähe-Distanz-Wechsel'];
+  AND pattern_tags ?| ARRAY['Grenzverletzung', 'Nähe-Distanz-Wechsel'];

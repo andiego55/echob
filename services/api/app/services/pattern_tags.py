@@ -32,10 +32,12 @@ PATTERN_GROUPS: dict[str, tuple[str, ...]] = {
     "Wirklichkeit umdeuten": ("Wahrnehmungsverunsicherung", "Schuldumkehr"),
     "Herabsetzen": ("Abwertung", "Verachtung"),
     "Einengen": ("Kontrolle", "Isolation", "Übergriffigkeit"),
-    "Unter Druck setzen": ("Drohung", "Kinder als Druckmittel"),
-    "Ausweichen": ("Schweigen/Rückzug", "Rechtfertigung/Abwehr", "Anpassung"),
-    "Ausbleiben lassen": ("Emotionale Vernachlässigung", "Wortbruch"),
-    "Zuwenden": ("Reparaturversuch", "Idealisierung"),
+    "Unter Druck setzen": ("Drohung", "Kinder als Druckmittel", "Stimmung als Druckmittel"),
+    "Im Konflikt": ("Konflikteskalation", "Rechtfertigung/Abwehr"),
+    "Ausweichen": ("Schweigen/Rückzug", "Anpassung"),
+    "Vorenthalten": ("Emotionale Vernachlässigung", "Wortbruch",
+                     "Verschwiegener Bereich", "Reparatur bleibt aus"),
+    "Zuwenden": ("Reparaturversuch", "Zugewandtheit", "Idealisierung"),
 }
 
 PATTERN_TAGS: tuple[str, ...] = tuple(t for tags in PATTERN_GROUPS.values() for t in tags)
@@ -46,15 +48,19 @@ GROUP_OF: dict[str, str] = {t: g for g, tags in PATTERN_GROUPS.items() for t in 
 MAX_TAGS_PER_SCENE = 5
 
 # ── Altbestand ───────────────────────────────────────────────────────────────
-# Drei der ursprünglich elf Tags fallen weg. `Grenzverletzung` war ein Oberbegriff neben
+# Zwei der ursprünglich elf Tags fallen weg. `Grenzverletzung` war ein Oberbegriff neben
 # seinen eigenen Unterfällen (Kontrolle, Isolation, Drohung sind alle Grenzverletzungen) —
 # das ruiniert die Übereinstimmung zwischen Bewertern; es bleibt die konkrete Handlung.
-# `Konflikteskalation` traf auf fast jede festgehaltene Szene zu und trennte damit nichts.
 # `Nähe-Distanz-Wechsel` braucht zwei Zeitpunkte und ist in einer Szene nicht beobachtbar —
 # das gehört auf die Fallebene, berechnet aus der Abfolge.
+#
+# `Konflikteskalation` war hier schon einmal gestrichen, mit der Begründung, sie treffe auf
+# fast jede festgehaltene Szene zu und trenne deshalb nichts. Ein Durchlauf gegen 30 echte
+# Szenen hat das widerlegt: Sie traf auf **eine** zu — und genau die Szene, die zentral von
+# einer Eskalationstreppe handelt, bekam sonst fast kein Label. Die Begründung war eine
+# Vermutung über Häufigkeit; die Klasse ist zurück.
 LEGACY_MAP: dict[str, str | None] = {
     "Grenzverletzung": "Übergriffigkeit",
-    "Konflikteskalation": None,
     "Nähe-Distanz-Wechsel": None,
 }
 
