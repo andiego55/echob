@@ -14,7 +14,7 @@ pull_quote: 'Er hat sich entschuldigt, bevor überhaupt etwas passiert war. Ich 
 echo:
   mode: stabilize
   opening_question: "Kennst du das, dein eigenes angepasstes Verhalten im Kind wiederzuerkennen? Magst du erzählen, was du beobachtet hast?"
-scene_tags: [kind-im-elternkonflikt, anpassung, fawning, weitergegebenes-muster, loyalitaetsdruck]
+scene_tags: [kind-im-elternkonflikt, anpassung, fawning, erlerntes-verhalten, loyalitaetsdruck]
 safety_tags: []
 ---
 

@@ -14,7 +14,7 @@ pull_quote: "Ich rede noch, und er steht schon auf. Als hätte er einen Schalter
 echo:
   mode: stabilize
   opening_question: "Kennst du das – dass sich jemand mitten im Gespräch komplett verschließt? Möchtest du so einen Moment anschauen?"
-scene_tags: [stonewalling, mauern, rueckzug, emotionale-vernachlaessigung, einsamkeit-zu-zweit]
+scene_tags: [stonewalling, rueckzug, emotionale-vernachlaessigung, einsamkeit-zu-zweit]
 ---
 
 Wir sind mitten im Gespräch. Kein Schreien, kein Drama, ich versuche gerade zu erklären, warum mich etwas beschäftigt.

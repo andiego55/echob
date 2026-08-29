@@ -14,7 +14,7 @@ pull_quote: "Mitten im Satz macht er zu. Kein Streit, kein Wort – nur eine Wan
 echo:
   mode: stabilize
   opening_question: "Kennst du dieses Reden gegen eine Wand? Woran erinnert dich das?"
-scene_tags: [stonewalling, mauern, rueckzug]
+scene_tags: [stonewalling, rueckzug]
 ---
 
 Ich versuche nur, etwas Wichtiges zu sagen.

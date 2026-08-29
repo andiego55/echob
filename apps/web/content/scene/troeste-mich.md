@@ -14,7 +14,7 @@ pull_quote: 'Eben noch war ich der, der getroffen wurde. Jetzt bin ich der, der 
 echo:
   mode: stabilize
   opening_question: "Kennst du das, den anderen trösten zu sollen, während du selbst noch verletzt bist? Magst du erzählen, wie sich das anfühlt?"
-scene_tags: [rollenumkehr, trostforderung, emotionale-ueberforderung, schuldumkehr, empathie]
+scene_tags: [rollenumkehr, emotionale-ueberforderung, schuldumkehr, empathie]
 safety_tags: []
 ---
 

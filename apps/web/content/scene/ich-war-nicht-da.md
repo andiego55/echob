@@ -14,7 +14,7 @@ pull_quote: "Ich saß mitten im Raum und war doch nicht da. Als hätte sich jema
 echo:
   mode: stabilize
   opening_question: "Kennst du das Gefühl, in einem angespannten Moment plötzlich fern und wie betäubt zu sein? Magst du so eine Situation anschauen?"
-scene_tags: [dissoziation, betaeubung, selbstverlust, koerpererinnerung]
+scene_tags: [dissoziation, selbstverlust, koerpererinnerung]
 safety_tags: []
 ---
 

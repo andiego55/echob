@@ -14,7 +14,7 @@ pull_quote: 'Sie hat es gehört. Und ist nicht aufgestanden. Das Schlimmste ist,
 echo:
   mode: stabilize
   opening_question: "Kennst du das, dass du aufgehört hast, Fürsorge überhaupt noch zu erwarten? Magst du erzählen, wann dir das zuletzt aufgefallen ist?"
-scene_tags: [fehlende-fuersorge, emotionale-vernachlaessigung, fehlende-empathie, resignation, einsamkeit-zu-zweit]
+scene_tags: [emotionale-vernachlaessigung, empathiemangel, resignation, einsamkeit-zu-zweit]
 safety_tags: []
 ---
 

@@ -14,7 +14,7 @@ pull_quote: 'Ich kann das hier sagen, weil jemand zusieht. Nicht, weil ich mutig
 echo:
   mode: clarity
   opening_question: "Kennst du das, dass du dich in Anwesenheit anderer sicherer fühlst, deine Sicht zu sagen? Magst du dem behutsam nachgehen?"
-scene_tags: [paartherapie, sicherer-raum, zeuge, machtasymmetrie, gespraechsabbruch]
+scene_tags: [paartherapie, sicherheit, zeuge, machtasymmetrie, stonewalling]
 safety_tags: []
 ---
 

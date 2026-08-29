@@ -14,7 +14,7 @@ pull_quote: "Das Nein hat elf Minuten gehalten. Danach hat mein Körper es wider
 echo:
   mode: stabilize
   opening_question: "Hast du schon einmal ein Nein zurückgenommen, das richtig war? Magst du anschauen, was in dir dabei passiert ist?"
-scene_tags: [grenzen, selbstaufgabe, schuldgefuehl, selbstwert]
+scene_tags: [grenze, selbstaufgabe, schuldgefuehle, selbstwert]
 safety_tags: []
 ---
 

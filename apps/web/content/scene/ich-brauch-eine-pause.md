@@ -14,7 +14,7 @@ pull_quote: 'Zum ersten Mal renne ich nicht die Treppe mit hoch. Ich sage: „Ic
 echo:
   mode: base
   opening_question: "Kennst du den Unterschied zwischen einer Pause als Schutz und einem Rückzug als Strafe? Möchtest du so einen Moment anschauen?"
-scene_tags: [reparaturversuch, deeskalation, klarheit, selbstfuersorge, verbindung]
+scene_tags: [reparaturversuch, konfliktregulation, klarheit, selbstfuersorge, verbindung]
 ---
 
 Wir sind wieder dabei. Ich spüre, wie es hochkocht, wie mein Puls schneller wird, wie die Worte in mir schon schärfer werden, bevor ich sie ausspreche. Der vertraute Sog, die Treppe mit hochzurennen.

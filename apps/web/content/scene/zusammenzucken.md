@@ -14,7 +14,7 @@ pull_quote: "Niemand wollte mir wehtun. Mein Körper hat es nur noch nicht verst
 echo:
   mode: stabilize
   opening_question: "Kennst du das, dass dein Körper schneller reagiert, als dein Kopf mitkommt? Magst du eine solche Situation anschauen?"
-scene_tags: [schreckreaktion, koerpererinnerung, hypervigilanz, angst]
+scene_tags: [stressreaktion, koerpererinnerung, hypervigilanz, angst]
 safety_tags: []
 ---
 

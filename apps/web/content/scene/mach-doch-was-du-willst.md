@@ -14,7 +14,7 @@ pull_quote: "‚Ist schon okay', sagst du. Und ich weiß: Nichts ist okay. Jetzt
 echo:
   mode: clarity
   opening_question: "Kennst du das – dass die Worte ‚alles gut' sagen und alles andere das Gegenteil? Wie geht es dir, wenn du diese Szene liest?"
-scene_tags: [passiv-aggressiv, silent-treatment, auf-eierschalen-gehen, schuldgefuehle]
+scene_tags: [passiv-aggressiv, stonewalling, auf-eierschalen-gehen, schuldgefuehle]
 ---
 
 „Ich geh am Samstag mit Nina zum Konzert", sage ich. „Ich hab dir das vor Wochen gesagt."

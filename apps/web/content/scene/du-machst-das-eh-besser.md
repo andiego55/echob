@@ -14,7 +14,7 @@ pull_quote: '„Du machst das eh besser", sagt er und lächelt. Also mache ich e
 echo:
   mode: clarity
   opening_question: "Kommt dir diese ungleiche Last bekannt vor? Woran erinnert dich die Szene?"
-scene_tags: [vorgetaeuschte-unfaehigkeit, ungleichgewicht, erschoepfung]
+scene_tags: [vorgetaeuschte-unfaehigkeit, machtasymmetrie, erschoepfung]
 ---
 
 „Kannst du die Anmeldung für die Kita machen? Du weißt, ich blick bei sowas nicht durch."

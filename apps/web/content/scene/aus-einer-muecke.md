@@ -14,7 +14,7 @@ pull_quote: 'Es ging um eine Pfanne. Zwanzig Minuten später geht es um alles, w
 echo:
   mode: stabilize
   opening_question: "Kennst du das – ein Streit, der aus dem Nichts riesig wird? Möchtest du so eine Eskalation einmal in Ruhe anschauen?"
-scene_tags: [eskalationsspirale, eskalation, wiederkehrendes-muster, erschoepfung, sich-nicht-gehoert-fuehlen]
+scene_tags: [eskalation, wiederkehrendes-muster, erschoepfung, sich-nicht-gehoert-fuehlen]
 ---
 
 Es fängt mit einer Pfanne an. Sie steht seit gestern ungespült in der Spüle, und ich sage, ein bisschen genervt: „Kannst du die nicht einfach mal abwaschen?"

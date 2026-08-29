@@ -14,7 +14,7 @@ pull_quote: "Er malt uns ein Haus mit Garten und einem Hund. Ich müsste nur noc
 echo:
   mode: clarity
   opening_question: "Kennst du das – auf Versprechen zu warten, die immer schön klingen und nie kommen? Woran erinnert dich das?"
-scene_tags: [future-faking, zukunftsversprechen, hinhalten, idealisierung-abwertung]
+scene_tags: [zukunftsversprechen, hinhalten, idealisierung-abwertung]
 ---
 
 Wir bleiben vor dem Schaufenster des Maklers stehen.

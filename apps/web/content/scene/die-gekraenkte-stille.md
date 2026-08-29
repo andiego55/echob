@@ -14,7 +14,7 @@ pull_quote: "Ein falsches Wort, und drei Tage Eiszeit. Am Ende bin ich es, der u
 echo:
   mode: stabilize
   opening_question: "Kennst du das, jemanden nach einer Kleinigkeit tagelang zu besänftigen? Magst du so eine Situation anschauen?"
-scene_tags: [vulnerabler-narzissmus, schweigen-als-strafe, schuldgefuehle, auf-eierschalen-gehen]
+scene_tags: [vulnerabler-narzissmus, stonewalling, schuldgefuehle, auf-eierschalen-gehen]
 safety_tags: []
 ---
 

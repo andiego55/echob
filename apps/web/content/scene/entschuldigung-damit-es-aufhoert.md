@@ -14,7 +14,7 @@ pull_quote: 'Es tut mir leid. Ich weiß nicht mehr, wofür. Ich weiß nur, dass 
 echo:
   mode: clarity
   opening_question: "Kennst du das, dich zu entschuldigen, nur damit es aufhört – nicht, weil du etwas falsch gemacht hast? Magst du eine solche Situation anschauen?"
-scene_tags: [fawning, konfliktvermeidung, anpassung, entschuldigung, erlerntes-verhalten]
+scene_tags: [fawning, konfliktvermeidung, anpassung, reparaturversuch, erlerntes-verhalten]
 safety_tags: []
 ---
 

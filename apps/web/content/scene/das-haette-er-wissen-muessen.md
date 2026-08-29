@@ -14,7 +14,7 @@ pull_quote: 'Ich habe nichts gesagt. Aber tief drin war ich überzeugt: Wenn er 
 echo:
   mode: clarity
   opening_question: "Kennst du das – enttäuscht zu sein, weil jemand etwas nicht erahnt hat, das du nie ausgesprochen hast? Möchtest du so eine Situation anschauen?"
-scene_tags: [erwartung, gedankenlesen, enttaeuschung, sich-nicht-gehoert-fuehlen, wiederkehrendes-muster]
+scene_tags: [erwartungsdruck, gedankenlesen, enttaeuschung, sich-nicht-gehoert-fuehlen, wiederkehrendes-muster]
 ---
 
 Ich hatte einen furchtbaren Tag. Das sah man mir an, dachte ich. Ich kam nach Hause, seufzte, machte mir einen Tee, setzte mich mit hängenden Schultern aufs Sofa.

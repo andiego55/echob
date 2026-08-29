@@ -14,7 +14,7 @@ pull_quote: "Sie sagt nichts. Sie verdreht nur die Augen. Und ich werde ein Stü
 echo:
   mode: clarity
   opening_question: "Kennst du diese leise Verachtung, die ohne lauten Streit auskommt? Was macht sie mit dir?"
-scene_tags: [verachtung, abwertung, sich-klein-fuehlen]
+scene_tags: [verachtung, entwertung, sich-klein-fuehlen]
 ---
 
 Ich erzähle beim Abendessen von einer Idee, die ich auf der Arbeit hatte.

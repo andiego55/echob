@@ -14,7 +14,7 @@ pull_quote: "Ich stand zwischen Milch und Brot – und war für einen Moment gan
 echo:
   mode: stabilize
   opening_question: "Drängt sich manchmal etwas Altes in einen ganz normalen Moment? Magst du behutsam anschauen, was zuletzt hochkam?"
-scene_tags: [flashback, wiedererleben, trigger, koerpererinnerung]
+scene_tags: [wiedererleben, trigger, koerpererinnerung]
 safety_tags: []
 ---
 

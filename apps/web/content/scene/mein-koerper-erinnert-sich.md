@@ -14,7 +14,7 @@ pull_quote: 'Sie hob nur die Hand, um sich das Haar aus dem Gesicht zu streichen
 echo:
   mode: stabilize
   opening_question: "Kennst du das, dass dein Körper auf Dinge reagiert, die harmlos aussehen? Magst du erzählen, in welchen Momenten sich das zeigt?"
-scene_tags: [stressreaktion, hypervigilanz, nachwirkung, koerpergedaechtnis, anpassung]
+scene_tags: [stressreaktion, hypervigilanz, nachwirkung, koerpererinnerung, anpassung]
 safety_tags: []
 ---
 

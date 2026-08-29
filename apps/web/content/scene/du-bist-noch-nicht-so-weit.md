@@ -14,7 +14,7 @@ pull_quote: "Meine Wut sei nur mein Ego, sagt er. Und schon stehe ich als die Un
 echo:
   mode: stabilize
   opening_question: "Wurden deine Gefühle schon einmal als bloßes Ego oder mangelnde Reife abgetan? Magst du so eine Situation anschauen?"
-scene_tags: [spiritueller-narzissmus, ueberlegenheit, entwertung, wahrnehmungszweifel]
+scene_tags: [spiritueller-narzissmus, verachtung, entwertung, wahrnehmungszweifel]
 safety_tags: []
 ---
 

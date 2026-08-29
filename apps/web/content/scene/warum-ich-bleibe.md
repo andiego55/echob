@@ -14,7 +14,7 @@ pull_quote: "Nach der schlimmsten Nacht bringt er mir Kaffee ans Bett. Und die E
 echo:
   mode: stabilize
   opening_question: "Kennst du dieses Auf und Ab, das bindet statt zu lösen? Was davon kommt dir nah?"
-scene_tags: [trauma-bindung, love-bombing, abwertung, verlustangst, wiederkehrendes-muster]
+scene_tags: [trauma-bindung, love-bombing, entwertung, verlustangst, wiederkehrendes-muster]
 ---
 
 Am Morgen nach der schlimmsten Nacht bringt Dennis mir Kaffee ans Bett.

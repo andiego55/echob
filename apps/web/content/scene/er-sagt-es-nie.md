@@ -14,7 +14,7 @@ pull_quote: "Er hat mein Auto zur Werkstatt gebracht. Ich wollte einen Satz."
 echo:
   mode: base
   opening_question: "Fehlen dir Worte, die dein Gegenüber nicht sagt? Magst du überlegen, was genau du gern hören würdest?"
-scene_tags: [liebessprachen, anerkennung, wertschaetzung, sehnsucht]
+scene_tags: [liebessprachen, wertschaetzung, sehnsucht]
 safety_tags: []
 ---
 

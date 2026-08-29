@@ -14,7 +14,7 @@ pull_quote: "Ich habe es nicht getan, weil er es nicht kann. Ich habe es getan, 
 echo:
   mode: clarity
   opening_question: "Gibt es etwas, das du regelmäßig für dein Gegenüber erledigst, das eigentlich seine Sache wäre? Magst du überlegen, was passieren würde, wenn du es lässt?"
-scene_tags: [fuersorge, selbstaufgabe, grenzen, verantwortung]
+scene_tags: [fuersorge, selbstaufgabe, grenze, verantwortung]
 safety_tags: []
 ---
 

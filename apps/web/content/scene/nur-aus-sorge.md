@@ -14,7 +14,7 @@ pull_quote: "Sie sagt nie, dass ich es nicht kann. Sie fragt nur so lange nach, 
 echo:
   mode: stabilize
   opening_question: "Kennst du eine Sorge, die dich am Ende kleiner macht statt sicherer? Magst du so eine Situation anschauen?"
-scene_tags: [gaslighting, kontrolle, verdeckte-abwertung, wahrnehmungszweifel]
+scene_tags: [gaslighting, kontrolle, entwertung, wahrnehmungszweifel]
 safety_tags: []
 ---
 

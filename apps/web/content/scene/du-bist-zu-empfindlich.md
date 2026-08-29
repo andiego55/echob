@@ -14,7 +14,7 @@ pull_quote: "Nicht das, was er gesagt hat, war plötzlich das Problem. Sondern d
 echo:
   mode: stabilize
   opening_question: "Kennst du das, dass am Ende nicht die Verletzung zählt, sondern dass du dich verletzt fühlst? Magst du so eine Situation anschauen?"
-scene_tags: [gaslighting, bagatellisieren, wahrnehmungszweifel, gefuehle-abwerten]
+scene_tags: [gaslighting, realitaetsverdrehung, wahrnehmungszweifel, entwertung]
 safety_tags: []
 ---
 

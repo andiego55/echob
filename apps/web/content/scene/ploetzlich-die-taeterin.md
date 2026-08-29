@@ -14,7 +14,7 @@ pull_quote: "Ich wollte sagen, dass er mich verletzt hat. Zehn Minuten später h
 echo:
   mode: stabilize
   opening_question: "Kennst du das – dass aus deinem Schmerz plötzlich seiner wird und du am Ende tröstest? Möchtest du so einen Moment anschauen?"
-scene_tags: [darvo, taeter-opfer-umkehr, schuldumkehr, entwertung, selbstzweifel]
+scene_tags: [schuldumkehr, entwertung, selbstzweifel]
 ---
 
 Ich hatte mir vorgenommen, es diesmal wirklich zu sagen. Ruhig, aber deutlich: „Das gestern hat mich verletzt."

@@ -14,7 +14,7 @@ pull_quote: "Man kann sich nicht versöhnen mit jemandem, der nicht da ist. Auch
 echo:
   mode: stabilize
   opening_question: "Kennst du ein Schweigen, gegen das nichts ankommt? Magst du beschreiben, wie es dir dabei geht?"
-scene_tags: [vertrauensbruch, schweigen, ohnmacht, streit]
+scene_tags: [vertrauensbruch, stonewalling, ohnmacht, streit]
 safety_tags: []
 ---
 

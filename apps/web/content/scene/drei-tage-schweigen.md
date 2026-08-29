@@ -14,7 +14,7 @@ pull_quote: "Er sagt nichts. Und dieses Nichts füllt die ganze Wohnung, bis kei
 echo:
   mode: stabilize
   opening_question: "Kennst du das – dass jemand durch Schweigen mehr sagt als durch Worte? Wann hast du dich zuletzt so gefühlt?"
-scene_tags: [silent-treatment, schweigen-als-strafe, passiv-aggressiv, rueckzug, auf-eierschalen-gehen, naehe-distanz]
+scene_tags: [stonewalling, passiv-aggressiv, rueckzug, auf-eierschalen-gehen, naehe-distanz]
 ---
 
 Es ist der dritte Tag.

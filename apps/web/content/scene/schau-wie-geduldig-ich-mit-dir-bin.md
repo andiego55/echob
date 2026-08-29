@@ -14,7 +14,7 @@ pull_quote: "Vor allen ist sie die Geduldige, die es mit mir aushält. Und ich b
 echo:
   mode: stabilize
   opening_question: "Wurdest du schon einmal öffentlich zum schwierigen Menschen gemacht, den jemand großmütig erträgt? Magst du das anschauen?"
-scene_tags: [kommunaler-narzissmus, ueberlegenheit, schuldumkehr, wahrnehmungszweifel]
+scene_tags: [kommunaler-narzissmus, verachtung, schuldumkehr, wahrnehmungszweifel]
 safety_tags: []
 ---
 

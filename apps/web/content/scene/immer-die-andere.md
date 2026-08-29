@@ -14,7 +14,7 @@ pull_quote: "Ihr Ex hätte das ohne Worte gewusst, sagt sie. Ich kämpfe gegen M
 echo:
   mode: clarity
   opening_question: "Kennst du das Gefühl, ständig mit jemandem verglichen zu werden? Was löst das in dir aus?"
-scene_tags: [triangulierung, vergleich, abwertung, sich-klein-fuehlen]
+scene_tags: [triangulierung, vergleich, entwertung, sich-klein-fuehlen]
 ---
 
 „Mein Ex hätte gemerkt, dass was nicht stimmt. Der hat mich ohne Worte verstanden."

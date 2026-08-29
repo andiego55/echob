@@ -14,7 +14,7 @@ pull_quote: 'Gestern hat sie gesagt, sie geht. Heute fragt sie, ob noch Milch da
 echo:
   mode: stabilize
   opening_question: "Kennst du das, mit einem Streit allein zurückzubleiben, während drumherum getan wird, als sei nichts gewesen? Magst du erzählen, wie sich das für dich anfühlt?"
-scene_tags: [fehlende-reparatur, emotionale-vernachlaessigung, konfliktnachsorge, wiederkehrendes-muster, einsamkeit-zu-zweit]
+scene_tags: [fehlende-reparatur, emotionale-vernachlaessigung, reparaturversuch, wiederkehrendes-muster, einsamkeit-zu-zweit]
 safety_tags: []
 ---
 
