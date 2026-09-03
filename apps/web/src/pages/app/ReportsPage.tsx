@@ -54,14 +54,17 @@ export default function ReportsPage() {
       <div className="mx-auto max-w-[1100px] px-6 py-8">
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <div>
+        {/* flex-wrap noetig: Die rechte Gruppe traegt flex-shrink-0 UND whitespace-nowrap
+            auf zwei langen Knoepfen - sie kann auf schmalen Bildschirmen nicht schrumpfen
+            und schob den orangen Knopf aus dem Bild. */}
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
             <h1 className="page-title">Berichte</h1>
             <p className="text-sm text-brand-muted mt-0.5">
               Strukturierte Auswertungen für Selbstreflexion, Coaching oder professionelle Begleitung.
             </p>
           </div>
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex flex-wrap items-center gap-3">
             <Link to={`/app/cases/${caseId}/export`} className="btn-quiet !py-2 !px-4 !text-sm whitespace-nowrap" title="Druckbare Fall-Zusammenfassung ohne KI – zum Mitnehmen zu Fachpersonen">
               Zusammenfassung (PDF)
             </Link>
