@@ -26,6 +26,21 @@ export default function PseudonymAuthPage() {
   const [loading, setLoading] = useState(false)
   const [newCode, setNewCode] = useState<string | null>(null)
 
+  /**
+   * Steht ABSICHTLICH vor dem `return` weiter unten — und muss dort bleiben.
+   *
+   * Diese Seite rendert im abgemeldeten Zustand, dabei laufen alle Hooks. Gelingt dann
+   * eine Anmeldung, setzt der AuthContext `session`, und beim nächsten Render griffe der
+   * frühe `return`: React sähe einen Hook weniger als im Render davor und würfe
+   * „Rendered fewer hooks than expected" — ausgerechnet im Moment des Erfolgs.
+   */
+  const recover = useMutation({
+    mutationFn: () => pseudonymousApi.recover({
+      handle: handle.trim(), recovery_code: recoveryCode, new_password: newPassword,
+    }),
+    onSuccess: (res) => setNewCode(res.recovery_code),
+  })
+
   if (session) return <Navigate to="/app" replace />
 
   const login = async (e: React.FormEvent) => {
@@ -37,13 +52,6 @@ export default function PseudonymAuthPage() {
     if (err) { setError('Pseudonym oder Passwort ist nicht korrekt.'); return }
     navigate('/app', { replace: true })
   }
-
-  const recover = useMutation({
-    mutationFn: () => pseudonymousApi.recover({
-      handle: handle.trim(), recovery_code: recoveryCode, new_password: newPassword,
-    }),
-    onSuccess: (res) => setNewCode(res.recovery_code),
-  })
 
   const finishRecover = async () => {
     setError(null); setLoading(true)
