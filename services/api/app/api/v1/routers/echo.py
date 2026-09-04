@@ -21,6 +21,7 @@ from app.schemas.echo import (
     EchoChatSessionUpdate,
     EchoMessageResponse,
 )
+from app.services.case_documents import build_document_context
 from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import build_hypothesis_context
 from app.services.pattern_tags import normalize_pattern_tags
@@ -230,6 +231,23 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
                 pp_summary = _ppj2.loads(pp_summary)
             if pp_modules:
                 context_parts.append(build_person_context({"modules": pp_modules, "summary": pp_summary}))
+
+        # Beigelegte Dokumente (Briefe, Chatverläufe). Absichtlich VOR den Deutungen:
+        # Erst der Beleg, dann was jemand darin gesehen hat.
+        async with pool.acquire() as conn:
+            dok_rows = await conn.fetch(
+                "SELECT title, kind, document_date, description, content "
+                "FROM case_documents WHERE case_id = $1 AND active = true "
+                "ORDER BY document_date DESC NULLS LAST, created_at DESC",
+                case_id,
+            )
+        if dok_rows:
+            dokumente = [
+                crypto.decrypt_fields(dict(r), "content", "description") for r in dok_rows
+            ]
+            dok_ctx = build_document_context(dokumente)
+            if dok_ctx:
+                context_parts.append(dok_ctx)
 
         # Themendialog-Zusammenfassungen
         if topic_summaries:

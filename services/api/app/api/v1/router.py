@@ -8,6 +8,7 @@ from fastapi import APIRouter
 
 from app.api.v1.routers import (
     account,
+    case_documents,
     case_shares,
     cases,
     client_invites,
@@ -97,6 +98,7 @@ v1_router.include_router(professional.router)
 v1_router.include_router(professionals.router)
 v1_router.include_router(organizations.router)
 v1_router.include_router(org_billing.router)
+v1_router.include_router(case_documents.router)
 v1_router.include_router(case_shares.router)
 v1_router.include_router(client_invites.router)
 v1_router.include_router(pseudonymous.router)

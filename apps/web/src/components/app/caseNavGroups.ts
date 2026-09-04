@@ -20,6 +20,7 @@ export const GRUPPEN: Gruppe[] = [
     label: 'Erfassen',
     kinder: [
       { path: '/scenes', label: 'Szenen' },
+      { path: '/documents', label: 'Dokumente' },
       { path: '/person-profile', label: 'Die andere Person' },
       { path: '/onboarding', label: 'Grunddaten' },
     ],
