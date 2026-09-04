@@ -176,12 +176,17 @@ async def test_ein_fehler_wird_ein_ereignis(bauen):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("nachricht,art", [
-    ("__add_context__", "topic"),
     ("Ganz normal.", "scene"),
-
+    ("__scene_start__", "scene"),
+    ("__add_context__", "scene"),
 ])
 async def test_nicht_streambare_formen_werden_abgelehnt(bauen, nachricht, art):
-    """409, damit die Oberflaeche sauber auf den gewoehnlichen Weg zurueckfaellt."""
+    """409, damit die Oberflaeche sauber auf den gewoehnlichen Weg zurueckfaellt.
+
+    Abgelehnt wird nur noch der gefuehrte Szenendialog. Er hat einen eigenen Ablauf mit
+    Extraktion am Ende - dort waere ein halb gelesener Strom kein Gewinn, sondern ein
+    zweiter Zustand, den die Extraktion nicht kennt.
+    """
     app, _ = bauen(FakeEcho(["x"]))
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         antwort = await c.post(
@@ -189,6 +194,30 @@ async def test_nicht_streambare_formen_werden_abgelehnt(bauen, nachricht, art):
             json={"message": nachricht, "thread_type": art},
         )
     assert antwort.status_code == 409
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("nachricht,art", [
+    ("__hyp_clusterb_start__", "hyp_clusterb"),
+    ("__topic_self_start__", "topic_self"),
+    ("__content_start__|Titel|Frage|Auszug", "content_gaslighting"),
+    ("__test_start__|Titel|Frage|Saat", "content_meine-grenzen"),
+])
+async def test_eroeffnungszuege_stroemen(bauen, nachricht, art):
+    """Die erste Antwort eines gefuehrten Dialogs entsteht wie jede andere.
+
+    Sie kam frueher als Block, weil ALLE Steuerbefehle vom Strom ausgenommen waren - und
+    war damit ausgerechnet an der auffaelligsten Stelle die einzige, die nicht entstand.
+    """
+    app, _ = bauen(FakeEcho(["Lass uns ", "damit anfangen."]))
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        antwort = await c.post(
+            f"/api/v1/cases/{FALL}/echo/chat/stream",
+            json={"message": nachricht, "thread_type": art},
+        )
+    assert antwort.status_code == 200
+    assert antwort.headers["content-type"].startswith("text/event-stream")
+    assert "Lass uns damit anfangen." in antwort.text
 
 
 @pytest.mark.asyncio

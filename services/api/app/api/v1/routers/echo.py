@@ -525,13 +525,20 @@ async def chat_stream(
     Antwort ankam - bei einer laengeren Echo-Antwort gut zehn Sekunden Punkte. Das ist der
     Unterschied zwischen "denkt nach" und "haengt".
 
-    **Was NICHT gestroemt wird und warum:**
-
-      * Steuerbefehle (``__…__``) - das sind Anweisungen der Oberflaeche, keine Fragen.
-      * Der gefuehrte Szenendialog - er hat einen eigenen Ablauf mit Extraktion am Ende.
+    **Was NICHT gestroemt wird und warum:** der gefuehrte Szenendialog - er hat einen
+    eigenen Ablauf mit Extraktion am Ende.
 
     Themen-, Blog-, Hypothesen- und Wissensdialoge streamen dagegen mit; ``stream_chat``
     verzweigt intern auf ihren Systemtext, genauso wie ``chat()`` es tut.
+
+    **Auch die Eroeffnungszuege (``__…_start__``) stroemen.** Frueher waren alle
+    Steuerbefehle ausgenommen, mit der Begruendung, es seien Anweisungen der Oberflaeche
+    und keine Fragen. Das stimmt fuer die ANFRAGE - aber die ANTWORT darauf ist eine
+    gewoehnliche Echo-Nachricht, und ausgerechnet sie ist die erste, die man in einem
+    gefuehrten Dialog zu sehen bekommt. Sie als Block erscheinen zu lassen, waehrend jede
+    folgende Antwort entsteht, war der auffaelligste Bruch im ganzen Gespraech. Technisch
+    stand dem nie etwas im Weg: Beide Wege bauen ihre Nachrichten ueber dieselbe Funktion,
+    und die Triage nimmt Steuerbefehle ueber ``ausgenommen`` weiterhin heraus.
 
     In beiden Faellen antwortet der Endpunkt mit 409 und der Client nimmt ``/chat``.
 
@@ -547,7 +554,7 @@ async def chat_stream(
     user_id = current_user["user_id"]
     echo_svc = _get_echo_service(request)
 
-    if body.message.startswith("__") or body.thread_type == "scene":
+    if body.thread_type == "scene":
         raise HTTPException(
             status_code=409,
             detail="Diese Gesprächsform läuft ohne Streaming – bitte /chat verwenden.",
