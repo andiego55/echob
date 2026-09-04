@@ -18,6 +18,7 @@ import { TEST_CATEGORY_LABELS, type TestCategory } from '@/selftests'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { hypothesesApi } from '@/api/hypotheses'
 import { caseArtifactsApi } from '@/api/caseArtifacts'
+import { caseDocumentsApi, KIND_LABELS } from '@/api/caseDocuments'
 import {
   RELATIONSHIP_TYPE_LABELS,
   RELATIONSHIP_STATUS_LABELS,
@@ -193,6 +194,12 @@ export default function CaseDetailPage() {
         {/* Selbsttest-Ergebnisse (nutzer-eigen, aufklappbar) */}
         <div className="mt-6">
           <TestResultsCard caseId={caseId!} />
+        </div>
+
+        {/* Dokumente stehen zuletzt: Sie sind Belege, kein Ergebnis — und gehören
+            damit unter die Deutungen, die aus ihnen entstanden sind. */}
+        <div className="mt-6">
+          <DokumenteUeberblickKarte caseId={caseId!} />
         </div>
 
         {/* Disclaimer */}
@@ -692,6 +699,97 @@ function ErkenntnisseUeberblickKarte({ caseId }: { caseId: string }) {
           Am Ende eines Gesprächs mit Echo steht „Erkenntnis festhalten". Echo destilliert
           dann in ein paar Sätzen, was bleiben sollte – du schreibst es um, bis es klingt
           wie du. Was hier liegt, fließt in kommende Gespräche ein.
+        </p>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Beigelegte Dokumente auf dem Fall-Überblick.
+ *
+ * **Warum hier nur die Zeile und nicht der Text.** Ein Dokument ist bis zu zwei A4-Seiten
+ * lang — es gehört gelesen, nicht überflogen. Auf dem Überblick zählt eine andere Frage:
+ * *Was liegt eigentlich bei?* Deshalb Titel, Art und Datum, und der Weg zum Ganzen.
+ *
+ * **Warum die pausierten getrennt gezählt werden.** Ein Dokument, das nicht mehr in
+ * Gespräche einfließt, ist leicht vergessen — und dann wundert man sich, warum Echo den
+ * Brief nicht kennt. Die Zahl steht deshalb da, wo man sie sieht.
+ */
+function DokumenteUeberblickKarte({ caseId }: { caseId: string }) {
+  const { data } = useQuery({
+    queryKey: ['case-documents', caseId],
+    queryFn: () => caseDocumentsApi.list(caseId),
+    enabled: !!caseId,
+    retry: false,
+  })
+
+  const alle = data?.documents ?? []
+  const aktive = alle.filter(d => d.active)
+  const pausiert = alle.length - aktive.length
+  const neueste = alle.slice(0, 3)
+  const weitere = alle.length - neueste.length
+
+  return (
+    <div className="card">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="section-label mb-0.5">Dokumente</p>
+          <p className="text-sm font-medium text-navy">
+            {alle.length > 0
+              ? `${alle.length} beigelegt`
+              : 'Nichts beigelegt'}
+            {pausiert > 0 && (
+              <span className="ml-1.5 font-normal text-brand-muted">
+                · {pausiert} pausiert
+              </span>
+            )}
+          </p>
+        </div>
+        <Link
+          to={`/app/cases/${caseId}/documents`}
+          className="shrink-0 text-xs font-semibold text-accent hover:underline"
+        >
+          Zu den Dokumenten →
+        </Link>
+      </div>
+
+      {neueste.length > 0 ? (
+        <>
+          <div className="space-y-2">
+            {neueste.map(d => (
+              <div
+                key={d.id}
+                className={`flex flex-wrap items-center gap-x-2 gap-y-1 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 ${
+                  d.active ? '' : 'opacity-60'
+                }`}
+              >
+                <span className="text-xs font-semibold text-navy">{d.title}</span>
+                <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[0.65rem] font-medium text-accent">
+                  {KIND_LABELS[d.kind]}
+                </span>
+                <span className="text-[0.7rem] text-brand-muted/70">
+                  {d.document_date
+                    ? new Date(d.document_date).toLocaleDateString('de-DE', {
+                        day: '2-digit', month: 'long', year: 'numeric',
+                      })
+                    : 'ohne Datum'}
+                </span>
+                {!d.active && (
+                  <span className="text-[0.7rem] text-brand-muted">fließt nicht ein</span>
+                )}
+              </div>
+            ))}
+          </div>
+          {weitere > 0 && (
+            <p className="mt-2.5 text-xs text-brand-muted/70">+{weitere} weitere.</p>
+          )}
+        </>
+      ) : (
+        <p className="text-xs leading-relaxed text-brand-muted/70">
+          Texte, die zur Beziehung gehören, aber keine Szene sind: ein Brief, ein
+          Chatverlauf, eine Mitschrift. Echo liest sie als Belege mit – als Ausschnitt,
+          nicht als ganze Wahrheit.
         </p>
       )}
     </div>
