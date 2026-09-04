@@ -13,6 +13,7 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import HypothesisIcon from '@/components/HypothesisIcon'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import { echoApi } from '@/api/echo'
+import { useEchoStrom } from '@/lib/echoStrom'
 import { hypothesesApi, HYPOTHESES } from '@/api/hypotheses'
 import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
@@ -43,17 +44,34 @@ export default function HypothesisDialogPage() {
     retry: false,
   })
 
-  const chatMutation = useMutation({
-    mutationFn: (message: string) =>
-      echoApi.chat(caseId!, { message, thread_type: hypothesisId as ThreadType }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['hyp-echo-history', caseId, hypothesisId] })
+  /**
+   * Echos Antwort entsteht sichtbar, statt als fertiger Block zu erscheinen.
+   *
+   * Der Eröffnungszug (`__…_start__`) ist davon ausgenommen: Steuerbefehle lehnt der
+   * Strom-Endpunkt mit 409 ab, und `useEchoStrom` nimmt dafür still den gewöhnlichen Weg.
+   */
+  const strom = useEchoStrom(caseId!, {
+    onFertig: (data) => {
+      // Die fertige Antwort wandert DIREKT in den Zwischenspeicher, statt den Verlauf
+      // nachzuladen. Nachladen hieße warten — und in der Wartezeit stünden die beiden
+      // Nachrichten weder vorläufig noch gespeichert da, das Gespräch blinkte kurz leer.
+      qc.setQueryData<EchoMessage[]>(
+        ['hyp-echo-history', caseId, hypothesisId],
+        alt => [...(alt ?? []), data.user_message, data.assistant_message],
+      )
       setInput('')
       setPendingMessage(null)
     },
-    onError: () => setPendingMessage(null),
-    retry: false,
+    onFehler: (anfrage) => {
+      // Der Text kommt zurück ins Feld. Sonst müsste man eine lange Nachricht ausgerechnet
+      // dann neu formulieren, wenn ohnehin gerade etwas nicht funktioniert.
+      if (!anfrage.message.startsWith('__')) setInput(v => v || anfrage.message)
+      setPendingMessage(null)
+    },
   })
+
+  const senden = (message: string) =>
+    strom.senden({ message, thread_type: hypothesisId as ThreadType })
 
   useEffect(() => { startedRef.current = false }, [hypothesisId])
 
@@ -61,13 +79,13 @@ export default function HypothesisDialogPage() {
     if (!historyLoaded || startedRef.current || !hyp) return
     startedRef.current = true
     const alreadyStarted = (history as EchoMessage[]).some(m => m.content === startTrigger || m.role === 'assistant')
-    if (!alreadyStarted) chatMutation.mutate(startTrigger)
+    if (!alreadyStarted) senden(startTrigger)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [historyLoaded, hypothesisId])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [history, chatMutation.isPending])
+  }, [history, strom.beschaeftigt, strom.takt.sichtbar])
 
   const summaryMutation = useMutation({
     mutationFn: () => hypothesesApi.generate(caseId!, hypothesisId!),
@@ -80,6 +98,9 @@ export default function HypothesisDialogPage() {
   const resetMutation = useMutation({
     mutationFn: () => echoApi.resetTopicHistory(caseId!, hypothesisId!),
     onSuccess: () => {
+      // Ein noch laufender Strom schriebe seine Antwort sonst in den gerade
+      // geleerten Verlauf zurueck.
+      strom.verwerfen()
       setSummary(null)
       startedRef.current = false
       qc.invalidateQueries({ queryKey: ['hyp-echo-history', caseId, hypothesisId] })
@@ -91,18 +112,18 @@ export default function HypothesisDialogPage() {
   }
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()
-    if (!input.trim() || chatMutation.isPending) return
+    if (!input.trim() || strom.beschaeftigt) return
     const msg = input.trim()
     setInput('')
     setPendingMessage(msg)
-    chatMutation.mutate(msg)
+    senden(msg)
   }
 
   const handleExample = (q: string) => {
-    if (chatMutation.isPending) return
+    if (strom.beschaeftigt) return
     setShowExamples(false)
     setPendingMessage(q)
-    chatMutation.mutate(q)
+    senden(q)
   }
 
   const visibleMessages = hyp ? (history as EchoMessage[]).filter(m => m.content !== startTrigger) : []
@@ -166,10 +187,18 @@ export default function HypothesisDialogPage() {
               />
             ))}
 
-            {pendingMessage && chatMutation.isPending && <ChatMessage content={pendingMessage} isUser />}
-            {chatMutation.isPending && <TypingIndicator />}
-            {chatMutation.isError && (
-              <ChatErrorMessage text={apiErrorMessage(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+            {pendingMessage && strom.beschaeftigt && <ChatMessage content={pendingMessage} isUser />}
+
+            {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment, in
+                dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder gar
+                nicht da. Den Punktindikator gibt es nur noch, solange kein Wort da ist. */}
+            {strom.takt.sichtbar && (
+              <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} />
+            )}
+            {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
+
+            {strom.fehler != null && (
+              <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
             )}
 
             {/* Arbeitshypothese (Zusammenfassung) */}
@@ -223,7 +252,7 @@ export default function HypothesisDialogPage() {
                   <button
                     key={q}
                     onClick={() => handleExample(q)}
-                    disabled={chatMutation.isPending}
+                    disabled={strom.beschaeftigt}
                     className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
                   >
                     {q}
@@ -237,7 +266,7 @@ export default function HypothesisDialogPage() {
             value={input}
             onChange={setInput}
             onSend={handleSend}
-            pending={chatMutation.isPending}
+            pending={strom.beschaeftigt}
             placeholder="Schreibe Echo …"
             leftAccessory={
               <button

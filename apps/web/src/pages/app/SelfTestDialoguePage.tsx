@@ -18,6 +18,7 @@ import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import TestOverviewPanel from '@/components/app/TestOverviewPanel'
 import { echoApi } from '@/api/echo'
+import { useEchoStrom } from '@/lib/echoStrom'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { testResultsApi } from '@/api/testResults'
@@ -106,19 +107,40 @@ function Dialogue({
     retry: false,
   })
 
-  const chatMutation = useMutation({
-    mutationFn: (message: string) => echoApi.chat(caseId, { message, thread_type: threadType }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['test-echo-history', caseId, threadType] })
+  /**
+   * Echos Antwort entsteht sichtbar, statt als fertiger Block zu erscheinen.
+   *
+   * Der Eröffnungszug (`__test_start__|…`) ist davon ausgenommen: Steuerbefehle lehnt der
+   * Strom-Endpunkt mit 409 ab, und `useEchoStrom` nimmt dafür still den gewöhnlichen Weg.
+   */
+  const strom = useEchoStrom(caseId, {
+    onFertig: (data) => {
+      // Die fertige Antwort wandert DIREKT in den Zwischenspeicher, statt den Verlauf
+      // nachzuladen. Nachladen hieße warten — und in der Wartezeit stünden die beiden
+      // Nachrichten weder vorläufig noch gespeichert da, das Gespräch blinkte kurz leer.
+      qc.setQueryData<EchoMessage[]>(
+        ['test-echo-history', caseId, threadType],
+        alt => [...(alt ?? []), data.user_message, data.assistant_message],
+      )
       setPendingMessage(null)
     },
-    onError: () => setPendingMessage(null),
-    retry: false,
+    onFehler: (anfrage) => {
+      // Der Text kommt zurück ins Feld. Sonst müsste man eine lange Nachricht ausgerechnet
+      // dann neu formulieren, wenn ohnehin gerade etwas nicht funktioniert.
+      if (!anfrage.message.startsWith('__')) setInput(v => v || anfrage.message)
+      setPendingMessage(null)
+    },
   })
+
+  const senden = (message: string) =>
+    strom.senden({ message, thread_type: threadType })
 
   const resetMutation = useMutation({
     mutationFn: () => echoApi.resetTopicHistory(caseId, threadType),
     onSuccess: () => {
+      // Ein noch laufender Strom schriebe seine Antwort sonst in den gerade
+      // geleerten Verlauf zurueck.
+      strom.verwerfen()
       startedRef.current = false
       qc.invalidateQueries({ queryKey: ['test-echo-history', caseId, threadType] })
     },
@@ -138,17 +160,17 @@ function Dialogue({
     if (!historyLoaded || startedRef.current) return
     startedRef.current = true
     const already = (history as EchoMessage[]).some((m) => m.content === startTrigger || m.role === 'assistant')
-    if (!already) chatMutation.mutate(startTrigger)
+    if (!already) senden(startTrigger)
   }, [historyLoaded]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [history, chatMutation.isPending])
+  }, [history, strom.beschaeftigt, strom.takt.sichtbar])
 
   const send = (message: string) => {
-    if (!message.trim() || chatMutation.isPending) return
+    if (!message.trim() || strom.beschaeftigt) return
     setPendingMessage(message)
-    chatMutation.mutate(message)
+    senden(message)
     setMobileView('chat')
   }
 
@@ -189,7 +211,7 @@ function Dialogue({
   }
 
   const restart = async () => {
-    if (chatMutation.isPending || resetMutation.isPending) return
+    if (strom.beschaeftigt || resetMutation.isPending) return
     if (await bestaetigen({ titel: 'Gespräch neu starten?', text: 'Der bisherige Verlauf wird gelöscht. Echo beginnt frisch mit deinem aktuellen Testergebnis.', knopf: 'Neu starten', gefahr: true })) {
       resetMutation.mutate()
     }
@@ -198,7 +220,7 @@ function Dialogue({
   useEffect(() => {
     if (resetMutation.isSuccess && !startedRef.current) {
       startedRef.current = true
-      chatMutation.mutate(buildStartTrigger(test, result, committed))
+      senden(buildStartTrigger(test, result, committed))
       resetMutation.reset()
     }
   }, [resetMutation.isSuccess]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -259,10 +281,16 @@ function Dialogue({
                   <ChatMessage key={msg.id} content={msg.content} isUser={msg.role === 'user'}
                     safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined} />
                 ))}
-                {pendingMessage && chatMutation.isPending && <ChatMessage content={pendingMessage} isUser />}
-                {chatMutation.isPending && <TypingIndicator />}
-                {chatMutation.isError && (
-                  <ChatErrorMessage text={apiErrorMessage(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+                {pendingMessage && strom.beschaeftigt && <ChatMessage content={pendingMessage} isUser />}
+                {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment,
+                    in dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder
+                    gar nicht da. Den Punktindikator gibt es nur, solange kein Wort da ist. */}
+                {strom.takt.sichtbar && (
+                  <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} />
+                )}
+                {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
+                {strom.fehler != null && (
+                  <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
                 )}
                 {summary && (
                   <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
@@ -291,7 +319,7 @@ function Dialogue({
             </div>
             <div className="flex-shrink-0 px-5 pb-4 pt-2">
               <ChatComposer value={input} onChange={setInput} onSend={handleSend}
-                pending={chatMutation.isPending} placeholder="Schreibe Echo …"
+                pending={strom.beschaeftigt} placeholder="Schreibe Echo …"
                 hint="Nichts wird als Urteil festgeschrieben – ihr klärt gemeinsam, wie deine Situation ist." />
             </div>
           </div>
@@ -304,7 +332,7 @@ function Dialogue({
               draft={draft}
               dirty={dirty}
               delta={delta}
-              recomputing={chatMutation.isPending}
+              recomputing={strom.beschaeftigt}
               onRevise={(id, v) => { setDelta(null); setDraft((prev) => ({ ...prev, [id]: v })) }}
               onResetDraft={() => { setDelta(null); setDraft(committed) }}
               onRecompute={recompute}

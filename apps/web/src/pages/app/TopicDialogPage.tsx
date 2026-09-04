@@ -11,6 +11,7 @@ import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { echoApi } from '@/api/echo'
+import { useEchoStrom } from '@/lib/echoStrom'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { getBody } from '@/content/bodies'
@@ -127,22 +128,34 @@ export default function TopicDialogPage() {
     retry: false,
   })
 
-  const chatMutation = useMutation({
-    mutationFn: (message: string) =>
-      echoApi.chat(caseId!, {
-        message,
-        thread_type: topicId as ThreadType,
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['topic-echo-history', caseId, topicId, sessionId] })
+  /**
+   * Echos Antwort entsteht sichtbar, statt als fertiger Block zu erscheinen.
+   *
+   * Der Eröffnungszug (`__…_start__`) ist davon ausgenommen: Steuerbefehle lehnt der
+   * Strom-Endpunkt mit 409 ab, und `useEchoStrom` nimmt dafür still den gewöhnlichen Weg.
+   */
+  const strom = useEchoStrom(caseId!, {
+    onFertig: (data) => {
+      // Die fertige Antwort wandert DIREKT in den Zwischenspeicher, statt den Verlauf
+      // nachzuladen. Nachladen hieße warten — und in der Wartezeit stünden die beiden
+      // Nachrichten weder vorläufig noch gespeichert da, das Gespräch blinkte kurz leer.
+      qc.setQueryData<EchoMessage[]>(
+        ['topic-echo-history', caseId, topicId, sessionId],
+        alt => [...(alt ?? []), data.user_message, data.assistant_message],
+      )
       setInput('')
       setPendingMessage(null)
     },
-    onError: () => {
+    onFehler: (anfrage) => {
+      // Der Text kommt zurück ins Feld. Sonst müsste man eine lange Nachricht ausgerechnet
+      // dann neu formulieren, wenn ohnehin gerade etwas nicht funktioniert.
+      if (!anfrage.message.startsWith('__')) setInput(v => v || anfrage.message)
       setPendingMessage(null)
     },
-    retry: false,
   })
+
+  const senden = (message: string) =>
+    strom.senden({ message, thread_type: topicId as ThreadType })
 
   // startedRef zurücksetzen wenn Thema wechselt (selbe Komponenten-Instanz)
   useEffect(() => {
@@ -157,13 +170,13 @@ export default function TopicDialogPage() {
       m => m.content === topic.startTrigger || m.role === 'assistant'
     )
     if (!alreadyStarted) {
-      chatMutation.mutate(topic.startTrigger)
+      senden(topic.startTrigger)
     }
   }, [historyLoaded, topicId])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [history, chatMutation.isPending])
+  }, [history, strom.beschaeftigt, strom.takt.sichtbar])
 
   const summaryMutation = useMutation({
     mutationFn: () => echoApi.topicSummary(caseId!, topicId!),
@@ -181,6 +194,9 @@ export default function TopicDialogPage() {
   const resetMutation = useMutation({
     mutationFn: () => echoApi.resetTopicHistory(caseId!, topicId!),
     onSuccess: () => {
+      // Ein noch laufender Strom schriebe seine Antwort sonst in den gerade
+      // geleerten Verlauf zurueck.
+      strom.verwerfen()
       setSummary(null)
       startedRef.current = false
       qc.invalidateQueries({ queryKey: ['topic-echo-history', caseId, topicId, sessionId] })
@@ -195,11 +211,11 @@ export default function TopicDialogPage() {
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault()
-    if (!input.trim() || chatMutation.isPending) return
+    if (!input.trim() || strom.beschaeftigt) return
     const msg = input.trim()
     setInput('')
     setPendingMessage(msg)
-    chatMutation.mutate(msg)
+    senden(msg)
   }
 
   const visibleMessages = topic
@@ -278,14 +294,20 @@ export default function TopicDialogPage() {
               />
             ))}
 
-            {pendingMessage && chatMutation.isPending && (
+            {pendingMessage && strom.beschaeftigt && (
               <ChatMessage content={pendingMessage} isUser />
             )}
 
-            {chatMutation.isPending && <TypingIndicator />}
+            {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment, in
+                dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder gar
+                nicht da. Den Punktindikator gibt es nur noch, solange kein Wort da ist. */}
+            {strom.takt.sichtbar && (
+              <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} />
+            )}
+            {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
 
-            {chatMutation.isError && (
-              <ChatErrorMessage text={apiErrorMessage(chatMutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+            {strom.fehler != null && (
+              <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
             )}
 
             {/* Zusammenfassung am Ende des Dialogs */}
@@ -335,7 +357,7 @@ export default function TopicDialogPage() {
             value={input}
             onChange={setInput}
             onSend={handleSend}
-            pending={chatMutation.isPending}
+            pending={strom.beschaeftigt}
             placeholder="Schreibe Echo …"
           />
         </div>
