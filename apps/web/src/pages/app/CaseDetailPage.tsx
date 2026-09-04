@@ -17,6 +17,7 @@ import SavedTestResultView from '@/components/selftests/SavedTestResultView'
 import { TEST_CATEGORY_LABELS, type TestCategory } from '@/selftests'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { hypothesesApi } from '@/api/hypotheses'
+import { caseArtifactsApi } from '@/api/caseArtifacts'
 import {
   RELATIONSHIP_TYPE_LABELS,
   RELATIONSHIP_STATUS_LABELS,
@@ -176,6 +177,12 @@ export default function CaseDetailPage() {
         {/* Themendialog-Zusammenfassungen */}
         <div className="mt-6">
           <TopicSummariesCard caseId={caseId!} summaries={topicSummaries} />
+        </div>
+
+        {/* Erkenntnisse — stehen VOR den Hypothesen, weil sie deren Rohstoff sind:
+            eine Notiz aus einem Gespräch kann zur stehenden Arbeitshypothese werden. */}
+        <div className="mt-6">
+          <ErkenntnisseUeberblickKarte caseId={caseId!} />
         </div>
 
         {/* Hypothesen */}
@@ -606,6 +613,86 @@ function TestResultsCard({ caseId }: { caseId: string }) {
             )
           })}
         </div>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Erkenntnisse auf dem Fall-Überblick.
+ *
+ * **Warum nur die drei neuesten.** Ein Artefakt ist kurz genug, um ganz dazustehen — und
+ * genau das ist der Wert: Man liest im Vorbeigehen, was man selbst einmal verstanden hat.
+ * Vierzig davon wären wieder eine Liste, durch die man scrollt statt sie zu lesen.
+ *
+ * **Warum die überholten mitgezählt werden.** Dass jemand eigene Einschätzungen verworfen
+ * hat, ist die seltenste und beste Nachricht auf dieser Seite: Da hat sich etwas bewegt.
+ * Sie steht deshalb hier, auch wenn ihr Inhalt nicht mehr gilt.
+ */
+function ErkenntnisseUeberblickKarte({ caseId }: { caseId: string }) {
+  const { data } = useQuery({
+    queryKey: ['case-artifacts', caseId],
+    queryFn: () => caseArtifactsApi.list(caseId),
+    enabled: !!caseId,
+    retry: false,
+  })
+
+  const aktive = (data?.artifacts ?? []).filter(a => a.status === 'aktiv')
+  const neueste = aktive.slice(0, 3)
+  const weitere = aktive.length - neueste.length
+  const ueberholt = data?.superseded_count ?? 0
+
+  return (
+    <div className="card">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="section-label mb-0.5">Erkenntnisse</p>
+          <p className="text-sm font-medium text-navy">
+            {aktive.length > 0
+              ? `${aktive.length} festgehalten`
+              : 'Noch nichts festgehalten'}
+            {ueberholt > 0 && (
+              <span className="ml-1.5 font-normal text-brand-muted">
+                · {ueberholt} gilt nicht mehr
+              </span>
+            )}
+          </p>
+        </div>
+        <Link
+          to={`/app/cases/${caseId}/artifacts`}
+          className="shrink-0 text-xs font-semibold text-accent hover:underline"
+        >
+          Zum Archiv →
+        </Link>
+      </div>
+
+      {neueste.length > 0 ? (
+        <>
+          <div className="space-y-2">
+            {neueste.map(a => (
+              <div key={a.id} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+                <p className="text-xs font-semibold text-navy">{a.title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-brand-muted">{a.body}</p>
+                <p className="mt-1.5 text-[0.7rem] text-brand-muted/70">
+                  {new Date(a.created_at).toLocaleDateString('de-DE', {
+                    day: '2-digit', month: 'long', year: 'numeric',
+                  })}
+                </p>
+              </div>
+            ))}
+          </div>
+          {weitere > 0 && (
+            <p className="mt-2.5 text-xs text-brand-muted/70">
+              +{weitere} weitere im Archiv.
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="text-xs leading-relaxed text-brand-muted/70">
+          Am Ende eines Gesprächs mit Echo steht „Erkenntnis festhalten". Echo destilliert
+          dann in ein paar Sätzen, was bleiben sollte – du schreibst es um, bis es klingt
+          wie du. Was hier liegt, fließt in kommende Gespräche ein.
+        </p>
       )}
     </div>
   )
