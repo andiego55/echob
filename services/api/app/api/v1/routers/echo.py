@@ -21,6 +21,7 @@ from app.schemas.echo import (
     EchoChatSessionUpdate,
     EchoMessageResponse,
 )
+from app.services.case_artifacts import build_artifact_context
 from app.services.case_documents import build_document_context
 from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import build_hypothesis_context
@@ -231,6 +232,26 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
                 pp_summary = _ppj2.loads(pp_summary)
             if pp_modules:
                 context_parts.append(build_person_context({"modules": pp_modules, "summary": pp_summary}))
+
+        # Festgehaltene Erkenntnisse aus früheren Gesprächen. Nur aktive; von den
+        # überholten geht bloß die Zahl mit — dass jemand eigene Einschätzungen verworfen
+        # hat, sagt etwas über die Bewegung im Fall, ihr Inhalt aber nichts mehr.
+        async with pool.acquire() as conn:
+            art_rows = await conn.fetch(
+                "SELECT title, body, created_at FROM case_artifacts "
+                "WHERE case_id = $1 AND status = 'aktiv' ORDER BY created_at DESC",
+                case_id,
+            )
+            ueberholt = await conn.fetchval(
+                "SELECT COUNT(*) FROM case_artifacts "
+                "WHERE case_id = $1 AND status = 'ueberholt'",
+                case_id,
+            ) or 0
+        if art_rows or ueberholt:
+            artefakte = [crypto.decrypt_fields(dict(r), "body") for r in art_rows]
+            art_ctx = build_artifact_context(artefakte, ueberholt_anzahl=ueberholt)
+            if art_ctx:
+                context_parts.append(art_ctx)
 
         # Beigelegte Dokumente (Briefe, Chatverläufe). Absichtlich VOR den Deutungen:
         # Erst der Beleg, dann was jemand darin gesehen hat.

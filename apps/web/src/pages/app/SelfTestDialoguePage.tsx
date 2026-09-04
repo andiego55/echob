@@ -32,6 +32,7 @@ import { loadTestAnswers, loadTestResult, saveTestResult, saveTestAnswers } from
 import type { SelfTest, TestQuestion, TestAnswers } from '@/selftests/types'
 import type { EchoMessage, ThreadType } from '@/types'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 
 export default function SelfTestDialoguePage() {
   const { caseId, slug } = useParams<{ caseId: string; slug: string }>()
@@ -239,6 +240,12 @@ function Dialogue({
             <p className="truncate text-sm font-semibold text-navy">{test.title}{overallChip ? ` · ${overallChip}` : ''}</p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
+            <ArtefaktErzeugen
+              caseId={caseId}
+              threadType={threadType}
+              eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
+              beschaeftigt={strom.beschaeftigt}
+            />
             <button onClick={() => summaryMutation.mutate()} disabled={summaryMutation.isPending || visibleMessages.length === 0}
               className="rounded-brand border border-accent bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/20 disabled:opacity-40">
               {summaryMutation.isPending ? 'Fasse zusammen …' : 'Verständnis festhalten'}

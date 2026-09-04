@@ -19,6 +19,7 @@ import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import DialogKopf, { DialogKopfKnopf } from '@/components/app/DialogKopf'
+import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 
 export default function HypothesisDialogPage() {
   const bestaetigen = useBestaetigen()
@@ -149,6 +150,12 @@ export default function HypothesisDialogPage() {
           symbol={<HypothesisIcon path={hyp.icon} size="sm" />}
           onZurueck={() => navigate(`/app/cases/${caseId}/hypotheses`)}
         >
+          <ArtefaktErzeugen
+            caseId={caseId!}
+            threadType={hypothesisId!}
+            eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
+            beschaeftigt={strom.beschaeftigt}
+          />
           <DialogKopfKnopf
             onClick={() => summaryMutation.mutate()}
             disabled={summaryMutation.isPending || visibleMessages.length === 0}

@@ -31,6 +31,7 @@ export const GRUPPEN: Gruppe[] = [
       { path: '/echo', label: 'Echo' },
       { path: '/scales', label: 'Muster' },
       { path: '/review', label: 'Verlauf' },
+      { path: '/artifacts', label: 'Erkenntnisse' },
       { path: '/hypotheses', label: 'Hypothesen' },
     ],
   },

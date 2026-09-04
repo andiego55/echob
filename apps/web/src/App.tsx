@@ -41,6 +41,7 @@ const SceneNewPage = lazy(() => import('@/pages/app/SceneNewPage'))
 const SceneDetailPage = lazy(() => import('@/pages/app/SceneDetailPage'))
 const SceneEchoPage = lazy(() => import('@/pages/app/SceneEchoPage'))
 const EchoPage = lazy(() => import('@/pages/app/EchoPage'))
+const ArtifactsPage = lazy(() => import('@/pages/app/ArtifactsPage'))
 const DocumentsPage = lazy(() => import('@/pages/app/DocumentsPage'))
 const ScalesPage = lazy(() => import('@/pages/app/ScalesPage'))
 const ReviewPage = lazy(() => import('@/pages/app/ReviewPage'))
@@ -266,6 +267,7 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/reflektieren" element={<ProtectedRoute><ReflectPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/echo" element={<ProtectedRoute><EchoPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/share" element={<ProtectedRoute><CaseSharingPage /></ProtectedRoute>} />
+      <Route path="/app/cases/:caseId/artifacts" element={<ProtectedRoute><ArtifactsPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/scales" element={<ProtectedRoute><ScalesPage /></ProtectedRoute>} />
       <Route path="/app/cases/:caseId/review" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />

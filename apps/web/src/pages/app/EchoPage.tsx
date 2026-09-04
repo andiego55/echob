@@ -8,6 +8,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import AssignmentDialogSummary from '@/components/app/AssignmentDialogSummary'
@@ -339,6 +340,20 @@ export default function EchoPage() {
               +
             </button>
           </div>
+
+          {/* Was aus dem Gespraech bleiben soll. Erscheint erst, wenn es einen
+              Verlauf gibt - vor dem ersten Wort waere der Knopf nur Deko. */}
+          {selectedSession && history.length > 0 && (
+            <div className="flex justify-end border-b border-brand-border bg-white px-4 py-2">
+              <ArtefaktErzeugen
+                caseId={caseId!}
+                threadType={threadType}
+                chatSessionId={selectedSession}
+                eigeneBeitraege={history.filter(m => m.role === 'user').length}
+                beschaeftigt={beschaeftigt}
+              />
+            </div>
+          )}
 
           {/* Chat-Bereich */}
           <div className="flex-1 overflow-y-auto">

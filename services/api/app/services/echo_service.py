@@ -655,6 +655,67 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
+    async def extract_artifacts(
+        self,
+        *,
+        history: list[dict[str, str]],
+        vorhandene: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Destilliert aus einem Gespräch ein bis drei Artefakt-Kandidaten.
+
+        **Speichert nichts.** Das Ergebnis ist ein Vorschlag, den der Nutzer bearbeitet und
+        erst dann ablegt — oder verwirft.
+
+        ``vorhandene`` sind die bereits abgelegten Artefakte (id, Titel, Text, Datum). Sie
+        gehen vollständig in den Prompt: Ohne sie legt jedes Gespräch eine weitere Fassung
+        derselben Einsicht an, und nach vier Monaten steht dasselbe zwölfmal da — im Archiv
+        UND in jedem Kontext. Weil Artefakte klein sind, kostet das Mitgeben fast nichts und
+        ist der Unterschied zwischen einem Archiv und einer Halde.
+        """
+        if not self._use_openai:
+            return {
+                "kandidaten": [],
+                "hinweis": "Echo läuft im Demo-Modus – ohne OpenAI-Schlüssel "
+                           "entstehen keine Artefakte.",
+            }
+
+        gespraech = "\n".join(
+            f"{'Ich' if m['role'] == 'user' else 'Echo'}: {m['content']}"
+            for m in history
+            if m["role"] in ("user", "assistant") and not m["content"].startswith("__")
+        )
+        if vorhandene:
+            bestand = "\n".join(
+                f"- id={a['id']} | {a.get('created_at')} | {a.get('title')}\n  {a.get('body')}"
+                for a in vorhandene
+            )
+        else:
+            bestand = "(noch keine)"
+
+        # Bewusst NICHT `generate_json`: Das nimmt das Smart-Modell bei Temperatur 0.9 —
+        # richtig für die Fallgenerierung, falsch hier. Destillieren soll wenig streuen,
+        # und der Aufruf wird nicht einzeln abgerechnet, darf also nicht teuer sein.
+        response = await self._chat(
+            model=self._model_fast,
+            messages=[
+                {"role": "system", "content": _load_prompt("artifact_extraction_prompt.md")},
+                {"role": "user", "content": (
+                    f"Bereits vorhandene Artefakte:\n{bestand}\n\n"
+                    f"---\n\nDas Gespräch:\n{gespraech}\n\n"
+                    f"Destilliere jetzt die Kandidaten."
+                )},
+            ],
+            max_tokens=900,
+            temperature=None if self._reasoning else 0.4,
+            response_format={"type": "json_object"},
+        )
+        import json as _aj
+        try:
+            return _aj.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("extract_artifacts: ungültige JSON-Antwort vom Modell.")
+            return {"kandidaten": [], "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
+
     async def generate_hypothesis_summary(
         self, *, hypothesis_type: str, history: list[dict[str, str]],
     ) -> str:

@@ -21,6 +21,7 @@ import { apiErrorMessage } from '@/api/errors'
 import type { EchoMessage, ThreadType } from '@/types'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import DialogKopf, { DialogKopfKnopf } from '@/components/app/DialogKopf'
+import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 
 interface TopicDef {
   label: string
@@ -242,6 +243,12 @@ export default function TopicDialogPage() {
           titel={topic.label}
           onZurueck={() => navigate(`/app/cases/${caseId}`)}
         >
+          <ArtefaktErzeugen
+            caseId={caseId!}
+            threadType={topicId!}
+            eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
+            beschaeftigt={strom.beschaeftigt}
+          />
           <DialogKopfKnopf
             onClick={() => summaryMutation.mutate()}
             disabled={summaryMutation.isPending || visibleMessages.length === 0}
