@@ -10,6 +10,7 @@ import { reportsApi } from '@/api/reports'
 import type { ReportType } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import { scoreLevel } from '@/utils/profileScoring'
 
 // ── Typ-Konfiguration ─────────────────────────────────────────────────────────
 
@@ -557,18 +558,27 @@ function ProfileScoresSection({ scores, title, subtitle, mode, patterns }: {
 }) {
   if (!scores || scores.length === 0) return null
 
-  const barColor = (score: number, m: typeof mode) => {
+  // Diese Werte kommen aus den Profilmodulen und laufen 1–5, nicht 0–100 — anders als
+  // die Fallskalen weiter oben, die seit Migration 06 wirklich 0–100 sind. Der Block
+  // druckte trotzdem „4/100" und zeichnete einen 4 % breiten Balken: die volle
+  // Ausprägung 5 sah aus wie „so gut wie nichts". Deshalb wird hier auf Prozent
+  // umgerechnet (1 → 0 %, 5 → 100 %) und der rohe Wert wie auf der Profilseite
+  // ausgeschrieben. Die Farbschwellen bleiben, sie greifen jetzt auf dem Prozentwert.
+  const alsProzent = (score: number) =>
+    Math.min(100, Math.max(0, ((score - 1) / 4) * 100))
+
+  const barColor = (pct: number, m: typeof mode) => {
     if (m === 'user') {
       // Teal gradient — neutral, not alarm-coded
-      if (score >= 90) return 'bg-teal-600'
-      if (score >= 70) return 'bg-teal-500'
-      if (score >= 50) return 'bg-teal-400'
+      if (pct >= 90) return 'bg-teal-600'
+      if (pct >= 70) return 'bg-teal-500'
+      if (pct >= 50) return 'bg-teal-400'
       return 'bg-teal-300'
     }
     // Person profile: orange/red gradient for concerning traits
-    if (score >= 80) return 'bg-orange-500'
-    if (score >= 60) return 'bg-amber-400'
-    if (score >= 40) return 'bg-yellow-300'
+    if (pct >= 80) return 'bg-orange-500'
+    if (pct >= 60) return 'bg-amber-400'
+    if (pct >= 40) return 'bg-yellow-300'
     return 'bg-gray-200'
   }
 
@@ -603,22 +613,25 @@ function ProfileScoresSection({ scores, title, subtitle, mode, patterns }: {
 
         {/* Score bars — two-column grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-          {scores.map(s => (
-            <div key={s.key}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-medium text-navy">{s.label}</span>
-                <span className="text-xs font-bold text-brand-muted ml-2 flex-shrink-0 tabular-nums">
-                  {Math.round(s.score)}<span className="font-normal opacity-50">/100</span>
-                </span>
+          {scores.map(s => {
+            const pct = alsProzent(s.score)
+            return (
+              <div key={s.key}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-medium text-navy">{s.label}</span>
+                  <span className="text-xs font-bold text-brand-muted ml-2 flex-shrink-0 tabular-nums">
+                    {scoreLevel(s.score)}<span className="ml-1 font-normal opacity-60">({s.score.toFixed(1)})</span>
+                  </span>
+                </div>
+                <div className="h-2.5 bg-brand-bg rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${barColor(pct, mode)} rounded-full`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-2.5 bg-brand-bg rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${barColor(s.score, mode)} rounded-full`}
-                  style={{ width: `${Math.min(100, Math.max(0, s.score))}%` }}
-                />
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <p className="mt-4 text-[10px] text-brand-muted leading-relaxed">
