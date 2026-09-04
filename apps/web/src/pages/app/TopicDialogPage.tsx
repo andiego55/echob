@@ -22,6 +22,7 @@ import type { EchoMessage, ThreadType } from '@/types'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import DialogKopf, { DialogKopfKnopf } from '@/components/app/DialogKopf'
 import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
+import AntwortZuege from '@/components/app/AntwortZuege'
 
 interface TopicDef {
   label: string
@@ -223,6 +224,17 @@ export default function TopicDialogPage() {
     ? (history as EchoMessage[]).filter(m => m.content !== topic.startTrigger)
     : []
 
+  /**
+   * Die letzte Nachricht, WENN sie von Echo ist - sonst nichts.
+   *
+   * Steht am Ende eine eigene Nachricht, wartet man noch auf die Antwort; dann waere
+   * ein Zug ins Leere gerichtet.
+   */
+  const letzteAntwort = visibleMessages.length > 0
+    && visibleMessages[visibleMessages.length - 1].role === 'assistant'
+    ? visibleMessages[visibleMessages.length - 1]
+    : null
+
   if (!topic) {
     return (
       <AppShell>
@@ -352,6 +364,16 @@ export default function TopicDialogPage() {
               <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
                 Zusammenfassung konnte nicht erstellt werden.
               </div>
+            )}
+
+            {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
+                Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
+                drei Beitraege zurueckliegt. */}
+            {!strom.beschaeftigt && letzteAntwort && (
+              <AntwortZuege
+                onZug={(text) => { setPendingMessage(text); senden(text) }}
+                safety={safetyLevelFromMeta(letzteAntwort.metadata)}
+              />
             )}
 
             <div ref={messagesEndRef} />

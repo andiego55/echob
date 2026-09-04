@@ -33,6 +33,7 @@ import type { SelfTest, TestQuestion, TestAnswers } from '@/selftests/types'
 import type { EchoMessage, ThreadType } from '@/types'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
+import AntwortZuege from '@/components/app/AntwortZuege'
 
 export default function SelfTestDialoguePage() {
   const { caseId, slug } = useParams<{ caseId: string; slug: string }>()
@@ -227,6 +228,17 @@ function Dialogue({
   }, [resetMutation.isSuccess]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const visibleMessages = (history as EchoMessage[]).filter((m) => m.content !== startTrigger && !m.content.startsWith('__test_start__|'))
+
+  /**
+   * Die letzte Nachricht, WENN sie von Echo ist - sonst nichts.
+   *
+   * Steht am Ende eine eigene Nachricht, wartet man noch auf die Antwort; dann waere
+   * ein Zug ins Leere gerichtet.
+   */
+  const letzteAntwort = visibleMessages.length > 0
+    && visibleMessages[visibleMessages.length - 1].role === 'assistant'
+    ? visibleMessages[visibleMessages.length - 1]
+    : null
   const overallChip = result.mode === 'dimensional' ? result.overall?.band?.label : result.primary?.name
 
   return (
@@ -321,6 +333,16 @@ function Dialogue({
                     Zusammenfassung konnte nicht erstellt werden.
                   </div>
                 )}
+                {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
+                    Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
+                    drei Beitraege zurueckliegt. */}
+                {!strom.beschaeftigt && letzteAntwort && (
+                  <AntwortZuege
+                    onZug={(text) => { setPendingMessage(text); senden(text) }}
+                    safety={safetyLevelFromMeta(letzteAntwort.metadata)}
+                  />
+                )}
+
                 <div ref={messagesEndRef} />
               </div>
             </div>

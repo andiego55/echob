@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
+import AntwortZuege from '@/components/app/AntwortZuege'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import AssignmentDialogSummary from '@/components/app/AssignmentDialogSummary'
@@ -303,6 +304,16 @@ export default function EchoPage() {
   const showEmptyState = (!selectedSession || history.length === 0) && !beschaeftigt
     && !pendingMessage
 
+  /**
+   * Die letzte Nachricht, WENN sie von Echo ist — sonst nichts.
+   *
+   * Steht am Ende eine eigene Nachricht, wartet man noch auf die Antwort; dann wäre ein
+   * Zug ins Leere gerichtet.
+   */
+  const letzteAntwort = history.length > 0 && history[history.length - 1].role === 'assistant'
+    ? history[history.length - 1]
+    : null
+
   return (
     <AppShell>
       <CaseNav caseId={caseId!} />
@@ -389,6 +400,16 @@ export default function EchoPage() {
 
               {mutation.isError && (
                 <ChatErrorMessage text={apiErrorMessage(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+              )}
+
+              {/* Züge unter der letzten Antwort. Nur dort — unter jeder zu stehen wäre
+                  Lärm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
+                  drei Beiträge zurückliegt. */}
+              {!beschaeftigt && letzteAntwort && (
+                <AntwortZuege
+                  onZug={(text) => { setPendingMessage(text); mutation.mutate({ message: text }) }}
+                  safety={safetyLevelFromMeta(letzteAntwort.metadata)}
+                />
               )}
 
               {assignmentId && selectedSession && history.length > 0 && !beschaeftigt && (
