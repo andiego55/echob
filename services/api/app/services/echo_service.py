@@ -116,10 +116,15 @@ def build_case_context(
     if include_scene_section and scenes:
         lines.append(f"## Dokumentierte Szenen ({len(scenes)} gesamt, {len(confirmed)} bestätigt)\n")
         for i, scene in enumerate(scenes[:MAX_CONTEXT_SCENES], 1):
+            # Die STABILE Nummer aus der Datenbank (Migration 98), nicht die Position
+            # in dieser Liste. Positionell nummeriert verschob jede neue Szene alle
+            # aelteren - ein Bericht vom Mai zeigte im August auf eine andere Szene.
+            # Der Rueckfall auf `i` deckt nur Aufrufer ohne die Spalte ab (Tests).
+            nr = scene.get("scene_no") or i
             date_str = f" ({scene['scene_date']})" if scene.get("scene_date") else ""
             distress = f", Belastung: {scene['distress_score']}/5" if scene.get("distress_score") else ""
             confirmed_mark = "✓" if scene.get("confirmed_by_user") else "○ unbestätigt"
-            lines.append(f"**Szene {i} – \"{scene.get('title', 'Ohne Titel')}\"**{date_str}{distress} [{confirmed_mark}]")
+            lines.append(f"**Szene {nr} – \"{scene.get('title', 'Ohne Titel')}\"**{date_str}{distress} [{confirmed_mark}]")
 
             tags = scene.get("pattern_tags") or []
             if isinstance(tags, str):

@@ -42,6 +42,8 @@ class SceneResponse(BaseModel):
     user_id: UUID
     title: str
     scene_date: date | None
+    #: Stabile Nummer je Fall (Migration 98) — Echo verweist damit auf die Szene.
+    scene_no: int | None = None
     description: str | None
     user_reaction: str | None
     distress_score: int | None

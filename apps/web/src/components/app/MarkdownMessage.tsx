@@ -2,6 +2,8 @@ import { memo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { belegAusHref, belegeVerlinken } from '@/lib/belege'
+import { BelegVerweis } from './Belege'
 
 interface Props {
   content: string
@@ -62,11 +64,16 @@ const BAUSTEINE: Components = {
   td: ({ children }) => (
     <td className="border-b border-brand-border/50 px-2.5 py-1.5 align-top">{children}</td>
   ),
-  a: ({ children, href }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-2 hover:text-accent-hover">
-      {children}
-    </a>
-  ),
+  a: ({ children, href }) => {
+    // Ein Beleg, den belegeVerlinken gesetzt hat — kein gewoehnlicher Link.
+    const beleg = belegAusHref(href)
+    if (beleg) return <BelegVerweis beleg={beleg}>{children}</BelegVerweis>
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-2 hover:text-accent-hover">
+        {children}
+      </a>
+    )
+  },
 }
 
 /**
@@ -83,7 +90,7 @@ function MarkdownMessage({ content, isUser = false }: Props) {
 
   return (
     <ReactMarkdown remarkPlugins={[remarkGfm]} components={BAUSTEINE}>
-      {content}
+      {belegeVerlinken(content)}
     </ReactMarkdown>
   )
 }

@@ -14,6 +14,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import { BelegeProvider } from '@/components/app/Belege'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import TestOverviewPanel from '@/components/app/TestOverviewPanel'
@@ -243,134 +244,136 @@ function Dialogue({
   const overallChip = result.mode === 'dimensional' ? result.overall?.band?.label : result.primary?.name
 
   return (
-    <AppShell>
-      <CaseNav caseId={caseId} />
-      <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
-        {/* Sub-Header */}
-        <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b border-brand-border bg-white px-5 py-2.5">
-          <div className="min-w-0">
-            <span className="label text-xs">Ergebnis-Dialog</span>
-            <p className="truncate text-sm font-semibold text-navy">{test.title}{overallChip ? ` · ${overallChip}` : ''}</p>
+    <BelegeProvider caseId={caseId}>
+      <AppShell>
+        <CaseNav caseId={caseId} />
+        <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
+          {/* Sub-Header */}
+          <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b border-brand-border bg-white px-5 py-2.5">
+            <div className="min-w-0">
+              <span className="label text-xs">Ergebnis-Dialog</span>
+              <p className="truncate text-sm font-semibold text-navy">{test.title}{overallChip ? ` · ${overallChip}` : ''}</p>
+            </div>
+            <div className="flex flex-shrink-0 items-center gap-2">
+              <ArtefaktErzeugen
+                caseId={caseId}
+                threadType={threadType}
+                eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
+                beschaeftigt={strom.beschaeftigt}
+              />
+              <button onClick={() => summaryMutation.mutate()} disabled={summaryMutation.isPending || visibleMessages.length === 0}
+                className="rounded-brand border border-accent bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/20 disabled:opacity-40">
+                {summaryMutation.isPending ? 'Fasse zusammen …' : 'Verständnis festhalten'}
+              </button>
+              <button onClick={restart} disabled={resetMutation.isPending}
+                className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-xs font-medium text-brand-muted transition-colors hover:bg-brand-bg disabled:opacity-40">
+                Neu starten
+              </button>
+              <button onClick={() => navigate(`/app/cases/${caseId}`)}
+                className="text-xs text-brand-muted transition-colors hover:text-navy">← Zurück</button>
+            </div>
           </div>
-          <div className="flex flex-shrink-0 items-center gap-2">
-            <ArtefaktErzeugen
-              caseId={caseId}
-              threadType={threadType}
-              eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
-              beschaeftigt={strom.beschaeftigt}
-            />
-            <button onClick={() => summaryMutation.mutate()} disabled={summaryMutation.isPending || visibleMessages.length === 0}
-              className="rounded-brand border border-accent bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/20 disabled:opacity-40">
-              {summaryMutation.isPending ? 'Fasse zusammen …' : 'Verständnis festhalten'}
-            </button>
-            <button onClick={restart} disabled={resetMutation.isPending}
-              className="rounded-brand border border-brand-border bg-white px-3 py-1.5 text-xs font-medium text-brand-muted transition-colors hover:bg-brand-bg disabled:opacity-40">
-              Neu starten
-            </button>
-            <button onClick={() => navigate(`/app/cases/${caseId}`)}
-              className="text-xs text-brand-muted transition-colors hover:text-navy">← Zurück</button>
+
+          {/* Mobile-Umschalter */}
+          <div className="flex flex-shrink-0 border-b border-brand-border lg:hidden">
+            {(['chat', 'overview'] as const).map((v) => (
+              <button key={v} onClick={() => setMobileView(v)}
+                className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${mobileView === v ? 'border-b-2 border-accent text-accent' : 'text-brand-muted'}`}>
+                {v === 'chat' ? 'Gespräch' : 'Test-Übersicht'}
+              </button>
+            ))}
           </div>
-        </div>
 
-        {/* Mobile-Umschalter */}
-        <div className="flex flex-shrink-0 border-b border-brand-border lg:hidden">
-          {(['chat', 'overview'] as const).map((v) => (
-            <button key={v} onClick={() => setMobileView(v)}
-              className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${mobileView === v ? 'border-b-2 border-accent text-accent' : 'text-brand-muted'}`}>
-              {v === 'chat' ? 'Gespräch' : 'Test-Übersicht'}
-            </button>
-          ))}
-        </div>
+          {/* Zwei Spalten */}
+          <div className="flex min-h-0 flex-1 lg:grid lg:grid-cols-[minmax(0,1fr)_390px]">
+            {/* Chat */}
+            <div className={`min-w-0 flex-col ${mobileView === 'chat' ? 'flex' : 'hidden'} lg:flex`}>
+              <div className="flex-1 overflow-y-auto">
+                <div className="mx-auto max-w-[780px] space-y-4 px-5 py-6">
+                  <div className="rounded-brand border border-accent/30 bg-accent/5 px-4 py-3">
+                    <span className="mb-0.5 inline-block text-[10px] font-bold uppercase tracking-wider text-accent">Aus den Selbsttests</span>
+                    <p className="text-xs leading-relaxed text-brand-muted">
+                      Echo kennt deinen kompletten Test. Es beginnt mit deinem Gesamtergebnis und fragt, wie sehr du es teilst.
+                      Rechts kannst du einzelne Fragen besprechen und Antworten anpassen – danach berechnet Echo dein Ergebnis neu.
+                      Kein festes Urteil, sondern ein besseres Verständnis deiner Situation. Ohne Diagnose.
+                    </p>
+                  </div>
 
-        {/* Zwei Spalten */}
-        <div className="flex min-h-0 flex-1 lg:grid lg:grid-cols-[minmax(0,1fr)_390px]">
-          {/* Chat */}
-          <div className={`min-w-0 flex-col ${mobileView === 'chat' ? 'flex' : 'hidden'} lg:flex`}>
-            <div className="flex-1 overflow-y-auto">
-              <div className="mx-auto max-w-[780px] space-y-4 px-5 py-6">
-                <div className="rounded-brand border border-accent/30 bg-accent/5 px-4 py-3">
-                  <span className="mb-0.5 inline-block text-[10px] font-bold uppercase tracking-wider text-accent">Aus den Selbsttests</span>
-                  <p className="text-xs leading-relaxed text-brand-muted">
-                    Echo kennt deinen kompletten Test. Es beginnt mit deinem Gesamtergebnis und fragt, wie sehr du es teilst.
-                    Rechts kannst du einzelne Fragen besprechen und Antworten anpassen – danach berechnet Echo dein Ergebnis neu.
-                    Kein festes Urteil, sondern ein besseres Verständnis deiner Situation. Ohne Diagnose.
-                  </p>
-                </div>
-
-                {visibleMessages.map((msg) => (
-                  <ChatMessage key={msg.id} content={msg.content} isUser={msg.role === 'user'}
-                    safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined} />
-                ))}
-                {pendingMessage && strom.beschaeftigt && <ChatMessage content={pendingMessage} isUser />}
-                {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment,
-                    in dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder
-                    gar nicht da. Den Punktindikator gibt es nur, solange kein Wort da ist. */}
-                {strom.takt.sichtbar && (
-                  <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
-                )}
-                {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
-                {strom.fehler != null && (
-                  <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
-                )}
-                {summary && (
-                  <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <p className="text-xs font-bold uppercase tracking-wide text-accent">So verstehe ich deine Situation</p>
-                      <button onClick={() => setSummary(null)} className="text-xs text-brand-muted transition-colors hover:text-navy">✕ Schließen</button>
+                  {visibleMessages.map((msg) => (
+                    <ChatMessage key={msg.id} content={msg.content} isUser={msg.role === 'user'}
+                      safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined} />
+                  ))}
+                  {pendingMessage && strom.beschaeftigt && <ChatMessage content={pendingMessage} isUser />}
+                  {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment,
+                      in dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder
+                      gar nicht da. Den Punktindikator gibt es nur, solange kein Wort da ist. */}
+                  {strom.takt.sichtbar && (
+                    <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
+                  )}
+                  {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
+                  {strom.fehler != null && (
+                    <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+                  )}
+                  {summary && (
+                    <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
+                      <div className="mb-3 flex items-center justify-between">
+                        <p className="text-xs font-bold uppercase tracking-wide text-accent">So verstehe ich deine Situation</p>
+                        <button onClick={() => setSummary(null)} className="text-xs text-brand-muted transition-colors hover:text-navy">✕ Schließen</button>
+                      </div>
+                      <div className="mb-4 text-sm leading-relaxed text-brand-text"><MarkdownMessage content={summary} /></div>
+                      {savedSummary ? (
+                        <span className="text-xs font-medium text-green-600">✓ Als Notiz zum Fall gespeichert</span>
+                      ) : (
+                        <button onClick={() => saveSummaryMutation.mutate()} disabled={saveSummaryMutation.isPending}
+                          className="rounded-brand border border-accent bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/20 disabled:opacity-40">
+                          {saveSummaryMutation.isPending ? 'Speichert …' : 'Als Notiz zum Fall speichern'}
+                        </button>
+                      )}
                     </div>
-                    <div className="mb-4 text-sm leading-relaxed text-brand-text"><MarkdownMessage content={summary} /></div>
-                    {savedSummary ? (
-                      <span className="text-xs font-medium text-green-600">✓ Als Notiz zum Fall gespeichert</span>
-                    ) : (
-                      <button onClick={() => saveSummaryMutation.mutate()} disabled={saveSummaryMutation.isPending}
-                        className="rounded-brand border border-accent bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/20 disabled:opacity-40">
-                        {saveSummaryMutation.isPending ? 'Speichert …' : 'Als Notiz zum Fall speichern'}
-                      </button>
-                    )}
-                  </div>
-                )}
-                {summaryMutation.isError && (
-                  <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
-                    Zusammenfassung konnte nicht erstellt werden.
-                  </div>
-                )}
-                {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
-                    Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
-                    drei Beitraege zurueckliegt. */}
-                {!strom.beschaeftigt && letzteAntwort && (
-                  <AntwortZuege
-                    onZug={(text) => { setPendingMessage(text); senden(text) }}
-                    safety={safetyLevelFromMeta(letzteAntwort.metadata)}
-                  />
-                )}
+                  )}
+                  {summaryMutation.isError && (
+                    <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                      Zusammenfassung konnte nicht erstellt werden.
+                    </div>
+                  )}
+                  {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
+                      Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
+                      drei Beitraege zurueckliegt. */}
+                  {!strom.beschaeftigt && letzteAntwort && (
+                    <AntwortZuege
+                      onZug={(text) => { setPendingMessage(text); senden(text) }}
+                      safety={safetyLevelFromMeta(letzteAntwort.metadata)}
+                    />
+                  )}
 
-                <div ref={messagesEndRef} />
+                  <div ref={messagesEndRef} />
+                </div>
+              </div>
+              <div className="flex-shrink-0 px-5 pb-4 pt-2">
+                <ChatComposer value={input} onChange={setInput} onSend={handleSend}
+                  pending={strom.beschaeftigt} placeholder="Schreibe Echo …"
+                  hint="Nichts wird als Urteil festgeschrieben – ihr klärt gemeinsam, wie deine Situation ist." />
               </div>
             </div>
-            <div className="flex-shrink-0 px-5 pb-4 pt-2">
-              <ChatComposer value={input} onChange={setInput} onSend={handleSend}
-                pending={strom.beschaeftigt} placeholder="Schreibe Echo …"
-                hint="Nichts wird als Urteil festgeschrieben – ihr klärt gemeinsam, wie deine Situation ist." />
-            </div>
-          </div>
 
-          {/* Übersicht */}
-          <aside className={`min-h-0 border-brand-border bg-brand-bg/40 lg:border-l ${mobileView === 'overview' ? 'flex' : 'hidden'} flex-col lg:flex`}>
-            <TestOverviewPanel
-              test={test}
-              result={result}
-              draft={draft}
-              dirty={dirty}
-              delta={delta}
-              recomputing={strom.beschaeftigt}
-              onRevise={(id, v) => { setDelta(null); setDraft((prev) => ({ ...prev, [id]: v })) }}
-              onResetDraft={() => { setDelta(null); setDraft(committed) }}
-              onRecompute={recompute}
-              onDiscuss={discuss}
-            />
-          </aside>
+            {/* Übersicht */}
+            <aside className={`min-h-0 border-brand-border bg-brand-bg/40 lg:border-l ${mobileView === 'overview' ? 'flex' : 'hidden'} flex-col lg:flex`}>
+              <TestOverviewPanel
+                test={test}
+                result={result}
+                draft={draft}
+                dirty={dirty}
+                delta={delta}
+                recomputing={strom.beschaeftigt}
+                onRevise={(id, v) => { setDelta(null); setDraft((prev) => ({ ...prev, [id]: v })) }}
+                onResetDraft={() => { setDelta(null); setDraft(committed) }}
+                onRecompute={recompute}
+                onDiscuss={discuss}
+              />
+            </aside>
+          </div>
         </div>
-      </div>
-    </AppShell>
+      </AppShell>
+    </BelegeProvider>
   )
 }

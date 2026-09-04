@@ -39,6 +39,8 @@ class CaseDocumentResponse(BaseModel):
     id: UUID
     case_id: UUID
     title: str
+    #: Stabile Nummer je Fall (Migration 98).
+    doc_no: int | None = None
     kind: DocumentKind
     document_date: date | None = None
     description: str | None = None

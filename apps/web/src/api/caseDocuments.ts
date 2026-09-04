@@ -12,6 +12,8 @@ export type DocumentKind =
   | 'brief' | 'chatverlauf' | 'nachricht' | 'notiz' | 'protokoll' | 'sonstiges'
 
 export interface CaseDocument {
+  /** Stabile Nummer je Fall. */
+  doc_no: number | null
   id: string
   case_id: string
   title: string

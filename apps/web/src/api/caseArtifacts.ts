@@ -10,6 +10,8 @@ import { apiClient } from './client'
 export type ArtifactStatus = 'aktiv' | 'ueberholt'
 
 export interface CaseArtifact {
+  /** Stabile Nummer je Fall. */
+  artifact_no: number | null
   id: string
   case_id: string
   title: string

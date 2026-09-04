@@ -86,7 +86,11 @@ def build_document_context(dokumente: list[dict[str, Any]]) -> str:
             rest.append(d)
             continue
 
-        kopf = f"### {d.get('title') or 'Ohne Titel'} ({art_label(d.get('kind'))})"
+        # Die Nummer ist stabil (Migration 98) und macht den Beleg verlinkbar:
+        # Die Oberflaeche erkennt "Dokument 3" im Antworttext wieder.
+        nr = d.get("doc_no")
+        marke = f"Dokument {nr} – " if nr else ""
+        kopf = f"### {marke}{d.get('title') or 'Ohne Titel'} ({art_label(d.get('kind'))})"
         if d.get("document_date"):
             kopf += f" — {d['document_date']}"
         zeilen.append(kopf)
@@ -109,7 +113,9 @@ def build_document_context(dokumente: list[dict[str, Any]]) -> str:
         )
         for d in rest:
             datum = f", {d['document_date']}" if d.get("document_date") else ""
-            zeilen.append(f"- {d.get('title') or 'Ohne Titel'} ({art_label(d.get('kind'))}{datum})")
+            nr = d.get("doc_no")
+            marke = f"Dokument {nr} – " if nr else ""
+            zeilen.append(f"- {marke}{d.get('title') or 'Ohne Titel'} ({art_label(d.get('kind'))}{datum})")
         zeilen.append("")
 
     return "\n".join(zeilen).strip()

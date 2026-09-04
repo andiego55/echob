@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import { BelegeProvider } from '@/components/app/Belege'
 import ChatComposer from '@/components/app/ChatComposer'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import HypothesisIcon from '@/components/HypothesisIcon'
@@ -152,169 +153,171 @@ export default function HypothesisDialogPage() {
   }
 
   return (
-    <AppShell>
-      <CaseNav caseId={caseId!} />
+    <BelegeProvider caseId={caseId!}>
+      <AppShell>
+        <CaseNav caseId={caseId!} />
 
-      <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
-        {/* Sub-Header */}
-        <DialogKopf
-          augenbraue="Hypothese"
-          titel={hyp.label}
-          symbol={<HypothesisIcon path={hyp.icon} size="sm" />}
-          onZurueck={() => navigate(`/app/cases/${caseId}/hypotheses`)}
-        >
-          <ArtefaktErzeugen
-            caseId={caseId!}
-            threadType={hypothesisId!}
-            eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
-            beschaeftigt={strom.beschaeftigt}
-          />
-          <DialogKopfKnopf
-            onClick={() => summaryMutation.mutate()}
-            disabled={summaryMutation.isPending || visibleMessages.length === 0}
+        <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
+          {/* Sub-Header */}
+          <DialogKopf
+            augenbraue="Hypothese"
+            titel={hyp.label}
+            symbol={<HypothesisIcon path={hyp.icon} size="sm" />}
+            onZurueck={() => navigate(`/app/cases/${caseId}/hypotheses`)}
           >
-            {summaryMutation.isPending ? 'Wird erstellt …' : 'Hypothese zusammenfassen'}
-          </DialogKopfKnopf>
-          <DialogKopfKnopf
-            onClick={handleReset}
-            disabled={resetMutation.isPending || visibleMessages.length === 0}
-            gefahr
-          >
-            Zurücksetzen
-          </DialogKopfKnopf>
-        </DialogKopf>
+            <ArtefaktErzeugen
+              caseId={caseId!}
+              threadType={hypothesisId!}
+              eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
+              beschaeftigt={strom.beschaeftigt}
+            />
+            <DialogKopfKnopf
+              onClick={() => summaryMutation.mutate()}
+              disabled={summaryMutation.isPending || visibleMessages.length === 0}
+            >
+              {summaryMutation.isPending ? 'Wird erstellt …' : 'Hypothese zusammenfassen'}
+            </DialogKopfKnopf>
+            <DialogKopfKnopf
+              onClick={handleReset}
+              disabled={resetMutation.isPending || visibleMessages.length === 0}
+              gefahr
+            >
+              Zurücksetzen
+            </DialogKopfKnopf>
+          </DialogKopf>
 
-        {/* Chat-Bereich */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
-            {/* Hinweis */}
-            <div className="rounded-brand border border-accent/30 bg-accent/5 px-4 py-3">
-              <p className="text-xs font-medium text-navy mb-0.5">{hyp.label}</p>
-              <p className="text-xs text-brand-muted">{hyp.description}</p>
-              <p className="text-xs text-brand-muted mt-2 pt-2 border-t border-navy/10">
-                <strong className="text-navy">Wichtig:</strong> Dies ist ein tastender Reflexionsdialog. Echo entwickelt{' '}
-                <strong className="text-navy">Hypothesen, keine Diagnosen</strong>. Über{' '}
-                <strong className="text-navy">„Hypothese zusammenfassen"</strong> speicherst du die Essenz – sie erscheint im Überblick und fließt als Kontext in weitere Gespräche ein.
-              </p>
+          {/* Chat-Bereich */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
+              {/* Hinweis */}
+              <div className="rounded-brand border border-accent/30 bg-accent/5 px-4 py-3">
+                <p className="text-xs font-medium text-navy mb-0.5">{hyp.label}</p>
+                <p className="text-xs text-brand-muted">{hyp.description}</p>
+                <p className="text-xs text-brand-muted mt-2 pt-2 border-t border-navy/10">
+                  <strong className="text-navy">Wichtig:</strong> Dies ist ein tastender Reflexionsdialog. Echo entwickelt{' '}
+                  <strong className="text-navy">Hypothesen, keine Diagnosen</strong>. Über{' '}
+                  <strong className="text-navy">„Hypothese zusammenfassen"</strong> speicherst du die Essenz – sie erscheint im Überblick und fließt als Kontext in weitere Gespräche ein.
+                </p>
+              </div>
+
+              {visibleMessages.map((msg) => (
+                <ChatMessage
+                  key={msg.id}
+                  content={msg.content}
+                  isUser={msg.role === 'user'}
+                  safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined}
+                />
+              ))}
+
+              {pendingMessage && strom.beschaeftigt && <ChatMessage content={pendingMessage} isUser />}
+
+              {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment, in
+                  dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder gar
+                  nicht da. Den Punktindikator gibt es nur noch, solange kein Wort da ist. */}
+              {strom.takt.sichtbar && (
+                <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
+              )}
+              {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
+
+              {strom.fehler != null && (
+                <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+              )}
+
+              {/* Arbeitshypothese (Zusammenfassung) */}
+              {summary && (
+                <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-bold text-accent uppercase tracking-wide">Arbeitshypothese</p>
+                    <button onClick={() => setSummary(null)} className="text-xs text-brand-muted hover:text-navy transition-colors">✕ Schließen</button>
+                  </div>
+                  <div className="text-sm text-brand-text leading-relaxed mb-4"><MarkdownMessage content={summary} /></div>
+                  <div className="flex items-center gap-3">
+                    {savedSummary ? (
+                      <span className="text-xs text-green-600 font-medium">✓ Gespeichert</span>
+                    ) : (
+                      <button
+                        onClick={() => saveSummaryMutation.mutate()}
+                        disabled={saveSummaryMutation.isPending}
+                        className="rounded-brand border border-accent bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors disabled:opacity-40"
+                      >
+                        {saveSummaryMutation.isPending ? 'Wird gespeichert …' : 'Hypothese speichern'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              {summaryMutation.isError && (
+                <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                  Zusammenfassung konnte nicht erstellt werden.
+                </div>
+              )}
+
+              {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
+                  Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
+                  drei Beitraege zurueckliegt. */}
+              {!strom.beschaeftigt && letzteAntwort && (
+                <AntwortZuege
+                  onZug={(text) => { setPendingMessage(text); senden(text) }}
+                  safety={safetyLevelFromMeta(letzteAntwort.metadata)}
+                />
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
+          </div>
 
-            {visibleMessages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                content={msg.content}
-                isUser={msg.role === 'user'}
-                safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined}
-              />
-            ))}
-
-            {pendingMessage && strom.beschaeftigt && <ChatMessage content={pendingMessage} isUser />}
-
-            {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment, in
-                dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder gar
-                nicht da. Den Punktindikator gibt es nur noch, solange kein Wort da ist. */}
-            {strom.takt.sichtbar && (
-              <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
-            )}
-            {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
-
-            {strom.fehler != null && (
-              <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
-            )}
-
-            {/* Arbeitshypothese (Zusammenfassung) */}
-            {summary && (
-              <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-bold text-accent uppercase tracking-wide">Arbeitshypothese</p>
-                  <button onClick={() => setSummary(null)} className="text-xs text-brand-muted hover:text-navy transition-colors">✕ Schließen</button>
+          {/* Einstiegsfragen + Eingabe */}
+          <div className="px-6 pb-5 pt-2 flex-shrink-0">
+            {showExamples && hyp.introQuestions.length > 0 && (
+              <div className="mx-auto max-w-[780px] mb-2 rounded-2xl border border-brand-border bg-white shadow-[0_4px_24px_rgba(15,30,46,0.08)] px-5 py-4">
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-sm font-semibold text-navy">Beispielfragen zum Einstieg</p>
+                  <button onClick={() => setShowExamples(false)} className="text-xs text-brand-muted hover:text-navy">
+                    ✕ Schließen
+                  </button>
                 </div>
-                <div className="text-sm text-brand-text leading-relaxed mb-4"><MarkdownMessage content={summary} /></div>
-                <div className="flex items-center gap-3">
-                  {savedSummary ? (
-                    <span className="text-xs text-green-600 font-medium">✓ Gespeichert</span>
-                  ) : (
+                <p className="text-xs text-brand-muted mb-3">
+                  Noch unsicher beim Thema? Klick eine Frage – Echo erklärt sie dir, bevor ihr gemeinsam auf deinen Fall schaut.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {hyp.introQuestions.map(q => (
                     <button
-                      onClick={() => saveSummaryMutation.mutate()}
-                      disabled={saveSummaryMutation.isPending}
-                      className="rounded-brand border border-accent bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors disabled:opacity-40"
+                      key={q}
+                      onClick={() => handleExample(q)}
+                      disabled={strom.beschaeftigt}
+                      className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
                     >
-                      {saveSummaryMutation.isPending ? 'Wird gespeichert …' : 'Hypothese speichern'}
+                      {q}
                     </button>
-                  )}
+                  ))}
                 </div>
               </div>
             )}
-            {summaryMutation.isError && (
-              <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
-                Zusammenfassung konnte nicht erstellt werden.
-              </div>
-            )}
 
-            {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
-                Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
-                drei Beitraege zurueckliegt. */}
-            {!strom.beschaeftigt && letzteAntwort && (
-              <AntwortZuege
-                onZug={(text) => { setPendingMessage(text); senden(text) }}
-                safety={safetyLevelFromMeta(letzteAntwort.metadata)}
-              />
-            )}
-
-            <div ref={messagesEndRef} />
+            <ChatComposer
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              pending={strom.beschaeftigt}
+              placeholder="Schreibe Echo …"
+              leftAccessory={
+                <button
+                  type="button"
+                  onClick={() => setShowExamples(v => !v)}
+                  title="Beispielfragen zum Einstieg"
+                  className={`h-9 px-3.5 rounded-full border text-xs font-medium transition-colors ${
+                    showExamples
+                      ? 'border-accent bg-accent/10 text-accent'
+                      : 'border-brand-border text-brand-muted hover:border-accent/40 hover:text-accent'
+                  }`}
+                >
+                  Beispiele
+                </button>
+              }
+            />
           </div>
         </div>
-
-        {/* Einstiegsfragen + Eingabe */}
-        <div className="px-6 pb-5 pt-2 flex-shrink-0">
-          {showExamples && hyp.introQuestions.length > 0 && (
-            <div className="mx-auto max-w-[780px] mb-2 rounded-2xl border border-brand-border bg-white shadow-[0_4px_24px_rgba(15,30,46,0.08)] px-5 py-4">
-              <div className="flex items-center justify-between mb-1.5">
-                <p className="text-sm font-semibold text-navy">Beispielfragen zum Einstieg</p>
-                <button onClick={() => setShowExamples(false)} className="text-xs text-brand-muted hover:text-navy">
-                  ✕ Schließen
-                </button>
-              </div>
-              <p className="text-xs text-brand-muted mb-3">
-                Noch unsicher beim Thema? Klick eine Frage – Echo erklärt sie dir, bevor ihr gemeinsam auf deinen Fall schaut.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {hyp.introQuestions.map(q => (
-                  <button
-                    key={q}
-                    onClick={() => handleExample(q)}
-                    disabled={strom.beschaeftigt}
-                    className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-40"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <ChatComposer
-            value={input}
-            onChange={setInput}
-            onSend={handleSend}
-            pending={strom.beschaeftigt}
-            placeholder="Schreibe Echo …"
-            leftAccessory={
-              <button
-                type="button"
-                onClick={() => setShowExamples(v => !v)}
-                title="Beispielfragen zum Einstieg"
-                className={`h-9 px-3.5 rounded-full border text-xs font-medium transition-colors ${
-                  showExamples
-                    ? 'border-accent bg-accent/10 text-accent'
-                    : 'border-brand-border text-brand-muted hover:border-accent/40 hover:text-accent'
-                }`}
-              >
-                Beispiele
-              </button>
-            }
-          />
-        </div>
-      </div>
-    </AppShell>
+      </AppShell>
+    </BelegeProvider>
   )
 }

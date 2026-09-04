@@ -250,7 +250,7 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
         # hat, sagt etwas über die Bewegung im Fall, ihr Inhalt aber nichts mehr.
         async with pool.acquire() as conn:
             art_rows = await conn.fetch(
-                "SELECT title, body, created_at FROM case_artifacts "
+                "SELECT artifact_no, title, body, created_at FROM case_artifacts "
                 "WHERE case_id = $1 AND status = 'aktiv' ORDER BY created_at DESC",
                 case_id,
             )
@@ -269,7 +269,7 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
         # Erst der Beleg, dann was jemand darin gesehen hat.
         async with pool.acquire() as conn:
             dok_rows = await conn.fetch(
-                "SELECT title, kind, document_date, description, content "
+                "SELECT doc_no, title, kind, document_date, description, content "
                 "FROM case_documents WHERE case_id = $1 AND active = true "
                 "ORDER BY document_date DESC NULLS LAST, created_at DESC",
                 case_id,

@@ -89,7 +89,11 @@ def build_artifact_context(
 
         datum = a.get("created_at")
         datum_text = datum.strftime("%d.%m.%Y") if hasattr(datum, "strftime") else str(datum or "")
-        zeilen.append(f"### {a.get('title') or 'Ohne Titel'} ({datum_text})")
+        # Stabile Nummer (Migration 98), damit die Oberflaeche "Erkenntnis 5" im
+        # Antworttext wiedererkennt und verlinken kann.
+        nr = a.get("artifact_no")
+        marke = f"Erkenntnis {nr} – " if nr else ""
+        zeilen.append(f"### {marke}{a.get('title') or 'Ohne Titel'} ({datum_text})")
         zeilen.append(body)
         zeilen.append("")
 

@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import { BelegeProvider } from '@/components/app/Belege'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
@@ -246,152 +247,154 @@ export default function TopicDialogPage() {
   }
 
   return (
-    <AppShell>
-      <CaseNav caseId={caseId!} />
+    <BelegeProvider caseId={caseId!}>
+      <AppShell>
+        <CaseNav caseId={caseId!} />
 
-      <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
-        {/* Sub-Header */}
-        <DialogKopf
-          augenbraue={topic.isTest ? 'Ergebnis-Dialog' : topic.isScene ? 'Szenendialog' : 'Themendialog'}
-          titel={topic.label}
-          onZurueck={() => navigate(`/app/cases/${caseId}`)}
-        >
-          <ArtefaktErzeugen
-            caseId={caseId!}
-            threadType={topicId!}
-            eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
-            beschaeftigt={strom.beschaeftigt}
-          />
-          <DialogKopfKnopf
-            onClick={() => summaryMutation.mutate()}
-            disabled={summaryMutation.isPending || visibleMessages.length === 0}
+        <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 49px)' }}>
+          {/* Sub-Header */}
+          <DialogKopf
+            augenbraue={topic.isTest ? 'Ergebnis-Dialog' : topic.isScene ? 'Szenendialog' : 'Themendialog'}
+            titel={topic.label}
+            onZurueck={() => navigate(`/app/cases/${caseId}`)}
           >
-            {summaryMutation.isPending ? 'Wird erstellt …' : 'Zusammenfassung'}
-          </DialogKopfKnopf>
-          <DialogKopfKnopf
-            onClick={handleReset}
-            disabled={resetMutation.isPending || visibleMessages.length === 0}
-            gefahr
-          >
-            Zurücksetzen
-          </DialogKopfKnopf>
-        </DialogKopf>
+            <ArtefaktErzeugen
+              caseId={caseId!}
+              threadType={topicId!}
+              eigeneBeitraege={visibleMessages.filter(m => m.role === 'user').length}
+              beschaeftigt={strom.beschaeftigt}
+            />
+            <DialogKopfKnopf
+              onClick={() => summaryMutation.mutate()}
+              disabled={summaryMutation.isPending || visibleMessages.length === 0}
+            >
+              {summaryMutation.isPending ? 'Wird erstellt …' : 'Zusammenfassung'}
+            </DialogKopfKnopf>
+            <DialogKopfKnopf
+              onClick={handleReset}
+              disabled={resetMutation.isPending || visibleMessages.length === 0}
+              gefahr
+            >
+              Zurücksetzen
+            </DialogKopfKnopf>
+          </DialogKopf>
 
-        {/* Chat-Bereich */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
-            {/* Kontext-Hinweis */}
-            <div className={`rounded-brand border px-4 py-3 ${topic.isContent ? 'border-accent/30 bg-accent/5' : 'border-brand-border bg-blue-50'}`}>
-              {topic.isContent && (
-                <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-accent mb-1">
-                  {topic.isTest ? 'Aus den Selbsttests' : topic.isScene ? 'Aus den Szenen' : 'Aus dem Wissen'}
-                </span>
+          {/* Chat-Bereich */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
+              {/* Kontext-Hinweis */}
+              <div className={`rounded-brand border px-4 py-3 ${topic.isContent ? 'border-accent/30 bg-accent/5' : 'border-brand-border bg-blue-50'}`}>
+                {topic.isContent && (
+                  <span className="inline-block text-[10px] font-bold tracking-wider uppercase text-accent mb-1">
+                    {topic.isTest ? 'Aus den Selbsttests' : topic.isScene ? 'Aus den Szenen' : 'Aus dem Wissen'}
+                  </span>
+                )}
+                <p className="text-xs font-medium text-navy mb-0.5">{topic.label}</p>
+                <p className="text-xs text-brand-muted">{topic.description}</p>
+
+                <p className="text-xs text-brand-muted mt-2 pt-2 border-t border-navy/10">
+                  <strong className="text-navy">Wozu dieser Dialog?</strong>{' '}
+                  Deine Antworten hier verbessern dein Nutzer- und Beziehungsprofil. Erstelle am Ende über{' '}
+                  <strong className="text-navy">„Zusammenfassung"</strong> die Essenz des Gesprächs und speichere sie –
+                  Echo berücksichtigt sie künftig in allen Gesprächen und Berichten.
+                </p>
+                <p className="text-xs text-brand-muted mt-2">
+                  Du möchtest frei mit Echo sprechen?{' '}
+                  <Link to={`/app/cases/${caseId}/echo`} className="text-accent font-medium hover:underline">
+                    Zum Echo-Chat →
+                  </Link>
+                </p>
+              </div>
+
+              {/* Nachrichten */}
+              {visibleMessages.map((msg) => (
+                <ChatMessage
+                  key={msg.id}
+                  content={msg.content}
+                  isUser={msg.role === 'user'}
+                  safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined}
+                />
+              ))}
+
+              {pendingMessage && strom.beschaeftigt && (
+                <ChatMessage content={pendingMessage} isUser />
               )}
-              <p className="text-xs font-medium text-navy mb-0.5">{topic.label}</p>
-              <p className="text-xs text-brand-muted">{topic.description}</p>
 
-              <p className="text-xs text-brand-muted mt-2 pt-2 border-t border-navy/10">
-                <strong className="text-navy">Wozu dieser Dialog?</strong>{' '}
-                Deine Antworten hier verbessern dein Nutzer- und Beziehungsprofil. Erstelle am Ende über{' '}
-                <strong className="text-navy">„Zusammenfassung"</strong> die Essenz des Gesprächs und speichere sie –
-                Echo berücksichtigt sie künftig in allen Gesprächen und Berichten.
-              </p>
-              <p className="text-xs text-brand-muted mt-2">
-                Du möchtest frei mit Echo sprechen?{' '}
-                <Link to={`/app/cases/${caseId}/echo`} className="text-accent font-medium hover:underline">
-                  Zum Echo-Chat →
-                </Link>
-              </p>
-            </div>
+              {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment, in
+                  dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder gar
+                  nicht da. Den Punktindikator gibt es nur noch, solange kein Wort da ist. */}
+              {strom.takt.sichtbar && (
+                <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
+              )}
+              {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
 
-            {/* Nachrichten */}
-            {visibleMessages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                content={msg.content}
-                isUser={msg.role === 'user'}
-                safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined}
-              />
-            ))}
+              {strom.fehler != null && (
+                <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+              )}
 
-            {pendingMessage && strom.beschaeftigt && (
-              <ChatMessage content={pendingMessage} isUser />
-            )}
-
-            {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment, in
-                dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder gar
-                nicht da. Den Punktindikator gibt es nur noch, solange kein Wort da ist. */}
-            {strom.takt.sichtbar && (
-              <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
-            )}
-            {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
-
-            {strom.fehler != null && (
-              <ChatErrorMessage text={apiErrorMessage(strom.fehler, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
-            )}
-
-            {/* Zusammenfassung am Ende des Dialogs */}
-            {summary && (
-              <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-bold text-accent uppercase tracking-wide">Zusammenfassung</p>
-                  <button
-                    onClick={() => setSummary(null)}
-                    className="text-xs text-brand-muted hover:text-navy transition-colors"
-                  >
-                    ✕ Schließen
-                  </button>
-                </div>
-                <div className="text-sm text-brand-text mb-4 leading-relaxed">
-                  <MarkdownMessage content={summary} />
-                </div>
-                <div className="flex items-center gap-3">
-                  {savedSummary ? (
-                    <span className="text-xs text-green-600 font-medium">✓ Gespeichert</span>
-                  ) : (
+              {/* Zusammenfassung am Ende des Dialogs */}
+              {summary && (
+                <div className="rounded-brand border border-accent/30 bg-accent/5 px-5 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-bold text-accent uppercase tracking-wide">Zusammenfassung</p>
                     <button
-                      onClick={() => saveSummaryMutation.mutate()}
-                      disabled={saveSummaryMutation.isPending}
-                      className="rounded-brand border border-accent bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors disabled:opacity-40"
+                      onClick={() => setSummary(null)}
+                      className="text-xs text-brand-muted hover:text-navy transition-colors"
                     >
-                      {saveSummaryMutation.isPending ? 'Wird gespeichert …' : 'Zusammenfassung speichern'}
+                      ✕ Schließen
                     </button>
-                  )}
+                  </div>
+                  <div className="text-sm text-brand-text mb-4 leading-relaxed">
+                    <MarkdownMessage content={summary} />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {savedSummary ? (
+                      <span className="text-xs text-green-600 font-medium">✓ Gespeichert</span>
+                    ) : (
+                      <button
+                        onClick={() => saveSummaryMutation.mutate()}
+                        disabled={saveSummaryMutation.isPending}
+                        className="rounded-brand border border-accent bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors disabled:opacity-40"
+                      >
+                        {saveSummaryMutation.isPending ? 'Wird gespeichert …' : 'Zusammenfassung speichern'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {summaryMutation.isError && (
-              <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
-                Zusammenfassung konnte nicht erstellt werden.
-              </div>
-            )}
+              {summaryMutation.isError && (
+                <div className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                  Zusammenfassung konnte nicht erstellt werden.
+                </div>
+              )}
 
-            {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
-                Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
-                drei Beitraege zurueckliegt. */}
-            {!strom.beschaeftigt && letzteAntwort && (
-              <AntwortZuege
-                onZug={(text) => { setPendingMessage(text); senden(text) }}
-                safety={safetyLevelFromMeta(letzteAntwort.metadata)}
-              />
-            )}
+              {/* Zuege unter der letzten Antwort. Nur dort - unter jeder zu stehen waere
+                  Laerm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
+                  drei Beitraege zurueckliegt. */}
+              {!strom.beschaeftigt && letzteAntwort && (
+                <AntwortZuege
+                  onZug={(text) => { setPendingMessage(text); senden(text) }}
+                  safety={safetyLevelFromMeta(letzteAntwort.metadata)}
+                />
+              )}
 
-            <div ref={messagesEndRef} />
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+
+          {/* Eingabe */}
+          <div className="px-6 pb-5 pt-2 flex-shrink-0">
+            <ChatComposer
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              pending={strom.beschaeftigt}
+              placeholder="Schreibe Echo …"
+            />
           </div>
         </div>
-
-        {/* Eingabe */}
-        <div className="px-6 pb-5 pt-2 flex-shrink-0">
-          <ChatComposer
-            value={input}
-            onChange={setInput}
-            onSend={handleSend}
-            pending={strom.beschaeftigt}
-            placeholder="Schreibe Echo …"
-          />
-        </div>
-      </div>
-    </AppShell>
+      </AppShell>
+    </BelegeProvider>
   )
 }

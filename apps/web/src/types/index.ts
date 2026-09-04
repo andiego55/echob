@@ -589,6 +589,8 @@ export interface CaseCreate {
 // ── Szene ─────────────────────────────────────────────────────────────────────
 
 export interface Scene {
+  /** Stabile Nummer je Fall — Echo verweist damit auf die Szene. */
+  scene_no: number | null
   id: string
   case_id: string
   user_id: string

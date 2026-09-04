@@ -8,6 +8,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
+import { BelegeProvider } from '@/components/app/Belege'
 import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 import AntwortZuege from '@/components/app/AntwortZuege'
 import KontextBand from '@/components/app/KontextBand'
@@ -326,190 +327,192 @@ export default function EchoPage() {
     : null
 
   return (
-    <AppShell>
-      <CaseNav caseId={caseId!} />
+    <BelegeProvider caseId={caseId!}>
+      <AppShell>
+        <CaseNav caseId={caseId!} />
 
-      <div className="flex h-[calc(100vh-112px)]">
-        {/* Chat-Sidebar */}
-        <ChatSidebar
-          caseId={caseId!}
-          sessions={sessions}
-          selected={selectedSession ?? null}
-          onSelect={chatWechseln}
-          onNewChat={handleNewChat}
-        />
+        <div className="flex h-[calc(100vh-112px)]">
+          {/* Chat-Sidebar */}
+          <ChatSidebar
+            caseId={caseId!}
+            sessions={sessions}
+            selected={selectedSession ?? null}
+            onSelect={chatWechseln}
+            onNewChat={handleNewChat}
+          />
 
-        {/* Hauptbereich */}
-        <div className="flex flex-col flex-1 min-w-0">
+          {/* Hauptbereich */}
+          <div className="flex flex-col flex-1 min-w-0">
 
-          {/* Mobile: Session-Auswahl */}
-          <div className="md:hidden border-b border-brand-border bg-white px-4 py-2 flex gap-2 items-center">
-            <select
-              value={selectedSession ?? ''}
-              onChange={(e) => chatWechseln(e.target.value || null)}
-              className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none"
-            >
-              <option value="">Neuer Chat</option>
-              {sessions.map((s) => (
-                <option key={s.id} value={s.id}>{s.title ?? 'Neuer Chat'}</option>
-              ))}
-            </select>
-            <button
-              onClick={handleNewChat}
-              className="flex-shrink-0 px-3 py-2 rounded-brand border border-brand-border text-sm text-brand-muted hover:border-accent hover:text-accent transition-colors"
-              title="Neuen Chat starten"
-            >
-              +
-            </button>
-          </div>
-
-          <KontextBand caseId={caseId!} ohne={ohne} onAendern={setOhne} />
-
-          {/* Was aus dem Gespraech bleiben soll. Erscheint erst, wenn es einen
-              Verlauf gibt - vor dem ersten Wort waere der Knopf nur Deko. */}
-          {selectedSession && history.length > 0 && (
-            <div className="flex justify-end border-b border-brand-border bg-white px-4 py-2">
-              <ArtefaktErzeugen
-                caseId={caseId!}
-                threadType={threadType}
-                chatSessionId={selectedSession}
-                eigeneBeitraege={history.filter(m => m.role === 'user').length}
-                beschaeftigt={beschaeftigt}
-              />
+            {/* Mobile: Session-Auswahl */}
+            <div className="md:hidden border-b border-brand-border bg-white px-4 py-2 flex gap-2 items-center">
+              <select
+                value={selectedSession ?? ''}
+                onChange={(e) => chatWechseln(e.target.value || null)}
+                className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none"
+              >
+                <option value="">Neuer Chat</option>
+                {sessions.map((s) => (
+                  <option key={s.id} value={s.id}>{s.title ?? 'Neuer Chat'}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleNewChat}
+                className="flex-shrink-0 px-3 py-2 rounded-brand border border-brand-border text-sm text-brand-muted hover:border-accent hover:text-accent transition-colors"
+                title="Neuen Chat starten"
+              >
+                +
+              </button>
             </div>
-          )}
 
-          {/* Chat-Bereich */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-[780px] px-6 py-6 space-y-5">
+            <KontextBand caseId={caseId!} ohne={ohne} onAendern={setOhne} />
 
-              {/* Begrüßung wenn leer */}
-              {showEmptyState && <WelcomePrompt onTopic={handleTopic} />}
-
-              {/* Nachrichten */}
-              {history.map((msg) => (
-                <ChatMessage
-                  key={msg.id}
-                  content={msg.content}
-                  isUser={msg.role === 'user'}
-                  safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined}
+            {/* Was aus dem Gespraech bleiben soll. Erscheint erst, wenn es einen
+                Verlauf gibt - vor dem ersten Wort waere der Knopf nur Deko. */}
+            {selectedSession && history.length > 0 && (
+              <div className="flex justify-end border-b border-brand-border bg-white px-4 py-2">
+                <ArtefaktErzeugen
+                  caseId={caseId!}
+                  threadType={threadType}
+                  chatSessionId={selectedSession}
+                  eigeneBeitraege={history.filter(m => m.role === 'user').length}
+                  beschaeftigt={beschaeftigt}
                 />
-              ))}
+              </div>
+            )}
 
-              {/* Optimistische Nutzernachricht */}
-              {/* Bleibt bis zur Uebergabe stehen — vorher verschwand sie kurz, weil sie
-                  geleert wurde, bevor der Verlauf sie enthielt. */}
-              {pendingMessage && (
-                <ChatMessage content={pendingMessage} isUser />
-              )}
+            {/* Chat-Bereich */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="mx-auto max-w-[780px] px-6 py-6 space-y-5">
 
-              {/* Die Antwort, waehrend sie entsteht. Der Tippindikator bleibt nur, bis
-                  das erste Stueck da ist - danach waere er neben dem wachsenden Text
-                  eine zweite, widerspruechliche Auskunft. */}
-              {takt.sichtbar && (
-                <ChatMessage content={takt.sichtbar} isUser={false} safetyLevel={stromSafety} imFluss />
-              )}
-              {beschaeftigt && !takt.sichtbar && <TypingIndicator />}
+                {/* Begrüßung wenn leer */}
+                {showEmptyState && <WelcomePrompt onTopic={handleTopic} />}
 
-              {mutation.isError && (
-                <ChatErrorMessage text={apiErrorMessage(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
-              )}
+                {/* Nachrichten */}
+                {history.map((msg) => (
+                  <ChatMessage
+                    key={msg.id}
+                    content={msg.content}
+                    isUser={msg.role === 'user'}
+                    safetyLevel={msg.role === 'assistant' ? safetyLevelFromMeta(msg.metadata) : undefined}
+                  />
+                ))}
 
-              {/* Züge unter der letzten Antwort. Nur dort — unter jeder zu stehen wäre
-                  Lärm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
-                  drei Beiträge zurückliegt. */}
-              {!beschaeftigt && letzteAntwort && (
-                <AntwortZuege
-                  onZug={(text) => { setPendingMessage(text); mutation.mutate({ message: text }) }}
-                  safety={safetyLevelFromMeta(letzteAntwort.metadata)}
-                />
-              )}
+                {/* Optimistische Nutzernachricht */}
+                {/* Bleibt bis zur Uebergabe stehen — vorher verschwand sie kurz, weil sie
+                    geleert wurde, bevor der Verlauf sie enthielt. */}
+                {pendingMessage && (
+                  <ChatMessage content={pendingMessage} isUser />
+                )}
 
-              {assignmentId && selectedSession && history.length > 0 && !beschaeftigt && (
-                <AssignmentDialogSummary caseId={caseId!} assignmentId={assignmentId} />
-              )}
+                {/* Die Antwort, waehrend sie entsteht. Der Tippindikator bleibt nur, bis
+                    das erste Stueck da ist - danach waere er neben dem wachsenden Text
+                    eine zweite, widerspruechliche Auskunft. */}
+                {takt.sichtbar && (
+                  <ChatMessage content={takt.sichtbar} isUser={false} safetyLevel={stromSafety} imFluss />
+                )}
+                {beschaeftigt && !takt.sichtbar && <TypingIndicator />}
 
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
+                {mutation.isError && (
+                  <ChatErrorMessage text={apiErrorMessage(mutation.error, 'Echo konnte nicht antworten. Bitte versuche es erneut.')} />
+                )}
 
-          {/* Glossar-Overlay */}
-          {showGlossary && (
-            <div className="px-6 pb-2">
-              <div className="mx-auto max-w-[780px] rounded-2xl border border-brand-border bg-white shadow-[0_4px_24px_rgba(15,30,46,0.10)] px-5 py-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-navy">Glossar – Begriff auswählen</p>
-                  <button onClick={() => setGlossary(false)} className="text-xs text-brand-muted hover:text-navy">
-                    ✕ Schließen
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {GLOSSARY_TERMS.map((term) => (
-                    <button
-                      key={term}
-                      onClick={() => handleGlossary(term)}
-                      className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors"
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
+                {/* Züge unter der letzten Antwort. Nur dort — unter jeder zu stehen wäre
+                    Lärm, und ein Klick weiter oben schickte eine Nachfrage zu etwas, das
+                    drei Beiträge zurückliegt. */}
+                {!beschaeftigt && letzteAntwort && (
+                  <AntwortZuege
+                    onZug={(text) => { setPendingMessage(text); mutation.mutate({ message: text }) }}
+                    safety={safetyLevelFromMeta(letzteAntwort.metadata)}
+                  />
+                )}
+
+                {assignmentId && selectedSession && history.length > 0 && !beschaeftigt && (
+                  <AssignmentDialogSummary caseId={caseId!} assignmentId={assignmentId} />
+                )}
+
+                <div ref={messagesEndRef} />
               </div>
             </div>
-          )}
 
-          {/* Eingabe */}
-          <div className="px-6 pb-5 pt-2">
-            {assignmentId && (
-              <div className="mx-auto max-w-[780px] mb-2">
-                <p className="text-[11px] text-brand-muted mb-1">
-                  Dieser Dialog wurde von deiner Fachperson vorbereitet – Echo richtet sich danach aus.
-                  {keywords.length > 0 && ' Tipp: Stichworte anklicken.'}
-                </p>
-                {keywords.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {keywords.map(kw => (
-                      <button key={kw} type="button" onClick={() => handleKeyword(kw)} disabled={beschaeftigt}
-                        className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-50">
-                        {kw}
+            {/* Glossar-Overlay */}
+            {showGlossary && (
+              <div className="px-6 pb-2">
+                <div className="mx-auto max-w-[780px] rounded-2xl border border-brand-border bg-white shadow-[0_4px_24px_rgba(15,30,46,0.10)] px-5 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-semibold text-navy">Glossar – Begriff auswählen</p>
+                    <button onClick={() => setGlossary(false)} className="text-xs text-brand-muted hover:text-navy">
+                      ✕ Schließen
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {GLOSSARY_TERMS.map((term) => (
+                      <button
+                        key={term}
+                        onClick={() => handleGlossary(term)}
+                        className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors"
+                      >
+                        {term}
                       </button>
                     ))}
                   </div>
-                )}
+                </div>
               </div>
             )}
-            {/* Direkt ueber dem Feld, in das der Text zurueckkommt. */}
-            <EntwurfHinweis
-              entwurf={eingabeEntwurf}
-              was="Eine angefangene Nachricht"
-              onUebernehmen={w => setInput(w.input)}
-            />
 
-            <ChatComposer
-              value={input}
-              onChange={setInput}
-              onSend={handleSend}
-              pending={beschaeftigt}
-              hint="Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung."
-              leftAccessory={
-                <button
-                  type="button"
-                  onClick={() => setGlossary((v) => !v)}
-                  title="Glossar öffnen"
-                  className={`h-9 px-3.5 rounded-full border text-xs font-medium transition-colors ${
-                    showGlossary
-                      ? 'border-accent bg-accent/10 text-accent'
-                      : 'border-brand-border text-brand-muted hover:border-accent/40 hover:text-accent'
-                  }`}
-                >
-                  Glossar
-                </button>
-              }
-            />
+            {/* Eingabe */}
+            <div className="px-6 pb-5 pt-2">
+              {assignmentId && (
+                <div className="mx-auto max-w-[780px] mb-2">
+                  <p className="text-[11px] text-brand-muted mb-1">
+                    Dieser Dialog wurde von deiner Fachperson vorbereitet – Echo richtet sich danach aus.
+                    {keywords.length > 0 && ' Tipp: Stichworte anklicken.'}
+                  </p>
+                  {keywords.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {keywords.map(kw => (
+                        <button key={kw} type="button" onClick={() => handleKeyword(kw)} disabled={beschaeftigt}
+                          className="text-xs px-3 py-1.5 rounded-full border border-brand-border text-brand-muted hover:border-accent hover:text-accent transition-colors disabled:opacity-50">
+                          {kw}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* Direkt ueber dem Feld, in das der Text zurueckkommt. */}
+              <EntwurfHinweis
+                entwurf={eingabeEntwurf}
+                was="Eine angefangene Nachricht"
+                onUebernehmen={w => setInput(w.input)}
+              />
+
+              <ChatComposer
+                value={input}
+                onChange={setInput}
+                onSend={handleSend}
+                pending={beschaeftigt}
+                hint="Echo stellt keine Diagnosen und ersetzt keine professionelle Beratung."
+                leftAccessory={
+                  <button
+                    type="button"
+                    onClick={() => setGlossary((v) => !v)}
+                    title="Glossar öffnen"
+                    className={`h-9 px-3.5 rounded-full border text-xs font-medium transition-colors ${
+                      showGlossary
+                        ? 'border-accent bg-accent/10 text-accent'
+                        : 'border-brand-border text-brand-muted hover:border-accent/40 hover:text-accent'
+                    }`}
+                  >
+                    Glossar
+                  </button>
+                }
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </AppShell>
+      </AppShell>
+    </BelegeProvider>
   )
 }
 

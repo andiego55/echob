@@ -64,6 +64,8 @@ class CaseArtifactResponse(BaseModel):
     id: UUID
     case_id: UUID
     title: str
+    #: Stabile Nummer je Fall (Migration 98).
+    artifact_no: int | None = None
     body: str
     source_thread: str | None = None
     source_session: UUID | None = None

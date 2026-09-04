@@ -89,3 +89,35 @@ def test_der_fall_selbst_bleibt_immer_stehen():
     text = build_case_context(case=_FALL, onboarding=None, scenes=[], scale_scores=[])
     assert "Fallkontext" in text
     assert text.strip() != ""
+
+
+# ── Stabile Nummern (Migration 98) ───────────────────────────────────────────
+
+def test_kontext_nutzt_die_stabile_nummer_statt_der_position():
+    """Der Kern von Migration 98.
+
+    Frueher war die Nummer die POSITION in einer nach Datum sortierten Liste - jede neue
+    Szene verschob alle aelteren, und ein Bericht vom Mai zeigte im August auf eine andere
+    Szene. Hier steht die dritte Szene an erster Position und muss trotzdem "Szene 3"
+    heissen.
+    """
+    szenen = [
+        {**_SZENEN[0], "title": "Zuletzt geschrieben", "scene_no": 3, "scene_date": "2026-06-01"},
+        {**_SZENEN[0], "title": "Zuerst geschrieben",  "scene_no": 1, "scene_date": "2026-01-01"},
+    ]
+    text = build_case_context(case=_FALL, onboarding=None, scenes=szenen, scale_scores=[])
+    assert 'Szene 3 – "Zuletzt geschrieben"' in text
+    assert 'Szene 1 – "Zuerst geschrieben"' in text
+
+
+def test_ohne_stabile_nummer_bleibt_die_position():
+    """Rueckfall fuer Aufrufer ohne die Spalte - Tests, aeltere Codepfade."""
+    szenen = [{**_SZENEN[0], "title": "Ohne Nummer"}]
+    assert 'Szene 1 – "Ohne Nummer"' in build_case_context(
+        case=_FALL, onboarding=None, scenes=szenen, scale_scores=[])
+
+
+def test_der_titel_steht_neben_der_nummer():
+    """Ohne ihn ist der Verweis fuer den Lesenden wertlos - genau der gemeldete Fehler."""
+    text = build_case_context(case=_FALL, onboarding=None, scenes=_SZENEN, scale_scores=[])
+    assert '"Der Abend im Maerz"' in text
