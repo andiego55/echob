@@ -1,8 +1,9 @@
 import { memo } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { defaultUrlTransform } from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { belegAusHref, belegeVerlinken } from '@/lib/belege'
+import { belegAusHref, belegeVerlinken, belegUrlTransform } from '@/lib/belege'
 import { BelegVerweis } from './Belege'
 
 interface Props {
@@ -89,7 +90,12 @@ function MarkdownMessage({ content, isUser = false }: Props) {
   }
 
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={BAUSTEINE}>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={BAUSTEINE}
+      // Warum das noetig ist, steht bei belegUrlTransform.
+      urlTransform={(url) => belegUrlTransform(url, defaultUrlTransform)}
+    >
       {belegeVerlinken(content)}
     </ReactMarkdown>
   )

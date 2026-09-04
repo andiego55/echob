@@ -6,7 +6,8 @@
  * gierig greift und mitten im Fließtext Wörter verlinkt, die keine Belege sind.
  */
 import { describe, expect, it } from 'vitest'
-import { belegAusHref, belegeVerlinken } from '../src/lib/belege'
+import { belegAusHref, belegUrlTransform, belegeVerlinken } from '../src/lib/belege'
+import { defaultUrlTransform } from 'react-markdown'
 
 describe('belegeVerlinken', () => {
   it('verlinkt eine Szene', () => {
@@ -84,5 +85,32 @@ describe('belegAusHref', () => {
     const raus = belegeVerlinken('Szene 7')
     const href = raus.match(/\(([^)]+)\)/)![1]
     expect(belegAusHref(href)).toEqual({ art: 'szene', nr: 7 })
+  })
+})
+
+describe('belegUrlTransform', () => {
+  it('lässt das eigene Schema durch', () => {
+    expect(belegUrlTransform('echob:szene/12', defaultUrlTransform)).toBe('echob:szene/12')
+  })
+
+  it('überlässt alles andere der Prüfung von react-markdown', () => {
+    expect(belegUrlTransform('https://example.com', defaultUrlTransform))
+      .toBe('https://example.com')
+    expect(belegUrlTransform('/app/cases/1', defaultUrlTransform)).toBe('/app/cases/1')
+    // Der Schutz bleibt: gefaehrliche Schemata werden weiterhin geleert.
+    expect(belegUrlTransform('javascript:alert(1)', defaultUrlTransform)).toBe('')
+  })
+
+  it('react-markdown WÜRDE das eigene Schema wegwerfen', () => {
+    // Der Grund, warum es belegUrlTransform ueberhaupt gibt. Faellt dieser Test eines
+    // Tages, weil die Bibliothek ihr Verhalten geaendert hat, ist die Umgehung
+    // ueberfluessig geworden - und man sieht es hier, statt es zu vermuten.
+    expect(defaultUrlTransform('echob:szene/12')).toBe('')
+  })
+
+  it('ein leeres Ziel wäre der gemeldete Fehler gewesen', () => {
+    // href="" fuehrt im Browser auf die Seite, auf der man steht: Die Belege sahen aus
+    // wie Links und fuehrten zurueck in denselben Chat.
+    expect(belegUrlTransform('echob:szene/12', defaultUrlTransform)).not.toBe('')
   })
 })

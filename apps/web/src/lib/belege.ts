@@ -69,3 +69,21 @@ export function belegAusHref(href: string | undefined): Beleg | null {
   const zahl = Number(nr)
   return Number.isInteger(zahl) && zahl > 0 ? { art: art as BelegArt, nr: zahl } : null
 }
+
+/**
+ * Welche Ziele react-markdown durchlassen darf.
+ *
+ * **Der Fehler, gegen den das steht.** `defaultUrlTransform` wirft jedes Protokoll weg, das
+ * nicht auf seiner Liste steht, und setzt `href=""`. Ein leeres href führt im Browser auf
+ * die Seite, auf der man gerade steht — die Belege sahen also aus wie Links und führten
+ * zurück in denselben Chat. Ein Fehler, den man nur bemerkt, wenn man klickt.
+ *
+ * Durchgelassen wird ausschließlich das eigene Schema. Für alles andere bleibt die Prüfung
+ * von react-markdown zuständig; sie hält `javascript:` und Verwandtes heraus.
+ */
+export function belegUrlTransform(
+  url: string,
+  standard: (u: string) => string,
+): string {
+  return url.startsWith(SCHEMA) ? url : standard(url)
+}
