@@ -12,6 +12,7 @@ import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } f
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { echoApi } from '@/api/echo'
 import { useEchoStrom } from '@/lib/echoStrom'
+import { mitlaufen } from '@/lib/mitlaufen'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { getBody } from '@/content/bodies'
@@ -177,7 +178,7 @@ export default function TopicDialogPage() {
   }, [historyLoaded, topicId])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    mitlaufen(messagesEndRef.current, strom.beschaeftigt)
   }, [history, strom.beschaeftigt, strom.takt.sichtbar])
 
   const summaryMutation = useMutation({
@@ -321,7 +322,7 @@ export default function TopicDialogPage() {
                 dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder gar
                 nicht da. Den Punktindikator gibt es nur noch, solange kein Wort da ist. */}
             {strom.takt.sichtbar && (
-              <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} />
+              <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
             )}
             {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
 

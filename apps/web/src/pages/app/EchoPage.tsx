@@ -23,6 +23,7 @@ import { echoStreamen, StreamNichtMoeglich } from '@/api/echoStream'
 import { useEntwurf } from '@/lib/entwurf'
 import EntwurfHinweis from '@/components/EntwurfHinweis'
 import { useGetakteterText } from '@/lib/textTakt'
+import { mitlaufen } from '@/lib/mitlaufen'
 import type { EchoChatResponse, EchoMessage } from '@/types'
 
 const GLOSSARY_TERMS = [
@@ -230,7 +231,7 @@ export default function EchoPage() {
 
   // Auto-scroll
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    mitlaufen(messagesEndRef.current, beschaeftigt)
   }, [history, takt.sichtbar])
 
   /**
@@ -406,7 +407,7 @@ export default function EchoPage() {
                   das erste Stueck da ist - danach waere er neben dem wachsenden Text
                   eine zweite, widerspruechliche Auskunft. */}
               {takt.sichtbar && (
-                <ChatMessage content={takt.sichtbar} isUser={false} safetyLevel={stromSafety} />
+                <ChatMessage content={takt.sichtbar} isUser={false} safetyLevel={stromSafety} imFluss />
               )}
               {beschaeftigt && !takt.sichtbar && <TypingIndicator />}
 

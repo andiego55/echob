@@ -4,6 +4,7 @@
  * – Echo: Avatar links, Text ohne Bubble direkt auf dem Hintergrund
  */
 import MarkdownMessage from './MarkdownMessage'
+import { teilenImFluss } from '@/lib/imFluss'
 
 /** Liest die Sicherheits-Markierung (metadata.safety.level) einer Echo-Antwort. */
 export function safetyLevelFromMeta(metadata: unknown): 'elevated' | 'acute' | undefined {
@@ -26,13 +27,20 @@ export function EchoAvatar() {
 }
 
 export function ChatMessage({
-  content, isUser, markdown = true, safetyLevel,
+  content, isUser, markdown = true, safetyLevel, imFluss = false,
 }: {
   content: string
   isUser: boolean
   markdown?: boolean
   /** Markiert eine Echo-Antwort als Sicherheits-/Krisenhinweis (siehe metadata.safety). */
   safetyLevel?: 'elevated' | 'acute' | null
+  /**
+   * Diese Antwort entsteht gerade noch.
+   *
+   * Ändert, wie Markdown gerendert wird — siehe `ImFluss`. Bei einer gespeicherten
+   * Nachricht bleibt alles wie bisher.
+   */
+  imFluss?: boolean
 }) {
   if (isUser) {
     return (
@@ -45,9 +53,11 @@ export function ChatMessage({
     )
   }
 
-  const body = markdown
-    ? <MarkdownMessage content={content} />
-    : <p className="whitespace-pre-wrap">{content}</p>
+  const body = !markdown
+    ? <p className="whitespace-pre-wrap">{content}</p>
+    : imFluss
+      ? <ImFluss text={content} />
+      : <MarkdownMessage content={content} />
 
   const safety = safetyLevel === 'acute' || safetyLevel === 'elevated' ? safetyLevel : null
 
@@ -103,5 +113,34 @@ export function ChatErrorMessage({
         {text}
       </div>
     </div>
+  )
+}
+
+/**
+ * Eine Antwort, die noch entsteht.
+ *
+ * **Das Problem.** Der Text wächst 37- bis 60-mal pro Sekunde um ein paar Zeichen (siehe
+ * `lib/textTakt`). Wurde er jedes Mal als Markdown geparst, passierten zwei Dinge: Der
+ * ganze Baum wurde vielfach pro Sekunde neu gebaut — und unfertige Auszeichnung kippte
+ * sichtbar hin und her. `**Wich` steht als Sternchen da und springt in Fettschrift, sobald
+ * das Paar zugeht; eine Zeile mit `-` springt in eine Liste, ein `#` in eine Überschrift.
+ * Jeder Sprung ist ein Umbruch. Zusammen ergab das ein Flackern.
+ *
+ * **Die Trennung.** Bis zum letzten abgeschlossenen Absatz ist der Text fertig — dort gibt
+ * es keine offene Auszeichnung mehr, und er ändert sich erst wieder, wenn der nächste
+ * Absatz fertig wird. Genau dieser Teil geht durch Markdown (und dank `memo` nur dann neu).
+ * Was danach kommt, ist der Satz, an dem gerade geschrieben wird: der läuft als Klartext
+ * mit und formatiert sich erst, wenn der Absatz steht.
+ *
+ * Damit bleibt genau EIN Umbruch je Absatz übrig — dort, wo ohnehin gerade etwas entsteht.
+ */
+export function ImFluss({ text }: { text: string }) {
+  const { fertig, laufend } = teilenImFluss(text)
+
+  return (
+    <>
+      {fertig && <MarkdownMessage content={fertig} />}
+      {laufend && <p className="mb-2.5 last:mb-0 whitespace-pre-wrap">{laufend}</p>}
+    </>
   )
 }

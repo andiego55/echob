@@ -19,9 +19,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import { ImFluss } from '@/components/app/ChatMessage'
 import { coupleCompanionApi } from '@/api/coupleCompanion'
 import { begleiterStreamen, StreamNichtMoeglich } from '@/api/coupleEchoStream'
 import { useGetakteterText } from '@/lib/textTakt'
+import { mitlaufen } from '@/lib/mitlaufen'
 import type { Einstufung } from '@/lib/sseLeser'
 import type { CoupleEchoConversation, CoupleThreadKind } from '@/api/coupleCompanion'
 import EchoThinking from './EchoThinking'
@@ -181,8 +183,8 @@ export default function EchoChat({
   const busy = send.isPending || uebergabe !== null || abschliessen.isPending
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages.length, takt.sichtbar])
+    mitlaufen(endRef.current, send.isPending)
+  }, [messages.length, takt.sichtbar, send.isPending])
 
   /**
    * Der Wechsel von der entstehenden zur gespeicherten Antwort – in EINEM Bild.
@@ -361,7 +363,7 @@ export default function EchoChat({
           {/* Die Antwort, während sie entsteht. Sie verschwindet erst in dem Moment,
               in dem die gespeicherte erscheint. */}
           {takt.sichtbar && (
-            <Blase role="echo" content={takt.sichtbar} safety={stromSafety} />
+            <Blase role="echo" content={takt.sichtbar} safety={stromSafety} imFluss />
           )}
 
           <div ref={endRef} />
@@ -426,9 +428,11 @@ export default function EchoChat({
 }
 
 /** Echo bekommt ein Gesicht: Wellenmarke und eigene Kante. Du sprichst rechts. */
-function Blase({ role, content, safety }: {
+function Blase({ role, content, safety, imFluss }: {
   role: string
   content: string
+  /** Diese Antwort entsteht gerade noch - siehe ImFluss. */
+  imFluss?: boolean
   /** Gesetzt, wenn die Sicherheits-Triage eingegriffen hat. */
   safety?: 'acute' | 'elevated' | null
 }) {
@@ -470,7 +474,7 @@ function Blase({ role, content, safety }: {
           </svg>
         </span>
         <div className="min-w-0 flex-1 text-sm text-brand-text lg:max-w-[74ch]">
-          <MarkdownMessage content={content} />
+          {imFluss ? <ImFluss text={content} /> : <MarkdownMessage content={content} />}
         </div>
       </div>
     )

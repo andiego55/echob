@@ -19,6 +19,7 @@ import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } f
 import TestOverviewPanel from '@/components/app/TestOverviewPanel'
 import { echoApi } from '@/api/echo'
 import { useEchoStrom } from '@/lib/echoStrom'
+import { mitlaufen } from '@/lib/mitlaufen'
 import { topicSummariesApi } from '@/api/topicSummaries'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { testResultsApi } from '@/api/testResults'
@@ -166,7 +167,7 @@ function Dialogue({
   }, [historyLoaded]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    mitlaufen(messagesEndRef.current, strom.beschaeftigt)
   }, [history, strom.beschaeftigt, strom.takt.sichtbar])
 
   const send = (message: string) => {
@@ -305,7 +306,7 @@ function Dialogue({
                     in dem die gespeicherte erscheint — sonst stünde sie kurz doppelt oder
                     gar nicht da. Den Punktindikator gibt es nur, solange kein Wort da ist. */}
                 {strom.takt.sichtbar && (
-                  <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} />
+                  <ChatMessage content={strom.takt.sichtbar} isUser={false} safetyLevel={strom.stromSafety} imFluss />
                 )}
                 {strom.beschaeftigt && !strom.takt.sichtbar && <TypingIndicator />}
                 {strom.fehler != null && (
