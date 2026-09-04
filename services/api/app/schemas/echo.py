@@ -47,6 +47,14 @@ class EchoChatRequest(BaseModel):
     chat_session_id: UUID | None = None     # Session im freien Echo-Chat
     assignment_id: UUID | None = None       # zugewiesener Dialog → Profi-Steuerung in den Kontext
 
+    #: Welche Kontextteile für DIESE Nachricht wegbleiben sollen (siehe echo_kontext.py).
+    #:
+    #: „Antworte mir mal ohne das Fallprofil", „heute ohne die Hypothesen denken" — das ist
+    #: ein Reflexionszug, kein Schalter. Er gilt pro Nachricht und wird nirgends gespeichert:
+    #: Ein dauerhaft weggeschalteter Kontext wäre eine Falle, die man Wochen später nicht
+    #: mehr erklären kann.
+    ohne: list[str] = Field(default_factory=list, max_length=12)
+
 
 class EchoChatResponse(BaseModel):
     user_message: EchoMessageResponse

@@ -650,6 +650,14 @@ export interface EchoChatRequest {
   chat_session_id?: string
   assignment_id?: string
   source?: string
+  /**
+   * Kontextteile, die für DIESE Nachricht wegbleiben sollen (Kontextband).
+   *
+   * Schlüssel wie `szenen`, `hypothesen`, `dokumente` — die Liste steht serverseitig in
+   * `echo_kontext.py`. Unbekanntes wird dort verworfen, ein Tippfehler schaltet also
+   * nichts still ab.
+   */
+  ohne?: string[]
 }
 
 export interface EchoChatResponse {

@@ -10,6 +10,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 import AntwortZuege from '@/components/app/AntwortZuege'
+import KontextBand from '@/components/app/KontextBand'
 import ChatComposer from '@/components/app/ChatComposer'
 import { ChatMessage, TypingIndicator, ChatErrorMessage, safetyLevelFromMeta } from '@/components/app/ChatMessage'
 import AssignmentDialogSummary from '@/components/app/AssignmentDialogSummary'
@@ -65,6 +66,14 @@ export default function EchoPage() {
   const [showGlossary, setGlossary] = useState(false)
   const [threadType]                = useState<ThreadType>('topic')
   const [keywords, setKeywords]     = useState<string[]>([])
+
+  /**
+   * Kontextteile, die fuer dieses Gespraech wegbleiben (Kontextband).
+   *
+   * Bewusst nur im Zustand der Seite: Ein dauerhaft weggeschalteter Kontext waere
+   * eine Falle, an die sich Wochen spaeter niemand erinnert.
+   */
+  const [ohne, setOhne] = useState<string[]>([])
 
   // undefined = noch nicht initialisiert, null = neuer (ungespeicherter) Chat
   const [selectedSession, setSelectedSession] = useState<string | null | undefined>(undefined)
@@ -150,6 +159,7 @@ export default function EchoPage() {
         thread_type: threadType,
         chat_session_id: selectedSession ?? undefined,
         assignment_id: assignmentId ?? undefined,
+        ohne,
       }
       setStromText('')
       setStromSafety(null)
@@ -351,6 +361,8 @@ export default function EchoPage() {
               +
             </button>
           </div>
+
+          <KontextBand caseId={caseId!} ohne={ohne} onAendern={setOhne} />
 
           {/* Was aus dem Gespraech bleiben soll. Erscheint erst, wenn es einen
               Verlauf gibt - vor dem ersten Wort waere der Knopf nur Deko. */}

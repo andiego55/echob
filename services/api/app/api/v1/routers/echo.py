@@ -23,6 +23,7 @@ from app.schemas.echo import (
 )
 from app.services.case_artifacts import build_artifact_context
 from app.services.case_documents import build_document_context
+from app.services.echo_kontext import ALLE_TEILE, LABELS, normalisieren
 from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import build_hypothesis_context
 from app.services.pattern_tags import normalize_pattern_tags
@@ -153,8 +154,16 @@ async def _vorbereiten(pool, case_id, user_id, body) -> ChatVorbereitung:
         crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
         if onboarding_row else None
     )
-    scenes = [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
-    scale_scores = [dict(r) for r in scale_rows]
+    # Weggeschaltete Teile werden hier abgeschnitten, nicht spaeter: Szenen und Muster
+    # gehen in den FALLKONTEXT (build_case_context), nicht in den Zusatzkontext — und
+    # ausserdem in die Verlaufsberechnung der Hypothesen-Dialoge. An der Quelle zu
+    # schneiden ist die einzige Stelle, an der beides zugleich stimmt.
+    ohne = normalisieren(body.ohne)
+    scenes = (
+        [] if "szenen" in ohne
+        else [crypto.decrypt_fields(dict(r), "description", "user_reaction") for r in scene_rows]
+    )
+    scale_scores = [] if "muster" in ohne else [dict(r) for r in scale_rows]
     topic_summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in topic_summary_rows]
     hypotheses = [crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows]
 
@@ -198,6 +207,9 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
 
     # ── Normaler Chat: Kontext bei jeder Nachricht frisch aus der DB bauen ────
     # (Änderungen an Selbstauskunft/Personenprofil wirken so sofort)
+    # Was der Nutzer fuer DIESE Nachricht weggeschaltet hat (Kontextband).
+    ohne = normalisieren(body.ohne)
+
     extra_context = ""
     if body.thread_type != "scene":
         context_parts: list[str] = []
@@ -207,7 +219,7 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
             user_profile_row = await conn.fetchrow(
                 "SELECT * FROM user_profiles WHERE user_id = $1", user_id
             )
-        if user_profile_row:
+        if user_profile_row and "selbstauskunft" not in ohne:
             up_modules = user_profile_row.get("modules") or {}
             if isinstance(up_modules, str):
                 import json as _upj
@@ -220,7 +232,7 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
                 }))
 
         # Personenprofil
-        if person_profile_row:
+        if person_profile_row and "fallprofil" not in ohne:
             pp_data = dict(person_profile_row)
             pp_modules = pp_data.get("modules") or {}
             if isinstance(pp_modules, str):
@@ -247,7 +259,7 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
                 "WHERE case_id = $1 AND status = 'ueberholt'",
                 case_id,
             ) or 0
-        if art_rows or ueberholt:
+        if (art_rows or ueberholt) and "erkenntnisse" not in ohne:
             artefakte = [crypto.decrypt_fields(dict(r), "body") for r in art_rows]
             art_ctx = build_artifact_context(artefakte, ueberholt_anzahl=ueberholt)
             if art_ctx:
@@ -262,7 +274,7 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
                 "ORDER BY document_date DESC NULLS LAST, created_at DESC",
                 case_id,
             )
-        if dok_rows:
+        if dok_rows and "dokumente" not in ohne:
             dokumente = [
                 crypto.decrypt_fields(dict(r), "content", "description") for r in dok_rows
             ]
@@ -271,13 +283,13 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
                 context_parts.append(dok_ctx)
 
         # Themendialog-Zusammenfassungen
-        if topic_summaries:
+        if topic_summaries and "themen" not in ohne:
             topic_ctx = build_topic_context(topic_summaries)
             if topic_ctx:
                 context_parts.append(topic_ctx)
 
         # Gespeicherte Hypothesen (tastend) — fließen als Kontext in alle Gespräche ein
-        if hypotheses:
+        if hypotheses and "hypothesen" not in ohne:
             hyp_ctx = build_hypothesis_context(hypotheses)
             if hyp_ctx:
                 context_parts.append(hyp_ctx)
@@ -887,6 +899,78 @@ async def finalize_scene(
             "note": extracted.get("_note"),
         },
     }
+
+
+class KontextTeilAntwort(BaseModel):
+    key: str
+    label: str
+    hinweis: str
+    #: Wie viele Einheiten dahinterstehen (Szenen, Erkenntnisse …). 1 bei Profilen.
+    anzahl: int
+
+
+class KontextAntwort(BaseModel):
+    parts: list[KontextTeilAntwort]
+
+
+@router.get("/context", response_model=KontextAntwort)
+async def get_context_overview(
+    case_id: UUID,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> KontextAntwort:
+    """Was Echo bei der nächsten Nachricht mitliest — als Zählung.
+
+    **Warum es das gibt.** Bis hierher war das die bestgehütete Eigenschaft der App: Bei
+    jedem Aufruf laufen bis zu 30.000 Token Fallwissen mit, und der Nutzer sass vor einem
+    Eingabefeld, das aussieht wie jedes andere. Er konnte den Unterschied zu einem leeren
+    Chatfenster erst bemerken, wenn Echo zufällig etwas sagte, das nur Echo sagen kann.
+
+    **Es werden nur Zahlen zurückgegeben, keine Inhalte.** Die stehen an ihren eigenen
+    Orten und sind dort schon lesbar; hier geht es um die eine Frage: Was ist gerade dabei?
+
+    Teile mit Anzahl 0 kommen mit — ein leerer Platz sagt genauso viel wie ein voller
+    („keine Dokumente" ist eine Auskunft, kein Fehler).
+    """
+    user_id = current_user["user_id"]
+    async with pool.acquire() as conn:
+        case_row = await conn.fetchrow(
+            "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
+            case_id, user_id,
+        )
+        if not case_row:
+            raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+
+        zaehlungen = {
+            "szenen": await conn.fetchval(
+                "SELECT COUNT(*) FROM scenes WHERE case_id = $1", case_id),
+            "muster": await conn.fetchval(
+                "SELECT COUNT(*) FROM scale_scores WHERE case_id = $1", case_id),
+            "selbstauskunft": await conn.fetchval(
+                "SELECT COUNT(*) FROM user_profiles WHERE user_id = $1", user_id),
+            "fallprofil": await conn.fetchval(
+                "SELECT COUNT(*) FROM person_profiles WHERE case_id = $1", case_id),
+            "themen": await conn.fetchval(
+                "SELECT COUNT(*) FROM topic_summaries WHERE case_id = $1", case_id),
+            "hypothesen": await conn.fetchval(
+                "SELECT COUNT(*) FROM case_hypotheses WHERE case_id = $1", case_id),
+            "erkenntnisse": await conn.fetchval(
+                "SELECT COUNT(*) FROM case_artifacts "
+                "WHERE case_id = $1 AND status = 'aktiv'", case_id),
+            "dokumente": await conn.fetchval(
+                "SELECT COUNT(*) FROM case_documents "
+                "WHERE case_id = $1 AND active = true", case_id),
+        }
+
+    return KontextAntwort(parts=[
+        KontextTeilAntwort(
+            key=teil,
+            label=LABELS[teil]["label"],
+            hinweis=LABELS[teil]["hinweis"],
+            anzahl=int(zaehlungen.get(teil) or 0),
+        )
+        for teil in ALLE_TEILE
+    ])
 
 
 @router.get("/history", response_model=list[EchoMessageResponse])
