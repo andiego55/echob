@@ -199,11 +199,11 @@ if [ -n "$FERNET" ]; then
       sagen "  Entweder war beim Schreiben kein ENCRYPTION_KEY gesetzt - dann liegen die"
       sagen "  Daten im Klartext in der Datenbank -, oder das Praefix hat sich geaendert."
     else
-      # ALS DATEI, NICHT ALS `-c`. Ein Dateipfad ist EIN Argument; ein mehrzeiliges
-      # Programm hinter `-c` muss durch Shell-Quoting und moegliche Wrapper hindurch und
-      # zerbricht dabei. Genau das ist zweimal passiert.
-      PROBE="$(mktemp)"
-      cat > "$PROBE" <<'PYCODE'
+    # ALS DATEI, NICHT ALS `-c`. Ein Dateipfad ist EIN Argument; ein mehrzeiliges
+    # Programm hinter `-c` muss durch Shell-Quoting und moegliche Wrapper hindurch und
+    # zerbricht dabei. Genau das ist zweimal passiert.
+    PROBE="$(mktemp)"
+    cat > "$PROBE" <<'PYCODE'
 import re, sys
 from cryptography.fernet import Fernet
 
@@ -236,28 +236,57 @@ try:
 except Exception:
     print("-1")
 PYCODE
-      laenge="$(printf %s "$token" | "$PY_BIN" "$PROBE" "$FERNET" "$PRAEFIX" 2>/dev/null)"
-      rm -f "$PROBE"
 
-      case "$laenge" in
+    # WARUM ZWEI PROBEN, NEUESTE UND AELTESTE.
+    #
+    # Fernet benutzt EINEN Schluessel fuer alle Felder - eine geglueckte Probe beweist ihn
+    # also fuer alles, was mit DIESEM Schluessel geschrieben wurde. Die Luecke liegt
+    # woanders: Waere der Schluessel irgendwann gewechselt worden, traegen aeltere Zeilen
+    # einen anderen. Eine Probe an der neuesten Nachricht saehe davon nichts und meldete
+    # Erfolg, waehrend die Haelfte des Bestands unlesbar waere.
+    #
+    # Deshalb die Raender: Gilt der Schluessel fuer die aelteste UND die neueste
+    # verschluesselte Nachricht, ist dazwischen kein Wechsel passiert.
+    pruefen() {
+      printf %s "$1" | "$PY_BIN" "$PROBE" "$FERNET" "$PRAEFIX" 2>/dev/null
+    }
+
+    deuten() {   # $1 = Ergebnis, $2 = Bezeichnung fuer die Meldung
+      case "$1" in
         FORM*)
           sagen "FEHLGESCHLAGEN: Die Datei enthaelt keinen gueltigen Fernet-Schluessel."
-          sagen "  Gelesen wurden ${laenge#FORM } Zeichen; erwartet sind 44 Base64-Zeichen,"
+          sagen "  Gelesen wurden ${1#FORM } Zeichen; erwartet sind 44 Base64-Zeichen,"
           sagen "  die auf '=' enden. Das ist ein Kopierfehler, kein falscher Schluessel -"
           sagen "  vermutlich steckt dort ein anderes Geheimnis (age-Schluessel? LUKS?)."
-          exit 1
+          return 1
           ;;
       esac
-
-      if [ "${laenge:--1}" -gt 0 ] 2>/dev/null; then
-        LESBARKEIT="ja"
-        sagen "Leseprobe: entschluesselt, $laenge Zeichen Klartext (Inhalt bewusst nicht angezeigt)."
-      else
-        sagen "FEHLGESCHLAGEN: Der ENCRYPTION_KEY passt nicht zu diesen Daten."
-        sagen "  Die Zeilen sind zwar da, aber unlesbar. Pruefe, ob es der Schluessel ist,"
-        sagen "  der zum Zeitpunkt des Backups in .env.docker stand."
-        exit 1
+      if [ "${1:--1}" -gt 0 ] 2>/dev/null; then
+        sagen "Leseprobe $2: entschluesselt, $1 Zeichen Klartext (Inhalt bewusst nicht angezeigt)."
+        return 0
       fi
+      sagen "FEHLGESCHLAGEN: Der ENCRYPTION_KEY passt nicht zu dieser Nachricht ($2)."
+      return 1
+    }
+
+    deuten "$(pruefen "$token")" "neueste" || {
+      sagen "  Die Zeilen sind zwar da, aber unlesbar. Pruefe, ob es der Schluessel ist,"
+      sagen "  der zum Zeitpunkt des Backups in .env.docker stand."
+      rm -f "$PROBE"; exit 1; }
+
+    aeltester="$(frage "SELECT content FROM echo_messages WHERE content LIKE '${PRAEFIX}%' ORDER BY created_at ASC LIMIT 1")"
+    if [ "$aeltester" = "$token" ]; then
+      sagen "  (Es gibt nur eine verschluesselte Nachricht - eine zweite Probe entfaellt.)"
+    else
+      deuten "$(pruefen "$aeltester")" "aelteste" || {
+        sagen "  Die NEUESTE Nachricht war lesbar, die aelteste nicht: Der Schluessel wurde"
+        sagen "  offenbar irgendwann gewechselt. Der alte Schluessel wird zusaetzlich"
+        sagen "  gebraucht, sonst ist ein Teil des Bestands verloren."
+        rm -f "$PROBE"; exit 1; }
+    fi
+
+    rm -f "$PROBE"
+    LESBARKEIT="ja"
     fi
   fi
 fi

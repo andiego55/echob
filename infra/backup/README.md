@@ -12,6 +12,10 @@ pg_dump → gzip → age (öffentlicher Schlüssel) → /var/backups/echob/
 | `backup.sh` | Server, täglich 03:30 | Dump, verschlüsseln, 14 Tage Rotation. **Alarm bei Fehlschlag.** |
 | `restore-pruefen.sh` | **Dein Rechner**, monatlich | Beweist, dass ein Backup entschlüsselbar, einspielbar und gefüllt ist. |
 
+> **Im Ernstfall nicht hier weiterlesen, sondern in [WIEDERHERSTELLUNG.md](WIEDERHERSTELLUNG.md).**
+> Diese Datei erklärt, wie das Backup gebaut ist; jene führt Schritt für Schritt durch das
+> Zurückspielen — geschrieben für den Moment, in dem etwas kaputt ist und es Nacht ist.
+
 ## Warum `age` und nicht eine Passphrase
 
 `age -r <öffentlicher Schlüssel>` verschlüsselt gegen einen **öffentlichen** Schlüssel; der
@@ -52,6 +56,13 @@ age-Schlüssel** und gehört an einen zweiten Ort als der Server.
 Verschlüsselte Werte stehen als `enc:v1:gAAAAA…` in der Datenbank — crypto.py setzt das
 Präfix vor den Fernet-Token, damit Altbestand im Klartext unterscheidbar bleibt. Ändert
 sich das Präfix dort, muss es im Skript mitgeändert werden.
+
+Geprüft werden die **neueste und die älteste** verschlüsselte Nachricht. Fernet benutzt
+einen Schlüssel für alle Felder, eine geglückte Probe beweist ihn also für alles, was mit
+diesem Schlüssel geschrieben wurde. Die Lücke läge woanders: Wäre der Schlüssel irgendwann
+gewechselt worden, trügen ältere Zeilen einen anderen — eine Probe nur an der neuesten
+Nachricht sähe davon nichts und meldete Erfolg. Gilt der Schlüssel für beide Ränder, ist
+dazwischen kein Wechsel passiert.
 
 Die Leseprobe entschlüsselt eine echte Nachricht und gibt trotzdem keinen Klartext aus —
 sie meldet nur, dass es ging und wie lang er war. Nimmt Fernet den Token an, stimmen
