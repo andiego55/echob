@@ -160,11 +160,9 @@ sagen ""
 # ohne sie: Nimmt Fernet den Token an, stimmen Schluessel UND Signatur. Ausgegeben wird
 # deshalb nur, DASS es ging und wie lang der Klartext war.
 #
-# DAS PRAEFIX. Verschluesselte Werte sehen aus wie `enc:v1:gAAAAA...`; crypto.py setzt es
-# vor den Fernet-Token, damit Altbestand im Klartext unterscheidbar bleibt. Beim ersten
-# Anlauf suchte diese Probe nach `gAAAAA%`, fand nichts und meldete "liegen die Daten im
-# Klartext?" - ein Fehlalarm ueber die wichtigste Frage ueberhaupt. Aendert sich das
-# Praefix in crypto.py, muss es hier mitgeaendert werden.
+# DAS PRAEFIX. Verschluesselte Werte stehen als `enc:v1:gAAAAA...` in der Datenbank;
+# crypto.py setzt es vor den Fernet-Token, damit Altbestand im Klartext unterscheidbar
+# bleibt. Aendert es sich dort, muss es hier mitgeaendert werden.
 PRAEFIX="enc:v1:"
 LESBARKEIT="ungeprueft"
 
@@ -174,7 +172,21 @@ if [ -n "$FERNET" ]; then
     sagen "FEHLGESCHLAGEN: Schluesseldatei '$FERNET' gibt es nicht."
     exit 1
   fi
-  PY_BIN="$(command -v python3 || command -v python)"
+
+  # DEN INTERPRETER PRUEFEN, NICHT RATEN. Auf Windows ist `python3` haeufig ein
+  # pyenv-Shim, der intern ein Batch-Skript aufruft; ein mehrzeiliges Programm ueberlebt
+  # das nicht. Ein frueherer Anlauf scheiterte genau daran - mit "IndentationError" auf
+  # einer Zeile `|| goto :error`, die aus der Batchdatei stammte, waehrend die Meldung
+  # "der ENCRYPTION_KEY passt nicht" lautete. Geprueft wird deshalb, was wirklich
+  # gebraucht wird: dass der Kandidat `cryptography` laden kann.
+  PY_BIN=""
+  for kandidat in python3 python py; do
+    if command -v "$kandidat" >/dev/null 2>&1 \
+       && "$kandidat" -c "import cryptography" >/dev/null 2>&1; then
+      PY_BIN="$kandidat"; break
+    fi
+  done
+
   if [ -z "$PY_BIN" ]; then
     sagen "UEBERSPRUNGEN: Fuer die Leseprobe wird Python mit 'cryptography' gebraucht."
   else
@@ -187,19 +199,56 @@ if [ -n "$FERNET" ]; then
       sagen "  Entweder war beim Schreiben kein ENCRYPTION_KEY gesetzt - dann liegen die"
       sagen "  Daten im Klartext in der Datenbank -, oder das Praefix hat sich geaendert."
     else
-      laenge="$(printf '%s' "$token" | "$PY_BIN" -c '
-import sys
+      # ALS DATEI, NICHT ALS `-c`. Ein Dateipfad ist EIN Argument; ein mehrzeiliges
+      # Programm hinter `-c` muss durch Shell-Quoting und moegliche Wrapper hindurch und
+      # zerbricht dabei. Genau das ist zweimal passiert.
+      PROBE="$(mktemp)"
+      cat > "$PROBE" <<'PYCODE'
+import re, sys
 from cryptography.fernet import Fernet
-schluessel = open(sys.argv[1], encoding="utf-8").read().strip()
+
+# utf-8-sig: Notepad speichert gern mit BOM, und ein BOM macht den Schluessel ungueltig -
+# ein Kopierfehler, der wie ein falscher Schluessel aussaehe.
+roh = open(sys.argv[1], encoding="utf-8-sig").read().strip().strip('"').strip("'")
+
+# Wer die ganze Zeile aus .env.docker kopiert hat: ENCRYPTION_KEY=... .
+# Das (.+)$ ist der entscheidende Teil: Ein Fernet-Schluessel endet SELBST auf '=' und
+# besteht davor aus [A-Za-z0-9_-]. Ohne die Forderung, dass danach noch etwas kommt,
+# frisst dieses Muster jeden Schluessel ohne Bindestrich auf und laesst nichts uebrig.
+treffer = re.match(r"^[A-Za-z_][A-Za-z0-9_]*=(.+)$", roh)
+if treffer:
+    roh = treffer.group(1).strip().strip('"').strip("'")
+
 praefix = sys.argv[2]
 token = sys.stdin.read().strip()
 if token.startswith(praefix):
     token = token[len(praefix):]
+
+# ZWEI Fehlerfaelle, die man auseinanderhalten muss: "das ist gar kein Schluessel" ist ein
+# Kopierfehler, "gueltiger Schluessel, falscher Inhalt" ist ein echtes Problem.
 try:
-    print(len(Fernet(schluessel.encode()).decrypt(token.encode()).decode()))
+    fernet = Fernet(roh.encode())
+except Exception:
+    print("FORM " + str(len(roh)))
+    sys.exit()
+try:
+    print(len(fernet.decrypt(token.encode()).decode()))
 except Exception:
     print("-1")
-' "$FERNET" "$PRAEFIX" 2>/dev/null)"
+PYCODE
+      laenge="$(printf %s "$token" | "$PY_BIN" "$PROBE" "$FERNET" "$PRAEFIX" 2>/dev/null)"
+      rm -f "$PROBE"
+
+      case "$laenge" in
+        FORM*)
+          sagen "FEHLGESCHLAGEN: Die Datei enthaelt keinen gueltigen Fernet-Schluessel."
+          sagen "  Gelesen wurden ${laenge#FORM } Zeichen; erwartet sind 44 Base64-Zeichen,"
+          sagen "  die auf '=' enden. Das ist ein Kopierfehler, kein falscher Schluessel -"
+          sagen "  vermutlich steckt dort ein anderes Geheimnis (age-Schluessel? LUKS?)."
+          exit 1
+          ;;
+      esac
+
       if [ "${laenge:--1}" -gt 0 ] 2>/dev/null; then
         LESBARKEIT="ja"
         sagen "Leseprobe: entschluesselt, $laenge Zeichen Klartext (Inhalt bewusst nicht angezeigt)."
@@ -213,10 +262,10 @@ except Exception:
   fi
 fi
 
-# Die Schlussmeldung sagt genau das, was geprueft WURDE. Beim ersten Anlauf stand hier
+# Die Schlussmeldung sagt genau das, was geprueft WURDE. Ein frueherer Stand meldete
 # "und die Daten sind lesbar", sobald ueberhaupt ein Schluessel uebergeben war - auch dann,
-# wenn die Probe gar nichts gefunden hatte. Eine falsche Erfolgsmeldung macht den ganzen
-# Beweis wertlos.
+# wenn die Probe zwei Zeilen darueber gemeldet hatte, nichts gefunden zu haben. Eine
+# falsche Erfolgsmeldung macht den ganzen Beweis wertlos.
 case "$LESBARKEIT" in
   ja)
     sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen, enthaelt Daten - und die Daten sind lesbar."
