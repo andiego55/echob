@@ -35,14 +35,26 @@ erste Kopie außer Haus:
 ```bash
 mkdir -p ~/echob-restore && cd ~/echob-restore
 scp root@<SERVER-IP>:/var/backups/echob/echob-JJJJ-MM-TT_HHMM.sql.gz.age .
-# privaten Schluessel aus dem Passwortmanager in eine temporaere Datei schreiben
-/pfad/zum/repo/infra/backup/restore-pruefen.sh echob-JJJJ-MM-TT_HHMM.sql.gz.age schluessel.txt
+# privaten age-Schluessel UND den ENCRYPTION_KEY je in eine temporaere Datei schreiben
+/pfad/zum/repo/infra/backup/restore-pruefen.sh echob-JJJJ-MM-TT_HHMM.sql.gz.age schluessel.txt encryption-key.txt
 ```
 
 Das Skript startet einen Wegwerf-Postgres im Container, spielt den Dump hinein, zählt
 Zeilen und räumt alles wieder ab — auch bei Abbruch. Es braucht `docker`, `age` und `gunzip`.
 
-**Danach: heruntergeladene Datei und Schlüsseldatei löschen.** Entschlüsselt sind das echte
+**Das dritte Argument ist der wichtigste Teil des Beweises.** Ohne es ist gezeigt, dass
+Zeilen zurückkommen — nicht, dass man sie noch verstehen kann. Szenentexte, Dokumente,
+Artefakte und Echo-Nachrichten liegen Fernet-verschlüsselt in der Datenbank. Wäre der
+`ENCRYPTION_KEY` verloren, liefe die Prüfung ohne ihn durch und meldete Erfolg, während die
+Daten praktisch weg wären. **Der `ENCRYPTION_KEY` ist genauso überlebenswichtig wie der
+age-Schlüssel** und gehört an einen zweiten Ort als der Server.
+
+Die Leseprobe entschlüsselt eine echte Nachricht und gibt trotzdem keinen Klartext aus —
+sie meldet nur, dass es ging und wie lang er war. Nimmt Fernet den Token an, stimmen
+Schlüssel und Signatur; der Inhalt muss dafür niemandem gezeigt werden. Sie braucht Python
+mit `cryptography`; fehlt beides, wird sie übersprungen statt zu scheitern.
+
+**Danach: heruntergeladene Datei und BEIDE Schlüsseldateien löschen.** Entschlüsselt sind das echte
 Nutzerdaten, inklusive Art.-9-Daten.
 
 Am Ende nennt es den Befehl, mit dem der Beweis auf dem Server vermerkt wird — sonst mahnt

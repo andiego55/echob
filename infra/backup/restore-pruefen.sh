@@ -2,7 +2,7 @@
 #
 # EchoB — beweist, dass ein Backup zurückkommt. Läuft auf DEINEM Rechner, nicht auf dem Server.
 #
-#   restore-pruefen.sh <backup.sql.gz.age> <age-schluesseldatei>
+#   restore-pruefen.sh <backup.sql.gz.age> <age-schluesseldatei> [<encryption-key-datei>]
 #
 # WARUM NICHT AUF DEM SERVER. Das Backup ist mit `age` gegen einen öffentlichen Schlüssel
 # verschlüsselt; der private liegt bewusst nicht auf der Maschine. Ein automatischer Test
@@ -28,15 +28,20 @@ set -uo pipefail
 
 DATEI="${1:-}"
 SCHLUESSEL="${2:-}"
+FERNET="${3:-}"   # optional: Datei mit dem ENCRYPTION_KEY
 if [ -z "$DATEI" ] || [ -z "$SCHLUESSEL" ]; then
   cat >&2 <<'HINWEIS'
-Aufruf: restore-pruefen.sh <backup.sql.gz.age> <age-schluesseldatei>
+Aufruf: restore-pruefen.sh <backup.sql.gz.age> <age-schluesseldatei> [<encryption-key-datei>]
 
   <backup.sql.gz.age>    vom Server geholt:
       scp root@<SERVER-IP>:/var/backups/echob/echob-JJJJ-MM-TT_HHMM.sql.gz.age .
 
   <age-schluesseldatei>  Textdatei mit der Zeile AGE-SECRET-KEY-1...
       Aus dem Passwortmanager in eine temporaere Datei schreiben und danach loeschen.
+
+  <encryption-key-datei> OPTIONAL. Textdatei mit dem ENCRYPTION_KEY (44 Zeichen, endet
+      auf '='). Damit wird zusaetzlich geprueft, ob die zurueckgespielten Daten auch
+      LESBAR sind - siehe "Warum die Leseprobe" oben.
 HINWEIS
   exit 2
 fi
@@ -142,7 +147,62 @@ fi
 sagen ""
 sagen "Juengste Nachricht im Backup: $(frage "SELECT max(created_at)::text FROM echo_messages")"
 sagen ""
-sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen und enthaelt Daten."
+# ── Leseprobe: sind die Daten auch LESBAR? ───────────────────────────────────
+#
+# WARUM DAS NOETIG IST. Bis hierher ist bewiesen, dass Zeilen zurueckkommen - nicht, dass
+# man sie noch verstehen kann. Szenentexte, Dokumente, Artefakte und Echo-Nachrichten
+# liegen Fernet-verschluesselt in der Datenbank (siehe app/core/crypto.py). Waere der
+# ENCRYPTION_KEY verloren, liefe dieser Test bis hierher durch und meldete Erfolg, waehrend
+# die Daten praktisch weg waeren. Der Schluessel ist damit genauso ueberlebenswichtig wie
+# der age-Schluessel - und ohne diese Probe sagt der Beweis nichts ueber ihn.
+#
+# WARUM DER KLARTEXT NICHT ANGEZEIGT WIRD. Was hier entschluesselt wird, ist eine echte
+# Nachricht aus einem Beziehungsdialog - Art.-9-Daten. Bewiesen ist die Lesbarkeit auch
+# ohne sie: Wenn Fernet den Token annimmt, stimmen Schluessel UND Signatur. Ausgegeben wird
+# deshalb nur, DASS es ging und wie lang der Klartext war.
+if [ -n "$FERNET" ]; then
+  sagen ""
+  if [ ! -f "$FERNET" ]; then
+    sagen "FEHLGESCHLAGEN: Schluesseldatei '$FERNET' gibt es nicht."
+    exit 1
+  fi
+  if ! command -v python >/dev/null 2>&1 && ! command -v python3 >/dev/null 2>&1; then
+    sagen "UEBERSPRUNGEN: Fuer die Leseprobe wird Python mit 'cryptography' gebraucht."
+  else
+    PY_BIN="$(command -v python3 || command -v python)"
+    token="$(frage "SELECT content FROM echo_messages WHERE content LIKE 'gAAAAA%' ORDER BY created_at DESC LIMIT 1")"
+    if [ -z "$token" ]; then
+      # Auch das ist ein Befund, kein Fehler des Skripts.
+      sagen "ACHTUNG: Keine verschluesselte Nachricht gefunden - liegen die Daten im Klartext?"
+    else
+      laenge="$(printf '%s' "$token" | "$PY_BIN" -c '
+import sys
+from cryptography.fernet import Fernet
+schluessel = open(sys.argv[1], encoding="utf-8").read().strip()
+token = sys.stdin.read().strip()
+try:
+    print(len(Fernet(schluessel.encode()).decrypt(token.encode()).decode()))
+except Exception:
+    print("-1")
+' "$FERNET" 2>/dev/null)"
+      if [ "${laenge:--1}" -gt 0 ] 2>/dev/null; then
+        sagen "Leseprobe: entschluesselt, $laenge Zeichen Klartext (Inhalt bewusst nicht angezeigt)."
+      else
+        sagen "FEHLGESCHLAGEN: Der ENCRYPTION_KEY passt nicht zu diesen Daten."
+        sagen "  Die Zeilen sind zwar da, aber unlesbar. Pruefe, ob es der Schluessel ist,"
+        sagen "  der zum Zeitpunkt des Backups in .env.docker stand."
+        exit 1
+      fi
+    fi
+  fi
+fi
+
+if [ -n "$FERNET" ]; then
+  sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen, enthaelt Daten - und die Daten sind lesbar."
+else
+  sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen und enthaelt Daten."
+  sagen "(Ob die Daten LESBAR sind, sagt das nicht - dafuer den ENCRYPTION_KEY als drittes Argument mitgeben.)"
+fi
 sagen ""
 sagen "Bitte noch erledigen:"
 sagen "  1. Auf dem Server vermerken, damit der Waechter Ruhe gibt:"
