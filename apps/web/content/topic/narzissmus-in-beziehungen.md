@@ -19,7 +19,7 @@ scene_tags: [narzissmus, idealisierung-abwertung, love-bombing, selbstwert]
 safety_tags: [kontrolle]
 links:
   glossary: [love-bombing, hoovering, narzisstische-zufuhr, idealisierung-abwertung, vulnerabler-narzissmus, spiritueller-narzissmus, kommunaler-narzissmus, grandioser-narzissmus, intermittierende-verstaerkung, projektion, gaslighting]
-  related: [narzisstische-spielarten, emotionale-manipulation, gaslighting-erkennen]
+  related: [narzisstische-spielarten, emotionale-manipulation, gaslighting-erkennen, emotionale-unreife]
 faq:
   - question: "Ist mein Partner ein Narzisst?"
     answer: "Das kann und darf dir dieser Text nicht beantworten. Eine narzisstische Persönlichkeitsstörung kann nur eine qualifizierte Fachperson im persönlichen Kontakt feststellen – niemals per Ferndiagnose und nicht anhand einer Website. Worum es hier geht, sind beobachtbare Muster und vor allem ihre Wirkung auf dich. Du musst niemandem ein Etikett verpassen, um ernst zu nehmen, dass es dir schlecht geht."
@@ -68,6 +68,8 @@ In so einer Beziehung schrumpfst du oft, ohne es zu merken. Du liest ständig di
 ## Nicht jeder egoistische Mensch ist ein Narzisst
 
 Selbstbezogenheit, Eitelkeit, schlechtes Zuhören – das gibt es in vielen Beziehungen, ohne dass gleich ein Muster von Missbrauch dahintersteckt. Dieser Text soll dir kein Fahndungsplakat in die Hand geben. Die Frage ist nicht, wen du verurteilen kannst. Die Frage ist, ob es dir in dieser Beziehung dauerhaft schlechter geht und ob du dich selbst verlierst.
+
+Für das, was dazwischenliegt — nicht böswillig, aber auch nicht tragfähig — gibt es einen eigenen Begriff: [emotionale Unreife](/wissen/emotionale-unreife). Woran du beides auseinanderhältst und warum der Unterschied darüber entscheidet, was dich schützt, steht in [Emotionale Unreife oder Narzissmus](/wissen/unreife-oder-narzissmus).
 
 ## Was helfen kann
 

@@ -26,6 +26,7 @@ export const CLUSTERS = [
   'gaslighting', // Gaslighting Deep Dive (Realitätsverdrehung)
   'narzissmus', // Narzissmus in Beziehungen (narzisstische Missbrauchsdynamik)
   'narzissmus-spielarten', // Spielarten des Narzissmus (grandios, verdeckt/vulnerabel, spirituell, kommunal)
+  'emotionale-unreife', // Emotionale Unreife (Lindsay Gibson) – Kapazitaetsgrenze statt Diagnose, Abgrenzung zu Narzissmus
   'trauma', // Trauma & PTBS-Belastung durch Beziehungen
   'kodependenz', // Kodependenz & Selbstliebe-Defizit (Ross Rosenberg, Human Magnet Syndrome)
   'bindung', // Bindung & Nähe
@@ -138,6 +139,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   gaslighting: 'Gaslighting',
   narzissmus: 'Narzissmus',
   'narzissmus-spielarten': 'Narzissmus-Spielarten',
+  'emotionale-unreife': 'Emotionale Unreife',
   trauma: 'Trauma & PTBS',
   kodependenz: 'Kodependenz',
   bindung: 'Bindung & Nähe',

@@ -20,7 +20,7 @@ safety_tags: [kontrolle]
 links:
   children: [verdeckter-narzissmus]
   glossary: [grandioser-narzissmus, vulnerabler-narzissmus, spiritueller-narzissmus, kommunaler-narzissmus, narzisstische-zufuhr]
-  related: [narzissmus-in-beziehungen, gaslighting-erkennen]
+  related: [narzissmus-in-beziehungen, gaslighting-erkennen, unreife-oder-narzissmus]
 faq:
   - question: "Welche Arten von Narzissmus gibt es?"
     answer: "Die Forschung unterscheidet vor allem zwei Grunddimensionen: den grandiosen (offen, dominant, im Mittelpunkt) und den vulnerablen bzw. verdeckten (leise, empfindlich, oft in der Opferrolle). Innerhalb davon gibt es feinere Spielarten, die sich hinter etwas Positivem verstecken – etwa der spirituelle (Überlegenheit über Bewusstheit) und der kommunale Narzissmus (Größe über Güte). Der Kern ist überall ähnlich, nur die Bühne ist eine andere."

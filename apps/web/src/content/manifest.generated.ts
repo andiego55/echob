@@ -5,6 +5,40 @@ import type { ContentMeta } from './types'
 export const CONTENT_MANIFEST: ContentMeta[] = [
   {
     "type": "glossary",
+    "slug": "affektive-realitaet",
+    "title": "Affektive Realität – wenn Gefühl gleich Wahrheit ist",
+    "description": "Affektive Realität heißt: Was ich fühle, ist die Wirklichkeit. Eine abweichende Sicht ist dann kein zweiter Blickwinkel, sondern ein Fehler. Warum das anders wirkt als Gaslighting und sich doch ähnlich anfühlt.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "affektive realitaet gefuehl als wahrheit emotionale unreife",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über affektive Realität gelesen. Magst du eine Situation anschauen, in der deine Version einer Szene einfach nicht gelten durfte?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist affektive Realität dasselbe wie Gaslighting?",
+        "answer": "Nein, auch wenn es sich ähnlich anfühlen kann. Bei Gaslighting wird deine Wahrnehmung gezielt verdreht, damit du an dir zweifelst. Affektive Realität ist unabsichtlich: Es ist schlicht kein Platz für zwei Versionen gleichzeitig. Die Wirkung auf dich kann dieselbe sein, der richtige Umgang damit ist ein anderer."
+      },
+      {
+        "question": "Wie reagiere ich, wenn nur ein Gefühl gilt?",
+        "answer": "Der aussichtsloseste Weg ist der Beweis. Je genauer du belegst, wie es wirklich war, desto stärker wird die Abwehr, weil du damit das Gefühl selbst infrage stellst. Wirksamer ist, das Gefühl stehen zu lassen und die Tatsache daneben – ohne die beiden gegeneinander auszuspielen."
+      }
+    ],
+    "url": "/glossar/affektive-realitaet"
+  },
+  {
+    "type": "glossary",
     "slug": "aktives-zuhoeren",
     "title": "Aktives Zuhören – verstehen wollen, statt schon zu antworten",
     "description": "Was aktives Zuhören wirklich bedeutet, warum es mehr ist als Schweigen und Nicken, und wie es in Beziehungen Nähe herstellt. Ohne Diagnose.",
@@ -70,6 +104,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/akzeptanz-und-veraenderung"
+  },
+  {
+    "type": "glossary",
+    "slug": "alexithymie",
+    "title": "Alexithymie – keine Worte für Gefühle",
+    "description": "Alexithymie beschreibt die Schwierigkeit, eigene Gefühle wahrzunehmen und zu benennen. Sie sieht aus wie Kälte und ist etwas anderes: ein Beschreibungsdefizit, kein Interessendefizit.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "alexithymie bedeutung gefuehlsblindheit partner keine gefuehle zeigen",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Alexithymie gelesen. Magst du eine Situation anschauen, in der auf deine Frage nach dem Befinden nichts kam?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Alexithymie eine Krankheit?",
+        "answer": "Nein, sie ist keine eigenständige Diagnose, sondern ein Persönlichkeitsmerkmal, das unterschiedlich stark ausgeprägt sein kann. Sie tritt gehäuft zusammen mit Autismus, Depressionen und nach traumatischen Erfahrungen auf, kommt aber auch ganz für sich vor."
+      },
+      {
+        "question": "Wie rede ich mit jemandem, der seine Gefühle nicht benennen kann?",
+        "answer": "Über den Körper und über Umwege statt über die offene Frage. Wie geht es dir führt oft ins Leere; woran hast du gemerkt, dass es zu viel wurde oder war es eher eng oder eher heiß führt weiter. Und es hilft, mehr Zeit zu geben, als sich richtig anfühlt – manche Antworten kommen erst Stunden später."
+      }
+    ],
+    "url": "/glossar/alexithymie"
   },
   {
     "type": "glossary",
@@ -343,6 +411,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "egozentrik",
+    "title": "Egozentrik – übersehen, nicht überheben",
+    "description": "Egozentrik meint die Unfähigkeit, die eigene Perspektive zu verlassen – nicht das Gefühl, mehr wert zu sein. Der Unterschied zum Narzissmus ist klein im Erleben und groß in den Folgen.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "egozentrik bedeutung unterschied narzissmus egozentrisch",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Egozentrik gelesen. Magst du eine Situation anschauen, in der dein Erleben schlicht nicht vorkam?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist egozentrisch dasselbe wie egoistisch?",
+        "answer": "Nein. Egoistisch heißt, die eigenen Interessen wissentlich über die anderer zu stellen. Egozentrisch heißt, die Interessen anderer gar nicht erst wahrzunehmen, weil die eigene Perspektive die einzige verfügbare ist. Das eine ist eine Entscheidung, das andere eine Grenze."
+      },
+      {
+        "question": "Ist Egozentrik ein Zeichen von Narzissmus?",
+        "answer": "Nicht zwingend. Narzisstische Selbstbezogenheit enthält ein Gefälle – besser, klüger, mehr wert. Egozentrik im engeren Sinne enthält kein Gefälle, sondern eine fehlende zweite Perspektive. Wer egozentrisch ist, hält sich nicht für überlegen; ihm fällt schlicht nicht ein, dass es einen zweiten Blick gibt."
+      }
+    ],
+    "url": "/glossar/egozentrik"
+  },
+  {
+    "type": "glossary",
     "slug": "einvernehmlichkeit",
     "title": "Einvernehmlichkeit – vier Bedingungen, die alle gelten müssen",
     "description": "Zustimmung ist mehr als das Ausbleiben eines Widerspruchs. Freiwillig, widerruflich, situationsbezogen, erkennbar – und warum Nachgeben keine davon erfüllt.",
@@ -408,6 +510,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/emotionale-affaere"
+  },
+  {
+    "type": "glossary",
+    "slug": "emotionale-einsamkeit",
+    "title": "Emotionale Einsamkeit – allein sein, während jemand da ist",
+    "description": "Emotionale Einsamkeit ist nicht das Alleinsein, sondern sein Gegenteil: das Gefühl, in Gesellschaft nicht vorzukommen. Woran du sie erkennst und warum sie so schwer zu erklären ist.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "emotionale einsamkeit in beziehung trotz partner allein fuehlen",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über emotionale Einsamkeit gelesen. Magst du eine Situation anschauen, in der du dich neben jemandem allein gefühlt hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum fühle ich mich in meiner Beziehung einsam?",
+        "answer": "Weil Anwesenheit und Kontakt zwei verschiedene Dinge sind. Einsamkeit entsteht nicht dadurch, dass niemand da ist, sondern dadurch, dass das, was in dir vorgeht, bei niemandem ankommt. Das kann in einer langjährigen Beziehung stärker sein als im Alleinleben – und ist ein ernstzunehmendes Signal, kein Zeichen von Undankbarkeit."
+      },
+      {
+        "question": "Ist emotionale Einsamkeit ein Grund für eine Trennung?",
+        "answer": "Sie ist erst einmal ein Grund, das Thema anzusprechen. Manchmal steckt etwas dahinter, das sich ändern lässt – Überlastung, Sprachlosigkeit, eine Phase. Wenn das Ansprechen aber über Jahre nichts verändert und du die Beziehung nur mit gesenkten Erwartungen aushältst, ist es eine Entscheidung über dein Leben und keine Kleinigkeit."
+      }
+    ],
+    "url": "/glossar/emotionale-einsamkeit"
   },
   {
     "type": "glossary",
@@ -861,6 +997,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/gruebeln"
+  },
+  {
+    "type": "glossary",
+    "slug": "heilungsphantasie",
+    "title": "Heilungsphantasie – der stille Vertrag, der niemals eingelöst wird",
+    "description": "Die Heilungsphantasie ist die unausgesprochene Annahme, dass Zuwendung irgendwann kommt, wenn man nur genug leistet. Sie hält Menschen jahrzehntelang in Beziehungen, die nichts zurückgeben.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "heilungsphantasie gibson bedeutung emotional unreife eltern",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über die Heilungsphantasie gelesen. Magst du anschauen, was du dir insgeheim erhoffst, wenn du dich besonders anstrengst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Woran merke ich, dass ich eine Heilungsphantasie habe?",
+        "answer": "An einem Wenn-dann-Satz, den du selten laut sagst. Etwa: Wenn ich endlich erfolgreich genug bin, wird sie stolz sein. Oder: Wenn ich nichts fordere, bleibt er. Verräterisch ist, dass die Bedingung nie erfüllt ist – sobald du sie erreichst, verschiebt sie sich."
+      },
+      {
+        "question": "Wie hört eine Heilungsphantasie auf?",
+        "answer": "Nicht durch Einsicht, sondern durch Trauer. Der Satz stimmt zu wissen und ihn loszulassen sind zwei verschiedene Dinge. Erst wenn betrauert ist, dass das Erhoffte nicht mehr kommt, endet die Anstrengung – und die Kraft, die daran gebunden war, wird frei."
+      }
+    ],
+    "url": "/glossar/heilungsphantasie"
   },
   {
     "type": "glossary",
@@ -1517,6 +1687,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/love-bombing"
+  },
+  {
+    "type": "glossary",
+    "slug": "mentalisierung",
+    "title": "Mentalisierung – hinter Verhalten ein Innenleben vermuten",
+    "description": "Mentalisierung ist die Fähigkeit, eigenes und fremdes Verhalten als Ausdruck von Gedanken und Gefühlen zu verstehen. Sie ist begrenzt, bricht unter Stress ab – und ist der Kern dessen, was emotionale Reife ausmacht.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "mentalisierung einfach erklaert bedeutung reflexive funktion",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Mentalisierung gelesen. Magst du eine Situation anschauen, in der du im Streit nicht mehr klar denken konntest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Was heißt Mentalisierung in einfachen Worten?",
+        "answer": "Zu erkennen, dass hinter dem, was jemand tut, etwas Inneres steckt – ein Gefühl, eine Absicht, eine Angst. Und dasselbe bei sich selbst zu tun. Also nicht nur zu sehen, dass jemand die Tür zuschlägt, sondern zu denken, dass er sich wahrscheinlich übergangen fühlt."
+      },
+      {
+        "question": "Warum bricht Mentalisierung im Streit zusammen?",
+        "answer": "Weil sie Ressourcen braucht. Unter starker Erregung schaltet der Körper auf Verteidigung um, und die aufwendigere Verarbeitung wird zurückgefahren. Deshalb sind Menschen im hochgefahrenen Streit vorübergehend zu Deutungen fähig, die sie eine Stunde später selbst nicht mehr verstehen."
+      }
+    ],
+    "url": "/glossar/mentalisierung"
   },
   {
     "type": "glossary",
@@ -3214,6 +3418,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "erschoepfung"
     ],
     "url": "/szenen/am-ende-troeste-ich-ihn"
+  },
+  {
+    "type": "scene",
+    "slug": "am-morgen-war-nichts-gewesen",
+    "title": "Am Morgen war nichts gewesen",
+    "description": "Eine fiktive Szene: Nach einem harten Streit fragt er beim Frühstück, ob sie Milch geholt hat. Über die Beziehung, in der es Brüche gibt, aber keine Reparatur – und darüber, wer die Rechnung dafür trägt.",
+    "cluster": "emotionale-unreife",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Annikas Sicht",
+    "pull_quote": "Es liegt jedes Mal bei mir, ob es das Gespräch gibt. Und wenn ich es aufmache, bin ich diejenige, die Streit will.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass ein Streit einfach verschwindet, ohne geklärt zu sein? Magst du anschauen, was das über die Zeit mit dir macht?"
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "fehlende-reparatur",
+      "emotionale-einsamkeit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/am-morgen-war-nichts-gewesen"
   },
   {
     "type": "scene",
@@ -4917,6 +5148,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "einer-von-uns-musste-falsch-liegen",
+    "title": "Einer von uns musste falsch liegen",
+    "description": "Eine fiktive Szene: Zwei Menschen erinnern denselben Abend verschieden – und nur eine Version darf gelten. Über affektive Realität, die sich wie Gaslighting anfühlt und doch etwas anderes ist.",
+    "cluster": "emotionale-unreife",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Maltes Sicht",
+    "pull_quote": "Sie log nicht. Das war das Verwirrendste. Für sie gab es diesen Tonfall wirklich nicht, weil sie ihn nicht gefühlt hatte.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass deine Erinnerung an eine Situation nicht gelten darf? Magst du eine solche Szene behutsam anschauen?"
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "affektive-realitaet",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/einer-von-uns-musste-falsch-liegen"
+  },
+  {
+    "type": "scene",
     "slug": "entschuldigung-damit-es-aufhoert",
     "title": "Entschuldigung, damit es aufhört",
     "description": "Eine fiktive Szene: Er entschuldigt sich für etwas, das er nicht getan hat – nicht aus Einsicht, sondern damit der Druck endet. Über Fawning, Konfliktvermeidung und erlernte Unterwerfung.",
@@ -5223,6 +5481,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "selbstzweifel"
     ],
     "url": "/szenen/es-tut-mir-leid-dass-du"
+  },
+  {
+    "type": "scene",
+    "slug": "es-war-nie-absicht",
+    "title": "Es war nie Absicht",
+    "description": "Eine fiktive Szene: Sie räumt die Wohnung ihres verstorbenen Vaters aus und begreift, dass da nie jemand war, der zurückhalten konnte. Über die Trauer, die schwerer ist als Wut.",
+    "cluster": "emotionale-unreife",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Simones Sicht",
+    "pull_quote": "Solange ich wütend war, gab es einen Schuldigen. Und solange es einen Schuldigen gab, hätte es auch anders sein können.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diesen Punkt, an dem aus Wut Trauer wird? Magst du behutsam anschauen, was du eigentlich betrauerst?"
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "erwachsene-kinder",
+      "heilungsphantasie",
+      "trauer"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/es-war-nie-absicht"
   },
   {
     "type": "scene",
@@ -5785,6 +6071,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "erschoepfung"
     ],
     "url": "/szenen/ich-muss-nicht-sofort"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-rufe-an-um-zu-erzaehlen",
+    "title": "Ich rufe an, um etwas zu erzählen",
+    "description": "Eine fiktive Szene: Sie ruft ihre Mutter an, um von einer Diagnose zu erzählen – und legt zwanzig Minuten später auf, nachdem sie ihre Mutter beruhigt hat. Über die Umkehrung der Rollen im erwachsenen Kind.",
+    "cluster": "emotionale-unreife",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Miriams Sicht",
+    "pull_quote": "Ich hatte angerufen, um getröstet zu werden, und legte auf, nachdem ich getröstet hatte. Wie immer.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass dein Anliegen im Gespräch verschwindet, ohne dass jemand es abgelehnt hätte? Magst du eine solche Situation anschauen?"
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "rollenumkehr",
+      "erwachsene-kinder",
+      "emotionale-einsamkeit"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/ich-rufe-an-um-zu-erzaehlen"
   },
   {
     "type": "scene",
@@ -6989,6 +7303,60 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/sie-uebersetzt-fuer-uns"
+  },
+  {
+    "type": "scene",
+    "slug": "sie-weinte-mehr-als-ich",
+    "title": "Sie weinte mehr als ich",
+    "description": "Eine fiktive Szene: Er sagt endlich, dass ihn etwas verletzt hat – und tröstet zehn Minuten später sie, weil sie sich als schlechter Mensch fühlt. Über die Umkehrung der Fürsorgerichtung in der Partnerschaft.",
+    "cluster": "emotionale-unreife",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Bens Sicht",
+    "pull_quote": "Mein Satz war zehn Minuten alt und schon nicht mehr im Raum. Nicht widerlegt. Nur weg.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du es, dass dein Anliegen sich in Trost für die andere Person verwandelt? Magst du eine solche Situation genauer anschauen?"
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "rollenumkehr",
+      "fehlende-reparatur"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/sie-weinte-mehr-als-ich"
+  },
+  {
+    "type": "scene",
+    "slug": "solange-alles-gut-lief",
+    "title": "Solange alles gut lief",
+    "description": "Eine fiktive Szene: Er war der aufmerksamste Mensch, den sie kannte – bis er seinen Job verlor. Über Verständnis, das nur zur Verfügung steht, wenn es nichts kostet.",
+    "cluster": "emotionale-unreife",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Katrins Sicht",
+    "pull_quote": "Ich hatte nicht bemerkt, dass seine Zugewandtheit ein Schönwetterphänomen war. Man merkt das nicht, solange schönes Wetter ist.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass Verständnis nur da ist, solange es nichts kostet? Magst du eine Situation anschauen, in der genau das sichtbar wurde?"
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "emotionale-einsamkeit",
+      "fehlende-reparatur"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/solange-alles-gut-lief"
   },
   {
     "type": "scene",
@@ -8383,6 +8751,69 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "emotional-unreife-eltern",
+    "title": "Emotional unreife Eltern: was das mit erwachsenen Kindern macht",
+    "description": "Aufwachsen bei Eltern, die körperlich da waren und emotional nicht: die Einsamkeit im vollen Haus, die Rollenumkehr, die Heilungsphantasie – und was davon im Erwachsenenleben weiterwirkt.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "emotional unreife eltern erwachsene kinder folgen umgang",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über emotional unreife Eltern gelesen. Magst du eine Erinnerung anschauen, in der du dich als Kind um jemanden gekümmert hast, der sich um dich hätte kümmern sollen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "emotionale-unreife",
+      "erwachsene-kinder",
+      "rollenumkehr",
+      "emotionale-einsamkeit",
+      "heilungsphantasie"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "emotionale-unreife",
+      "glossary": [
+        "emotionale-einsamkeit",
+        "heilungsphantasie",
+        "parentifizierung",
+        "affektive-realitaet"
+      ],
+      "related": [
+        "emotionale-vernachlaessigung",
+        "bindungsstile",
+        "selbstmitgefuehl"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Woran erkenne ich, dass meine Eltern emotional unreif waren?",
+        "answer": "Weniger an einzelnen Erinnerungen als an einem Grundgefühl: Du warst nicht allein, und du hast dich trotzdem allein gefühlt. Dazu kommen oft konkrete Muster – dass Gespräche über Gefühle immer bei den Gefühlen der Eltern endeten, dass du früh getröstet statt getröstet wurdest, und dass es nach Streit nie eine Klärung gab, sondern nur ein Weitermachen."
+      },
+      {
+        "question": "Muss ich den Kontakt abbrechen?",
+        "answer": "Für die meisten Menschen ist das weder nötig noch das Ziel. Zwischen vollem Kontakt und Kontaktabbruch liegt viel Raum: seltener, kürzer, zu bestimmten Themen gar nicht, ohne Erwartung an ein tiefes Gespräch. Ein Abbruch ist eine Möglichkeit, keine Pflicht – und er ist vor allem dann sinnvoll, wenn der Kontakt selbst dir schadet."
+      },
+      {
+        "question": "Warum tut es weh, obwohl nie etwas Schlimmes passiert ist?",
+        "answer": "Weil ein Mangel keine Spuren hinterlässt, an denen man ihn belegen könnte. Es gibt keine Szene, die man erzählen kann, und deshalb hat man das Gefühl, kein Recht auf den Schmerz zu haben. Das Fehlen von etwas Notwendigem wirkt aber genauso wie ein Ereignis – nur unsichtbarer."
+      }
+    ],
+    "url": "/wissen/emotional-unreife-eltern"
+  },
+  {
+    "type": "topic",
     "slug": "emotionale-gewalt-gegen-maenner",
     "title": "Wenn Männer emotionale Gewalt erleben",
     "description": "Emotionale Gewalt trifft auch Männer – und wird bei ihnen besonders leicht übersehen. Über Rollenbilder, Scham und die Angst, nicht ernst genommen zu werden. Und darüber, dass es Hilfe gibt. Ohne Ferndiagnose.",
@@ -8486,6 +8917,199 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/emotionale-manipulation"
+  },
+  {
+    "type": "topic",
+    "slug": "emotionale-reife",
+    "title": "Emotionale Reife: woran man sie tatsächlich erkennt",
+    "description": "Reife ist nicht Ruhe und nicht Beherrschung. Sie zeigt sich an sechs konkreten Fähigkeiten – und daran, was von ihnen unter Belastung übrig bleibt. Auch als Maßstab für einen ehrlichen Blick auf sich selbst.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "emotionale reife erkennen merkmale emotional reifer partner",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über emotionale Reife gelesen. Magst du eine Situation anschauen, in der dir eine dieser Fähigkeiten selbst schwergefallen ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "emotionale-unreife",
+      "fehlende-reparatur",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "emotionale-unreife",
+      "glossary": [
+        "mentalisierung",
+        "reparaturversuch",
+        "verletzlichkeit",
+        "emotionale-ueberflutung"
+      ],
+      "related": [
+        "emotionsregulation",
+        "co-regulation",
+        "ehrlich-zu-sich-selbst-sein"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist emotionale Reife dasselbe wie Selbstbeherrschung?",
+        "answer": "Nein, und die Verwechslung ist folgenreich. Wer nie laut wird, aber auch nie erreichbar ist, wirkt beherrscht und ist es nicht – er hat den Kontakt zu seinen Gefühlen abgeschnitten, statt sie halten zu lernen. Reife heißt nicht wenig fühlen, sondern denkfähig bleiben, während man viel fühlt."
+      },
+      {
+        "question": "Ist emotionale Reife eine Frage des Alters?",
+        "answer": "Nur sehr grob. Sie entsteht durch Erfahrungen, in denen jemand mit starken Gefühlen nicht allein gelassen wurde, und durch Beziehungen, in denen Konflikte überlebt und geklärt wurden. Wer beides nie hatte, kann mit sechzig sehr wenig davon haben – und wer beides früh hatte, mit fünfundzwanzig ziemlich viel."
+      },
+      {
+        "question": "Kann man emotionale Reife noch lernen?",
+        "answer": "Ja, sie ist die am besten veränderbare der hier beschriebenen Eigenschaften – vorausgesetzt, jemand will. Die beiden wirksamsten Hebel sind, unter Aufregung das Denken nicht ganz zu verlieren und nach einem Bruch zurückzukommen. Beides lässt sich üben, in Therapie schneller als allein."
+      }
+    ],
+    "url": "/wissen/emotionale-reife"
+  },
+  {
+    "type": "topic",
+    "slug": "emotionale-unreife",
+    "title": "Emotionale Unreife: was der Begriff meint – und was nicht",
+    "description": "Emotionale Unreife beschreibt keine Bosheit und keine Diagnose, sondern eine Grenze: Was mit dem Denken passiert, wenn das Fühlen stark wird. Woran du sie erkennst, wie sie sich anfühlt und wo der Begriff aufhört.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "emotionale unreife erkennen bedeutung anzeichen emotional unreifer partner",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über emotionale Unreife gelesen. Magst du eine Situation anschauen, in der ein Gespräch plötzlich nicht mehr weiterging – und du am Ende der Vernünftige warst?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "emotionale-unreife",
+      "emotionale-einsamkeit",
+      "rollenumkehr",
+      "fehlende-reparatur"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "emotionale-unreife-abgrenzen",
+        "emotional-unreife-eltern",
+        "emotionale-reife"
+      ],
+      "glossary": [
+        "mentalisierung",
+        "affektive-realitaet",
+        "emotionale-einsamkeit",
+        "heilungsphantasie",
+        "egozentrik"
+      ],
+      "comparison": [
+        "unreife-oder-narzissmus"
+      ],
+      "related": [
+        "narzissmus-in-beziehungen",
+        "emotionale-vernachlaessigung",
+        "emotionsregulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist emotionale Unreife eine Diagnose?",
+        "answer": "Nein. Der Begriff stammt aus der psychologischen Ratgeberliteratur, vor allem von der Klinischen Psychologin Lindsay C. Gibson. Er steht weder im ICD-11 noch im DSM-5 und beschreibt keine Krankheit, sondern eine Entwicklungsgrenze: eine Fähigkeit, die weniger weit ausgebildet ist als bei anderen Erwachsenen. Das macht ihn nicht wertlos, aber es macht ihn zu einer Beschreibung, nicht zu einem Befund."
+      },
+      {
+        "question": "Woran erkenne ich emotionale Unreife am schnellsten?",
+        "answer": "An dem, was nach einem Konflikt passiert. Reife zeigt sich nicht darin, dass jemand nie ausrastet, sondern darin, dass er danach zurückkommt: nachfragt, einordnet, etwas gerade rückt. Bleibt der Bruch einfach stehen und wird am nächsten Morgen so getan, als sei nichts gewesen, ist das aussagekräftiger als jeder einzelne Streit."
+      },
+      {
+        "question": "Ist ein emotional unreifer Mensch dasselbe wie ein Narzisst?",
+        "answer": "Nein. Narzisstische Muster sind eine mögliche Form emotionaler Unreife, aber die meisten emotional unreifen Menschen sind nicht narzisstisch. Der Unterschied liegt in der Richtung: Unreife ist eine Kapazitätsgrenze, narzisstische Muster sind eine Strategie, den eigenen Selbstwert über andere zu stabilisieren."
+      },
+      {
+        "question": "Kann sich emotionale Unreife noch ändern?",
+        "answer": "Grundsätzlich ja, Menschen entwickeln sich lebenslang weiter. Aber sie ändert sich nicht dadurch, dass du besser erklärst, geduldiger bist oder mehr leistest. Veränderung setzt voraus, dass die Person selbst ein Problem sieht und daran arbeiten will. Wenn das nicht der Fall ist, ist die ehrlichere Frage nicht wie ändere ich sie, sondern wie viel Nähe verträgt diese Beziehung."
+      }
+    ],
+    "url": "/wissen/emotionale-unreife"
+  },
+  {
+    "type": "topic",
+    "slug": "emotionale-unreife-abgrenzen",
+    "title": "Was es sonst noch sein kann: emotionale Unreife abgrenzen",
+    "description": "Vieles sieht aus wie emotionale Unreife und ist etwas ganz anderes – Autismus, ADHS, Depression, Alexithymie, Bindungsvermeidung, Trauma. Drei Achsen, an denen du sortieren kannst, ohne jemanden zu etikettieren.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "emotionale unreife oder autismus adhs depression unterschied abgrenzung",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du versuchst gerade zu unterscheiden, ob jemand nicht will oder nicht kann. Magst du eine Situation anschauen, an der sich das zeigen würde?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "fehlende-reparatur"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "emotionale-unreife",
+      "glossary": [
+        "mentalisierung",
+        "alexithymie",
+        "komplextrauma",
+        "dissoziation"
+      ],
+      "related": [
+        "bindungsstile",
+        "emotionsregulation",
+        "beziehungstrauma"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist mein autistischer Partner emotional unreif?",
+        "answer": "Sehr wahrscheinlich beschreibt der Begriff das Falsche. Autismus verändert, wie Gefühle wahrgenommen, verarbeitet und gezeigt werden – nicht, ob jemand sich kümmert. Viele autistische Menschen empfinden sehr stark und richten sich zuverlässig nach einer Absprache, sobald sie sie verstanden haben. Genau das ist der Unterschied: Bei emotionaler Unreife folgt auf die Rückmeldung Abwehr, bei Autismus meist der Versuch, es künftig anders zu machen."
+      },
+      {
+        "question": "Woran erkenne ich, ob es eine Depression ist?",
+        "answer": "Am Verlauf und am Leidensdruck. Eine Depression hat einen Beginn – es gab ein Vorher, in dem mehr möglich war. Und die Person leidet selbst darunter, dass sie nichts mehr fühlt oder nichts mehr geben kann. Emotionale Unreife ist keine Veränderung, sondern ein Dauerzustand, und sie tut in erster Linie den anderen weh."
+      },
+      {
+        "question": "Und wenn mehreres zugleich zutrifft?",
+        "answer": "Das ist eher der Normalfall als die Ausnahme. Ein Mensch kann ADHS haben, erschöpft sein und dazu wenig gelernt haben, über Gefühle zu sprechen. Die Frage ist dann nicht, welches Etikett gewinnt, sondern welcher Anteil sich bewegen lässt – und was für dich übrig bleibt, wenn sich nichts bewegt."
+      }
+    ],
+    "url": "/wissen/emotionale-unreife-abgrenzen"
   },
   {
     "type": "topic",
@@ -9870,7 +10494,8 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "related": [
         "narzisstische-spielarten",
         "emotionale-manipulation",
-        "gaslighting-erkennen"
+        "gaslighting-erkennen",
+        "emotionale-unreife"
       ]
     },
     "faq": [
@@ -9937,7 +10562,8 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ],
       "related": [
         "narzissmus-in-beziehungen",
-        "gaslighting-erkennen"
+        "gaslighting-erkennen",
+        "unreife-oder-narzissmus"
       ]
     },
     "faq": [
@@ -10748,6 +11374,65 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/trennen-oder-bleiben"
+  },
+  {
+    "type": "comparison",
+    "slug": "unreife-oder-narzissmus",
+    "title": "Emotionale Unreife oder Narzissmus? Woran du den Unterschied merkst",
+    "description": "Beides fühlt sich an, als käme nichts zurück. Aber Unreife ist eine Grenze, narzisstische Muster sind eine Strategie – und der Unterschied entscheidet darüber, was dich schützt. Fünf Prüfsteine, ohne Ferndiagnose.",
+    "cluster": "emotionale-unreife",
+    "search_intent": "emotionale unreife oder narzissmus unterschied narzisst oder unreif",
+    "updated": "2026-09-05",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du versuchst gerade einzuordnen, ob da eine Grenze ist oder ein Muster mit Absicht. Magst du eine Situation anschauen, an der sich das zeigt?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "emotionale-unreife",
+      "wahrnehmungszweifel",
+      "fehlende-reparatur"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "emotionale-unreife",
+      "glossary": [
+        "mentalisierung",
+        "egozentrik",
+        "narzisstische-zufuhr",
+        "hoovering",
+        "idealisierung-abwertung"
+      ],
+      "related": [
+        "narzissmus-in-beziehungen",
+        "verdeckter-narzissmus",
+        "narzisstische-spielarten"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist jeder Narzisst emotional unreif?",
+        "answer": "Im Prinzip ja – narzisstische Muster setzen voraus, dass die Fähigkeit fehlt, andere als eigenständige Menschen mit eigenem Innenleben zu behandeln. Umgekehrt gilt es nicht: Die meisten emotional unreifen Menschen sind nicht narzisstisch. Emotionale Unreife ist der größere Kreis, narzisstische Muster sind ein kleinerer Kreis darin."
+      },
+      {
+        "question": "Was ist der schnellste Unterschied im Alltag?",
+        "answer": "Beobachte, was passiert, wenn du aufhörst, dich zu bemühen. Bei emotionaler Unreife folgt Ratlosigkeit, Gekränktheit oder schlicht gar nichts – die Person kommt dir nicht hinterher. Bei narzisstischen Mustern wird dein Rückzug als Kränkung erlebt, auf die reagiert werden muss: mit Charme, mit Druck, mit Schuld oder mit Abwertung."
+      },
+      {
+        "question": "Kann ich das selbst sicher unterscheiden?",
+        "answer": "Sicher nicht. Eine narzisstische Persönlichkeitsstörung stellt ausschließlich eine Fachperson fest, und emotionale Unreife ist überhaupt keine Diagnose. Was du sehr wohl beurteilen kannst, ist die Wirkung auf dich: ob du in dieser Beziehung einsam bist oder ob du kleiner wirst. Das ist die Unterscheidung, an der praktisch etwas hängt."
+      }
+    ],
+    "url": "/wissen/unreife-oder-narzissmus"
   },
   {
     "type": "topic",
@@ -11592,6 +12277,10 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
 ]
 
 export const CONTENT_ROUTE_META: Record<string, { title: string; description: string }> = {
+  "/glossar/affektive-realitaet": {
+    "title": "Affektive Realität – wenn Gefühl gleich Wahrheit ist",
+    "description": "Affektive Realität heißt: Was ich fühle, ist die Wirklichkeit. Eine abweichende Sicht ist dann kein zweiter Blickwinkel, sondern ein Fehler. Warum das anders wirkt als Gaslighting und sich doch ähnlich anfühlt."
+  },
   "/glossar/aktives-zuhoeren": {
     "title": "Aktives Zuhören – verstehen wollen, statt schon zu antworten",
     "description": "Was aktives Zuhören wirklich bedeutet, warum es mehr ist als Schweigen und Nicken, und wie es in Beziehungen Nähe herstellt. Ohne Diagnose."
@@ -11599,6 +12288,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/akzeptanz-und-veraenderung": {
     "title": "Akzeptanz und Veränderung – die Unterscheidung, die entlastet",
     "description": "Manches zwischen zwei Menschen lässt sich ändern, manches nicht. Warum der Kampf gegen das Unveränderliche oft mehr anrichtet als der Unterschied selbst – und wo die Grenze liegt."
+  },
+  "/glossar/alexithymie": {
+    "title": "Alexithymie – keine Worte für Gefühle",
+    "description": "Alexithymie beschreibt die Schwierigkeit, eigene Gefühle wahrzunehmen und zu benennen. Sie sieht aus wie Kälte und ist etwas anderes: ein Beschreibungsdefizit, kein Interessendefizit."
   },
   "/glossar/ambivalenz": {
     "title": "Ambivalenz – wenn du hin- und hergerissen bist",
@@ -11632,6 +12325,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
     "description": "Ein Double Bind ist eine Zwickmühle aus zwei widersprüchlichen Botschaften, bei der jede Reaktion falsch ist – und das Benennen des Widerspruchs verboten scheint. Warum das so tief verunsichert. Ohne Diagnose."
   },
+  "/glossar/egozentrik": {
+    "title": "Egozentrik – übersehen, nicht überheben",
+    "description": "Egozentrik meint die Unfähigkeit, die eigene Perspektive zu verlassen – nicht das Gefühl, mehr wert zu sein. Der Unterschied zum Narzissmus ist klein im Erleben und groß in den Folgen."
+  },
   "/glossar/einvernehmlichkeit": {
     "title": "Einvernehmlichkeit – vier Bedingungen, die alle gelten müssen",
     "description": "Zustimmung ist mehr als das Ausbleiben eines Widerspruchs. Freiwillig, widerruflich, situationsbezogen, erkennbar – und warum Nachgeben keine davon erfüllt."
@@ -11639,6 +12336,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/emotionale-affaere": {
     "title": "Emotionale Affäre – Nähe ohne Berührung",
     "description": "Eine emotionale Affäre ist eine Verbindung, die eigentlich in die Beziehung gehörte. Woran du sie erkennst, warum sie oft mehr verletzt als Sex und wo die Grenze verläuft."
+  },
+  "/glossar/emotionale-einsamkeit": {
+    "title": "Emotionale Einsamkeit – allein sein, während jemand da ist",
+    "description": "Emotionale Einsamkeit ist nicht das Alleinsein, sondern sein Gegenteil: das Gefühl, in Gesellschaft nicht vorzukommen. Woran du sie erkennst und warum sie so schwer zu erklären ist."
   },
   "/glossar/emotionale-erpressung": {
     "title": "Emotionale Erpressung – wenn Nähe an Bedingungen geknüpft wird",
@@ -11691,6 +12392,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/gruebeln": {
     "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
     "description": "Grübeln (Rumination) ist das kreisende Wiederholen derselben Gedanken ohne Lösung. Warum es sich nach Nachdenken anfühlt, aber die Wunde offen hält – und wie du den Kreis unterbrichst. Ohne Diagnose."
+  },
+  "/glossar/heilungsphantasie": {
+    "title": "Heilungsphantasie – der stille Vertrag, der niemals eingelöst wird",
+    "description": "Die Heilungsphantasie ist die unausgesprochene Annahme, dass Zuwendung irgendwann kommt, wenn man nur genug leistet. Sie hält Menschen jahrzehntelang in Beziehungen, die nichts zurückgeben."
   },
   "/glossar/hoovering": {
     "title": "Hoovering – das Zurückholen, wenn du gehen willst",
@@ -11767,6 +12472,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/love-bombing": {
     "title": "Love Bombing – der überwältigende Anfang",
     "description": "Love Bombing ist eine Flut aus Zuneigung, Aufmerksamkeit und Zukunftsversprechen ganz am Anfang – so intensiv, dass sie schnell bindet und später als Druckmittel dient. Woran du es erkennst. Ohne Diagnose."
+  },
+  "/glossar/mentalisierung": {
+    "title": "Mentalisierung – hinter Verhalten ein Innenleben vermuten",
+    "description": "Mentalisierung ist die Fähigkeit, eigenes und fremdes Verhalten als Ausdruck von Gedanken und Gefühlen zu verstehen. Sie ist begrenzt, bricht unter Stress ab – und ist der Kern dessen, was emotionale Reife ausmacht."
   },
   "/glossar/metakommunikation": {
     "title": "Metakommunikation – über das Reden reden",
@@ -11967,6 +12676,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/am-ende-troeste-ich-ihn": {
     "title": "Am Ende tröste ich ihn",
     "description": "Eine Szene über verdeckten Narzissmus: Du kommst mit deinem Schmerz – und gehst mit seinem. Wie aus deinem Anliegen sein Leid wird. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/am-morgen-war-nichts-gewesen": {
+    "title": "Am Morgen war nichts gewesen",
+    "description": "Eine fiktive Szene: Nach einem harten Streit fragt er beim Frühstück, ob sie Milch geholt hat. Über die Beziehung, in der es Brüche gibt, aber keine Reparatur – und darüber, wer die Rechnung dafür trägt."
   },
   "/szenen/am-tisch-vor-den-anderen": {
     "title": "Am Tisch, vor den anderen",
@@ -12212,6 +12925,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Eine Spur besser",
     "description": "Eine Szene über eine Freundschaft mit feinem Konkurrenzdruck – wenn gute Nachrichten beim Gegenüber immer klein werden. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/einer-von-uns-musste-falsch-liegen": {
+    "title": "Einer von uns musste falsch liegen",
+    "description": "Eine fiktive Szene: Zwei Menschen erinnern denselben Abend verschieden – und nur eine Version darf gelten. Über affektive Realität, die sich wie Gaslighting anfühlt und doch etwas anderes ist."
+  },
   "/szenen/entschuldigung-damit-es-aufhoert": {
     "title": "Entschuldigung, damit es aufhört",
     "description": "Eine fiktive Szene: Er entschuldigt sich für etwas, das er nicht getan hat – nicht aus Einsicht, sondern damit der Druck endet. Über Fawning, Konfliktvermeidung und erlernte Unterwerfung."
@@ -12255,6 +12972,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/es-tut-mir-leid-dass-du": {
     "title": "Es tut mir leid, dass du",
     "description": "Eine Szene über die Schein-Entschuldigung – wenn ein „Sorry\" die Schuld leise zu dir zurückschiebt. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/es-war-nie-absicht": {
+    "title": "Es war nie Absicht",
+    "description": "Eine fiktive Szene: Sie räumt die Wohnung ihres verstorbenen Vaters aus und begreift, dass da nie jemand war, der zurückhalten konnte. Über die Trauer, die schwerer ist als Wut."
   },
   "/szenen/es-wird-leiser": {
     "title": "Es wird leiser",
@@ -12335,6 +13056,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-muss-nicht-sofort": {
     "title": "Ich muss nicht sofort",
     "description": "Eine Szene über eine kleine, große Grenze – nicht mehr auf jede Nachricht sofort zu reagieren und die eigene Zeit zurückzuerobern. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-rufe-an-um-zu-erzaehlen": {
+    "title": "Ich rufe an, um etwas zu erzählen",
+    "description": "Eine fiktive Szene: Sie ruft ihre Mutter an, um von einer Diagnose zu erzählen – und legt zwanzig Minuten später auf, nachdem sie ihre Mutter beruhigt hat. Über die Umkehrung der Rollen im erwachsenen Kind."
   },
   "/szenen/ich-schreibe-es-jetzt-auf": {
     "title": "Ich schreibe es jetzt auf",
@@ -12508,6 +13233,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sie übersetzt für uns",
     "description": "Eine fiktive Szene: Die Eltern reden nicht mehr direkt miteinander – die achtjährige Tochter trägt die Botschaften hin und her. Über Parentifizierung und Kinder, die zu Vermittlern im Elternkonflikt werden."
   },
+  "/szenen/sie-weinte-mehr-als-ich": {
+    "title": "Sie weinte mehr als ich",
+    "description": "Eine fiktive Szene: Er sagt endlich, dass ihn etwas verletzt hat – und tröstet zehn Minuten später sie, weil sie sich als schlechter Mensch fühlt. Über die Umkehrung der Fürsorgerichtung in der Partnerschaft."
+  },
+  "/szenen/solange-alles-gut-lief": {
+    "title": "Solange alles gut lief",
+    "description": "Eine fiktive Szene: Er war der aufmerksamste Mensch, den sie kannte – bis er seinen Job verlor. Über Verständnis, das nur zur Verfügung steht, wenn es nichts kostet."
+  },
   "/szenen/troeste-mich": {
     "title": "Tröste mich",
     "description": "Eine fiktive Szene: Sie trifft ihn mit gezielten Sätzen, dann weint sie – und wirft ihm vor, sie nicht zu trösten. Über Rollenumkehr und die Zumutung, die Person zu regulieren, von der der Angriff ausging."
@@ -12660,6 +13393,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Eingestehen können: warum Zugeben so schwer ist",
     "description": "Ein Fehler zuzugeben kostet fast nichts und fühlt sich an wie Selbstaufgabe. Warum das so ist, woran man ein echtes Eingeständnis erkennt und welche fünf Formen es nur so aussehen lassen."
   },
+  "/wissen/emotional-unreife-eltern": {
+    "title": "Emotional unreife Eltern: was das mit erwachsenen Kindern macht",
+    "description": "Aufwachsen bei Eltern, die körperlich da waren und emotional nicht: die Einsamkeit im vollen Haus, die Rollenumkehr, die Heilungsphantasie – und was davon im Erwachsenenleben weiterwirkt."
+  },
   "/wissen/emotionale-gewalt-gegen-maenner": {
     "title": "Wenn Männer emotionale Gewalt erleben",
     "description": "Emotionale Gewalt trifft auch Männer – und wird bei ihnen besonders leicht übersehen. Über Rollenbilder, Scham und die Angst, nicht ernst genommen zu werden. Und darüber, dass es Hilfe gibt. Ohne Ferndiagnose."
@@ -12667,6 +13404,18 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/emotionale-manipulation": {
     "title": "Emotionale Manipulation in Beziehungen erkennen",
     "description": "Wie emotionale Manipulation funktioniert, welche Muster typisch sind und wie du deine eigene Wahrnehmung wieder ernst nimmst – vorsichtig erklärt, ohne Ferndiagnose."
+  },
+  "/wissen/emotionale-reife": {
+    "title": "Emotionale Reife: woran man sie tatsächlich erkennt",
+    "description": "Reife ist nicht Ruhe und nicht Beherrschung. Sie zeigt sich an sechs konkreten Fähigkeiten – und daran, was von ihnen unter Belastung übrig bleibt. Auch als Maßstab für einen ehrlichen Blick auf sich selbst."
+  },
+  "/wissen/emotionale-unreife": {
+    "title": "Emotionale Unreife: was der Begriff meint – und was nicht",
+    "description": "Emotionale Unreife beschreibt keine Bosheit und keine Diagnose, sondern eine Grenze: Was mit dem Denken passiert, wenn das Fühlen stark wird. Woran du sie erkennst, wie sie sich anfühlt und wo der Begriff aufhört."
+  },
+  "/wissen/emotionale-unreife-abgrenzen": {
+    "title": "Was es sonst noch sein kann: emotionale Unreife abgrenzen",
+    "description": "Vieles sieht aus wie emotionale Unreife und ist etwas ganz anderes – Autismus, ADHS, Depression, Alexithymie, Bindungsvermeidung, Trauma. Drei Achsen, an denen du sortieren kannst, ohne jemanden zu etikettieren."
   },
   "/wissen/emotionale-vernachlaessigung": {
     "title": "Emotionale Vernachlässigung: einsam in der Beziehung",
@@ -12835,6 +13584,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/trennen-oder-bleiben": {
     "title": "Trennen oder bleiben? Woran du Orientierung findest",
     "description": "Kein Test entscheidet für dich – aber diese Fragen und Merkmale helfen dir, ehrlicher hinzuschauen, ob Bleiben oder Gehen deiner Wahrheit näherkommt."
+  },
+  "/wissen/unreife-oder-narzissmus": {
+    "title": "Emotionale Unreife oder Narzissmus? Woran du den Unterschied merkst",
+    "description": "Beides fühlt sich an, als käme nichts zurück. Aber Unreife ist eine Grenze, narzisstische Muster sind eine Strategie – und der Unterschied entscheidet darüber, was dich schützt. Fünf Prüfsteine, ohne Ferndiagnose."
   },
   "/wissen/untreue": {
     "title": "Untreue: warum es passiert und was es mit dir macht",
