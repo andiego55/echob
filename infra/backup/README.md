@@ -49,6 +49,10 @@ Artefakte und Echo-Nachrichten liegen Fernet-verschlüsselt in der Datenbank. W�
 Daten praktisch weg wären. **Der `ENCRYPTION_KEY` ist genauso überlebenswichtig wie der
 age-Schlüssel** und gehört an einen zweiten Ort als der Server.
 
+Verschlüsselte Werte stehen als `enc:v1:gAAAAA…` in der Datenbank — crypto.py setzt das
+Präfix vor den Fernet-Token, damit Altbestand im Klartext unterscheidbar bleibt. Ändert
+sich das Präfix dort, muss es im Skript mitgeändert werden.
+
 Die Leseprobe entschlüsselt eine echte Nachricht und gibt trotzdem keinen Klartext aus —
 sie meldet nur, dass es ging und wie lang er war. Nimmt Fernet den Token an, stimmen
 Schlüssel und Signatur; der Inhalt muss dafür niemandem gezeigt werden. Sie braucht Python

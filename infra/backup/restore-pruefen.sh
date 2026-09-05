@@ -153,39 +153,55 @@ sagen ""
 # man sie noch verstehen kann. Szenentexte, Dokumente, Artefakte und Echo-Nachrichten
 # liegen Fernet-verschluesselt in der Datenbank (siehe app/core/crypto.py). Waere der
 # ENCRYPTION_KEY verloren, liefe dieser Test bis hierher durch und meldete Erfolg, waehrend
-# die Daten praktisch weg waeren. Der Schluessel ist damit genauso ueberlebenswichtig wie
-# der age-Schluessel - und ohne diese Probe sagt der Beweis nichts ueber ihn.
+# die Daten praktisch weg waeren.
 #
 # WARUM DER KLARTEXT NICHT ANGEZEIGT WIRD. Was hier entschluesselt wird, ist eine echte
 # Nachricht aus einem Beziehungsdialog - Art.-9-Daten. Bewiesen ist die Lesbarkeit auch
-# ohne sie: Wenn Fernet den Token annimmt, stimmen Schluessel UND Signatur. Ausgegeben wird
+# ohne sie: Nimmt Fernet den Token an, stimmen Schluessel UND Signatur. Ausgegeben wird
 # deshalb nur, DASS es ging und wie lang der Klartext war.
+#
+# DAS PRAEFIX. Verschluesselte Werte sehen aus wie `enc:v1:gAAAAA...`; crypto.py setzt es
+# vor den Fernet-Token, damit Altbestand im Klartext unterscheidbar bleibt. Beim ersten
+# Anlauf suchte diese Probe nach `gAAAAA%`, fand nichts und meldete "liegen die Daten im
+# Klartext?" - ein Fehlalarm ueber die wichtigste Frage ueberhaupt. Aendert sich das
+# Praefix in crypto.py, muss es hier mitgeaendert werden.
+PRAEFIX="enc:v1:"
+LESBARKEIT="ungeprueft"
+
 if [ -n "$FERNET" ]; then
   sagen ""
   if [ ! -f "$FERNET" ]; then
     sagen "FEHLGESCHLAGEN: Schluesseldatei '$FERNET' gibt es nicht."
     exit 1
   fi
-  if ! command -v python >/dev/null 2>&1 && ! command -v python3 >/dev/null 2>&1; then
+  PY_BIN="$(command -v python3 || command -v python)"
+  if [ -z "$PY_BIN" ]; then
     sagen "UEBERSPRUNGEN: Fuer die Leseprobe wird Python mit 'cryptography' gebraucht."
   else
-    PY_BIN="$(command -v python3 || command -v python)"
-    token="$(frage "SELECT content FROM echo_messages WHERE content LIKE 'gAAAAA%' ORDER BY created_at DESC LIMIT 1")"
+    token="$(frage "SELECT content FROM echo_messages WHERE content LIKE '${PRAEFIX}%' ORDER BY created_at DESC LIMIT 1")"
     if [ -z "$token" ]; then
-      # Auch das ist ein Befund, kein Fehler des Skripts.
-      sagen "ACHTUNG: Keine verschluesselte Nachricht gefunden - liegen die Daten im Klartext?"
+      # Auch das ist ein Befund, kein Skriptfehler: Ohne gesetzten ENCRYPTION_KEY ist
+      # encrypt() ein No-op, und alles landet im Klartext in der Datenbank.
+      LESBARKEIT="nichts-verschluesselt"
+      sagen "ACHTUNG: Keine verschluesselte Nachricht gefunden."
+      sagen "  Entweder war beim Schreiben kein ENCRYPTION_KEY gesetzt - dann liegen die"
+      sagen "  Daten im Klartext in der Datenbank -, oder das Praefix hat sich geaendert."
     else
       laenge="$(printf '%s' "$token" | "$PY_BIN" -c '
 import sys
 from cryptography.fernet import Fernet
 schluessel = open(sys.argv[1], encoding="utf-8").read().strip()
+praefix = sys.argv[2]
 token = sys.stdin.read().strip()
+if token.startswith(praefix):
+    token = token[len(praefix):]
 try:
     print(len(Fernet(schluessel.encode()).decrypt(token.encode()).decode()))
 except Exception:
     print("-1")
-' "$FERNET" 2>/dev/null)"
+' "$FERNET" "$PRAEFIX" 2>/dev/null)"
       if [ "${laenge:--1}" -gt 0 ] 2>/dev/null; then
+        LESBARKEIT="ja"
         sagen "Leseprobe: entschluesselt, $laenge Zeichen Klartext (Inhalt bewusst nicht angezeigt)."
       else
         sagen "FEHLGESCHLAGEN: Der ENCRYPTION_KEY passt nicht zu diesen Daten."
@@ -197,12 +213,23 @@ except Exception:
   fi
 fi
 
-if [ -n "$FERNET" ]; then
-  sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen, enthaelt Daten - und die Daten sind lesbar."
-else
-  sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen und enthaelt Daten."
-  sagen "(Ob die Daten LESBAR sind, sagt das nicht - dafuer den ENCRYPTION_KEY als drittes Argument mitgeben.)"
-fi
+# Die Schlussmeldung sagt genau das, was geprueft WURDE. Beim ersten Anlauf stand hier
+# "und die Daten sind lesbar", sobald ueberhaupt ein Schluessel uebergeben war - auch dann,
+# wenn die Probe gar nichts gefunden hatte. Eine falsche Erfolgsmeldung macht den ganzen
+# Beweis wertlos.
+case "$LESBARKEIT" in
+  ja)
+    sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen, enthaelt Daten - und die Daten sind lesbar."
+    ;;
+  nichts-verschluesselt)
+    sagen "TEILWEISE BEWIESEN: Backup entschluesselbar, zurueckspielbar, enthaelt Daten."
+    sagen "Ueber die Lesbarkeit sagt das nichts - es war nichts Verschluesseltes zu finden (siehe oben)."
+    ;;
+  *)
+    sagen "BEWIESEN: Das Backup laesst sich entschluesseln, zurueckspielen und enthaelt Daten."
+    sagen "(Ob die Daten LESBAR sind, sagt das nicht - dafuer den ENCRYPTION_KEY als drittes Argument mitgeben.)"
+    ;;
+esac
 sagen ""
 sagen "Bitte noch erledigen:"
 sagen "  1. Auf dem Server vermerken, damit der Waechter Ruhe gibt:"
