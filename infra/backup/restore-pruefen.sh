@@ -285,6 +285,10 @@ sagen "  1. Auf dem Server vermerken, damit der Waechter Ruhe gibt:"
 sagen "     ssh root@<SERVER-IP> 'date +%s > /var/backups/echob/.restore-test-ok'"
 sagen "  2. Die heruntergeladene Datei loeschen - sie enthaelt echte Nutzerdaten:"
 sagen "     rm -f \"$DATEI\""
-sagen "  3. Die temporaere Schluesseldatei loeschen:"
-sagen "     rm -f \"$SCHLUESSEL\""
+sagen "  3. Die temporaeren Schluesseldateien loeschen:"
+if [ -n "$FERNET" ]; then
+  sagen "     rm -f \"$SCHLUESSEL\" \"$FERNET\""
+else
+  sagen "     rm -f \"$SCHLUESSEL\""
+fi
 exit 0
