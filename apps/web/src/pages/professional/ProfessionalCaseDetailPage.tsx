@@ -4,7 +4,7 @@
  * Bei Widerruf/keinem Zugriff antwortet der Server mit 404 → "Kein Zugriff".
  */
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
@@ -247,9 +247,21 @@ type ProfileLikeConfig = {
 }
 
 /** Rendert die ausgefüllten Antworten eines Profils (modules) anhand der Modul-Konfiguration. */
-function ProfileAnswers({ modules, config }: {
+/**
+ * Die Antworten eines Fragebogens — je Modul aufklappbar.
+ *
+ * **Warum der Echo-Knopf am Modul hängt und nicht an der einzelnen Frage.** Ein
+ * Fragebogen trägt vierzig Einzelangaben; vierzig Knöpfe sind keine Möglichkeit, sondern
+ * Lärm — man findet den einen nicht mehr, den man wollte. Das Modul ist die Einheit, über
+ * die man tatsächlich spricht, und Echo hat den ganzen Fragebogen ohnehin im Kontext:
+ * Die Frage lenkt es auf einen Ausschnitt, sie liefert ihn nicht.
+ */
+function ProfileAnswers({ modules, config, caseId, quelle }: {
   modules: Record<string, Record<string, unknown>>
   config: ProfileLikeConfig[]
+  caseId: string
+  /** Welcher Fragebogen — steht so in der Frage an Echo. */
+  quelle: string
 }) {
   const sections = config
     .map(mod => {
@@ -312,10 +324,38 @@ function ProfileAnswers({ modules, config }: {
               </div>
             ))}
           </dl>
+          <Link
+            to={`/professional/cases/${caseId}/echo?frage=${encodeURIComponent(
+              `Was fällt dir im ${quelle} zum Bereich „${sec.label}“ auf?`)}`}
+            className="mt-3 inline-block rounded-full border border-brand-border px-2.5 py-1 text-[0.7rem] text-brand-muted transition-colors hover:border-accent hover:text-accent"
+          >
+            Echo dazu fragen
+          </Link>
         </details>
       ))}
     </div>
   )
+}
+
+/**
+ * Ein Anker aus dem Chat („Szene 12") muss den Eintrag auch aufklappen.
+ *
+ * Seit die Listen zugeklappt sind, führt ein Sprung auf `#szene-12` sonst zu einer Zeile
+ * mit einem Titel — der Inhalt, wegen dem man geklickt hat, bleibt versteckt. Der Browser
+ * öffnet `<details>` bei Fragment-Navigation nicht zuverlässig, und scrollen kann er
+ * ohnehin erst, wenn der Inhalt da ist. Also beides von Hand, in dieser Reihenfolge.
+ */
+function useAnkerOeffnen(bereit: boolean) {
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (!bereit || !hash) return
+    const el = document.getElementById(decodeURIComponent(hash.slice(1)))
+    if (!el) return
+    if (el instanceof HTMLDetailsElement) el.open = true
+    // Erst im nächsten Bild scrollen: Vorher steht die Höhe des aufgeklappten Inhalts
+    // noch nicht fest, und das Ziel landet an der falschen Stelle.
+    requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+  }, [hash, bereit])
 }
 
 export default function ProfessionalCaseDetailPage() {
@@ -334,6 +374,7 @@ export default function ProfessionalCaseDetailPage() {
     retry: false,
     enabled: !!caseId,
   })
+  useAnkerOeffnen(!!bundle)
   const { data: glossary = [] } = useQuery({ queryKey: ['prof-glossary'], queryFn: professionalApi.glossary })
 
   const qc = useQueryClient()
@@ -650,7 +691,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 
         {has('person_profile') && bundle.person_profile && (
           <Section title="Fragebogen zur Fallperson" icon={<IconClipboard />}>
-            <ProfileAnswers modules={bundle.person_profile.modules} config={PERSON_PROFILE_MODULES} />
+            <ProfileAnswers modules={bundle.person_profile.modules} config={PERSON_PROFILE_MODULES}
+              caseId={bundle.case_id} quelle="Fragebogen zur Fallperson" />
           </Section>
         )}
         {has('self_profile') && bundle.self_profile && (
@@ -660,7 +702,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                 <MarkdownMessage content={bundle.self_profile.summary_text} />
               </div>
             )}
-            <ProfileAnswers modules={bundle.self_profile.modules} config={PROFILE_MODULES} />
+            <ProfileAnswers modules={bundle.self_profile.modules} config={PROFILE_MODULES}
+              caseId={bundle.case_id} quelle="Selbstprofil der nutzenden Person" />
           </Section>
         )}
       </div>
@@ -672,17 +715,28 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
               ? <p className="text-sm text-brand-muted">Keine freigegebenen Szenen.</p>
               : (
                 <div className="space-y-2.5">
+                  {/* Zugeklappt: Ein Fall trägt bis zu fünfzig Szenen, und ausgeklappt ist
+                      die Liste eine Wand, in der man den Überblick verliert, den sie geben
+                      soll. Der Titel ist die Auskunft, der Rest ist auf Abruf. */}
                   {bundle.scenes.map(s => (
-                    <div key={s.id} id={s.scene_no ? `szene-${s.scene_no}` : undefined}
-                       className="rounded-brand border border-brand-border bg-white px-4 py-3">
-                      <div className="flex justify-between gap-2 flex-wrap">
-                        <p className="text-sm font-semibold text-navy">
+                    <details key={s.id} id={s.scene_no ? `szene-${s.scene_no}` : undefined}
+                       className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 open:border-accent/30 open:bg-accent/[0.02]">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
+                        <p className="min-w-0 flex-1 text-sm font-semibold text-navy">
                           {s.scene_no && <span className="mr-1.5 font-mono text-xs font-normal text-brand-muted">Szene {s.scene_no}</span>}
                           {s.title}
                         </p>
-                        {s.scene_date && <span className="text-xs text-brand-muted">{s.scene_date}</span>}
-                      </div>
-                      {s.description && <p className="mt-1.5 text-sm text-brand-text whitespace-pre-wrap leading-relaxed">{s.description}</p>}
+                        <span className="flex shrink-0 items-center gap-2">
+                          {s.safety_level && s.safety_level !== 'none' && (
+                            <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[0.62rem] font-medium text-amber-800">
+                              Sicherheit
+                            </span>
+                          )}
+                          {s.scene_date && <span className="text-xs text-brand-muted">{s.scene_date}</span>}
+                          <Chevron />
+                        </span>
+                      </summary>
+                      {s.description && <p className="mt-2.5 border-t border-brand-border pt-2.5 text-sm text-brand-text whitespace-pre-wrap leading-relaxed">{s.description}</p>}
                       {s.user_reaction && <p className="mt-1.5 text-xs text-brand-muted italic">Reaktion: {s.user_reaction}</p>}
                       {s.pattern_tags?.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -698,12 +752,12 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                         <Link
                           to={`/professional/cases/${bundle.case_id}/echo?frage=${
                             encodeURIComponent(`Was fällt dir an Szene ${s.scene_no} auf?`)}`}
-                          className="mt-2 inline-block rounded-full border border-brand-border px-2.5 py-1 text-[0.7rem] text-brand-muted transition-colors hover:border-accent hover:text-accent"
+                          className="mt-2.5 inline-block rounded-full border border-brand-border px-2.5 py-1 text-[0.7rem] text-brand-muted transition-colors hover:border-accent hover:text-accent"
                         >
                           Echo dazu fragen
                         </Link>
                       )}
-                    </div>
+                    </details>
                   ))}
                 </div>
               )}

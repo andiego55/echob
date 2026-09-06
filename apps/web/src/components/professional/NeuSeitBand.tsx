@@ -43,7 +43,26 @@ export default function NeuSeitBand({
   })
 
   const neue = (data?.items ?? []).filter(e => e.actor === 'client')
-  if (!seit || neue.length === 0) return null
+
+  // Ohne früheres Gespräch gibt es nichts zu vergleichen — und noch keinen Stand, auf den
+  // sich „seit" beziehen könnte.
+  if (!seit) return null
+
+  /**
+   * Auch „nichts Neues" wird angezeigt, und das ist Absicht.
+   *
+   * Ein Band, das nur bei Neuem erscheint, beantwortet die Frage nie, die man tatsächlich
+   * hat: Bin ich auf dem Stand? Man sieht nichts und weiß nicht, ob nichts da ist oder ob
+   * nichts geprüft wurde. Die leise Fassung kostet eine Zeile und nimmt dem Gespräch eine
+   * offene Frage ab.
+   */
+  if (neue.length === 0) {
+    return (
+      <p className="mb-3 px-1 text-xs text-brand-muted">
+        Seit deinem letzten Gespräch am {datum(seit)} ist nichts dazugekommen.
+      </p>
+    )
+  }
 
   return (
     <div className="mb-3 rounded-brand border border-accent/30 bg-accent/[0.05] px-3.5 py-2.5">
