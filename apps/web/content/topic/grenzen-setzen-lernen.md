@@ -15,6 +15,11 @@ echo:
   opening_question: "Gibt es eine Grenze, die du dir schon lange zu setzen wünschst, aber nicht traust? Möchtest du gemeinsam herausfinden, was dich zurückhält?"
   cta_positions: [after-intro, end]
 safety_tags: []
+links:
+  children: [wenn-die-grenze-steht, warum-es-zu-hause-nicht-geht, innere-grenzen, grenzen-gegenueber-eltern, wenn-grenzen-nicht-reichen]
+  comparison: [grenze-oder-forderung]
+  glossary: [persoenliche-grenzen, konsequenz, schuldgefuehl, grenzerosion]
+  related: [nein-sagen, grenzen-setzen, sich-selbst-verlieren]
 faq:
   - question: 'Wie setze ich eine Grenze, ohne den anderen zu verletzen?'
     answer: 'Indem du sie als Aussage über dich formulierst, nicht als Angriff: „Ich brauche abends eine Stunde für mich" statt „Du erdrückst mich". Eine klare, ruhige Grenze ist kein Angriff – auch wenn das Gegenüber sie zunächst so empfindet.'
@@ -27,6 +32,14 @@ faq:
 Viele Menschen wissen genau, dass sie Grenzen setzen sollten – und tun es trotzdem nicht. Nicht aus Schwäche, sondern aus Angst: vor Streit, vor Ablehnung, davor, ein schlechter Mensch zu sein. Eine Grenze fühlt sich an wie ein Risiko für die Beziehung.
 
 Dabei ist das Gegenteil wahr. Wer nie Grenzen zieht, verschwindet mit der Zeit – und mit ihm das, was die Beziehung eigentlich lebendig hält.
+
+Diese Seite ist der Einstieg. Wer tiefer einsteigen will, findet fünf Vertiefungen: was eine Grenze überhaupt von einer Forderung unterscheidet
+([Grenze oder Forderung](/wissen/grenze-oder-forderung)), was nach dem Nein passiert
+([Wenn die Grenze steht](/wissen/wenn-die-grenze-steht)), warum es zu Hause schwerer ist als im Job
+([Im Büro kannst du es](/wissen/warum-es-zu-hause-nicht-geht)), die Grenze nach innen
+([Innere Grenzen](/wissen/innere-grenzen)), der Sonderfall Eltern
+([Grenzen gegenüber den eigenen Eltern](/wissen/grenzen-gegenueber-eltern))
+und die ehrliche Kehrseite ([Wenn Grenzen nicht reichen](/wissen/wenn-grenzen-nicht-reichen)).
 
 ## Eine Grenze beginnt innen, nicht außen
 

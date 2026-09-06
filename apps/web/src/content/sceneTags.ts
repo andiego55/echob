@@ -6,6 +6,9 @@
 // Wörter groß). Nur wo das falsch aussieht (Nähe, Love Bombing …) ein Override.
 
 const SCENE_TAG_LABELS: Record<string, string> = {
+  // Cluster Grenzen
+  koerpersignale: 'Körpersignale',
+
   // Cluster Emotionale Unreife
   'affektive-realitaet': 'Affektive Realität',
   // Cluster Liebessprachen & Kodependenz – nur die Tags, deren Label sonst mit

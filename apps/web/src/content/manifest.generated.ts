@@ -309,6 +309,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "differenzierung",
+    "title": "Differenzierung des Selbst – nah bleiben, ohne zu verschmelzen",
+    "description": "Murray Bowens Begriff für die Fähigkeit, in Verbindung zu bleiben und dabei man selbst zu bleiben. Keine Skala von kalt bis warm, sondern von verschmolzen bis unterschieden – und mehr Unterscheidung erlaubt mehr Nähe.",
+    "cluster": "grenzen",
+    "search_intent": "differenzierung des selbst bowen bedeutung abgrenzung naehe",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Differenzierung gelesen. Magst du anschauen, wie es dir geht, wenn jemand neben dir schlechte Laune hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Ist Differenzierung dasselbe wie Distanz?",
+        "answer": "Nein, eher das Gegenteil. Distanz ist eine der beiden Ausweichbewegungen – die andere ist Verschmelzung. Differenzierung ist der dritte Weg: berührbar bleiben und trotzdem wissen, wo man aufhört. Bowens Kernaussage ist, dass gerade das mehr Nähe möglich macht."
+      },
+      {
+        "question": "Kann man Differenzierung erhöhen?",
+        "answer": "Ja, aber langsam und nicht durch Einsicht allein. Wirksam sind kleine Wiederholungen unter echtem Druck: eine abweichende Meinung stehen lassen, ohne sie zurückzunehmen; die schlechte Laune eines anderen im Raum lassen, ohne sie zu beheben. Es geht dabei nie um Sturheit, sondern darum, in Verbindung zu bleiben und nicht zu verschwinden."
+      }
+    ],
+    "url": "/glossar/differenzierung"
+  },
+  {
+    "type": "glossary",
     "slug": "digitale-kontrolle",
     "title": "Digitale Kontrolle – Aufsicht ohne Spuren",
     "description": "Mitlesen, Orten, Zugänge verlangen. Warum digitale Übergriffe am spätesten erkannt werden und welche drei Fragen den Unterschied zwischen Nähe und Aufsicht machen.",
@@ -510,6 +544,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/emotionale-affaere"
+  },
+  {
+    "type": "glossary",
+    "slug": "emotionale-ansteckung",
+    "title": "Emotionale Ansteckung – wenn seine Stimmung deine wird",
+    "description": "Gefühle springen in Sekunden über, ganz ohne Worte. Das ist die Grundlage von Mitgefühl und zugleich der Grund, warum man abends eine Laune mit sich trägt, die man morgens nicht hatte.",
+    "cluster": "grenzen",
+    "search_intent": "emotionale ansteckung stimmung uebernehmen partner schlechte laune",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über emotionale Ansteckung gelesen. Magst du einen Abend anschauen, an dem du eine Stimmung übernommen hast, die nicht deine war?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie merke ich, ob ein Gefühl von mir ist?",
+        "answer": "Über den Zeitpunkt. Frag dich, ob es schon da war, bevor du dieser Person begegnet bist. Und gib ihm eine Stunde Abstand – was danach noch da ist, gehört wahrscheinlich dir. Was verschwindet, sobald du allein bist, war meistens übernommen."
+      },
+      {
+        "question": "Ist emotionale Ansteckung etwas Schlechtes?",
+        "answer": "Nein, sie ist die körperliche Grundlage von Mitgefühl. Ohne sie gäbe es kein Mitschwingen und keine Beruhigung durch Anwesenheit. Zum Problem wird sie erst, wenn keine Rückfahrkarte dabei ist – wenn du also nicht mehr unterscheiden kannst, wessen Zustand du gerade trägst."
+      }
+    ],
+    "url": "/glossar/emotionale-ansteckung"
   },
   {
     "type": "glossary",
@@ -755,6 +823,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "extinktionsburst",
+    "title": "Extinktionsburst – warum es erst schlimmer wird",
+    "description": "Ein Verhalten, das jahrelang funktioniert hat, hört nicht auf, wenn es nicht mehr wirkt – es wird zuerst lauter. Warum die ersten Wochen nach einer Grenze die schwersten sind und was das über den Erfolg aussagt.",
+    "cluster": "grenzen",
+    "search_intent": "extinktionsburst bedeutung verhalten wird schlimmer nach grenze",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast eine Grenze gesetzt und es ist heftiger geworden. Magst du anschauen, was in den Tagen danach genau passiert ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie lange dauert ein Extinktionsburst?",
+        "answer": "Das lässt sich nicht auf den Tag festlegen, aber die Erfahrung aus Beratung und Therapie spricht meist von zwei bis sechs Wochen deutlicher Unruhe. Entscheidend ist die Richtung: Nimmt die Heftigkeit über Wochen ab, war es ein Burst. Bleibt sie auf gleichem Niveau oder steigt weiter, geht es um etwas anderes."
+      },
+      {
+        "question": "Heißt das, ich muss einfach durchhalten?",
+        "answer": "Bei gewöhnlichem Widerstand ja – dort ist Verlässlichkeit tatsächlich das Wirksamste. Nicht aber, wenn die Reaktion in Drohungen, Kontrolle oder Angst übergeht. Dann ist der Rat, standhaft zu bleiben, der falsche und möglicherweise ein riskanter."
+      }
+    ],
+    "url": "/glossar/extinktionsburst"
+  },
+  {
+    "type": "glossary",
     "slug": "fawning",
     "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
     "description": "Fawning ist die vierte Stressreaktion neben Kampf, Flucht und Erstarren: beschwichtigen und gefallen, um Sicherheit herzustellen. Warum das kein Charakterfehler ist – ohne Diagnose.",
@@ -959,6 +1061,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/grandioser-narzissmus"
+  },
+  {
+    "type": "glossary",
+    "slug": "grenzerosion",
+    "title": "Grenzerosion – wie Grenzen ohne einen einzigen Vorfall verschwinden",
+    "description": "Es gibt keinen Tag, an dem es passiert ist. Jede einzelne Verschiebung war klein, verständlich und leicht zu übergehen – und nach zwei Jahren steht die Linie an einem Ort, dem du nie zugestimmt hättest.",
+    "cluster": "grenzen",
+    "search_intent": "grenzen verschwinden schleichend anpassung beziehung merken zu spaet",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Grenzerosion gelesen. Magst du anschauen, was du heute als normal hinnimmst und vor drei Jahren nicht hingenommen hättest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum merkt man Grenzerosion so spät?",
+        "answer": "Weil jeder einzelne Schritt zu klein ist, um sich dagegen zu wehren. Ein Einwand gegen eine Kleinigkeit wirkt kleinlich, also lässt man sie durchgehen – und die Kleinigkeit wird zum neuen Ausgangspunkt. Der Vergleich findet immer zum Vortag statt, nie zu vor drei Jahren."
+      },
+      {
+        "question": "Wie stellt man fest, ob es passiert ist?",
+        "answer": "Mit dem Sprung über die Zeit statt mit dem Blick auf gestern. Zwei Fragen helfen: Was hätte ich vor drei Jahren dazu gesagt? Und: Würde ich einer Freundin raten, das hinzunehmen? Beide umgehen den schleichenden Vergleich, der die Erosion unsichtbar macht."
+      }
+    ],
+    "url": "/glossar/grenzerosion"
   },
   {
     "type": "glossary",
@@ -1307,6 +1443,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/intermittierende-verstaerkung"
+  },
+  {
+    "type": "glossary",
+    "slug": "interozeption",
+    "title": "Interozeption – der Körper meldet die Grenze zuerst",
+    "description": "Die Wahrnehmung der eigenen Körpersignale ist der früheste Hinweis darauf, dass etwas zu viel wird. Wer früh gelernt hat, sie zu übergehen, verliert den Zugang – und weiß später auf die Frage nach dem eigenen Wollen keine Antwort.",
+    "cluster": "grenzen",
+    "search_intent": "interozeption bedeutung koerpersignale wahrnehmen grenze spueren",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Körpersignale gelesen. Magst du eine Situation anschauen, in der du Ja gesagt hast und dein Körper etwas anderes gemeldet hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Warum spüre ich nicht, was ich will?",
+        "answer": "Weil die Wahrnehmung der eigenen Körpersignale eine Fähigkeit ist, die man verlieren kann. Wer über Jahre gelernt hat, sie zu übergehen – weil Anpassung sicherer war –, hört sie irgendwann nicht mehr. Das ist keine Gefühllosigkeit, sondern eine trainierte Taubheit, und sie lässt sich schrittweise zurückgewinnen."
+      },
+      {
+        "question": "Wie trainiert man das?",
+        "answer": "Mit kleinen, regelmäßigen Anlässen statt mit großen Übungen. Zum Beispiel drei Mal am Tag kurz innehalten und nur zwei Dinge feststellen: wo im Körper ist gerade etwas eng, und wo ist es weit. Ohne Deutung. Körperbezogene Verfahren, Yoga und traumasensible Therapie arbeiten ebenfalls daran."
+      }
+    ],
+    "url": "/glossar/interozeption"
   },
   {
     "type": "glossary",
@@ -2301,6 +2471,40 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/schema"
+  },
+  {
+    "type": "glossary",
+    "slug": "schuldgefuehl",
+    "title": "Schuldgefühl – Meldung über ein Unrecht oder über eine Gewohnheit?",
+    "description": "Nach einer Grenze kommen fast immer Schuldgefühle. Meist melden sie nicht, dass du etwas falsch gemacht hast, sondern dass du etwas Ungewohntes tust. Eine Prüffrage, die die beiden zuverlässig trennt.",
+    "cluster": "grenzen",
+    "search_intent": "schuldgefuehle nach grenze setzen nein sagen schlechtes gewissen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast nach einem Nein ein schlechtes Gewissen. Magst du anschauen, worauf es sich eigentlich bezieht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "safety_tags": [],
+    "faq": [
+      {
+        "question": "Wie unterscheide ich echte Schuld von einem schlechten Gewissen aus Gewohnheit?",
+        "answer": "Mit einer einzigen Frage: Würdest du eine gute Freundin verurteilen, die genau dasselbe getan hätte? Wenn nein, ist es keine Schuld, sondern die Meldung, dass du etwas Ungewohntes tust. Echte Schuld hält dieser Frage stand – sie bleibt auch dann bestehen, wenn du sie von außen betrachtest."
+      },
+      {
+        "question": "Sollte ich Schuldgefühle einfach ignorieren?",
+        "answer": "Nein. Sie sind ein nützliches Signal, nur kein zuverlässiges. Ein Gefühl ist eine Meldung, kein Urteil. Es lohnt, sie zu prüfen statt ihr entweder blind zu folgen oder sie wegzudrücken."
+      }
+    ],
+    "url": "/glossar/schuldgefuehl"
   },
   {
     "type": "glossary",
@@ -4228,6 +4432,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-erste-sonntag-ohne-anruf",
+    "title": "Der erste Sonntag ohne Anruf",
+    "description": "Eine fiktive Szene: Sie hat gesagt, dass sie nicht mehr jeden Sonntag anruft – und erlebt in den zwei Wochen danach, wie ein Verhalten lauter wird, bevor es leiser wird. Über den Widerstand nach einer Grenze.",
+    "cluster": "grenzen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Fraukes Sicht",
+    "pull_quote": "Es ist nicht besser geworden. Es ist erst mal viel lauter geworden. Damit hatte ich nicht gerechnet.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, dass es nach einer Grenze erst schlimmer wird? Magst du anschauen, was in den Tagen danach passiert ist?"
+    },
+    "scene_tags": [
+      "grenzen",
+      "widerstand",
+      "schuldgefuehle",
+      "familie"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/der-erste-sonntag-ohne-anruf"
+  },
+  {
+    "type": "scene",
     "slug": "der-konflikt-ist-vorbei-in-mir-nicht",
     "title": "Der Konflikt ist vorbei. In mir nicht.",
     "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist.",
@@ -5006,6 +5238,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/du-bist-zu-empfindlich"
+  },
+  {
+    "type": "scene",
+    "slug": "du-hast-dich-veraendert",
+    "title": "Du hast dich verändert",
+    "description": "Eine fiktive Szene: Nach vier Monaten mit einer neuen Klarheit hört er den Satz, den er gefürchtet hat – und merkt beim Nachdenken, dass darin gar kein Vorwurf steckt.",
+    "cluster": "grenzen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Deniz Sicht",
+    "pull_quote": "Er hat nicht gesagt, dass ich unfair bin. Er hat gesagt, dass ich unbequemer geworden bin. Das stimmt sogar.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du diesen Satz? Magst du anschauen, was er über die Beziehung sagt – und was nicht?"
+    },
+    "scene_tags": [
+      "grenzen",
+      "widerstand",
+      "selbstbestimmung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/du-hast-dich-veraendert"
   },
   {
     "type": "scene",
@@ -6298,6 +6557,34 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "im-buero-kann-ich-das",
+    "title": "Im Büro kann ich das",
+    "description": "Eine fiktive Szene: Sie gibt am Vormittag ein Projekt zurück, ohne mit der Wimper zu zucken – und bekommt abends einen einzigen Satz nicht heraus. Über den Unterschied zwischen Können und Einsatz.",
+    "cluster": "grenzen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ines Sicht",
+    "pull_quote": "Ich habe nicht vergessen, wie man das macht. Der Preis ist nur ein anderer.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kannst du es an manchen Stellen und an anderen nicht? Magst du anschauen, was den Unterschied ausmacht?"
+    },
+    "scene_tags": [
+      "grenzen",
+      "angst",
+      "anpassung",
+      "koerpersignale"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/im-buero-kann-ich-das"
+  },
+  {
+    "type": "scene",
     "slug": "im-kreis",
     "title": "Im Kreis",
     "description": "Eine Szene über den Streit, der sich dreht, bis man das eigene Anliegen vergisst – Wortsalat und Themenwechsel als Nebel. Aus der Ich-Perspektive, fiktiv.",
@@ -6804,6 +7091,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "meine-grenze-war-eine-forderung",
+    "title": "Meine Grenze war eine Forderung",
+    "description": "Eine fiktive Szene: Sie merkt in einem Gespräch, dass ihr Satz über eine Grenze in Wahrheit eine Vorschrift war – und dass jedes Nein deshalb wie ein Übergriff wirken musste.",
+    "cluster": "grenzen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Meikes Sicht",
+    "pull_quote": "Ich hatte ihm keine Grenze gesetzt. Ich hatte ihm eine Regel gegeben und sie Grenze genannt, damit er nicht darüber reden kann.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du einen Satz anschauen, den du zuletzt eine Grenze genannt hast – und prüfen, ob du ihn allein einhalten kannst?"
+    },
+    "scene_tags": [
+      "grenzen",
+      "selbstbestimmung",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/meine-grenze-war-eine-forderung"
+  },
+  {
+    "type": "scene",
     "slug": "mitten-am-tag",
     "title": "Mitten am Tag",
     "description": "Eine fiktive Szene: An der Supermarktkasse, zwischen Milch und Brot, ist plötzlich alles wieder da – so echt, als geschehe es jetzt. Über einen Flashback, der sich ungefragt in einen ganz normalen Moment drängt.",
@@ -7026,6 +7340,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "nur-eine-kleinigkeit",
+    "title": "Nur eine Kleinigkeit",
+    "description": "Eine fiktive Szene: Er rechnet nach, was er heute normal findet und vor vier Jahren nicht hingenommen hätte – und stellt fest, dass es keinen Tag gab, an dem es passiert ist.",
+    "cluster": "grenzen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Timos Sicht",
+    "pull_quote": "Es gibt keinen Tag, an dem es passiert ist. Jeder einzelne Schritt war zu klein, um sich zu wehren.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, was du heute normal findest und vor drei Jahren nicht hingenommen hättest?"
+    },
+    "scene_tags": [
+      "grenzen",
+      "anpassung",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/nur-eine-kleinigkeit"
+  },
+  {
+    "type": "scene",
     "slug": "ploetzlich-die-taeterin",
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv.",
@@ -7134,6 +7475,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/schau-wie-geduldig-ich-mit-dir-bin"
+  },
+  {
+    "type": "scene",
+    "slug": "seine-laune-im-auto",
+    "title": "Seine Laune im Auto",
+    "description": "Eine fiktive Szene: Er steigt gut gelaunt ins Auto und kommt schlecht gelaunt zu Hause an, ohne dass ein Wort gefallen wäre. Über emotionale Ansteckung und die Grenze, die nicht zwischen zwei Menschen verläuft.",
+    "cluster": "grenzen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Roberts Sicht",
+    "pull_quote": "Zwanzig Minuten Schweigen, und ich war nicht mehr der, der eingestiegen ist. Niemand hatte etwas gesagt.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, dass die Stimmung eines anderen deine wird? Magst du anschauen, wann genau das passiert?"
+    },
+    "scene_tags": [
+      "grenzen",
+      "emotionale-ansteckung",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "url": "/szenen/seine-laune-im-auto"
   },
   {
     "type": "scene",
@@ -9581,11 +9949,133 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/gottman-methode"
   },
   {
+    "type": "comparison",
+    "slug": "grenze-oder-forderung",
+    "title": "Grenze oder Forderung? Der Unterschied, an dem alles hängt",
+    "description": "Eine Grenze sagt, was du tust. Eine Forderung sagt, was der andere zu lassen hat. Warum fast alles, was Menschen Grenze nennen, in Wahrheit eine Forderung ist – und warum das den ganzen Unterschied macht.",
+    "cluster": "grenzen",
+    "search_intent": "was ist eine grenze unterschied forderung grenze richtig formulieren",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über den Unterschied zwischen Grenze und Forderung gelesen. Magst du einen Satz anschauen, den du zuletzt gesagt hast – und prüfen, was er eigentlich war?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "grenzen",
+      "selbstbestimmung",
+      "verantwortung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "persoenliche-grenzen",
+        "konsequenz",
+        "schuldgefuehl"
+      ],
+      "related": [
+        "nein-sagen",
+        "wenn-die-grenze-steht",
+        "wenn-grenzen-nicht-reichen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen einer Grenze und einer Forderung?",
+        "answer": "Eine Grenze beschreibt dein eigenes Verhalten: Wenn X passiert, tue ich Y. Eine Forderung beschreibt das Verhalten eines anderen: Du sollst X nicht mehr tun. Der praktische Unterschied ist entscheidend – deine Grenze kannst du allein einhalten, eine Forderung braucht das Einverständnis der anderen Person."
+      },
+      {
+        "question": "Ist der Satz meine Grenze ist, dass du nicht mit ihr schreibst eine Grenze?",
+        "answer": "Nein, das ist eine Forderung im Gewand einer Grenze. Sie ist deshalb nicht unberechtigt – in einer Beziehung darf man sich etwas wünschen. Aber wenn sie Grenze genannt wird, ist ein Nein plötzlich keine Meinungsverschiedenheit mehr, sondern eine Grenzverletzung. Damit endet jedes Gespräch, bevor es begonnen hat."
+      },
+      {
+        "question": "Heißt das, ich darf nichts von meinem Partner verlangen?",
+        "answer": "Im Gegenteil. Bitten und Verlangen sind das normale Mittel zwischen Menschen, die sich nahe sind – ohne sie gäbe es keine Beziehung. Es geht nur darum, sie nicht zu tarnen. Eine offene Bitte kann verhandelt werden. Eine als Grenze getarnte Bitte kann nur befolgt oder verletzt werden."
+      }
+    ],
+    "url": "/wissen/grenze-oder-forderung"
+  },
+  {
+    "type": "topic",
+    "slug": "grenzen-gegenueber-eltern",
+    "title": "Grenzen gegenüber den eigenen Eltern",
+    "description": "Hier gelten andere Regeln: Es gibt keinen Ausstieg, die Vorgeschichte ist vierzig Jahre alt, und die halbe Familie hat eine Meinung dazu. Warum weniger Erklärung hier besser wirkt und wie eine Abstufung zwischen allem und nichts aussieht.",
+    "cluster": "grenzen",
+    "search_intent": "grenzen setzen eltern mutter erwachsene kinder schuldgefuehle besuche",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du denkst über eine Grenze gegenüber deinen Eltern nach. Magst du eine konkrete Situation anschauen, die sich immer wieder gleich abspielt?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "grenzen",
+      "erwachsene-kinder",
+      "schuldgefuehle",
+      "familie"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "schuldgefuehl",
+        "kontaktabbruch",
+        "parentifizierung",
+        "differenzierung"
+      ],
+      "related": [
+        "emotional-unreife-eltern",
+        "wenn-die-grenze-steht",
+        "innere-grenzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum sind Grenzen gegenüber Eltern so viel schwerer?",
+        "answer": "Weil die Regeln, die du gerade änderst, festgelegt wurden, bevor du sprechen konntest. Eine Grenze gegenüber Eltern verhandelt rückwirkend eine Rangordnung neu, die vierzig Jahre lang selbstverständlich war. Dazu kommt, dass es keinen sauberen Ausstieg gibt und dass meist weitere Familienmitglieder mitreden."
+      },
+      {
+        "question": "Muss ich meiner Mutter erklären, warum ich das brauche?",
+        "answer": "Meistens ist weniger Erklärung wirksamer. Eine Begründung lädt zur Diskussion über die Begründung ein – und in dieser Diskussion verlierst du, weil deine Eltern vierzig Jahre Übung darin haben. Ein Satz genügt, freundlich und ohne Anhang: Wir bleiben diesmal zwei Stunden."
+      },
+      {
+        "question": "Ist Kontaktabbruch die einzige Lösung, wenn nichts hilft?",
+        "answer": "Er ist eine Möglichkeit, aber selten die erste und fast nie die einzige. Zwischen vollem Kontakt und Abbruch liegen viele Stufen: Häufigkeit, Dauer, Ort, Themen, Kanal. Die meisten Menschen finden dort eine Form, die trägt. Ein Abbruch ist dann sinnvoll, wenn der Kontakt selbst schadet – und er darf auch vorübergehend sein."
+      }
+    ],
+    "url": "/wissen/grenzen-gegenueber-eltern"
+  },
+  {
     "type": "topic",
     "slug": "grenzen-setzen",
     "title": "Grenzen setzen: was sie sind und warum sie so schwerfallen",
     "description": "Was Grenzen wirklich sind, warum sie so schwer zu setzen sind und wie du sie klar kommunizierst – ohne Angriff und ohne Rechtfertigungsdruck.",
-    "cluster": "selbstreflexion",
+    "cluster": "grenzen",
     "search_intent": "Grenzen setzen Beziehung lernen",
     "updated": "2026-07-14",
     "author": {
@@ -9611,9 +10101,18 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "konsequenz",
+        "grenzerosion"
+      ],
+      "comparison": [
+        "grenze-oder-forderung"
+      ],
       "related": [
         "emotionale-manipulation",
-        "beziehungsmuster"
+        "beziehungsmuster",
+        "wenn-die-grenze-steht"
       ]
     },
     "url": "/wissen/grenzen-setzen"
@@ -9641,6 +10140,29 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "safety_tags": [],
+    "links": {
+      "children": [
+        "wenn-die-grenze-steht",
+        "warum-es-zu-hause-nicht-geht",
+        "innere-grenzen",
+        "grenzen-gegenueber-eltern",
+        "wenn-grenzen-nicht-reichen"
+      ],
+      "comparison": [
+        "grenze-oder-forderung"
+      ],
+      "glossary": [
+        "persoenliche-grenzen",
+        "konsequenz",
+        "schuldgefuehl",
+        "grenzerosion"
+      ],
+      "related": [
+        "nein-sagen",
+        "grenzen-setzen",
+        "sich-selbst-verlieren"
+      ]
+    },
     "faq": [
       {
         "question": "Wie setze ich eine Grenze, ohne den anderen zu verletzen?",
@@ -9790,6 +10312,68 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/ich-war-untreu"
+  },
+  {
+    "type": "topic",
+    "slug": "innere-grenzen",
+    "title": "Innere Grenzen: die Linie, die nicht zwischen euch verläuft",
+    "description": "Man kann ausgezogen sein und trotzdem dreimal täglich die Stimmung des anderen prüfen. Über die Grenze nach innen – wessen Gefühl das gerade ist, wofür du zuständig bist und warum genau diese Linie mehr Nähe erlaubt, nicht weniger.",
+    "cluster": "grenzen",
+    "search_intent": "innere grenzen gefuehle anderer uebernehmen abgrenzen emotional",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über innere Grenzen gelesen. Magst du eine Situation anschauen, in der du eine Stimmung übernommen hast, die gar nicht deine war?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "grenzen",
+      "emotionale-ansteckung",
+      "verantwortung",
+      "gruebeln"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "differenzierung",
+        "emotionale-ansteckung",
+        "gruebeln",
+        "interozeption"
+      ],
+      "related": [
+        "sich-selbst-verlieren",
+        "emotionale-unreife",
+        "co-regulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was sind innere Grenzen?",
+        "answer": "Grenzen, die nicht zwischen dir und einer anderen Person verlaufen, sondern in dir. Sie regeln, wie viel von der Stimmung eines anderen du übernimmst, wofür du dich zuständig fühlst und wie viel Raum ein Gedanke oder ein Urteil über dich bekommt. Man kann perfekte äußere Grenzen haben und innerlich vollständig durchlässig sein."
+      },
+      {
+        "question": "Ist Abgrenzung nicht das Gegenteil von Empathie?",
+        "answer": "Es ist ihre Voraussetzung. Wer die Gefühle anderer ungefiltert übernimmt, hält das nicht lange durch – irgendwann kippt Mitgefühl in Überforderung und dann in Vermeidung. Menschen, die niemanden mehr an sich heranlassen, sind selten kalt geboren. Häufig haben sie nie gelernt, sich berühren zu lassen, ohne unterzugehen."
+      },
+      {
+        "question": "Wie merke ich, ob ein Gefühl meins ist?",
+        "answer": "Zwei Fragen helfen. Erstens der Zeitpunkt: War es schon da, bevor ich diesem Menschen begegnet bin? Zweitens die Form: Fühlt es sich an wie meine eigene Traurigkeit oder wie eine fremde, die ich mittrage? Und dann die praktische Probe – eine Stunde Abstand. Was bleibt, gehört wahrscheinlich dir."
+      }
+    ],
+    "url": "/wissen/innere-grenzen"
   },
   {
     "type": "topic",
@@ -10600,6 +11184,18 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "safety_tags": [],
+    "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "schuldgefuehl",
+        "interozeption",
+        "fawning"
+      ],
+      "related": [
+        "warum-es-zu-hause-nicht-geht",
+        "wenn-die-grenze-steht"
+      ]
+    },
     "faq": [
       {
         "question": "Wie sage ich Nein, ohne mich zu rechtfertigen?",
@@ -12012,6 +12608,69 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "warum-es-zu-hause-nicht-geht",
+    "title": "Im Job kannst du es, zu Hause nicht – warum Grenzen kein Können sind",
+    "description": "Wer bei der Arbeit klar Nein sagt und beim eigenen Partner nicht, hat kein Technikproblem. Grenzen scheitern nicht am Wissen, sondern am Einsatz – und manchmal ist die Angst dahinter keine Verzerrung, sondern eine richtige Messung.",
+    "cluster": "grenzen",
+    "search_intent": "kann keine grenzen setzen partner warum faellt nein sagen schwer ursachen",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du kannst es an manchen Stellen und an anderen nicht. Magst du anschauen, was den Unterschied ausmacht – und was du befürchtest, dort wo es nicht geht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "grenzen",
+      "angst",
+      "anpassung",
+      "koerpersignale"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "interozeption",
+        "fawning",
+        "schuldgefuehl",
+        "persoenliche-grenzen"
+      ],
+      "related": [
+        "nein-sagen",
+        "bindungsstile",
+        "wenn-die-grenze-steht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum kann ich im Job Nein sagen und zu Hause nicht?",
+        "answer": "Weil der Einsatz ein anderer ist. Bei der Arbeit kostet ein Nein etwas Wohlwollen; in einer nahen Beziehung kann es sich anfühlen, als stünde die Bindung selbst auf dem Spiel. Dein Nervensystem rechnet das aus, bevor du denkst. Es fehlt dir also nicht die Fähigkeit, sondern das Gefühl von Sicherheit."
+      },
+      {
+        "question": "Bin ich einfach zu nett?",
+        "answer": "Sehr wahrscheinlich nicht. Was als Nettigkeit erscheint, ist meistens eine erlernte Schutzstrategie – oft aus einer Zeit, in der Anpassung tatsächlich der sicherste Weg war. Das ist keine Charakterschwäche, sondern eine alte Lösung, die ihre Aufgabe überlebt hat."
+      },
+      {
+        "question": "Was hilft, wenn Ratschläge wie sag einfach Nein nicht funktionieren?",
+        "answer": "Nicht mehr Mut, sondern ein kleinerer Einsatz. Übe dort, wo ein Nein billig ist – bei Fremden, in Nebensachen, bei Menschen, die dir wenig bedeuten. Was du dabei trainierst, ist nicht der Satz, sondern das Aushalten der Unzufriedenheit des anderen. Genau das ist die eigentliche Fähigkeit."
+      }
+    ],
+    "url": "/wissen/warum-es-zu-hause-nicht-geht"
+  },
+  {
+    "type": "topic",
     "slug": "wege-aus-der-kodependenz",
     "title": "Wege aus der Kodependenz: was wirklich hilft",
     "description": "Öfter Nein sagen reicht nicht. Was tatsächlich hilft, wenn die eigenen Bedürfnisse über Jahre unsichtbar waren – in Schritten, die klein genug sind, um sie zu gehen.",
@@ -12079,6 +12738,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "wenn-die-grenze-steht",
+    "title": "Wenn die Grenze steht: was danach passiert",
+    "description": "Der schwere Teil beginnt nach dem Nein. Warum Widerstand am Anfang zunimmt statt abzunehmen, warum Schuldgefühle kein Beweis für ein Unrecht sind – und warum die Reaktion auf deine Grenze mehr über die Beziehung sagt als Jahre von Gesprächen.",
+    "cluster": "grenzen",
+    "search_intent": "grenze gesetzt reaktion partner beleidigt schuldgefuehle nach nein",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast eine Grenze gesetzt und es ist schwieriger geworden statt leichter. Magst du anschauen, was seitdem passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "grenzen",
+      "schuldgefuehle",
+      "widerstand",
+      "verantwortung"
+    ],
+    "safety_tags": [
+      "kontrolle"
+    ],
+    "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "extinktionsburst",
+        "schuldgefuehl",
+        "konsequenz",
+        "intermittierende-verstaerkung"
+      ],
+      "comparison": [
+        "grenze-oder-forderung"
+      ],
+      "related": [
+        "nein-sagen",
+        "wenn-grenzen-nicht-reichen",
+        "grenzen-gegenueber-eltern"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum wird alles schlimmer, seit ich eine Grenze gesetzt habe?",
+        "answer": "Weil ein Verhalten, das jahrelang funktioniert hat, nicht sofort aufhört, wenn es nicht mehr funktioniert – es wird zuerst lauter. In der Lerntheorie heißt das Extinktionsburst. Die ersten zwei bis sechs Wochen sind deshalb typischerweise die schwersten. Wer das nicht weiß, schließt daraus, die Grenze sei ein Fehler gewesen, und nimmt sie zurück."
+      },
+      {
+        "question": "Ich habe furchtbare Schuldgefühle. Heißt das, ich war zu hart?",
+        "answer": "Meistens nicht. Schuldgefühle nach einer Grenze sind selten ein moralisches Urteil und fast immer ein Gewöhnungssignal – der Körper meldet, dass du etwas Ungewohntes tust, nicht etwas Falsches. Eine brauchbare Prüfung: Würdest du eine Freundin verurteilen, die dasselbe getan hätte? Wenn nein, ist es Gewöhnung, nicht Schuld."
+      },
+      {
+        "question": "Was, wenn ich die Grenze einmal nicht durchhalte?",
+        "answer": "Das passiert fast allen und macht sie nicht wertlos. Nur eines solltest du vermeiden: nach besonders heftigem Widerstand nachzugeben. Damit lernt das Gegenüber, dass genug Druck wirkt – und beim nächsten Mal beginnt der Widerstand genau dort. Besser ist, klein anzufangen und die kleine Grenze verlässlich zu halten."
+      }
+    ],
+    "url": "/wissen/wenn-die-grenze-steht"
+  },
+  {
+    "type": "topic",
     "slug": "wenn-es-zu-schnell-geht",
     "title": "Wenn es zu schnell geht: Intensität als Warnzeichen",
     "description": "Überwältigende Nähe in den ersten Wochen, große Worte, Zukunftspläne nach zwei Treffen. Wann Intensität einfach Verliebtheit ist – und woran du merkst, dass sie etwas anderes ist.",
@@ -12142,6 +12869,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/wenn-es-zu-schnell-geht"
+  },
+  {
+    "type": "topic",
+    "slug": "wenn-grenzen-nicht-reichen",
+    "title": "Wenn Grenzen nicht reichen – und wann sie schaden",
+    "description": "Grenzen sind ein Werkzeug für Beziehungen, die im Kern tragen. Wo Macht ungleich verteilt ist, kann der Rat nach klareren Grenzen gefährlich werden – und Grenz-Sprache lässt sich hervorragend als Waffe benutzen. Beides gehört gesagt.",
+    "cluster": "grenzen",
+    "search_intent": "grenzen setzen funktioniert nicht partner ignoriert grenzen gefaehrlich",
+    "updated": "2026-09-06",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast es mit Grenzen versucht und es hat nichts verändert. Magst du behutsam anschauen, was jedes Mal danach passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "grenzen",
+      "kontrolle",
+      "widerstand"
+    ],
+    "safety_tags": [
+      "kontrolle",
+      "gewalt"
+    ],
+    "links": {
+      "parent": "grenzen-setzen-lernen",
+      "glossary": [
+        "stonewalling",
+        "coercive-control",
+        "uebergriffigkeit",
+        "konsequenz"
+      ],
+      "comparison": [
+        "grenze-oder-forderung"
+      ],
+      "related": [
+        "war-das-schon-gewalt",
+        "emotionaler-missbrauch",
+        "wenn-die-grenze-steht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum funktionieren Grenzen bei meinem Partner nicht?",
+        "answer": "Es gibt drei häufige Gründe. Erstens war es vielleicht keine Grenze, sondern eine Forderung – die braucht Zustimmung. Zweitens fehlte die Konsequenz, dann war es eine Ankündigung. Drittens, und das ist der ernsteste Fall: In manchen Beziehungen werden Grenzen nicht überhört, sondern bestraft. Dann ist das kein Kommunikationsproblem."
+      },
+      {
+        "question": "Kann der Rat, klarer Grenzen zu setzen, gefährlich sein?",
+        "answer": "Ja. Wo jemand mit Kontrolle, Drohungen oder Gewalt reagiert, kann eine deutlichere Grenze die Lage verschärfen statt entspannen. In solchen Situationen geht es nicht um bessere Formulierungen, sondern um Sicherheit, um Zeugen und um Vorbereitung. Beratungsstellen helfen dabei kostenlos und anonym."
+      },
+      {
+        "question": "Kann man Grenzen auch missbrauchen?",
+        "answer": "Sehr gut sogar. Der Satz das ist meine Grenze beendet jedes Gespräch, und genau dafür wird er manchmal benutzt – um Kritik abzuwehren, um anderen Verhalten vorzuschreiben oder um Schweigen als Selbstfürsorge auszugeben. Der Prüfstein ist immer derselbe: Beschreibt der Satz mein eigenes Verhalten oder das eines anderen?"
+      }
+    ],
+    "url": "/wissen/wenn-grenzen-nicht-reichen"
   },
   {
     "type": "topic",
@@ -12313,6 +13107,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose."
   },
+  "/glossar/differenzierung": {
+    "title": "Differenzierung des Selbst – nah bleiben, ohne zu verschmelzen",
+    "description": "Murray Bowens Begriff für die Fähigkeit, in Verbindung zu bleiben und dabei man selbst zu bleiben. Keine Skala von kalt bis warm, sondern von verschmolzen bis unterschieden – und mehr Unterscheidung erlaubt mehr Nähe."
+  },
   "/glossar/digitale-kontrolle": {
     "title": "Digitale Kontrolle – Aufsicht ohne Spuren",
     "description": "Mitlesen, Orten, Zugänge verlangen. Warum digitale Übergriffe am spätesten erkannt werden und welche drei Fragen den Unterschied zwischen Nähe und Aufsicht machen."
@@ -12336,6 +13134,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/emotionale-affaere": {
     "title": "Emotionale Affäre – Nähe ohne Berührung",
     "description": "Eine emotionale Affäre ist eine Verbindung, die eigentlich in die Beziehung gehörte. Woran du sie erkennst, warum sie oft mehr verletzt als Sex und wo die Grenze verläuft."
+  },
+  "/glossar/emotionale-ansteckung": {
+    "title": "Emotionale Ansteckung – wenn seine Stimmung deine wird",
+    "description": "Gefühle springen in Sekunden über, ganz ohne Worte. Das ist die Grundlage von Mitgefühl und zugleich der Grund, warum man abends eine Laune mit sich trägt, die man morgens nicht hatte."
   },
   "/glossar/emotionale-einsamkeit": {
     "title": "Emotionale Einsamkeit – allein sein, während jemand da ist",
@@ -12365,6 +13167,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Eskalationsspirale – wie aus einer Kleinigkeit ein großer Streit wird",
     "description": "Wie sich Konflikte hochschaukeln, warum jede Reaktion die nächste verschärft und an welcher Stelle man aus der Spirale aussteigen kann. Ohne Diagnose."
   },
+  "/glossar/extinktionsburst": {
+    "title": "Extinktionsburst – warum es erst schlimmer wird",
+    "description": "Ein Verhalten, das jahrelang funktioniert hat, hört nicht auf, wenn es nicht mehr wirkt – es wird zuerst lauter. Warum die ersten Wochen nach einer Grenze die schwersten sind und was das über den Erfolg aussagt."
+  },
   "/glossar/fawning": {
     "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
     "description": "Fawning ist die vierte Stressreaktion neben Kampf, Flucht und Erstarren: beschwichtigen und gefallen, um Sicherheit herzustellen. Warum das kein Charakterfehler ist – ohne Diagnose."
@@ -12388,6 +13194,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/grandioser-narzissmus": {
     "title": "Grandioser Narzissmus – die laute, dominante Form",
     "description": "Der grandiose Narzissmus ist die offene, selbstsichere Ausprägung: Bewunderung als Bedürfnis, wenig Mitgefühl, alles dreht sich um die eigene Größe. Woran du das erkennst und wie es sich anfühlt. Ohne Diagnose."
+  },
+  "/glossar/grenzerosion": {
+    "title": "Grenzerosion – wie Grenzen ohne einen einzigen Vorfall verschwinden",
+    "description": "Es gibt keinen Tag, an dem es passiert ist. Jede einzelne Verschiebung war klein, verständlich und leicht zu übergehen – und nach zwei Jahren steht die Linie an einem Ort, dem du nie zugestimmt hättest."
   },
   "/glossar/gruebeln": {
     "title": "Grübeln – wenn Nachdenken zur Endlosschleife wird",
@@ -12428,6 +13238,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/intermittierende-verstaerkung": {
     "title": "Intermittierende Verstärkung – warum unberechenbare Zuwendung so süchtig macht",
     "description": "Warum gerade unzuverlässige Nähe am stärksten bindet: das psychologische Prinzip hinter Trauma-Bindung, On-Off-Beziehungen und dem Gefühl, nicht loszukommen. Ohne Diagnose."
+  },
+  "/glossar/interozeption": {
+    "title": "Interozeption – der Körper meldet die Grenze zuerst",
+    "description": "Die Wahrnehmung der eigenen Körpersignale ist der früheste Hinweis darauf, dass etwas zu viel wird. Wer früh gelernt hat, sie zu übergehen, verliert den Zugang – und weiß später auf die Frage nach dem eigenen Wollen keine Antwort."
   },
   "/glossar/introspektions-illusion": {
     "title": "Introspektions-Illusion – warum du deine Gründe nicht kennst",
@@ -12544,6 +13358,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/schema": {
     "title": "Schema – ein früh erworbenes Muster, das mitreist",
     "description": "Überzeugungen, Erinnerungen und Körperempfindungen, die sich früh gebildet haben und im Erwachsenenleben weiterwirken. Was der Begriff meint und wo seine Grenzen liegen."
+  },
+  "/glossar/schuldgefuehl": {
+    "title": "Schuldgefühl – Meldung über ein Unrecht oder über eine Gewohnheit?",
+    "description": "Nach einer Grenze kommen fast immer Schuldgefühle. Meist melden sie nicht, dass du etwas falsch gemacht hast, sondern dass du etwas Ungewohntes tust. Eine Prüffrage, die die beiden zuverlässig trennt."
   },
   "/glossar/selbst-gaslighting": {
     "title": "Selbst-Gaslighting – wenn du dir selbst nicht mehr glaubst",
@@ -12793,6 +13611,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Der erste gute Tag",
     "description": "Eine fiktive Szene: Zum ersten Mal seit der Trennung vergeht ein ganzer Tag, an dem sie kaum an ihn gedacht hat. Und abends kommt statt Erleichterung ein seltsames Schuldgefühl. Über die krummen Wege der Heilung."
   },
+  "/szenen/der-erste-sonntag-ohne-anruf": {
+    "title": "Der erste Sonntag ohne Anruf",
+    "description": "Eine fiktive Szene: Sie hat gesagt, dass sie nicht mehr jeden Sonntag anruft – und erlebt in den zwei Wochen danach, wie ein Verhalten lauter wird, bevor es leiser wird. Über den Widerstand nach einer Grenze."
+  },
   "/szenen/der-konflikt-ist-vorbei-in-mir-nicht": {
     "title": "Der Konflikt ist vorbei. In mir nicht.",
     "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist."
@@ -12904,6 +13726,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/du-bist-zu-empfindlich": {
     "title": "Du bist zu empfindlich",
     "description": "Eine fiktive Szene: Sie spricht an, was sie verletzt hat – und bekommt zur Antwort, sie sei einfach zu empfindlich. Über das Bagatellisieren, das aus deinem Gefühl das eigentliche Problem macht."
+  },
+  "/szenen/du-hast-dich-veraendert": {
+    "title": "Du hast dich verändert",
+    "description": "Eine fiktive Szene: Nach vier Monaten mit einer neuen Klarheit hört er den Satz, den er gefürchtet hat – und merkt beim Nachdenken, dass darin gar kein Vorwurf steckt."
   },
   "/szenen/du-machst-das-eh-besser": {
     "title": "Du machst das eh besser",
@@ -13089,6 +13915,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ihr Name in meinem Kopf",
     "description": "Eine fiktive Szene: Seine Ex ist seit Jahren weg – und trotzdem sitzt sie jeden Tag mit am Tisch, in meinem Kopf. Über retrospektive Eifersucht und den Kampf gegen etwas Unveränderbares."
   },
+  "/szenen/im-buero-kann-ich-das": {
+    "title": "Im Büro kann ich das",
+    "description": "Eine fiktive Szene: Sie gibt am Vormittag ein Projekt zurück, ohne mit der Wimper zu zucken – und bekommt abends einen einzigen Satz nicht heraus. Über den Unterschied zwischen Können und Einsatz."
+  },
   "/szenen/im-kreis": {
     "title": "Im Kreis",
     "description": "Eine Szene über den Streit, der sich dreht, bis man das eigene Anliegen vergisst – Wortsalat und Themenwechsel als Nebel. Aus der Ich-Perspektive, fiktiv."
@@ -13161,6 +13991,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Mein Zimmer im Haus",
     "description": "Eine fiktive Szene: Das Haus ist groß, doch sein ganzes Leben passt auf zehn Quadratmeter. Niemand hat es verboten – er hat sich selbst immer kleiner gemacht. Über Coercive Control und schleichenden Raumverlust."
   },
+  "/szenen/meine-grenze-war-eine-forderung": {
+    "title": "Meine Grenze war eine Forderung",
+    "description": "Eine fiktive Szene: Sie merkt in einem Gespräch, dass ihr Satz über eine Grenze in Wahrheit eine Vorschrift war – und dass jedes Nein deshalb wie ein Übergriff wirken musste."
+  },
   "/szenen/mitten-am-tag": {
     "title": "Mitten am Tag",
     "description": "Eine fiktive Szene: An der Supermarktkasse, zwischen Milch und Brot, ist plötzlich alles wieder da – so echt, als geschehe es jetzt. Über einen Flashback, der sich ungefragt in einen ganz normalen Moment drängt."
@@ -13193,6 +14027,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich mach mir doch nur Sorgen um dich",
     "description": "Eine fiktive Szene: Sie zweifelt jede seiner Entscheidungen an – aber immer als Fürsorge verpackt. Über das leise Gaslighting, das dich an deiner eigenen Urteilskraft zweifeln lässt, während es sich wie Liebe anfühlt."
   },
+  "/szenen/nur-eine-kleinigkeit": {
+    "title": "Nur eine Kleinigkeit",
+    "description": "Eine fiktive Szene: Er rechnet nach, was er heute normal findet und vor vier Jahren nicht hingenommen hätte – und stellt fest, dass es keinen Tag gab, an dem es passiert ist."
+  },
   "/szenen/ploetzlich-die-taeterin": {
     "title": "Plötzlich die Täterin",
     "description": "Eine Szene über Täter-Opfer-Umkehr – wenn man einen Schmerz anspricht und am Ende den anderen tröstet. Aus der Ich-Perspektive, fiktiv."
@@ -13208,6 +14046,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/schau-wie-geduldig-ich-mit-dir-bin": {
     "title": "Schau, wie geduldig ich mit dir bin",
     "description": "Eine fiktive Szene: Vor Freunden lobt sie sich selbst dafür, wie viel sie mit ihm aushält – und macht ihn so zum schwierigen Fall, den sie großmütig erträgt. Über kommunalen Narzissmus als moralische Überlegenheit."
+  },
+  "/szenen/seine-laune-im-auto": {
+    "title": "Seine Laune im Auto",
+    "description": "Eine fiktive Szene: Er steigt gut gelaunt ins Auto und kommt schlecht gelaunt zu Hause an, ohne dass ein Wort gefallen wäre. Über emotionale Ansteckung und die Grenze, die nicht zwischen zwei Menschen verläuft."
   },
   "/szenen/sie-hat-die-kinder-erwaehnt": {
     "title": "Sie hat die Kinder erwähnt",
@@ -13453,6 +14295,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Die Gottman-Methode: aus der Beobachtung echter Paare",
     "description": "Jahrzehntelange Beobachtungsforschung mit erstaunlich treffsicheren Vorhersagen – und eine daraus abgeleitete Therapie, deren Belege schwächer sind als die der Forschung. Beides erklärt."
   },
+  "/wissen/grenze-oder-forderung": {
+    "title": "Grenze oder Forderung? Der Unterschied, an dem alles hängt",
+    "description": "Eine Grenze sagt, was du tust. Eine Forderung sagt, was der andere zu lassen hat. Warum fast alles, was Menschen Grenze nennen, in Wahrheit eine Forderung ist – und warum das den ganzen Unterschied macht."
+  },
+  "/wissen/grenzen-gegenueber-eltern": {
+    "title": "Grenzen gegenüber den eigenen Eltern",
+    "description": "Hier gelten andere Regeln: Es gibt keinen Ausstieg, die Vorgeschichte ist vierzig Jahre alt, und die halbe Familie hat eine Meinung dazu. Warum weniger Erklärung hier besser wirkt und wie eine Abstufung zwischen allem und nichts aussieht."
+  },
   "/wissen/grenzen-setzen": {
     "title": "Grenzen setzen: was sie sind und warum sie so schwerfallen",
     "description": "Was Grenzen wirklich sind, warum sie so schwer zu setzen sind und wie du sie klar kommunizierst – ohne Angriff und ohne Rechtfertigungsdruck."
@@ -13468,6 +14318,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/ich-war-untreu": {
     "title": "Ich war untreu: was jetzt wirklich zählt",
     "description": "Du hast Vertrauen gebrochen und weißt nicht wohin damit. Dieser Text verurteilt nicht und beschönigt nichts – er sagt dir, was du schuldest, warum Scham der falsche Antrieb ist und was Reparatur tatsächlich verlangt."
+  },
+  "/wissen/innere-grenzen": {
+    "title": "Innere Grenzen: die Linie, die nicht zwischen euch verläuft",
+    "description": "Man kann ausgezogen sein und trotzdem dreimal täglich die Stimmung des anderen prüfen. Über die Grenze nach innen – wessen Gefühl das gerade ist, wofür du zuständig bist und warum genau diese Linie mehr Nähe erlaubt, nicht weniger."
   },
   "/wissen/integrative-verhaltenstherapie-fuer-paare": {
     "title": "Integrative Verhaltenstherapie für Paare (IBCT): Akzeptanz neben Veränderung",
@@ -13625,13 +14479,25 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "War das schon Gewalt? Eine Einordnung ohne Urteil",
     "description": "Festhalten, den Weg versperren, etwas werfen: die Frage, die Betroffene jahrelang mit sich herumtragen. Was Fachleute unterscheiden, warum die Schwere der falsche Maßstab ist und woran du dich stattdessen orientieren kannst."
   },
+  "/wissen/warum-es-zu-hause-nicht-geht": {
+    "title": "Im Job kannst du es, zu Hause nicht – warum Grenzen kein Können sind",
+    "description": "Wer bei der Arbeit klar Nein sagt und beim eigenen Partner nicht, hat kein Technikproblem. Grenzen scheitern nicht am Wissen, sondern am Einsatz – und manchmal ist die Angst dahinter keine Verzerrung, sondern eine richtige Messung."
+  },
   "/wissen/wege-aus-der-kodependenz": {
     "title": "Wege aus der Kodependenz: was wirklich hilft",
     "description": "Öfter Nein sagen reicht nicht. Was tatsächlich hilft, wenn die eigenen Bedürfnisse über Jahre unsichtbar waren – in Schritten, die klein genug sind, um sie zu gehen."
   },
+  "/wissen/wenn-die-grenze-steht": {
+    "title": "Wenn die Grenze steht: was danach passiert",
+    "description": "Der schwere Teil beginnt nach dem Nein. Warum Widerstand am Anfang zunimmt statt abzunehmen, warum Schuldgefühle kein Beweis für ein Unrecht sind – und warum die Reaktion auf deine Grenze mehr über die Beziehung sagt als Jahre von Gesprächen."
+  },
   "/wissen/wenn-es-zu-schnell-geht": {
     "title": "Wenn es zu schnell geht: Intensität als Warnzeichen",
     "description": "Überwältigende Nähe in den ersten Wochen, große Worte, Zukunftspläne nach zwei Treffen. Wann Intensität einfach Verliebtheit ist – und woran du merkst, dass sie etwas anderes ist."
+  },
+  "/wissen/wenn-grenzen-nicht-reichen": {
+    "title": "Wenn Grenzen nicht reichen – und wann sie schaden",
+    "description": "Grenzen sind ein Werkzeug für Beziehungen, die im Kern tragen. Wo Macht ungleich verteilt ist, kann der Rat nach klareren Grenzen gefährlich werden – und Grenz-Sprache lässt sich hervorragend als Waffe benutzen. Beides gehört gesagt."
   },
   "/wissen/wenn-liebe-nicht-ankommt": {
     "title": "Wenn Liebe nicht ankommt: woran es liegt und was hilft",

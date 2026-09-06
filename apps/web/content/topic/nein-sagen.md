@@ -15,6 +15,10 @@ echo:
   opening_question: "Fällt es dir schwer, Nein zu sagen? Möchtest du eine konkrete Situation anschauen, in der du Ja gesagt hast, obwohl du Nein gemeint hast?"
   cta_positions: [end]
 safety_tags: []
+links:
+  parent: grenzen-setzen-lernen
+  glossary: [schuldgefuehl, interozeption, fawning]
+  related: [warum-es-zu-hause-nicht-geht, wenn-die-grenze-steht]
 faq:
   - question: 'Wie sage ich Nein, ohne mich zu rechtfertigen?'
     answer: 'Ein Nein braucht keine lange Begründung – oft reicht ein klarer, freundlicher Satz: „Das geht bei mir gerade nicht." Je mehr man erklärt, desto mehr Angriffsfläche bietet man für Gegenargumente. Ein kurzes, ruhiges Nein ist ein vollständiger Satz.'

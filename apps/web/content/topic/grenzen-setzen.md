@@ -3,7 +3,7 @@ type: topic
 slug: grenzen-setzen
 title: "Grenzen setzen: was sie sind und warum sie so schwerfallen"
 description: "Was Grenzen wirklich sind, warum sie so schwer zu setzen sind und wie du sie klar kommunizierst – ohne Angriff und ohne Rechtfertigungsdruck."
-cluster: selbstreflexion
+cluster: grenzen
 search_intent: "Grenzen setzen Beziehung lernen"
 updated: "2026-07-14"
 author:
@@ -18,7 +18,10 @@ profile_modules: [selbstwert, beziehungsmuster]
 scene_tags: [grenzen]
 safety_tags: []
 links:
-  related: [emotionale-manipulation, beziehungsmuster]
+  parent: grenzen-setzen-lernen
+  glossary: [konsequenz, grenzerosion]
+  comparison: [grenze-oder-forderung]
+  related: [emotionale-manipulation, beziehungsmuster, wenn-die-grenze-steht]
 ---
 
 „Du musst einfach Grenzen setzen" – das klingt einfach. Wer es versucht hat, weiß, dass es das nicht ist. Grenzen setzen ist eine Kompetenz, die gelernt werden muss – und die in vielen Kontexten aktiv erschwert wird.
