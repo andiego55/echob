@@ -26,6 +26,7 @@ import EntwurfHinweis from '@/components/EntwurfHinweis'
 import { useGetakteterText } from '@/lib/textTakt'
 import { mitlaufen } from '@/lib/mitlaufen'
 import type { EchoChatResponse, EchoMessage } from '@/types'
+import ZumEndeKnopf from '@/components/app/ZumEndeKnopf'
 
 const GLOSSARY_TERMS = [
   'Schuldumkehr', 'Grenzverletzung', 'Gaslighting', 'Manipulation',
@@ -62,6 +63,7 @@ export default function EchoPage() {
   const contentSlug = searchParams.get('content')
   const qc = useQueryClient()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const verlaufRef = useRef<HTMLDivElement>(null)
 
   const [input, setInput]           = useState('')
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
@@ -382,7 +384,7 @@ export default function EchoPage() {
             )}
 
             {/* Chat-Bereich */}
-            <div className="flex-1 overflow-y-auto">
+            <div ref={verlaufRef} className="flex-1 overflow-y-auto">
               <div className="mx-auto max-w-[780px] px-6 py-6 space-y-5">
 
                 {/* Begrüßung wenn leer */}
@@ -432,6 +434,7 @@ export default function EchoPage() {
                 )}
 
                 <div ref={messagesEndRef} />
+                <ZumEndeKnopf behaelter={verlaufRef} imFluss={beschaeftigt} />
               </div>
             </div>
 

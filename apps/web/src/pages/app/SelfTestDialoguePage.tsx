@@ -36,6 +36,7 @@ import type { EchoMessage, ThreadType } from '@/types'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 import AntwortZuege from '@/components/app/AntwortZuege'
+import ZumEndeKnopf from '@/components/app/ZumEndeKnopf'
 
 export default function SelfTestDialoguePage() {
   const { caseId, slug } = useParams<{ caseId: string; slug: string }>()
@@ -85,6 +86,7 @@ function Dialogue({
   const { session } = useAuth()
   const threadType = `content_${test.slug}` as ThreadType
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const verlaufRef = useRef<HTMLDivElement>(null)
   const startedRef = useRef(false)
 
   const [committed, setCommitted] = useState<TestAnswers>(initialAnswers)
@@ -288,7 +290,7 @@ function Dialogue({
           <div className="flex min-h-0 flex-1 lg:grid lg:grid-cols-[minmax(0,1fr)_390px]">
             {/* Chat */}
             <div className={`min-w-0 flex-col ${mobileView === 'chat' ? 'flex' : 'hidden'} lg:flex`}>
-              <div className="flex-1 overflow-y-auto">
+              <div ref={verlaufRef} className="flex-1 overflow-y-auto">
                 <div className="mx-auto max-w-[780px] space-y-4 px-5 py-6">
                   <div className="rounded-brand border border-accent/30 bg-accent/5 px-4 py-3">
                     <span className="mb-0.5 inline-block text-[10px] font-bold uppercase tracking-wider text-accent">Aus den Selbsttests</span>
@@ -347,6 +349,7 @@ function Dialogue({
                   )}
 
                   <div ref={messagesEndRef} />
+                  <ZumEndeKnopf behaelter={verlaufRef} imFluss={strom.beschaeftigt} />
                 </div>
               </div>
               <div className="flex-shrink-0 px-5 pb-4 pt-2">

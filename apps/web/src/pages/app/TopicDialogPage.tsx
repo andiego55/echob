@@ -25,6 +25,7 @@ import { useBestaetigen } from '@/components/Bestaetigung'
 import DialogKopf, { DialogKopfKnopf } from '@/components/app/DialogKopf'
 import ArtefaktErzeugen from '@/components/app/ArtefaktErzeugen'
 import AntwortZuege from '@/components/app/AntwortZuege'
+import ZumEndeKnopf from '@/components/app/ZumEndeKnopf'
 
 interface TopicDef {
   label: string
@@ -115,6 +116,7 @@ export default function TopicDialogPage() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const verlaufRef = useRef<HTMLDivElement>(null)
   const startedRef = useRef(false)
   const [input, setInput] = useState('')
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
@@ -280,7 +282,7 @@ export default function TopicDialogPage() {
           </DialogKopf>
 
           {/* Chat-Bereich */}
-          <div className="flex-1 overflow-y-auto">
+          <div ref={verlaufRef} className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
               {/* Kontext-Hinweis */}
               <div className={`rounded-brand border px-4 py-3 ${topic.isContent ? 'border-accent/30 bg-accent/5' : 'border-brand-border bg-blue-50'}`}>
@@ -380,6 +382,7 @@ export default function TopicDialogPage() {
               )}
 
               <div ref={messagesEndRef} />
+              <ZumEndeKnopf behaelter={verlaufRef} imFluss={strom.beschaeftigt} />
             </div>
           </div>
 

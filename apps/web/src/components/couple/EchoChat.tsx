@@ -31,6 +31,7 @@ import Weiterfuehren from './Weiterfuehren'
 import type { Zug } from './Weiterfuehren'
 import { abmachungsvorschlaege } from './abmachungsvorschlaege'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import ZumEndeKnopf from '@/components/app/ZumEndeKnopf'
 
 export interface Impulsgruppe {
   gruppe: string
@@ -60,6 +61,7 @@ export default function EchoChat({
   const [auswahlOffen, setAuswahlOffen] = useState(false)
   const [festgehalten, setFestgehalten] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
+  const verlaufRef = useRef<HTMLDivElement>(null)
   const eingabe = useRef<HTMLTextAreaElement>(null)
 
   /** Der Text, der gerade hereinkommt – noch nicht gespeichert. */
@@ -341,7 +343,7 @@ export default function EchoChat({
 
       {/* ── Der Dialog ─────────────────────────────────────────── */}
       <div className="card card-static flex flex-col">
-        <div className="space-y-4 overflow-y-auto pr-1"
+        <div ref={verlaufRef} className="space-y-4 overflow-y-auto pr-1"
           style={{ maxHeight: messages.length === 0 ? undefined : '58vh' }}>
           {(aktuell.isLoading || altes.isLoading) && (
             <div className="animate-pulse space-y-3" aria-hidden>
@@ -367,6 +369,7 @@ export default function EchoChat({
           )}
 
           <div ref={endRef} />
+          <ZumEndeKnopf behaelter={verlaufRef} imFluss={send.isPending} />
         </div>
 
         {liest ? (
