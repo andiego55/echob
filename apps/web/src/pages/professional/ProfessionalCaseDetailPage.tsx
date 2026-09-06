@@ -676,7 +676,10 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                     <div key={s.id} id={s.scene_no ? `szene-${s.scene_no}` : undefined}
                        className="rounded-brand border border-brand-border bg-white px-4 py-3">
                       <div className="flex justify-between gap-2 flex-wrap">
-                        <p className="text-sm font-semibold text-navy">{s.title}</p>
+                        <p className="text-sm font-semibold text-navy">
+                          {s.scene_no && <span className="mr-1.5 font-mono text-xs font-normal text-brand-muted">Szene {s.scene_no}</span>}
+                          {s.title}
+                        </p>
                         {s.scene_date && <span className="text-xs text-brand-muted">{s.scene_date}</span>}
                       </div>
                       {s.description && <p className="mt-1.5 text-sm text-brand-text whitespace-pre-wrap leading-relaxed">{s.description}</p>}
@@ -687,6 +690,18 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                             <span key={i} className="rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">{t}</span>
                           ))}
                         </div>
+                      )}
+                      {/* Der Rückweg: Bisher zeigte nur der Chat in den Fall. Die Frage wird
+                          ins Feld gelegt, nicht abgeschickt — ein Klick hier soll kein
+                          Kontingent verbrauchen. */}
+                      {s.scene_no && (
+                        <Link
+                          to={`/professional/cases/${bundle.case_id}/echo?frage=${
+                            encodeURIComponent(`Was fällt dir an Szene ${s.scene_no} auf?`)}`}
+                          className="mt-2 inline-block rounded-full border border-brand-border px-2.5 py-1 text-[0.7rem] text-brand-muted transition-colors hover:border-accent hover:text-accent"
+                        >
+                          Echo dazu fragen
+                        </Link>
                       )}
                     </div>
                   ))}

@@ -34,6 +34,15 @@ interface Ziel {
   /** Ein Auszug, damit man ohne Klick weiß, worum es ging. */
   text: string | null
   marken: string[]
+  /**
+   * Ein Hinweis, der nicht überlesen werden darf — etwa eine als sicherheitsrelevant
+   * markierte Szene.
+   *
+   * Bewusst nicht als weitere Marke: Marken sind Muster-Etiketten und stehen
+   * gleichberechtigt nebeneinander. Wer ein Gespräch vorbereitet, muss diesen einen
+   * Hinweis sehen, bevor er die anderen liest.
+   */
+  warnung?: string | null
 }
 
 export type Aufloeser = (beleg: Beleg) => Ziel | null
@@ -72,6 +81,20 @@ function kuerzen(text: string | null | undefined): string | null {
 }
 
 /**
+ * Der Hinweis, der nicht überlesen werden darf.
+ *
+ * Szenen tragen eine Sicherheitsmarkierung. Wer ein Gespräch vorbereitet und nur den
+ * Verweis „Szene 12" liest, sähe sie sonst nicht — und genau diese Szene ist die, bei der
+ * es darauf ankommt.
+ */
+function sicherheitsWarnung(stufe: string | null | undefined): string | null {
+  if (!stufe || stufe === 'none') return null
+  return stufe === 'acute'
+    ? 'Als akut sicherheitsrelevant markiert'
+    : 'Als sicherheitsrelevant markiert'
+}
+
+/**
  * Stellt die Auflösung für einen Fall bereit.
  *
  * Die drei Abfragen teilen sich die Zwischenspeicher-Schlüssel mit den übrigen Seiten
@@ -106,6 +129,7 @@ export function BelegeProvider({ caseId, children }: { caseId: string; children:
         zeile: `${datum(z.scene_date)}${belastung}`,
         text: kuerzen(z.description),
         marken: z.pattern_tags ?? [],
+        warnung: sicherheitsWarnung(z.safety_level),
       })
     }
 
@@ -141,7 +165,7 @@ export function BelegeProvider({ caseId, children }: { caseId: string; children:
 }
 
 /** Hilfsmittel für eigene Auflöser — damit Datum und Kürzung überall gleich aussehen. */
-export const belegHelfer = { datum, kuerzen }
+export const belegHelfer = { datum, kuerzen, sicherheitsWarnung }
 
 /**
  * Ein Verweis im Fließtext.
@@ -203,6 +227,11 @@ export function BelegVerweis({ beleg, children }: { beleg: Beleg; children: Reac
           <p className="mt-0.5 text-[0.7rem] text-brand-muted">{ziel.zeile}</p>
           {ziel.text && (
             <p className="mt-2 text-[0.75rem] leading-relaxed text-brand-text">{ziel.text}</p>
+          )}
+          {ziel.warnung && (
+            <p className="mt-2 rounded border border-amber-300 bg-amber-50 px-2 py-1 text-[0.7rem] font-medium text-amber-800">
+              {ziel.warnung}
+            </p>
           )}
           {ziel.marken.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">

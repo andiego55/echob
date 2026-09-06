@@ -187,7 +187,9 @@ async def _lage_beschaffen(
     pro_mode_steering = echo_modes.build_pro_steering(
         pro_settings["echo_approach"] if pro_settings else None,
         pro_settings["echo_tone"] if pro_settings else None,
-        pro_settings["echo_depth"] if pro_settings else None,
+        # Die Tiefe aus der Anfrage schlaegt die aus dem Profil - fuer diese eine Antwort.
+        body.depth if body.depth is not None else (
+            pro_settings["echo_depth"] if pro_settings else None),
         crypto.decrypt(pro_settings["echo_custom_steering"]) if pro_settings else None,
     )
 

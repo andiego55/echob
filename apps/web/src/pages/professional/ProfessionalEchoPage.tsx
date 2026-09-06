@@ -13,6 +13,9 @@ import ZumEndeKnopf from '@/components/app/ZumEndeKnopf'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { BelegeFachpersonProvider } from '@/components/professional/BelegeFachperson'
 import ArbeitsmappeUebernehmen from '@/components/professional/ArbeitsmappeUebernehmen'
+import Kontextband from '@/components/professional/Kontextband'
+import NeuSeitBand from '@/components/professional/NeuSeitBand'
+import { PROFI_ZUEGE, hatBeleg } from '@/components/professional/profiZuegeDaten'
 import { professionalApi } from '@/api/professional'
 import { professionalEchoStreamen, type ProfessionalEchoAnfrage } from '@/api/professionalEchoStream'
 import { useAntwortStrom } from '@/lib/antwortStrom'
@@ -43,6 +46,10 @@ export default function ProfessionalEchoPage() {
   const glossaryStarted = useRef(false)
   const endRef = useRef<HTMLDivElement>(null)
   const verlaufRef = useRef<HTMLDivElement>(null)
+  const eingabeRef = useRef<HTMLTextAreaElement>(null)
+  /** Tiefe nur fuer die naechste Antwort - die Grundeinstellung bleibt unberuehrt. */
+  const [knapp, setKnapp] = useState(false)
+  const [suche, setSuche] = useState('')
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['prof-echo-sessions', caseId],
@@ -106,12 +113,41 @@ export default function ProfessionalEchoPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [glossarySlug, glossary])
 
+  /** Ein Zug oder eine Nachricht — beides geht denselben Weg, samt Tiefe. */
+  const senden = (msg: string) => {
+    if (!msg.trim() || strom.beschaeftigt || locked) return
+    strom.senden({ message: msg.trim(), ...(knapp ? { depth: 1 } : {}) })
+  }
+
   const send = () => {
     const msg = input.trim()
     if (!msg || strom.beschaeftigt || locked) return
     setInput('')
-    strom.senden({ message: msg })
+    senden(msg)
   }
+
+  /**
+   * Aus der Fallansicht kommend: „Echo dazu fragen" an einer Szene.
+   *
+   * Die Frage wird ins Feld gelegt und NICHT abgeschickt. Ein Klick in der Fallansicht
+   * soll kein Kontingent verbrauchen und keine Antwort auf eine Frage erzeugen, die man
+   * noch anpassen wollte.
+   */
+  const vorbelegt = searchParams.get('frage')
+  useEffect(() => {
+    if (!vorbelegt) return
+    setInput(vorbelegt)
+    eingabeRef.current?.focus()
+  }, [vorbelegt])
+
+  const letzteAntwort = [...messages].reverse().find(m => m.role === 'assistant') ?? null
+  /** Stichtag für „was ist neu": das jüngste Gespräch dieses Falls. */
+  const letztesGespraech = sessions.length
+    ? sessions.map(s => s.updated_at).sort()[sessions.length - 1] ?? null
+    : null
+  const gefundeneSessions = suche.trim()
+    ? sessions.filter(s => (s.title ?? 'Neuer Chat').toLowerCase().includes(suche.trim().toLowerCase()))
+    : sessions
 
   const summaryGen = useMutation({
     mutationFn: () => professionalApi.echoSummaryGenerate(caseId!, activeSession!),
@@ -177,8 +213,16 @@ export default function ProfessionalEchoPage() {
           {/* Sessions */}
           <aside className="hidden md:block w-52 flex-shrink-0">
             <p className="text-xs font-semibold text-brand-muted mb-2">Gespräche</p>
+            {sessions.length > 4 && (
+              <input
+                value={suche}
+                onChange={e => setSuche(e.target.value)}
+                placeholder="Gespräche filtern …"
+                className="mb-2 w-full rounded-brand border border-brand-border bg-white px-2.5 py-1.5 text-xs outline-none focus:border-accent"
+              />
+            )}
             <nav className="space-y-1">
-              {sessions.map(s => {
+              {gefundeneSessions.map(s => {
                 const isActive = s.id === activeSession
                 const isEditing = s.id === editingId
                 return (
@@ -226,12 +270,17 @@ export default function ProfessionalEchoPage() {
                   </div>
                 )
               })}
-              {sessions.length === 0 && <p className="text-xs text-brand-muted/70 px-3">Noch keine Gespräche.</p>}
+              {gefundeneSessions.length === 0 && (
+                <p className="text-xs text-brand-muted/70 px-3">{sessions.length === 0 ? 'Noch keine Gespräche.' : 'Nichts gefunden.'}</p>
+              )}
             </nav>
           </aside>
 
           {/* Chat */}
           <div className="flex-1 min-w-0">
+            <Kontextband bundle={caseInfo} />
+            <NeuSeitBand caseId={caseId!} seit={letztesGespraech}
+              onFragen={senden} aus={strom.beschaeftigt || locked} />
             <div className="card min-h-[50vh] flex flex-col">
               <div ref={verlaufRef} className="flex-1 space-y-4 overflow-y-auto">
                 {messages.length === 0 && !strom.beschaeftigt && (
@@ -239,7 +288,7 @@ export default function ProfessionalEchoPage() {
                     <p className="mb-3">Stelle Echo eine Frage zu diesem Fall. Zum Beispiel:</p>
                     <div className="flex flex-col gap-2">
                       {SUGGESTIONS.map(q => (
-                        <button key={q} onClick={() => strom.senden({ message: q })} disabled={locked}
+                        <button key={q} onClick={() => senden(q)} disabled={locked}
                           className="text-left text-xs px-3 py-2 rounded-brand border border-brand-border hover:border-accent hover:text-accent transition-colors disabled:opacity-40 disabled:hover:border-brand-border disabled:hover:text-brand-muted">
                           {q}
                         </button>
@@ -260,6 +309,14 @@ export default function ProfessionalEchoPage() {
                         will, steht oft drei Beiträge weiter oben. */}
                     {m.role === 'assistant' && (
                       <div className="mt-1.5 max-w-[85%]">
+                        {/* Keine Warnung, eine Feststellung: Es gibt gute Antworten ohne
+                            Beleg. Für eine Fachperson ist der Unterschied zwischen
+                            Beobachtung und Eindruck aber der ganze Unterschied. */}
+                        {!hatBeleg(m.content) && (
+                          <p className="mb-1 text-[0.68rem] text-brand-muted/80">
+                            ohne Bezug auf konkretes Material
+                          </p>
+                        )}
                         <ArbeitsmappeUebernehmen
                           caseId={caseId!}
                           antwort={m.content}
@@ -283,6 +340,25 @@ export default function ProfessionalEchoPage() {
                 {strom.beschaeftigt && !strom.takt.sichtbar && (
                   <p className="text-sm text-brand-muted">Echo denkt nach …</p>
                 )}
+                {/* Züge nur unter der LETZTEN Antwort. Unter jeder wären sie Lärm — und
+                    ein Klick weiter oben schickte eine Nachfrage zu etwas, das drei
+                    Beiträge zurückliegt. */}
+                {!strom.beschaeftigt && letzteAntwort && (
+                  <div className="flex flex-wrap gap-1.5" aria-label="Weiter mit Echo">
+                    {PROFI_ZUEGE.map(zug => (
+                      <button
+                        key={zug.id}
+                        type="button"
+                        onClick={() => senden(zug.text)}
+                        disabled={locked}
+                        title={zug.titel}
+                        className="rounded-full border border-brand-border px-2.5 py-1 text-[0.7rem] text-brand-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-40"
+                      >
+                        {zug.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div ref={endRef} />
                 <ZumEndeKnopf behaelter={verlaufRef} imFluss={strom.beschaeftigt} />
               </div>
@@ -292,6 +368,7 @@ export default function ProfessionalEchoPage() {
                 <div className="flex gap-2">
                   <textarea
                     value={input}
+                    ref={eingabeRef}
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
                     rows={2}
@@ -299,7 +376,27 @@ export default function ProfessionalEchoPage() {
                     placeholder={locked ? 'Fall nicht aktiviert – Echo ist gesperrt' : 'Nachricht an Echo …'}
                     className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none disabled:opacity-60 disabled:cursor-not-allowed"
                   />
-                  <button onClick={send} disabled={strom.beschaeftigt || !input.trim() || locked} className="btn-primary !px-5 !text-sm self-end">Senden</button>
+                  <div className="flex flex-col items-stretch justify-end gap-1.5">
+                    {/* Zwischen zwei Terminen will man knapp, beim Berichtschreiben
+                        ausführlich. Der Schalter gilt nur für die nächste Antwort — die
+                        Grundeinstellung im Profil bleibt unberührt. */}
+                    <button
+                      type="button"
+                      onClick={() => setKnapp(k => !k)}
+                      aria-pressed={knapp}
+                      title={knapp
+                        ? 'Antworten kommen knapp – klicken für die normale Tiefe'
+                        : 'Antworten kommen in deiner eingestellten Tiefe – klicken für knapp'}
+                      className={`rounded-full border px-2.5 py-1 text-[0.7rem] transition-colors ${
+                        knapp
+                          ? 'border-accent bg-accent/10 font-medium text-accent'
+                          : 'border-brand-border text-brand-muted hover:border-accent/50'
+                      }`}
+                    >
+                      {knapp ? 'knapp' : 'normal'}
+                    </button>
+                    <button onClick={send} disabled={strom.beschaeftigt || !input.trim() || locked} className="btn-primary !px-5 !text-sm">Senden</button>
+                  </div>
                 </div>
                 {messages.length > 0 && (
                   <div className="mt-2 flex gap-3">

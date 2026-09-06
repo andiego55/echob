@@ -23,7 +23,7 @@ import { KIND_LABELS } from '@/api/caseDocuments'
 import { BelegeKontextProvider, belegHelfer, type Aufloeser, type Ziel } from '@/components/app/Belege'
 import type { SharedCaseBundle } from '@/types'
 
-const { datum, kuerzen } = belegHelfer
+const { datum, kuerzen, sicherheitsWarnung } = belegHelfer
 
 export function BelegeFachpersonProvider(
   { caseId, bundle, children }:
@@ -41,6 +41,7 @@ export function BelegeFachpersonProvider(
         zeile: `${datum(s.scene_date)}${belastung}`,
         text: kuerzen(s.description),
         marken: s.pattern_tags ?? [],
+        warnung: sicherheitsWarnung(s.safety_level),
       })
     }
 

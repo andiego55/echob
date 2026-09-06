@@ -192,6 +192,10 @@ class ProfessionalEchoChatRequest(BaseModel):
     thread_type: Literal["case", "glossary"] = "case"
     glossary_slug: str | None = Field(None, max_length=100)
     session_id: UUID | None = None
+    #: Tiefe NUR fuer diese eine Antwort (1..5). Ueberschreibt die Einstellung im Profil,
+    #: ohne sie zu aendern: Zwischen zwei Terminen will man knapp, beim Berichtschreiben
+    #: ausfuehrlich - und keines von beidem soll die Grundeinstellung umstellen.
+    depth: int | None = Field(None, ge=1, le=5)
 
 
 class ProfessionalEchoMessageResponse(BaseModel):

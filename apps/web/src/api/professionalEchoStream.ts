@@ -15,6 +15,8 @@ export interface ProfessionalEchoAnfrage {
   session_id?: string
   thread_type?: 'case' | 'glossary'
   glossary_slug?: string
+  /** Tiefe nur fuer diese eine Antwort (1..5). Ueberschreibt das Profil, ohne es zu aendern. */
+  depth?: number
 }
 
 /**

@@ -211,6 +211,8 @@ export const professionalApi = {
     thread_type?: 'case' | 'glossary'
     glossary_slug?: string
     session_id?: string
+    /** Tiefe nur für diese eine Antwort (1..5) — überschreibt das Profil, ohne es zu ändern. */
+    depth?: number
   }) =>
     apiClient.post<EchoChatResult>(`/professional/cases/${caseId}/echo/chat`, data).then(r => r.data),
   echoSummaryGenerate: (caseId: string, sessionId: string) =>
