@@ -15,6 +15,8 @@ from fastapi import HTTPException
 
 from app.core import crypto
 from app.services import agreement_service
+from app.services.case_artifacts import build_artifact_context
+from app.services.case_documents import build_document_context
 from app.services.echo_service import build_case_context
 from app.services.hypothesis_service import build_hypothesis_context
 from app.services.person_profile_service import build_person_context
@@ -37,6 +39,11 @@ class SharedBundle:
     person_profile: dict[str, Any] | None = None
     self_profile: dict[str, Any] | None = None
     test_results: list[dict[str, Any]] = field(default_factory=list)
+    documents: list[dict[str, Any]] = field(default_factory=list)
+    artifacts: list[dict[str, Any]] = field(default_factory=list)
+    #: Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon —
+    #: dass jemand eigene Einschaetzungen revidiert hat, sagt etwas ueber den Fall.
+    artifacts_ueberholt: int = 0
 
 
 async def require_active_share(professional_user_id, case_id, conn) -> dict[str, Any]:
@@ -143,6 +150,33 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
         )
         bundle.self_profile = dict(row) if row else None
 
+    # Beigelegte Dokumente (Briefe, Chatverläufe). Nur aktive — dieselbe Auswahlregel
+    # wie im Nutzer-Echo, damit hier keine zweite Wahrheit darüber entsteht.
+    if "documents" in allowed:
+        rows = await conn.fetch(
+            "SELECT doc_no, title, kind, document_date, description, content, created_at "
+            "FROM case_documents WHERE case_id = $1 AND active = true "
+            "ORDER BY document_date DESC NULLS LAST, created_at DESC",
+            case_id,
+        )
+        bundle.documents = [
+            crypto.decrypt_fields(dict(r), "content", "description") for r in rows
+        ]
+
+    # Festgehaltene Erkenntnisse. Überholte fließen inhaltlich NICHT mit (siehe
+    # build_artifact_context) — nur ihre Zahl.
+    if "artifacts" in allowed:
+        rows = await conn.fetch(
+            "SELECT artifact_no, title, body, status, created_at FROM case_artifacts "
+            "WHERE case_id = $1 AND status = 'aktiv' ORDER BY created_at DESC",
+            case_id,
+        )
+        bundle.artifacts = [crypto.decrypt_fields(dict(r), "body") for r in rows]
+        bundle.artifacts_ueberholt = await conn.fetchval(
+            "SELECT COUNT(*) FROM case_artifacts WHERE case_id = $1 AND status = 'ueberholt'",
+            case_id,
+        ) or 0
+
     # Nutzer-eigene Selbsttest-Ergebnisse (Anzeige-only; fließen NICHT in den Echo-Kontext).
     if "test_results" in allowed:
         rows = await conn.fetch(
@@ -185,11 +219,28 @@ def build_shared_case_context(bundle: SharedBundle) -> str:
         if isinstance(modules, str):
             modules = json.loads(modules)
         if modules:
+            # anrede=False: Hier liest eine Fachperson ueber ihre Klient:in, nicht die
+            # Klient:in ueber sich. Ohne das begruesst Echo die Fachperson mit dem
+            # Pseudonym der Klient:in - eine konkrete Anweisung im Kontext schlaegt die
+            # allgemeine Stilregel im Systemtext.
             parts.append(build_profile_context({
                 "modules": modules,
                 "safety_status": bundle.self_profile.get("safety_status", "no_indication"),
                 "display_name": bundle.self_profile.get("display_name"),
-            }))
+            }, anrede=False))
+
+    # Erst der Beleg, dann die Deutung: Dokumente vor Erkenntnissen. Beide tragen ihre
+    # stabile Nummer im Text ("Dokument 3"), damit die Oberflaeche daraus einen Verweis
+    # mit Vorschau machen kann — genauso wie bei Szenen.
+    if bundle.documents:
+        ctx = build_document_context(bundle.documents)
+        if ctx:
+            parts.append(ctx)
+
+    if bundle.artifacts or bundle.artifacts_ueberholt:
+        ctx = build_artifact_context(bundle.artifacts, ueberholt_anzahl=bundle.artifacts_ueberholt)
+        if ctx:
+            parts.append(ctx)
 
     if bundle.person_profile:
         pp_modules = bundle.person_profile.get("modules") or {}

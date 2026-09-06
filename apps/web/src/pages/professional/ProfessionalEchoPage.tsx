@@ -8,9 +8,17 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { isAxiosError } from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import { ImFluss } from '@/components/app/ChatMessage'
+import ZumEndeKnopf from '@/components/app/ZumEndeKnopf'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
+import { BelegeFachpersonProvider } from '@/components/professional/BelegeFachperson'
+import ArbeitsmappeUebernehmen from '@/components/professional/ArbeitsmappeUebernehmen'
 import { professionalApi } from '@/api/professional'
+import { professionalEchoStreamen, type ProfessionalEchoAnfrage } from '@/api/professionalEchoStream'
+import { useAntwortStrom } from '@/lib/antwortStrom'
+import { mitlaufen } from '@/lib/mitlaufen'
 import type { ProfessionalEchoMessage } from '@/types'
+import type { EchoChatResult } from '@/api/professional'
 
 const SUGGESTIONS = [
   'Welche Themen tauchen im freigegebenen Material auf?',
@@ -34,6 +42,7 @@ export default function ProfessionalEchoPage() {
   const [gateError, setGateError] = useState(false)
   const glossaryStarted = useRef(false)
   const endRef = useRef<HTMLDivElement>(null)
+  const verlaufRef = useRef<HTMLDivElement>(null)
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['prof-echo-sessions', caseId],
@@ -56,21 +65,34 @@ export default function ProfessionalEchoPage() {
   })
 
   useEffect(() => { if (history) setMessages(history) }, [history])
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
-  const chat = useMutation({
-    mutationFn: (vars: { message: string; thread_type?: 'case' | 'glossary'; glossary_slug?: string }) =>
-      professionalApi.echoChat(caseId!, { ...vars, session_id: activeSession ?? undefined }),
-    onSuccess: (res) => {
+  /**
+   * Die Antwort entsteht sichtbar, statt nach zehn Sekunden als Block dazustehen.
+   *
+   * Der Rückfall auf `/chat` steckt im Baustein: Reicht ein Proxy den Strom nicht durch,
+   * kommt dieselbe Antwort am Stück, und die Fachperson merkt nur, dass sie später da ist.
+   */
+  const strom = useAntwortStrom<ProfessionalEchoAnfrage, EchoChatResult>({
+    streamen: (anfrage, onStueck, onEinstufung, signal) =>
+      professionalEchoStreamen(
+        caseId!, { ...anfrage, session_id: activeSession ?? undefined },
+        onStueck, onEinstufung, signal),
+    rueckfall: (anfrage) =>
+      professionalApi.echoChat(caseId!, { ...anfrage, session_id: activeSession ?? undefined }),
+    onFertig: (res) => {
       setGateError(false)
       setActiveSession(res.session_id)
       setMessages(prev => [...prev, res.user_message, res.assistant_message])
       qc.invalidateQueries({ queryKey: ['prof-echo-sessions', caseId] })
     },
-    onError: (err) => {
+    onFehler: (_anfrage, err) => {
       if (isAxiosError(err) && err.response?.status === 402) setGateError(true)
     },
   })
+
+  useEffect(() => {
+    mitlaufen(endRef.current, strom.beschaeftigt)
+  }, [messages, strom.takt.sichtbar])
 
   // Glossar-Dialog automatisch starten
   useEffect(() => {
@@ -79,16 +101,16 @@ export default function ProfessionalEchoPage() {
       const term = glossary.find(g => g.slug === glossarySlug)?.term ?? glossarySlug
       setActiveSession(null)
       setMessages([])
-      chat.mutate({ message: `Bitte besprich den Begriff „${term}" im Kontext dieses Falls.`, thread_type: 'glossary', glossary_slug: glossarySlug })
+      strom.senden({ message: `Bitte besprich den Begriff „${term}" im Kontext dieses Falls.`, thread_type: 'glossary', glossary_slug: glossarySlug })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [glossarySlug, glossary])
 
   const send = () => {
     const msg = input.trim()
-    if (!msg || chat.isPending || locked) return
+    if (!msg || strom.beschaeftigt || locked) return
     setInput('')
-    chat.mutate({ message: msg })
+    strom.senden({ message: msg })
   }
 
   const summaryGen = useMutation({
@@ -123,6 +145,10 @@ export default function ProfessionalEchoPage() {
 
   return (
     <ProfessionalShell>
+      {/* Löst „Szene 12", „Dokument 3", „Erkenntnis 5" in Echos Antworten auf — aus dem
+          freigegebenen Material, das ohnehin schon geladen ist. Was nicht freigegeben ist,
+          bleibt schlichter Text. */}
+      <BelegeFachpersonProvider caseId={caseId!} bundle={caseInfo}>
       <div className="mx-auto max-w-[1100px] px-6 py-6">
         <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
           <div>
@@ -207,13 +233,13 @@ export default function ProfessionalEchoPage() {
           {/* Chat */}
           <div className="flex-1 min-w-0">
             <div className="card min-h-[50vh] flex flex-col">
-              <div className="flex-1 space-y-4 overflow-y-auto">
-                {messages.length === 0 && !chat.isPending && (
+              <div ref={verlaufRef} className="flex-1 space-y-4 overflow-y-auto">
+                {messages.length === 0 && !strom.beschaeftigt && (
                   <div className="text-sm text-brand-muted">
                     <p className="mb-3">Stelle Echo eine Frage zu diesem Fall. Zum Beispiel:</p>
                     <div className="flex flex-col gap-2">
                       {SUGGESTIONS.map(q => (
-                        <button key={q} onClick={() => chat.mutate({ message: q })} disabled={locked}
+                        <button key={q} onClick={() => strom.senden({ message: q })} disabled={locked}
                           className="text-left text-xs px-3 py-2 rounded-brand border border-brand-border hover:border-accent hover:text-accent transition-colors disabled:opacity-40 disabled:hover:border-brand-border disabled:hover:text-brand-muted">
                           {q}
                         </button>
@@ -230,10 +256,35 @@ export default function ProfessionalEchoPage() {
                         ? <MarkdownMessage content={m.content} />
                         : <span className="whitespace-pre-wrap">{m.content}</span>}
                     </div>
+                    {/* Unter JEDER Antwort, nicht nur der letzten: Der Satz, den man behalten
+                        will, steht oft drei Beiträge weiter oben. */}
+                    {m.role === 'assistant' && (
+                      <div className="mt-1.5 max-w-[85%]">
+                        <ArbeitsmappeUebernehmen
+                          caseId={caseId!}
+                          antwort={m.content}
+                          sessionId={activeSession}
+                          messageId={m.id}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
-                {chat.isPending && <p className="text-sm text-brand-muted">Echo denkt nach …</p>}
+                {/* Die entstehende Antwort. Dieselbe Blase wie eine gespeicherte, nur mit
+                    `ImFluss`: Unfertige Auszeichnung würde sonst 37- bis 60-mal pro Sekunde
+                    hin und her kippen (siehe lib/imFluss). */}
+                {strom.takt.sichtbar && (
+                  <div>
+                    <div className="inline-block max-w-[85%] rounded-brand bg-brand-bg px-4 py-2.5 text-sm text-left text-brand-text">
+                      <ImFluss text={strom.takt.sichtbar} />
+                    </div>
+                  </div>
+                )}
+                {strom.beschaeftigt && !strom.takt.sichtbar && (
+                  <p className="text-sm text-brand-muted">Echo denkt nach …</p>
+                )}
                 <div ref={endRef} />
+                <ZumEndeKnopf behaelter={verlaufRef} imFluss={strom.beschaeftigt} />
               </div>
 
               {/* Composer */}
@@ -248,7 +299,7 @@ export default function ProfessionalEchoPage() {
                     placeholder={locked ? 'Fall nicht aktiviert – Echo ist gesperrt' : 'Nachricht an Echo …'}
                     className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none disabled:opacity-60 disabled:cursor-not-allowed"
                   />
-                  <button onClick={send} disabled={chat.isPending || !input.trim() || locked} className="btn-primary !px-5 !text-sm self-end">Senden</button>
+                  <button onClick={send} disabled={strom.beschaeftigt || !input.trim() || locked} className="btn-primary !px-5 !text-sm self-end">Senden</button>
                 </div>
                 {messages.length > 0 && (
                   <div className="mt-2 flex gap-3">
@@ -278,6 +329,7 @@ export default function ProfessionalEchoPage() {
           </div>
         </div>
       </div>
+      </BelegeFachpersonProvider>
     </ProfessionalShell>
   )
 }

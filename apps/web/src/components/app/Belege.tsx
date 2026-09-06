@@ -36,9 +36,24 @@ interface Ziel {
   marken: string[]
 }
 
-type Aufloeser = (beleg: Beleg) => Ziel | null
+export type Aufloeser = (beleg: Beleg) => Ziel | null
 
 const BelegKontext = createContext<Aufloeser | null>(null)
+
+/**
+ * Der Kontext ohne die Frage, WOHER die Einträge kommen.
+ *
+ * Der Nutzerbereich löst aus den eigenen Fall-Abfragen auf und verlinkt nach `/app/…`;
+ * der Fachpersonenbereich löst aus dem freigegebenen Material auf und verlinkt nach
+ * `/professional/…`. Gemeinsam ist alles andere — deshalb steht hier nur die Weitergabe.
+ */
+export function BelegeKontextProvider(
+  { aufloesen, children }: { aufloesen: Aufloeser; children: ReactNode },
+) {
+  return <BelegKontext.Provider value={aufloesen}>{children}</BelegKontext.Provider>
+}
+
+export type { Ziel }
 
 /** Höchstens so viel Text in der Vorschau — sie soll ergänzen, nicht ersetzen. */
 const VORSCHAU_ZEICHEN = 320
@@ -122,8 +137,11 @@ export function BelegeProvider({ caseId, children }: { caseId: string; children:
       (beleg.art === 'szene' ? s : beleg.art === 'dokument' ? d : e).get(beleg.nr) ?? null
   }, [caseId, szenen, dokumente, erkenntnisse])
 
-  return <BelegKontext.Provider value={aufloesen}>{children}</BelegKontext.Provider>
+  return <BelegeKontextProvider aufloesen={aufloesen}>{children}</BelegeKontextProvider>
 }
+
+/** Hilfsmittel für eigene Auflöser — damit Datum und Kürzung überall gleich aussehen. */
+export const belegHelfer = { datum, kuerzen }
 
 /**
  * Ein Verweis im Fließtext.

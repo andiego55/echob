@@ -29,6 +29,7 @@ import type {
 } from '@/types'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
+import ArbeitsmappePanel from '@/components/professional/ArbeitsmappePanel'
 
 const TOPIC_LABELS: Record<string, string> = {
   topic_self: 'Über mich', topic_person: 'Über die Fallperson',
@@ -47,6 +48,7 @@ const TABS = [
   { key: 'ueber', label: 'Übersicht' },
   { key: 'collab', label: 'Zusammenarbeit' },
   { key: 'echo', label: 'Echo' },
+  { key: 'arbeitsmappe', label: 'Arbeitsmappe' },
   { key: 'reports', label: 'Berichte' },
   { key: 'notes', label: 'Notizen' },
   { key: 'appointments', label: 'Termine' },
@@ -400,6 +402,7 @@ export default function ProfessionalCaseDetailPage() {
             updating={updateSummary.isPending}
           />
         )}
+        {tab === 'arbeitsmappe' && <ArbeitsmappePanel caseId={caseId!} />}
         {tab === 'reports' && <ReportsPanel caseId={caseId!} />}
         {tab === 'notes' && <NotesPanel caseId={caseId!} overview={bundle.notes} />}
         {tab === 'appointments' && <AppointmentsPanel caseId={caseId!} />}
@@ -670,7 +673,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
               : (
                 <div className="space-y-2.5">
                   {bundle.scenes.map(s => (
-                    <div key={s.id} className="rounded-brand border border-brand-border bg-white px-4 py-3">
+                    <div key={s.id} id={s.scene_no ? `szene-${s.scene_no}` : undefined}
+                       className="rounded-brand border border-brand-border bg-white px-4 py-3">
                       <div className="flex justify-between gap-2 flex-wrap">
                         <p className="text-sm font-semibold text-navy">{s.title}</p>
                         {s.scene_date && <span className="text-xs text-brand-muted">{s.scene_date}</span>}
@@ -688,6 +692,66 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
                   ))}
                 </div>
               )}
+          </Section>
+        </div>
+      )}
+
+      {has('documents') && (
+        <div className="mt-4">
+          <Section title={`Dokumente (${bundle.documents?.length ?? 0})`} icon={<IconDoc />}>
+            {!bundle.documents?.length
+              ? <p className="text-sm text-brand-muted">Keine freigegebenen Dokumente.</p>
+              : (
+                <div className="space-y-2.5">
+                  {bundle.documents.map(d => (
+                    <details key={d.doc_no ?? d.title} id={d.doc_no ? `dokument-${d.doc_no}` : undefined}
+                      className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40">
+                      <summary className="cursor-pointer list-none">
+                        <div className="flex justify-between gap-2 flex-wrap">
+                          <p className="text-sm font-semibold text-navy">
+                            {d.doc_no && <span className="mr-1.5 font-mono text-xs text-brand-muted">Dokument {d.doc_no}</span>}
+                            {d.title}
+                          </p>
+                          <span className="text-xs text-brand-muted">{d.document_date ?? ''}</span>
+                        </div>
+                        {d.description && <p className="mt-1 text-xs text-brand-muted">{d.description}</p>}
+                      </summary>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-brand-text">{d.content}</p>
+                    </details>
+                  ))}
+                </div>
+              )}
+          </Section>
+        </div>
+      )}
+
+      {has('artifacts') && (
+        <div className="mt-4">
+          <Section title={`Erkenntnisse (${bundle.artifacts?.length ?? 0})`} icon={<IconBook />}>
+            {!bundle.artifacts?.length
+              ? <p className="text-sm text-brand-muted">Keine freigegebenen Erkenntnisse.</p>
+              : (
+                <div className="space-y-2.5">
+                  {bundle.artifacts.map(a => (
+                    <div key={a.artifact_no ?? a.title} id={a.artifact_no ? `erkenntnis-${a.artifact_no}` : undefined}
+                      className="rounded-brand border border-brand-border bg-white px-4 py-3">
+                      <p className="text-sm font-semibold text-navy">
+                        {a.artifact_no && <span className="mr-1.5 font-mono text-xs text-brand-muted">Erkenntnis {a.artifact_no}</span>}
+                        {a.title}
+                      </p>
+                      <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-brand-text">{a.body}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            {/* Die Zahl der verworfenen Einschaetzungen sagt etwas ueber die Bewegung im
+                Fall - ihr Inhalt geht bewusst nicht mit. */}
+            {!!bundle.artifacts_ueberholt && (
+              <p className="mt-3 border-t border-brand-border pt-2 text-xs text-brand-muted">
+                {bundle.artifacts_ueberholt} frühere Einschätzung{bundle.artifacts_ueberholt === 1 ? '' : 'en'} wurde
+                {bundle.artifacts_ueberholt === 1 ? '' : 'n'} inzwischen verworfen. Der Inhalt wird nicht geteilt.
+              </p>
+            )}
           </Section>
         </div>
       )}

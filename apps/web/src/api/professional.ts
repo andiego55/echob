@@ -26,7 +26,8 @@ import type {
   CoupleReportListItem,
 } from '@/types'
 
-interface EchoChatResult {
+/** Antwort von /echo/chat — auch der Strom endet mit genau dieser Nutzlast. */
+export interface EchoChatResult {
   user_message: ProfessionalEchoMessage
   assistant_message: ProfessionalEchoMessage
   session_id: string

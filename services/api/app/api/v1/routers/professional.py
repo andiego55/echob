@@ -777,6 +777,11 @@ async def case_detail(
         "person_profile": _public_profile(bundle.person_profile),
         "self_profile": _public_profile(bundle.self_profile),
         "test_results": bundle.test_results,
+        # Tragen ihre stabilen Nummern (doc_no / artifact_no) mit: Die Oberflaeche macht
+        # aus "Dokument 3" in Echos Antwort einen Verweis mit Vorschau.
+        "documents": [_public_row(d) for d in bundle.documents],
+        "artifacts": [_public_row(a) for a in bundle.artifacts],
+        "artifacts_ueberholt": bundle.artifacts_ueberholt,
         "notes": (
             crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
             if note_row else None

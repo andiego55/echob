@@ -59,10 +59,18 @@ _LC_VALUE_LABELS: dict[str, dict[str, str]] = {
 }
 
 
-def build_profile_context(profile: dict[str, Any]) -> str:
+def build_profile_context(profile: dict[str, Any], *, anrede: bool = True) -> str:
     """Erzeugt einen lesbaren Echo-Kontext aus dem Beziehungsprofil.
 
     Vorsichtige, nicht-diagnostische Formulierungen.
+
+    ``anrede`` sagt, ob der LESER dieses Kontexts die nutzende Person selbst ist.
+
+    Im Nutzer-Dialog ist er das, und dann ist der hinterlegte Name eine Anrede. Im
+    Fachpersonen-Dialog ist er es NICHT - dort liest eine Fachperson ueber ihre
+    Klient:in. Die Anweisung "sprich die nutzende Person mit diesem Namen an" fuehrte
+    dort dazu, dass Echo die Fachperson mit dem Pseudonym der Klient:in ansprach: eine
+    konkrete Anweisung im Kontext schlaegt eine allgemeine Stilregel im Systemtext.
     """
     m = profile.get("modules", {})
     safety = profile.get("safety_status", "no_indication")
@@ -74,10 +82,16 @@ def build_profile_context(profile: dict[str, Any]) -> str:
 
     if display_name := profile.get("display_name"):
         lines.append(f"**Name / Pseudonym der nutzenden Person:** {display_name}")
-        lines.append(
-            "_Sprich die nutzende Person mit diesem Namen an (als gewählte Anrede, "
-            "nicht zwanghaft in jedem Satz)._\n"
-        )
+        if anrede:
+            lines.append(
+                "_Sprich die nutzende Person mit diesem Namen an (als gewählte Anrede, "
+                "nicht zwanghaft in jedem Satz)._\n"
+            )
+        else:
+            lines.append(
+                "_So nennt sich die nutzende Person selbst. Sprich in deinen Antworten "
+                "ÜBER sie, nicht sie an — dein Gegenüber ist die Fachperson._\n"
+            )
 
     # Lebenskontext
     lc = m.get("life_context", {})

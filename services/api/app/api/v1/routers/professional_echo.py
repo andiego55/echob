@@ -7,9 +7,13 @@ strikt getrennt von den Echo-Daten der nutzenden Person.
 """
 from __future__ import annotations
 
+import json as _json
+import logging
+from dataclasses import dataclass
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 
 from app.api.v1.routers.professional_notes import (
     build_session_notes_context,
@@ -17,6 +21,7 @@ from app.api.v1.routers.professional_notes import (
 )
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_pool
+from app.core.sse import ereignis
 from app.schemas.professional import (
     ProfessionalEchoChatRequest,
     ProfessionalEchoChatResponse,
@@ -28,6 +33,7 @@ from app.schemas.professional import (
     ProfessionalEchoSummaryUpdate,
 )
 from app.services import collab_service, echo_modes, seat_service
+from app.services.professional_findings import build_findings_context
 from app.services.sharing_service import (
     build_shared_case_context,
     load_shared_bundle,
@@ -37,6 +43,8 @@ from app.services.subscription_service import (
     enforce_demo_echo_limit,
     enforce_professional_echo_limit,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/professional/cases/{case_id}/echo", tags=["professional-echo"])
 
@@ -81,17 +89,28 @@ def _build_notes_context(note: dict | None) -> str:
     return "## Deine Notizen zu diesem Fall\n" + "\n".join(parts) if parts else ""
 
 
-@router.post("/chat", response_model=ProfessionalEchoChatResponse)
-async def chat(
-    case_id: UUID,
-    body: ProfessionalEchoChatRequest,
-    request: Request,
-    current: dict = Depends(get_current_professional),
-    pool=Depends(get_pool),
-) -> ProfessionalEchoChatResponse:
-    pid = current["user_id"]
-    echo_svc = _get_echo_service(request)
+@dataclass
+class _Lage:
+    """Alles, was für eine Antwort gebraucht wird — einmal beschafft, zweimal benutzt.
 
+    ``/chat`` und ``/chat/stream`` unterscheiden sich nur darin, ob die Antwort am Stück
+    oder während ihres Entstehens kommt. Alles davor — Kontingent, Freigabe, Sitzplatz,
+    Verlauf, Notizen, Steuerung — ist identisch. Zweimal hingeschrieben wäre es zweimal
+    zu pflegen, und die Sicherheitsprüfungen sind genau die Stelle, an der das gefährlich
+    wird.
+    """
+    session_id: UUID
+    shared_context: str
+    history: list[dict[str, str]]
+    mode_steering: str
+    glossary_term: str | None
+    glossary_definition: str | None
+
+
+async def _lage_beschaffen(
+    *, case_id: UUID, body: ProfessionalEchoChatRequest, pid, pool,
+    current: dict,
+) -> _Lage:
     async with pool.acquire() as conn:
         await enforce_professional_echo_limit(pid, conn)
         await enforce_demo_echo_limit(pid, case_id, conn)   # harter Spielwiese-Deckel
@@ -134,6 +153,14 @@ async def chat(
             "SELECT echo_approach, echo_tone, echo_depth, echo_custom_steering "
             "FROM professional_profiles WHERE user_id = $1", pid,
         )
+        # Was die Fachperson selbst aus frueheren Gespraechen mitgenommen hat.
+        findings_rows = await conn.fetch(
+            "SELECT title, body, kind, status, beleg, created_at "
+            "FROM professional_findings "
+            "WHERE professional_user_id = $1 AND case_id = $2 "
+            "ORDER BY created_at DESC",
+            pid, case_id,
+        )
 
     history = [
         {"role": r["role"], "content": crypto.decrypt(r["content"])}
@@ -149,6 +176,9 @@ async def chat(
             _build_notes_context(note),
             build_session_notes_context(session_notes),
             collab_service.build_collaboration_context(assignments, appointments),
+            build_findings_context([
+                crypto.decrypt_fields(dict(r), "body") for r in findings_rows
+            ]),
         ) if s
     ]
     if extras:
@@ -171,15 +201,21 @@ async def chat(
         if g:
             glossary_term, glossary_definition = g["term"], g["definition"]
 
-    answer = await echo_svc.professional_chat(
-        user_message=body.message,
+    return _Lage(
+        session_id=session_id,
         shared_context=shared_context,
         history=history,
+        mode_steering=pro_mode_steering,
         glossary_term=glossary_term,
         glossary_definition=glossary_definition,
-        mode_steering=pro_mode_steering,
     )
 
+
+async def _antwort_speichern(
+    *, pool, lage: _Lage, case_id: UUID, pid, body: ProfessionalEchoChatRequest,
+    answer: str,
+) -> ProfessionalEchoChatResponse:
+    session_id = lage.session_id
     async with pool.acquire() as conn:
         user_msg = await conn.fetchrow(
             "INSERT INTO professional_echo_messages "
@@ -205,6 +241,106 @@ async def chat(
         user_message=_msg_response(user_msg),
         assistant_message=_msg_response(assistant_msg),
         session_id=session_id,
+    )
+
+
+@router.post("/chat", response_model=ProfessionalEchoChatResponse)
+async def chat(
+    case_id: UUID,
+    body: ProfessionalEchoChatRequest,
+    request: Request,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalEchoChatResponse:
+    pid = current["user_id"]
+    echo_svc = _get_echo_service(request)
+    lage = await _lage_beschaffen(
+        case_id=case_id, body=body, pid=pid, pool=pool, current=current)
+
+    answer = await echo_svc.professional_chat(
+        user_message=body.message,
+        shared_context=lage.shared_context,
+        history=lage.history,
+        glossary_term=lage.glossary_term,
+        glossary_definition=lage.glossary_definition,
+        mode_steering=lage.mode_steering,
+    )
+    return await _antwort_speichern(
+        pool=pool, lage=lage, case_id=case_id, pid=pid, body=body, answer=answer)
+
+
+@router.post("/chat/stream")
+async def chat_stream(
+    case_id: UUID,
+    body: ProfessionalEchoChatRequest,
+    request: Request,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+):
+    """Dieselbe Antwort wie ``/chat``, nur während sie entsteht.
+
+    **Warum das hier zählt.** Eine Fachperson sichtet Material zwischen zwei Terminen,
+    oft mit wenigen Minuten Luft. Zehn Sekunden Punkte sind in dieser Lage keine
+    Wartezeit, sondern eine Unterbrechung — man wechselt das Fenster und kommt nicht
+    zurück. Die Fähigkeit war im Dienst längst da (``stream_professional_chat``); es
+    fehlte nur dieser Endpunkt.
+
+    **Keine Sicherheits-Triage, anders als im Nutzer-Dialog.** Dort schreibt jemand über
+    die eigene Not, und eine akute Lage muss vor dem ersten Byte erkannt sein. Hier
+    schreibt eine Fachperson über einen Fall; die Triage ist auf Selbstaussagen gebaut
+    und würde auf fachliche Fragen nur falsch anschlagen. Das ``beginn``-Ereignis geht
+    deshalb ohne Einstufung raus — die Oberfläche liest dieselbe Struktur wie sonst.
+
+    **Was schiefgehen kann, geht vor dem Strom schief.** Kontingent, Freigabe, Sitzplatz
+    — alles in ``_lage_beschaffen`` und damit vor dem ersten Byte, damit daraus ein
+    sauberer HTTP-Fehler wird und nicht ein halber Strom.
+    """
+    pid = current["user_id"]
+    echo_svc = _get_echo_service(request)
+    lage = await _lage_beschaffen(
+        case_id=case_id, body=body, pid=pid, pool=pool, current=current)
+
+    async def strom():
+        teile: list[str] = []
+        try:
+            yield ereignis("beginn", safety=None)
+
+            async for stueck in echo_svc.stream_professional_chat(
+                user_message=body.message,
+                shared_context=lage.shared_context,
+                history=lage.history,
+                glossary_term=lage.glossary_term,
+                glossary_definition=lage.glossary_definition,
+                mode_steering=lage.mode_steering,
+            ):
+                teile.append(stueck)
+                yield ereignis("delta", text=stueck)
+
+            fertig = await _antwort_speichern(
+                pool=pool, lage=lage, case_id=case_id, pid=pid, body=body,
+                answer="".join(teile).strip(),
+            )
+            # Zum Schluss dasselbe Ergebnis wie bei /chat - mit echten Ids, damit die
+            # Oberflaeche den vorlaeufigen Text durch die gespeicherte Nachricht ersetzt.
+            yield ereignis("fertig", **_json.loads(fertig.model_dump_json()))
+
+        except Exception:
+            # Ab hier ist kein HTTP-Fehler mehr moeglich - die Kopfzeilen sind raus.
+            logger.exception("Fachpersonen-Echo: Streaming fehlgeschlagen (Fall %s)", case_id)
+            yield ereignis(
+                "fehler",
+                detail="Echo ist gerade nicht erreichbar. Bitte später noch einmal.",
+            )
+
+    return StreamingResponse(
+        strom(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            # Ohne das puffert der Reverse Proxy den Strom und liefert alles am Stueck.
+            "X-Accel-Buffering": "no",
+        },
     )
 
 

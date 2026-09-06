@@ -45,6 +45,7 @@ from app.api.v1.routers import (
     professional_couple_room,
     professional_couples,
     professional_echo,
+    professional_findings,
     professional_notes,
     professional_reports,
     professional_templates,
@@ -105,6 +106,7 @@ v1_router.include_router(case_shares.router)
 v1_router.include_router(client_invites.router)
 v1_router.include_router(pseudonymous.router)
 v1_router.include_router(professional_echo.router)
+v1_router.include_router(professional_findings.router)
 v1_router.include_router(professional_couples.router)
 v1_router.include_router(professional_couple_room.router)
 v1_router.include_router(professional_collab.router)

@@ -16,6 +16,7 @@ ShareElementType = Literal[
     "case_info", "onboarding", "all_scenes", "scene",
     "scales", "reports", "topic_summaries", "person_profile", "self_profile",
     "hypotheses", "test_results",
+    "documents", "artifacts",
 ]
 
 
@@ -350,6 +351,45 @@ class NoteTemplateCreate(BaseModel):
 class NoteTemplateUpdate(BaseModel):
     name: str = Field(..., min_length=1, max_length=160)
     fields: list[str] = Field(..., min_length=1, max_length=30)
+
+
+# -- Arbeitsmappe der Fachperson ----------------------------------------------
+
+FindingKind = Literal["hypothese", "beobachtung", "frage", "impuls", "achtung"]
+FindingStatus = Literal["offen", "bestaetigt", "verworfen"]
+
+
+class FindingCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    body: str = Field(..., min_length=1, max_length=4000)
+    kind: FindingKind = "beobachtung"
+    source_session: UUID | None = None
+    source_message: UUID | None = None
+    #: Bezug in Echos Schreibweise, z. B. "Szene 12". Frei, weil er ungueltig werden darf.
+    beleg: str | None = Field(None, max_length=60)
+
+
+class FindingUpdate(BaseModel):
+    title: str | None = Field(None, min_length=1, max_length=200)
+    body: str | None = Field(None, min_length=1, max_length=4000)
+    kind: FindingKind | None = None
+    status: FindingStatus | None = None
+    beleg: str | None = Field(None, max_length=60)
+
+
+class Finding(BaseModel):
+    id: UUID
+    case_id: UUID
+    title: str
+    body: str
+    kind: FindingKind
+    status: FindingStatus
+    resolved_at: datetime | None
+    source_session: UUID | None
+    source_message: UUID | None
+    beleg: str | None
+    created_at: datetime
+    updated_at: datetime
 
 
 class SessionNoteCreate(BaseModel):

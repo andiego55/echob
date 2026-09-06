@@ -886,6 +886,7 @@ export type ShareElementType =
   | 'case_info' | 'onboarding' | 'all_scenes' | 'scene'
   | 'scales' | 'reports' | 'topic_summaries' | 'person_profile' | 'self_profile'
   | 'hypotheses' | 'test_results'
+  | 'documents' | 'artifacts'
 
 export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   case_info:       'Fallinformationen',
@@ -899,6 +900,8 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   self_profile:    'Nutzerprofil / Selbstprofil',
   hypotheses:      'Hypothesen (tastend)',
   test_results:    'Selbsttest-Ergebnisse',
+  documents:       'Beigelegte Dokumente',
+  artifacts:       'Festgehaltene Erkenntnisse',
 }
 
 export interface ProfessionalProfile {
@@ -1133,6 +1136,31 @@ export interface ActivationLogEntry {
 }
 
 /** Fallansicht-Bundle der Fachperson — enthält nur freigegebene Inhalte. */
+/**
+ * Ein freigegebenes Dokument, wie die Fachperson es sieht.
+ *
+ * Bewusst schmaler als `CaseDocument` im Nutzerbereich: Die Fachperson bekommt genau die
+ * Felder, die der Server ausliefert — keine internen Ids, keine Herkunftsangaben.
+ */
+export interface SharedCaseDocument {
+  doc_no: number | null
+  title: string
+  kind: import('@/api/caseDocuments').DocumentKind
+  document_date: string | null
+  description: string | null
+  content: string
+  created_at: string
+}
+
+/** Eine freigegebene Erkenntnis, wie die Fachperson sie sieht. */
+export interface SharedCaseArtifact {
+  artifact_no: number | null
+  title: string
+  body: string
+  status: 'aktiv' | 'ueberholt'
+  created_at: string
+}
+
 export interface SharedCaseBundle {
   case_id: string
   client_display_name: string
@@ -1152,6 +1180,12 @@ export interface SharedCaseBundle {
   person_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null } | null
   self_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null; display_name?: string | null } | null
   test_results: import('@/selftests/scoring').SavedTestResult[]
+  /** Freigegebene Dokumente – tragen ihre stabile Nummer (doc_no) für Belege. */
+  documents?: SharedCaseDocument[]
+  /** Freigegebene Erkenntnisse – tragen ihre stabile Nummer (artifact_no). */
+  artifacts?: SharedCaseArtifact[]
+  /** Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon. */
+  artifacts_ueberholt?: number
   notes: ProfessionalNote | null
   echo_summaries: ProfessionalEchoSummary[]
 }

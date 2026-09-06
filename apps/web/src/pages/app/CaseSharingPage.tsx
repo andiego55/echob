@@ -18,6 +18,7 @@ import { useBestaetigen } from '@/components/Bestaetigung'
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
   'reports', 'topic_summaries', 'person_profile', 'self_profile', 'hypotheses', 'test_results',
+  'documents', 'artifacts',
 ]
 
 export default function CaseSharingPage() {
