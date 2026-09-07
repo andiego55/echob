@@ -1,25 +1,12 @@
 /**
- * Listenfelder im Admin-Editor: Schwerpunkte und Sprachen tippt man als Text mit
- * Kommas, gespeichert werden sie als Feld.
+ * Kleine Regeln des Admin-Formulars, die außerhalb von React stehen sollen.
  *
- * **Warum das eine eigene Datei ist.** Die Umwandlung läuft bei jedem Tastendruck hin
- * und zurück. Verliert sie dabei etwas — ein Leerzeichen zu viel, ein leerer Eintrag
- * aus dem Komma am Ende —, dann verändert sich das Feld, während man nur hineinschaut.
- * Beim Speichern steht dann etwas anderes drin als das, was man gelesen hat.
+ * Hier standen einmal `listeAusText`/`textAusListe`, die ein Komma-Textfeld in eine Liste
+ * und zurück rechneten. Sie sind weg, und mit ihnen ein Fehler, der nur beim Benutzen
+ * auffiel: Wer „Paare," tippte, bekam die Liste `['Paare']` und daraus wieder den Text
+ * „Paare" — das Komma verschwand unter den Fingern. Listenfelder benutzen jetzt
+ * `components/directory/TagInput`, das seinen Entwurfstext selbst behält.
  */
-
-/** „Paare, Trauma , " → ['Paare', 'Trauma'] — leere Stücke fallen weg. */
-export function listeAusText(text: string): string[] {
-  return text
-    .split(',')
-    .map(t => t.trim())
-    .filter(Boolean)
-}
-
-/** ['Paare', 'Trauma'] → „Paare, Trauma" */
-export function textAusListe(liste: string[] | null | undefined): string {
-  return (liste ?? []).join(', ')
-}
 
 /** Die drei Settings, die das Verzeichnis kennt. Mehr nimmt der Server nicht an. */
 export const SETTINGS = [

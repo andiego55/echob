@@ -13,6 +13,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { apiErrorMessage } from '@/api/errors'
 import { adminApi, type UserRow } from './api'
 
 const ROLLEN = [
@@ -121,6 +122,11 @@ export default function AdminUsersPage() {
 
             {isLoading ? (
               <p className="py-12 text-center text-brand-muted">Lädt …</p>
+            ) : error ? (
+              // Ein Fehler darf nie als „keine Konten" erscheinen.
+              <p className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                Konten konnten nicht geladen werden: {apiErrorMessage(error, 'Unbekannter Grund.')}
+              </p>
             ) : (data ?? []).length === 0 ? (
               <p className="py-12 text-center text-sm text-brand-muted">Keine Konten in dieser Ansicht.</p>
             ) : (

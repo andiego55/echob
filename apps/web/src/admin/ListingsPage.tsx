@@ -23,7 +23,9 @@ import {
   type ListingUpdate,
   type ProvisionResult,
 } from './api'
-import { LINK_MARKE, SETTINGS, linkStelleFehlt, listeAusText, settingUmschalten, textAusListe } from './felder'
+import { apiErrorMessage } from '@/api/errors'
+import TagInput from '@/components/directory/TagInput'
+import { LINK_MARKE, SETTINGS, linkStelleFehlt, settingUmschalten } from './felder'
 
 const FILTER = [
   { key: '', label: 'Alle' },
@@ -93,6 +95,12 @@ export default function AdminListingsPage() {
 
             {isLoading ? (
               <p className="py-12 text-center text-brand-muted">Lädt …</p>
+            ) : error ? (
+              // Ein Fehler darf nie als „keine Einträge" erscheinen - sonst sucht man
+              // den Grund in den Daten statt in der Verbindung.
+              <p className="rounded-brand border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                Einträge konnten nicht geladen werden: {apiErrorMessage(error, 'Unbekannter Grund.')}
+              </p>
             ) : (
               <div className="space-y-2.5">
                 {(data ?? []).map(row => (
@@ -274,7 +282,11 @@ function Zeile({ row, sofortOeffnen, onGeaendert }: {
         </div>
       </div>
 
-      {vorbereiten.isError && <p className="mt-2 text-[0.76rem] text-red-600">Bereitstellung fehlgeschlagen.</p>}
+      {vorbereiten.isError && (
+        <p className="mt-2 text-[0.76rem] text-red-600">
+          {apiErrorMessage(vorbereiten.error, 'Bereitstellung fehlgeschlagen.')}
+        </p>
+      )}
       {zugang && <ZugangPanel ergebnis={zugang} name={row.display_name} onSchliessen={() => setZugang(null)} />}
       {einladungOffen && (
         <EinladungPanel
@@ -367,7 +379,7 @@ function EinladungPanel({ listingId, voreingestellteMail, onGesendet, onAbbreche
   onGesendet: () => void
   onAbbrechen: () => void
 }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['admin-invite-draft', listingId, voreingestellteMail],
     queryFn: () => adminApi.inviteDraft(listingId, voreingestellteMail ?? undefined),
     retry: false,
@@ -383,10 +395,21 @@ function EinladungPanel({ listingId, voreingestellteMail, onGesendet, onAbbreche
       if (r.ok) { setMeldung(null); onGesendet() }
       else setMeldung(r.detail ?? 'Fehlgeschlagen.')
     },
-    onError: () => setMeldung('Senden fehlgeschlagen.'),
+    // Den Grund durchreichen statt ihn zu verschlucken: „Senden fehlgeschlagen" sagt
+    // niemandem, ob der Server fehlt, die Sitzung abgelaufen ist oder die Eingabe klemmt.
+    onError: (e) => setMeldung(apiErrorMessage(e, 'Senden fehlgeschlagen.')),
   })
 
-  if (isLoading || !data) return <p className="mt-3 text-[0.78rem] text-brand-muted">Lädt Entwurf …</p>
+  // „Lädt …" darf nie der Endzustand sein: Ein fehlgeschlagener Abruf sähe sonst aus
+  // wie ein langsamer, und der Grund bliebe verborgen.
+  if (isLoading) return <p className="mt-3 text-[0.78rem] text-brand-muted">Lädt Entwurf …</p>
+  if (error || !data) {
+    return (
+      <p className="mt-3 rounded-brand border border-red-200 bg-red-50 px-3.5 py-2.5 text-[0.82rem] text-red-700">
+        Entwurf konnte nicht geladen werden: {apiErrorMessage(error, 'Unbekannter Grund.')}
+      </p>
+    )
+  }
 
   const v = f ?? { email: data.email, subject: data.subject, body: data.body }
   const setz = (patch: Partial<typeof v>) => { setF({ ...v, ...patch }); setMeldung(null) }
@@ -436,7 +459,7 @@ function EinladungPanel({ listingId, voreingestellteMail, onGesendet, onAbbreche
  * einer Liste mit hunderten Einträgen nur Gewicht wären.
  */
 function ProfilEditor({ listingId, onGespeichert }: { listingId: string; onGespeichert: () => void }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['admin-listing', listingId],
     queryFn: () => adminApi.listing(listingId),
     retry: false,
@@ -449,7 +472,14 @@ function ProfilEditor({ listingId, onGespeichert }: { listingId: string; onGespe
     onSuccess: () => { setOk(true); onGespeichert() },
   })
 
-  if (isLoading || !data) return <p className="mt-3 text-[0.78rem] text-brand-muted">Lädt Profil …</p>
+  if (isLoading) return <p className="mt-3 text-[0.78rem] text-brand-muted">Lädt Profil …</p>
+  if (error || !data) {
+    return (
+      <p className="mt-3 rounded-brand border border-red-200 bg-red-50 px-3.5 py-2.5 text-[0.82rem] text-red-700">
+        Profil konnte nicht geladen werden: {apiErrorMessage(error, 'Unbekannter Grund.')}
+      </p>
+    )
+  }
 
   const v: ListingUpdate = f ?? {
     display_name: data.display_name,
@@ -505,10 +535,17 @@ function ProfilEditor({ listingId, onGespeichert }: { listingId: string; onGespe
           value={v.approach ?? ''} onChange={e => setz({ approach: e.target.value })} />
         <textarea className="input sm:col-span-2" rows={2} placeholder="Honorar"
           value={v.fees ?? ''} onChange={e => setz({ fees: e.target.value })} />
-        <input className="input" placeholder="Schwerpunkte, mit Komma getrennt"
-          value={textAusListe(v.focus_areas)} onChange={e => setz({ focus_areas: listeAusText(e.target.value) })} />
-        <input className="input" placeholder="Sprachen, mit Komma getrennt"
-          value={textAusListe(v.languages)} onChange={e => setz({ languages: listeAusText(e.target.value) })} />
+        <div>
+          <span className="mb-1.5 block text-[0.78rem] font-medium text-brand-text">Schwerpunkte</span>
+          <TagInput values={v.focus_areas ?? []} onChange={w => setz({ focus_areas: w })}
+            placeholder="Schwerpunkt + Enter …" />
+        </div>
+        <div>
+          <span className="mb-1.5 block text-[0.78rem] font-medium text-brand-text">Sprachen</span>
+          <TagInput values={v.languages ?? []} onChange={w => setz({ languages: w })}
+            placeholder="Sprache + Enter …"
+            suggestions={['Deutsch', 'Englisch', 'Türkisch', 'Französisch', 'Russisch']} />
+        </div>
         <input className="input sm:col-span-2" placeholder="Buchungslink (optional)"
           value={v.booking_url ?? ''} onChange={e => setz({ booking_url: e.target.value })} />
       </div>
@@ -542,7 +579,11 @@ function ProfilEditor({ listingId, onGespeichert }: { listingId: string; onGespe
           {speichern.isPending ? 'Speichert …' : 'Profil speichern'}
         </button>
         {ok && <span className="text-[0.78rem] text-green-700">Gespeichert ✓</span>}
-        {speichern.isError && <span className="text-[0.78rem] text-red-600">Speichern fehlgeschlagen.</span>}
+        {speichern.isError && (
+          <span className="text-[0.78rem] text-red-600">
+            {apiErrorMessage(speichern.error, 'Speichern fehlgeschlagen.')}
+          </span>
+        )}
       </div>
     </div>
   )

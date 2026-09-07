@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import TagInput from '@/components/directory/TagInput'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { directoryProfileApi, type DirectoryMe, type DirectoryProfilePayload } from '@/api/directory'
@@ -388,34 +389,3 @@ function Area({ value, onChange, rows, min, placeholder }: { value: string; onCh
   )
 }
 
-function TagInput({ values, onChange, placeholder, suggestions }: { values: string[]; onChange: (v: string[]) => void; placeholder?: string; suggestions?: string[] }) {
-  const [draft, setDraft] = useState('')
-  const add = (t: string) => { const v = t.trim(); if (v && !values.includes(v)) onChange([...values, v]); setDraft('') }
-  const openSuggestions = (suggestions ?? []).filter((s) => !values.includes(s))
-  return (
-    <div>
-      {values.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-1.5">
-          {values.map((t) => (
-            <span key={t} className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-[0.8rem] text-navy">
-              {t}
-              <button onClick={() => onChange(values.filter((x) => x !== t))} className="text-brand-muted hover:text-accent" aria-label="Entfernen">×</button>
-            </span>
-          ))}
-        </div>
-      )}
-      <input value={draft} onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); add(draft) } }}
-        placeholder={placeholder} className="input" />
-      {openSuggestions.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {openSuggestions.slice(0, 6).map((s) => (
-            <button key={s} onClick={() => add(s)} className="rounded-full border border-dashed border-brand-border px-2.5 py-0.5 text-[0.75rem] text-brand-muted hover:border-accent hover:text-accent">
-              + {s}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}

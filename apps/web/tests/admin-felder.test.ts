@@ -1,39 +1,43 @@
 /**
- * Zwei kleine Stellen im Admin-Bereich, an denen ein Fehler still bliebe.
+ * Kleine Regeln des Admin-Formulars, an denen ein Fehler still bliebe.
  *
- * Die Listenfelder laufen bei jedem Tastendruck hin und zurück: Text → Feld → Text.
- * Verlieren sie dabei etwas, verändert sich der Inhalt, während man nur hineinschaut —
- * und gespeichert wird etwas anderes als das, was auf dem Schirm stand.
+ * Hier standen einmal Tests fuer ein Komma-Textfeld — und sie waren gruen, waehrend das
+ * Feld unbenutzbar war. Geprueft war nur der fertige Zustand
+ * `['Paare','Trauma'] -> "Paare, Trauma" -> zurueck`. Beim Tippen ist der Zwischenstand
+ * aber `"Paare,"`, und genau den frass die Umwandlung. Die Lehre steckt jetzt im Bauteil
+ * (TagInput behaelt seinen Entwurfstext selbst) und in `tagHinzufuegen` unten.
  *
- * Der AVV-Zustand hat drei Werte, nicht zwei. Ein Institut schließt keinen Vertrag nach
- * Art. 28 ab; „offen" wäre dort eine erfundene Baustelle, die niemand je erledigen kann.
+ * Der AVV-Zustand hat drei Werte, nicht zwei. Ein Institut schliesst keinen Vertrag nach
+ * Art. 28 ab; „offen" waere dort eine erfundene Baustelle, die niemand je erledigen kann.
  */
 import { describe, expect, it } from 'vitest'
-import { LINK_MARKE, SETTINGS, linkStelleFehlt, listeAusText, settingUmschalten, textAusListe } from '../src/admin/felder'
+import { LINK_MARKE, SETTINGS, linkStelleFehlt, settingUmschalten } from '../src/admin/felder'
+import { tagHinzufuegen } from '../src/components/directory/TagInput'
 import { avvZustand } from '../src/admin/UsersPage'
 
-describe('Listenfelder', () => {
-  it('trennt an Kommas und raeumt Leerraum weg', () => {
-    expect(listeAusText('Paare,  Trauma , Angst')).toEqual(['Paare', 'Trauma', 'Angst'])
+describe('Eintrag in eine Liste aufnehmen', () => {
+  it('raeumt Leerraum weg', () => {
+    expect(tagHinzufuegen([], '  Paare  ')).toEqual(['Paare'])
   })
 
-  it('wirft leere Stuecke weg statt sie zu speichern', () => {
-    // Das Komma am Ende entsteht beim Tippen staendig. Ohne diese Regel entstuende ein
-    // leerer Schwerpunkt, der spaeter als leeres Etikett im Profil auftaucht.
-    expect(listeAusText('Paare, , Trauma,')).toEqual(['Paare', 'Trauma'])
-    expect(listeAusText('   ')).toEqual([])
+  it('nimmt nichts Leeres auf', () => {
+    // Sonst entstuende ein leeres Etikett im oeffentlichen Profil.
+    expect(tagHinzufuegen(['Paare'], '   ')).toEqual(['Paare'])
+    expect(tagHinzufuegen(['Paare'], '')).toEqual(['Paare'])
   })
 
-  it('ueberlebt den Weg hin und zurueck unveraendert', () => {
-    // Der eigentliche Punkt: Was beim Tippen durch beide Richtungen laeuft, muss
-    // stabil sein - sonst wandert der Text unter den Fingern.
-    const liste = ['Paare', 'Trauma', 'Angst']
-    expect(listeAusText(textAusListe(liste))).toEqual(liste)
+  it('nimmt nichts doppelt auf', () => {
+    expect(tagHinzufuegen(['Paare'], 'Paare')).toEqual(['Paare'])
   })
 
-  it('kommt mit fehlender Liste zurecht', () => {
-    expect(textAusListe(null)).toBe('')
-    expect(textAusListe(undefined)).toBe('')
+  it('haengt hinten an und laesst Vorhandenes stehen', () => {
+    expect(tagHinzufuegen(['Paare'], 'Trauma')).toEqual(['Paare', 'Trauma'])
+  })
+
+  it('gibt bei Ablehnung dieselbe Liste zurueck', () => {
+    // Damit ein abgelehnter Eintrag keine ueberfluessige Neuzeichnung ausloest.
+    const vorher = ['Paare']
+    expect(tagHinzufuegen(vorher, 'Paare')).toBe(vorher)
   })
 })
 
