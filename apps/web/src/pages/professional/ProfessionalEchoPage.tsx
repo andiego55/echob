@@ -22,6 +22,7 @@ import { useAntwortStrom } from '@/lib/antwortStrom'
 import { mitlaufen } from '@/lib/mitlaufen'
 import type { ProfessionalEchoMessage } from '@/types'
 import type { EchoChatResult } from '@/api/professional'
+import KiHinweis from '@/components/KiHinweis'
 
 const SUGGESTIONS = [
   'Welche Themen tauchen im freigegebenen Material auf?',
@@ -398,6 +399,8 @@ export default function ProfessionalEchoPage() {
                     <button onClick={send} disabled={strom.beschaeftigt || !input.trim() || locked} className="btn-primary !px-5 !text-sm">Senden</button>
                   </div>
                 </div>
+                {/* Art. 50 KI-VO: am Eingabefeld, nicht in einem Dokument. */}
+                <KiHinweis className="mt-2" />
                 {messages.length > 0 && (
                   <div className="mt-2 flex gap-3">
                     <button onClick={() => summaryGen.mutate()} disabled={summaryGen.isPending || !activeSession}

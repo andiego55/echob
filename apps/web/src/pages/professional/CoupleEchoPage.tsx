@@ -14,6 +14,7 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { professionalApi } from '@/api/professional'
 import type { CoupleReportListItem, ProfessionalEchoMessage } from '@/types'
+import KiHinweis from '@/components/KiHinweis'
 
 function fmtDay(iso: string): string {
   return new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' })
@@ -193,6 +194,8 @@ export default function CoupleEchoPage() {
                   <button onClick={() => send()} disabled={chat.isPending || !input.trim()}
                     className="btn-primary !px-5 !text-sm self-end">Senden</button>
                 </div>
+                {/* Art. 50 KI-VO: am Eingabefeld, nicht in einem Dokument. */}
+                <KiHinweis className="mt-2" />
               </div>
             </div>
 

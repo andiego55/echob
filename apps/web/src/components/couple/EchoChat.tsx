@@ -32,6 +32,7 @@ import type { Zug } from './Weiterfuehren'
 import { abmachungsvorschlaege } from './abmachungsvorschlaege'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import ZumEndeKnopf from '@/components/app/ZumEndeKnopf'
+import KiHinweis from '@/components/KiHinweis'
 
 export interface Impulsgruppe {
   gruppe: string
@@ -423,6 +424,8 @@ export default function EchoChat({
               </span>
             </div>
             <Fehlermeldung error={send.error ?? abschliessen.error} />
+            {/* Art. 50 KI-VO: am Eingabefeld, nicht in einem Dokument. */}
+            <KiHinweis className="mt-2" />
           </form>
         )}
       </div>

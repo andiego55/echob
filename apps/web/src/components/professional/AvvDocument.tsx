@@ -12,7 +12,7 @@
 
 /** Frontend-Kennung des hier hinterlegten Vertragstexts. Muss mit CURRENT_AVV_VERSION
  *  im Backend (agreement_service.py) übereinstimmen. Bei Textänderungen beide erhöhen. */
-export const AVV_DOC_VERSION = 'avv-2026-07'
+export const AVV_DOC_VERSION = 'avv-2026-09'
 
 function H({ children }: { children: React.ReactNode }) {
   return <h3 className="mt-6 text-[15px] font-bold text-navy">{children}</h3>
@@ -137,7 +137,42 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         erforderlich auf Inhalte zu.
       </P>
 
-      <H>5. Technische und organisatorische Maßnahmen (Art. 32, lit. c)</H>
+      <H>5. Berufsgeheimnis und Schweigepflicht (§ 203 StGB)</H>
+      <P>
+        Dieser Abschnitt gilt, soweit die Verantwortliche einer strafbewehrten Schweigepflicht
+        unterliegt — etwa als Psychotherapeutin oder Psychotherapeut, als Berufspsychologin
+        oder Berufspsychologe mit staatlich anerkannter wissenschaftlicher Abschlussprüfung
+        oder als Angehörige eines anderen Heilberufs im Sinne des § 203 Abs. 1 StGB. Für
+        beratende und coachende Tätigkeiten ohne solche Pflicht ist er gegenstandslos.
+      </P>
+      <P>
+        Der Auftragsverarbeiter ist <strong className="text-navy">mitwirkende Person</strong> im
+        Sinne des § 203 Abs. 3 Satz 2 StGB. Er ist über die Schweigepflicht belehrt und
+        verpflichtet sich, fremde Geheimnisse, die ihm im Rahmen dieses Vertrages bekannt
+        werden, nicht unbefugt zu offenbaren. Die Verpflichtung besteht über das Ende dieses
+        Vertrages hinaus fort und gilt auch nach Beendigung der Tätigkeit.
+      </P>
+      <P>
+        Der Auftragsverarbeiter verpflichtet die von ihm eingesetzten Personen und
+        Unterauftragsverarbeiter in gleicher Weise (§ 203 Abs. 4 Satz 1 StGB) und setzt nur
+        solche ein, die zur Wahrung der Vertraulichkeit verpflichtet sind. Er trifft die zur
+        Verhinderung einer unbefugten Offenbarung erforderlichen Vorkehrungen; diese sind in
+        Abschnitt 6 beschrieben.
+      </P>
+      <P>
+        <strong className="text-navy">Datenminimierung gegenüber der KI:</strong> An das
+        Sprachmodell werden ausschließlich die freigegebenen Inhalte übermittelt — ohne Namen,
+        ohne Kontokennung und ohne Kennung der nutzenden Person. Klient:innen werden über
+        selbst gewählte Pseudonyme geführt. Welche Inhalte übermittelt werden, ist für die
+        Verantwortliche vor jeder Anfrage einsehbar.
+      </P>
+      <P>
+        Die Verantwortliche entscheidet in eigener Verantwortung, dass die Einbeziehung des
+        Auftragsverarbeiters für ihre Berufsausübung erforderlich ist (§ 203 Abs. 3 Satz 2
+        StGB), und gibt nur solche Inhalte frei, die dafür erforderlich sind.
+      </P>
+
+      <H>6. Technische und organisatorische Maßnahmen (Art. 32, lit. c)</H>
       <P>Der Auftragsverarbeiter unterhält dem Risiko angemessene Maßnahmen, insbesondere:</P>
       <ul className="mt-2 list-disc space-y-1 pl-5">
         <LI>Transportverschlüsselung (TLS) für alle Verbindungen;</LI>
@@ -158,7 +193,7 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         <LI>Sicherheits-Header und Content-Security-Policy.</LI>
       </ul>
 
-      <H>6. Unterauftragsverarbeiter (Art. 28 Abs. 2 und 4)</H>
+      <H>7. Unterauftragsverarbeiter (Art. 28 Abs. 2 und 4)</H>
       <P>
         Die Verantwortliche erteilt mit Abschluss dieses Vertrags ihre{' '}
         <strong className="text-navy">allgemeine Genehmigung</strong> zum Einsatz der
@@ -196,7 +231,7 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         Verantwortlicher – nicht die diesem Vertrag unterliegenden Klient-Daten.
       </P>
 
-      <H>7. Drittlandtransfer (Kapitel V DSGVO)</H>
+      <H>8. Drittlandtransfer (Kapitel V DSGVO)</H>
       <P>
         Soweit Daten in die USA übermittelt werden (insbesondere an OpenAI zur KI-Verarbeitung),
         stützt sich die Übermittlung auf das EU-U.S. Data Privacy Framework (Angemessenheits­beschluss
@@ -205,7 +240,7 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         Verantwortliche wird hierüber transparent informiert.
       </P>
 
-      <H>8. Unterstützung bei Betroffenenrechten (lit. e)</H>
+      <H>9. Unterstützung bei Betroffenenrechten (lit. e)</H>
       <P>
         Der Auftragsverarbeiter unterstützt die Verantwortliche mit geeigneten technischen und
         organisatorischen Maßnahmen bei der Erfüllung von Betroffenenrechten (Auskunft,
@@ -213,7 +248,7 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         betroffener Personen leitet er unverzüglich an die Verantwortliche weiter.
       </P>
 
-      <H>9. Unterstützung bei Sicherheit und Meldepflichten (lit. f, Art. 32–36)</H>
+      <H>10. Unterstützung bei Sicherheit und Meldepflichten (lit. f, Art. 32–36)</H>
       <P>
         Der Auftragsverarbeiter unterstützt die Verantwortliche bei der Einhaltung der Pflichten
         aus Art. 32–36 und meldet ihm bekannt gewordene Verletzungen des Schutzes
@@ -221,7 +256,7 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         Benachrichtigungspflichten (Art. 33, 34) erfüllen kann.
       </P>
 
-      <H>10. Löschung oder Rückgabe nach Auftragsende (lit. g)</H>
+      <H>11. Löschung oder Rückgabe nach Auftragsende (lit. g)</H>
       <P>
         Nach Beendigung der Verarbeitung löscht der Auftragsverarbeiter die Daten oder gibt sie
         zurück, nach Wahl der Verantwortlichen, sofern keine gesetzliche Aufbewahrungspflicht
@@ -229,14 +264,14 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         eine Verbindung, endet der Zugriff über die Plattform unmittelbar.
       </P>
 
-      <H>11. Nachweise und Überprüfungen (lit. h)</H>
+      <H>12. Nachweise und Überprüfungen (lit. h)</H>
       <P>
         Der Auftragsverarbeiter stellt der Verantwortlichen die zum Nachweis der Einhaltung
         dieser Pflichten erforderlichen Informationen zur Verfügung und ermöglicht angemessene
         Überprüfungen.
       </P>
 
-      <H>12. Laufzeit</H>
+      <H>13. Laufzeit</H>
       <P>
         Der Vertrag gilt für die Dauer der Nutzung des Fachpersonen-Zugangs. Er kann durch eine
         aktualisierte Fassung ersetzt werden; in diesem Fall ist die Zustimmung zur neuen Version
@@ -246,7 +281,9 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
 
       <p className="mt-6 border-t border-brand-border pt-4 text-xs leading-relaxed text-brand-muted">
         Hinweis: Dieser Entwurf ersetzt keine Rechtsberatung. Verbindlich ist die anwaltlich
-        geprüfte Endfassung. Fragen zur Auftragsverarbeitung: kontakt@echo-b.de.
+        geprüfte Endfassung — das gilt besonders für Abschnitt 5, dessen strafrechtliche
+        Reichweite gerade bei KI-Unterauftragsverarbeitern noch nicht abschließend geklärt ist.
+        Fragen zur Auftragsverarbeitung: kontakt@echo-b.de.
       </p>
     </div>
   )

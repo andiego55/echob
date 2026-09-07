@@ -23,7 +23,7 @@ import asyncpg
 # Aktuell gültige AVV-Version. Bei jeder inhaltlichen Änderung des Vertragstextes
 # hochzählen (Frontend-Dokument + dieser Wert gehören zusammen) → alle Fachpersonen
 # müssen neu zustimmen. Format: 'avv-JJJJ-MM'.
-CURRENT_AVV_VERSION = "avv-2026-07"
+CURRENT_AVV_VERSION = "avv-2026-09"
 
 # Vertragsarten, die eine Fachperson akzeptieren muss, bevor sie Klient-Daten verarbeitet.
 _KIND_AVV = "avv"

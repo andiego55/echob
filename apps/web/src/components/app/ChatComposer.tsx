@@ -4,6 +4,7 @@
  * Enter sendet, Shift+Enter macht eine neue Zeile.
  */
 import { useEffect, useRef } from 'react'
+import KiHinweis from '@/components/KiHinweis'
 
 interface Props {
   value: string
@@ -94,6 +95,10 @@ export default function ChatComposer({
       {hint && (
         <p className="mt-2 text-center text-[11px] text-brand-muted/60">{hint}</p>
       )}
+
+      {/* Art. 50 KI-VO: gehoert an das Eingabefeld, nicht in ein Dokument, das man
+          vorher haette lesen koennen. Hier deckt eine Stelle zwoelf Chats ab. */}
+      <KiHinweis className="mt-2" />
     </div>
   )
 }
