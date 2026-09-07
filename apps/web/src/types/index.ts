@@ -910,6 +910,10 @@ export interface ProfessionalProfile {
   title: string | null
   created_at: string
   // Auftragsverarbeitung (Art. 28 DSGVO) — steuert das AVV-Zustimmungs-Gate
+  /** Berufsgruppe; `unterliegt_203` hat drei Zustaende - null heisst ungeklaert. */
+  profession_group?: string | null
+  profession_group_label?: string | null
+  unterliegt_203?: boolean | null
   avv_current_version?: string | null
   avv_accepted?: boolean
   avv_accepted_version?: string | null
@@ -966,6 +970,8 @@ export interface ShareCreate {
   message?: string | null
   consent?: boolean
   consent_version?: string
+  /** Wortlaut, wie er angezeigt wurde - der eigentliche Nachweis (Art. 7 Abs. 1 DSGVO). */
+  consent_text?: string
 }
 
 export interface InboxItem {

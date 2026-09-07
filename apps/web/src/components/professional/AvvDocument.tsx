@@ -153,11 +153,22 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         Vertrages hinaus fort und gilt auch nach Beendigung der Tätigkeit.
       </P>
       <P>
-        Der Auftragsverarbeiter verpflichtet die von ihm eingesetzten Personen und
-        Unterauftragsverarbeiter in gleicher Weise (§ 203 Abs. 4 Satz 1 StGB) und setzt nur
-        solche ein, die zur Wahrung der Vertraulichkeit verpflichtet sind. Er trifft die zur
-        Verhinderung einer unbefugten Offenbarung erforderlichen Vorkehrungen; diese sind in
-        Abschnitt 6 beschrieben.
+        <strong className="text-navy">Belehrung.</strong> Der Auftragsverarbeiter ist darüber
+        belehrt, dass die unbefugte Offenbarung eines fremden Geheimnisses, das ihm in dieser
+        Eigenschaft bekannt geworden ist, nach § 203 Abs. 4 StGB mit Freiheitsstrafe bis zu
+        einem Jahr oder mit Geldstrafe bestraft werden kann. Er hat die von ihm eingesetzten
+        Personen entsprechend belehrt.
+      </P>
+      <P>
+        <strong className="text-navy">Weitergabe der Verpflichtung.</strong> Der
+        Auftragsverarbeiter verpflichtet die von ihm eingesetzten Personen und die in
+        Abschnitt 7 benannten Unterauftragsverarbeiter in gleicher Weise (§ 203 Abs. 4 Satz 1
+        StGB). Setzt ein Unterauftragsverarbeiter seinerseits weitere Personen ein, ist die
+        Verpflichtung bis zur zuletzt eingesetzten Person fortzusetzen; der
+        Auftragsverarbeiter wirkt darauf hin und weist dies auf Verlangen nach. Er setzt nur
+        Unterauftragsverarbeiter ein, die zur Wahrung der Vertraulichkeit verpflichtet sind,
+        und trifft die zur Verhinderung einer unbefugten Offenbarung erforderlichen
+        Vorkehrungen; diese sind in Abschnitt 6 beschrieben.
       </P>
       <P>
         <strong className="text-navy">Datenminimierung gegenüber der KI:</strong> An das
@@ -167,9 +178,19 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
         Verantwortliche vor jeder Anfrage einsehbar.
       </P>
       <P>
-        Die Verantwortliche entscheidet in eigener Verantwortung, dass die Einbeziehung des
-        Auftragsverarbeiters für ihre Berufsausübung erforderlich ist (§ 203 Abs. 3 Satz 2
-        StGB), und gibt nur solche Inhalte frei, die dafür erforderlich sind.
+        <strong className="text-navy">Erforderlichkeit.</strong> Die Verantwortliche
+        entscheidet in eigener Verantwortung, dass die Einbeziehung des Auftragsverarbeiters
+        für ihre Berufsausübung erforderlich ist (§ 203 Abs. 3 Satz 2 StGB). Sie gibt nur
+        solche Inhalte frei und veranlasst nur solche Verarbeitungen, die dafür erforderlich
+        sind. Eine darüber hinausgehende Offenbarung ist von dieser Vereinbarung nicht
+        gedeckt.
+      </P>
+      <P>
+        <strong className="text-navy">Verhältnis zur Einwilligung der Klient:in.</strong> Diese
+        Vereinbarung tritt neben die Erklärung, die die Klient:in bei der Freigabe abgibt. Dort
+        entbindet sie die Fachperson ausdrücklich insoweit von der Schweigepflicht, als es für
+        die Verarbeitung der freigegebenen Inhalte erforderlich ist. Beide Grundlagen stehen
+        nebeneinander; keine ersetzt die andere.
       </P>
 
       <H>6. Technische und organisatorische Maßnahmen (Art. 32, lit. c)</H>

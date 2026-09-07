@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { professionalApi } from '@/api/professional'
 import { useProfessional, Spinner } from '@/components/auth/ProfessionalRoute'
+import BerufsgruppeFeld from '@/components/professional/BerufsgruppeFeld'
 
 export default function ProfessionalRegisterPage() {
   const { session, loading } = useAuth()
@@ -17,9 +18,14 @@ export default function ProfessionalRegisterPage() {
 
   const [displayName, setDisplayName] = useState('')
   const [title, setTitle] = useState('')
+  const [gruppe, setGruppe] = useState<string | null>(null)
 
   const mutation = useMutation({
-    mutationFn: () => professionalApi.register({ display_name: displayName.trim(), title: title.trim() || null }),
+    mutationFn: () => professionalApi.register({
+      display_name: displayName.trim(),
+      title: title.trim() || null,
+      profession_group: gruppe,
+    }),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ['professional-me'] })
       navigate('/professional', { replace: true })
@@ -72,6 +78,8 @@ export default function ProfessionalRegisterPage() {
                 className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent"
               />
             </div>
+
+            <BerufsgruppeFeld wert={gruppe} onAendern={setGruppe} />
 
             {mutation.isError && (
               <p className="rounded-brand border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">

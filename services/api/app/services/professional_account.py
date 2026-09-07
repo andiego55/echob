@@ -23,6 +23,7 @@ from typing import Any
 
 import asyncpg
 
+from app.core import berufsgruppen
 from app.services.demo_service import ensure_demo_for_professional
 from app.services.org_service import ensure_org_for_professional
 
@@ -34,6 +35,7 @@ async def ensure_professional_account(
     email: str | None,
     display_name: str,
     title: str | None = None,
+    profession_group: str | None = None,
 ) -> dict[str, Any]:
     """Legt Fachpersonen-Profil, Organisation und Spielwiese an (idempotent).
 
@@ -45,17 +47,21 @@ async def ensure_professional_account(
     existing = await conn.fetchrow(
         "SELECT id FROM professional_profiles WHERE user_id = $1", user_id
     )
+    # Eine einmal gesetzte Berufsgruppe wird nicht durch ein leeres Feld ueberschrieben:
+    # Die Bereitstellung durch das Admin kennt sie nicht, die Fachperson schon.
+    gruppe = profession_group if berufsgruppen.ist_gueltig(profession_group) else None
     if existing:
         row = await conn.fetchrow(
             "UPDATE professional_profiles SET display_name = $2, title = $3, "
-            "email = COALESCE(email, $4), updated_at = NOW() WHERE user_id = $1 RETURNING *",
-            user_id, display_name, title, mail,
+            "email = COALESCE(email, $4), profession_group = COALESCE($5, profession_group), "
+            "updated_at = NOW() WHERE user_id = $1 RETURNING *",
+            user_id, display_name, title, mail, gruppe,
         )
     else:
         row = await conn.fetchrow(
-            "INSERT INTO professional_profiles (user_id, email, display_name, title) "
-            "VALUES ($1, $2, $3, $4) RETURNING *",
-            user_id, mail, display_name, title,
+            "INSERT INTO professional_profiles (user_id, email, display_name, title, profession_group) "
+            "VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            user_id, mail, display_name, title, gruppe,
         )
         # Offene Einladungen an diese Adresse verknüpfen. Nur beim ersten Mal: Wer
         # schon Fachperson war, hat seine Einladungen längst.

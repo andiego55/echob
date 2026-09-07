@@ -124,9 +124,17 @@ export const professionalApi = {
   // Rolle / Profil
   me: () =>
     apiClient.get<ProfessionalProfile>('/professional/me').then(r => r.data),
-  register: (data: { display_name: string; title?: string | null }) =>
+  register: (data: { display_name: string; title?: string | null; profession_group?: string | null }) =>
     apiClient.post<ProfessionalProfile>('/professional/register', data).then(r => r.data),
   /** AVV (Art. 28) abschließen — akzeptiert die angezeigte Vertragsversion (Nachweis serverseitig). */
+  /** Berufsgruppen samt Folge fuer die Schweigepflicht - kommt vom Server, nicht aus dem Formular. */
+  berufsgruppen: () =>
+    apiClient.get<{ id: string; label: string; unterliegt_203: boolean | null; begruendung: string }[]>(
+      '/professional/berufsgruppen').then(r => r.data),
+  setBerufsgruppe: (profession_group: string | null) =>
+    apiClient.put<ProfessionalProfile>('/professional/berufsgruppe', { profession_group })
+      .then(r => r.data),
+
   acceptAgreement: (version: string) =>
     apiClient.post<ProfessionalProfile>('/professional/agreements/accept', { version }).then(r => r.data),
 

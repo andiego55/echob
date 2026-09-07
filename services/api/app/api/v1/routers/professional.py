@@ -13,10 +13,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel as _BaseModel
 
-from app.core import crypto
+from app.core import berufsgruppen, crypto
 from app.core.dependencies import get_current_professional, get_current_user, get_pool
 from app.schemas.professional import (
     AgreementAccept,
+    BerufsgruppeUpdate,
     DiscoverableUpdate,
     GlossaryTerm,
     InboxItem,
@@ -143,6 +144,21 @@ def _public_profile(row):
 
 # ── Rolle / Profil ────────────────────────────────────────────────────────────
 
+def _mit_berufsgruppe(profil: dict) -> dict:
+    """Reichert die Profilzeile um die abgeleiteten Felder der Berufsgruppe an.
+
+    Steht getrennt, weil das Profil aus mehreren Endpunkten zurueckkommt und eine
+    vergessene Stelle bedeuten wuerde: Das Frontend sieht keine Berufsgruppe und haelt
+    die Fachperson faelschlich fuer nicht schweigepflichtig.
+    """
+    gruppe = profil.get("profession_group")
+    return {
+        **profil,
+        "profession_group_label": berufsgruppen.label(gruppe) if gruppe else None,
+        "unterliegt_203": berufsgruppen.unterliegt_203(gruppe),
+    }
+
+
 async def _avv_abgeschlossen(conn, pid) -> bool:
     """Art. 28 DSGVO: Ohne Vertrag nur die Spielwiese, keine echten Klientendaten.
 
@@ -171,7 +187,7 @@ async def get_me(
     """
     async with pool.acquire() as conn:
         await ensure_demo_for_professional(current["user_id"], conn)
-    return ProfessionalProfileResponse(**current["professional"], **current["avv"])
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(current["professional"]), **current["avv"])
 
 
 @router.post("/register", response_model=ProfessionalProfileResponse)
@@ -190,8 +206,49 @@ async def register(
             email=current_user.get("email"),
             display_name=body.display_name,
             title=body.title,
+            profession_group=body.profession_group,
         )
-    return ProfessionalProfileResponse(**row)
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(row))
+
+
+@router.put("/berufsgruppe", response_model=ProfessionalProfileResponse)
+async def set_berufsgruppe(
+    body: BerufsgruppeUpdate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalProfileResponse:
+    """Berufsgruppe setzen oder ändern.
+
+    An ihr hängt, ob § 203 StGB gilt — und damit, welche Vertragsbausteine die Fachperson
+    braucht. Sie ist bewusst nachträglich änderbar: Bei einer Bereitstellung durch das
+    Admin ist sie unbekannt, und niemand soll sie raten müssen.
+    """
+    gruppe = body.profession_group
+    if gruppe is not None and not berufsgruppen.ist_gueltig(gruppe):
+        raise HTTPException(status_code=422, detail="Unbekannte Berufsgruppe.")
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE professional_profiles SET profession_group = $2, updated_at = NOW() "
+            "WHERE user_id = $1 RETURNING *",
+            current["user_id"], gruppe,
+        )
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(dict(row)), **current["avv"])
+
+
+@router.get("/berufsgruppen")
+async def list_berufsgruppen(
+    _current: dict = Depends(get_current_professional),
+) -> list[dict]:
+    """Die auswählbaren Berufsgruppen samt Folge für die Schweigepflicht.
+
+    Kommt vom Server, damit die Liste nicht im Formular mitwandert: Die Zuordnung ist
+    eine rechtliche Aussage, keine Beschriftung.
+    """
+    return [
+        {"id": kennung, "label": beschriftung,
+         "unterliegt_203": pflicht, "begruendung": grund}
+        for kennung, (beschriftung, pflicht, grund) in berufsgruppen.BERUFSGRUPPEN.items()
+    ]
 
 
 @router.post("/agreements/accept", response_model=ProfessionalProfileResponse)
@@ -222,7 +279,7 @@ async def accept_agreement(
                 status_code=400,
                 detail="Diese Vertragsversion ist nicht mehr aktuell. Bitte lade die Seite neu.",
             )
-    return ProfessionalProfileResponse(**current["professional"], **avv)
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(current["professional"]), **avv)
 
 
 # ── Auffindbarkeit + Verbindungsanfragen (Opt-in) ─────────────────────────────
@@ -240,7 +297,7 @@ async def set_discoverable(
             "WHERE user_id = $2 RETURNING *",
             body.discoverable, current["user_id"],
         )
-    return ProfessionalProfileResponse(**dict(row), **current["avv"])
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(dict(row)), **current["avv"])
 
 
 @router.get("/requests", response_model=list[IncomingRequest])

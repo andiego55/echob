@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@/components/settings/EchoSteeringForm'
 import AvvDocument, { AVV_DOC_VERSION } from '@/components/professional/AvvDocument'
+import BerufsgruppeFeld from '@/components/professional/BerufsgruppeFeld'
 import { apiErrorMessage } from '@/api/errors'
 import { professionalApi } from '@/api/professional'
 
@@ -60,7 +61,7 @@ export default function ProfessionalSettingsPage() {
           Hier stimmst du Echo auf deine Arbeitsweise ab. Weitere Einstellungen folgen.
         </p>
 
-        <div id="avv" className="mt-8 card scroll-mt-24">
+    <div className="mt-8 card">
           <h2 className="text-lg font-semibold text-navy">Therapeutischer Ansatz für Echo</h2>
           <p className="mt-1 text-sm text-brand-muted">
             Prägt nur den Stil, in dem Echo dich bei der Fallvorbereitung unterstützt
@@ -94,9 +95,44 @@ export default function ProfessionalSettingsPage() {
 
         <PracticeSection />
         <BillingSection />
+        <BerufsgruppeSection />
         <AgreementSection />
       </div>
     </ProfessionalShell>
+  )
+}
+
+/** Berufsgruppe: entscheidet, ob § 203 StGB gilt — und damit, was der Vertrag leisten muss. */
+function BerufsgruppeSection() {
+  const qc = useQueryClient()
+  const { data: me } = useQuery({ queryKey: ['professional-me'], queryFn: professionalApi.me })
+
+  const speichern = useMutation({
+    mutationFn: (g: string | null) => professionalApi.setBerufsgruppe(g),
+    onSuccess: (profil) => qc.setQueryData(['professional-me'], profil),
+  })
+
+  return (
+    <div className="mt-8 card">
+      <h2 className="text-lg font-semibold text-navy">Berufsgruppe</h2>
+      <p className="mt-1 mb-4 text-sm text-brand-muted">
+        Sie entscheidet, welche Vereinbarungen für die Zusammenarbeit gelten — insbesondere,
+        ob die strafbewehrte Schweigepflicht nach § 203 StGB greift. Jederzeit änderbar.
+      </p>
+      <div className="max-w-md">
+        <BerufsgruppeFeld
+          wert={me?.profession_group}
+          disabled={speichern.isPending}
+          onAendern={(g) => speichern.mutate(g)}
+        />
+      </div>
+      {speichern.isError && (
+        <p className="mt-2 text-sm text-red-600">
+          {apiErrorMessage(speichern.error, 'Speichern fehlgeschlagen.')}
+        </p>
+      )}
+      {speichern.isSuccess && <p className="mt-2 text-sm text-green-700">Gespeichert ✓</p>}
+    </div>
   )
 }
 
@@ -121,7 +157,7 @@ function AgreementSection() {
     })
 
   return (
-    <div className="mt-8 card">
+    <div id="avv" className="mt-8 card scroll-mt-24">
       <h2 className="text-lg font-semibold text-navy">Auftragsverarbeitung (AVV)</h2>
       <p className="mt-1 text-sm text-brand-muted">
         Wenn Klient:innen Inhalte für Sie freigeben, sind Sie die Verantwortliche und EchoB ist Ihr
@@ -168,8 +204,10 @@ function AgreementSection() {
             />
             <span>
               Ich schließe als Verantwortliche den vorstehenden Auftragsverarbeitungsvertrag
-              (Version {version}) mit EchoB ab und genehmige die dort
-              genannten Unterauftragsverarbeiter.
+              (Version {version}) mit EchoB ab, <strong>erteile die dokumentierte Weisung</strong>,
+              die von meinen Klient:innen freigegebenen Inhalte für die von mir genutzten
+              KI-Funktionen zu verarbeiten, und genehmige die dort genannten
+              Unterauftragsverarbeiter.
             </span>
           </label>
           <div className="mt-4 flex flex-wrap items-center gap-3">

@@ -14,6 +14,7 @@ import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import { EINWILLIGUNG_FASSUNG, einwilligungsAbsaetze, einwilligungsText } from '@/lib/einwilligung'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
@@ -202,8 +203,8 @@ function ConnectionsCard() {
 
 // ── Neue Freigabe ───────────────────────────────────────────────────────────
 
-// Version des Einwilligungstexts (bei inhaltlicher Änderung hochzählen – wird protokolliert).
-const SHARE_CONSENT_VERSION = 'share-2026-07'
+// Fassung und Wortlaut stehen in lib/einwilligung — eine Quelle für Anzeige und
+// Nachweis. Frueher stand der Text nur hier im JSX und wurde nie gespeichert.
 
 function NewShareCard({ caseId, accepted, shares, scenes }: {
   caseId: string
@@ -254,7 +255,9 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
         scene_ids: allScenes ? [] : sceneIds,
         message: message.trim() || null,
         consent: true,
-        consent_version: SHARE_CONSENT_VERSION,
+        consent_version: EINWILLIGUNG_FASSUNG,
+        // Genau der Text, der oben stand — nicht eine zweite Fassung davon.
+        consent_text: einwilligungsText(selProName),
       })
     },
     onSuccess: () => {
@@ -339,11 +342,10 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
             <label className="mt-4 flex cursor-pointer gap-3 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3">
               <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 shrink-0 accent-accent" />
               <span className="text-xs leading-relaxed text-brand-text">
-                Ich willige ausdrücklich ein, dass die ausgewählten Inhalte an <strong>{selProName}</strong> freigegeben werden.
-                Mir ist bewusst, dass die Fachperson sie in EchoB einsehen und – auch <strong>KI-gestützt (Echo)</strong> – verarbeiten kann;
-                die KI-Verarbeitung erfolgt derzeit über einen Dienstleister in den <strong>USA</strong>.
-                Ich kann diese Einwilligung jederzeit widerrufen. Details in der{' '}
-                <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Datenschutzerklärung</a>.
+                {einwilligungsAbsaetze(selProName).map((absatz, i) => (
+                  <span key={i} className="mb-1.5 block last:mb-0">{absatz}</span>
+                ))}
+                <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Datenschutzerklärung öffnen</a>
               </span>
             </label>
           )}

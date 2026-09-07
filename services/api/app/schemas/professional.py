@@ -28,6 +28,12 @@ class ProfessionalProfileResponse(BaseModel):
     title: str | None = None
     created_at: datetime
 
+    # Berufsgruppe und was daraus folgt. `unterliegt_203` hat drei Zustaende:
+    # true / false / null - "nicht geklaert" ist kein "nein".
+    profession_group: str | None = None
+    profession_group_label: str | None = None
+    unterliegt_203: bool | None = None
+
     # Auftragsverarbeitung (Art. 28 DSGVO): steuert das AVV-Zustimmungs-Gate.
     avv_current_version: str | None = None
     avv_accepted: bool = False
@@ -43,6 +49,14 @@ class ProfessionalProfileResponse(BaseModel):
 class ProfessionalRegister(BaseModel):
     display_name: str = Field(..., min_length=1, max_length=120)
     title: str | None = Field(None, max_length=160)
+    # Entscheidet ueber die Anwendbarkeit von § 203 StGB (siehe core/berufsgruppen.py).
+    # Optional: Bestandskonten haben sie nicht, und eine erfundene Voreinstellung waere
+    # schlimmer als eine fehlende Angabe.
+    profession_group: str | None = Field(None, max_length=40)
+
+
+class BerufsgruppeUpdate(BaseModel):
+    profession_group: str | None = Field(None, max_length=40)
 
 
 class AgreementAccept(BaseModel):
@@ -112,6 +126,10 @@ class ShareCreate(BaseModel):
     message: str | None = Field(None, max_length=2000)
     consent: bool = False                                  # ausdrueckliche Einwilligung (Pflicht)
     consent_version: str | None = Field(None, max_length=64)
+    # Der Wortlaut, wie er der Person angezeigt wurde. Eine Fassungskennung allein
+    # belegt nicht, WOZU eingewilligt wurde - dafuer muesste man den damaligen
+    # Quellcode-Stand rekonstruieren. Art. 7 Abs. 1 DSGVO verlangt den Nachweis.
+    consent_text: str | None = Field(None, max_length=4000)
 
 
 class ShareUpdate(BaseModel):

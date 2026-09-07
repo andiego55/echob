@@ -108,6 +108,15 @@ async def create_share(
             status_code=400,
             detail="Für die Freigabe ist deine ausdrückliche Einwilligung erforderlich.",
         )
+    # Art. 7 Abs. 1 DSGVO: Die Einwilligung muss NACHWEISBAR sein, und der Nachweis ist
+    # eine Aussage über den Text, nicht über eine Fassungskennung. Ohne den Wortlaut
+    # müsste man in zwei Jahren den damaligen Quellcode-Stand rekonstruieren und darauf
+    # vertrauen, dass die Kennung damals mit hochgezählt wurde.
+    if not (body.consent_text or "").strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Der Wortlaut der Einwilligung fehlt. Bitte lade die Seite neu.",
+        )
     async with pool.acquire() as conn:
         await _require_owned_case(conn, case_id, uid)
         connected = await conn.fetchrow(
@@ -124,14 +133,17 @@ async def create_share(
             share = await conn.fetchrow(
                 """
                 INSERT INTO case_shares
-                  (case_id, owner_user_id, professional_user_id, status, message, consent_version, consented_at)
-                VALUES ($1, $2, $3, 'active', $4, $5, NOW())
+                  (case_id, owner_user_id, professional_user_id, status, message,
+                   consent_version, consent_text, consented_at)
+                VALUES ($1, $2, $3, 'active', $4, $5, $6, NOW())
                 ON CONFLICT (case_id, professional_user_id) DO UPDATE SET
                   status = 'active', message = EXCLUDED.message, updated_at = NOW(), revoked_at = NULL,
-                  consent_version = EXCLUDED.consent_version, consented_at = NOW()
+                  consent_version = EXCLUDED.consent_version,
+                  consent_text = EXCLUDED.consent_text, consented_at = NOW()
                 RETURNING *
                 """,
-                case_id, uid, body.professional_user_id, body.message, body.consent_version,
+                case_id, uid, body.professional_user_id, body.message,
+                body.consent_version, body.consent_text.strip(),
             )
             await _set_elements(conn, share["id"], case_id, body.elements, body.scene_ids)
         return await _build_share_response(conn, share)
