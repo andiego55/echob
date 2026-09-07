@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@/components/settings/EchoSteeringForm'
-import AvvDocument from '@/components/professional/AvvDocument'
+import AvvDocument, { AVV_DOC_VERSION } from '@/components/professional/AvvDocument'
+import { apiErrorMessage } from '@/api/errors'
 import { professionalApi } from '@/api/professional'
 
 const PRO_APPROACHES: EchoModeOption[] = [
@@ -59,7 +60,7 @@ export default function ProfessionalSettingsPage() {
           Hier stimmst du Echo auf deine Arbeitsweise ab. Weitere Einstellungen folgen.
         </p>
 
-        <div className="mt-8 card">
+        <div id="avv" className="mt-8 card scroll-mt-24">
           <h2 className="text-lg font-semibold text-navy">Therapeutischer Ansatz für Echo</h2>
           <p className="mt-1 text-sm text-brand-muted">
             Prägt nur den Stil, in dem Echo dich bei der Fallvorbereitung unterstützt
@@ -101,8 +102,18 @@ export default function ProfessionalSettingsPage() {
 
 /** Auftragsverarbeitung (Art. 28 DSGVO): Status des abgeschlossenen AVV + einsehbares Dokument. */
 function AgreementSection() {
+  const qc = useQueryClient()
   const { data: me } = useQuery({ queryKey: ['professional-me'], queryFn: professionalApi.me })
   const [open, setOpen] = useState(false)
+  const [gelesen, setGelesen] = useState(false)
+
+  // Fehlt die Version (aeltere API), gilt die Fassung des angezeigten Dokuments -
+  // derselbe Rueckfall, den das frueher blockierende Tor benutzt hat.
+  const version = me?.avv_current_version || AVV_DOC_VERSION
+  const abschliessen = useMutation({
+    mutationFn: () => professionalApi.acceptAgreement(version),
+    onSuccess: (profil) => qc.setQueryData(['professional-me'], profil),
+  })
 
   const fmtDT = (s: string) =>
     new Date(s).toLocaleString('de-DE', {
@@ -143,8 +154,43 @@ function AgreementSection() {
       </button>
 
       {open && (
-        <div className="mt-4 border-t border-brand-border pt-4">
+        <div className="mt-4 max-h-[55vh] overflow-y-auto border-t border-brand-border pt-4">
           <AvvDocument version={me?.avv_accepted_version || me?.avv_current_version} />
+        </div>
+      )}
+
+      {me && !me.avv_accepted && (
+        <div className="mt-5 border-t border-brand-border pt-5">
+          <label className="flex cursor-pointer gap-3 text-sm text-brand-text">
+            <input
+              type="checkbox" checked={gelesen} onChange={e => setGelesen(e.target.checked)}
+              className="mt-0.5 h-4 w-4 flex-shrink-0 accent-accent"
+            />
+            <span>
+              Ich schließe als Verantwortliche den vorstehenden Auftragsverarbeitungsvertrag
+              (Version {version}) mit EchoB ab und genehmige die dort
+              genannten Unterauftragsverarbeiter.
+            </span>
+          </label>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => abschliessen.mutate()}
+              disabled={!gelesen || abschliessen.isPending}
+              className="btn-primary disabled:opacity-50"
+            >
+              {abschliessen.isPending ? 'Wird abgeschlossen …' : 'Vertrag abschließen'}
+            </button>
+            {abschliessen.isError && (
+              <span className="text-sm text-red-600">
+                {apiErrorMessage(abschliessen.error, 'Konnte nicht gespeichert werden.')}
+              </span>
+            )}
+          </div>
+          <p className="mt-3 text-xs leading-relaxed text-brand-muted">
+            Bis dahin sehen Sie hier nur den Beispielfall — freigegebene Inhalte echter
+            Klient:innen bleiben gesperrt. Das ist keine Schikane: Art. 28 DSGVO verlangt
+            den Vertrag, <em>bevor</em> wir Daten in Ihrem Auftrag verarbeiten.
+          </p>
         </div>
       )}
     </div>

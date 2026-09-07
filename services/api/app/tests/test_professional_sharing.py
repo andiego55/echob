@@ -175,3 +175,51 @@ async def test_response_sanitizers_strip_owner_data():
     assert "plan" not in prof             # kein Abo/Billing
     assert "subscription_ends_at" not in prof
     assert prof["modules"] == {"m": 1}
+
+
+# ── Der Vertrag sperrt echte Faelle, nicht die Spielwiese ────────────────────
+#
+# Seit der AVV nicht mehr den ganzen Bereich blockiert, sondern nur noch die Daten,
+# haengt hier mehr: Die Ausnahme fuer die Spielwiese darf sich niemals auf einen echten
+# Fall erstrecken. Sie ist eine Zeile - und eine falsche Zeile hiesse Zugriff auf fremde
+# Klientendaten ohne Vertrag.
+
+async def test_spielwiese_geht_auch_ohne_vertrag(db):
+    """Der Beispielfall enthaelt erfundene Menschen - dafuer braucht es keinen Vertrag."""
+    _owner, pro, case_id, share_id = await _seed(db)
+    await db.execute("DELETE FROM professional_agreements WHERE professional_user_id=$1", pro)
+    await db.execute("UPDATE case_shares SET is_demo = true WHERE id = $1", share_id)
+
+    share = await require_active_share(pro, case_id, db)
+    assert share["is_demo"] is True
+
+
+async def test_echter_fall_bleibt_ohne_vertrag_gesperrt(db):
+    """Die Gegenprobe zur Ausnahme - und der eigentliche Grund, warum sie hier steht."""
+    _owner, pro, case_id, _share_id = await _seed(db)
+    await db.execute("DELETE FROM professional_agreements WHERE professional_user_id=$1", pro)
+
+    with pytest.raises(HTTPException) as exc:
+        await require_active_share(pro, case_id, db)
+    assert exc.value.status_code == 403
+
+
+async def test_spielwiese_hebt_den_vertrag_nicht_allgemein_auf(db):
+    """Ein Demo-Share darf keinen ZWEITEN, echten Fall mit freischalten."""
+    _owner, pro, case_id, share_id = await _seed(db)
+    await db.execute("DELETE FROM professional_agreements WHERE professional_user_id=$1", pro)
+    await db.execute("UPDATE case_shares SET is_demo = true WHERE id = $1", share_id)
+
+    # Zweiter Fall derselben Fachperson, diesmal echt.
+    owner2 = uuid.uuid4()
+    case2 = await db.fetchval(
+        "INSERT INTO cases (user_id, relationship_type, relationship_status, contact_frequency, main_concern) "
+        "VALUES ($1,'partner','together','daily','ZWEITER') RETURNING id", owner2)
+    await db.execute(
+        "INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status) "
+        "VALUES ($1,$2,$3,'active')", case2, owner2, pro)
+
+    await require_active_share(pro, case_id, db)          # Spielwiese: geht
+    with pytest.raises(HTTPException) as exc:              # echter Fall: nicht
+        await require_active_share(pro, case2, db)
+    assert exc.value.status_code == 403

@@ -27,7 +27,7 @@ from app.schemas.professional import (
     ProfessionalProfileResponse,
     ProfessionalRegister,
 )
-from app.services import collab_service, seat_service
+from app.services import agreement_service, collab_service, seat_service
 from app.services.demo_service import ensure_demo_for_professional
 from app.services.echo_service import _REL_TYPE_LABELS
 from app.services.professional_account import ensure_professional_account
@@ -143,6 +143,22 @@ def _public_profile(row):
 
 # ── Rolle / Profil ────────────────────────────────────────────────────────────
 
+async def _avv_abgeschlossen(conn, pid) -> bool:
+    """Art. 28 DSGVO: Ohne Vertrag nur die Spielwiese, keine echten Klientendaten.
+
+    **Warum das hier steht und nicht nur beim Öffnen eines Falls.** Die Listen zeigen
+    Pseudonyme, Falltitel und Freigabe-Zeitpunkte — auch das ist Verarbeitung im Auftrag.
+    Bisher hing dieser Schutz allein am blockierenden Frontend-Tor; serverseitig geprüft
+    wurde erst beim Öffnen (``require_active_share``). Seit der Vertrag in die
+    Einstellungen gewandert ist und der Bereich offensteht, muss die Grenze hier liegen —
+    sonst entschiede die Oberfläche über den Datenschutz.
+
+    Die Spielwiese bleibt sichtbar: Sie enthält erfundene Menschen, keine Klientendaten,
+    und ohne sie wäre der Bereich vor der Unterschrift leer und nutzlos.
+    """
+    return await agreement_service.has_accepted_current_avv(conn, pid)
+
+
 @router.get("/me", response_model=ProfessionalProfileResponse)
 async def get_me(
     current: dict = Depends(get_current_professional),
@@ -235,6 +251,9 @@ async def incoming_requests(
     """Eingehende Verbindungsanfragen (über die Suche), die auf Zustimmung warten."""
     pid = current["user_id"]
     async with pool.acquire() as conn:
+        # Eine Anfrage traegt den Namen der anfragenden Person - ohne Vertrag nicht.
+        if not await _avv_abgeschlossen(conn, pid):
+            return []
         rows = await conn.fetch(
             "SELECT i.inviter_user_id, i.created_at, up.display_name "
             "FROM professional_invites i "
@@ -367,10 +386,11 @@ async def inbox(
             LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id
             LEFT JOIN case_share_elements e ON e.share_id = s.id
             WHERE s.professional_user_id = $1 AND s.status = 'active'
+              AND (s.is_demo OR $2)
             GROUP BY s.id, s.case_id, s.created_at, s.is_demo, c.relationship_type, up.display_name
             ORDER BY s.is_demo ASC, s.created_at DESC
             """,
-            pid,
+            pid, await _avv_abgeschlossen(conn, pid),
         )
     return [
         InboxItem(
@@ -406,11 +426,12 @@ async def cases(
             LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id
             LEFT JOIN case_share_elements e ON e.share_id = s.id
             WHERE s.professional_user_id = $1 AND s.status = 'active'
+              AND (s.is_demo OR $2)
             GROUP BY s.id, s.case_id, s.owner_user_id, s.created_at,
                      s.is_demo, c.relationship_type, up.display_name
             ORDER BY s.is_demo ASC, up.display_name NULLS LAST, s.created_at DESC
             """,
-            pid,
+            pid, await _avv_abgeschlossen(conn, pid),
         )
     groups: dict[str, dict] = {}
     for r in rows:
@@ -441,6 +462,7 @@ async def dashboard(
     """
     pid = current["user_id"]
     async with pool.acquire() as conn:
+        avv = await _avv_abgeschlossen(conn, pid)
         share_rows = await conn.fetch(
             "SELECT s.case_id, s.is_demo, c.relationship_type, "
             "up.display_name AS client_display_name, up.avatar AS client_avatar, "
@@ -452,14 +474,16 @@ async def dashboard(
             "LEFT JOIN onboarding_answers oa ON oa.case_id = s.case_id "
             "LEFT JOIN case_share_elements e ON e.share_id = s.id "
             "WHERE s.professional_user_id = $1 AND s.status = 'active' "
+            "  AND (s.is_demo OR $2) "
             "GROUP BY s.case_id, s.is_demo, c.relationship_type, up.display_name, up.avatar, oa.avatar",
-            pid,
+            pid, avv,
         )
         # „Verbunden, wartet auf Freigabe": akzeptierte Verbindungen (Zwei-Schritt-Modell:
         # verbinden ≠ teilen), zu denen es noch keinen aktiven Fall-Share gibt. Rein
         # informativ – die Person muss selbst einen Fall freigeben. Anzeigename:
         # Fachpersonen-Label (client_invites) vor selbst gewähltem Anzeigenamen.
-        pending_rows = await conn.fetch(
+        # Auch wartende Verbindungen tragen einen echten Namen - ohne Vertrag nicht.
+        pending_rows = [] if not avv else await conn.fetch(
             "SELECT pi.inviter_user_id, pi.accepted_at, up.avatar AS client_avatar, "
             "       up.display_name AS client_display_name, ci.label AS invite_label "
             "FROM professional_invites pi "
@@ -640,6 +664,9 @@ async def postfach(
     plus die aktiven Freigaben."""
     pid = current["user_id"]
     async with pool.acquire() as conn:
+        # Hier gibt es nichts Erfundenes: Jeder Eintrag gehoert einer echten Person.
+        if not await _avv_abgeschlossen(conn, pid):
+            return {"attention": [], "shares": []}
         share_rows = await conn.fetch(
             "SELECT s.case_id, s.created_at AS shared_at, c.relationship_type, "
             "       up.display_name AS client_display_name, up.avatar AS client_avatar "

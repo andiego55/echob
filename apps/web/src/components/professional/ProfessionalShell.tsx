@@ -3,6 +3,7 @@
  * Eigener Header mit Fachpersonen-Navigation (Postfach, Klient:innen).
  */
 import { NavLink, useNavigate } from 'react-router-dom'
+import AvvBanner from '@/components/professional/AvvBanner'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { professionalApi } from '@/api/professional'
@@ -78,7 +79,12 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        {/* Steht in der Schale, damit der Hinweis auf jeder Seite des Bereichs
+            sichtbar ist - nicht nur dort, wo man ihn ohnehin vermutet. */}
+        <AvvBanner />
+        {children}
+      </main>
     </div>
   )
 }

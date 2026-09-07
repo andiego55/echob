@@ -63,7 +63,14 @@ async def require_active_share(professional_user_id, case_id, conn) -> dict[str,
     # die Fachperson keine freigegebenen Klient-Daten. Serverseitige Durchsetzung des
     # Zustimmungs-Gates — greift erst NACH der Freigabe-Prüfung, damit die 404-
     # Existenz-Absicherung fremder Fälle erhalten bleibt.
-    if not await agreement_service.has_accepted_current_avv(conn, professional_user_id):
+    #
+    # Ausgenommen ist die Spielwiese (``is_demo``): Der Beispielfall enthält erfundene
+    # Menschen, keine Klientendaten — es gibt dort niemanden, in dessen Auftrag verarbeitet
+    # würde. Ohne diese Ausnahme wäre der Fachpersonenbereich vor der Unterschrift leer,
+    # und die Unterschrift stünde vor dem ersten Blick statt vor der ersten echten Person.
+    if not row["is_demo"] and not await agreement_service.has_accepted_current_avv(
+        conn, professional_user_id
+    ):
         raise HTTPException(
             status_code=403,
             detail="Auftragsverarbeitungsvertrag (AVV) noch nicht abgeschlossen.",

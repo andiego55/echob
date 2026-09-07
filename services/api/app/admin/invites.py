@@ -25,6 +25,7 @@ from app.admin.schemas import InviteDraft, InviteResult, InviteSend
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.services.notify_service import send_email_or_raise
+from app.services.professional_account import ensure_professional_account
 
 logger = get_logger(__name__)
 
@@ -89,10 +90,10 @@ async def senden(
         )
 
     async with pool.acquire() as conn:
-        vorhanden = await conn.fetchval(
-            "SELECT id FROM directory_listings WHERE id = $1", listing_id
+        eintrag = await conn.fetchrow(
+            "SELECT id, display_name, title FROM directory_listings WHERE id = $1", listing_id
         )
-    if not vorhanden:
+    if not eintrag:
         return InviteResult(ok=False, email=email, detail="Eintrag nicht gefunden.")
 
     redirect_to = f"{settings.frontend_url.rstrip('/')}/auth?role=professional"
@@ -126,11 +127,28 @@ async def senden(
             detail="Das Konto wurde angelegt, die Mail ging aber nicht raus. Bitte erneut senden.",
         )
 
-    async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE directory_listings SET claimed_by_user_id = $1, claim_sent_at = NOW(), "
-            "updated_at = NOW() WHERE id = $2",
-            user_id, listing_id,
+    # Profil, Organisation und Spielwiese gleich mit anlegen — den Namen kennen wir aus
+    # dem Eintrag. Ohne das landete die eingeladene Person nach dem Passwort auf einem
+    # Formular, das nach etwas fragt, das längst dasteht: ein Absprungpunkt ohne Nutzen.
+    try:
+        async with pool.acquire() as conn:
+            await ensure_professional_account(
+                conn, user_id,
+                email=email,
+                display_name=(eintrag["display_name"] or "").strip() or "Meine Praxis",
+                title=eintrag["title"],
+            )
+            await conn.execute(
+                "UPDATE directory_listings SET claimed_by_user_id = $1, claim_sent_at = NOW(), "
+                "updated_at = NOW() WHERE id = $2",
+                user_id, listing_id,
+            )
+    except Exception as exc:  # noqa: BLE001 — Mail ist raus, Profil nicht: ehrlich melden
+        logger.error("Profil nach Einladung fehlgeschlagen (%s): %s", maskiere(email), exc)
+        return InviteResult(
+            ok=True, email=email,
+            detail="Mail ist raus, aber Profil/Zuordnung fehlgeschlagen – bitte prüfen.",
         )
-    logger.info("Einladung versendet + Eintrag zugeordnet: %s", listing_id)
+
+    logger.info("Einladung versendet + Konto vorbereitet: %s", listing_id)
     return InviteResult(ok=True, email=email)
