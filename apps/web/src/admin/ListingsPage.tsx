@@ -25,7 +25,7 @@ import {
 } from './api'
 import { apiErrorMessage } from '@/api/errors'
 import TagInput from '@/components/directory/TagInput'
-import { LINK_MARKE, SETTINGS, linkStelleFehlt, settingUmschalten } from './felder'
+import { LINK_MARKE, SETTINGS, einladungsInhalt, linkStelleFehlt, settingUmschalten } from './felder'
 
 const FILTER = [
   { key: '', label: 'Alle' },
@@ -390,7 +390,11 @@ function EinladungPanel({ listingId, voreingestellteMail, onGesendet, onAbbreche
   const [meldung, setMeldung] = useState<string | null>(null)
 
   const senden = useMutation({
-    mutationFn: () => adminApi.inviteSend(listingId, f!),
+    // data! ist hier sicher: Der Knopf existiert erst hinter der Ladepruefung unten.
+    mutationFn: () => adminApi.inviteSend(
+      listingId,
+      einladungsInhalt({ email: data!.email, subject: data!.subject, body: data!.body }, f),
+    ),
     onSuccess: (r) => {
       if (r.ok) { setMeldung(null); onGesendet() }
       else setMeldung(r.detail ?? 'Fehlgeschlagen.')
@@ -411,7 +415,7 @@ function EinladungPanel({ listingId, voreingestellteMail, onGesendet, onAbbreche
     )
   }
 
-  const v = f ?? { email: data.email, subject: data.subject, body: data.body }
+  const v = einladungsInhalt({ email: data.email, subject: data.subject, body: data.body }, f)
   const setz = (patch: Partial<typeof v>) => { setF({ ...v, ...patch }); setMeldung(null) }
   const linkFehlt = linkStelleFehlt(v.body)
   const bereit = v.email.includes('@') && v.subject.trim() && !linkFehlt

@@ -33,3 +33,23 @@ export const LINK_MARKE = '{LINK}'
 export function linkStelleFehlt(text: string): boolean {
   return !text.includes(LINK_MARKE)
 }
+
+export interface EinladungsInhalt { email: string; subject: string; body: string }
+
+/**
+ * Was tatsächlich gesendet wird: das Geänderte, sonst der Entwurf.
+ *
+ * **Warum das eine eigene Funktion ist.** Genau hier lag ein Fehler, der nur den
+ * Normalfall traf: Die Anzeige nahm `geaendert ?? entwurf`, das Senden aber nur
+ * `geaendert` — also `null`, solange niemand etwas angefasst hatte. Wer den
+ * vorgeschlagenen Text unverändert abschickte, sendete einen leeren Rumpf und bekam
+ * eine nichtssagende Fehlermeldung. Wer vorher irgendein Zeichen tippte, nicht.
+ *
+ * Anzeige und Versand ziehen jetzt aus derselben Quelle.
+ */
+export function einladungsInhalt(
+  entwurf: EinladungsInhalt,
+  geaendert: EinladungsInhalt | null,
+): EinladungsInhalt {
+  return geaendert ?? entwurf
+}

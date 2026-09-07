@@ -69,7 +69,12 @@ export function apiErrorMessage(err: unknown, fallback = 'Das hat leider nicht g
     case 403: return 'Dafür fehlt dir die Berechtigung.'
     case 404: return 'Diese Funktion steht auf dem Server noch nicht bereit.'
     case 409: return 'Das wurde zwischenzeitlich schon verwendet.'
+    // 422 fehlte hier, und das war teuer: FastAPIs Prueffehler liefern ein `detail` als
+    // LISTE, nicht als Text - der Zweig oben greift also nicht, und ohne diesen Fall
+    // fiel alles auf den Rueckfalltext. Ein Formularfehler sah dadurch aus wie ein
+    // unerklaerliches Scheitern, was das Suchen einmal viel Zeit gekostet hat.
     case 410: return 'Das ist nicht mehr gültig.'
+    case 422: return 'Die Eingabe passt so nicht.'
     case 429: return 'Zu viele Anfragen – bitte kurz warten.'
     case 503: return 'Echo ist gerade nicht erreichbar. Bitte später noch einmal.'
     default:

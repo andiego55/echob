@@ -11,7 +11,7 @@
  * Art. 28 ab; „offen" waere dort eine erfundene Baustelle, die niemand je erledigen kann.
  */
 import { describe, expect, it } from 'vitest'
-import { LINK_MARKE, SETTINGS, linkStelleFehlt, settingUmschalten } from '../src/admin/felder'
+import { LINK_MARKE, SETTINGS, einladungsInhalt, linkStelleFehlt, settingUmschalten } from '../src/admin/felder'
 import { tagHinzufuegen } from '../src/components/directory/TagInput'
 import { avvZustand } from '../src/admin/UsersPage'
 
@@ -100,5 +100,30 @@ Gruesse`)).toBe(false)
     // Laufen Frontend und Backend hier auseinander, warnt die Oberflaeche vor einem
     // Fehler, den es nicht gibt - oder schlimmer: sie warnt nicht.
     expect(LINK_MARKE).toBe('{LINK}')
+  })
+})
+
+describe('Inhalt der Einladung', () => {
+  const entwurf = { email: 'a@b.test', subject: 'Betreff', body: `Hallo ${LINK_MARKE}` }
+
+  it('nimmt den Entwurf, wenn niemand etwas geaendert hat', () => {
+    // Der Fehler, um den es geht: Frueher wurde hier `null` verschickt - also genau im
+    // Normalfall, in dem der vorgeschlagene Text gut genug ist. Der Server antwortete
+    // mit 422 und die Oberflaeche mit "Senden fehlgeschlagen", ohne jeden Hinweis.
+    expect(einladungsInhalt(entwurf, null)).toEqual(entwurf)
+  })
+
+  it('nimmt das Geaenderte, sobald es eines gibt', () => {
+    const geaendert = { ...entwurf, subject: 'Andere Betreffzeile' }
+    expect(einladungsInhalt(entwurf, geaendert)).toBe(geaendert)
+  })
+
+  it('liefert nie etwas Leeres', () => {
+    // Was hier herauskommt, geht als Rumpf an den Server. Null oder undefined waere
+    // dort ein Prueffehler - und der ist im Formular nicht sichtbar.
+    const inhalt = einladungsInhalt(entwurf, null)
+    expect(inhalt).toBeTruthy()
+    expect(inhalt.subject.length).toBeGreaterThan(0)
+    expect(inhalt.body.length).toBeGreaterThan(0)
   })
 })

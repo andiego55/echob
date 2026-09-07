@@ -66,3 +66,13 @@ describe('apiErrorMessage', () => {
       .toBe('Echo konnte nicht antworten.')
   })
 })
+
+describe('Prueffehler des Servers (422)', () => {
+  it('nennt einen Grund statt auf den Rueckfalltext zu fallen', () => {
+    // FastAPI liefert bei 422 ein `detail` als LISTE. Ohne eigenen Fall fiel alles auf
+    // den Rueckfalltext - ein Formularfehler sah aus wie ein unerklaerliches Scheitern.
+    const fehler = { response: { status: 422, data: { detail: [{ loc: ['body'], msg: 'field required' }] } } }
+    expect(apiErrorMessage(fehler, 'RUECKFALL')).not.toBe('RUECKFALL')
+    expect(apiErrorMessage(fehler, 'RUECKFALL')).toBe('Die Eingabe passt so nicht.')
+  })
+})
