@@ -2335,7 +2335,16 @@ async def test_barometer_reaches_the_professional_only_as_an_average(db):
     assert daten["barometer"][0]["average"] == 6.0        # (9 + 3) / 2
     blob = str(daten)
     assert "NOTIZ_VON_ALEX" not in blob and "NOTIZ_VON_RIO" not in blob
-    assert "9" not in str(daten["barometer"])             # keine Einzelwerte
+
+    # Keine Einzelwerte — geprüft an den Daten, nicht an ihrer Zeichenkette.
+    #
+    # Vorher stand hier `"9" not in str(daten["barometer"])`. Das suchte die Ziffer im
+    # gesamten Abbild der Zeile, Datum eingeschlossen: In jeder Woche, deren Montag eine
+    # 9 enthält, schlug der Test an, ohne dass sich am Verhalten etwas geändert hätte.
+    # Am 2026-09-07 ist es das erste Mal passiert (Wochenstart 2026-09-07).
+    zeile = daten["barometer"][0]
+    assert set(zeile) == {"week", "average", "readings"}, "unerwartetes Feld im Barometer"
+    assert 9 not in zeile.values() and 3 not in zeile.values()
 
 
 async def test_appreciation_reaches_the_professional_only_as_a_count(db):
