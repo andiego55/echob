@@ -2,8 +2,9 @@
  * AvvDocument – Auftragsverarbeitungsvertrag (Art. 28 DSGVO), ENTWURF.
  *
  * Einsehbarer Vertragstext zwischen der Fachperson (Verantwortliche) und EchoB
- * (Auftragsverarbeiter). Wird sowohl im Zustimmungs-Gate als auch in den
- * Einstellungen angezeigt. Der Wortlaut ist ein sorgfältiger Entwurf und MUSS vor
+ * (Auftragsverarbeiter). Steht in den Einstellungen — dort wird er auch
+ * abgeschlossen. Das frueher blockierende Zustimmungs-Gate gibt es nicht mehr;
+ * auf den offenen Abschluss weist <AvvBanner /> hin. Der Wortlaut ist ein sorgfältiger Entwurf und MUSS vor
  * dem Produktivbetrieb anwaltlich final geprüft werden – die Prüfung veranlasst der
  * Betreiber. Die Versionskennung kommt vom Server (avv_current_version) und bindet
  * den angezeigten Text an den protokollierten Nachweis.

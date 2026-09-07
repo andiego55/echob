@@ -205,7 +205,6 @@ function Bereich({
   )
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 function Inhalt({ element, data }: { element: string; data: any }) {
   const leer = <p className="text-sm text-brand-muted">Hier ist noch nichts entstanden.</p>
 
