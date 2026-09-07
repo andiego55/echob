@@ -102,6 +102,12 @@ def create_app() -> FastAPI:
         ),
         docs_url="/docs" if not settings.is_production else None,
         redoc_url="/redoc" if not settings.is_production else None,
+        # Auch das Schema selbst. /docs abzuschalten und /openapi.json offen zu lassen
+        # verbirgt nur die Oberflaeche: Die Datei listet jeden Pfad, jedes Feld und jede
+        # Fehlerform - vom Admin-Bereich bis zum Paarraum. Kein Leck (alles ist
+        # auth-geschuetzt), aber eine fertige Landkarte fuer jeden, der eine sucht.
+        # In Entwicklung bleibt sie an, sonst funktionierte /docs dort nicht.
+        openapi_url="/openapi.json" if not settings.is_production else None,
         lifespan=lifespan,
     )
 
