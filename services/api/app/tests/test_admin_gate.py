@@ -97,16 +97,16 @@ def test_das_admin_recht_wird_nirgends_sonst_vergeben():
     verschiedene Dinge mit fast demselben Namen; deshalb trennt die Suche sie genau.
     """
     gruender_recht = re.compile(r"(?<![\w])require_admin")
-    erlaubt = {
-        APP / "core" / "dependencies.py",      # dort ist es definiert
-        Path(__file__),                        # und hier geprueft
-    }
+    # Tests sind ausgenommen: Sie werden nicht ausgeliefert. Ein Test darf pruefen und
+    # benennen, worum es geht - die Regel gilt dem laufenden Code, nicht der Prosa
+    # darueber. (Dieselbe Ausnahme wie in test_admin_grenze.py.)
     treffer = [
         str(p.relative_to(APP))
         for p in APP.rglob("*.py")
         if "__pycache__" not in p.parts
         and (APP / "admin") not in p.parents
-        and p not in erlaubt
+        and (APP / "tests") not in p.parents
+        and p != APP / "core" / "dependencies.py"     # dort ist es definiert
         and gruender_recht.search(p.read_text(encoding="utf-8"))
     ]
     assert not treffer, "Admin-Recht ausserhalb von app/admin:\n  " + "\n  ".join(treffer)

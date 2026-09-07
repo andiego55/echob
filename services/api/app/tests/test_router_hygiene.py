@@ -19,7 +19,15 @@ Läuft ohne Datenbank: reine Syntaxbaum-Prüfung, deshalb immer.
 import ast
 from pathlib import Path
 
-ROUTERS = Path(__file__).resolve().parents[1] / "api" / "v1" / "routers"
+_APP = Path(__file__).resolve().parents[1]
+ROUTERS = _APP / "api" / "v1" / "routers"
+
+# Das Admin-Werkzeug hat seinen eigenen Router ausserhalb von api/v1/routers. Es haelt
+# Verbindungen genauso wie jeder andere - und der Fehler, um den es hier geht, macht vor
+# einem Paket nicht halt. Ohne diese Zeile waere der Admin-Router beim Umzug still aus
+# der Pruefung gefallen.
+def _zu_pruefen() -> list[Path]:
+    return sorted(ROUTERS.glob("*.py")) + sorted((_APP / "admin").glob("*.py"))
 
 
 def _verwendungen_ausserhalb(quelle: str) -> list[tuple[str, int]]:
@@ -52,7 +60,7 @@ def _verwendungen_ausserhalb(quelle: str) -> list[tuple[str, int]]:
 def test_no_router_uses_a_released_connection():
     """``conn`` darf nur innerhalb seines ``async with``-Blocks vorkommen."""
     fehler: list[str] = []
-    for pfad in sorted(ROUTERS.glob("*.py")):
+    for pfad in _zu_pruefen():
         quelle = pfad.read_text(encoding="utf-8")
         for fn_name, zeile in _verwendungen_ausserhalb(quelle):
             fehler.append(f"{pfad.name}:{zeile} in {fn_name}()")
@@ -135,7 +143,7 @@ def test_kein_modellaufruf_haelt_eine_verbindung_fest():
     Transaktion darüber läuft (in diesen Routern läuft keine).
     """
     fehler: list[str] = []
-    for pfad in sorted(ROUTERS.glob("*.py")):
+    for pfad in _zu_pruefen():
         for fn_name, zeile in _echo_aufrufe_im_verbindungsblock(
             pfad.read_text(encoding="utf-8")
         ):

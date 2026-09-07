@@ -33,6 +33,16 @@ from pathlib import Path
 
 WURZEL = Path(__file__).resolve().parents[1]
 DIENSTE = WURZEL / "services"
+#: Das Admin-Paket wird mitgeprueft, obwohl es dem Gruender gehoert.
+#:
+#: Sein Zugriff ist absichtlich nicht an eine Nutzer-Id gebunden - er soll fremde
+#: Eintraege sehen. Getragen wird das nicht vom SQL, sondern von zwei Struktur-Waechtern:
+#: `test_admin_gate` (jeder Endpunkt haengt an require_admin) und `test_admin_grenze`
+#: (von aussen erreicht niemand dieses Paket). Trotzdem laeuft es hier mit: Wer kuenftig
+#: eine Eigentuemer-Tabelle im Admin anfasst, soll das bewusst in VERTRAUT_DEM_AUFRUFER
+#: eintragen muessen statt es nebenbei zu tun. Beim Umzug des Admin-Codes aus services/
+#: heraus war diese Pruefung schon einmal still verlorengegangen.
+ADMIN = WURZEL / "admin"
 MIGRATIONEN = WURZEL.parents[2] / "infra" / "docker" / "postgres" / "init"
 
 #: Funktionen, die Zugriff prüfen und im Fehlerfall abbrechen. Wer eine davon aufruft, hat
@@ -125,7 +135,7 @@ def _ungesicherte_funktionen() -> dict[str, tuple[str, int]]:
     tabellen = _eigentuemer_tabellen()
     gefunden: dict[str, tuple[str, int]] = {}
 
-    for pfad in sorted(DIENSTE.glob("*.py")):
+    for pfad in sorted(DIENSTE.glob("*.py")) + sorted(ADMIN.glob("*.py")):
         baum = ast.parse(pfad.read_text(encoding="utf-8"))
         for fn in _funktionen_oberster_ebene(baum):
             sql, aufrufe = _sql_und_aufrufe(fn)

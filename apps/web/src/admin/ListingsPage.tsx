@@ -23,7 +23,7 @@ import {
   type ListingUpdate,
   type ProvisionResult,
 } from './api'
-import { SETTINGS, linkStelleFehlt, listeAusText, settingUmschalten, textAusListe } from './felder'
+import { LINK_MARKE, SETTINGS, linkStelleFehlt, listeAusText, settingUmschalten, textAusListe } from './felder'
 
 const FILTER = [
   { key: '', label: 'Alle' },
@@ -244,6 +244,11 @@ function Zeile({ row, sofortOeffnen, onGeaendert }: {
             className="rounded-brand-sm border border-brand-border bg-white px-2 py-1.5 text-[0.78rem] text-navy">
             {TIER.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
+          <label className="flex items-center gap-1.5 text-[0.78rem] text-navy" title="Im öffentlichen Verzeichnis zeigen">
+            <input type="checkbox" checked={row.published} className="accent-accent"
+              onChange={e => aendern.mutate({ published: e.target.checked })} />
+            Sichtbar
+          </label>
           <button onClick={() => setProfilOffen(!profilOffen)}
             className="rounded-brand-sm border border-brand-border px-3 py-1.5 text-[0.78rem] font-medium text-navy hover:border-accent/50">
             {profilOffen ? 'Profil schließen' : 'Profil bearbeiten'}
@@ -393,7 +398,7 @@ function EinladungPanel({ listingId, voreingestellteMail, onGesendet, onAbbreche
       <p className="text-[0.82rem] font-semibold text-navy">Einladung — noch ist nichts verschickt</p>
       <p className="mt-1 text-[0.78rem] leading-relaxed text-brand-text">
         Beim Senden wird ein Konto angelegt und diese Mail verschickt.
-        {' '}<code className="rounded bg-white px-1">{'{LINK}'}</code> ersetzt der Server durch
+        {' '}<code className="rounded bg-white px-1">{LINK_MARKE}</code> ersetzt der Server durch
         den echten Einladungslink.
       </p>
 
@@ -408,7 +413,7 @@ function EinladungPanel({ listingId, voreingestellteMail, onGesendet, onAbbreche
 
       {linkFehlt && (
         <p className="mt-2 rounded-brand border border-amber-200 bg-amber-50 px-3 py-2 text-[0.78rem] text-amber-900">
-          Im Text fehlt <code>{'{LINK}'}</code>. Ohne diese Stelle enthält die Mail keinen Zugang.
+          Im Text fehlt <code>{LINK_MARKE}</code>. Ohne diese Stelle enthält die Mail keinen Zugang.
         </p>
       )}
       {meldung && <p className="mt-2 text-[0.78rem] text-red-600">{meldung}</p>}

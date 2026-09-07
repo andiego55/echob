@@ -111,7 +111,10 @@ async def aendern(
         params.append(val)
         sets.append(f"{col} = ${len(params)}")
 
-    for col in ("display_name", "profession", "title", "city", "postal_code", "state",
+    # `profession` fehlt hier bewusst — es wird unten aus den Fachrichtungen abgeleitet.
+    # Stuende es in beiden Bloecken, enthielte das UPDATE die Spalte zweimal, und Postgres
+    # lehnt das ab ("multiple assignments to same column").
+    for col in ("display_name", "title", "city", "postal_code", "state",
                 "website", "phone", "headline", "about", "approach", "fees", "booking_url"):
         if col in fields:
             val = clean(fields[col])
@@ -123,17 +126,22 @@ async def aendern(
     if "contact_email" in fields:
         add("contact_email", (clean(fields["contact_email"]) or "").lower() or None)
 
-    # Fachrichtungen: Die Liste ist maßgeblich, `profession` ist die primäre daraus.
-    # Kommt nur die einzelne, wird die Liste daraus gebildet — sonst zeigte die
-    # Detailseite eine Fachrichtung, nach der die Suche nicht findet.
+    # Fachrichtungen. Beide Spalten werden immer gemeinsam gesetzt: `professions` ist die
+    # maßgebliche Liste, `profession` die primäre daraus (sie treibt die Regionalseiten).
+    #
+    # Auch der leere Fall muss durchschlagen: Die öffentliche Ansicht fällt auf
+    # `profession` zurück, wenn `professions` leer ist (directory_service._profs). Bliebe
+    # der alte Wert stehen, zeigte der Eintrag weiter eine Fachrichtung, die gerade
+    # abgewählt wurde. `profession` ist NOT NULL, deshalb "" statt None.
     if "professions" in fields:
         profs = _fachrichtungen(fields["professions"])
-        add("professions", profs)
-        if profs:
-            add("profession", profs[0])
     elif "profession" in fields:
-        pv = clean(fields["profession"]) or ""
-        add("professions", [pv] if pv else [])
+        profs = _fachrichtungen([clean(fields["profession"]) or ""])
+    else:
+        profs = None
+    if profs is not None:
+        add("professions", profs)
+        add("profession", profs[0] if profs else "")
 
     for col in ("published", "verified", "bills_insurance", "offers_free_intro"):
         if col in fields:
