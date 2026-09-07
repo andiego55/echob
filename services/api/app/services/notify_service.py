@@ -36,14 +36,31 @@ def _send_sync(to: str, subject: str, text: str, reply_to: str | None) -> None:
         raise RuntimeError(f"Resend {resp.status_code}: {resp.text[:300]}")
 
 
+async def send_email_or_raise(to: str, subject: str, text: str, *, reply_to: str | None = None) -> None:
+    """Verschickt eine E-Mail und meldet Fehler weiter.
+
+    Für Versand, den jemand ausgelöst hat und dessen Ausgang er wissen muss — eine
+    Einladung etwa, die von Hand abgeschickt wird. „Gesendet" anzuzeigen, obwohl nichts
+    rausging, ist dort schlimmer als eine Fehlermeldung: Man wartet auf eine Antwort,
+    die nie kommen kann.
+    """
+    if not settings.resend_api_key:
+        raise RuntimeError("E-Mail-Versand ist nicht eingerichtet (RESEND_API_KEY fehlt).")
+    await asyncio.to_thread(_send_sync, to, subject, text, reply_to)
+    logger.info("E-Mail gesendet an %s: %s", to, subject)
+
+
 async def send_email(to: str, subject: str, text: str, *, reply_to: str | None = None) -> None:
-    """Verschickt eine E-Mail an ``to`` (best-effort)."""
+    """Verschickt eine E-Mail an ``to`` (best-effort).
+
+    Für begleitenden Versand, der einen Request nie scheitern lassen darf (Bestätigungen,
+    Benachrichtigungen). Wer den Ausgang wissen muss, nimmt ``send_email_or_raise``.
+    """
     if not settings.resend_api_key:
         logger.info("E-Mail übersprungen — RESEND_API_KEY nicht gesetzt.")
         return
     try:
-        await asyncio.to_thread(_send_sync, to, subject, text, reply_to)
-        logger.info("E-Mail gesendet an %s: %s", to, subject)
+        await send_email_or_raise(to, subject, text, reply_to=reply_to)
     except Exception as exc:  # noqa: BLE001 — best effort, darf den Request nicht scheitern lassen
         logger.warning("E-Mail-Versand fehlgeschlagen (%s): %s", subject, exc)
 

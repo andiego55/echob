@@ -30,7 +30,7 @@ from app.schemas.professional import (
 from app.services import collab_service, seat_service
 from app.services.demo_service import ensure_demo_for_professional
 from app.services.echo_service import _REL_TYPE_LABELS
-from app.services.org_service import ensure_org_for_professional
+from app.services.professional_account import ensure_professional_account
 from app.services.sharing_service import load_shared_bundle, require_active_share
 
 router = APIRouter(prefix="/professional", tags=["professional"])
@@ -168,35 +168,14 @@ async def register(
 
     Idempotent: bereits registrierte Fachpersonen aktualisieren nur ihr Profil.
     """
-    user_id = current_user["user_id"]
-    email = (current_user.get("email") or "").strip().lower()
     async with pool.acquire() as conn:
-        existing = await conn.fetchrow(
-            "SELECT id FROM professional_profiles WHERE user_id = $1", user_id
+        row = await ensure_professional_account(
+            conn, current_user["user_id"],
+            email=current_user.get("email"),
+            display_name=body.display_name,
+            title=body.title,
         )
-        if existing:
-            row = await conn.fetchrow(
-                "UPDATE professional_profiles SET display_name = $2, title = $3, "
-                "email = COALESCE(email, $4), updated_at = NOW() WHERE user_id = $1 RETURNING *",
-                user_id, body.display_name, body.title, email or None,
-            )
-        else:
-            row = await conn.fetchrow(
-                "INSERT INTO professional_profiles (user_id, email, display_name, title) "
-                "VALUES ($1, $2, $3, $4) RETURNING *",
-                user_id, email or None, body.display_name, body.title,
-            )
-            # Offene Einladungen an diese E-Mail verknüpfen
-            if email:
-                await conn.execute(
-                    "UPDATE professional_invites "
-                    "SET status = 'accepted', professional_user_id = $1, accepted_at = NOW() "
-                    "WHERE lower(email) = $2 AND status = 'pending'",
-                    user_id, email,
-                )
-        await ensure_org_for_professional(user_id, conn, body.display_name)
-        await ensure_demo_for_professional(user_id, conn)
-    return ProfessionalProfileResponse(**dict(row))
+    return ProfessionalProfileResponse(**row)
 
 
 @router.post("/agreements/accept", response_model=ProfessionalProfileResponse)

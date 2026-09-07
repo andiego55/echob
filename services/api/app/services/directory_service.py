@@ -5,25 +5,18 @@ an die Fachperson weitergeleitet (+ Kopie an EchoB + Bestätigung an anfragende 
 """
 from __future__ import annotations
 
-import re
 import time
 
 import asyncpg
 
-from app.core.config import settings
 from app.core.directory_taxonomy import (
     PROFESSIONS,
-    TIERS,
     is_contactable,
     profession_label,
     profession_labels,
 )
 from app.core.logging import get_logger
 from app.schemas.directory import (
-    AdminInviteResult,
-    AdminListingCreate,
-    AdminListingRow,
-    AdminListingUpdate,
     ContactAck,
     DirectoryCard,
     DirectoryContactCreate,
@@ -35,6 +28,9 @@ from app.schemas.directory import (
     MissingItem,
 )
 from app.services import storage_service
+from app.services.directory_text import clean as _clean
+from app.services.directory_text import slugify as _slugify
+from app.services.directory_text import unique_slug as _unique_slug
 from app.services.notify_service import notify_lead, send_email
 
 logger = get_logger(__name__)
@@ -227,24 +223,6 @@ async def create_contact_request(
 
 # ── Selfservice-Profil (eingeloggte Fachperson) ──────────────────────────────
 
-_UMLAUT = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",
-                         "Ä": "ae", "Ö": "oe", "Ü": "ue"})
-
-
-def _slugify(s: str) -> str:
-    s = (s or "").translate(_UMLAUT).lower()
-    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
-    return s or "fachperson"
-
-
-async def _unique_slug(conn: asyncpg.Connection, base: str) -> str:
-    slug, n = base, 2
-    while await conn.fetchval("SELECT 1 FROM directory_listings WHERE slug = $1", slug):
-        slug, n = f"{base}-{n}", n + 1
-    return slug
-
-
-# (key, Label, Punkte, erfüllt?) — steuert Fortschritt + Checkliste im Editor.
 _SCORE = [
     ("photo", "Profilfoto hinzufügen", 15, lambda r: bool(r["photo_url"])),
     ("headline", "Kurzprofil (ein Satz)", 10, lambda r: bool((r["headline"] or "").strip())),
@@ -288,11 +266,6 @@ def _me(row: asyncpg.Record) -> DirectoryMe:
         publishable=not missing_required, missing_required=missing_required,
         public_url=f"/fachpersonen/{row['slug']}",
     )
-
-
-def _clean(v: str | None) -> str | None:
-    v = (v or "").strip()
-    return v or None
 
 
 async def get_or_create_my_listing(
@@ -369,6 +342,33 @@ async def update_my_listing(
     return _me(row)
 
 
+# Grenzen fuer Profilfotos. Stehen hier und nicht in den Routern, weil es zwei Wege
+# zum selben Bild gibt (Fachperson selbst / Admin) - zwei Zahlen, die auseinanderlaufen,
+# ergaeben ein Bild, das der eine hochladen darf und der andere nicht.
+FOTO_MAX_BYTES = 4 * 1024 * 1024
+FOTO_TYPEN = {"image/jpeg", "image/png", "image/webp"}
+_FOTO_ENDUNG = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
+
+
+async def foto_ablegen(
+    pool: asyncpg.Pool, listing_id, data: bytes, content_type: str
+) -> str:
+    """Legt das Bild im Speicher ab und haengt es an das Listing.
+
+    Der Zeitstempel im Pfad ist Absicht: Waere der Name fest, zeigte der Browser nach
+    einem Wechsel noch tagelang das alte Bild aus seinem Zwischenspeicher.
+    """
+    ext = _FOTO_ENDUNG.get(content_type, "jpg")
+    path = f"{listing_id}/photo-{int(time.time())}.{ext}"
+    url = await storage_service.upload_public_image(path, data, content_type)
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE directory_listings SET photo_url = $2, updated_at = NOW() WHERE id = $1",
+            listing_id, url,
+        )
+    return url
+
+
 async def set_my_photo(pool: asyncpg.Pool, user_id: str, data: bytes, content_type: str) -> str:
     async with pool.acquire() as conn:
         listing_id = await conn.fetchval(
@@ -376,151 +376,4 @@ async def set_my_photo(pool: asyncpg.Pool, user_id: str, data: bytes, content_ty
         )
     if not listing_id:
         raise ValueError("Bitte speichere zuerst dein Profil.")
-    ext = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}.get(content_type, "jpg")
-    path = f"{listing_id}/photo-{int(time.time())}.{ext}"
-    url = await storage_service.upload_public_image(path, data, content_type)
-    async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE directory_listings SET photo_url = $2, updated_at = NOW() WHERE claimed_by_user_id = $1",
-            user_id, url,
-        )
-    return url
-
-
-# ── Admin (Verzeichnis aufbauen + Fachpersonen einladen) ─────────────────────
-
-def _admin_row(r: asyncpg.Record) -> AdminListingRow:
-    return AdminListingRow(
-        id=str(r["id"]), slug=r["slug"], display_name=r["display_name"],
-        profession=r["profession"], profession_label=profession_label(r["profession"]),
-        title=r["title"], city=r["city"], postal_code=r["postal_code"], state=r["state"],
-        tier=r["tier"], published=r["published"], verified=r["verified"],
-        bills_insurance=r["bills_insurance"],
-        contact_email=r["contact_email"], website=r["website"], phone=r["phone"],
-        claimed=r["claimed_by_user_id"] is not None, claim_sent_at=r["claim_sent_at"],
-    )
-
-
-async def admin_list(pool: asyncpg.Pool, status: str | None = None) -> list[AdminListingRow]:
-    where = {
-        "researched": "WHERE tier = 'researched'",
-        "claimed": "WHERE claimed_by_user_id IS NOT NULL",
-        "published": "WHERE published",
-        "invited": "WHERE claim_sent_at IS NOT NULL",
-    }.get(status or "", "")
-    async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            f"SELECT * FROM directory_listings {where} ORDER BY created_at DESC LIMIT 500"
-        )
-    return [_admin_row(r) for r in rows]
-
-
-async def admin_create(pool: asyncpg.Pool, p: AdminListingCreate) -> AdminListingRow:
-    async with pool.acquire() as conn:
-        slug = await _unique_slug(conn, _slugify(f"{p.display_name}-{p.city}"))
-        prof = _clean(p.profession) or ""
-        row = await conn.fetchrow(
-            """
-            INSERT INTO directory_listings
-              (slug, display_name, profession, professions, title, city, city_slug, postal_code, state,
-               website, phone, contact_email, tier, published)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'researched',true)
-            RETURNING *
-            """,
-            slug, _clean(p.display_name) or "", prof, [prof] if prof else [], _clean(p.title),
-            _clean(p.city) or "", _slugify(p.city or ""), _clean(p.postal_code), _clean(p.state),
-            _clean(p.website), _clean(p.phone), (_clean(p.contact_email) or "").lower() or None,
-        )
-    return _admin_row(row)
-
-
-async def admin_update(pool: asyncpg.Pool, listing_id: str, p: AdminListingUpdate) -> AdminListingRow | None:
-    if p.tier is not None and p.tier not in TIERS:
-        raise ValueError("Ungültige Stufe.")
-    fields = p.model_dump(exclude_unset=True)
-    notnull = {"display_name", "profession", "city"}
-    sets: list[str] = []
-    params: list[object] = []
-
-    def add(col: str, val: object) -> None:
-        params.append(val)
-        sets.append(f"{col} = ${len(params)}")
-
-    for col in ("display_name", "profession", "title", "city", "postal_code", "state", "website", "phone"):
-        if col in fields:
-            val = _clean(fields[col])
-            if val is None and col in notnull:
-                val = ""
-            add(col, val)
-    if "city" in fields:
-        add("city_slug", _slugify(fields["city"] or ""))
-    if "contact_email" in fields:
-        add("contact_email", (_clean(fields["contact_email"]) or "").lower() or None)
-    if "profession" in fields:
-        pv = _clean(fields["profession"]) or ""
-        add("professions", [pv] if pv else [])
-    if "tier" in fields:
-        add("tier", fields["tier"])
-    if "published" in fields:
-        add("published", bool(fields["published"]))
-    if "verified" in fields:
-        add("verified", bool(fields["verified"]))
-    if "bills_insurance" in fields:
-        add("bills_insurance", bool(fields["bills_insurance"]))
-
-    async with pool.acquire() as conn:
-        if not sets:
-            row = await conn.fetchrow("SELECT * FROM directory_listings WHERE id = $1", listing_id)
-            return _admin_row(row) if row else None
-        params.append(listing_id)
-        row = await conn.fetchrow(
-            f"UPDATE directory_listings SET {', '.join(sets)}, updated_at = NOW() "
-            f"WHERE id = ${len(params)} RETURNING *",
-            *params,
-        )
-    return _admin_row(row) if row else None
-
-
-async def admin_delete(pool: asyncpg.Pool, listing_id: str) -> bool:
-    async with pool.acquire() as conn:
-        res = await conn.execute("DELETE FROM directory_listings WHERE id = $1", listing_id)
-    return res != "DELETE 0"
-
-
-async def admin_invite(
-    pool: asyncpg.Pool, supabase, listing_id: str, email_override: str | None
-) -> AdminInviteResult:
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "SELECT id, display_name, contact_email FROM directory_listings WHERE id = $1",
-            listing_id,
-        )
-    if not row:
-        return AdminInviteResult(ok=False, email="", detail="Eintrag nicht gefunden.")
-    email = (email_override or row["contact_email"] or "").strip().lower()
-    if "@" not in email:
-        return AdminInviteResult(ok=False, email=email, detail="Keine gültige E-Mail hinterlegt.")
-
-    redirect_to = f"{settings.frontend_url.rstrip('/')}/auth?role=professional"
-    try:
-        resp = supabase.auth.admin.invite_user_by_email(
-            email,
-            {"redirect_to": redirect_to,
-             "data": {"pending_role": "professional", "needs_password": True}},
-        )
-        user_id = resp.user.id
-    except Exception as exc:  # noqa: BLE001 — meist: Konto existiert bereits
-        logger.warning("Verzeichnis-Einladung fehlgeschlagen (%s): %s", email, exc)
-        return AdminInviteResult(
-            ok=False, email=email,
-            detail="Einladung fehlgeschlagen – evtl. existiert für diese E-Mail schon ein Konto.",
-        )
-
-    async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE directory_listings SET claimed_by_user_id = $1, claim_sent_at = NOW(), "
-            "updated_at = NOW() WHERE id = $2",
-            user_id, listing_id,
-        )
-    logger.info("Verzeichnis-Einladung versendet + Listing zugeordnet: %s", listing_id)
-    return AdminInviteResult(ok=True, email=email)
+    return await foto_ablegen(pool, listing_id, data, content_type)

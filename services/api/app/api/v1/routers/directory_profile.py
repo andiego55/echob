@@ -17,8 +17,11 @@ from app.services import directory_service
 logger = get_logger(__name__)
 router = APIRouter(prefix="/directory", tags=["directory"])
 
-_MAX_PHOTO = 4 * 1024 * 1024
-_ALLOWED = {"image/jpeg", "image/png", "image/webp"}
+# Grenzen kommen aus dem Service: Den Upload gibt es zweimal (hier und im Admin),
+# und zwei Zahlen, die auseinanderlaufen, ergeben ein Bild, das der eine hochladen
+# darf und der andere nicht.
+_MAX_PHOTO = directory_service.FOTO_MAX_BYTES
+_ALLOWED = directory_service.FOTO_TYPEN
 
 
 @router.get("/me", response_model=DirectoryMe)

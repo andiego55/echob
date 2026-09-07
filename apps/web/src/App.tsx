@@ -122,7 +122,10 @@ const ProfessionalDashboardPage = lazy(() => import('@/pages/professional/Profes
 const ProfessionalTemplatesPage = lazy(() => import('@/pages/professional/ProfessionalTemplatesPage'))
 const ProfessionalSettingsPage = lazy(() => import('@/pages/professional/ProfessionalSettingsPage'))
 const ProfessionalProfilePage = lazy(() => import('@/pages/professional/ProfessionalProfilePage'))
-const AdminDirectoryPage = lazy(() => import('@/pages/admin/AdminDirectoryPage'))
+// Admin-Werkzeug des Gruenders: eigenes Paket unter src/admin, immer nachgeladen -
+// es gehoert nie ins Buendel, das eine nutzende Person herunterlaedt.
+const AdminListingsPage = lazy(() => import('@/admin/ListingsPage'))
+const AdminUsersPage = lazy(() => import('@/admin/UsersPage'))
 const RegionalPage = lazy(() => import('@/pages/RegionalPage'))
 import { REGION_PROFESSIONS }    from '@/directory/regions'
 const ProfessionalReportTemplatesPage = lazy(() => import('@/pages/professional/ProfessionalReportTemplatesPage'))
@@ -308,7 +311,8 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/professional/templates" element={<ProfessionalRoute><ProfessionalTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/settings" element={<ProfessionalRoute><ProfessionalSettingsPage /></ProfessionalRoute>} />
       <Route path="/professional/profil" element={<ProfessionalRoute><ProfessionalProfilePage /></ProfessionalRoute>} />
-      <Route path="/admin/verzeichnis" element={<ProtectedRoute><AdminDirectoryPage /></ProtectedRoute>} />
+      <Route path="/admin/verzeichnis" element={<ProtectedRoute><AdminListingsPage /></ProtectedRoute>} />
+      <Route path="/admin/nutzer" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
       <Route path="/professional/report-templates" element={<ProfessionalRoute><ProfessionalReportTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />

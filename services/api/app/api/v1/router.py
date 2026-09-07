@@ -6,6 +6,7 @@ Neue Router einfach importieren und mit include_router() hinzufügen.
 """
 from fastapi import APIRouter
 
+from app.admin import router as admin_router
 from app.api.v1.routers import (
     account,
     case_artifacts,
@@ -28,7 +29,6 @@ from app.api.v1.routers import (
     couple_shares,
     couple_tests,
     directory,
-    directory_admin,
     directory_profile,
     echo,
     health,
@@ -75,7 +75,7 @@ v1_router.include_router(contact.router)
 # ── Fachpersonen-Verzeichnis (öffentlich, "Fachperson finden") ─────────────────
 v1_router.include_router(directory.router)
 v1_router.include_router(directory_profile.router)  # authentifiziert: /directory/me
-v1_router.include_router(directory_admin.router)    # nur Admin: /directory/admin
+v1_router.include_router(admin_router)               # nur Admin (Gruender): /admin/*
 
 # ── Phase 1: Kern-App ─────────────────────────────────────────────────────────
 v1_router.include_router(cases.router)
