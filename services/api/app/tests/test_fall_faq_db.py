@@ -22,6 +22,7 @@ import asyncpg
 import pytest
 
 from app.core import crypto
+from app.core.config import settings
 from app.services import fall_faq_service as dienst
 from app.services.agreement_service import CURRENT_AVV_VERSION
 
@@ -63,8 +64,23 @@ async def _fall_mit_freigabe(conn, *, faq=True):
     return owner, pro, case_id, dict(share)
 
 
+async def _kontingent_aufbrauchen(conn, owner):
+    """Fuellt das Monatskontingent der Nutzer:in bis zur Obergrenze auf.
+
+    Liest die Grenze aus den Einstellungen statt sie zu wiederholen: Waere sie hier fest
+    verdrahtet, wuerde eine Aenderung an `fall_faq_limit` die Tests gruen lassen, obwohl
+    sie dann etwas anderes pruefen als das Produkt tut.
+    """
+    for _ in range(settings.fall_faq_limit):
+        await conn.execute(
+            "INSERT INTO ai_usage_log (user_id, kind) VALUES ($1, 'fall_faq')", owner)
+
+
 async def _lauf_mit_antwort(conn, share, *, antwort="Es geht um wiederkehrende Konflikte."):
     run_id = await dienst.lauf_anlegen(conn, share=share)
+    # Ohne diese Zusicherung schlaegt ein abgelehnter Lauf erst zwei Zeilen spaeter als
+    # NOT-NULL-Verletzung auf run_id zu - und die Meldung sagt dann nichts ueber den Grund.
+    assert run_id is not None, "lauf_anlegen hat abgelehnt (laeuft schon oder Kontingent leer)"
     await dienst._schreibe_antworten(conn, run_id, [{
         "frage_id": "anliegen_kern", "kategorie": "auftrag", "antwort": antwort,
         "belege": [{"szene_nr": 2, "zitat": "ein wörtliches Zitat"}],
@@ -160,9 +176,9 @@ async def test_ein_zweiter_lauf_ersetzt_den_ersten(db):
 async def test_ein_laufender_lauf_wird_nicht_zurueckgesetzt(db):
     """Zweimal Speichern kurz hintereinander darf keinen zweiten Task starten.
 
-    ``lauf_anlegen`` setzt die Zeile zurück und löscht die Antworten. Passierte das,
-    während der erste Hintergrund-Task noch hineinschreibt, liefen zwei Tasks auf
-    demselben Lauf: vermischte Antworten und ein Zähler, der nicht mehr stimmt.
+    ``lauf_anlegen`` setzt die Zeile zurueck und loescht die Antworten. Passierte das,
+    waehrend der erste Hintergrund-Task noch hineinschreibt, liefen zwei Tasks auf
+    demselben Lauf: vermischte Antworten und ein Zaehler, der nicht mehr stimmt.
     """
     _owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
     erster = await dienst.lauf_anlegen(db, share=share)
@@ -172,6 +188,96 @@ async def test_ein_laufender_lauf_wird_nicht_zurueckgesetzt(db):
     assert await dienst.lauf_anlegen(db, share=share) is None
     assert await db.fetchval(
         "SELECT status FROM case_faq_runs WHERE id = $1", erster) == "laeuft"
+
+
+# ── Das Monatskontingent ─────────────────────────────────────────────────────
+
+async def test_jeder_lauf_wird_im_kontingent_verbucht(db):
+    """Ein Lauf schickt den vollen Fallkontext zehnmal an das Modell.
+
+    Bei einem Fall mittlerer Groesse rund 73.000 Eingabe-Token, am Szenen-Deckel ueber
+    370.000 - etwa so viel wie zehn Fachpersonen-Berichte. Ohne Verbuchung koennte jemand
+    die Freigabe fuenfzigmal speichern und fuenfzigmal ausloesen.
+    """
+    owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    await dienst.lauf_anlegen(db, share=share)
+
+    gebucht = await db.fetchval(
+        "SELECT count(*) FROM ai_usage_log WHERE user_id = $1 AND kind = 'fall_faq'", owner)
+    assert gebucht == 1
+
+
+async def test_bei_aufgebrauchtem_kontingent_laeuft_nichts_mehr(db):
+    owner, pro, case_id, share = await _fall_mit_freigabe(db)
+    await _lauf_mit_antwort(db, share, antwort="Erster Stand.")
+    await _kontingent_aufbrauchen(db, owner)
+
+    assert await dienst.lauf_anlegen(db, share=share) is None
+
+    # Der vorhandene Lauf bleibt unangetastet - die Fachperson behaelt, was sie hat.
+    faq = await dienst.lade_fuer_fachperson(db, professional_user_id=pro, case_id=case_id)
+    auftrag = next(k for k in faq["kategorien"] if k["id"] == "auftrag")
+    kern = next(f for f in auftrag["fragen"] if f["frage_id"] == "anliegen_kern")
+    assert kern["antwort"] == "Erster Stand."
+
+
+async def test_das_kontingent_des_vormonats_sperrt_nicht(db):
+    """Ohne diesen Test koennte die Grenze dauerhaft sperren, und niemandem fiele es auf:
+    Ein Fall-FAQ, das sich nie erneuern laesst, sieht aus wie eins, das niemand erneuert.
+    """
+    owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    await _kontingent_aufbrauchen(db, owner)
+    await db.execute(
+        "UPDATE ai_usage_log SET created_at = NOW() - INTERVAL '40 days' "
+        "WHERE user_id = $1 AND kind = 'fall_faq'",
+        owner,
+    )
+    assert await dienst.lauf_anlegen(db, share=share) is not None
+
+
+async def test_das_kontingent_gilt_je_nutzerin_nicht_je_freigabe(db):
+    """Zwei Fachpersonen sind zwei Uebermittlungen - beide zaehlen gegen dasselbe Konto.
+
+    Waere es je Freigabe gezaehlt, koennte jemand die Grenze umgehen, indem er mehrere
+    Fachpersonen verbindet. Die Kosten entstehen aber je Lauf, nicht je Empfaenger.
+    """
+    owner, _pro, case_id, share = await _fall_mit_freigabe(db)
+    await _lauf_mit_antwort(db, share)
+
+    zweite_pro = uuid.uuid4()
+    zweite_freigabe = dict(await db.fetchrow(
+        "INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status, faq_enabled) "
+        "VALUES ($1,$2,$3,'active',TRUE) RETURNING *",
+        case_id, owner, zweite_pro,
+    ))
+    # Solange Kontingent da ist, laeuft die zweite Freigabe.
+    assert await dienst.lauf_anlegen(db, share=zweite_freigabe) is not None
+
+    # Ist es aufgebraucht, laeuft auch eine dritte Freigabe nicht mehr.
+    await _kontingent_aufbrauchen(db, owner)
+    dritte = dict(await db.fetchrow(
+        "INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status, faq_enabled) "
+        "VALUES ($1,$2,$3,'active',TRUE) RETURNING *",
+        case_id, owner, uuid.uuid4(),
+    ))
+    assert await dienst.lauf_anlegen(db, share=dritte) is None
+
+
+async def test_ein_gescheiterter_lauf_kostet_trotzdem(db):
+    """Verbucht wird beim Anlegen, nicht beim Gelingen.
+
+    Der Aufruf kostet in dem Moment, in dem er hinausgeht. Ein Lauf, der auf halber
+    Strecke scheitert, hat die Haelfte des Geldes trotzdem ausgegeben - eine Bremse, die
+    nur Erfolge bucht, griffe genau im teuersten Fall nicht.
+    """
+    owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    erster = await dienst.lauf_anlegen(db, share=share)
+    await db.execute("UPDATE case_faq_runs SET status = 'fehler' WHERE id = $1", erster)
+
+    assert await db.fetchval(
+        "SELECT count(*) FROM ai_usage_log WHERE user_id = $1 AND kind = 'fall_faq'",
+        owner,
+    ) == 1
 
 
 async def test_ein_veralteter_lauf_laesst_sich_entfernen(db):

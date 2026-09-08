@@ -64,8 +64,9 @@ async def _build_share_response(conn, share_row) -> CaseShareResponse:
     # Fachperson. Die Klient:in soll sehen, dass etwas ausgeloest wurde und wie weit es
     # ist - Auskunft ueber die Inhalte gibt es auf Verlangen (Art. 15 DSGVO), nicht
     # nebenbei in einer Liste.
-    faq_status = await conn.fetchval(
-        "SELECT status FROM case_faq_runs WHERE share_id = $1", share_row["id"])
+    faq = await conn.fetchrow(
+        "SELECT status, angefordert_am FROM case_faq_runs WHERE share_id = $1",
+        share_row["id"])
     return CaseShareResponse(
         id=share_row["id"],
         case_id=share_row["case_id"],
@@ -80,7 +81,8 @@ async def _build_share_response(conn, share_row) -> CaseShareResponse:
         created_at=share_row["created_at"],
         updated_at=share_row["updated_at"],
         faq_enabled=share_row["faq_enabled"],
-        faq_status=faq_status,
+        faq_status=faq["status"] if faq else None,
+        faq_erstellt_am=faq["angefordert_am"] if faq else None,
     )
 
 

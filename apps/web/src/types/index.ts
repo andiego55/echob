@@ -964,6 +964,8 @@ export interface CaseShare {
   /** Fall-FAQ ausgeloest? Der Stand, nie der Inhalt - die Antworten gehen an die Fachperson. */
   faq_enabled?: boolean
   faq_status?: 'offen' | 'laeuft' | 'fertig' | 'fehler' | null
+  /** Wann das Paket entstand. Macht den Tagesdeckel sichtbar - siehe FaqStand. */
+  faq_erstellt_am?: string | null
 }
 
 export interface ShareCreate {

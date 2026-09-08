@@ -31,6 +31,7 @@ from typing import Any
 from app.core import crypto
 from app.services import fall_faq_katalog as katalog
 from app.services import fall_faq_merkmale as merkmale
+from app.services import subscription_service
 from app.services.sharing_service import build_shared_case_context, load_shared_bundle
 
 logger = logging.getLogger(__name__)
@@ -174,11 +175,25 @@ async def lauf_anlegen(conn, *, share: dict) -> str | None:
     Ein Lauf je Freigabe: Löst die Klient:in erneut aus, wird der alte ersetzt. Sonst
     lägen mehrere Stände nebeneinander und die Fachperson müsste raten, welcher gilt.
 
-    ``None``, wenn schon einer läuft — dann passiert nichts. Zweimal Speichern kurz
-    hintereinander setzte sonst die Zeile zurück, während der erste Hintergrund-Task noch
-    hineinschreibt: Zwei Tasks auf demselben Lauf, deren Antworten sich vermischen, und
-    ein Zähler, der nicht mehr stimmt. Die Prüfung steht hier und nicht im Router, weil
-    sie sonst beim nächsten Aufrufer fehlt.
+    Gibt ``None`` zurück, wenn nicht gelaufen wird — in zwei Fällen:
+
+    *Es läuft schon einer.* Zweimal Speichern kurz hintereinander setzte sonst die Zeile
+    zurück, während der erste Hintergrund-Task noch hineinschreibt: zwei Tasks auf
+    demselben Lauf, deren Antworten sich vermischen, und ein Zähler, der nicht stimmt.
+
+    *Das Monatskontingent ist aufgebraucht.* Ein Lauf schickt den vollen Fallkontext
+    zehnmal an das Modell — bei einem Fall mittlerer Größe rund 73.000 Eingabe-Token, am
+    Szenen-Deckel über 370.000. Er kostet damit ungefähr so viel wie zehn
+    Fachpersonen-Berichte, und ohne Grenze könnte jemand die Freigabe fünfzigmal
+    speichern. Gezählt wird über dasselbe ``ai_usage_log`` wie bei Berichten und Skalen:
+    je Nutzer:in, je Kalendermonat, löschfest.
+
+    In beiden Fällen bleibt ein vorhandener Lauf unangetastet — die Fachperson behält,
+    was sie hat. Und in beiden Fällen wird **nicht** geworfen: Das FAQ hängt als Wahl an
+    der Freigabe, ein Fehler hier ließe die ganze Freigabe scheitern.
+
+    Die Prüfungen stehen hier und nicht im Router, weil sie sonst beim nächsten Aufrufer
+    fehlen.
     """
     laeuft = await conn.fetchval(
         "SELECT 1 FROM case_faq_runs WHERE share_id = $1 AND status IN ('offen','laeuft')",
@@ -186,6 +201,13 @@ async def lauf_anlegen(conn, *, share: dict) -> str | None:
     )
     if laeuft:
         logger.info("Fall-FAQ: Lauf für Freigabe %s läuft bereits.", share["id"])
+        return None
+
+    if not await subscription_service.has_ai_usage_left(
+        share["owner_user_id"], conn, "fall_faq"
+    ):
+        logger.info(
+            "Fall-FAQ: Monatskontingent von %s aufgebraucht.", share["owner_user_id"])
         return None
 
     run_id = await conn.fetchval(
@@ -204,6 +226,12 @@ async def lauf_anlegen(conn, *, share: dict) -> str | None:
         share["owner_user_id"], KATALOG_FASSUNG, len(katalog.KATALOG),
     )
     await conn.execute("DELETE FROM case_faq_answers WHERE run_id = $1", run_id)
+
+    # Verbucht wird beim Anlegen, nicht beim Gelingen. Der Aufruf kostet in dem Moment, in
+    # dem er hinausgeht — ein Lauf, der auf halber Strecke scheitert, hat die Hälfte des
+    # Geldes trotzdem ausgegeben. Gegen die Kosten zu zählen und dann nur die Erfolge zu
+    # buchen, wäre eine Bremse, die genau im teuersten Fall nicht greift.
+    await subscription_service.log_ai_usage(share["owner_user_id"], conn, "fall_faq")
     return str(run_id)
 
 

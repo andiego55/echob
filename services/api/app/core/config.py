@@ -76,6 +76,10 @@ class Settings(BaseSettings):
     echo_prompt_daily_limit: int = 120    # harter Tages-Deckel Echo-Nachrichten/Nutzer
     report_limit: int = 10         # max. Berichts-Generierungen pro Nutzer/Monat
     scale_calc_limit: int = 10     # max. Skalen-Analysen pro Nutzer/Monat
+    # Ein Fall-FAQ-Lauf schickt den vollen Fallkontext zehnmal an das Modell und
+    # kostet etwa so viel wie zehn Berichte. Zehn im Monat decken den ehrlichen
+    # Gebrauch (ein Lauf je Fachperson, gelegentlich erneuert) mehrfach ab.
+    fall_faq_limit: int = 10       # max. Fall-FAQ-Laeufe pro Nutzer/Monat
     # Harter Deckel der kostenlosen Spielwiese (Demo-Fälle), pro Fachperson:
     demo_echo_limit: int = 30      # max. Echo-Nachrichten auf Demo-Fällen (gesamt)
     demo_report_limit: int = 6     # max. Berichte pro Demo-Fall (inkl. Beispielbericht)

@@ -108,6 +108,7 @@ async def enforce_demo_echo_limit(professional_user_id: str, case_id, conn) -> N
 _AI_USAGE_LIMITS = {
     "report":     ("report_limit", "REPORT_LIMIT_REACHED", "Berichte"),
     "scale_calc": ("scale_calc_limit", "SCALE_LIMIT_REACHED", "Skalen-Analysen"),
+    "fall_faq":   ("fall_faq_limit", "FAQ_LIMIT_REACHED", "Fall-FAQ"),
 }
 
 
@@ -160,6 +161,23 @@ async def enforce_ai_usage_limit(user_id: str, conn, kind: str) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail=error_code,
         )
+
+
+async def has_ai_usage_left(user_id: str, conn, kind: str) -> bool:
+    """Wie ``enforce_ai_usage_limit``, aber ohne 403 — für Aktionen, die *nebenbei* laufen.
+
+    Der Unterschied ist nicht kosmetisch. Ein Bericht ist das, was die Person angefordert
+    hat: Ist das Kontingent leer, gehört ein Fehler auf den Schirm. Das Fall-FAQ hängt
+    dagegen als Wahl an der Freigabe — würde hier ein 403 fliegen, scheiterte die ganze
+    Freigabe an einem erschöpften Nebenkontingent, und die Klient:in bekäme für ihren
+    eigentlichen Wunsch eine Fehlermeldung.
+
+    Beide Wege zählen über dieselbe Grenze, damit Sperre und Anzeige nicht auseinanderlaufen.
+    """
+    limit = getattr(settings, _AI_USAGE_LIMITS[kind][0])
+    if limit <= 0:
+        return True
+    return await _count_ai_usage_this_month(user_id, conn, kind) < limit
 
 
 async def log_ai_usage(user_id: str, conn, kind: str) -> None:

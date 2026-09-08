@@ -96,11 +96,21 @@ export default function CaseSharingPage() {
  * nebenbei in einer Liste vorweggenommen.
  */
 function FaqStand({ share }: { share: CaseShare }) {
-  const text = share.faq_status === 'fertig'
-    ? 'Fragenpaket an die Fachperson übermittelt'
-    : share.faq_status === 'fehler'
-      ? 'Fragenpaket konnte nicht erstellt werden'
-      : 'Fragenpaket wird erstellt …'
+  // Das Datum steht dabei, weil es sonst keinen sichtbaren Unterschied gaebe zwischen
+  // "gerade neu erstellt" und "es gab schon eins, deshalb kein zweites".
+  const am = share.faq_erstellt_am
+    ? ` (${new Date(share.faq_erstellt_am).toLocaleDateString('de-DE')})`
+    : ''
+  // Haekchen gesetzt, aber gar kein Lauf: Das monatliche Kontingent ist aufgebraucht.
+  // Ohne diesen Fall stuende hier "wird erstellt ..." fuer etwas, das nie kommt - und
+  // die Person wartete auf eine Uebermittlung, die nicht stattfindet.
+  const text = !share.faq_status
+    ? 'Fragenpaket nicht erstellt — dein monatliches Kontingent ist aufgebraucht'
+    : share.faq_status === 'fertig'
+      ? `Fragenpaket an die Fachperson übermittelt${am}`
+      : share.faq_status === 'fehler'
+        ? 'Fragenpaket konnte nicht erstellt werden'
+        : 'Fragenpaket wird erstellt …'
   return (
     <p className="mt-1.5 text-[11px] text-brand-muted">
       <span aria-hidden="true">· </span>{text}

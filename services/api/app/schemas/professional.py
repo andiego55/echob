@@ -161,6 +161,10 @@ class CaseShareResponse(BaseModel):
     # Antworten - genau das hat sie ausgeloest: eine Uebermittlung an die Fachperson.
     faq_enabled: bool = False
     faq_status: str | None = None
+    # Wann das Paket entstand. Ohne dieses Datum waere der Tagesdeckel unsichtbar: Wer
+    # erneut speichert und keinen neuen Lauf bekommt, saehe dieselbe Zeile wie vorher und
+    # wuesste nicht, ob etwas passiert ist.
+    faq_erstellt_am: datetime | None = None
 
 
 # ── Postfach / Fallübersicht (Fachperson) ─────────────────────────────────────
