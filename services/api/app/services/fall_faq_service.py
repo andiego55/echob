@@ -44,6 +44,24 @@ KATALOG_FASSUNG = "faq-2026-09"
 _MATERIALLAGE = {"gut", "duenn", "keine"}
 _MAX_ZITAT_WOERTER = 30
 
+#: Ab wann ein Lauf, der noch auf ``offen``/``laeuft`` steht, als abgestorben gilt.
+#:
+#: **Der Grund ist eine Sackgasse, die es wirklich gab.** Stirbt der Prozess mitten im
+#: Lauf — ein Deploy, ein Neustart, ein hartes Kill —, bleibt die Zeile auf ``laeuft``
+#: stehen: Beim SIGKILL läuft kein Python mehr, das den Status setzen könnte. Und weil
+#: ``lauf_anlegen`` einen laufenden Lauf nicht ersetzt, konnte die Klient:in das Häkchen
+#: danach beliebig oft setzen, ohne dass je wieder etwas passierte. Die Fachperson sah
+#: dauerhaft einen Ladebalken, hinter dem nichts mehr war.
+#:
+#: Der Wert muss über der realistischen Laufzeit liegen (zehn Modellaufrufe mit großem
+#: Kontext), sonst startet ein zweiter Lauf neben einem noch arbeitenden.
+TOT_NACH_MINUTEN = 30
+
+#: Zeitlimit je Modellaufruf. Ohne eigenes Limit gilt die Voreinstellung der
+#: OpenAI-Bibliothek — zehn Minuten, dazu Wiederholungen. Für einen Hintergrund-Lauf, den
+#: niemand beobachtet, ist das zu lang: Der Lauf hinge, und niemand wüsste, woran.
+_AUFRUF_TIMEOUT_S = 180
+
 
 # ── Prüfung ──────────────────────────────────────────────────────────────────
 
@@ -196,8 +214,10 @@ async def lauf_anlegen(conn, *, share: dict) -> str | None:
     fehlen.
     """
     laeuft = await conn.fetchval(
-        "SELECT 1 FROM case_faq_runs WHERE share_id = $1 AND status IN ('offen','laeuft')",
-        share["id"],
+        "SELECT 1 FROM case_faq_runs WHERE share_id = $1 "
+        "  AND status IN ('offen','laeuft') "
+        "  AND angefordert_am > NOW() - ($2 || ' minutes')::interval",
+        share["id"], str(TOT_NACH_MINUTEN),
     )
     if laeuft:
         logger.info("Fall-FAQ: Lauf für Freigabe %s läuft bereits.", share["id"])
@@ -308,7 +328,14 @@ async def erzeuge(app, run_id: str) -> None:
             int(s["scene_no"]) for s in bundle.scenes if s.get("scene_no") is not None
         }
 
-        beantwortet = 0
+        # Ein Block, der scheitert, reißt die anderen nicht mit. Neun gelungene Aufrufe
+        # sind bezahlt — sie wegzuwerfen, weil der zehnte hakt, wäre teuer und für die
+        # Fachperson schlechter als eine unvollständige Auskunft, die sich als solche zu
+        # erkennen gibt („34 von 40 beantwortet").
+        #
+        # Gezählt wird trotzdem mit: Scheitert JEDER Block, ist das kein dünnes Ergebnis,
+        # sondern ein Fehler — und muss auch als Fehler dastehen.
+        beantwortet, versucht, gescheitert = 0, 0, 0
         nach_kategorie = katalog.fragen_nach_kategorie()
         for kennung in katalog.KATEGORIEN:
             fragen = [
@@ -317,11 +344,22 @@ async def erzeuge(app, run_id: str) -> None:
             if not fragen:
                 continue
             erlaubt = {f.id: f for f in fragen}
-            roh = await echo_svc.fall_faq_antworten(
-                context=context,
-                fragen=[{"frage_id": f.id, "frage": f.frage, "auftrag": f.auftrag}
-                        for f in fragen],
-            )
+            versucht += 1
+            try:
+                roh = await asyncio.wait_for(
+                    echo_svc.fall_faq_antworten(
+                        context=context,
+                        fragen=[{"frage_id": f.id, "frage": f.frage, "auftrag": f.auftrag}
+                                for f in fragen],
+                    ),
+                    timeout=_AUFRUF_TIMEOUT_S,
+                )
+            except Exception:       # noqa: BLE001 — der nächste Block bekommt seine Chance
+                gescheitert += 1
+                logger.exception(
+                    "Fall-FAQ: Kategorie %s fehlgeschlagen (run_id=%s).", kennung, run_id)
+                continue
+
             geprueft = [
                 a for a in (_saubere_antwort(r, erlaubt, nummern) for r in roh) if a
             ]
@@ -334,6 +372,10 @@ async def erzeuge(app, run_id: str) -> None:
                         "UPDATE case_faq_runs SET fragen_beantwortet = $2 WHERE id = $1",
                         run_id, beantwortet,
                     )
+
+        if versucht and gescheitert == versucht:
+            raise RuntimeError(
+                f"Alle {versucht} Frageblöcke sind fehlgeschlagen — siehe Log.")
 
         auswertung = await _erzeuge_merkmalsbild(echo_svc, context, nummern)
 
@@ -364,11 +406,14 @@ async def _erzeuge_merkmalsbild(echo_svc, context: str, nummern: set[int]) -> di
     die Zugabe aus, bleibt der Kern.
     """
     try:
-        roh = await echo_svc.fall_faq_merkmale(
-            context=context,
-            achsen=[{"achse_id": a.id, "name": a.name, "frage": a.frage,
-                     "pol_niedrig": a.pol_niedrig, "pol_hoch": a.pol_hoch}
-                    for a in merkmale.ACHSEN],
+        roh = await asyncio.wait_for(
+            echo_svc.fall_faq_merkmale(
+                context=context,
+                achsen=[{"achse_id": a.id, "name": a.name, "frage": a.frage,
+                         "pol_niedrig": a.pol_niedrig, "pol_hoch": a.pol_hoch}
+                        for a in merkmale.ACHSEN],
+            ),
+            timeout=_AUFRUF_TIMEOUT_S,
         )
     except Exception:           # noqa: BLE001
         logger.exception("Fall-FAQ: Merkmalsbild fehlgeschlagen — Antworten bleiben.")

@@ -56,6 +56,14 @@ async def _fall_mit_freigabe(conn, *, faq=True):
         "VALUES ($1,$2,$3,'active',$4) RETURNING *",
         case_id, owner, pro, faq,
     )
+    # Ohne freigegebene Elemente ist keine einzige Katalogfrage anwendbar - der Lauf
+    # liefe durch, ohne irgendetwas zu fragen. Eine Fixture, die das ausliesse, wuerde
+    # jeden Test ueber den Ablauf ins Leere laufen lassen, ohne rot zu werden.
+    for element in ("all_scenes", "onboarding", "scales"):
+        await conn.execute(
+            "INSERT INTO case_share_elements (share_id, element_type) VALUES ($1,$2)",
+            share["id"], element,
+        )
     # Art. 28: eine arbeitende Fachperson hat den AVV abgeschlossen.
     await conn.execute(
         "INSERT INTO professional_agreements (professional_user_id, kind, version) VALUES ($1,'avv',$2)",
@@ -122,6 +130,26 @@ class _AppAttrappe:
         self.state = type("S", (), {"pool": _PoolAttrappe(conn), "echo_service": echo_service})()
 
 
+class _EchoAttrappe:
+    """Echo-Dienst, der eine feste Zahl von Frageblöcken scheitern laesst."""
+
+    def __init__(self, *, scheitert_ab=0):
+        self.aufrufe = 0
+        self._scheitert_ab = scheitert_ab
+
+    async def fall_faq_antworten(self, *, context, fragen, **_):
+        self.aufrufe += 1
+        if self.aufrufe > self._scheitert_ab:
+            raise RuntimeError("Modell nicht erreichbar")
+        return [{
+            "frage_id": f["frage_id"], "antwort": "Eine Antwort.",
+            "belege": [], "gegenbelege": [], "materiallage": "keine",
+        } for f in fragen]
+
+    async def fall_faq_merkmale(self, **_):
+        return {}
+
+
 # ── Der Hintergrund-Lauf ─────────────────────────────────────────────────────
 
 async def test_ein_gescheiterter_start_bleibt_nicht_auf_laeuft_haengen(db):
@@ -144,6 +172,30 @@ async def test_ein_gescheiterter_start_bleibt_nicht_auf_laeuft_haengen(db):
         "SELECT status FROM case_faq_runs WHERE id = $1", run_id) == "fehler"
 
 
+async def test_ein_abgestorbener_lauf_blockiert_nicht_fuer_immer(db):
+    """Die Sackgasse, die es in der Produktion wirklich gab.
+
+    Stirbt der Prozess mitten im Lauf - Deploy, Neustart, hartes Kill -, bleibt die Zeile
+    auf 'laeuft': Beim SIGKILL laeuft kein Python mehr, das den Status setzen koennte.
+    Und weil lauf_anlegen einen laufenden Lauf nicht ersetzt, konnte die Klient:in das
+    Haekchen danach beliebig oft setzen, ohne dass je wieder etwas passierte.
+    """
+    _owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    erster = await dienst.lauf_anlegen(db, share=share)
+    await db.execute("UPDATE case_faq_runs SET status = 'laeuft' WHERE id = $1", erster)
+
+    # Frisch: kein zweiter Lauf.
+    assert await dienst.lauf_anlegen(db, share=share) is None
+
+    # Ueber der Totzeit: der abgestorbene Lauf wird ersetzt.
+    await db.execute(
+        "UPDATE case_faq_runs SET angefordert_am = NOW() - ($2 || ' minutes')::interval "
+        "WHERE id = $1",
+        erster, str(dienst.TOT_NACH_MINUTEN + 5),
+    )
+    assert await dienst.lauf_anlegen(db, share=share) is not None
+
+
 async def test_ohne_echo_dienst_endet_der_lauf_als_fehler(db):
     _owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
     run_id = await dienst.lauf_anlegen(db, share=share)
@@ -157,6 +209,39 @@ async def test_ohne_echo_dienst_endet_der_lauf_als_fehler(db):
     # Der Grund muss lesbar sein - sonst steht die Fachperson vor "fehlgeschlagen" und
     # niemand kann nachsehen, warum.
     assert zeile["fehler"]
+
+
+async def test_ein_gescheiterter_block_reisst_die_anderen_nicht_mit(db):
+    """Neun gelungene Aufrufe sind bezahlt.
+
+    Sie wegzuwerfen, weil der zehnte hakt, waere teuer - und fuer die Fachperson
+    schlechter als eine unvollstaendige Auskunft, die sich als solche zu erkennen gibt.
+    """
+    _owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    run_id = await dienst.lauf_anlegen(db, share=share)
+    echo = _EchoAttrappe(scheitert_ab=3)     # die ersten drei Bloecke gelingen
+
+    await dienst.erzeuge(_AppAttrappe(db, echo_service=echo), run_id)
+
+    zeile = await db.fetchrow(
+        "SELECT status, fragen_beantwortet FROM case_faq_runs WHERE id = $1", run_id)
+    assert zeile["status"] == "fertig"
+    assert zeile["fragen_beantwortet"] > 0
+    assert zeile["fragen_beantwortet"] < 40      # unvollstaendig, und das sagt die Zahl
+
+
+async def test_scheitern_alle_bloecke_ist_es_ein_fehler(db):
+    # Sonst stuende ein Lauf ohne eine einzige Antwort als 'fertig' da - und sein
+    # Ergebnis "nichts war beantwortbar" waere eine Luege ueber die Freigabe.
+    _owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    run_id = await dienst.lauf_anlegen(db, share=share)
+
+    with pytest.raises(Exception):
+        await dienst.erzeuge(
+            _AppAttrappe(db, echo_service=_EchoAttrappe(scheitert_ab=0)), run_id)
+
+    assert await db.fetchval(
+        "SELECT status FROM case_faq_runs WHERE id = $1", run_id) == "fehler"
 
 
 # ── Der Widerruf ─────────────────────────────────────────────────────────────
