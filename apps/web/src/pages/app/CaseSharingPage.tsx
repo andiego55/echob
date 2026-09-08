@@ -14,7 +14,7 @@ import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
-import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen } from '@/lib/einwilligung'
+import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen } from '@/lib/einwilligung'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
@@ -73,6 +73,7 @@ export default function CaseSharingPage() {
                               <span key={label} className="text-[11px] px-2 py-0.5 rounded-full border border-brand-border text-brand-muted">{label}</span>
                             ))}
                       </div>
+                      {s.faq_enabled && <FaqStand share={s} />}
                     </div>
                     {s.status === 'active' && <RevokeButton caseId={caseId!} share={s} />}
                   </div>
@@ -83,6 +84,27 @@ export default function CaseSharingPage() {
         </div>
       </div>
     </AppShell>
+  )
+}
+
+/**
+ * Der Stand des Fragenpakets — und ausdruecklich nicht sein Inhalt.
+ *
+ * Wer das Haekchen gesetzt hat, soll sehen, dass etwas passiert ist. Die Antworten
+ * stehen hier bewusst nicht: Sie sind genau das, was uebermittelt wurde. Wer sie sehen
+ * will, hat einen Auskunftsanspruch (Art. 15 DSGVO) - der wird beantwortet, nicht
+ * nebenbei in einer Liste vorweggenommen.
+ */
+function FaqStand({ share }: { share: CaseShare }) {
+  const text = share.faq_status === 'fertig'
+    ? 'Fragenpaket an die Fachperson übermittelt'
+    : share.faq_status === 'fehler'
+      ? 'Fragenpaket konnte nicht erstellt werden'
+      : 'Fragenpaket wird erstellt …'
+  return (
+    <p className="mt-1.5 text-[11px] text-brand-muted">
+      <span aria-hidden="true">· </span>{text}
+    </p>
   )
 }
 
@@ -220,6 +242,9 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   // Zwei rechtlich verschiedene Erklaerungen - deshalb zwei Haken. Frueher stand beides
   // in einer Bestaetigung; wer nur einer zustimmen wollte, konnte das nicht.
   const [zustimmung, setZustimmung] = useState<Record<string, boolean>>({})
+  // Bewusst NICHT in `zustimmung`: Das Fragenpaket ist eine Wahl, keine Bedingung. Läge
+  // es im selben Zustand, wäre es eine Zeile Code davon entfernt, die Freigabe zu sperren.
+  const [fallFaq, setFallFaq] = useState(false)
   const [done, setDone] = useState(false)
 
   // Bestehende Freigabe der gewählten Fachperson vorbefüllen (= Bearbeiten)
@@ -233,8 +258,10 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
       setElements([]); setSceneIds([]); setMessage('')
     }
     // Beim Wechsel der Fachperson beide Haken loesen: Die Erklaerungen nennen sie
-    // beim Namen - fuer eine andere Person gelten sie nicht.
+    // beim Namen - fuer eine andere Person gelten sie nicht. Das Fragenpaket ebenso:
+    // Es wuerde sonst fuer jemanden ausgeloest, fuer den es nie gemeint war.
     setZustimmung({})
+    setFallFaq(false)
     setDone(false)
   }, [proId, shares])
 
@@ -261,8 +288,10 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
         message: message.trim() || null,
         consent: true,
         consent_version: EINWILLIGUNG_FASSUNG,
-        // Beide Erklärungen im Wortlaut — genau, was oben stand.
-        consent_text: einwilligungsProtokoll(selProName),
+        // Beide Erklärungen im Wortlaut — genau, was oben stand. Der FAQ-Absatz kommt
+        // nur mit, wenn das Häkchen wirklich gesetzt war.
+        consent_text: einwilligungsProtokoll(selProName, fallFaq),
+        fall_faq: fallFaq,
       })
     },
     onSuccess: () => {
@@ -382,6 +411,25 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
                 {WIDERRUFSHINWEIS}
               </p>
             </div>
+
+            {/* Optional, und deshalb abgesetzt: keine Umrandung in Akzentfarbe, kein
+                Platz in der Reihe der Pflicht-Erklärungen. Wer nur freigeben will, soll
+                hier nichts tun müssen. */}
+            <label className="mt-3 flex cursor-pointer gap-3 rounded-brand border border-dashed border-brand-border px-4 py-3 hover:bg-brand-bg/50">
+              <input
+                type="checkbox"
+                checked={fallFaq}
+                onChange={e => setFallFaq(e.target.checked)}
+                className="mt-0.5 shrink-0 accent-accent"
+              />
+              <span className="text-xs leading-relaxed text-brand-text">
+                <strong className="mb-1 block text-navy">
+                  {FALL_FAQ_ERKLAERUNG.titel}{' '}
+                  <span className="font-normal text-brand-muted">· optional</span>
+                </strong>
+                {FALL_FAQ_ERKLAERUNG.text}
+              </span>
+            </label>
             </>
           )}
 

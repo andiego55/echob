@@ -130,6 +130,10 @@ class ShareCreate(BaseModel):
     # belegt nicht, WOZU eingewilligt wurde - dafuer muesste man den damaligen
     # Quellcode-Stand rekonstruieren. Art. 7 Abs. 1 DSGVO verlangt den Nachweis.
     consent_text: str | None = Field(None, max_length=4000)
+    # Fall-FAQ: Die Klient:in loest das Fragenpaket aus, nicht die Fachperson. Fuer
+    # Berufsgeheimnistraeger:innen ist der Unterschied nicht akademisch - wer selbst
+    # fragt, offenbart. Deshalb steht der Schalter hier und nicht im Fachpersonenbereich.
+    fall_faq: bool = False
 
 
 class ShareUpdate(BaseModel):
@@ -153,6 +157,10 @@ class CaseShareResponse(BaseModel):
     elements: list[ShareElementResponse] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
+    # Fall-FAQ: ob ausgeloest, und wie weit. Die Klient:in sieht den STAND, nie die
+    # Antworten - genau das hat sie ausgeloest: eine Uebermittlung an die Fachperson.
+    faq_enabled: bool = False
+    faq_status: str | None = None
 
 
 # ── Postfach / Fallübersicht (Fachperson) ─────────────────────────────────────

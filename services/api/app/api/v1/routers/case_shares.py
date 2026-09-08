@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.professional import (
@@ -16,7 +16,7 @@ from app.schemas.professional import (
     ShareElementResponse,
     ShareUpdate,
 )
-from app.services import seat_service
+from app.services import fall_faq_service, seat_service
 
 router = APIRouter(prefix="/cases/{case_id}/shares", tags=["shares"])
 
@@ -60,6 +60,12 @@ async def _build_share_response(conn, share_row) -> CaseShareResponse:
         "SELECT display_name FROM professional_profiles WHERE user_id = $1",
         share_row["professional_user_id"],
     )
+    # Nur der Stand des Fragenpakets, nie sein Inhalt: Die Antworten gehen an die
+    # Fachperson. Die Klient:in soll sehen, dass etwas ausgeloest wurde und wie weit es
+    # ist - Auskunft ueber die Inhalte gibt es auf Verlangen (Art. 15 DSGVO), nicht
+    # nebenbei in einer Liste.
+    faq_status = await conn.fetchval(
+        "SELECT status FROM case_faq_runs WHERE share_id = $1", share_row["id"])
     return CaseShareResponse(
         id=share_row["id"],
         case_id=share_row["case_id"],
@@ -73,6 +79,8 @@ async def _build_share_response(conn, share_row) -> CaseShareResponse:
         ],
         created_at=share_row["created_at"],
         updated_at=share_row["updated_at"],
+        faq_enabled=share_row["faq_enabled"],
+        faq_status=faq_status,
     )
 
 
@@ -97,6 +105,7 @@ async def list_shares(
 async def create_share(
     case_id: UUID,
     body: ShareCreate,
+    request: Request,
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CaseShareResponse:
@@ -134,18 +143,34 @@ async def create_share(
                 """
                 INSERT INTO case_shares
                   (case_id, owner_user_id, professional_user_id, status, message,
-                   consent_version, consent_text, consented_at)
-                VALUES ($1, $2, $3, 'active', $4, $5, $6, NOW())
+                   consent_version, consent_text, consented_at, faq_enabled)
+                VALUES ($1, $2, $3, 'active', $4, $5, $6, NOW(), $7)
                 ON CONFLICT (case_id, professional_user_id) DO UPDATE SET
                   status = 'active', message = EXCLUDED.message, updated_at = NOW(), revoked_at = NULL,
                   consent_version = EXCLUDED.consent_version,
-                  consent_text = EXCLUDED.consent_text, consented_at = NOW()
+                  consent_text = EXCLUDED.consent_text, consented_at = NOW(),
+                  faq_enabled = EXCLUDED.faq_enabled
                 RETURNING *
                 """,
                 case_id, uid, body.professional_user_id, body.message,
-                body.consent_version, body.consent_text.strip(),
+                body.consent_version, body.consent_text.strip(), body.fall_faq,
             )
             await _set_elements(conn, share["id"], case_id, body.elements, body.scene_ids)
+            # Das Fragenpaket wird HIER ausgeloest, in der Transaktion der Freigabe: Der
+            # Lauf und die Einwilligung, auf der er beruht, entstehen gemeinsam oder
+            # keins von beidem.
+            run_id = None
+            if body.fall_faq:
+                run_id = await fall_faq_service.lauf_anlegen(conn, share=share)
+            else:
+                # Haken weggenommen: Ein frueher erzeugter Lauf muss weg. Sonst blieben
+                # Antworten stehen, die die Klient:in gerade abbestellt hat - und die
+                # Freigabe saehe aus, als waere nichts uebermittelt worden.
+                await fall_faq_service.lauf_entfernen(conn, share["id"], uid)
+        # Erst nach der Transaktion starten - ein Hintergrund-Task, der eine noch nicht
+        # festgeschriebene Zeile sucht, findet sie nicht.
+        if run_id:
+            fall_faq_service.spawn(request.app, run_id)
         return await _build_share_response(conn, share)
 
 
@@ -172,6 +197,13 @@ async def update_share(
                 share_id, body.message,
             )
             await _set_elements(conn, share_id, case_id, body.elements, body.scene_ids)
+            # Die Auswahl hat sich geaendert - ein vorhandener Fall-FAQ-Lauf passt nicht
+            # mehr dazu. Er zitiert woertlich aus Szenen, die jetzt womoeglich nicht mehr
+            # freigegeben sind. Der Freigabe-Status bleibt dabei 'active', der Lesepfad
+            # wuerde ihn also weiter herausgeben.
+            await fall_faq_service.lauf_entfernen(conn, share_id, uid)
+            await conn.execute(
+                "UPDATE case_shares SET faq_enabled = FALSE WHERE id = $1", share_id)
             share = await conn.fetchrow("SELECT * FROM case_shares WHERE id = $1", share_id)
         return await _build_share_response(conn, share)
 

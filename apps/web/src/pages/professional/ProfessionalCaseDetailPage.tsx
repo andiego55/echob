@@ -30,6 +30,7 @@ import type {
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
 import ArbeitsmappePanel from '@/components/professional/ArbeitsmappePanel'
+import FallFaqPanel from '@/components/professional/FallFaqPanel'
 
 const TOPIC_LABELS: Record<string, string> = {
   topic_self: 'Über mich', topic_person: 'Über die Fallperson',
@@ -46,6 +47,9 @@ const HYP_LABELS: Record<string, string> = {
 
 const TABS = [
   { key: 'ueber', label: 'Übersicht' },
+  // Direkt hinter der Uebersicht: Das FAQ ist Vorbereitungsmaterial, es wird VOR dem
+  // ersten Gespraech gelesen und danach kaum noch.
+  { key: 'faq', label: 'Fall-FAQ' },
   { key: 'collab', label: 'Zusammenarbeit' },
   { key: 'echo', label: 'Echo' },
   { key: 'arbeitsmappe', label: 'Arbeitsmappe' },
@@ -431,6 +435,7 @@ export default function ProfessionalCaseDetailPage() {
         {!bundle.is_demo && bundle.activated && <CaseSeatActive caseId={caseId!} />}
 
         {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
+        {tab === 'faq' && <FallFaqPanel caseId={caseId!} bundle={bundle} />}
         {tab === 'collab' && <CollabPanel caseId={caseId!} initialType={collabSub} />}
         {tab === 'echo' && (
           <EchoPanel

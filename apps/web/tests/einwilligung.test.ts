@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DATENSCHUTZHINWEISE,
   EINWILLIGUNG_FASSUNG,
+  FALL_FAQ_ERKLAERUNG,
   WIDERRUFSHINWEIS,
   alleErklaerungenBestaetigt,
   einwilligungsProtokoll,
@@ -98,6 +99,45 @@ describe('Widerruf und Nachweis', () => {
 
   it('traegt eine Fassungskennung, die eine zweite Fassung im Monat zulaesst', () => {
     expect(EINWILLIGUNG_FASSUNG).toMatch(/^share-\d{4}-\d{2}[a-z]?$/)
+  })
+})
+
+describe('Das Fall-FAQ im Nachweis', () => {
+  it('steht NICHT im Protokoll, wenn es nicht angehakt war', () => {
+    // Der Nachweis soll belegen, was die Person erklaert hat - nicht, was ihr angeboten
+    // wurde. Stuende der Absatz immer drin, belegte er bei jeder Freigabe eine
+    // Uebermittlung, die meistens nicht stattgefunden hat.
+    expect(einwilligungsProtokoll(NAME)).not.toContain(FALL_FAQ_ERKLAERUNG.titel)
+    expect(einwilligungsProtokoll(NAME, false)).not.toContain(FALL_FAQ_ERKLAERUNG.titel)
+  })
+
+  it('steht im Wortlaut im Protokoll, wenn es angehakt war', () => {
+    const protokoll = einwilligungsProtokoll(NAME, true)
+    expect(protokoll).toContain(FALL_FAQ_ERKLAERUNG.titel)
+    expect(protokoll).toContain(FALL_FAQ_ERKLAERUNG.text)
+  })
+
+  it('sagt den Satz, den man nicht erraten kann', () => {
+    // Dass die Antworten bei der Fachperson landen und nicht bei der Person, die sie
+    // ausloest, ist ungewoehnlich genug, dass es dastehen muss - es ist der einzige
+    // Grund, aus dem jemand das Haekchen vielleicht doch nicht setzen will.
+    expect(FALL_FAQ_ERKLAERUNG.text).toContain('sieht die Fachperson, nicht ich')
+    expect(FALL_FAQ_ERKLAERUNG.text).toContain('Art. 15 DSGVO')
+  })
+
+  it('verspricht nicht mehr, als die Freigabe hergibt', () => {
+    // Verarbeitet wird nur das Ausgewaehlte. Faellt dieser Satz weg, klingt das
+    // Fragenpaket nach einem Zugriff auf den ganzen Fall.
+    expect(FALL_FAQ_ERKLAERUNG.text).toContain('nur, was ich oben ausgewählt habe')
+  })
+
+  it('haengt nicht an den Pflicht-Erklaerungen', () => {
+    // Das Fragenpaket ist eine Wahl, keine Bedingung: Ohne den Haken muss die Freigabe
+    // trotzdem moeglich sein. Ein `every` ueber drei statt zwei Erklaerungen wuerde sie
+    // sperren, und der Knopf saehe genauso aus.
+    const ids = erklaerungen(NAME).map(e => e.id)
+    expect(ids).not.toContain('fall_faq')
+    expect(alleErklaerungenBestaetigt({ einwilligung: true, entbindung: true }, NAME)).toBe(true)
   })
 })
 

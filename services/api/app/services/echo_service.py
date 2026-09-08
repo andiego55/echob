@@ -1898,6 +1898,68 @@ class EchoService:
         )
         return response.choices[0].message.content or ""
 
+    # ── Fall-FAQ ─────────────────────────────────────────────────────────────
+    #
+    # Zwei Aufrufe mit demselben Fallkontext, aber verschiedenen Systemtexten: einmal
+    # freie Antworten auf vorgegebene Fragen, einmal Zahlen auf vorgegebenen Achsen.
+    # Beide fordern JSON, beide erzwingen Belege — die Prüfung, ob welche da sind,
+    # passiert danach im fall_faq_service, nicht hier.
+
+    async def fall_faq_antworten(
+        self, *, context: str, fragen: list[dict], max_tokens: int = 4000,
+    ) -> list[dict]:
+        """Beantwortet einen Block Katalogfragen. Gibt die Rohliste zurück (ungeprüft)."""
+        if not self._use_openai:
+            return []
+        import json as _json
+
+        aufgabe = _json.dumps({"fragen": fragen}, ensure_ascii=False, indent=1)
+        response = await self._chat(
+            model=self._model_smart,
+            messages=[
+                {"role": "system", "content": _load_prompt("fall_faq_prompt.md")},
+                {"role": "system", "content": context},
+                {"role": "user", "content": aufgabe},
+            ],
+            max_tokens=max_tokens,
+            temperature=0.25,
+            response_format={"type": "json_object"},
+        )
+        try:
+            parsed = _json.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("Fall-FAQ: ungültige JSON-Antwort für %d Fragen.", len(fragen))
+            return []
+        antworten = parsed.get("antworten")
+        return antworten if isinstance(antworten, list) else []
+
+    async def fall_faq_merkmale(
+        self, *, context: str, achsen: list[dict], max_tokens: int = 5000,
+    ) -> dict:
+        """Schätzt die Merkmalsachsen ein. Gibt die Rohstruktur zurück (ungeprüft)."""
+        if not self._use_openai:
+            return {}
+        import json as _json
+
+        aufgabe = _json.dumps({"achsen": achsen}, ensure_ascii=False, indent=1)
+        response = await self._chat(
+            model=self._model_smart,
+            messages=[
+                {"role": "system", "content": _load_prompt("fall_faq_merkmale_prompt.md")},
+                {"role": "system", "content": context},
+                {"role": "user", "content": aufgabe},
+            ],
+            max_tokens=max_tokens,
+            temperature=0.2,
+            response_format={"type": "json_object"},
+        )
+        try:
+            parsed = _json.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("Fall-FAQ: ungültige JSON-Antwort für das Merkmalsbild.")
+            return {}
+        return parsed if isinstance(parsed, dict) else {}
+
 
 # ── Singleton-Factory für lifespan ────────────────────────────────────────────
 

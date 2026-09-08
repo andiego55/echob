@@ -51,7 +51,7 @@ import { BETREIBER_KURZ, BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreibe
  * und benennt die Beteiligten. Seit Migration 102 wird zusätzlich der Wortlaut selbst
  * gespeichert — die Kennung ordnet ein, der Text beweist.
  */
-export const EINWILLIGUNG_FASSUNG = 'share-2026-09b'
+export const EINWILLIGUNG_FASSUNG = 'share-2026-09c'
 
 /**
  * Was geschieht — die Information, bevor gefragt wird.
@@ -136,6 +136,38 @@ export function erklaerungen(fachperson: string): Erklaerung[] {
 }
 
 /**
+ * Das Fall-FAQ — die eine zusätzliche Entscheidung, die getroffen werden kann.
+ *
+ * **Warum das kein dritter Haken neben den beiden Erklärungen ist.** Die beiden
+ * Erklärungen sind Pflicht: Ohne sie gibt es keine Freigabe. Das Fragenpaket ist eine
+ * *Wahl* — man kann freigeben und es nicht wollen. Stünde es in derselben Reihe, sähe es
+ * aus wie eine dritte Bedingung, und wer zügig klickt, hakte es mit ab. Genau das soll es
+ * nicht sein.
+ *
+ * **Warum es trotzdem hier steht und nicht bloß im Formular.** Wer es anhakt, löst eine
+ * Übermittlung aus, die ohne den Haken nicht stattfände. Was dabei geschieht und wer die
+ * Antworten sieht, gehört deshalb in den Wortlaut, der als Nachweis gespeichert wird —
+ * nicht in eine Bildunterschrift, die morgen anders lautet.
+ *
+ * **Der Satz, auf den es ankommt,** ist der vorletzte: dass die Antworten bei der
+ * Fachperson landen und nicht bei der Person, die sie auslöst. Das ist ungewöhnlich genug,
+ * dass man es nicht erraten kann, und es ist der einzige Grund, aus dem jemand das
+ * Häkchen vielleicht doch nicht setzen will.
+ */
+export const FALL_FAQ_ERKLAERUNG = {
+  titel: 'Fragenpaket für die Fachperson',
+  kurz: 'EchoB beantwortet einmalig 40 fachliche Fragen zu deinem Fall.',
+  text:
+    'Zusätzlich kann EchoB einmalig 40 fachlich vorbereitete Fragen zu den freigegebenen '
+    + 'Inhalten beantworten, damit die Fachperson sich vor dem ersten Gespräch einlesen '
+    + 'kann. Die Fragen stehen fest und sind für alle gleich; die Fachperson kann sie weder '
+    + 'ändern noch eigene stellen. Verarbeitet wird dabei nur, was ich oben ausgewählt habe '
+    + '— nichts darüber hinaus. Die Antworten sieht die Fachperson, nicht ich; auf Verlangen '
+    + 'erhalte ich sie jederzeit (Art. 15 DSGVO). Widerrufe ich die Freigabe, verliert die '
+    + 'Fachperson auch auf diese Antworten den Zugriff.',
+}
+
+/**
  * Der gemeinsame Hinweis unter beiden Erklärungen.
  *
  * Kein Teil der Erklärungen selbst, sondern die Information, ohne die sie nicht informiert
@@ -154,8 +186,12 @@ export const WIDERRUFSHINWEIS =
  * Genau dieser Text stand der Person auf dem Schirm. Er wird an der Freigabe abgelegt,
  * damit später nicht der Quellcode-Stand rekonstruiert werden muss.
  */
-export function einwilligungsProtokoll(fachperson: string): string {
+export function einwilligungsProtokoll(fachperson: string, fallFaq = false): string {
   const teile = erklaerungen(fachperson).map(e => `${e.titel}\n${e.text}`)
+  // Nur wenn wirklich angehakt: Der Nachweis soll belegen, was die Person erklaert hat,
+  // nicht was ihr angeboten wurde. Stuende der Absatz immer drin, belegte er bei jeder
+  // Freigabe eine Uebermittlung, die meistens nicht stattgefunden hat.
+  if (fallFaq) teile.push(`${FALL_FAQ_ERKLAERUNG.titel}\n${FALL_FAQ_ERKLAERUNG.text}`)
   return [...teile, WIDERRUFSHINWEIS].join('\n\n')
 }
 

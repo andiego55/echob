@@ -961,6 +961,9 @@ export interface CaseShare {
   elements: ShareElement[]
   created_at: string
   updated_at: string
+  /** Fall-FAQ ausgeloest? Der Stand, nie der Inhalt - die Antworten gehen an die Fachperson. */
+  faq_enabled?: boolean
+  faq_status?: 'offen' | 'laeuft' | 'fertig' | 'fehler' | null
 }
 
 export interface ShareCreate {
@@ -972,6 +975,8 @@ export interface ShareCreate {
   consent_version?: string
   /** Wortlaut, wie er angezeigt wurde - der eigentliche Nachweis (Art. 7 Abs. 1 DSGVO). */
   consent_text?: string
+  /** Fragenpaket ausloesen. Loest die Klient:in aus, nicht die Fachperson. */
+  fall_faq?: boolean
 }
 
 export interface InboxItem {
@@ -1232,4 +1237,81 @@ export interface CoupleReport {
 export interface CoupleMeta {
   suggested_questions: string[]
   glossary: GlossaryTerm[]
+}
+
+// ── Fall-FAQ ──────────────────────────────────────────────────────────────────
+//
+// Das Fragenpaket, das die Klient:in bei der Freigabe ausloest und das nur die
+// Fachperson liest. Struktur siehe services/api/app/services/fall_faq_service.py.
+
+export interface FaqBeleg {
+  szene_nr: number
+  zitat: string
+}
+
+export interface FaqFrage {
+  frage_id: string
+  frage: string
+  /** Antworten, die vorsichtig gelesen werden wollen - im Dashboard gekennzeichnet. */
+  heikel: boolean
+  antwort: string | null
+  belege: FaqBeleg[]
+  gegenbelege: FaqBeleg[]
+  materiallage: 'gut' | 'duenn' | 'keine'
+  /** Wurde die Frage ueberhaupt gestellt? Nein = das noetige Material war nicht freigegeben. */
+  gestellt: boolean
+}
+
+export interface FaqKategorie {
+  id: string
+  titel: string
+  untertitel: string
+  marke: string
+  fragen: FaqFrage[]
+  beantwortet: number
+}
+
+export interface FaqAchse {
+  achse_id: string
+  /** Beschriftung kommt beim Lesen aus dem Backend-Katalog - nie hier zweitgeschrieben. */
+  name: string
+  pol_niedrig: string
+  pol_hoch: string
+  /** Achsen, bei denen ein HOHER Wert das Unauffaellige ist (Reue, Empathie, ...). */
+  positiv_gepolt: boolean
+  wert: number
+  begruendung: string
+  belege: FaqBeleg[]
+  gegenbelege: FaqBeleg[]
+  belegdichte: 'keine' | 'duenn' | 'tragfaehig' | 'gut'
+  /** Unter zwei Belegen wird die Zahl nicht angezeigt - sie waere eine Episode, kein Muster. */
+  belastbar: boolean
+}
+
+export interface FaqClusterAnteil {
+  id: string
+  name: string
+  beschreibung: string
+  /** null = nicht beurteilbar, weil eine tragende Achse zu duenn belegt ist. */
+  wert: number | null
+  achsen: string[]
+  gegenachsen: string[]
+  fehlende_achsen: string[]
+}
+
+export interface FaqAuswertung {
+  achsen: FaqAchse[]
+  cluster: FaqClusterAnteil[]
+  materiallage: { umfang?: string; luecken?: string; einseitigkeit?: string }
+}
+
+export interface FallFaq {
+  status: 'nicht_angefordert' | 'offen' | 'laeuft' | 'fertig' | 'fehler'
+  angefordert_am?: string
+  fertig_am?: string | null
+  fragen_geplant?: number
+  fragen_beantwortet?: number
+  katalog_fassung?: string
+  kategorien: FaqKategorie[]
+  auswertung: FaqAuswertung | null
 }
