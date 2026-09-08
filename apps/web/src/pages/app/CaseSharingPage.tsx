@@ -14,7 +14,7 @@ import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
-import { EINWILLIGUNG_FASSUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen } from '@/lib/einwilligung'
+import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen } from '@/lib/einwilligung'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
@@ -342,9 +342,28 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
             className="w-full rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-y"
           />
 
-          {/* DSGVO: ausdrückliche, spezifische Einwilligung vor der Freigabe */}
+          {/* Drei Ebenen: erst die Information (Art. 13), dann die beiden Erklärungen
+              (Art. 9 und Schweigepflicht). Nur die Erklärungen werden angehakt — man
+              bestätigt keine Information. */}
           {!nothingSelected && (
-            <div className="mt-4 space-y-2">
+            <>
+            <div className="mt-4 rounded-brand border border-brand-border bg-brand-bg/60 px-4 py-3">
+              <p className="mb-2 text-xs font-semibold text-navy">Was mit deinen Inhalten geschieht</p>
+              <dl className="grid gap-1.5 text-xs leading-relaxed text-brand-text sm:grid-cols-[9rem_1fr]">
+                {DATENSCHUTZHINWEISE.map(h => (
+                  <div key={h.was} className="sm:contents">
+                    <dt className="font-medium text-brand-muted">{h.was}</dt>
+                    <dd className="mb-1 ml-0 sm:mb-0">{h.text}</dd>
+                  </div>
+                ))}
+              </dl>
+              <a href="/datenschutz" target="_blank" rel="noopener noreferrer"
+                className="mt-2 inline-block text-xs text-accent hover:underline">
+                Vollständige Datenschutzerklärung öffnen
+              </a>
+            </div>
+
+            <div className="mt-3 space-y-2">
               {erklaerungen(selProName).map(e => (
                 <label key={e.id} className="flex cursor-pointer gap-3 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3">
                   <input
@@ -360,10 +379,10 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
                 </label>
               ))}
               <p className="px-1 text-[11px] leading-relaxed text-brand-muted">
-                {WIDERRUFSHINWEIS}{' '}
-                <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Datenschutzerklärung öffnen</a>
+                {WIDERRUFSHINWEIS}
               </p>
             </div>
+            </>
           )}
 
           <div className="mt-3 flex items-center gap-3">

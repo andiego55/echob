@@ -13,6 +13,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import {
+  DATENSCHUTZHINWEISE,
   EINWILLIGUNG_FASSUNG,
   WIDERRUFSHINWEIS,
   alleErklaerungenBestaetigt,
@@ -117,5 +118,34 @@ describe('Beide Haken, nicht einer', () => {
     // undefined, null oder ein truthiger Fremdwert duerfen nicht genuegen.
     expect(alleErklaerungenBestaetigt({ einwilligung: true, entbindung: false }, NAME)).toBe(false)
     expect(alleErklaerungenBestaetigt({}, NAME)).toBe(false)
+  })
+})
+
+describe('Drei Ebenen, sauber getrennt', () => {
+  it('haelt Information und Erklaerung auseinander', () => {
+    // Die Hinweise sind KEINE Erklaerung: Sie werden nicht bestaetigt. Stuenden sie in
+    // den Haken, taete derselbe Text beides halb - er informierte in einer Erklaerung,
+    // die man abnickt.
+    const ids = erklaerungen(NAME).map(e => e.id)
+    expect(ids).not.toContain('hinweise')
+    expect(DATENSCHUTZHINWEISE.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('beantwortet in den Hinweisen die Fragen des Art. 13', () => {
+    const alles = DATENSCHUTZHINWEISE.map(h => h.was + ' ' + h.text).join(' ')
+    expect(alles).toContain('Fachperson')          // Empfaenger
+    expect(alles).toContain('Auftrag')             // Zweck und Rolle
+    expect(alles).toContain('besondere Kategorien')
+    expect(alles).toContain('USA')                 // Drittland
+    expect(alles).toContain('widerrufst')          // Dauer und Widerruf
+  })
+
+  it('laesst die Erklaerungen trotzdem aus sich heraus bestimmt sein', () => {
+    // Eine Einwilligung darf sich nicht darauf verlassen, dass jemand den Kasten
+    // darueber gelesen hat. Die Wiederholung ist gewollt.
+    for (const e of erklaerungen(NAME)) {
+      expect(e.text).toContain(NAME)
+      expect(e.text.length).toBeGreaterThan(200)
+    }
   })
 })

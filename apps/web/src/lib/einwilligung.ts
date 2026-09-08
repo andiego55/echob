@@ -1,7 +1,13 @@
 /**
  * Die beiden Erklärungen bei der Freigabe — und ihr Wortlaut als Nachweis.
  *
- * **Zwei Erklärungen, nicht eine.** Hier stecken zwei rechtlich verschiedene Dinge:
+ * **Drei Ebenen, nicht eine.** Beim Freigeben treffen drei verschiedene Dinge zusammen:
+ * die *Information* darüber, was geschieht (Art. 13 DSGVO — schuldet EchoB ohnehin), und
+ * zwei *Erklärungen*, die die Klient:in abgibt. Nur die beiden Erklärungen werden
+ * angehakt; die Information steht darüber und wird nicht bestätigt, weil man Information
+ * nicht bestätigt.
+ *
+ * **Zwei Erklärungen, nicht eine.** Denn hier stecken zwei rechtlich verschiedene Dinge:
  *
  * 1. Die **Einwilligung** nach Art. 9 Abs. 2 lit. a DSGVO — sie erlaubt die Verarbeitung
  *    besonderer Kategorien personenbezogener Daten.
@@ -35,7 +41,7 @@
  * Freiwilligkeit der Einwilligung eine offene Frage (Art. 7 Abs. 4 DSGVO), und ein
  * Versprechen an dieser Stelle würde sie verdecken statt lösen.
  */
-import { BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreiber'
+import { BETREIBER_KURZ, BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreiber'
 
 /**
  * Fassung der Erklärungen.
@@ -46,6 +52,49 @@ import { BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreiber'
  * gespeichert — die Kennung ordnet ein, der Text beweist.
  */
 export const EINWILLIGUNG_FASSUNG = 'share-2026-09b'
+
+/**
+ * Was geschieht — die Information, bevor gefragt wird.
+ *
+ * **Warum das über den Haken steht und nicht darin.** Information (Art. 13 DSGVO) und
+ * Erklärung (Art. 9, Schweigepflicht) sind verschiedene Dinge: Die eine schuldet EchoB
+ * ohnehin, die andere gibt die Klient:in ab. Standen sie im selben Text, tat er beides
+ * halb — er wurde lang, weil er informieren musste, und blieb doch eine Erklärung, die man
+ * abnickt. Jetzt wird erst gesagt, was passiert, und dann gefragt.
+ *
+ * Die Erklärungen selbst bleiben trotzdem vollständig: Eine Einwilligung muss aus sich
+ * heraus bestimmt sein und darf sich nicht darauf verlassen, dass jemand den Absatz
+ * darüber gelesen hat. Die Wiederholung ist gewollt.
+ */
+export const DATENSCHUTZHINWEISE: { was: string; text: string }[] = [
+  {
+    was: 'Wer etwas bekommt',
+    text: 'Nur die Fachperson, die du oben ausgewählt hast — und nur die Inhalte, die du '
+      + 'angehakt hast. Andere Fachpersonen sehen nichts davon.',
+  },
+  {
+    was: 'Wozu',
+    text: 'Damit die Fachperson mit dir fachlich daran arbeiten kann. EchoB verarbeitet '
+      + 'die Inhalte dabei in ihrem Auftrag, nicht für eigene Zwecke.',
+  },
+  {
+    was: 'Worum es sich handelt',
+    text: 'Es können besondere Kategorien personenbezogener Daten dabei sein — etwa '
+      + 'Angaben zu deiner Gesundheit. Deshalb wird ausdrücklich gefragt.',
+  },
+  {
+    was: 'Wer sie verarbeitet',
+    text: `Die Fachperson, ${BETREIBER_KURZ} in ihrem Auftrag und für die KI-Funktionen `
+      + `${KI_DIENSTLEISTER} samt der im Auftragsverarbeitungsvertrag offengelegten `
+      + 'Unterauftragnehmer. Dabei kann eine Verarbeitung in den USA stattfinden.',
+  },
+  {
+    was: 'Wie lange',
+    text: 'Bis du die Freigabe widerrufst. Danach verliert die Fachperson sofort den '
+      + 'Zugriff — auf die Inhalte und auf die daraus in EchoB erstellten Berichte und '
+      + 'Notizen.',
+  },
+]
 
 export interface Erklaerung {
   id: 'einwilligung' | 'entbindung'
