@@ -14,7 +14,7 @@ from app.schemas.professional import (
     ProfessionalInviteCreate,
     ProfessionalSearchResult,
 )
-from app.services import seat_service
+from app.services import seat_service, sharing_service
 from app.services.invite_service import send_professional_invite_email
 
 router = APIRouter(prefix="/professionals", tags=["professionals"])
@@ -243,6 +243,10 @@ async def dissolve_connection(
                     uid, pro_id,
                 )
                 for r in revoked:
+                    # Auch hier: Was aus dem Material der Klient:in stammt, wird
+                    # geloescht. Ihre Verbindung aufzuloesen ist ein Widerruf.
+                    await sharing_service.loesche_fallgebundenes_material(
+                        conn, professional_user_id=pro_id, case_id=r["case_id"])
                     await seat_service.release_case_by_id(
                         r["case_id"], conn, reason="revoked")
             await conn.execute(

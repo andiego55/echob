@@ -78,6 +78,106 @@ async def require_active_share(professional_user_id, case_id, conn) -> dict[str,
     return dict(row)
 
 
+#: Was beim Widerruf gelöscht wird — und die Begründung je Tabelle.
+#:
+#: **Die Trennlinie: Wer hat es geschrieben?** Was die Fachperson selbst verfasst hat,
+#: bleibt ihr — sie hat eine Dokumentationspflicht (§ 630f BGB, zehn Jahre), und die kann
+#: eine Klient:in nicht widerrufen. Was die Klient:in beigetragen hat oder was EchoB aus
+#: ihrem Material erzeugt hat, verschwindet. Sonst wäre der Satz „du kannst jederzeit
+#: widerrufen" nur halb wahr.
+#:
+#: Nicht in dieser Liste, und das ist Absicht: ``professional_session_notes``,
+#: ``professional_notes``, ``professional_assignments`` und ``professional_appointments``.
+#: Das ist ihre Behandlungsdokumentation und ihre Terminplanung.
+_BEIM_WIDERRUF_LOESCHEN: tuple[tuple[str, str], ...] = (
+    # Von EchoB aus dem Klientenmaterial erzeugt — ohne das Material haltlos.
+    ("professional_reports", "Bericht, aus dem freigegebenen Material erzeugt"),
+    # Ihr Arbeitsmaterial, aber aus den Inhalten gezogen und oft daraus zitierend.
+    # Keine Pflichtdokumentation: § 630f verlangt keine Aufbewahrung von Vorüberlegungen.
+    ("professional_findings", "Arbeitsmappe: Hypothesen, Beobachtungen, Fragen"),
+    # Enthalten das Material wörtlich im Gesprächsverlauf.
+    ("professional_echo_summaries", "Zusammenfassungen ihrer Echo-Gespräche"),
+    ("professional_echo_messages", "Verlauf ihrer Echo-Gespräche zum Fall"),
+    ("professional_echo_sessions", "Ihre Echo-Gespräche zum Fall"),
+    # Von der Klient:in ausgelöst, aus ihrem Material — stirbt mit der Freigabe.
+    ("case_faq_runs", "Fall-FAQ samt Antworten"),
+)
+
+
+async def loesche_fallgebundenes_material(conn, *, professional_user_id, case_id) -> dict:
+    """Räumt beim Widerruf alles ab, was aus dem Material der Klient:in stammt.
+
+    Gibt zurück, was gelöscht wurde — der Aufrufer kann das protokollieren, und die Tests
+    können darauf bestehen.
+
+    **Warum das nicht reicht, die Freigabe nur auf 'revoked' zu setzen.** Der Status
+    sperrt den Zugriff. Er löscht nichts. Wir versprechen der Klient:in aber, dass ihre
+    Inhalte verschwinden — nicht, dass sie unsichtbar werden. Solange die Berichte in der
+    Tabelle stehen, ist das Versprechen eine Anzeigeeinstellung.
+
+    **Der Sonderfall in den Vereinbarungen.** ``professional_assignments`` bleibt stehen,
+    weil die Fachperson sie erteilt hat. Die Spalte ``response`` gehört aber nicht ihr —
+    dort stehen die Antworten der Klient:in, etwa auf einen Fragebogen. Die Zeile bleibt,
+    die Antwort geht.
+    """
+    geloescht: dict[str, int] = {}
+    for tabelle, _grund in _BEIM_WIDERRUF_LOESCHEN:
+        ergebnis = await conn.execute(
+            f"DELETE FROM {tabelle} "  # noqa: S608 — feste Liste oben, keine Eingabe
+            "WHERE case_id = $1 AND professional_user_id = $2",
+            case_id, professional_user_id,
+        )
+        anzahl = int(ergebnis.rsplit(" ", 1)[-1] or 0)
+        if anzahl:
+            geloescht[tabelle] = anzahl
+
+    ergebnis = await conn.execute(
+        "UPDATE professional_assignments SET response = NULL, responded_at = NULL "
+        "WHERE case_id = $1 AND professional_user_id = $2 AND response IS NOT NULL",
+        case_id, professional_user_id,
+    )
+    anzahl = int(ergebnis.rsplit(" ", 1)[-1] or 0)
+    if anzahl:
+        geloescht["professional_assignments.response"] = anzahl
+
+    return geloescht
+
+
+async def require_dokumentation(professional_user_id, case_id, conn) -> dict[str, Any]:
+    """Das zweite Tor: Zugriff auf das, was die Fachperson SELBST geschrieben hat.
+
+    **Warum es das gibt.** Ihre Sitzungsnotizen sind ihre Behandlungsdokumentation. § 630f
+    BGB verpflichtet sie, die zehn Jahre aufzubewahren, und Art. 17 Abs. 3 lit. b DSGVO
+    nimmt genau solche Fälle vom Löschanspruch aus. Eine Klient:in kann die
+    Dokumentationspflicht ihrer Therapeutin nicht widerrufen. Bis hierher sperrte
+    ``require_active_share`` sie aus ihren eigenen Aufzeichnungen aus — und das Produkt
+    hatte sie vorher eingeladen, sie hier zu führen.
+
+    **Warum es trotzdem ein eigenes, benanntes Tor ist und kein weggelassenes.** Die
+    Abfragen tragen ohnehin ``professional_user_id = $1``; man könnte die Prüfung einfach
+    streichen. Dann könnte aber später niemand mehr unterscheiden, ob ein Endpunkt
+    absichtlich offen ist oder ob jemand ``require_active_share`` vergessen hat. Der Name
+    macht die Absicht prüfbar — ``test_zwei_tore`` besteht darauf, dass jeder
+    fallbezogene Endpunkt genau eines von beiden trägt.
+
+    **Was hier NICHT durchgeht:** Inhalte der Klient:in. Dieses Tor gehört ausschließlich
+    an lesende Endpunkte auf das Material der Fachperson. Alles, was Szenen, Fragebogen,
+    Profile oder daraus Erzeugtes berührt, bleibt bei ``require_active_share``.
+
+    Ohne AVV wird trotzdem gelesen: Läuft der Vertrag aus, endet die Zusammenarbeit — die
+    Aufbewahrungspflicht endet nicht. Sie auszusperren schüfe dasselbe Problem noch einmal.
+    """
+    row = await conn.fetchrow(
+        "SELECT * FROM case_shares "
+        "WHERE case_id = $1 AND professional_user_id = $2 "
+        "ORDER BY (status = 'active') DESC, updated_at DESC LIMIT 1",
+        case_id, professional_user_id,
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
+    return dict(row)
+
+
 async def load_share_elements(share_id, conn) -> tuple[set[str], list]:
     """Erlaubte Element-Typen + freigegebene Einzelszenen-IDs einer Freigabe."""
     rows = await conn.fetch(

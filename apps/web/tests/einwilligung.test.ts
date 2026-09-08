@@ -80,10 +80,26 @@ describe('Die Einwilligung nach Art. 9', () => {
 
 describe('Widerruf und Nachweis', () => {
   it('nennt die Folgen des Widerrufs, wie sie wirklich eintreten', () => {
-    // Berichte und Notizen haengen ebenso an der aktiven Freigabe wie die Inhalte -
-    // deshalb darf hier stehen, dass auch sie unerreichbar werden.
+    // Der Satz stand hier vorher zu grob: "verliert den Zugriff auf ... Berichte und
+    // Notizen". Das war in BEIDE Richtungen ungenau. Berichte wurden nicht geloescht,
+    // sondern nur unsichtbar - und die Sitzungsnotizen der Fachperson wurden ihr
+    // entzogen, obwohl sie diese zehn Jahre aufbewahren MUSS.
     expect(WIDERRUFSHINWEIS).toContain('widerrufen')
-    expect(WIDERRUFSHINWEIS).toContain('Berichte und Notizen')
+    expect(WIDERRUFSHINWEIS).toContain('gelöscht')
+  })
+
+  it('sagt auch, was die Fachperson behaelt — und warum', () => {
+    // Das Unbequeme gehoert genauso hinein wie das Angenehme. Wer liest, dass "alles
+    // geloescht wird", und spaeter erfaehrt, dass die Therapeutin ihre Notizen behalten
+    // hat, ist zu Recht veraergert - auch wenn das Gesetz es so verlangt.
+    expect(WIDERRUFSHINWEIS).toContain('behält')
+    expect(WIDERRUFSHINWEIS).toContain('§ 630f BGB')
+  })
+
+  it('zaehlt auf, was geloescht wird, statt es zu umschreiben', () => {
+    for (const posten of ['Berichte', 'Arbeitsmappe', 'Fragenpaket']) {
+      expect(WIDERRUFSHINWEIS).toContain(posten)
+    }
   })
 
   it('speichert beide Erklärungen im Wortlaut', () => {

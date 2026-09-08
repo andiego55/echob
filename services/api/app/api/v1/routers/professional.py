@@ -28,7 +28,7 @@ from app.schemas.professional import (
     ProfessionalProfileResponse,
     ProfessionalRegister,
 )
-from app.services import agreement_service, collab_service, seat_service
+from app.services import agreement_service, collab_service, seat_service, sharing_service
 from app.services.demo_service import ensure_demo_for_professional
 from app.services.echo_service import _REL_TYPE_LABELS
 from app.services.professional_account import ensure_professional_account
@@ -696,6 +696,11 @@ async def dissolve_connection(
                 pid, client_id,
             )
             for r in revoked:
+                # Wie beim Widerruf durch die Klient:in: Was aus ihrem Material stammt,
+                # wird geloescht, nicht nur unsichtbar gemacht. Die eigene Dokumentation
+                # der Fachperson bleibt.
+                await sharing_service.loesche_fallgebundenes_material(
+                    conn, professional_user_id=pid, case_id=r["case_id"])
                 await seat_service.release_case_by_id(r["case_id"], conn, reason="revoked")
             await conn.execute(
                 "DELETE FROM professional_invites "

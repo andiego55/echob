@@ -41,6 +41,7 @@ from app.api.v1.routers import (
     organizations,
     person_profile,
     professional,
+    professional_archiv,
     professional_collab,
     professional_couple_room,
     professional_couples,
@@ -109,6 +110,7 @@ v1_router.include_router(pseudonymous.router)
 v1_router.include_router(professional_echo.router)
 v1_router.include_router(professional_findings.router)
 v1_router.include_router(professional_faq.router)
+v1_router.include_router(professional_archiv.router)
 v1_router.include_router(professional_couples.router)
 v1_router.include_router(professional_couple_room.router)
 v1_router.include_router(professional_collab.router)

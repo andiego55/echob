@@ -51,7 +51,7 @@ import { BETREIBER_KURZ, BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreibe
  * und benennt die Beteiligten. Seit Migration 102 wird zusätzlich der Wortlaut selbst
  * gespeichert — die Kennung ordnet ein, der Text beweist.
  */
-export const EINWILLIGUNG_FASSUNG = 'share-2026-09c'
+export const EINWILLIGUNG_FASSUNG = 'share-2026-09d'
 
 /**
  * Was geschieht — die Information, bevor gefragt wird.
@@ -91,8 +91,13 @@ export const DATENSCHUTZHINWEISE: { was: string; text: string }[] = [
   {
     was: 'Wie lange',
     text: 'Bis du die Freigabe widerrufst. Danach verliert die Fachperson sofort den '
-      + 'Zugriff — auf die Inhalte und auf die daraus in EchoB erstellten Berichte und '
-      + 'Notizen.',
+      + 'Zugriff auf die Inhalte, und was EchoB daraus erstellt hat, wird gelöscht.',
+  },
+  {
+    was: 'Was sie behält',
+    text: 'Ihre eigenen Sitzungsnotizen. Die sind ihre Behandlungsdokumentation, und sie '
+      + 'ist gesetzlich verpflichtet, sie zehn Jahre aufzubewahren — das kann auch ein '
+      + 'Widerruf nicht aufheben. Auskunft darüber bekommst du bei ihr.',
   },
 ]
 
@@ -171,13 +176,27 @@ export const FALL_FAQ_ERKLAERUNG = {
  * Der gemeinsame Hinweis unter beiden Erklärungen.
  *
  * Kein Teil der Erklärungen selbst, sondern die Information, ohne die sie nicht informiert
- * wären: Widerruf und dessen Folgen. Die Folgen stimmen mit dem Verhalten überein —
- * Berichte und Notizen hängen ebenso an der aktiven Freigabe wie die Inhalte selbst.
+ * wären: Widerruf und dessen Folgen. Die Folgen stimmen mit dem Verhalten überein — und
+ * seit September 2026 stimmen sie genauer, weil das Verhalten sich geändert hat.
+ *
+ * Vorher stand hier, die Fachperson verliere den Zugriff „auf die freigegebenen Inhalte
+ * und auf die daraus in EchoB erstellten Berichte und Notizen". Das war in beide
+ * Richtungen ungenau. Berichte, Arbeitsmappe und KI-Gespräche wurden nicht gelöscht,
+ * sondern nur unsichtbar — sie standen weiter in den Tabellen, obwohl sie ganz aus dem
+ * Material der Klient:in stammten. Und die Sitzungsnotizen der Fachperson wurden ihr
+ * entzogen, obwohl sie diese nach § 630f BGB zehn Jahre aufbewahren MUSS.
+ *
+ * Jetzt gilt beides wörtlich: Was aus ihrem Material erzeugt wurde, wird gelöscht. Was
+ * die Fachperson selbst geschrieben hat, bleibt bei ihr. Wer den Satz ändert, muss vorher
+ * das Verhalten ändern — nicht umgekehrt.
  */
 export const WIDERRUFSHINWEIS =
   'Beide Erklärungen kann ich jederzeit mit Wirkung für die Zukunft widerrufen. Die '
-  + 'Fachperson verliert dann sofort den Zugriff auf die freigegebenen Inhalte und auf die '
-  + 'daraus in EchoB erstellten Berichte und Notizen. Einzelheiten stehen in der '
+  + 'Fachperson verliert dann sofort den Zugriff auf die freigegebenen Inhalte, und was '
+  + 'EchoB daraus erstellt hat — Berichte, Arbeitsmappe, KI-Gespräche zum Fall und das '
+  + 'Fragenpaket — wird gelöscht. Was die Fachperson selbst aufgeschrieben hat, behält '
+  + 'sie: Ihre Sitzungsnotizen sind ihre Behandlungsdokumentation, und sie ist gesetzlich '
+  + 'verpflichtet, diese aufzubewahren (§ 630f BGB). Einzelheiten stehen in der '
   + 'Datenschutzerklärung.'
 
 /**

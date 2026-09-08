@@ -16,7 +16,7 @@ from app.schemas.professional import (
     ShareElementResponse,
     ShareUpdate,
 )
-from app.services import fall_faq_service, seat_service
+from app.services import fall_faq_service, seat_service, sharing_service
 
 router = APIRouter(prefix="/cases/{case_id}/shares", tags=["shares"])
 
@@ -222,16 +222,31 @@ async def revoke_share(
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> dict:
-    """Widerruf: status='revoked'. Danach kein Zugriff der Fachperson mehr (404)."""
+    """Widerruf: Zugriff endet, und das aus dem Material Erzeugte wird gelöscht.
+
+    Der Status allein sperrte nur den Zugriff — die Berichte, die Arbeitsmappe und die
+    Echo-Gespräche blieben in den Tabellen stehen. „Du kannst jederzeit widerrufen" wäre
+    damit eine Anzeigeeinstellung gewesen. Was die Fachperson selbst geschrieben hat
+    (Sitzungsnotizen, Fallüberblick, Vereinbarungen, Termine), bleibt ihr: Sie hat eine
+    Dokumentationspflicht, die die Klient:in nicht widerrufen kann.
+    """
     uid = current_user["user_id"]
     async with pool.acquire() as conn:
-        result = await conn.execute(
-            "UPDATE case_shares SET status = 'revoked', revoked_at = NOW(), updated_at = NOW() "
-            "WHERE id = $1 AND case_id = $2 AND owner_user_id = $3 AND status = 'active'",
-            share_id, case_id, uid,
-        )
-        if result != "UPDATE 0":
-            await seat_service.release_case_by_id(case_id, conn, reason="revoked")
-    if result == "UPDATE 0":
+        async with conn.transaction():
+            share = await conn.fetchrow(
+                "UPDATE case_shares SET status = 'revoked', revoked_at = NOW(), "
+                "updated_at = NOW(), faq_enabled = FALSE "
+                "WHERE id = $1 AND case_id = $2 AND owner_user_id = $3 AND status = 'active' "
+                "RETURNING professional_user_id",
+                share_id, case_id, uid,
+            )
+            if share:
+                await sharing_service.loesche_fallgebundenes_material(
+                    conn,
+                    professional_user_id=share["professional_user_id"],
+                    case_id=case_id,
+                )
+                await seat_service.release_case_by_id(case_id, conn, reason="revoked")
+    if not share:
         raise HTTPException(status_code=404, detail="Freigabe nicht gefunden.")
     return {"revoked": True}

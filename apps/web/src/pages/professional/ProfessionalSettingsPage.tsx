@@ -8,6 +8,7 @@ import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@/components/settings/EchoSteeringForm'
 import AvvDocument, { AVV_DOC_VERSION } from '@/components/professional/AvvDocument'
 import BerufsgruppeFeld from '@/components/professional/BerufsgruppeFeld'
+import ArchivSection from '@/components/professional/ArchivSection'
 import { apiErrorMessage } from '@/api/errors'
 import { professionalApi } from '@/api/professional'
 
@@ -97,6 +98,7 @@ export default function ProfessionalSettingsPage() {
         <BillingSection />
         <BerufsgruppeSection />
         <AgreementSection />
+        <ArchivSection />
       </div>
     </ProfessionalShell>
   )
