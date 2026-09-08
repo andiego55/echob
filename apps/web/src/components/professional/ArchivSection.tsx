@@ -16,8 +16,8 @@
  * Aufzeichnungen aus — nachdem es sie eingeladen hatte, sie hier zu führen.
  */
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { archivApi, type ArchivFall } from '@/api/archiv'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { archivApi, speichern, type ArchivFall } from '@/api/archiv'
 import Fehlermeldung from '@/components/Fehlermeldung'
 
 const datum = (s: string | null) =>
@@ -43,6 +43,13 @@ export default function ArchivSection() {
         wird der Fall mit allem darin entfernt. Für deine Akte gehört, was du brauchst, in
         dein eigenes Praxissystem.
       </p>
+
+      <ExportKnopf
+        label="Alles exportieren"
+        beschreibung="Eine Datei mit deinen Aufzeichnungen zu allen Fällen — auch den laufenden."
+        holen={() => archivApi.export()}
+        dateiname="echob-dokumentation"
+      />
 
       {isLoading && <div className="mt-4 h-16 animate-pulse rounded-brand bg-brand-bg" />}
       <Fehlermeldung error={error} className="mt-4" />
@@ -189,6 +196,57 @@ function FallInhalt({ caseId }: { caseId: string }) {
           </ul>
         </section>
       )}
+
+      <ExportKnopf
+        label="Diesen Fall exportieren"
+        holen={() => archivApi.export(caseId)}
+        dateiname={`echob-dokumentation-${caseId}`}
+      />
+    </div>
+  )
+}
+
+/**
+ * Ein Knopf, der eine Datei holt und speichert.
+ *
+ * Der Erfolgshinweis ist wichtiger, als er aussieht: Ein Browser laedt still herunter,
+ * und wer nichts sieht, klickt noch dreimal.
+ */
+function ExportKnopf({ label, beschreibung, holen, dateiname }: {
+  label: string
+  beschreibung?: string
+  holen: () => Promise<Blob>
+  dateiname: string
+}) {
+  const [fertig, setFertig] = useState(false)
+  const laden = useMutation({
+    mutationFn: holen,
+    onSuccess: blob => {
+      const heute = new Date().toISOString().slice(0, 10)
+      speichern(blob, `${dateiname}-${heute}.html`)
+      setFertig(true)
+    },
+  })
+
+  return (
+    <div className="mt-4">
+      <button
+        onClick={() => { setFertig(false); laden.mutate() }}
+        disabled={laden.isPending}
+        className="btn-quiet !py-1.5 !px-3 !text-xs disabled:opacity-50"
+      >
+        {laden.isPending ? 'Wird erstellt …' : label}
+      </button>
+      {beschreibung && (
+        <p className="mt-1.5 max-w-prose text-[11px] text-brand-muted">{beschreibung}</p>
+      )}
+      {fertig && (
+        <p className="mt-1.5 text-[11px] text-brand-muted">
+          Gespeichert. Die Datei öffnet sich in jedem Browser und lässt sich von dort als
+          PDF sichern.
+        </p>
+      )}
+      <Fehlermeldung error={laden.error} className="mt-2" />
     </div>
   )
 }

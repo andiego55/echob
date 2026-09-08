@@ -38,4 +38,28 @@ export const archivApi = {
   liste: () => apiClient.get<ArchivFall[]>('/professional/archiv').then(r => r.data),
   detail: (caseId: string) =>
     apiClient.get<ArchivDetail>(`/professional/archiv/${caseId}`).then(r => r.data),
+
+  /** Eine Datei fuer die eigene Akte. `caseId` weglassen = alles auf einmal. */
+  export: (caseId?: string) =>
+    apiClient
+      .get(caseId ? `/professional/archiv/${caseId}/export` : '/professional/archiv/export',
+        { responseType: 'blob' })
+      .then(r => r.data as Blob),
+}
+
+/**
+ * Die heruntergeladene Datei speichern.
+ *
+ * Steht hier und nicht im Bauteil, weil derselbe Ablauf an zwei Knoepfen haengt - und
+ * weil ein vergessenes revokeObjectURL ein Leck ist, das niemand bemerkt.
+ */
+export function speichern(blob: Blob, dateiname: string) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = dateiname
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
 }

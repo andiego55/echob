@@ -27,14 +27,17 @@ Fachperson selbst geschrieben.
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_pool
+from app.services import dokumentation_export
 from app.services.sharing_service import require_dokumentation
 
 router = APIRouter(prefix="/professional/archiv", tags=["professional-archiv"])
@@ -128,47 +131,109 @@ async def liste(
     ]
 
 
-@router.get("/{case_id}", response_model=ArchivDetail)
-async def detail(
+@router.get("/export")
+async def export_alle(
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+):
+    """Alle eigenen Aufzeichnungen als eine Datei.
+
+    Steht VOR ``/{case_id}``, sonst versucht FastAPI, das Wort „export" als UUID zu lesen
+    und antwortet mit 422. Die Reihenfolge der Dekoratoren ist hier Programm.
+
+    Der wichtigere Fall von beiden: Wer EchoB verlässt oder befürchtet, dass eine
+    Klient:in ihr Konto löscht, braucht alles auf einmal — nicht Fall für Fall.
+    """
+    pid = current["user_id"]
+    async with pool.acquire() as conn:
+        # Jeder Fall, zu dem es eine Freigabe gab, gleich welchen Status. Der Export ist
+        # kein Archiv-Feature: Auch aus einem laufenden Fall darf sie ihre Dokumentation
+        # herausholen, ohne auf einen Widerruf zu warten.
+        case_ids = [r["case_id"] for r in await conn.fetch(
+            "SELECT DISTINCT case_id FROM case_shares WHERE professional_user_id = $1", pid)]
+        faelle = [await _lade_fall(conn, pid=pid, case_id=c) for c in case_ids]
+        name = await conn.fetchval(
+            "SELECT display_name FROM professional_profiles WHERE user_id = $1", pid)
+
+    faelle = [f for f in faelle
+              if f["ueberblick"] or f["sitzungsnotizen"] or f["vereinbarungen"] or f["termine"]]
+    return _als_datei(
+        dokumentation_export.rendere(faelle=faelle, fachperson=name),
+        "echob-dokumentation")
+
+
+@router.get("/{case_id}/export")
+async def export_fall(
     case_id: UUID,
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
-) -> ArchivDetail:
-    """Die eigenen Aufzeichnungen zu einem beendeten Fall — lesend, nichts sonst."""
+):
+    """Die eigenen Aufzeichnungen zu einem Fall als Datei."""
     pid = current["user_id"]
     async with pool.acquire() as conn:
-        share = await require_dokumentation(pid, case_id, conn)
+        fall = await _lade_fall(conn, pid=pid, case_id=case_id)
+        name = await conn.fetchval(
+            "SELECT display_name FROM professional_profiles WHERE user_id = $1", pid)
+    return _als_datei(
+        dokumentation_export.rendere(faelle=[fall], fachperson=name),
+        f"echob-dokumentation-{case_id}")
 
-        kopf = await conn.fetchrow(
-            "SELECT c.title AS case_title, up.display_name AS client_display_name "
-            "FROM case_shares s LEFT JOIN cases c ON c.id = s.case_id "
-            "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
-            "WHERE s.id = $1",
-            share["id"],
-        )
-        ueberblick_row = await conn.fetchrow(
-            "SELECT * FROM professional_notes "
-            "WHERE professional_user_id = $1 AND case_id = $2",
-            pid, case_id,
-        )
-        notiz_rows = await conn.fetch(
-            "SELECT id, session_date, title, content FROM professional_session_notes "
-            "WHERE professional_user_id = $1 AND case_id = $2 "
-            "ORDER BY session_date DESC, created_at DESC",
-            pid, case_id,
-        )
-        # Nur was SIE erteilt hat. `response` ist beim Widerruf geleert worden — die
-        # Antworten der Klient:in gehoeren ihr, nicht der Akte.
-        vereinbarung_rows = await conn.fetch(
-            "SELECT id, type, title, status, due_at, created_at FROM professional_assignments "
-            "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY created_at DESC",
-            pid, case_id,
-        )
-        termin_rows = await conn.fetch(
-            "SELECT id, title, start_at, end_at, status FROM professional_appointments "
-            "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY start_at DESC",
-            pid, case_id,
-        )
+
+def _als_datei(html: str, basisname: str) -> HTMLResponse:
+    """Als Download ausliefern, nicht im Browser anzeigen.
+
+    Ohne ``attachment`` öffnet der Browser die Datei einfach — und die Fachperson denkt,
+    sie habe sie gespeichert. Der Export soll auf ihrer Festplatte landen.
+    """
+    heute = datetime.now(UTC).strftime("%Y-%m-%d")
+    return HTMLResponse(
+        content=html,
+        headers={
+            "Content-Disposition": f'attachment; filename="{basisname}-{heute}.html"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+async def _lade_fall(conn, *, pid, case_id) -> dict:
+    """Die eigenen Aufzeichnungen zu einem Fall, entschluesselt.
+
+    Eine Stelle fuer beide Wege: die Anzeige im Archiv und den Export. Zwei getrennte
+    Ladefunktionen waeren zwei Gelegenheiten, dass in der einen etwas auftaucht, das in
+    der anderen bewusst fehlt.
+    """
+    share = await require_dokumentation(pid, case_id, conn)
+
+    kopf = await conn.fetchrow(
+        "SELECT c.title AS case_title, up.display_name AS client_display_name "
+        "FROM case_shares s LEFT JOIN cases c ON c.id = s.case_id "
+        "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
+        "WHERE s.id = $1",
+        share["id"],
+    )
+    ueberblick_row = await conn.fetchrow(
+        "SELECT * FROM professional_notes "
+        "WHERE professional_user_id = $1 AND case_id = $2",
+        pid, case_id,
+    )
+    notiz_rows = await conn.fetch(
+        "SELECT id, session_date, title, content FROM professional_session_notes "
+        "WHERE professional_user_id = $1 AND case_id = $2 "
+        "ORDER BY session_date DESC, created_at DESC",
+        pid, case_id,
+    )
+    # Nur was SIE erteilt hat. `response` ist beim Widerruf geleert worden — die
+    # Antworten der Klient:in gehoeren ihr, nicht der Akte.
+    vereinbarung_rows = await conn.fetch(
+        "SELECT id, type, title, status, due_at, created_at FROM professional_assignments "
+        "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY created_at DESC",
+        pid, case_id,
+    )
+    termin_rows = await conn.fetch(
+        "SELECT id, title, start_at, end_at, status FROM professional_appointments "
+        "WHERE professional_user_id = $1 AND case_id = $2 ORDER BY start_at DESC",
+        pid, case_id,
+    )
 
     ueberblick = None
     if ueberblick_row:
@@ -176,26 +241,50 @@ async def detail(
             {k: ueberblick_row[k] for k in _UEBERBLICK_FELDER}, *_UEBERBLICK_FELDER)
         ueberblick = {k: v for k, v in entschluesselt.items() if (v or "").strip()} or None
 
-    return ArchivDetail(
-        fall=ArchivFall(
-            case_id=case_id,
-            client_display_name=kopf["client_display_name"] if kopf else None,
-            case_title=kopf["case_title"] if kopf else None,
-            freigegeben_am=share["created_at"],
-            beendet_am=share["revoked_at"],
-            beendet=share["status"] != "active",
-            sitzungsnotizen=len(notiz_rows),
-            vereinbarungen=len(vereinbarung_rows),
-            termine=len(termin_rows),
-        ),
-        ueberblick=ueberblick,
-        sitzungsnotizen=[
-            ArchivNotiz(
-                id=r["id"], session_date=r["session_date"], title=r["title"],
-                content=crypto.decrypt_json_strings(_jsonb(r["content"]) or {"sections": []}),
-            )
+    return {
+        "case_id": case_id,
+        "client_display_name": kopf["client_display_name"] if kopf else None,
+        "case_title": kopf["case_title"] if kopf else None,
+        "freigegeben_am": share["created_at"],
+        "beendet_am": share["revoked_at"],
+        "beendet": share["status"] != "active",
+        "ueberblick": ueberblick,
+        "sitzungsnotizen": [
+            {
+                "id": r["id"], "session_date": r["session_date"], "title": r["title"],
+                "content": crypto.decrypt_json_strings(
+                    _jsonb(r["content"]) or {"sections": []}),
+            }
             for r in notiz_rows
         ],
-        vereinbarungen=[dict(r) for r in vereinbarung_rows],
-        termine=[dict(r) for r in termin_rows],
+        "vereinbarungen": [dict(r) for r in vereinbarung_rows],
+        "termine": [dict(r) for r in termin_rows],
+    }
+
+
+@router.get("/{case_id}", response_model=ArchivDetail)
+async def detail(
+    case_id: UUID,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ArchivDetail:
+    """Die eigenen Aufzeichnungen zu einem beendeten Fall — lesend, nichts sonst."""
+    async with pool.acquire() as conn:
+        f = await _lade_fall(conn, pid=current["user_id"], case_id=case_id)
+    return ArchivDetail(
+        fall=ArchivFall(
+            case_id=f["case_id"],
+            client_display_name=f["client_display_name"],
+            case_title=f["case_title"],
+            freigegeben_am=f["freigegeben_am"],
+            beendet_am=f["beendet_am"],
+            beendet=f["beendet"],
+            sitzungsnotizen=len(f["sitzungsnotizen"]),
+            vereinbarungen=len(f["vereinbarungen"]),
+            termine=len(f["termine"]),
+        ),
+        ueberblick=f["ueberblick"],
+        sitzungsnotizen=[ArchivNotiz(**n) for n in f["sitzungsnotizen"]],
+        vereinbarungen=f["vereinbarungen"],
+        termine=f["termine"],
     )
