@@ -85,8 +85,29 @@ def test_fragen_ohne_freigegebenes_material_werden_nicht_gestellt():
     # Vierzig Mal "dazu liegt nichts vor" sieht aus wie ein Befund und ist doch nur eine
     # Auskunft ueber die Freigabe.
     f = katalog.frage("anliegen_kern")
-    assert katalog.anwendbar(f, {"all_scenes", "onboarding"}) is True
-    assert katalog.anwendbar(f, {"all_scenes"}) is False
+    assert katalog.anwendbar(f, set()) is False
+    assert katalog.anwendbar(f, {"reports"}) is False
+
+
+def test_eine_quelle_genuegt():
+    """`braucht` zaehlt Quellen auf, nicht Bedingungen.
+
+    Zuerst stand hier `all`: "Worum geht es im Kern?" nennt Szenen UND Fragebogen und
+    wurde deshalb ohne Fragebogen gar nicht gestellt - obwohl sie aus den Szenen allein
+    gut zu beantworten ist. Eine Freigabe ohne `all_scenes` lieferte sogar null von
+    vierzig Fragen, und im Dashboard stand vierzigmal "nicht gestellt".
+    """
+    f = katalog.frage("anliegen_kern")
+    assert f.braucht == ("all_scenes", "onboarding")
+    assert katalog.anwendbar(f, {"all_scenes"}) is True
+    assert katalog.anwendbar(f, {"onboarding"}) is True
+
+
+def test_eine_freigabe_ohne_szenen_liefert_trotzdem_fragen():
+    # Der konkrete Fall, der null Antworten erzeugte.
+    ohne_szenen = {"onboarding", "person_profile", "hypotheses"}
+    gestellt = [f for f in katalog.KATALOG if katalog.anwendbar(f, ohne_szenen)]
+    assert len(gestellt) >= 10, "Ohne Szenen bleibt das Fragenpaket sonst komplett leer"
 
 
 # ── Die Merkmalsachsen ───────────────────────────────────────────────────────

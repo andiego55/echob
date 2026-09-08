@@ -77,11 +77,34 @@ export default function FallFaqPanel({ caseId, bundle }: {
     return <WirdErstellt fertig={data.fragen_beantwortet ?? 0} gesamt={data.fragen_geplant ?? 40} />
   }
 
+  const beantwortet = data.kategorien.reduce((n, k) => n + k.beantwortet, 0)
+
   return (
     <div className="space-y-5">
       <Kopf faq={data} />
+      {/* Null Antworten ist kein Fehler, sondern eine Auskunft über die Freigabe — aber
+          eine, die man nicht aus vierzig grauen Zeilen herauslesen können muss. */}
+      {beantwortet === 0 && <NichtsAuswertbares />}
       {data.auswertung && <Merkmalsbild auswertung={data.auswertung} szenen={szenen} />}
       <Fragenteil kategorien={data.kategorien} szenen={szenen} />
+    </div>
+  )
+}
+
+function NichtsAuswertbares() {
+  return (
+    <div className="card border-l-2 border-accent/40">
+      <h2 className="card-title mb-2">Keine der Fragen war beantwortbar</h2>
+      <p className="max-w-2xl text-sm leading-relaxed text-brand-muted">
+        Das Fragenpaket wurde erstellt, aber im freigegebenen Material fand sich nichts,
+        worauf sich die Fragen stützen könnten — typischerweise, wenn weder Szenen noch
+        der erste Fragebogen freigegeben sind. Das ist kein Fehler und sagt nichts über
+        den Fall: Es sagt etwas über den Umfang der Freigabe.
+      </p>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-brand-muted">
+        Unten steht, welche Frage woran gescheitert ist. Erweitert die Klient:in die
+        Freigabe und löst das Paket erneut aus, füllt es sich.
+      </p>
     </div>
   )
 }

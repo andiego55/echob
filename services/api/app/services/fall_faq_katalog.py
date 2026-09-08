@@ -283,5 +283,15 @@ def anwendbar(f: Frage, freigegeben: set[str]) -> bool:
 
     Ohne diese Prüfung stünden im Ergebnis vierzig Mal „dazu liegt nichts vor" — das
     sieht aus wie ein Befund, ist aber nur eine Auskunft über die Freigabe.
+
+    **``any``, nicht ``all`` — und das war zuerst falsch herum.** ``braucht`` zählt die
+    Quellen auf, aus denen eine Frage schöpft, nicht die Bedingungen, die alle erfüllt
+    sein müssen. „Worum geht es im Kern?" nennt Szenen *und* Fragebogen, ist aber aus den
+    Szenen allein gut zu beantworten.
+
+    Mit ``all`` fiel eine Freigabe ohne Fragebogen um zehn Fragen ärmer aus, und eine
+    Freigabe ohne ``all_scenes`` — etwa wenn nur Profil und Hypothesen geteilt wurden —
+    lieferte **null von vierzig**. Im Dashboard stand dann vierzigmal „nicht gestellt",
+    was wie ein Fehler des Produkts aussieht und in Wahrheit diese Zeile war.
     """
-    return all(b in freigegeben for b in f.braucht)
+    return any(b in freigegeben for b in f.braucht)

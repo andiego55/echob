@@ -282,14 +282,23 @@ async def erzeuge(app, run_id: str) -> None:
             return
         await conn.execute(
             "UPDATE case_faq_runs SET status = 'laeuft' WHERE id = $1", run_id)
-        # Durch dasselbe Nadelöhr wie jeder Fachpersonen-Zugriff: Was hier nicht
-        # freigegeben ist, wird gar nicht erst geladen und kann nie in einen Prompt geraten.
-        bundle = await load_shared_bundle(
-            run["professional_user_id"], run["case_id"], conn)
 
     try:
         if echo_svc is None:
             raise RuntimeError("Echo-Service nicht verfügbar.")
+
+        # Innerhalb des try, und das ist keine Formsache: ``load_shared_bundle`` wirft,
+        # wenn die Freigabe fehlt oder der AVV nicht unterschrieben ist. Stand der Aufruf
+        # davor, verließ genau dieser Fehler den Task, ohne den Status zu setzen — der
+        # Lauf blieb für immer auf „laeuft", und die Fachperson sah einen Ladebalken,
+        # hinter dem nichts mehr passierte. Das ist der Fall, den der Docstring oben
+        # ausschließen wollte und der ihm selbst durchgerutscht ist.
+        #
+        # Durch dasselbe Nadelöhr wie jeder Fachpersonen-Zugriff: Was hier nicht
+        # freigegeben ist, wird gar nicht erst geladen und kann nie in einen Prompt geraten.
+        async with pool.acquire() as conn:
+            bundle = await load_shared_bundle(
+                run["professional_user_id"], run["case_id"], conn)
 
         context = build_shared_case_context(bundle)
         freigegeben = set(bundle.allowed)

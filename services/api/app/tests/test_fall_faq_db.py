@@ -93,6 +93,72 @@ async def _lauf_mit_antwort(conn, share, *, antwort="Es geht um wiederkehrende K
     return run_id
 
 
+class _PoolAttrappe:
+    """Gibt bei jedem ``acquire()`` dieselbe Testverbindung zurueck.
+
+    ``erzeuge`` holt sich mehrfach eine Verbindung aus dem Pool - genau deshalb, damit
+    waehrend der Modellaufrufe keine gehalten wird. Fuer den Test soll aber alles in
+    derselben zurueckgerollten Transaktion landen.
+    """
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def acquire(self):
+        conn = self._conn
+
+        class _Ctx:
+            async def __aenter__(self):
+                return conn
+
+            async def __aexit__(self, *_):
+                return False
+
+        return _Ctx()
+
+
+class _AppAttrappe:
+    def __init__(self, conn, echo_service=None):
+        self.state = type("S", (), {"pool": _PoolAttrappe(conn), "echo_service": echo_service})()
+
+
+# ── Der Hintergrund-Lauf ─────────────────────────────────────────────────────
+
+async def test_ein_gescheiterter_start_bleibt_nicht_auf_laeuft_haengen(db):
+    """Der Fehler, der in der ersten Fassung genau hier steckte.
+
+    ``load_shared_bundle`` wirft, wenn die Freigabe fehlt oder der AVV nicht unterzeichnet
+    ist. Der Aufruf stand VOR dem try - der Fehler verliess den Task, ohne den Status zu
+    setzen, und der Lauf blieb fuer immer auf 'laeuft'. Die Fachperson sah einen
+    Ladebalken, hinter dem nichts mehr passierte, und niemand konnte es ihr ansehen.
+    """
+    _owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    run_id = await dienst.lauf_anlegen(db, share=share)
+    # Freigabe faellt weg, bevor der Hintergrund-Task sie laedt.
+    await db.execute("UPDATE case_shares SET status = 'revoked' WHERE id = $1", share["id"])
+
+    with pytest.raises(Exception):
+        await dienst.erzeuge(_AppAttrappe(db), run_id)
+
+    assert await db.fetchval(
+        "SELECT status FROM case_faq_runs WHERE id = $1", run_id) == "fehler"
+
+
+async def test_ohne_echo_dienst_endet_der_lauf_als_fehler(db):
+    _owner, _pro, _case_id, share = await _fall_mit_freigabe(db)
+    run_id = await dienst.lauf_anlegen(db, share=share)
+
+    with pytest.raises(Exception):
+        await dienst.erzeuge(_AppAttrappe(db, echo_service=None), run_id)
+
+    zeile = await db.fetchrow(
+        "SELECT status, fehler FROM case_faq_runs WHERE id = $1", run_id)
+    assert zeile["status"] == "fehler"
+    # Der Grund muss lesbar sein - sonst steht die Fachperson vor "fehlgeschlagen" und
+    # niemand kann nachsehen, warum.
+    assert zeile["fehler"]
+
+
 # ── Der Widerruf ─────────────────────────────────────────────────────────────
 
 async def test_die_fachperson_liest_die_antworten(db):
