@@ -21,9 +21,25 @@ def test_die_katalogberufe_unterliegen():
     assert bg.unterliegt_203("heilberuf_andere") is True
 
 
-def test_beratung_und_coaching_unterliegen_nicht():
-    assert bg.unterliegt_203("beratung") is False
+def test_beratung_in_freier_praxis_unterliegt_nicht():
+    assert bg.unterliegt_203("beratung_frei") is False
     assert bg.unterliegt_203("coaching") is False
+
+
+def test_dieselbe_beratung_in_anerkannter_stelle_unterliegt_doch():
+    """§ 203 Abs. 1 Nr. 4 haengt an der EINRICHTUNG, nicht an der Qualifikation.
+
+    Dieselbe Eheberaterin ist bei der Diakonie Berufsgeheimnistraegerin und in eigener
+    Praxis nicht. Die erste Fassung dieser Datei fuehrte "Beratung" pauschal als nicht
+    schweigepflichtig - falsch, und zwar in der gefaehrlichen Richtung.
+    """
+    assert bg.unterliegt_203("beratungsstelle") is True
+    assert bg.unterliegt_203("beratung_frei") is False
+
+
+def test_sozialarbeit_unterliegt_ohne_bedingung():
+    # Nr. 6 kennt keine Einrichtungs-Bedingung: Die staatliche Anerkennung genuegt.
+    assert bg.unterliegt_203("sozialarbeit") is True
 
 
 def test_der_strittige_fall_bleibt_offen():
@@ -45,6 +61,14 @@ def test_offen_und_nein_sind_unterscheidbar():
     nein = bg.unterliegt_203("coaching")
     assert offen is not nein
     assert (offen is None) and (nein is False)
+
+
+def test_jede_schweigepflichtige_gruppe_nennt_ihre_nummer():
+    # Ohne die Fundstelle ist die Einstufung eine Behauptung. Sie steht im Formular
+    # unter der Auswahl - dort soll nachlesbar sein, WORAUS sie folgt.
+    for kennung, (_label, pflicht, grund) in bg.BERUFSGRUPPEN.items():
+        if pflicht is True:
+            assert "§ 203 Abs. 1 Nr." in grund, kennung
 
 
 def test_jede_gruppe_traegt_eine_begruendung():
