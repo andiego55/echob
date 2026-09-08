@@ -1,66 +1,121 @@
 /**
- * Der Wortlaut der Einwilligung — angezeigt und gespeichert muss dasselbe sein.
+ * Die beiden Erklärungen bei der Freigabe — Wortlaut und Trennung.
  *
- * Art. 7 Abs. 1 DSGVO verlangt den Nachweis der Einwilligung, und der Nachweis ist eine
- * Aussage über den Text. Bisher wurden nur Fassungskennung und Zeitpunkt gespeichert; der
- * Text stand allein im Formular. Jetzt erzeugt eine Funktion ihn, das Formular zeigt genau
- * ihn, und genau er wird mitgeschickt.
+ * Hier stecken zwei rechtlich verschiedene Dinge: die Einwilligung nach Art. 9 DSGVO und
+ * die Entbindung von der Schweigepflicht (§ 203 StGB). Bis September 2026 standen sie in
+ * einer einzigen Bestätigung — wer nur einer zustimmen wollte, konnte das nicht, und wer
+ * zustimmte, konnte nicht erkennen, dass er zwei Dinge erklärt.
  *
- * Diese Tests halten fest, was in dem Text stehen muss, damit die Einwilligung bestimmt
- * genug ist — und dass Anzeige und Nachweis nicht auseinanderlaufen können.
+ * Eine Entbindung muss außerdem **bestimmt** sein. „Ich entbinde die Fachperson gegenüber
+ * einem Dienstleister" ist keine Erklärung, der man ansieht, was sie gestattet. Diese
+ * Tests halten fest, dass die Beteiligten beim Namen genannt bleiben — sie sind der
+ * Unterschied zwischen einer wirksamen und einer folgenlosen Erklärung.
  */
 import { describe, expect, it } from 'vitest'
 import {
   EINWILLIGUNG_FASSUNG,
-  einwilligungsAbsaetze,
-  einwilligungsText,
+  WIDERRUFSHINWEIS,
+  alleErklaerungenBestaetigt,
+  einwilligungsProtokoll,
+  erklaerungen,
 } from '../src/lib/einwilligung'
+import { BETREIBER_VOLL, KI_DIENSTLEISTER } from '../src/lib/betreiber'
 
-describe('Wortlaut der Einwilligung', () => {
-  it('nennt die Fachperson beim Namen', () => {
-    // „Einwilligung an eine Fachperson" waere nicht bestimmt genug - die Erklaerung muss
-    // sagen, WEM gegenueber sie gilt.
-    expect(einwilligungsText('Dr. A. Muster')).toContain('Dr. A. Muster')
+const NAME = 'Dr. A. Muster'
+
+describe('Zwei getrennte Erklärungen', () => {
+  it('sind genau zwei, mit eigener Kennung und Überschrift', () => {
+    const e = erklaerungen(NAME)
+    expect(e.map(x => x.id)).toEqual(['einwilligung', 'entbindung'])
+    for (const x of e) expect(x.titel.trim().length).toBeGreaterThan(10)
+  })
+
+  it('nennen beide die Fachperson beim Namen', () => {
+    // Eine Erklaerung "gegenueber der Fachperson" waere nicht bestimmt genug - und die
+    // Entbindung ist genau die, bei der Unbestimmtheit teuer wird.
+    for (const x of erklaerungen(NAME)) expect(x.text).toContain(NAME)
   })
 
   it('faellt ohne Namen nicht auf eine leere Stelle zurueck', () => {
-    // Sonst stuende im Nachweis "... an  freigegeben werden".
-    const text = einwilligungsText('')
-    expect(text).not.toMatch(/an\s{2,}/)
-    expect(text).toContain('die ausgewählte Fachperson')
+    for (const x of erklaerungen('')) {
+      expect(x.text).not.toMatch(/\s{2,}/)
+      expect(x.text).toContain('die ausgewählte Fachperson')
+    }
+  })
+})
+
+describe('Die Entbindung von der Schweigepflicht', () => {
+  const entbindung = () => erklaerungen(NAME).find(e => e.id === 'entbindung')!.text
+
+  it('benennt alle, gegenüber denen entbunden wird', () => {
+    // Betreiber, KI-Dienstleister und die Unterauftragnehmer - fehlt einer, deckt die
+    // Entbindung genau diese Weitergabe nicht.
+    expect(entbindung()).toContain(BETREIBER_VOLL)
+    expect(entbindung()).toContain(KI_DIENSTLEISTER)
+    expect(entbindung()).toContain('Unterauftragnehmer')
   })
 
-  it('nennt die vier Punkte, ohne die die Einwilligung nicht informiert waere', () => {
-    const text = einwilligungsText('Dr. A. Muster')
-    expect(text).toContain('Art. 9')           // besondere Kategorien
-    expect(text).toContain('KI')               // Verarbeitung durch ein Modell
-    expect(text).toContain('USA')              // Drittland
-    expect(text).toContain('widerrufen')       // Widerruflichkeit
+  it('nennt die Vorschrift, um die es geht', () => {
+    expect(entbindung()).toContain('§ 203 StGB')
   })
 
-  it('enthaelt die Entbindung von der Schweigepflicht', () => {
-    // Die zweite, rechtlich eigenstaendige Erklaerung. Sie steht heute im selben Text;
-    // die Trennung in zwei Bestaetigungen ist Massnahme M2. Faellt sie hier heraus, ist
-    // der Einsatz bei Berufsgeheimnistraeger:innen ohne Grundlage.
-    expect(einwilligungsText('Dr. A. Muster')).toContain('Schweigepflicht')
+  it('begrenzt sich auf Zweck und Umfang', () => {
+    // Eine unbegrenzte Entbindung waere weder erforderlich noch wirksam.
+    expect(entbindung()).toContain('erforderlich')
+    expect(entbindung()).toContain('nur für die von mir ausgewählten Inhalte')
+  })
+})
+
+describe('Die Einwilligung nach Art. 9', () => {
+  const einwilligung = () => erklaerungen(NAME).find(e => e.id === 'einwilligung')!.text
+
+  it('nennt die besonderen Kategorien und das Drittland', () => {
+    expect(einwilligung()).toContain('Art. 9')
+    expect(einwilligung()).toContain('USA')
+    expect(einwilligung()).toContain(KI_DIENSTLEISTER)
+  })
+})
+
+describe('Widerruf und Nachweis', () => {
+  it('nennt die Folgen des Widerrufs, wie sie wirklich eintreten', () => {
+    // Berichte und Notizen haengen ebenso an der aktiven Freigabe wie die Inhalte -
+    // deshalb darf hier stehen, dass auch sie unerreichbar werden.
+    expect(WIDERRUFSHINWEIS).toContain('widerrufen')
+    expect(WIDERRUFSHINWEIS).toContain('Berichte und Notizen')
   })
 
-  it('zeigt genau das an, was gespeichert wird', () => {
-    // Der eigentliche Punkt: Anzeige und Nachweis kommen aus derselben Quelle. Liefen sie
-    // auseinander, belegte der Nachweis eine Zustimmung zu einem anderen Text.
-    const name = 'Praxis Sonnenhof'
-    expect(einwilligungsAbsaetze(name).join('\n\n')).toBe(einwilligungsText(name))
+  it('speichert beide Erklärungen im Wortlaut', () => {
+    // Der Nachweis nach Art. 7 Abs. 1 DSGVO ist eine Aussage ueber den Text. Faellt eine
+    // Erklaerung aus dem Protokoll, ist genau sie spaeter nicht belegt.
+    const protokoll = einwilligungsProtokoll(NAME)
+    for (const x of erklaerungen(NAME)) {
+      expect(protokoll).toContain(x.titel)
+      expect(protokoll).toContain(x.text)
+    }
+    expect(protokoll).toContain(WIDERRUFSHINWEIS)
   })
 
-  it('ist in lesbare Absaetze geteilt', () => {
-    // Ein Block aus sechs Zeilen liest niemand. Informiert ist eine Einwilligung nur,
-    // wenn sie auch gelesen werden kann.
-    const absaetze = einwilligungsAbsaetze('Dr. A. Muster')
-    expect(absaetze.length).toBeGreaterThanOrEqual(3)
-    for (const a of absaetze) expect(a.trim().length).toBeGreaterThan(40)
+  it('traegt eine Fassungskennung, die eine zweite Fassung im Monat zulaesst', () => {
+    expect(EINWILLIGUNG_FASSUNG).toMatch(/^share-\d{4}-\d{2}[a-z]?$/)
+  })
+})
+
+describe('Beide Haken, nicht einer', () => {
+  it('laesst die Freigabe erst nach beiden Erklaerungen zu', () => {
+    // Der Fehler, den das verhindert: ein `||` statt `&&`. Der Knopf saehe genauso aus,
+    // und die Freigabe erfolgte nach nur einer der beiden Erklaerungen.
+    expect(alleErklaerungenBestaetigt({ einwilligung: true }, NAME)).toBe(false)
+    expect(alleErklaerungenBestaetigt({ entbindung: true }, NAME)).toBe(false)
+    expect(alleErklaerungenBestaetigt({ einwilligung: true, entbindung: true }, NAME)).toBe(true)
   })
 
-  it('traegt eine Fassungskennung in der vereinbarten Form', () => {
-    expect(EINWILLIGUNG_FASSUNG).toMatch(/^share-\d{4}-\d{2}$/)
+  it('laesst sich nicht mit einem fremden Haken taeuschen', () => {
+    expect(alleErklaerungenBestaetigt({ einwilligung: true, irgendwas: true }, NAME)).toBe(false)
+  })
+
+  it('nimmt nur ein echtes Ja', () => {
+    // undefined, null oder ein truthiger Fremdwert duerfen nicht genuegen.
+    expect(alleErklaerungenBestaetigt({ einwilligung: true, entbindung: false }, NAME)).toBe(false)
+    expect(alleErklaerungenBestaetigt({}, NAME)).toBe(false)
   })
 })

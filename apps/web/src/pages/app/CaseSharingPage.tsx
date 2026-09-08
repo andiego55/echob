@@ -14,7 +14,7 @@ import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
-import { EINWILLIGUNG_FASSUNG, einwilligungsAbsaetze, einwilligungsText } from '@/lib/einwilligung'
+import { EINWILLIGUNG_FASSUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen } from '@/lib/einwilligung'
 
 const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales',
@@ -217,7 +217,9 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   const [elements, setElements] = useState<ShareElementType[]>([])
   const [sceneIds, setSceneIds] = useState<string[]>([])
   const [message, setMessage] = useState('')
-  const [consent, setConsent] = useState(false)
+  // Zwei rechtlich verschiedene Erklaerungen - deshalb zwei Haken. Frueher stand beides
+  // in einer Bestaetigung; wer nur einer zustimmen wollte, konnte das nicht.
+  const [zustimmung, setZustimmung] = useState<Record<string, boolean>>({})
   const [done, setDone] = useState(false)
 
   // Bestehende Freigabe der gewählten Fachperson vorbefüllen (= Bearbeiten)
@@ -230,12 +232,15 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
     } else {
       setElements([]); setSceneIds([]); setMessage('')
     }
-    setConsent(false)
+    // Beim Wechsel der Fachperson beide Haken loesen: Die Erklaerungen nennen sie
+    // beim Namen - fuer eine andere Person gelten sie nicht.
+    setZustimmung({})
     setDone(false)
   }, [proId, shares])
 
   const selPro = accepted.find(c => c.professional_user_id === proId)
   const selProName = selPro?.display_name || selPro?.email || 'die Fachperson'
+  const alleErklaert = alleErklaerungenBestaetigt(zustimmung, selProName)
 
   const toggle = (el: ShareElementType) =>
     setElements(prev => prev.includes(el) ? prev.filter(e => e !== el) : [...prev, el])
@@ -256,8 +261,8 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
         message: message.trim() || null,
         consent: true,
         consent_version: EINWILLIGUNG_FASSUNG,
-        // Genau der Text, der oben stand — nicht eine zweite Fassung davon.
-        consent_text: einwilligungsText(selProName),
+        // Beide Erklärungen im Wortlaut — genau, was oben stand.
+        consent_text: einwilligungsProtokoll(selProName),
       })
     },
     onSuccess: () => {
@@ -339,21 +344,32 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
 
           {/* DSGVO: ausdrückliche, spezifische Einwilligung vor der Freigabe */}
           {!nothingSelected && (
-            <label className="mt-4 flex cursor-pointer gap-3 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3">
-              <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 shrink-0 accent-accent" />
-              <span className="text-xs leading-relaxed text-brand-text">
-                {einwilligungsAbsaetze(selProName).map((absatz, i) => (
-                  <span key={i} className="mb-1.5 block last:mb-0">{absatz}</span>
-                ))}
+            <div className="mt-4 space-y-2">
+              {erklaerungen(selProName).map(e => (
+                <label key={e.id} className="flex cursor-pointer gap-3 rounded-brand border border-accent/30 bg-accent/[0.04] px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={!!zustimmung[e.id]}
+                    onChange={ev => setZustimmung(z => ({ ...z, [e.id]: ev.target.checked }))}
+                    className="mt-0.5 shrink-0 accent-accent"
+                  />
+                  <span className="text-xs leading-relaxed text-brand-text">
+                    <strong className="mb-1 block text-navy">{e.titel}</strong>
+                    {e.text}
+                  </span>
+                </label>
+              ))}
+              <p className="px-1 text-[11px] leading-relaxed text-brand-muted">
+                {WIDERRUFSHINWEIS}{' '}
                 <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">Datenschutzerklärung öffnen</a>
-              </span>
-            </label>
+              </p>
+            </div>
           )}
 
           <div className="mt-3 flex items-center gap-3">
             <button
               onClick={() => create.mutate()}
-              disabled={create.isPending || nothingSelected || !consent}
+              disabled={create.isPending || nothingSelected || !alleErklaert}
               className="btn-primary !py-2 !px-5 !text-sm disabled:opacity-50"
             >
               {create.isPending ? 'Wird freigegeben …' : done ? '✓ Freigegeben' : 'Freigeben'}
