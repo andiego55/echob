@@ -244,6 +244,41 @@ async def test_scheitern_alle_bloecke_ist_es_ein_fehler(db):
         "SELECT status FROM case_faq_runs WHERE id = $1", run_id) == "fehler"
 
 
+# ── Das Fragenpaket darf die Freigabe nicht mitreissen ───────────────────────
+
+async def test_ein_fehler_am_fragenpaket_laesst_die_freigabe_stehen(db):
+    """Der Produktionsfehler vom 8.9.2026, nachgestellt.
+
+    Nach einem Deploy ohne die zugehoerige Migration verstiess das Verbuchen im
+    Kontingent gegen die CHECK-Bedingung auf ai_usage_log.kind. Der Fehler riss die
+    Transaktion mit, und die Klient:in bekam beim Teilen ihres Falls "Datenbankfehler.
+    Bitte versuche es erneut." - ein optionales Nebenfeature legte die Kernfunktion lahm.
+
+    Hier wird die Bedingung fuer die Dauer des Tests auf den alten Stand zurueckgedreht.
+    """
+    owner, _pro, case_id, _share = await _fall_mit_freigabe(db, faq=False)
+    await db.execute("ALTER TABLE ai_usage_log DROP CONSTRAINT ai_usage_log_kind_check")
+    await db.execute(
+        "ALTER TABLE ai_usage_log ADD CONSTRAINT ai_usage_log_kind_check "
+        "CHECK (kind IN ('report', 'scale_calc'))"
+    )
+
+    neue_pro = uuid.uuid4()
+    share = dict(await db.fetchrow(
+        "INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status, faq_enabled) "
+        "VALUES ($1,$2,$3,'active',TRUE) RETURNING *",
+        case_id, owner, neue_pro,
+    ))
+
+    # Das Fragenpaket scheitert - aber es scheitert LEISE.
+    assert await dienst.sicher_anlegen(db, share=share, gewuenscht=True) is None
+
+    # Und die Verbindung ist danach weiter benutzbar: Ohne Savepoint waere die
+    # Transaktion vergiftet und jede weitere Anweisung schluege fehl.
+    assert await db.fetchval(
+        "SELECT status FROM case_shares WHERE id = $1", share["id"]) == "active"
+
+
 # ── Der Widerruf ─────────────────────────────────────────────────────────────
 
 async def test_die_fachperson_liest_die_antworten(db):

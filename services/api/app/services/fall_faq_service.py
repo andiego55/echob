@@ -255,6 +255,42 @@ async def lauf_anlegen(conn, *, share: dict) -> str | None:
     return str(run_id)
 
 
+async def sicher_anlegen(conn, *, share: dict, gewuenscht: bool) -> str | None:
+    """Startet das Fragenpaket — aber niemals auf Kosten der Freigabe selbst.
+
+    **Warum es diese Hülle gibt.** Das Fall-FAQ hängt als *Wahl* an der Freigabe. Die
+    Freigabe ist das, worum es geht: Eine Klient:in teilt ihrem Gegenüber ihren Fall mit.
+    Scheitert dabei irgendetwas am Fragenpaket, darf das nicht dazu führen, dass sie ihren
+    Fall nicht teilen kann.
+
+    Genau das ist passiert. Nach einem Deploy ohne die zugehörige Migration verstieß das
+    Verbuchen im Kontingent gegen eine CHECK-Bedingung; der Fehler riss die Transaktion
+    mit, und die Freigabe endete mit „Datenbankfehler". Ein optionales Nebenfeature legte
+    die Kernfunktion lahm.
+
+    **Warum trotzdem in derselben Transaktion.** Der Lauf und die Einwilligung, auf der er
+    beruht, sollen gemeinsam entstehen — ein Lauf ohne Einwilligung wäre eine Übermittlung
+    ohne Grundlage. Deshalb ein *Savepoint* statt einer eigenen Verbindung: Geht hier
+    etwas schief, wird nur dieser Teil zurückgenommen, und die Freigabe bleibt bestehen.
+    Der umgekehrte Fehler bleibt damit ausgeschlossen.
+
+    ``gewuenscht=False`` räumt einen früheren Lauf ab — auch das darf die Freigabe nicht
+    gefährden.
+    """
+    try:
+        async with conn.transaction():          # verschachtelt = SAVEPOINT
+            if gewuenscht:
+                return await lauf_anlegen(conn, share=share)
+            await lauf_entfernen(conn, share["id"], share["owner_user_id"])
+            return None
+    except Exception:       # noqa: BLE001 — die Freigabe zählt mehr als das Fragenpaket
+        logger.exception(
+            "Fall-FAQ: Anlegen/Entfernen für Freigabe %s fehlgeschlagen — die Freigabe "
+            "selbst bleibt davon unberührt.", share["id"],
+        )
+        return None
+
+
 async def lauf_entfernen(conn, share_id, owner_user_id) -> None:
     """Löscht den Lauf einer Freigabe samt Antworten.
 

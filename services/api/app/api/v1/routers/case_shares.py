@@ -159,16 +159,18 @@ async def create_share(
             )
             await _set_elements(conn, share["id"], case_id, body.elements, body.scene_ids)
             # Das Fragenpaket wird HIER ausgeloest, in der Transaktion der Freigabe: Der
-            # Lauf und die Einwilligung, auf der er beruht, entstehen gemeinsam oder
-            # keins von beidem.
-            run_id = None
-            if body.fall_faq:
-                run_id = await fall_faq_service.lauf_anlegen(conn, share=share)
-            else:
-                # Haken weggenommen: Ein frueher erzeugter Lauf muss weg. Sonst blieben
-                # Antworten stehen, die die Klient:in gerade abbestellt hat - und die
-                # Freigabe saehe aus, als waere nichts uebermittelt worden.
-                await fall_faq_service.lauf_entfernen(conn, share["id"], uid)
+            # Lauf und die Einwilligung, auf der er beruht, entstehen gemeinsam oder keins
+            # von beidem. Ohne Haken wird ein frueher erzeugter Lauf abgeraeumt: Sonst blieben
+            # Antworten stehen, die die Klient:in gerade abbestellt hat - und die Freigabe
+            # saehe aus, als waere nichts uebermittelt worden.
+            #
+            # sicher_anlegen kapselt beides in einem Savepoint. Das Fragenpaket ist eine
+            # Wahl an der Freigabe; scheitert daran etwas, darf die Freigabe selbst nicht
+            # mitfallen. Genau das ist einmal passiert - eine fehlende Migration liess das
+            # Verbuchen im Kontingent gegen eine CHECK-Bedingung laufen, und die Klient:in
+            # bekam beim Teilen ihres Falls "Datenbankfehler".
+            run_id = await fall_faq_service.sicher_anlegen(
+                conn, share=share, gewuenscht=body.fall_faq)
         # Erst nach der Transaktion starten - ein Hintergrund-Task, der eine noch nicht
         # festgeschriebene Zeile sucht, findet sie nicht.
         if run_id:
@@ -203,7 +205,10 @@ async def update_share(
             # mehr dazu. Er zitiert woertlich aus Szenen, die jetzt womoeglich nicht mehr
             # freigegeben sind. Der Freigabe-Status bleibt dabei 'active', der Lesepfad
             # wuerde ihn also weiter herausgeben.
-            await fall_faq_service.lauf_entfernen(conn, share_id, uid)
+            # Ueber dieselbe Huelle wie beim Anlegen: Ein Fehler am Fragenpaket darf
+            # das Bearbeiten der Freigabe nicht scheitern lassen.
+            await fall_faq_service.sicher_anlegen(
+                conn, share={"id": share_id, "owner_user_id": uid}, gewuenscht=False)
             await conn.execute(
                 "UPDATE case_shares SET faq_enabled = FALSE WHERE id = $1", share_id)
             share = await conn.fetchrow("SELECT * FROM case_shares WHERE id = $1", share_id)
