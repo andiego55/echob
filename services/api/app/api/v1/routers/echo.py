@@ -21,7 +21,7 @@ from app.schemas.echo import (
     EchoChatSessionUpdate,
     EchoMessageResponse,
 )
-from app.services import resonanz_service, resonanz_uebungen
+from app.services import gefuehlsbild_service, resonanz_service, resonanz_uebungen
 from app.services.case_artifacts import build_artifact_context
 from app.services.case_documents import build_document_context
 from app.services.echo_kontext import ALLE_TEILE, LABELS, normalisieren
@@ -301,6 +301,16 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
             ueb_ctx = resonanz_uebungen.kontext_block(resonanz)
             if ueb_ctx:
                 context_parts.append(ueb_ctx)
+
+        # Das juengste bestaetigte Gefuehlsbild. Vor den Themendialogen, weil es die
+        # unmittelbarste Auskunft ist: Wie es der Person GERADE geht, von ihr selbst
+        # festgehalten - nicht abgeleitet, nicht gedeutet.
+        if "gefuehlsbild" not in ohne:
+            async with pool.acquire() as conn:
+                bild = await gefuehlsbild_service.aktuelles(conn, case_id, UUID(str(user_id)))
+            gb_ctx = gefuehlsbild_service.kontext_block(bild)
+            if gb_ctx:
+                context_parts.append(gb_ctx)
 
         # Themendialog-Zusammenfassungen
         if topic_summaries and "themen" not in ohne:
@@ -983,6 +993,9 @@ async def get_context_overview(
             # Nur das Wiedererkannte, nicht die Absagen: "Nicht mein Thema" steht in
             # keinem Prompt, also darf es auch nicht im Band mitgezaehlt werden - sonst
             # zeigt das Band eine Zahl an, die im Kontext nirgends auftaucht.
+            "gefuehlsbild": await conn.fetchval(
+                "SELECT COUNT(*) FROM feeling_snapshots "
+                "WHERE case_id = $1 AND status = 'bestaetigt'", case_id),
             "resonanz": await conn.fetchval(
                 "SELECT COUNT(*) FROM scene_resonance "
                 "WHERE user_id = $1 AND (case_id = $2 OR case_id IS NULL) "

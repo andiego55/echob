@@ -31,6 +31,7 @@ from app.api.v1.routers import (
     directory,
     directory_profile,
     echo,
+    gefuehlsbild,
     health,
     hypotheses,
     inbox,
@@ -89,6 +90,7 @@ v1_router.include_router(admin_router)               # nur Admin (Gruender): /ad
 v1_router.include_router(cases.router)
 v1_router.include_router(scenes.router)
 v1_router.include_router(resonanz.router)
+v1_router.include_router(gefuehlsbild.router)
 v1_router.include_router(echo.router)
 v1_router.include_router(scales.router)
 v1_router.include_router(reports.router)

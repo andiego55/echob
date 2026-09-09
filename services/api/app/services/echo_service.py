@@ -781,6 +781,50 @@ class EchoService:
             logger.error("resonanz_nachfragen: ungültige JSON-Antwort vom Modell.")
             return {"fragen": [], "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
 
+    async def gefuehlsbild_schreiben(self, *, eingaben: str) -> dict[str, Any]:
+        """Aus Szenen, Achsen und Woertern einen kurzen Text in der Ich-Form.
+
+        **Warum das heikler ist als jede andere Erzeugung hier.** Der Text legt einem
+        Menschen Worte ueber sich selbst in den Mund. Wer sich darin nicht wiedererkennt,
+        glaubt entweder, er sei falsch verstanden worden - oder, schlimmer, dass er sich
+        selbst falsch einschaetzt. Deshalb steht im Prompt an erster Stelle: nichts
+        hinzufuegen, nur ordnen, und alles Darueberhinausgehende als Frage.
+
+        Gespeichert wird nichts. Der Vorschlag geht an die Person, sie bearbeitet ihn und
+        bestaetigt - erst dann gehoert der Text ihr. Dasselbe Zweischritt-Muster wie bei
+        den Artefakten.
+        """
+        if not self._use_openai:
+            return {
+                "bericht": "",
+                "hinweis": "Echo laeuft im Demo-Modus - ohne OpenAI-Schluessel entsteht "
+                           "hier kein Text. Du kannst trotzdem selbst einen schreiben.",
+            }
+
+        response = await self._chat(
+            model=self._model_fast,
+            messages=[
+                {"role": "system", "content": _load_prompt("gefuehlsbild_prompt.md")},
+                {"role": "user", "content": (
+                    f"Seine Angaben:\n---\n{eingaben}\n---\n\n"
+                    f"Schreib jetzt das Gefuehlsbild."
+                )},
+            ],
+            max_tokens=700,
+            temperature=None if self._reasoning else 0.5,
+            response_format={"type": "json_object"},
+        )
+        import json as _gj
+        try:
+            roh = _gj.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("gefuehlsbild_schreiben: ungueltige JSON-Antwort vom Modell.")
+            return {"bericht": "", "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
+        return {
+            "bericht": (roh.get("bericht") or "").strip(),
+            "hinweis": roh.get("hinweis"),
+        }
+
     async def generate_hypothesis_summary(
         self, *, hypothesis_type: str, history: list[dict[str, str]],
     ) -> str:

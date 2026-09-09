@@ -26,7 +26,7 @@ _USER_TABLES = (
     "person_profiles", "echo_chat_sessions", "user_profiles", "payments",
     "ai_usage_log", "user_consents", "professional_profiles",
     "professional_assignments", "professional_appointments",
-    "scene_resonance",
+    "scene_resonance", "feeling_snapshots",
 )
 
 # Tabellen mit Daten in der Fachpersonen-Rolle (Spalte professional_user_id).
@@ -142,6 +142,7 @@ _DELETE_STEPS = (
     ("person_profiles", "user_id = $1"),
     ("echo_chat_sessions", "user_id = $1"),
     ("scene_resonance", "user_id = $1"),
+    ("feeling_snapshots", "user_id = $1"),
     ("professional_echo_messages", "professional_user_id = $1"),
     ("professional_echo_summaries", "professional_user_id = $1"),
     ("professional_echo_sessions", "professional_user_id = $1"),

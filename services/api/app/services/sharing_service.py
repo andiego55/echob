@@ -41,6 +41,9 @@ class SharedBundle:
     test_results: list[dict[str, Any]] = field(default_factory=list)
     documents: list[dict[str, Any]] = field(default_factory=list)
     artifacts: list[dict[str, Any]] = field(default_factory=list)
+    #: Das juengste BESTAETIGTE Gefuehlsbild. Ein Entwurf ist keine Aussage
+    #: und wird nie freigegeben.
+    gefuehlsbild: dict[str, Any] | None = None
     #: Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon —
     #: dass jemand eigene Einschaetzungen revidiert hat, sagt etwas ueber den Fall.
     artifacts_ueberholt: int = 0
@@ -270,6 +273,18 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
             crypto.decrypt_fields(dict(r), "content", "description") for r in rows
         ]
 
+    # Das Gefuehlsbild: wie es der Person zuletzt ging, von ihr selbst festgehalten und
+    # bestaetigt. Nur das juengste bestaetigte - ein Entwurf ist eine Momentaufnahme im
+    # Werden und keine Aussage, und der ganze Verlauf waere an dieser Stelle zu viel:
+    # Was gilt, ist das letzte.
+    if "gefuehlsbild" in allowed:
+        from app.services import gefuehlsbild_service
+        # Gebunden an die EIGENTUEMERIN aus der geprueften Freigabe - nicht an die
+        # Fachperson, der die Zeile nicht gehoert.
+        bundle.gefuehlsbild = await gefuehlsbild_service.aktuelles(
+            conn, case_id, share["owner_user_id"]
+        )
+
     # Festgehaltene Erkenntnisse. Überholte fließen inhaltlich NICHT mit (siehe
     # build_artifact_context) — nur ihre Zahl.
     if "artifacts" in allowed:
@@ -343,6 +358,12 @@ def build_shared_case_context(bundle: SharedBundle) -> str:
         ctx = build_document_context(bundle.documents)
         if ctx:
             parts.append(ctx)
+
+    if bundle.gefuehlsbild:
+        from app.services import gefuehlsbild_service
+        gb = gefuehlsbild_service.kontext_block(bundle.gefuehlsbild)
+        if gb:
+            parts.append(gb)
 
     if bundle.artifacts or bundle.artifacts_ueberholt:
         ctx = build_artifact_context(bundle.artifacts, ueberholt_anzahl=bundle.artifacts_ueberholt)
