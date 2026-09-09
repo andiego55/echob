@@ -39,6 +39,7 @@ from app.api.v1.routers import (
     onboarding,
     org_billing,
     organizations,
+    paar_szenen,
     person_profile,
     professional,
     professional_archiv,
@@ -138,6 +139,7 @@ v1_router.include_router(couple_questions.router)
 v1_router.include_router(couple_impulses.router)
 v1_router.include_router(couple_reminders.router)
 v1_router.include_router(couple_shares.router)
+v1_router.include_router(paar_szenen.router)     # Beziehungsszenen im Paarraum
 
 # ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
 v1_router.include_router(institute.router)
