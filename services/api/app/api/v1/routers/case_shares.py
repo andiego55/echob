@@ -16,7 +16,12 @@ from app.schemas.professional import (
     ShareElementResponse,
     ShareUpdate,
 )
-from app.services import fall_faq_service, seat_service, sharing_service
+from app.services import (
+    fall_faq_service,
+    seat_service,
+    sharing_service,
+    subscription_service,
+)
 
 router = APIRouter(prefix="/cases/{case_id}/shares", tags=["shares"])
 
@@ -212,6 +217,77 @@ async def update_share(
             await conn.execute(
                 "UPDATE case_shares SET faq_enabled = FALSE WHERE id = $1", share_id)
             share = await conn.fetchrow("SELECT * FROM case_shares WHERE id = $1", share_id)
+        return await _build_share_response(conn, share)
+
+
+@router.post("/{share_id}/faq", response_model=CaseShareResponse)
+async def faq_aktualisieren(
+    case_id: UUID,
+    share_id: UUID,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CaseShareResponse:
+    """Das Fragenpaket auf den heutigen Stand bringen — ohne die Freigabe neu zu erklären.
+
+    **Warum es diesen Endpunkt gibt.** Vorher gab es nur einen Weg: die ganze Freigabe
+    noch einmal speichern. Das hieß, beide Rechtserklärungen erneut zu bestätigen — für
+    eine Auffrischung von Antworten, deren Einwilligung längst vorliegt. Wer eine
+    Einwilligung so oft abfragt, dass sie zur Formalie wird, beschädigt sie.
+
+    **Warum trotzdem nur bei bereits ausgelöstem Paket.** Wer das Häkchen nie gesetzt hat,
+    hat den FAQ-Absatz auch nicht in ihrem gespeicherten Einwilligungstext stehen. Es hier
+    einzuschalten wäre eine Übermittlung ohne den dazugehörigen Nachweis. Der erste Start
+    läuft deshalb weiter über die Freigabe selbst — dort steht der Text.
+
+    **Wer auslöst, bleibt gleich:** die Klient:in. Für Berufsgeheimnisträger:innen ist der
+    Unterschied nicht akademisch (§ 203 StGB).
+    """
+    uid = current_user["user_id"]
+    async with pool.acquire() as conn:
+        share = await conn.fetchrow(
+            "SELECT * FROM case_shares WHERE id = $1 AND case_id = $2 AND owner_user_id = $3",
+            share_id, case_id, uid,
+        )
+        if not share:
+            raise HTTPException(status_code=404, detail="Freigabe nicht gefunden.")
+        if share["status"] != "active":
+            raise HTTPException(
+                status_code=422,
+                detail="Diese Freigabe ist widerrufen. Gib den Fall neu frei, wenn du "
+                       "wieder mit dieser Fachperson arbeiten möchtest.",
+            )
+        if not share["faq_enabled"]:
+            raise HTTPException(
+                status_code=422,
+                detail="Für diese Freigabe ist noch kein Fragenpaket ausgelöst. Setze das "
+                       "Häkchen beim Bearbeiten der Freigabe — dort steht, was dabei "
+                       "geschieht.",
+            )
+
+        laeuft = await conn.fetchval(
+            "SELECT 1 FROM case_faq_runs WHERE share_id = $1 "
+            "  AND status IN ('offen','laeuft')",
+            share_id,
+        )
+        if laeuft:
+            raise HTTPException(
+                status_code=409,
+                detail="Das Fragenpaket wird gerade erstellt. Einen Moment noch.",
+            )
+        if not await subscription_service.has_ai_usage_left(uid, conn, "fall_faq"):
+            raise HTTPException(
+                status_code=422,
+                detail="Dein monatliches Kontingent für Fragenpakete ist aufgebraucht. "
+                       "Am Monatsersten geht es weiter.",
+            )
+
+        async with conn.transaction():
+            run_id = await fall_faq_service.sicher_anlegen(
+                conn, share=dict(share), gewuenscht=True)
+        if run_id:
+            fall_faq_service.spawn(request.app, run_id)
+        share = await conn.fetchrow("SELECT * FROM case_shares WHERE id = $1", share_id)
         return await _build_share_response(conn, share)
 
 

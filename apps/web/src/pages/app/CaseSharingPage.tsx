@@ -9,6 +9,7 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { scenesApi } from '@/api/scenes'
 import { sharesApi, professionalsApi } from '@/api/shares'
+import { subscriptionApi } from '@/api/subscription'
 import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
@@ -73,7 +74,7 @@ export default function CaseSharingPage() {
                               <span key={label} className="text-[11px] px-2 py-0.5 rounded-full border border-brand-border text-brand-muted">{label}</span>
                             ))}
                       </div>
-                      {s.faq_enabled && <FaqStand share={s} />}
+                      {s.faq_enabled && <FaqStand caseId={caseId!} share={s} />}
                     </div>
                     {s.status === 'active' && <RevokeButton caseId={caseId!} share={s} />}
                   </div>
@@ -95,26 +96,61 @@ export default function CaseSharingPage() {
  * will, hat einen Auskunftsanspruch (Art. 15 DSGVO) - der wird beantwortet, nicht
  * nebenbei in einer Liste vorweggenommen.
  */
-function FaqStand({ share }: { share: CaseShare }) {
+function FaqStand({ caseId, share }: { caseId: string; share: CaseShare }) {
+  const qc = useQueryClient()
+  const { data: usage } = useQuery({ queryKey: ['ai-usage'], queryFn: subscriptionApi.getUsage })
+  const kontingent = usage?.quotas.find(q => q.kind === 'fall_faq')
+
+  const aktualisieren = useMutation({
+    mutationFn: () => sharesApi.faqAktualisieren(caseId, share.id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['case-shares', caseId] })
+      qc.invalidateQueries({ queryKey: ['ai-usage'] })
+    },
+  })
+
+  const laeuft = share.faq_status === 'offen' || share.faq_status === 'laeuft'
+  const leer = !!kontingent && !kontingent.unlimited && (kontingent.remaining ?? 0) <= 0
+
   // Das Datum steht dabei, weil es sonst keinen sichtbaren Unterschied gaebe zwischen
   // "gerade neu erstellt" und "es gab schon eins, deshalb kein zweites".
   const am = share.faq_erstellt_am
     ? ` (${new Date(share.faq_erstellt_am).toLocaleDateString('de-DE')})`
     : ''
-  // Haekchen gesetzt, aber gar kein Lauf: Das monatliche Kontingent ist aufgebraucht.
-  // Ohne diesen Fall stuende hier "wird erstellt ..." fuer etwas, das nie kommt - und
-  // die Person wartete auf eine Uebermittlung, die nicht stattfindet.
+  // Haekchen gesetzt, aber gar kein Lauf: Das monatliche Kontingent war aufgebraucht.
+  // Ohne diesen Fall stuende hier "wird erstellt ..." fuer etwas, das nie kommt.
   const text = !share.faq_status
-    ? 'Fragenpaket nicht erstellt — dein monatliches Kontingent ist aufgebraucht'
+    ? 'Fragenpaket nicht erstellt — dein monatliches Kontingent war aufgebraucht'
     : share.faq_status === 'fertig'
       ? `Fragenpaket an die Fachperson übermittelt${am}`
       : share.faq_status === 'fehler'
         ? 'Fragenpaket konnte nicht erstellt werden'
         : 'Fragenpaket wird erstellt …'
+
   return (
-    <p className="mt-1.5 text-[11px] text-brand-muted">
-      <span aria-hidden="true">· </span>{text}
-    </p>
+    <div className="mt-1.5">
+      <p className="text-[11px] text-brand-muted">
+        <span aria-hidden="true">· </span>{text}
+      </p>
+      {share.status === 'active' && (
+        <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <button
+            onClick={() => aktualisieren.mutate()}
+            disabled={aktualisieren.isPending || laeuft || leer}
+            className="text-[11px] text-accent hover:underline disabled:text-brand-muted disabled:no-underline"
+          >
+            {aktualisieren.isPending ? 'Wird gestartet …' : 'Fragenpaket aktualisieren'}
+          </button>
+          {kontingent && !kontingent.unlimited && (
+            <span className="text-[11px] text-brand-muted">
+              {kontingent.used} von {kontingent.limit} diesen Monat
+              {leer && ' · aufgebraucht'}
+            </span>
+          )}
+        </div>
+      )}
+      <Fehlermeldung error={aktualisieren.error} className="mt-1" />
+    </div>
   )
 }
 

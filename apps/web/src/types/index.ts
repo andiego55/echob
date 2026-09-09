@@ -853,7 +853,7 @@ export interface SubscriptionStatus {
 }
 
 export interface AiUsageQuota {
-  kind: 'report' | 'scale_calc'
+  kind: 'report' | 'scale_calc' | 'fall_faq'
   label: string
   used: number
   limit: number | null       // null = unbegrenzt/deaktiviert

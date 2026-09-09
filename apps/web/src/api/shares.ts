@@ -11,6 +11,9 @@ export const sharesApi = {
     apiClient.patch<CaseShare>(`/cases/${caseId}/shares/${shareId}`, data).then(r => r.data),
   revoke: (caseId: string, shareId: string) =>
     apiClient.delete(`/cases/${caseId}/shares/${shareId}`),
+  /** Fragenpaket neu erstellen — ohne die Freigabe erneut zu erklaeren. */
+  faqAktualisieren: (caseId: string, shareId: string) =>
+    apiClient.post<CaseShare>(`/cases/${caseId}/shares/${shareId}/faq`).then(r => r.data),
 }
 
 /** Nutzerseitige Fachpersonen-Verbindungen. */

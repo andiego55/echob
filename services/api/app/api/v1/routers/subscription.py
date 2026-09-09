@@ -40,7 +40,7 @@ async def ai_usage_status(
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> AiUsageStatus:
-    """Monatliche KI-Kontingente (Berichte, Skalen) für Counter + Einstellungen."""
+    """Monatliche KI-Kontingente (Berichte, Skalen, Fall-FAQ) für Counter + Einstellungen."""
     async with pool.acquire() as conn:
         data = await get_ai_usage_status(current_user["user_id"], conn)
     return AiUsageStatus(**data)

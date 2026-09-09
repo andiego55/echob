@@ -5,7 +5,7 @@ export const subscriptionApi = {
   getStatus: () =>
     apiClient.get<SubscriptionStatus>('/subscription/status').then(r => r.data),
 
-  /** Monatliche KI-Kontingente (Berichte, Skalen) für Counter + Einstellungen. */
+  /** Monatliche KI-Kontingente (Berichte, Skalen, Fall-FAQ) für Counter + Einstellungen. */
   getUsage: () =>
     apiClient.get<AiUsageStatus>('/subscription/usage').then(r => r.data),
 
