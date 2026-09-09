@@ -79,6 +79,7 @@ import {
 const CouplePartnerEchoPage = lazy(() => import('@/pages/couple/CoupleEchoPage'))
 const CoupleDeescalationPage = lazy(() => import('@/pages/couple/CoupleDeescalationPage'))
 const CoupleHonestPage = lazy(() => import('@/pages/couple/CoupleHonestPage'))
+const CoupleSzenenPage = lazy(() => import('@/pages/couple/CoupleSzenenPage'))
 const PrivacySettingsPage = lazy(() => import('@/pages/app/PrivacySettingsPage'))
 const SettingsPage = lazy(() => import('@/pages/app/SettingsPage'))
 import { useParams }         from 'react-router-dom'
@@ -293,6 +294,7 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/app/paar/:coupleId/echo" element={<ProtectedRoute><CouplePartnerEchoPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/streit" element={<ProtectedRoute><CoupleDeescalationPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/mitteilen" element={<ProtectedRoute><CoupleHonestPage /></ProtectedRoute>} />
+      <Route path="/app/paar/:coupleId/szenen" element={<ProtectedRoute><CoupleSzenenPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/gespraeche" element={<ProtectedRoute><CoupleSessionsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/mediation" element={<ProtectedRoute><CoupleTopicsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/abmachungen" element={<ProtectedRoute><CoupleAgreementsPage /></ProtectedRoute>} />
