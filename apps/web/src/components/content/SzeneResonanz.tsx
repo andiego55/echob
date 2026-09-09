@@ -137,6 +137,10 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
     queryFn: () => oeffentlicheResonanzApi.zaehler([slug]),
     enabled: typeof window !== 'undefined',
     staleTime: 60_000,
+    // Einmal nachfassen genuegt. Die Voreinstellung (dreimal mit wachsender Pause) liesse
+    // den Abschnitt bei einem fehlenden Backend rund zehn Sekunden lang bedienbar
+    // aussehen - genau lange genug, dass jemand darauf tippt.
+    retry: 1,
   })
 
   const eigeneAbfrage = useQuery({
@@ -160,6 +164,37 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
 
   const gewaehlt: Reaktion | null = angemeldet ? (eigener?.reaction ?? null) : anonymeWahl
   const zaehler: Zaehler = zaehlerAbfrage.data?.[slug] ?? {}
+
+  // Antwortet der Server auf die Zaehlerabfrage nicht, ist der ganze Abschnitt eine
+  // Attrappe: Jeder Tipp liefe in eine Fehlermeldung.
+  //
+  // Das ist kein hypothetischer Fall, sondern der Normalfall bei jedem Deploy: Diese Seite
+  // geht beim Push automatisch live, das Backend wird von Hand nachgezogen. Dazwischen
+  // stuenden auf 178 oeffentlichen Seiten vier Knoepfe, die bei jedem Tippen scheitern -
+  // gelesen von Menschen, die zum ersten Mal hier sind, und nebenbei von Suchmaschinen
+  // erfasst. Lieber nichts anbieten als etwas Kaputtes.
+  //
+  // **Die Bedingung ist zweiteilig, und beide Teile mussten sein.**
+  //
+  // `isError` deckt den geradlinigen Fall: Der Server antwortet mit 404, React Query gibt
+  // nach dem Wiederholungsversuch auf. Warum nicht auf `status === 404` geprueft wird:
+  // Fuer diesen Abschnitt macht die Fehlerart keinen Unterschied - ohne Antwort kann er
+  // nichts -, und die engere Fassung braeuchte eine Annahme darueber, in welcher Form der
+  // Fehler ankommt.
+  //
+  // `paused` deckt den Fall, der beim Pruefen ans Licht kam und den `isError` NICHT
+  // erwischt: Haelt React Query den Browser fuer offline, parkt es den Wiederholungsversuch
+  // und die Abfrage bleibt auf `pending` stehen - fuer immer. Der erste Versuch war da
+  // laengst mit 404 zurueck. `failureCount > 0` unterscheidet das vom ruhigen Warten vor
+  // dem ersten Versuch.
+  //
+  // **Warum es nicht einfacher geht, naemlich `!isSuccess`.** Weil dieser Abschnitt im
+  // vorgerenderten HTML steht. Eine Bedingung, die schon waehrend des ersten Ladens
+  // zutrifft, liesse ihn bei JEDEM Seitenaufruf kurz erscheinen und wieder verschwinden.
+  // Ausgeblendet wird nur bei einem endgueltigen Nein.
+  const nichtVerfuegbar =
+    zaehlerAbfrage.isError
+    || (zaehlerAbfrage.fetchStatus === 'paused' && zaehlerAbfrage.failureCount > 0)
 
   // ── Schreiben ─────────────────────────────────────────────────────────────
   const speichern = useMutation({
@@ -234,6 +269,8 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
 
   const satz = zaehlerSatz(zaehler, gewaehlt)
   const offen = istWiedererkannt(gewaehlt)
+
+  if (nichtVerfuegbar) return null
 
   return (
     <section
