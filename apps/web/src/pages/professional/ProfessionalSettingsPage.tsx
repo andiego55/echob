@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@/components/settings/EchoSteeringForm'
-import AvvDocument, { AVV_DOC_VERSION } from '@/components/professional/AvvDocument'
+import AvvDocument, { AVV_DOC_VERSION, fassungPasstZumText } from '@/components/professional/AvvDocument'
 import BerufsgruppeFeld from '@/components/professional/BerufsgruppeFeld'
 import ArchivSection from '@/components/professional/ArchivSection'
 import { apiErrorMessage } from '@/api/errors'
@@ -148,6 +148,10 @@ function AgreementSection() {
   // Fehlt die Version (aeltere API), gilt die Fassung des angezeigten Dokuments -
   // derselbe Rueckfall, den das frueher blockierende Tor benutzt hat.
   const version = me?.avv_current_version || AVV_DOC_VERSION
+
+  // Begruendung an der Funktion selbst. Kurz: test_avv_version.py haelt Text und Kennung
+  // in den QUELLTEXTEN zusammen - im Fenster zwischen zwei Deploys kann es das nicht.
+  const fassungenLaufenAuseinander = !fassungPasstZumText(me?.avv_current_version)
   const abschliessen = useMutation({
     mutationFn: () => professionalApi.acceptAgreement(version),
     onSuccess: (profil) => qc.setQueryData(['professional-me'], profil),
@@ -212,10 +216,20 @@ function AgreementSection() {
               Unterauftragsverarbeiter.
             </span>
           </label>
+          {fassungenLaufenAuseinander && (
+            <p className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Der Abschluss ist gerade kurz gesperrt: Der hier angezeigte Vertragstext und
+              die Fassung, die unser Server protokollieren würde, gehören nicht zusammen
+              ({AVV_DOC_VERSION} gegenüber {me.avv_current_version}). Wir würden sonst Ihre
+              Zustimmung zu einem anderen Text festhalten als dem, den Sie gelesen haben.
+              Das legt sich mit dem nächsten Server-Update von selbst — bitte in Kürze
+              erneut versuchen.
+            </p>
+          )}
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               onClick={() => abschliessen.mutate()}
-              disabled={!gelesen || abschliessen.isPending}
+              disabled={!gelesen || abschliessen.isPending || fassungenLaufenAuseinander}
               className="btn-primary disabled:opacity-50"
             >
               {abschliessen.isPending ? 'Wird abgeschlossen …' : 'Vertrag abschließen'}

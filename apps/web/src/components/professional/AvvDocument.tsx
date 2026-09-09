@@ -12,7 +12,24 @@
 
 /** Frontend-Kennung des hier hinterlegten Vertragstexts. Muss mit CURRENT_AVV_VERSION
  *  im Backend (agreement_service.py) übereinstimmen. Bei Textänderungen beide erhöhen. */
-export const AVV_DOC_VERSION = 'avv-2026-09'
+export const AVV_DOC_VERSION = 'avv-2026-09b'
+
+/**
+ * Passt die Fassung, die der Server protokollieren würde, zu dem Text auf dieser Seite?
+ *
+ * **Warum das eine Frage sein kann, ohne dass jemand einen Fehler gemacht hat.** Diese
+ * Datei deployt automatisch beim Push, das Backend von Hand. Dazwischen liegt ein Fenster,
+ * in dem hier der neue Vertragstext steht — die Komponente kennt nur einen — während der
+ * Server noch die alte Kennung meldet. Ein Abschluss in diesem Fenster hielte Zustimmung
+ * zu einer Fassung fest, die die Fachperson nie gesehen hat. Der Nachweis sähe dabei
+ * einwandfrei aus; auffallen würde es erst, wenn es darauf ankommt.
+ *
+ * Fehlt die Angabe (ältere API), wird nicht gesperrt: Dann gilt die Fassung des
+ * angezeigten Dokuments, und Text und Kennung stammen wieder aus derselben Quelle.
+ */
+export function fassungPasstZumText(serverFassung: string | null | undefined): boolean {
+  return !serverFassung || serverFassung === AVV_DOC_VERSION
+}
 
 function H({ children }: { children: React.ReactNode }) {
   return <h3 className="mt-6 text-[15px] font-bold text-navy">{children}</h3>
@@ -172,10 +189,32 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
       </P>
       <P>
         <strong className="text-navy">Datenminimierung gegenüber der KI:</strong> An das
-        Sprachmodell werden ausschließlich die freigegebenen Inhalte übermittelt — ohne Namen,
-        ohne Kontokennung und ohne Kennung der nutzenden Person. Klient:innen werden über
-        selbst gewählte Pseudonyme geführt. Welche Inhalte übermittelt werden, ist für die
-        Verantwortliche vor jeder Anfrage einsehbar.
+        Sprachmodell werden ausschließlich die freigegebenen Inhalte übermittelt. Nicht
+        übermittelt werden Kontokennungen, Nutzer-Kennungen und E-Mail-Adressen; Klient:innen
+        werden über selbst gewählte Pseudonyme geführt. Welche Inhalte übermittelt werden,
+        ist für die Verantwortliche vor jeder Anfrage einsehbar.
+      </P>
+      <P>
+        <strong className="text-navy">Was das ausdrücklich nicht bedeutet.</strong> Die
+        freigegebenen Inhalte werden im Wortlaut übermittelt, wie die Klient:in sie verfasst
+        hat. Nennt sie darin Namen — eigene, die von Angehörigen, Partner:innen, Kindern oder
+        Dritten —, so werden diese Namen mit übermittelt. Eine automatische Entfernung von
+        Namen aus Freitext findet <strong>nicht</strong> statt: Ein Verfahren, das Namen
+        errät, erzeugt entweder Fehlalarme oder — schwerer wiegend — eine trügerische
+        Sicherheit. Für beigelegte Dokumente stellt der Auftragsverarbeiter stattdessen ein
+        Werkzeug bereit, das E-Mail-Adressen, Telefonnummern und IBANs erkennt und auf einen
+        Klick ersetzt; Namen ersetzt es nach Angabe der schreibenden Person. Die
+        Verantwortliche wirkt darauf hin, dass nur erforderliche Angaben erhoben werden.
+      </P>
+      <P>
+        <strong className="text-navy">Keine Nutzung zum Modelltraining.</strong> Die
+        übermittelten Inhalte werden weder vom Auftragsverarbeiter noch vom eingesetzten
+        KI-Dienstleister zum Training oder zur Verbesserung von Modellen verwendet. Der
+        Auftragsverarbeiter nutzt die Programmierschnittstelle des KI-Dienstleisters, für
+        die dieser eine Nutzung zu Trainingszwecken vertraglich ausschließt. Eine
+        kurzzeitige Speicherung beim KI-Dienstleister zur Missbrauchserkennung ist derzeit
+        nicht ausgeschlossen; der Auftragsverarbeiter wirkt auf eine Vereinbarung ohne
+        Datenspeicherung hin und informiert die Verantwortliche über das Ergebnis.
       </P>
       <P>
         <strong className="text-navy">Erforderlichkeit.</strong> Die Verantwortliche

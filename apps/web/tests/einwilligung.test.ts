@@ -157,6 +157,36 @@ describe('Das Fall-FAQ im Nachweis', () => {
   })
 })
 
+describe('Die zwei Saetze, die vorher fehlten', () => {
+  // Beide standen im September 2026 zur Korrektur an, aus entgegengesetzten Gruenden:
+  // Der eine fehlte (Training), der andere stand falsch da (Namen). Ohne Test verschwinden
+  // sie beim naechsten Umformulieren, ohne dass es jemandem auffaellt.
+
+  it('schliesst die Nutzung zum Modelltraining aus - in der Erklaerung selbst', () => {
+    // Nicht nur im Hinweiskasten: Die Einwilligung muss aus sich heraus bestimmt sein,
+    // und "wird nicht zum Training verwendet" ist eine Zusage, keine blosse Information.
+    const einwilligung = erklaerungen(NAME).find(e => e.id === 'einwilligung')!.text
+    expect(einwilligung).toContain('Training')
+    expect(einwilligung).toContain('findet nicht statt')
+  })
+
+  it('sagt, dass Namen Dritter im Wortlaut mitgehen', () => {
+    // Es gibt keine automatische Entfernung von Namen - nirgends im Code. Solange das so
+    // ist, muss es dastehen: Die genannten Dritten haben in nichts eingewilligt, und die
+    // einzige Stelle, an der ueberhaupt jemand darauf Einfluss hat, ist das Schreibfeld.
+    const alles = DATENSCHUTZHINWEISE.map(h => h.was + ' ' + h.text).join(' ')
+    expect(alles).toContain('Wortlaut')
+    expect(alles).toMatch(/Rollen statt|statt voller Namen/)
+  })
+
+  it('nennt die Aufbewahrung, nicht nur den Widerruf', () => {
+    // "Bis du widerrufst" beantwortet Art. 13 Abs. 2 lit. a nur halb: Auch die Loeschung
+    // beim Kontoende gehoert hinein.
+    const einwilligung = erklaerungen(NAME).find(e => e.id === 'einwilligung')!.text
+    expect(einwilligung).toContain('Konto lösche')
+  })
+})
+
 describe('Beide Haken, nicht einer', () => {
   it('laesst die Freigabe erst nach beiden Erklaerungen zu', () => {
     // Der Fehler, den das verhindert: ein `||` statt `&&`. Der Knopf saehe genauso aus,

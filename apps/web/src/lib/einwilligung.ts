@@ -51,7 +51,7 @@ import { BETREIBER_KURZ, BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreibe
  * und benennt die Beteiligten. Seit Migration 102 wird zusätzlich der Wortlaut selbst
  * gespeichert — die Kennung ordnet ein, der Text beweist.
  */
-export const EINWILLIGUNG_FASSUNG = 'share-2026-09d'
+export const EINWILLIGUNG_FASSUNG = 'share-2026-09e'
 
 /**
  * Was geschieht — die Information, bevor gefragt wird.
@@ -89,9 +89,22 @@ export const DATENSCHUTZHINWEISE: { was: string; text: string }[] = [
       + 'Unterauftragnehmer. Dabei kann eine Verarbeitung in den USA stattfinden.',
   },
   {
+    was: 'Andere Menschen in deinen Texten',
+    text: 'Was du schreibst, geht im Wortlaut mit — auch Namen von Partner:innen, Kindern '
+      + 'oder Kolleg:innen. Diese Menschen haben nicht eingewilligt. Du hilfst ihnen, wenn '
+      + 'du Rollen statt voller Namen verwendest („mein Partner", „meine Chefin"). Für dich '
+      + 'ändert das nichts, für sie viel.',
+  },
+  {
     was: 'Wie lange',
     text: 'Bis du die Freigabe widerrufst. Danach verliert die Fachperson sofort den '
       + 'Zugriff auf die Inhalte, und was EchoB daraus erstellt hat, wird gelöscht.',
+  },
+  {
+    was: 'Was nicht passiert',
+    text: 'Deine Inhalte werden nicht zum Training von KI-Modellen verwendet — weder von '
+      + `${BETREIBER_KURZ} noch von ${KI_DIENSTLEISTER}. Eine kurzzeitige Speicherung dort `
+      + 'zur Missbrauchserkennung ist derzeit nicht ausgeschlossen; daran arbeiten wir.',
   },
   {
     was: 'Was sie behält',
@@ -123,7 +136,10 @@ export function erklaerungen(fachperson: string): Erklaerung[] {
         + 'zu meiner Gesundheit. Für die KI-gestützte Verarbeitung werden die Inhalte an '
         + `${KI_DIENSTLEISTER} und die im Auftragsverarbeitungsvertrag offengelegten `
         + 'Unterauftragnehmer übermittelt; dabei kann eine Verarbeitung in den USA '
-        + 'stattfinden.',
+        + 'stattfinden. Eine Verwendung meiner Inhalte zum Training oder zur Verbesserung '
+        + 'von KI-Modellen findet nicht statt. Die Inhalte bleiben gespeichert, bis ich die '
+        + 'Freigabe widerrufe oder mein Konto lösche; danach werden sie und die daraus '
+        + 'erzeugten Auswertungen entfernt.',
     },
     {
       id: 'entbindung',
