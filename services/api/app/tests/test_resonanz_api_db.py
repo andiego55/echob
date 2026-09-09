@@ -121,6 +121,124 @@ async def test_ein_zweiter_klick_loescht_die_zuordnung_nicht(welt):
     assert antwort.json()["case_id"] == str(case_id)
 
 
+async def test_ein_zugeordneter_eintrag_taucht_im_anderen_fall_nicht_auf(welt):
+    """Warum der Rueckweg noetig ist.
+
+    Die Liste eines Falls zeigt, was ihm gehoert - und was noch niemandem. Ein Eintrag,
+    der Fall A zugeordnet ist, ist bei Fall B unsichtbar. Ohne die Moeglichkeit, die
+    Zuordnung wieder zu loesen, waere eine versehentliche Zuordnung endgueltig.
+    """
+    pool, user, case_a, slug, _ = welt
+    async with pool.acquire() as conn:
+        case_b = await conn.fetchval(
+            "INSERT INTO cases (user_id, relationship_type, relationship_status, "
+            "contact_frequency) VALUES ($1,'family','separated','rarely') RETURNING id", user)
+
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}",
+              json={"reaction": "kenne_ich", "case_id": str(case_a)})
+        in_a = c.get(f"/api/v1/resonanz?case_id={case_a}").json()["eintraege"]
+        in_b = c.get(f"/api/v1/resonanz?case_id={case_b}").json()["eintraege"]
+
+    assert [e["scene_slug"] for e in in_a] == [slug]
+    assert in_b == []
+
+
+async def test_die_zuordnung_laesst_sich_wieder_loesen_und_neu_setzen(welt):
+    """Der ganze Weg: falsch zugeordnet, geloest, richtig zugeordnet.
+
+    Das ist der Fall, der bei mehreren Faellen wirklich vorkommt - man ordnet im
+    Vorbeigehen zu und merkt spaeter, dass es die andere Beziehung war.
+    """
+    pool, user, case_a, slug, _ = welt
+    async with pool.acquire() as conn:
+        case_b = await conn.fetchval(
+            "INSERT INTO cases (user_id, relationship_type, relationship_status, "
+            "contact_frequency) VALUES ($1,'family','separated','rarely') RETURNING id", user)
+
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.patch(f"/api/v1/resonanz/{slug}/fall", json={"case_id": str(case_a)})
+
+        geloest = c.patch(f"/api/v1/resonanz/{slug}/fall", json={"case_id": None})
+        assert geloest.status_code == 200, geloest.text
+        assert geloest.json()["case_id"] is None
+
+        # Jetzt sichtbar bei BEIDEN Faellen - als noch nicht zugeordnet.
+        assert len(c.get(f"/api/v1/resonanz?case_id={case_b}").json()["eintraege"]) == 1
+
+        neu = c.patch(f"/api/v1/resonanz/{slug}/fall", json={"case_id": str(case_b)})
+        assert neu.json()["case_id"] == str(case_b)
+        assert c.get(f"/api/v1/resonanz?case_id={case_a}").json()["eintraege"] == []
+
+
+async def test_die_ausarbeitung_ueberlebt_einen_fallwechsel(welt):
+    """Was geschrieben wurde, haengt am Menschen, nicht an der Zuordnung.
+
+    Sonst waere die Korrektur teuer: Wer merkt, dass er dem falschen Fall zugeordnet hat,
+    muesste seine Fassung noch einmal schreiben - und wuerde die Zuordnung lieber falsch
+    stehen lassen.
+    """
+    pool, user, case_a, slug, _ = welt
+    async with pool.acquire() as conn:
+        case_b = await conn.fetchval(
+            "INSERT INTO cases (user_id, relationship_type, relationship_status, "
+            "contact_frequency) VALUES ($1,'family','separated','rarely') RETURNING id", user)
+
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}",
+              json={"reaction": "kenne_ich", "case_id": str(case_a)})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
+        c.patch(f"/api/v1/resonanz/{slug}/fall", json={"case_id": None})
+        c.patch(f"/api/v1/resonanz/{slug}/fall", json={"case_id": str(case_b)})
+        eintrag = c.get(f"/api/v1/resonanz?case_id={case_b}").json()["eintraege"][0]
+
+    assert eintrag["ausarbeitung"]["what"] == _MEINS
+    assert eintrag["fehlt_noch"] == []
+
+
+async def test_ohne_zuordnung_keine_szene_trotz_vollstaendiger_fassung(welt):
+    """Bei mehreren Faellen ist das der Normalfall, nicht die Ausnahme.
+
+    Die Fassung darf vollstaendig sein - ohne Fall gibt es trotzdem keine Szene. Sonst
+    landete Material in der Akte einer Beziehung, um die es nie ging.
+    """
+    pool, user, case_a, slug, _ = welt
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO cases (user_id, relationship_type, relationship_status, "
+            "contact_frequency) VALUES ($1,'family','separated','rarely')", user)
+
+    with _client(user) as c:
+        # Zwei Faelle -> keine stille Zuordnung.
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+
+    assert antwort.status_code == 422
+    assert "Fall" in antwort.json()["detail"]
+    async with pool.acquire() as conn:
+        assert await conn.fetchval(
+            "SELECT COUNT(*) FROM scenes WHERE user_id = $1", user) == 0
+
+
+async def test_die_szene_landet_im_zugeordneten_fall(welt):
+    pool, user, case_a, slug, _ = welt
+    async with pool.acquire() as conn:
+        case_b = await conn.fetchval(
+            "INSERT INTO cases (user_id, relationship_type, relationship_status, "
+            "contact_frequency) VALUES ($1,'family','separated','rarely') RETURNING id", user)
+
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.patch(f"/api/v1/resonanz/{slug}/fall", json={"case_id": str(case_b)})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+
+    assert antwort.status_code == 201, antwort.text
+    assert antwort.json()["case_id"] == str(case_b)
+
+
 # ── Von der Reaktion zur eigenen Szene ───────────────────────────────────────
 #
 # Der Weg heisst jetzt: markieren -> ausarbeiten -> uebernehmen. Die Stufe dazwischen ist

@@ -99,9 +99,10 @@ function Feld({
 }
 
 export default function ResonanzFassung({
-  eintrag, fragen, onSchliessen, onUebernommen,
+  eintrag, caseId, fragen, onSchliessen, onUebernommen,
 }: {
   eintrag: ResonanzEintrag
+  caseId?: string
   fragen: ResonanzFrage[]
   onSchliessen: () => void
   onUebernommen: (szeneNr: number) => void
@@ -149,6 +150,16 @@ export default function ResonanzFassung({
     },
     onError: () => setFehler('Echo antwortet gerade nicht. Deine Fassung ist gespeichert.'),
   })
+
+  // Ohne Fall keine Szene. Das stand bisher nur in der Fehlermeldung am Ende - man
+  // konnte die ganze Ausarbeitung schreiben und erfuhr erst beim Uebernehmen, dass eine
+  // Zuordnung fehlt. Bei mehreren Faellen ist genau das der Normalfall.
+  const zuordnen = useMutation({
+    mutationFn: () => resonanzApi.zuordnen(eintrag.scene_slug, caseId ?? null),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['resonanz-ueberblick'] }),
+    onError: () => setFehler('Die Zuordnung hat gerade nicht geklappt.'),
+  })
+  const ohneFall = eintrag.case_id === null
 
   const uebernehmen = useMutation({
     mutationFn: () => resonanzApi.zuSzeneMachen(eintrag.scene_slug),
@@ -213,6 +224,27 @@ export default function ResonanzFassung({
           Schließen
         </button>
       </div>
+
+      {ohneFall && caseId && (
+        <div className="mt-4 rounded-brand border border-amber-300 bg-amber-50 px-4 py-3">
+          <p className="text-[0.88rem] font-semibold text-amber-900">
+            Diese Einordnung gehört noch keinem Fall.
+          </p>
+          <p className="mt-1 text-[0.84rem] leading-relaxed text-amber-900/80">
+            Weil du mehr als einen Fall hast, wurde beim Lesen nicht geraten — dort ist ja
+            nicht klar, um wen es geht. Schreiben kannst du trotzdem; für eine Szene braucht
+            es die Zuordnung.
+          </p>
+          <button
+            type="button"
+            onClick={() => zuordnen.mutate()}
+            disabled={zuordnen.isPending}
+            className="mt-2 text-[0.86rem] font-semibold text-amber-900 underline disabled:opacity-50"
+          >
+            {zuordnen.isPending ? 'Wird zugeordnet …' : 'Gehört zu diesem Fall'}
+          </button>
+        </div>
+      )}
 
       {/* Die Vorlage — sichtbar, aber als das benannt, was sie ist. */}
       <div className="mt-4 rounded-brand bg-navy/[0.04] px-4 py-3">
@@ -356,6 +388,11 @@ export default function ResonanzFassung({
 
       {/* Fuß */}
       <div className="mt-6 border-t border-brand-border pt-5">
+        {ohneFall && (
+          <p className="mb-3 text-[0.84rem] text-brand-muted">
+            Für eine Szene fehlt noch: <span className="text-navy">die Zuordnung zu diesem Fall</span>
+          </p>
+        )}
         {fehltNoch.length > 0 && (
           <p className="mb-3 text-[0.84rem] leading-relaxed text-brand-muted">
             Für eine Szene fehlt noch: <span className="text-navy">{fehltNoch.join(' · ')}</span>
@@ -365,7 +402,7 @@ export default function ResonanzFassung({
           <button
             type="button"
             onClick={() => uebernehmen.mutate()}
-            disabled={!bereit || uebernehmen.isPending}
+            disabled={!bereit || ohneFall || uebernehmen.isPending}
             className="btn-primary !px-6 !py-2.5 !text-[0.88rem] disabled:opacity-40"
           >
             {uebernehmen.isPending ? 'Wird übernommen …' : 'Als eigene Szene übernehmen'}

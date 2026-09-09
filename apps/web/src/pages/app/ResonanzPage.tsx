@@ -62,14 +62,15 @@ function LeerZustand({ caseId }: { caseId: string }) {
 }
 
 function EintragsKarte({
-  eintrag, caseId, fragen, offen, onZuordnen, onOeffnen, onSchliessen, onUebernommen,
-  zuordnenLaeuft,
+  eintrag, caseId, fragen, offen, onZuordnen, onLoesen, onOeffnen, onSchliessen,
+  onUebernommen, zuordnenLaeuft,
 }: {
   eintrag: ResonanzEintrag
   caseId: string
   fragen: ResonanzFrage[]
   offen: boolean
   onZuordnen: (slug: string) => void
+  onLoesen: (slug: string) => void
   onOeffnen: (slug: string) => void
   onSchliessen: () => void
   onUebernommen: (nr: number) => void
@@ -138,16 +139,35 @@ function EintragsKarte({
       )}
 
       <div className="mt-3.5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.82rem]">
-        {/* Nur zeigen, wenn wirklich offen: Wer einen Fall hat, sieht diese Zeile nie. */}
-        {e.case_id === null && !e.verwaist && (
-          <button
-            type="button"
-            onClick={() => onZuordnen(e.scene_slug)}
-            disabled={zuordnenLaeuft}
-            className="font-semibold text-accent hover:underline disabled:opacity-50"
-          >
-            Gehört zu diesem Fall
-          </button>
+        {/* Die Zuordnung geht in BEIDE Richtungen, und der Rueckweg ist der wichtigere.
+            Bei mehreren Faellen ordnet man im Vorbeigehen zu und merkt spaeter, dass es
+            die andere Beziehung war. Ohne diesen Knopf waere das nicht mehr zu
+            korrigieren: Ein Eintrag, der Fall A gehoert, taucht bei Fall B gar nicht auf.
+
+            Derselbe Knopf loest auch die Falle der stillen Zuordnung: Wer heute EINEN Fall
+            hat, bekommt alles automatisch zugeordnet - legt er in drei Monaten einen
+            zweiten an, haengen die alten Eintraege fest, auch die, die zum neuen
+            gehoeren. */}
+        {!e.verwaist && !e.promoted_scene_id && (
+          e.case_id === null ? (
+            <button
+              type="button"
+              onClick={() => onZuordnen(e.scene_slug)}
+              disabled={zuordnenLaeuft}
+              className="font-semibold text-accent hover:underline disabled:opacity-50"
+            >
+              Gehört zu diesem Fall
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onLoesen(e.scene_slug)}
+              disabled={zuordnenLaeuft}
+              className="text-brand-muted hover:text-navy hover:underline disabled:opacity-50"
+            >
+              Gehört doch nicht hierher
+            </button>
+          )
         )}
         {/* Der einzige Weg zu einer Szene fuehrt ueber die Ausarbeitung. Der Knopf
             heisst deshalb nicht „Szene anlegen“ - er oeffnet ein Menue, in dem die
@@ -178,6 +198,7 @@ function EintragsKarte({
       {offen && (
         <ResonanzFassung
           eintrag={e}
+          caseId={caseId}
           fragen={fragen}
           onSchliessen={onSchliessen}
           onUebernommen={onUebernommen}
@@ -206,6 +227,10 @@ export default function ResonanzPage() {
   }
   const zuordnen = useMutation({
     mutationFn: (slug: string) => resonanzApi.zuordnen(slug, caseId!),
+    onSuccess: frisch,
+  })
+  const loesen = useMutation({
+    mutationFn: (slug: string) => resonanzApi.zuordnen(slug, null),
     onSuccess: frisch,
   })
   function uebernommen(nr: number) {
@@ -383,10 +408,11 @@ export default function ResonanzPage() {
                   fragen={data.fragen}
                   offen={offenerSlug === e.scene_slug}
                   onZuordnen={slug => zuordnen.mutate(slug)}
+                  onLoesen={slug => loesen.mutate(slug)}
                   onOeffnen={setOffenerSlug}
                   onSchliessen={() => setOffenerSlug(null)}
                   onUebernommen={uebernommen}
-                  zuordnenLaeuft={zuordnen.isPending}
+                  zuordnenLaeuft={zuordnen.isPending || loesen.isPending}
                 />
               ))}
             </ul>
@@ -396,7 +422,9 @@ export default function ResonanzPage() {
                 Einige Einordnungen sind noch keinem Fall zugeordnet. Das passiert, wenn du
                 mehr als einen Fall hast — beim Lesen einer Szene ist ja nicht klar, um wen
                 es geht. Erst zugeordnete Einordnungen fließen in die Gespräche dieses Falls
-                ein.
+                ein, und erst aus ihnen kann eine Szene werden. Was hierher gehört, ordnest
+                du mit einem Klick zu; was du versehentlich zugeordnet hast, löst du mit
+                „Gehört doch nicht hierher" wieder.
               </p>
             )}
 
