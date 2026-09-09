@@ -20,7 +20,7 @@ from uuid import UUID
 import asyncpg
 
 from app.core import crypto
-from app.services import resonanz_fassung, szenen_verzeichnis
+from app.services import resonanz_fassung, resonanz_uebungen, szenen_verzeichnis
 from app.services.pattern_tags import GROUP_OF, PATTERN_GROUPS
 from app.services.resonanz_katalog import (
     REAKTION_LABELS,
@@ -141,7 +141,7 @@ async def setzen(
                 case_id    = COALESCE(EXCLUDED.case_id, scene_resonance.case_id),
                 updated_at = NOW()
             RETURNING id, scene_slug, case_id, reaction, frequency, distress, note,
-                      ausarbeitung, promoted_scene_id, created_at, updated_at
+                      ausarbeitung, uebungen, promoted_scene_id, created_at, updated_at
             """,
             user_id, slug, case_id, reaktion, frequency, distress, crypto.encrypt(sauber),
         )
@@ -185,6 +185,30 @@ async def fall_zuordnen(
     return ergebnis.endswith(" 1")
 
 
+async def uebungen_speichern(
+    conn: asyncpg.Connection, user_id: UUID, slug: str, roh: object
+) -> dict[str, Any] | None:
+    """Die Schreibimpulse sichern.
+
+    Getrennt von der Fassung, weil sie etwas anderes sind: Was hier steht, bleibt bei der
+    erfundenen Geschichte und wird nie Teil einer Szene. Siehe :mod:`resonanz_uebungen`.
+    """
+    if not szenen_verzeichnis.kennt(slug):
+        return None
+    sauber = resonanz_uebungen.bereinigen(roh)
+    zeile = await conn.fetchrow(
+        """
+        UPDATE scene_resonance
+           SET uebungen = $3::jsonb, updated_at = NOW()
+         WHERE user_id = $1 AND scene_slug = $2
+        RETURNING id, scene_slug, case_id, reaction, frequency, distress, note,
+                  ausarbeitung, uebungen, promoted_scene_id, created_at, updated_at
+        """,
+        user_id, slug, _json.dumps(crypto.encrypt_json_strings(sauber)),
+    )
+    return _aufbereiten(dict(zeile)) if zeile else None
+
+
 async def fassung_speichern(
     conn: asyncpg.Connection, user_id: UUID, slug: str, roh: object
 ) -> dict[str, Any] | None:
@@ -205,7 +229,7 @@ async def fassung_speichern(
                updated_at = NOW()
          WHERE user_id = $1 AND scene_slug = $2
         RETURNING id, scene_slug, case_id, reaction, frequency, distress, note,
-                  ausarbeitung, promoted_scene_id, created_at, updated_at
+                  ausarbeitung, uebungen, promoted_scene_id, created_at, updated_at
         """,
         user_id, slug,
         _json.dumps(crypto.encrypt_json_strings(sauber)),
@@ -230,6 +254,12 @@ def _aufbereiten(zeile: dict[str, Any]) -> dict[str, Any]:
     # auseinandergelaufen: Der Knopf waere aktiv gewesen und der Endpunkt haette 422
     # geantwortet.
     daten["fehlt_noch"] = resonanz_fassung.fehlt_noch(daten["ausarbeitung"])
+
+    roh_u = daten.get("uebungen")
+    if isinstance(roh_u, str):
+        roh_u = _json.loads(roh_u)
+    uebungen = crypto.decrypt_json_strings(roh_u) if roh_u else {}
+    daten["uebungen"] = uebungen if isinstance(uebungen, dict) else {}
     szene = szenen_verzeichnis.szene(daten["scene_slug"]) or {}
     daten["title"] = szene.get("title")
     daten["cluster"] = szene.get("cluster")
@@ -254,14 +284,14 @@ async def liste(
     if case_id is None:
         zeilen = await conn.fetch(
             "SELECT id, scene_slug, case_id, reaction, frequency, distress, note, "
-            "       ausarbeitung, promoted_scene_id, created_at, updated_at "
+            "       ausarbeitung, uebungen, promoted_scene_id, created_at, updated_at "
             "FROM scene_resonance WHERE user_id = $1 ORDER BY updated_at DESC",
             user_id,
         )
     else:
         zeilen = await conn.fetch(
             "SELECT id, scene_slug, case_id, reaction, frequency, distress, note, "
-            "       ausarbeitung, promoted_scene_id, created_at, updated_at "
+            "       ausarbeitung, uebungen, promoted_scene_id, created_at, updated_at "
             "FROM scene_resonance WHERE user_id = $1 AND (case_id = $2 OR case_id IS NULL) "
             "ORDER BY updated_at DESC",
             user_id, case_id,

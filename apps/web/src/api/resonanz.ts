@@ -30,6 +30,8 @@ export interface ResonanzEintrag {
   verwaist: boolean
   /** Die eigene Fassung: Antworten auf die gefuehrten Fragen. */
   ausarbeitung: Record<string, string>
+  /** Schreibimpulse an der erfundenen Szene. Werden NIE Teil einer Fall-Szene. */
+  uebungen: Record<string, string>
   /**
    * Was noch fehlt, bis daraus eine Szene werden darf — lesbare Labels vom Server.
    *
@@ -37,6 +39,16 @@ export interface ResonanzEintrag {
    * auseinander, und der Knopf waere aktiv, waehrend der Endpunkt 422 antwortet.
    */
   fehlt_noch: string[]
+}
+
+/** Ein Schreibimpuls. `ton: "hell"` markiert die Gegenszene - die einzige Frage im
+ *  Produkt, die man mit einem guten Gefuehl beantwortet. */
+export interface ResonanzUebung {
+  key: string
+  label: string
+  hinweis: string
+  platzhalter: string
+  ton: string
 }
 
 /** Eine gefuehrte Frage. Kommt vom Server, damit sie nur an einer Stelle steht. */
@@ -87,6 +99,8 @@ export interface ResonanzUeberblick {
   auswertung: ResonanzAuswertung
   /** Die gefuehrten Fragen — damit die Oberflaeche sie nicht ein zweites Mal fuehrt. */
   fragen: ResonanzFrage[]
+  /** Dasselbe fuer die Schreibimpulse. */
+  uebungen: ResonanzUebung[]
 }
 
 export interface ResonanzEingabe {
@@ -132,6 +146,11 @@ export const resonanzApi = {
   fassungSpeichern: (slug: string, ausarbeitung: Record<string, string>) =>
     apiClient
       .put<ResonanzEintrag>(`/resonanz/${slug}/fassung`, { ausarbeitung })
+      .then(r => r.data),
+
+  uebungenSpeichern: (slug: string, uebungen: Record<string, string>) =>
+    apiClient
+      .put<ResonanzEintrag>(`/resonanz/${slug}/uebungen`, { uebungen })
       .then(r => r.data),
 
   nachfragen: (slug: string) =>

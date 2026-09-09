@@ -22,6 +22,7 @@ from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.resonanz import (
     FRAGEN_KATALOG,
+    UEBUNGEN_KATALOG,
     FallZuordnung,
     FassungSpeichern,
     Nachfrage,
@@ -30,6 +31,7 @@ from app.schemas.resonanz import (
     ResonanzEintrag,
     ResonanzSetzen,
     ResonanzUeberblick,
+    UebungenSpeichern,
 )
 from app.services import resonanz_fassung, resonanz_service, szenen_verzeichnis
 from app.services.subscription_service import enforce_echo_prompt_limit
@@ -79,6 +81,7 @@ async def ueberblick(
             eintraege=[ResonanzEintrag(**e) for e in eintraege],
             auswertung=ResonanzAuswertung(**auswertung),
             fragen=FRAGEN_KATALOG,
+            uebungen=UEBUNGEN_KATALOG,
         )
 
 
@@ -161,6 +164,33 @@ async def fassung_speichern(
     async with pool.acquire() as conn:
         eintrag = await resonanz_service.fassung_speichern(
             conn, UUID(user["user_id"]), slug, body.ausarbeitung
+        )
+        if eintrag is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                "Markiere die Szene zuerst als wiedererkannt.",
+            )
+        return ResonanzEintrag(**eintrag)
+
+
+@router.put(
+    "/{slug}/uebungen",
+    response_model=ResonanzEintrag,
+    summary="Gegenszene und Weiterschreiben sichern",
+    description=(
+        "Zwei Schreibimpulse an der erfundenen Szene. Sie bleiben bei der Geschichte und "
+        "werden nie Teil einer Fall-Szene."
+    ),
+)
+async def uebungen_speichern(
+    slug: str,
+    body: UebungenSpeichern,
+    user: dict = Depends(get_current_user),
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> ResonanzEintrag:
+    async with pool.acquire() as conn:
+        eintrag = await resonanz_service.uebungen_speichern(
+            conn, UUID(user["user_id"]), slug, body.uebungen
         )
         if eintrag is None:
             raise HTTPException(

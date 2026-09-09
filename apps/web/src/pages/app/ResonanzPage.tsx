@@ -25,8 +25,14 @@ import CaseNav from '@/components/app/CaseNav'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import ResonanzUebernahme from '@/components/app/ResonanzUebernahme'
 import ResonanzFassung from '@/components/app/ResonanzFassung'
+import ResonanzWeiterdenken from '@/components/app/ResonanzWeiterdenken'
 import { ListSkeleton } from '@/components/Skeleton'
-import { resonanzApi, type ResonanzEintrag, type ResonanzFrage } from '@/api/resonanz'
+import {
+  resonanzApi,
+  type ResonanzEintrag,
+  type ResonanzFrage,
+  type ResonanzUebung,
+} from '@/api/resonanz'
 import { REAKTIONS_INFOS, REAKTION_LABEL, SKALEN, istWiedererkannt, type Reaktion } from '@/lib/resonanz'
 
 type Filter = 'alle' | Reaktion
@@ -62,16 +68,17 @@ function LeerZustand({ caseId }: { caseId: string }) {
 }
 
 function EintragsKarte({
-  eintrag, caseId, fragen, offen, onZuordnen, onLoesen, onOeffnen, onSchliessen,
-  onUebernommen, zuordnenLaeuft,
+  eintrag, caseId, fragen, uebungen, offen, onZuordnen, onLoesen, onOeffnen,
+  onSchliessen, onUebernommen, zuordnenLaeuft,
 }: {
   eintrag: ResonanzEintrag
   caseId: string
   fragen: ResonanzFrage[]
-  offen: boolean
+  uebungen: ResonanzUebung[]
+  offen: 'fassung' | 'weiterdenken' | null
   onZuordnen: (slug: string) => void
   onLoesen: (slug: string) => void
-  onOeffnen: (slug: string) => void
+  onOeffnen: (slug: string, was: 'fassung' | 'weiterdenken') => void
   onSchliessen: () => void
   onUebernommen: (nr: number) => void
   zuordnenLaeuft: boolean
@@ -175,14 +182,33 @@ function EintragsKarte({
         {!e.promoted_scene_id && !e.verwaist && (
           <button
             type="button"
-            onClick={() => (offen ? onSchliessen() : onOeffnen(e.scene_slug))}
+            onClick={() =>
+              offen === 'fassung' ? onSchliessen() : onOeffnen(e.scene_slug, 'fassung')}
             className="font-semibold text-accent hover:underline"
           >
-            {offen
+            {offen === 'fassung'
               ? 'Ausarbeitung schließen'
               : Object.keys(e.ausarbeitung).length > 0
                 ? 'Fassung weiterschreiben →'
                 : 'In eigene Worte fassen →'}
+          </button>
+        )}
+
+        {/* Zweiter Weg, bewusst gleichrangig daneben: Weiterdenken ist keine Vorstufe der
+            Fassung und keine Nacharbeit, sondern etwas anderes - es bleibt bei der
+            erfundenen Geschichte, statt sich von ihr zu loesen. */}
+        {!e.verwaist && (
+          <button
+            type="button"
+            onClick={() =>
+              offen === 'weiterdenken' ? onSchliessen() : onOeffnen(e.scene_slug, 'weiterdenken')}
+            className="font-semibold text-accent hover:underline"
+          >
+            {offen === 'weiterdenken'
+              ? 'Weiterdenken schließen'
+              : Object.keys(e.uebungen).length > 0
+                ? 'Weitergedacht ansehen →'
+                : 'Weiterdenken →'}
           </button>
         )}
         {e.promoted_scene_id && (
@@ -195,13 +221,21 @@ function EintragsKarte({
         )}
       </div>
 
-      {offen && (
+      {offen === 'fassung' && (
         <ResonanzFassung
           eintrag={e}
           caseId={caseId}
           fragen={fragen}
           onSchliessen={onSchliessen}
           onUebernommen={onUebernommen}
+        />
+      )}
+
+      {offen === 'weiterdenken' && (
+        <ResonanzWeiterdenken
+          eintrag={e}
+          uebungen={uebungen}
+          onSchliessen={onSchliessen}
         />
       )}
     </li>
@@ -212,7 +246,7 @@ export default function ResonanzPage() {
   const { caseId } = useParams<{ caseId: string }>()
   const qc = useQueryClient()
   const [filter, setFilter] = useState<Filter>('alle')
-  const [offenerSlug, setOffenerSlug] = useState<string | null>(null)
+  const [offen, setOffen] = useState<{ slug: string; was: 'fassung' | 'weiterdenken' } | null>(null)
   const [geradeUebernommen, setGeradeUebernommen] = useState<number | null>(null)
 
   const { data, isLoading, error } = useQuery({
@@ -234,7 +268,7 @@ export default function ResonanzPage() {
     onSuccess: frisch,
   })
   function uebernommen(nr: number) {
-    setOffenerSlug(null)
+    setOffen(null)
     setGeradeUebernommen(nr)
     qc.invalidateQueries({ queryKey: ['scenes', caseId] })
   }
@@ -406,11 +440,12 @@ export default function ResonanzPage() {
                   eintrag={e}
                   caseId={caseId!}
                   fragen={data.fragen}
-                  offen={offenerSlug === e.scene_slug}
+                  uebungen={data.uebungen}
+                  offen={offen?.slug === e.scene_slug ? offen.was : null}
                   onZuordnen={slug => zuordnen.mutate(slug)}
                   onLoesen={slug => loesen.mutate(slug)}
-                  onOeffnen={setOffenerSlug}
-                  onSchliessen={() => setOffenerSlug(null)}
+                  onOeffnen={(slug, was) => setOffen({ slug, was })}
+                  onSchliessen={() => setOffen(null)}
                   onUebernommen={uebernommen}
                   zuordnenLaeuft={zuordnen.isPending || loesen.isPending}
                 />

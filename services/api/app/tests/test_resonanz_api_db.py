@@ -455,6 +455,120 @@ async def test_die_fragen_kommen_vom_server(welt):
     assert set(pflicht) == {"what", "anders"}
 
 
+# ── Weiterdenken: zwei Impulse, die keine Szene werden ───────────────────────
+_GEGEN = (
+    "Sie haette nach dem Lachen gemerkt, dass ich still geworden bin, und auf dem Rueckweg "
+    "gefragt, ob das eben zu weit ging."
+)
+_WEITER = (
+    "Am naechsten Morgen liegt ein Zettel auf dem Tisch. Er liest ihn zweimal und steckt "
+    "ihn ein, ohne etwas zu sagen."
+)
+
+
+async def test_die_impulse_werden_gesichert_und_kommen_zurueck(welt):
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        antwort = c.put(f"/api/v1/resonanz/{slug}/uebungen",
+                        json={"uebungen": {"gegenszene": _GEGEN, "weiter": _WEITER}})
+        assert antwort.status_code == 200, antwort.text
+        wieder = c.get("/api/v1/resonanz").json()["eintraege"][0]
+
+    assert wieder["uebungen"]["gegenszene"] == _GEGEN
+    assert wieder["uebungen"]["weiter"] == _WEITER
+
+
+async def test_die_impulse_landen_NICHT_in_der_szene(welt):
+    """Der Grund, warum sie eine eigene Spalte haben.
+
+    Die Gegenszene ist eine Vorstellung davon, wie es haette laufen koennen. In einer
+    Fall-Szene - dem Bericht ueber ein reales Ereignis, aus dem Muster gerechnet und
+    Berichte gebaut werden - waere sie eine Falschaussage. Dasselbe gilt fuer den
+    weitergeschriebenen Absatz: Der handelt von einer erfundenen Figur.
+    """
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/uebungen",
+              json={"uebungen": {"gegenszene": _GEGEN, "weiter": _WEITER}})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+
+    assert antwort.status_code == 201, antwort.text
+    async with pool.acquire() as conn:
+        text = crypto.decrypt(await conn.fetchval(
+            "SELECT description FROM scenes WHERE id = $1",
+            uuid.UUID(antwort.json()["scene_id"]))) or ""
+    assert _GEGEN not in text
+    assert _WEITER not in text
+
+
+async def test_die_impulse_liegen_verschluesselt(welt):
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/uebungen", json={"uebungen": {"gegenszene": _GEGEN}})
+    async with pool.acquire() as conn:
+        roh = await conn.fetchval(
+            "SELECT uebungen::text FROM scene_resonance WHERE user_id = $1", user)
+    if crypto.encryption_enabled():
+        assert _GEGEN not in (roh or "")
+
+
+async def test_unbekannte_impulse_kommen_nicht_durch(welt):
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/uebungen",
+              json={"uebungen": {"gegenszene": "Ok.", "erfunden": "Weg damit."}})
+        wieder = c.get("/api/v1/resonanz").json()["eintraege"][0]
+    assert "erfunden" not in wieder["uebungen"]
+
+
+async def test_der_impuls_katalog_kommt_vom_server(welt):
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        antwort = c.get("/api/v1/resonanz").json()
+    keys = [u["key"] for u in antwort["uebungen"]]
+    assert keys == ["gegenszene", "weiter"]
+
+
+async def test_der_kontext_sagt_dass_es_ausgedacht_ist(welt):
+    """Ohne die Rahmung erzaehlt Echo der Person ihre eigene Fiktion als Tatsache zurueck.
+
+    "Am naechsten Morgen liegt ein Zettel auf dem Tisch" ist ein Satz ueber eine erfundene
+    Figur. Steht er ohne Hinweis im Kontext, wird daraus im naechsten Gespraech ein Zettel,
+    den der echte Partner geschrieben hat.
+    """
+    from app.services import resonanz_service, resonanz_uebungen
+
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/uebungen",
+              json={"uebungen": {"gegenszene": _GEGEN, "weiter": _WEITER}})
+
+    async with pool.acquire() as conn:
+        eintraege = await resonanz_service.liste(conn, user)
+    block = resonanz_uebungen.kontext_block(eintraege)
+
+    assert "keine Berichte" in block
+    assert "Vorstellungen" in block
+    assert _GEGEN in block
+
+
+async def test_ohne_impulse_bleibt_der_block_leer(welt):
+    from app.services import resonanz_service, resonanz_uebungen
+
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+    async with pool.acquire() as conn:
+        eintraege = await resonanz_service.liste(conn, user)
+    assert resonanz_uebungen.kontext_block(eintraege) == ""
+
+
 # ── Die Uebernahme nach der Anmeldung ────────────────────────────────────────
 async def test_die_uebernahme_zaehlt_nicht_doppelt(welt):
     """Der Fehler, der die einzige oeffentliche Zahl still verfaelscht haette.

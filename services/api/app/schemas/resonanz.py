@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 from app.services.resonanz_fassung import FRAGEN
 from app.services.resonanz_service import MAX_ZEICHEN_NOTIZ
+from app.services.resonanz_uebungen import UEBUNGEN
 
 Reaktion = Literal["kenne_ich", "kannte_ich", "andere_seite", "nicht_meins"]
 
@@ -94,6 +95,8 @@ class ResonanzEintrag(BaseModel):
     #: Die eigene Fassung: Antworten auf die geführten Fragen. Leer, solange niemand
     #: angefangen hat.
     ausarbeitung: dict[str, str] = Field(default_factory=dict)
+    #: Schreibimpulse an der erfundenen Szene. Werden NIE Teil einer Fall-Szene.
+    uebungen: dict[str, str] = Field(default_factory=dict)
     #: Was noch fehlt, bis daraus eine Szene werden darf — als lesbare Labels.
     #:
     #: Der Server entscheidet das, nicht das Frontend. Stünde die Regel zweimal, liefen
@@ -137,6 +140,8 @@ class ResonanzUeberblick(BaseModel):
     auswertung: ResonanzAuswertung
     #: Die geführten Fragen — damit die Oberfläche sie nicht ein zweites Mal führt.
     fragen: list[Frage] = Field(default_factory=list)
+    #: Dasselbe für die Schreibimpulse.
+    uebungen: list[Uebung] = Field(default_factory=list)
 
 
 class FallZuordnung(BaseModel):
@@ -170,6 +175,23 @@ class Frage(BaseModel):
 #: hier einen Wortlaut, fragt die Oberfläche weiter das Alte — und der Text, der in der
 #: Szene landet, trüge die neue Überschrift über der alten Antwort.
 FRAGEN_KATALOG: list[Frage] = [Frage(**f) for f in FRAGEN]
+
+
+class UebungenSpeichern(BaseModel):
+    uebungen: dict[str, str] = Field(default_factory=dict)
+
+
+class Uebung(BaseModel):
+    key: str
+    label: str
+    hinweis: str
+    platzhalter: str
+    #: „hell" bei der Gegenszene — der einzige Impuls, den man mit einem guten Gefuehl
+    #: beantwortet, und die Oberflaeche darf das zeigen.
+    ton: str
+
+
+UEBUNGEN_KATALOG: list[Uebung] = [Uebung(**u) for u in UEBUNGEN]
 
 
 class Nachfrage(BaseModel):

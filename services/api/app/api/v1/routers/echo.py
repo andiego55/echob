@@ -21,7 +21,7 @@ from app.schemas.echo import (
     EchoChatSessionUpdate,
     EchoMessageResponse,
 )
-from app.services import resonanz_service
+from app.services import resonanz_service, resonanz_uebungen
 from app.services.case_artifacts import build_artifact_context
 from app.services.case_documents import build_document_context
 from app.services.echo_kontext import ALLE_TEILE, LABELS, normalisieren
@@ -295,6 +295,12 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
             res_ctx = resonanz_service.kontext_block(resonanz)
             if res_ctx:
                 context_parts.append(res_ctx)
+            # Die Schreibimpulse hinterher und mit eigener Rahmung: Sie sind ausgedachter
+            # Text ueber eine ausgedachte Figur. Ohne den Hinweis liest ein Modell
+            # "Am naechsten Morgen entschuldigt er sich" als Bericht.
+            ueb_ctx = resonanz_uebungen.kontext_block(resonanz)
+            if ueb_ctx:
+                context_parts.append(ueb_ctx)
 
         # Themendialog-Zusammenfassungen
         if topic_summaries and "themen" not in ohne:
