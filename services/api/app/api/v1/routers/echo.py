@@ -21,6 +21,7 @@ from app.schemas.echo import (
     EchoChatSessionUpdate,
     EchoMessageResponse,
 )
+from app.services import resonanz_service
 from app.services.case_artifacts import build_artifact_context
 from app.services.case_documents import build_document_context
 from app.services.echo_kontext import ALLE_TEILE, LABELS, normalisieren
@@ -281,6 +282,19 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
             dok_ctx = build_document_context(dokumente)
             if dok_ctx:
                 context_parts.append(dok_ctx)
+
+        # Wiedererkannte Szenen. Hinter den Dokumenten, weil sie schwaecheres Material
+        # sind: Ein Dokument ist ein Beleg, eine eigene Szene ein Bericht - eine
+        # wiedererkannte Szene ist ein Hinweis darauf, wonach sich zu fragen lohnt. Die
+        # Reihenfolge im Prompt ist die Reihenfolge der Verlaesslichkeit.
+        if "resonanz" not in ohne:
+            async with pool.acquire() as conn:
+                resonanz = await resonanz_service.liste(
+                    conn, UUID(str(user_id)), case_id=case_id
+                )
+            res_ctx = resonanz_service.kontext_block(resonanz)
+            if res_ctx:
+                context_parts.append(res_ctx)
 
         # Themendialog-Zusammenfassungen
         if topic_summaries and "themen" not in ohne:
@@ -960,6 +974,13 @@ async def get_context_overview(
             "dokumente": await conn.fetchval(
                 "SELECT COUNT(*) FROM case_documents "
                 "WHERE case_id = $1 AND active = true", case_id),
+            # Nur das Wiedererkannte, nicht die Absagen: "Nicht mein Thema" steht in
+            # keinem Prompt, also darf es auch nicht im Band mitgezaehlt werden - sonst
+            # zeigt das Band eine Zahl an, die im Kontext nirgends auftaucht.
+            "resonanz": await conn.fetchval(
+                "SELECT COUNT(*) FROM scene_resonance "
+                "WHERE user_id = $1 AND (case_id = $2 OR case_id IS NULL) "
+                "AND reaction <> 'nicht_meins'", user_id, case_id),
         }
 
     return KontextAntwort(parts=[

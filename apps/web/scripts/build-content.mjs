@@ -166,6 +166,38 @@ export const TEST_COUNT = ${tests}
   'utf-8',
 )
 console.log(`  counts.generated.ts: ${szenen} Szenen, ${tests} Selbsttests`)
+
+// -- Szenen-Verzeichnis fuer das Backend --------------------------------------
+//
+// Das Backend braucht zu einer Resonanz (jemand hat eine Szene wiedererkannt) den Titel
+// und die Schlagwoerter der Szene - fuer den Echo-Kontext und die Auswertung. Es kann
+// sie nicht selbst lesen: Das API-Abbild enthaelt nur services/api, nicht apps/web.
+//
+// Die naheliegende Abkuerzung waere, das Frontend Titel und Tags mitschicken zu lassen.
+// Das waere ein Fehler - dann bestimmt der Aufrufer, was in seinem eigenen Fallkontext
+// steht, und koennte sich ein beliebiges Muster andichten.
+//
+// Also eine schlanke Kopie, aus derselben Quelle und mit derselben Pruefung wie das
+// Manifest. Sie wird eingecheckt; test_szenen_verzeichnis.py schlaegt an, wenn jemand
+// eine Szene aendert und `npm run content` vergisst.
+const szenenVerzeichnis = manifest
+  .filter((m) => m.type === 'scene')
+  .map((m) => ({
+    slug: m.slug,
+    title: m.title,
+    cluster: m.cluster,
+    perspective: m.perspective ?? null,
+    scene_tags: m.scene_tags ?? [],
+  }))
+
+const backendData = path.resolve(webRoot, '..', '..', 'services', 'api', 'app', 'data')
+fs.mkdirSync(backendData, { recursive: true })
+fs.writeFileSync(
+  path.join(backendData, 'szenen.json'),
+  JSON.stringify(szenenVerzeichnis, null, 2) + String.fromCharCode(10),
+  'utf-8',
+)
+console.log(`  szenen.json: ${szenenVerzeichnis.length} Szenen fuer das Backend`)
 console.log(
   `✓ Content: ${manifest.length} veröffentlicht, ${pages.length - published.length} Entwurf/Entwürfe. ` +
     `Manifest → ${path.relative(webRoot, outFile)}`,

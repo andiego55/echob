@@ -5,6 +5,7 @@ import { getBody } from '@/content/bodies'
 import MarkdownArticle from '@/components/content/MarkdownArticle'
 import type { ContentMeta } from '@/content/types'
 import { sceneTagLabel } from '@/content/sceneTags'
+import SzeneResonanz from '@/components/content/SzeneResonanz'
 
 /**
  * /szenen/:slug — einzelne fiktive Beziehungsszene (Ich-Perspektive).
@@ -105,6 +106,12 @@ export default function SzeneDetailPage() {
           <div className="prose-scene">
             <MarkdownArticle content={body} />
           </div>
+
+          {/* Wiedererkennen — direkt unter dem Text, vor jedem Angebot.
+              Der Moment, in dem jemand die Szene zu Ende gelesen hat, ist der einzige, in
+              dem "Kenne ich" nichts kostet. Stuende hier zuerst eine Einladung zum
+              Gespraech, waere die Geste schon ein Vorhaben. */}
+          <SzeneResonanz slug={scene.slug} titel={scene.title} />
 
           {/* Übergang zu Echo */}
           <aside className="mt-14 rounded-brand-lg border border-accent/25 bg-accent/[0.05] px-7 py-8">

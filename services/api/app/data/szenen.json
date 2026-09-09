@@ -1,0 +1,2188 @@
+[
+  {
+    "slug": "alle-finden-dich-schwierig",
+    "title": "Das sagen alle, nicht nur ich",
+    "cluster": "gaslighting",
+    "perspective": "Aus Sophies Sicht",
+    "scene_tags": [
+      "gaslighting-by-proxy",
+      "isolation",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "allein-zu-zweit",
+    "title": "Allein zu zweit",
+    "cluster": "bindung",
+    "perspective": "Aus Hannahs Sicht",
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "einsamkeit-zu-zweit",
+      "rueckzug"
+    ]
+  },
+  {
+    "slug": "als-ich-endlich-weg-war",
+    "title": "Als ich endlich weg war",
+    "cluster": "narzissmus",
+    "perspective": "Aus Philipps Sicht",
+    "scene_tags": [
+      "hoovering",
+      "love-bombing",
+      "sehnsucht",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "als-sie-endlich-zuhoerte",
+    "title": "Als sie endlich zuhörte",
+    "cluster": "kommunikation",
+    "perspective": "Aus Kajas Sicht",
+    "scene_tags": [
+      "aktives-zuhoeren",
+      "verbindung",
+      "gehoert-werden",
+      "ressource",
+      "klarheit"
+    ]
+  },
+  {
+    "slug": "als-waere-nichts-gewesen",
+    "title": "Als wäre nichts gewesen",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Davids Sicht",
+    "scene_tags": [
+      "fehlende-reparatur",
+      "emotionale-vernachlaessigung",
+      "reparaturversuch",
+      "wiederkehrendes-muster",
+      "einsamkeit-zu-zweit"
+    ]
+  },
+  {
+    "slug": "am-ende-entschuldige-ich-mich",
+    "title": "Am Ende entschuldige ich mich",
+    "cluster": "dynamiken",
+    "perspective": "Aus Neles Sicht",
+    "scene_tags": [
+      "schuldumkehr",
+      "gaslighting",
+      "schuldgefuehle",
+      "erschoepfung",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "am-ende-troeste-ich-ihn",
+    "title": "Am Ende tröste ich ihn",
+    "cluster": "dynamiken",
+    "perspective": "Aus Sarahs Sicht",
+    "scene_tags": [
+      "verdeckter-narzissmus",
+      "schuldumkehr",
+      "selbstzweifel",
+      "schuldgefuehle",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "am-morgen-war-nichts-gewesen",
+    "title": "Am Morgen war nichts gewesen",
+    "cluster": "emotionale-unreife",
+    "perspective": "Aus Annikas Sicht",
+    "scene_tags": [
+      "emotionale-unreife",
+      "fehlende-reparatur",
+      "emotionale-einsamkeit"
+    ]
+  },
+  {
+    "slug": "am-tisch-vor-den-anderen",
+    "title": "Am Tisch, vor den anderen",
+    "cluster": "konflikt",
+    "perspective": "Aus Gregors Sicht",
+    "scene_tags": [
+      "verachtung",
+      "scham",
+      "sich-klein-fuehlen",
+      "selbstwert"
+    ]
+  },
+  {
+    "slug": "aneinander-vorbei",
+    "title": "Aneinander vorbei",
+    "cluster": "kommunikation",
+    "perspective": "Aus Idas Sicht",
+    "scene_tags": [
+      "missverstaendnis",
+      "rechthaben",
+      "sich-nicht-gehoert-fuehlen",
+      "eskalation",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "auf-ihrer-buehne",
+    "title": "Auf ihrer Bühne",
+    "cluster": "dynamiken",
+    "perspective": "Aus Pauls Sicht",
+    "scene_tags": [
+      "grandioser-narzissmus",
+      "entwertung",
+      "sich-klein-fuehlen",
+      "einsamkeit-zu-zweit"
+    ]
+  },
+  {
+    "slug": "aus-einer-muecke",
+    "title": "Aus einer Mücke",
+    "cluster": "konflikt",
+    "perspective": "Aus Vics Sicht",
+    "scene_tags": [
+      "eskalation",
+      "wiederkehrendes-muster",
+      "erschoepfung",
+      "sich-nicht-gehoert-fuehlen"
+    ]
+  },
+  {
+    "slug": "bevor-sie-es-merkt",
+    "title": "Bevor sie es merkt",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Stefans Sicht",
+    "scene_tags": [
+      "anpassung",
+      "hypervigilanz",
+      "konfliktvermeidung",
+      "auf-eierschalen-gehen",
+      "erlerntes-verhalten"
+    ]
+  },
+  {
+    "slug": "bis-hierhin-und-nicht-weiter",
+    "title": "Bis hierhin und nicht weiter",
+    "cluster": "grenzen",
+    "perspective": "Aus Franzis Sicht",
+    "scene_tags": [
+      "grenze",
+      "konsequenz",
+      "kontrolle",
+      "selbstfuersorge",
+      "klarheit"
+    ]
+  },
+  {
+    "slug": "dann-geh-doch",
+    "title": "Dann geh doch",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Julias Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "drohung",
+      "streit",
+      "sicherheit"
+    ]
+  },
+  {
+    "slug": "darf-ich-erleichtert-sein",
+    "title": "Darf ich erleichtert sein?",
+    "cluster": "trennung",
+    "perspective": "Aus Jonas' Sicht",
+    "scene_tags": [
+      "trennung",
+      "erleichterung",
+      "schuldgefuehle",
+      "ambivalenz",
+      "klarheit"
+    ]
+  },
+  {
+    "slug": "das-augenrollen",
+    "title": "Das Augenrollen",
+    "cluster": "dynamiken",
+    "perspective": "Aus Timos Sicht",
+    "scene_tags": [
+      "verachtung",
+      "entwertung",
+      "sich-klein-fuehlen"
+    ]
+  },
+  {
+    "slug": "das-dritte-mal-derselbe-satz",
+    "title": "Das dritte Mal derselbe Satz",
+    "cluster": "selbsterkenntnis",
+    "perspective": "Aus Christophs Sicht",
+    "scene_tags": [
+      "selbstreflexion",
+      "beziehungsmuster",
+      "ehrlichkeit",
+      "veraenderung"
+    ]
+  },
+  {
+    "slug": "das-foto-von-mir-mit-neun",
+    "title": "Das Foto von mir mit neun",
+    "cluster": "selbstmitgefuehl",
+    "perspective": "Aus Simons Sicht",
+    "scene_tags": [
+      "selbstwert",
+      "scham",
+      "selbstfuersorge",
+      "veraenderung"
+    ]
+  },
+  {
+    "slug": "das-glas-an-der-wand",
+    "title": "Das Glas an der Wand",
+    "cluster": "grenzverletzung",
+    "perspective": "Aus Marleens Sicht",
+    "scene_tags": [
+      "grenze",
+      "sicherheit",
+      "hypervigilanz",
+      "ohnmacht"
+    ]
+  },
+  {
+    "slug": "das-habe-ich-nie-gesagt",
+    "title": "Das habe ich nie gesagt",
+    "cluster": "dynamiken",
+    "perspective": "Aus Lenas Sicht",
+    "scene_tags": [
+      "gaslighting",
+      "realitaetsverdrehung",
+      "selbstzweifel",
+      "sich-klein-fuehlen",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "das-haette-er-wissen-muessen",
+    "title": "Das hätte er wissen müssen",
+    "cluster": "kommunikation",
+    "perspective": "Aus Merets Sicht",
+    "scene_tags": [
+      "erwartungsdruck",
+      "gedankenlesen",
+      "enttaeuschung",
+      "sich-nicht-gehoert-fuehlen",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "das-handy-auf-dem-kuechentisch",
+    "title": "Das Handy auf dem Küchentisch",
+    "cluster": "dynamiken",
+    "perspective": "Aus Ninas Sicht",
+    "scene_tags": [
+      "eifersucht",
+      "kontrolle",
+      "misstrauen",
+      "verlustangst",
+      "selbstzweifel"
+    ]
+  },
+  {
+    "slug": "das-hast-du-dir-eingebildet",
+    "title": "Das hast du dir eingebildet",
+    "cluster": "gaslighting",
+    "perspective": "Aus Tobias' Sicht",
+    "scene_tags": [
+      "gaslighting",
+      "realitaetsverdrehung",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "das-haus-das-nie-kommt",
+    "title": "Das Haus, das nie kommt",
+    "cluster": "dynamiken",
+    "perspective": "Aus Janas Sicht",
+    "scene_tags": [
+      "zukunftsversprechen",
+      "hinhalten",
+      "idealisierung-abwertung"
+    ]
+  },
+  {
+    "slug": "das-ist-deine-alte-wunde",
+    "title": "Das ist nur deine alte Wunde",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Michaels Sicht",
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "spiritual-bypassing",
+      "schuldumkehr",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "das-konto-von-dem-ich-nichts-wusste",
+    "title": "Das Konto, von dem ich nichts wusste",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Anjas Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "geheimnis",
+      "geld",
+      "sicherheit"
+    ]
+  },
+  {
+    "slug": "das-nein-das-ich-zurueckgenommen-habe",
+    "title": "Das Nein, das ich zurückgenommen habe",
+    "cluster": "kodependenz",
+    "perspective": "Aus Elenas Sicht",
+    "scene_tags": [
+      "grenze",
+      "selbstaufgabe",
+      "schuldgefuehle",
+      "selbstwert"
+    ]
+  },
+  {
+    "slug": "das-schlechte-gewissen",
+    "title": "Das schlechte Gewissen",
+    "cluster": "grenzen",
+    "perspective": "Aus Milans Sicht",
+    "scene_tags": [
+      "schuldgefuehle",
+      "grenze",
+      "selbstzweifel",
+      "nein-sagen",
+      "selbstfuersorge"
+    ]
+  },
+  {
+    "slug": "das-schnauben-im-hintergrund",
+    "title": "Das Schnauben im Hintergrund",
+    "cluster": "konflikt",
+    "perspective": "Aus Nikolas' Sicht",
+    "scene_tags": [
+      "verachtung",
+      "sich-klein-fuehlen",
+      "konflikt",
+      "selbstwert"
+    ]
+  },
+  {
+    "slug": "das-wetter-zuhause",
+    "title": "Das Wetter zuhause",
+    "cluster": "dynamiken",
+    "perspective": "Aus Theas Sicht",
+    "scene_tags": [
+      "coercive-control",
+      "auf-eierschalen-gehen",
+      "kontrolle",
+      "rueckzug",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "deine-ex-haette",
+    "title": "Deine Ex hätte",
+    "cluster": "dynamiken",
+    "perspective": "Aus Kims Sicht",
+    "scene_tags": [
+      "vergleich",
+      "entwertung",
+      "triangulierung",
+      "sich-klein-fuehlen",
+      "selbstzweifel"
+    ]
+  },
+  {
+    "slug": "der-beste-mensch-im-raum",
+    "title": "Der beste Mensch im Raum",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Julians Sicht",
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "fassade",
+      "narzisstische-zufuhr",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "der-bildschirm-leuchtet-auf",
+    "title": "Der Bildschirm leuchtet auf",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Katjas Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "schock",
+      "sicherheit"
+    ]
+  },
+  {
+    "slug": "der-daumen-ueber-dem-profil",
+    "title": "Der Daumen über dem Profil",
+    "cluster": "trennung",
+    "perspective": "Aus Tims Sicht",
+    "scene_tags": [
+      "loslassen",
+      "kontaktabbruch",
+      "gruebeln",
+      "sehnsucht"
+    ]
+  },
+  {
+    "slug": "der-erste-gute-tag",
+    "title": "Der erste gute Tag",
+    "cluster": "liebeskummer",
+    "perspective": "Aus Miriams Sicht",
+    "scene_tags": [
+      "hoffnung",
+      "schuldgefuehle",
+      "loslassen",
+      "trennungsschmerz"
+    ]
+  },
+  {
+    "slug": "der-erste-sonntag-ohne-anruf",
+    "title": "Der erste Sonntag ohne Anruf",
+    "cluster": "grenzen",
+    "perspective": "Aus Fraukes Sicht",
+    "scene_tags": [
+      "grenzen",
+      "widerstand",
+      "schuldgefuehle",
+      "familie"
+    ]
+  },
+  {
+    "slug": "der-konflikt-ist-vorbei-in-mir-nicht",
+    "title": "Der Konflikt ist vorbei. In mir nicht.",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Daniks Sicht",
+    "scene_tags": [
+      "nachwirkung",
+      "emotionale-ueberflutung",
+      "erschoepfung",
+      "gruebeln",
+      "stressreaktion"
+    ]
+  },
+  {
+    "slug": "der-kruemel",
+    "title": "Der Krümel",
+    "cluster": "dynamiken",
+    "perspective": "Aus Sinas Sicht",
+    "scene_tags": [
+      "breadcrumbing",
+      "hinhalten",
+      "intermittierende-verstaerkung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "der-mann-den-alle-lieben",
+    "title": "Der Mann, den alle lieben",
+    "cluster": "narzissmus",
+    "perspective": "Aus Katjas Sicht",
+    "scene_tags": [
+      "narzissmus",
+      "fassade",
+      "wahrnehmungszweifel",
+      "isolation"
+    ]
+  },
+  {
+    "slug": "der-morgen-danach",
+    "title": "Der Morgen danach",
+    "cluster": "konflikt",
+    "perspective": "Aus Antons Sicht",
+    "scene_tags": [
+      "rueckzug",
+      "einsamkeit-zu-zweit",
+      "reparaturversuch",
+      "wiederkehrendes-muster",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "der-perfekte-tag",
+    "title": "Der perfekte Tag",
+    "cluster": "dynamiken",
+    "perspective": "Aus Noras Sicht",
+    "scene_tags": [
+      "intermittierende-verstaerkung",
+      "trauma-bindung",
+      "idealisierung-abwertung",
+      "naehe-distanz",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "der-punkt-auf-der-karte",
+    "title": "Der Punkt auf der Karte",
+    "cluster": "grenzverletzung",
+    "perspective": "Aus Sinas Sicht",
+    "scene_tags": [
+      "kontrolle",
+      "grenze",
+      "hypervigilanz",
+      "sicherheit"
+    ]
+  },
+  {
+    "slug": "der-satz-den-ich-zu-marie-gesagt-haette",
+    "title": "Der Satz, den ich zu Marie gesagt hätte",
+    "cluster": "selbstmitgefuehl",
+    "perspective": "Aus Rebekkas Sicht",
+    "scene_tags": [
+      "selbstwert",
+      "innerer-kritiker",
+      "scham",
+      "selbstfuersorge"
+    ]
+  },
+  {
+    "slug": "der-schluessel-im-schloss",
+    "title": "Der Schlüssel im Schloss",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Florians Sicht",
+    "scene_tags": [
+      "hypervigilanz",
+      "auf-eierschalen-gehen",
+      "anpassung",
+      "kontrolle",
+      "dauerstress"
+    ]
+  },
+  {
+    "slug": "der-vorwurf",
+    "title": "Der Vorwurf",
+    "cluster": "dynamiken",
+    "perspective": "Aus Yasmins Sicht",
+    "scene_tags": [
+      "eifersuchtsvorwuerfe",
+      "misstrauen",
+      "kontrolle",
+      "auf-eierschalen-gehen"
+    ]
+  },
+  {
+    "slug": "die-eine-nachricht",
+    "title": "Die eine Nachricht",
+    "cluster": "bindung",
+    "perspective": "Aus Nils' Sicht",
+    "scene_tags": [
+      "breadcrumbing",
+      "hinhalten",
+      "naehe-distanz",
+      "verlustangst"
+    ]
+  },
+  {
+    "slug": "die-gekraenkte-stille",
+    "title": "Die gekränkte Stille",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Pauls Sicht",
+    "scene_tags": [
+      "vulnerabler-narzissmus",
+      "stonewalling",
+      "schuldgefuehle",
+      "auf-eierschalen-gehen"
+    ]
+  },
+  {
+    "slug": "die-hand-in-meinem-nacken",
+    "title": "Die Hand in meinem Nacken",
+    "cluster": "liebessprachen",
+    "perspective": "Aus Tobias' Sicht",
+    "scene_tags": [
+      "liebessprachen",
+      "koerperkontakt",
+      "naehe",
+      "sehnsucht"
+    ]
+  },
+  {
+    "slug": "die-kueche-die-niemand-sieht",
+    "title": "Die Küche, die niemand sieht",
+    "cluster": "liebessprachen",
+    "perspective": "Aus Meikes Sicht",
+    "scene_tags": [
+      "liebessprachen",
+      "wertschaetzung",
+      "missverstaendnis",
+      "alltag"
+    ]
+  },
+  {
+    "slug": "die-leere-seite-vom-bett",
+    "title": "Die leere Seite vom Bett",
+    "cluster": "liebeskummer",
+    "perspective": "Aus Simons Sicht",
+    "scene_tags": [
+      "sehnsucht",
+      "vermissen",
+      "trennungsschmerz",
+      "einsamkeit-zu-zweit"
+    ]
+  },
+  {
+    "slug": "die-liste",
+    "title": "Die Liste",
+    "cluster": "dynamiken",
+    "perspective": "Aus Bens Sicht",
+    "scene_tags": [
+      "aufrechnen",
+      "entwertung",
+      "verachtung",
+      "wiederkehrendes-muster",
+      "sich-klein-fuehlen"
+    ]
+  },
+  {
+    "slug": "die-neue-ist-schon-da",
+    "title": "Die Neue ist schon da",
+    "cluster": "narzissmus",
+    "perspective": "Aus Sarahs Sicht",
+    "scene_tags": [
+      "triangulierung",
+      "vergleich",
+      "narzisstische-zufuhr",
+      "selbstwert"
+    ]
+  },
+  {
+    "slug": "die-scham-danach",
+    "title": "Die Scham danach",
+    "cluster": "gefuehle",
+    "perspective": "Aus Robins Sicht",
+    "scene_tags": [
+      "scham",
+      "selbstzweifel",
+      "rueckzug",
+      "verletzung",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "die-tuer-war-offen",
+    "title": "Die Tür war offen",
+    "cluster": "trennung",
+    "perspective": "Aus Hannas Sicht",
+    "scene_tags": [
+      "klarheit",
+      "aufbruch",
+      "grenze",
+      "wiederkehrendes-muster",
+      "rueckzug"
+    ]
+  },
+  {
+    "slug": "die-wand",
+    "title": "Die Wand",
+    "cluster": "dynamiken",
+    "perspective": "Aus Ellens Sicht",
+    "scene_tags": [
+      "stonewalling",
+      "rueckzug"
+    ]
+  },
+  {
+    "slug": "die-zahnbuerste",
+    "title": "Die Zahnbürste, die noch da ist",
+    "cluster": "liebeskummer",
+    "perspective": "Aus Annas Sicht",
+    "scene_tags": [
+      "vermissen",
+      "loslassen",
+      "trennungsschmerz",
+      "sehnsucht"
+    ]
+  },
+  {
+    "slug": "dieselbe-eigenschaft",
+    "title": "Dieselbe Eigenschaft",
+    "cluster": "narzissmus",
+    "perspective": "Aus Solveigs Sicht",
+    "scene_tags": [
+      "idealisierung",
+      "entwertung",
+      "selbstzweifel",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "dieser-blick",
+    "title": "Dieser Blick",
+    "cluster": "konflikt",
+    "perspective": "Aus Jorans Sicht",
+    "scene_tags": [
+      "verachtung",
+      "entwertung",
+      "sich-klein-fuehlen",
+      "sich-nicht-gehoert-fuehlen",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "drei-tage-schweigen",
+    "title": "Drei Tage Schweigen",
+    "cluster": "dynamiken",
+    "perspective": "Aus Miras Sicht",
+    "scene_tags": [
+      "stonewalling",
+      "passiv-aggressiv",
+      "rueckzug",
+      "auf-eierschalen-gehen",
+      "naehe-distanz"
+    ]
+  },
+  {
+    "slug": "drei-uhr-nachts",
+    "title": "Drei Uhr nachts",
+    "cluster": "trennung",
+    "perspective": "Aus Lenas Sicht",
+    "scene_tags": [
+      "sehnsucht",
+      "gruebeln",
+      "loslassen",
+      "verlustangst"
+    ]
+  },
+  {
+    "slug": "dreiundzwanzig-uhr-die-liste",
+    "title": "Dreiundzwanzig Uhr, die Liste",
+    "cluster": "selbstmitgefuehl",
+    "perspective": "Aus Tobias' Sicht",
+    "scene_tags": [
+      "innerer-kritiker",
+      "gruebeln",
+      "selbstwert",
+      "scham"
+    ]
+  },
+  {
+    "slug": "dritter-tag-ohne-antwort",
+    "title": "Dritter Tag ohne Antwort",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Leonies Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "stonewalling",
+      "ohnmacht",
+      "streit"
+    ]
+  },
+  {
+    "slug": "du-bist-noch-nicht-so-weit",
+    "title": "Du bist da noch nicht so weit",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Ninas Sicht",
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "verachtung",
+      "entwertung",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "du-bist-zu-empfindlich",
+    "title": "Du bist zu empfindlich",
+    "cluster": "gaslighting",
+    "perspective": "Aus Miras Sicht",
+    "scene_tags": [
+      "gaslighting",
+      "realitaetsverdrehung",
+      "wahrnehmungszweifel",
+      "entwertung"
+    ]
+  },
+  {
+    "slug": "du-hast-dich-veraendert",
+    "title": "Du hast dich verändert",
+    "cluster": "grenzen",
+    "perspective": "Aus Deniz Sicht",
+    "scene_tags": [
+      "grenzen",
+      "widerstand",
+      "selbstbestimmung"
+    ]
+  },
+  {
+    "slug": "du-machst-das-eh-besser",
+    "title": "Du machst das eh besser",
+    "cluster": "dynamiken",
+    "perspective": "Aus Carlas Sicht",
+    "scene_tags": [
+      "vorgetaeuschte-unfaehigkeit",
+      "machtasymmetrie",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "du-ziehst-das-an",
+    "title": "Das hast du dir angezogen",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Sebastians Sicht",
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "spiritual-bypassing",
+      "schuldumkehr",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "egal-was-ich-tue",
+    "title": "Egal, was ich tue",
+    "cluster": "narzissmus",
+    "perspective": "Aus Davids Sicht",
+    "scene_tags": [
+      "idealisierung-abwertung",
+      "entwertung",
+      "erschoepfung",
+      "selbstwert"
+    ]
+  },
+  {
+    "slug": "ein-gespraech-mit-mir-selbst",
+    "title": "Ein Gespräch mit mir selbst",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Michaels Sicht",
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "fehlende-gegenseitigkeit",
+      "einsamkeit-zu-zweit",
+      "desinteresse",
+      "resignation"
+    ]
+  },
+  {
+    "slug": "eine-spur-besser",
+    "title": "Eine Spur besser",
+    "cluster": "selbstreflexion",
+    "perspective": "Aus Fritzis Sicht",
+    "scene_tags": [
+      "freundschaft",
+      "konkurrenz",
+      "neid",
+      "entwertung",
+      "sich-klein-fuehlen"
+    ]
+  },
+  {
+    "slug": "einer-von-uns-musste-falsch-liegen",
+    "title": "Einer von uns musste falsch liegen",
+    "cluster": "emotionale-unreife",
+    "perspective": "Aus Maltes Sicht",
+    "scene_tags": [
+      "emotionale-unreife",
+      "affektive-realitaet",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "entschuldigung-damit-es-aufhoert",
+    "title": "Entschuldigung, damit es aufhört",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Philipps Sicht",
+    "scene_tags": [
+      "fawning",
+      "konfliktvermeidung",
+      "anpassung",
+      "reparaturversuch",
+      "erlerntes-verhalten"
+    ]
+  },
+  {
+    "slug": "entwurf-geloescht",
+    "title": "Entwurf gelöscht",
+    "cluster": "liebeskummer",
+    "perspective": "Aus Ninas Sicht",
+    "scene_tags": [
+      "kontaktsperre",
+      "sehnsucht",
+      "gruebeln",
+      "trennungsschmerz"
+    ]
+  },
+  {
+    "slug": "er-hat-meine-stimme-nachgemacht",
+    "title": "Er hat meine Stimme nachgemacht",
+    "cluster": "konflikt",
+    "perspective": "Aus Cordulas Sicht",
+    "scene_tags": [
+      "verachtung",
+      "scham",
+      "selbstwert",
+      "konflikt"
+    ]
+  },
+  {
+    "slug": "er-sagt-es-nie",
+    "title": "Er sagt es nie",
+    "cluster": "liebessprachen",
+    "perspective": "Aus Sarahs Sicht",
+    "scene_tags": [
+      "liebessprachen",
+      "wertschaetzung",
+      "sehnsucht"
+    ]
+  },
+  {
+    "slug": "erst-der-rausch-dann-die-kaelte",
+    "title": "Erst der Rausch, dann die Kälte",
+    "cluster": "dynamiken",
+    "perspective": "Aus Alinas Sicht",
+    "scene_tags": [
+      "love-bombing",
+      "idealisierung-abwertung",
+      "entwertung",
+      "push-pull",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "erst-wenn-ich-liefere",
+    "title": "Erst wenn ich liefere",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Matthias' Sicht",
+    "scene_tags": [
+      "bedingte-zuwendung",
+      "erwartungsdruck",
+      "entzug",
+      "anpassung",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "es-fuehlt-sich-falsch-an-nett-zu-mir-zu-sein",
+    "title": "Es fühlt sich falsch an, nett zu mir zu sein",
+    "cluster": "selbstmitgefuehl",
+    "perspective": "Aus Jasmins Sicht",
+    "scene_tags": [
+      "selbstwert",
+      "scham",
+      "veraenderung",
+      "innerer-kritiker"
+    ]
+  },
+  {
+    "slug": "es-fuehlt-sich-flach-an",
+    "title": "Es fühlt sich flach an",
+    "cluster": "narzissmus",
+    "perspective": "Aus Wiebkes Sicht",
+    "scene_tags": [
+      "idealisierung",
+      "naehe-distanz",
+      "veraenderung",
+      "sicherheit"
+    ]
+  },
+  {
+    "slug": "es-ging-nie-um-mich",
+    "title": "Es ging nie um mich",
+    "cluster": "narzissmus",
+    "perspective": "Aus Marleens Sicht",
+    "scene_tags": [
+      "narzissmus",
+      "empathiemangel",
+      "einsamkeit-zu-zweit",
+      "selbstverlust"
+    ]
+  },
+  {
+    "slug": "es-riecht-nach-ihm",
+    "title": "Es riecht nach ihm",
+    "cluster": "trauma",
+    "perspective": "Aus Melanies Sicht",
+    "scene_tags": [
+      "trigger",
+      "koerpererinnerung",
+      "angst",
+      "wiedererleben"
+    ]
+  },
+  {
+    "slug": "es-tut-mir-leid-dass-du",
+    "title": "Es tut mir leid, dass du",
+    "cluster": "dynamiken",
+    "perspective": "Aus Levs Sicht",
+    "scene_tags": [
+      "schein-entschuldigung",
+      "schuldumkehr",
+      "entwertung",
+      "realitaetsverdrehung",
+      "selbstzweifel"
+    ]
+  },
+  {
+    "slug": "es-war-nie-absicht",
+    "title": "Es war nie Absicht",
+    "cluster": "emotionale-unreife",
+    "perspective": "Aus Simones Sicht",
+    "scene_tags": [
+      "emotionale-unreife",
+      "erwachsene-kinder",
+      "heilungsphantasie",
+      "trauer"
+    ]
+  },
+  {
+    "slug": "es-wird-leiser",
+    "title": "Es wird leiser",
+    "cluster": "bindung",
+    "perspective": "Aus Ediths Sicht",
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "rueckzug",
+      "einsamkeit-zu-zweit",
+      "naehe-distanz",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "es-wird-mir-zu-viel",
+    "title": "Es wird mir zu viel",
+    "cluster": "gefuehle",
+    "perspective": "Aus Juris Sicht",
+    "scene_tags": [
+      "emotionale-ueberflutung",
+      "eskalation",
+      "rueckzug",
+      "erschoepfung",
+      "selbstfuersorge"
+    ]
+  },
+  {
+    "slug": "fragst-du-gar-nicht",
+    "title": "Fragst du gar nicht?",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Tobias' Sicht",
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "desinteresse",
+      "fehlende-gegenseitigkeit",
+      "einsamkeit-zu-zweit",
+      "sich-unsichtbar-fuehlen"
+    ]
+  },
+  {
+    "slug": "fuer-alle-da",
+    "title": "Für alle da, nur nicht für mich",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Hannahs Sicht",
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "empathiemangel",
+      "einsamkeit-zu-zweit",
+      "schuldgefuehle"
+    ]
+  },
+  {
+    "slug": "gemeinsame-freunde",
+    "title": "Wie geht es ihr?",
+    "cluster": "liebeskummer",
+    "perspective": "Aus Tims Sicht",
+    "scene_tags": [
+      "gruebeln",
+      "sehnsucht",
+      "loslassen",
+      "vergleich"
+    ]
+  },
+  {
+    "slug": "hauptsache-alle-sehen-es",
+    "title": "Hauptsache, alle sehen es",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Lisas Sicht",
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "fassade",
+      "narzisstische-zufuhr",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "ich-brauch-eine-pause",
+    "title": "Ich brauch eine Pause",
+    "cluster": "konflikt",
+    "perspective": "Aus Neles Sicht",
+    "scene_tags": [
+      "reparaturversuch",
+      "konfliktregulation",
+      "klarheit",
+      "selbstfuersorge",
+      "verbindung"
+    ]
+  },
+  {
+    "slug": "ich-hab-mich-geaendert",
+    "title": "Ich hab mich geändert",
+    "cluster": "trennung",
+    "perspective": "Aus Jules Sicht",
+    "scene_tags": [
+      "hoovering",
+      "zukunftsversprechen",
+      "trauma-bindung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "ich-habe-die-augen-verdreht",
+    "title": "Ich habe die Augen verdreht",
+    "cluster": "konflikt",
+    "perspective": "Aus Ruprechts Sicht",
+    "scene_tags": [
+      "verachtung",
+      "ehrlichkeit",
+      "selbstreflexion",
+      "konflikt"
+    ]
+  },
+  {
+    "slug": "ich-habe-es-doch-gezeigt",
+    "title": "Ich habe es doch gezeigt",
+    "cluster": "liebessprachen",
+    "perspective": "Aus Andreas' Sicht",
+    "scene_tags": [
+      "liebessprachen",
+      "missverstaendnis",
+      "erschoepfung",
+      "wertschaetzung"
+    ]
+  },
+  {
+    "slug": "ich-habe-es-ihr-gesagt",
+    "title": "Ich habe es ihr gesagt",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Martins Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "scham",
+      "verantwortung"
+    ]
+  },
+  {
+    "slug": "ich-habe-es-zugegeben-und-nichts-ist-passiert",
+    "title": "Ich habe es zugegeben, und nichts ist passiert",
+    "cluster": "selbsterkenntnis",
+    "perspective": "Aus Andrés Sicht",
+    "scene_tags": [
+      "ehrlichkeit",
+      "verantwortung",
+      "scham",
+      "veraenderung"
+    ]
+  },
+  {
+    "slug": "ich-habe-mir-ein-bad-eingelassen",
+    "title": "Ich habe mir ein Bad eingelassen",
+    "cluster": "selbstmitgefuehl",
+    "perspective": "Aus Kathrins Sicht",
+    "scene_tags": [
+      "selbstfuersorge",
+      "selbstwert",
+      "beduerfnisse",
+      "veraenderung"
+    ]
+  },
+  {
+    "slug": "ich-habe-nicht-nein-gesagt",
+    "title": "Ich habe nicht nein gesagt",
+    "cluster": "grenzverletzung",
+    "perspective": "Aus Frederikes Sicht",
+    "scene_tags": [
+      "grenze",
+      "scham",
+      "selbstzweifel",
+      "sicherheit"
+    ]
+  },
+  {
+    "slug": "ich-habe-seinen-arzttermin-gemacht",
+    "title": "Ich habe seinen Arzttermin gemacht",
+    "cluster": "kodependenz",
+    "perspective": "Aus Petras Sicht",
+    "scene_tags": [
+      "fuersorge",
+      "selbstaufgabe",
+      "grenze",
+      "verantwortung"
+    ]
+  },
+  {
+    "slug": "ich-habe-wieder-musik-gehoert",
+    "title": "Ich habe wieder Musik gehört",
+    "cluster": "trennung",
+    "perspective": "Aus Kais Sicht",
+    "scene_tags": [
+      "trennung",
+      "wiederentdeckung",
+      "selbstverlust",
+      "klarheit",
+      "aufbruch"
+    ]
+  },
+  {
+    "slug": "ich-habe-zu-viel-gesagt-und-zu-frueh",
+    "title": "Ich habe zu viel gesagt, und zu früh",
+    "cluster": "selbsterkenntnis",
+    "perspective": "Aus Leas Sicht",
+    "scene_tags": [
+      "verletzlichkeit",
+      "naehe",
+      "scham",
+      "ehrlichkeit"
+    ]
+  },
+  {
+    "slug": "ich-lese-mit-und-hasse-mich-dafuer",
+    "title": "Ich lese mit und hasse mich dafür",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Ninas Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "hypervigilanz",
+      "selbstwert",
+      "gruebeln"
+    ]
+  },
+  {
+    "slug": "ich-muss-fragen",
+    "title": "Ich muss fragen",
+    "cluster": "dynamiken",
+    "perspective": "Aus Sonjas Sicht",
+    "scene_tags": [
+      "finanzielle-kontrolle",
+      "kontrolle",
+      "abhaengigkeit",
+      "isolation"
+    ]
+  },
+  {
+    "slug": "ich-muss-nicht-sofort",
+    "title": "Ich muss nicht sofort",
+    "cluster": "grenzen",
+    "perspective": "Aus Sonjas Sicht",
+    "scene_tags": [
+      "grenze",
+      "autonomie",
+      "kontrolle",
+      "selbstfuersorge",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "ich-rufe-an-um-zu-erzaehlen",
+    "title": "Ich rufe an, um etwas zu erzählen",
+    "cluster": "emotionale-unreife",
+    "perspective": "Aus Miriams Sicht",
+    "scene_tags": [
+      "emotionale-unreife",
+      "rollenumkehr",
+      "erwachsene-kinder",
+      "emotionale-einsamkeit"
+    ]
+  },
+  {
+    "slug": "ich-schreibe-es-jetzt-auf",
+    "title": "Ich schreibe es jetzt auf",
+    "cluster": "gaslighting",
+    "perspective": "Aus Lenas Sicht",
+    "scene_tags": [
+      "selbst-gaslighting",
+      "wahrnehmungszweifel",
+      "klarheit",
+      "selbstfuersorge"
+    ]
+  },
+  {
+    "slug": "ich-vermisse-das-chaos",
+    "title": "Ich vermisse das Chaos",
+    "cluster": "trennung",
+    "perspective": "Aus Pauls Sicht",
+    "scene_tags": [
+      "entzug",
+      "trauma-bindung",
+      "intermittierende-verstaerkung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "ich-war-nicht-da",
+    "title": "Ich war nicht da",
+    "cluster": "trauma",
+    "perspective": "Aus Kais Sicht",
+    "scene_tags": [
+      "dissoziation",
+      "selbstverlust",
+      "koerpererinnerung"
+    ]
+  },
+  {
+    "slug": "ich-warte-auf-den-knall",
+    "title": "Ich warte auf den Knall",
+    "cluster": "trauma",
+    "perspective": "Aus Lauras Sicht",
+    "scene_tags": [
+      "hypervigilanz",
+      "misstrauen",
+      "koerpererinnerung",
+      "naehe-distanz"
+    ]
+  },
+  {
+    "slug": "ich-wollte-doch-nur-reden",
+    "title": "Ich wollte doch nur reden",
+    "cluster": "kommunikation",
+    "perspective": "Aus Toms Sicht",
+    "scene_tags": [
+      "missverstaendnis",
+      "eskalation",
+      "rueckzug",
+      "verbindung",
+      "sich-nicht-gehoert-fuehlen"
+    ]
+  },
+  {
+    "slug": "ich-wusste-es-bevor-sie-anrief",
+    "title": "Ich wusste es, bevor sie anrief",
+    "cluster": "kodependenz",
+    "perspective": "Aus Jonas' Sicht",
+    "scene_tags": [
+      "selbstaufgabe",
+      "fuersorge",
+      "beziehungsmuster",
+      "kindheit"
+    ]
+  },
+  {
+    "slug": "ihr-name-in-meinem-kopf",
+    "title": "Ihr Name in meinem Kopf",
+    "cluster": "dynamiken",
+    "perspective": "Aus Jonas' Sicht",
+    "scene_tags": [
+      "eifersucht",
+      "retrospektive-eifersucht",
+      "vergleich",
+      "selbstzweifel",
+      "gruebeln"
+    ]
+  },
+  {
+    "slug": "im-buero-kann-ich-das",
+    "title": "Im Büro kann ich das",
+    "cluster": "grenzen",
+    "perspective": "Aus Ines Sicht",
+    "scene_tags": [
+      "grenzen",
+      "angst",
+      "anpassung",
+      "koerpersignale"
+    ]
+  },
+  {
+    "slug": "im-kreis",
+    "title": "Im Kreis",
+    "cluster": "dynamiken",
+    "perspective": "Aus Maris Sicht",
+    "scene_tags": [
+      "wortsalat",
+      "realitaetsverdrehung",
+      "gaslighting",
+      "schuldumkehr",
+      "erschoepfung"
+    ]
+  },
+  {
+    "slug": "immer-derselbe-typ",
+    "title": "Immer derselbe Typ",
+    "cluster": "selbstreflexion",
+    "perspective": "Aus Rosas Sicht",
+    "scene_tags": [
+      "wiederkehrendes-muster",
+      "bindungsangst",
+      "naehe-distanz",
+      "selbstzweifel",
+      "push-pull"
+    ]
+  },
+  {
+    "slug": "immer-die-andere",
+    "title": "Immer die andere",
+    "cluster": "dynamiken",
+    "perspective": "Aus Davids Sicht",
+    "scene_tags": [
+      "triangulierung",
+      "vergleich",
+      "entwertung",
+      "sich-klein-fuehlen"
+    ]
+  },
+  {
+    "slug": "immer-die-grosse",
+    "title": "Immer die Große",
+    "cluster": "selbstreflexion",
+    "perspective": "Aus Lucies Sicht",
+    "scene_tags": [
+      "parentifizierung",
+      "narzisstischer-elternteil",
+      "schuldgefuehle",
+      "grenzverletzung",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "immer-die-hauptrolle",
+    "title": "Immer die Hauptrolle",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Elenas Sicht",
+    "scene_tags": [
+      "grandioser-narzissmus",
+      "empathiemangel",
+      "einsamkeit-zu-zweit",
+      "selbstverlust"
+    ]
+  },
+  {
+    "slug": "in-der-therapie-war-ich-sicher",
+    "title": "In der Therapie war ich plötzlich sicher",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Benedikts Sicht",
+    "scene_tags": [
+      "paartherapie",
+      "sicherheit",
+      "zeuge",
+      "machtasymmetrie",
+      "stonewalling"
+    ]
+  },
+  {
+    "slug": "jede-stunde-muss-sich-rechnen",
+    "title": "Jede Stunde muss sich rechnen",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Roberts Sicht",
+    "scene_tags": [
+      "kontrolle",
+      "misstrauen",
+      "rechtfertigung",
+      "grenzverletzung",
+      "auf-eierschalen-gehen"
+    ]
+  },
+  {
+    "slug": "jeder-euro",
+    "title": "Jeder Euro",
+    "cluster": "dynamiken",
+    "perspective": "Aus Rahels Sicht",
+    "scene_tags": [
+      "finanzielle-kontrolle",
+      "kontrolle",
+      "abhaengigkeit",
+      "sich-klein-fuehlen",
+      "coercive-control"
+    ]
+  },
+  {
+    "slug": "kaum-bin-ich-nah",
+    "title": "Kaum bin ich nah, wirst du kalt",
+    "cluster": "bindung",
+    "perspective": "Aus Jans Sicht",
+    "scene_tags": [
+      "naehe-distanz",
+      "push-pull",
+      "bindungsangst",
+      "rueckzug"
+    ]
+  },
+  {
+    "slug": "kaum-bin-ich-raus-bist-du-zurueck",
+    "title": "Kaum bin ich raus, bist du zurück",
+    "cluster": "dynamiken",
+    "perspective": "Aus Meikes Sicht",
+    "scene_tags": [
+      "hoovering",
+      "love-bombing",
+      "push-pull",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "kein-wort-mehr",
+    "title": "Kein Wort mehr",
+    "cluster": "trennung",
+    "perspective": "Aus Davids Sicht",
+    "scene_tags": [
+      "ghosting",
+      "selbstzweifel",
+      "verlustangst",
+      "einsamkeit-zu-zweit",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "mach-doch-was-du-willst",
+    "title": "Mach doch, was du willst",
+    "cluster": "dynamiken",
+    "perspective": "Aus Katjas Sicht",
+    "scene_tags": [
+      "passiv-aggressiv",
+      "stonewalling",
+      "auf-eierschalen-gehen",
+      "schuldgefuehle"
+    ]
+  },
+  {
+    "slug": "mein-erstes-nein",
+    "title": "Mein erstes Nein",
+    "cluster": "grenzen",
+    "perspective": "Aus Ronjas Sicht",
+    "scene_tags": [
+      "nein-sagen",
+      "grenze",
+      "schuldgefuehle",
+      "angst",
+      "selbstfuersorge"
+    ]
+  },
+  {
+    "slug": "mein-ja-das-ein-nein-war",
+    "title": "Mein Ja, das ein Nein war",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Niklas' Sicht",
+    "scene_tags": [
+      "anpassung",
+      "selbstverlust",
+      "nein-sagen",
+      "konfliktvermeidung",
+      "erlerntes-verhalten"
+    ]
+  },
+  {
+    "slug": "mein-koerper-erinnert-sich",
+    "title": "Mein Körper erinnert sich",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Simons Sicht",
+    "scene_tags": [
+      "stressreaktion",
+      "hypervigilanz",
+      "nachwirkung",
+      "koerpererinnerung",
+      "anpassung"
+    ]
+  },
+  {
+    "slug": "mein-sohn-entschuldigt-sich",
+    "title": "Mein Sohn entschuldigt sich",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Thomas' Sicht",
+    "scene_tags": [
+      "kind-im-elternkonflikt",
+      "anpassung",
+      "fawning",
+      "erlerntes-verhalten",
+      "loyalitaetsdruck"
+    ]
+  },
+  {
+    "slug": "mein-teller-blieb-voll",
+    "title": "Mein Teller blieb voll",
+    "cluster": "kodependenz",
+    "perspective": "Aus Beates Sicht",
+    "scene_tags": [
+      "selbstaufgabe",
+      "fuersorge",
+      "erschoepfung",
+      "familie"
+    ]
+  },
+  {
+    "slug": "mein-zimmer-im-haus",
+    "title": "Mein Zimmer im Haus",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Jans Sicht",
+    "scene_tags": [
+      "coercive-control",
+      "anpassung",
+      "rueckzug",
+      "auf-eierschalen-gehen",
+      "raumverlust"
+    ]
+  },
+  {
+    "slug": "meine-grenze-war-eine-forderung",
+    "title": "Meine Grenze war eine Forderung",
+    "cluster": "grenzen",
+    "perspective": "Aus Meikes Sicht",
+    "scene_tags": [
+      "grenzen",
+      "selbstbestimmung",
+      "verantwortung"
+    ]
+  },
+  {
+    "slug": "mitten-am-tag",
+    "title": "Mitten am Tag",
+    "cluster": "trauma",
+    "perspective": "Aus Robins Sicht",
+    "scene_tags": [
+      "wiedererleben",
+      "trigger",
+      "koerpererinnerung"
+    ]
+  },
+  {
+    "slug": "mitten-im-satz",
+    "title": "Mitten im Satz",
+    "cluster": "dynamiken",
+    "perspective": "Aus Yaras Sicht",
+    "scene_tags": [
+      "stonewalling",
+      "rueckzug",
+      "emotionale-vernachlaessigung",
+      "einsamkeit-zu-zweit"
+    ]
+  },
+  {
+    "slug": "nach-dem-anruf-bei-mama",
+    "title": "Nach dem Anruf bei Mama",
+    "cluster": "dynamiken",
+    "perspective": "Aus Christophs Sicht",
+    "scene_tags": [
+      "narzisstischer-elternteil",
+      "verdeckter-narzissmus",
+      "schuldumkehr",
+      "sich-klein-fuehlen"
+    ]
+  },
+  {
+    "slug": "nach-zwei-wochen-die-zukunft",
+    "title": "Nach zwei Wochen die Zukunft",
+    "cluster": "narzissmus",
+    "perspective": "Aus Antonias Sicht",
+    "scene_tags": [
+      "idealisierung",
+      "naehe-distanz",
+      "sehnsucht",
+      "grenze"
+    ]
+  },
+  {
+    "slug": "neben-dir-ruhig",
+    "title": "Neben dir ruhig",
+    "cluster": "gefuehle",
+    "perspective": "Aus Malins Sicht",
+    "scene_tags": [
+      "co-regulation",
+      "verbindung",
+      "ressource",
+      "klarheit",
+      "selbstfuersorge"
+    ]
+  },
+  {
+    "slug": "niemand-hat-gratuliert",
+    "title": "Niemand hat gratuliert",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Markus' Sicht",
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "fehlende-gegenseitigkeit",
+      "mitfreude",
+      "einsamkeit-zu-zweit",
+      "sich-unsichtbar-fuehlen"
+    ]
+  },
+  {
+    "slug": "nur-am-arm-festgehalten",
+    "title": "Nur am Arm festgehalten",
+    "cluster": "grenzverletzung",
+    "perspective": "Aus Yvonnes Sicht",
+    "scene_tags": [
+      "grenze",
+      "sicherheit",
+      "selbstzweifel",
+      "ohnmacht"
+    ]
+  },
+  {
+    "slug": "nur-aus-sorge",
+    "title": "Ich mach mir doch nur Sorgen um dich",
+    "cluster": "gaslighting",
+    "perspective": "Aus Bens Sicht",
+    "scene_tags": [
+      "gaslighting",
+      "kontrolle",
+      "entwertung",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "nur-eine-kleinigkeit",
+    "title": "Nur eine Kleinigkeit",
+    "cluster": "grenzen",
+    "perspective": "Aus Timos Sicht",
+    "scene_tags": [
+      "grenzen",
+      "anpassung",
+      "verantwortung"
+    ]
+  },
+  {
+    "slug": "ploetzlich-die-taeterin",
+    "title": "Plötzlich die Täterin",
+    "cluster": "dynamiken",
+    "perspective": "Aus Esthers Sicht",
+    "scene_tags": [
+      "schuldumkehr",
+      "entwertung",
+      "selbstzweifel"
+    ]
+  },
+  {
+    "slug": "ploetzlich-war-ich-nichts-mehr",
+    "title": "Plötzlich war ich nichts mehr",
+    "cluster": "narzissmus",
+    "perspective": "Aus Tims Sicht",
+    "scene_tags": [
+      "idealisierung-abwertung",
+      "discard",
+      "selbstwert",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "sag-einfach-nichts-papa",
+    "title": "Sag einfach nichts, Papa",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Sebastians Sicht",
+    "scene_tags": [
+      "kind-im-elternkonflikt",
+      "hypervigilanz",
+      "konfliktregulation",
+      "loyalitaetsdruck",
+      "auf-eierschalen-gehen"
+    ]
+  },
+  {
+    "slug": "schau-wie-geduldig-ich-mit-dir-bin",
+    "title": "Schau, wie geduldig ich mit dir bin",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Fabians Sicht",
+    "scene_tags": [
+      "kommunaler-narzissmus",
+      "verachtung",
+      "schuldumkehr",
+      "wahrnehmungszweifel"
+    ]
+  },
+  {
+    "slug": "seine-laune-im-auto",
+    "title": "Seine Laune im Auto",
+    "cluster": "grenzen",
+    "perspective": "Aus Roberts Sicht",
+    "scene_tags": [
+      "grenzen",
+      "emotionale-ansteckung",
+      "verantwortung"
+    ]
+  },
+  {
+    "slug": "sie-hat-die-kinder-erwaehnt",
+    "title": "Sie hat die Kinder erwähnt",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Stefans Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "drohung",
+      "kind-im-elternkonflikt",
+      "ohnmacht"
+    ]
+  },
+  {
+    "slug": "sie-hat-es-gehoert",
+    "title": "Sie hat es gehört",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Andreas' Sicht",
+    "scene_tags": [
+      "emotionale-vernachlaessigung",
+      "empathiemangel",
+      "resignation",
+      "einsamkeit-zu-zweit"
+    ]
+  },
+  {
+    "slug": "sie-hat-nicht-gemerkt-was-passiert-ist",
+    "title": "Sie hat nicht gemerkt, was passiert ist",
+    "cluster": "selbstmitgefuehl",
+    "perspective": "Aus Maltes Sicht",
+    "scene_tags": [
+      "selbstwert",
+      "veraenderung",
+      "selbstfuersorge",
+      "naehe"
+    ]
+  },
+  {
+    "slug": "sie-hat-recht-gehabt-und-ich-wusste-es-sofort",
+    "title": "Sie hat recht gehabt, und ich wusste es sofort",
+    "cluster": "selbsterkenntnis",
+    "perspective": "Aus Miriams Sicht",
+    "scene_tags": [
+      "ehrlichkeit",
+      "selbstreflexion",
+      "scham",
+      "verantwortung"
+    ]
+  },
+  {
+    "slug": "sie-stand-in-der-wohnung",
+    "title": "Sie stand in der Wohnung",
+    "cluster": "grenzverletzung",
+    "perspective": "Aus Fabians Sicht",
+    "scene_tags": [
+      "grenze",
+      "sicherheit",
+      "ohnmacht",
+      "kontrolle"
+    ]
+  },
+  {
+    "slug": "sie-uebersetzt-fuer-uns",
+    "title": "Sie übersetzt für uns",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Lukas' Sicht",
+    "scene_tags": [
+      "kind-im-elternkonflikt",
+      "parentifizierung",
+      "loyalitaetsdruck",
+      "einsamkeit-zu-zweit",
+      "konfliktregulation"
+    ]
+  },
+  {
+    "slug": "sie-weinte-mehr-als-ich",
+    "title": "Sie weinte mehr als ich",
+    "cluster": "emotionale-unreife",
+    "perspective": "Aus Bens Sicht",
+    "scene_tags": [
+      "emotionale-unreife",
+      "rollenumkehr",
+      "fehlende-reparatur"
+    ]
+  },
+  {
+    "slug": "solange-alles-gut-lief",
+    "title": "Solange alles gut lief",
+    "cluster": "emotionale-unreife",
+    "perspective": "Aus Katrins Sicht",
+    "scene_tags": [
+      "emotionale-unreife",
+      "emotionale-einsamkeit",
+      "fehlende-reparatur"
+    ]
+  },
+  {
+    "slug": "troeste-mich",
+    "title": "Tröste mich",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Timos Sicht",
+    "scene_tags": [
+      "rollenumkehr",
+      "emotionale-ueberforderung",
+      "schuldumkehr",
+      "empathie"
+    ]
+  },
+  {
+    "slug": "und-wie-geht-es-dir",
+    "title": "Und wie geht es dir?",
+    "cluster": "grenzen",
+    "perspective": "Aus Marlenes Sicht",
+    "scene_tags": [
+      "selbstverlust",
+      "anpassung",
+      "fawning",
+      "erschoepfung",
+      "selbstzweifel",
+      "grenze"
+    ]
+  },
+  {
+    "slug": "unser-lied",
+    "title": "Unser Lied",
+    "cluster": "liebeskummer",
+    "perspective": "Aus Davids Sicht",
+    "scene_tags": [
+      "sehnsucht",
+      "trennungsschmerz",
+      "vermissen",
+      "gruebeln"
+    ]
+  },
+  {
+    "slug": "unter-der-wut",
+    "title": "Unter der Wut",
+    "cluster": "gefuehle",
+    "perspective": "Aus Elias Sicht",
+    "scene_tags": [
+      "wut",
+      "verletzung",
+      "selbstzweifel",
+      "erschoepfung",
+      "klarheit"
+    ]
+  },
+  {
+    "slug": "war-das-wirklich-so",
+    "title": "War das wirklich so?",
+    "cluster": "gaslighting",
+    "perspective": "Aus Jans Sicht",
+    "scene_tags": [
+      "selbst-gaslighting",
+      "wahrnehmungszweifel",
+      "gruebeln"
+    ]
+  },
+  {
+    "slug": "warum-habe-ich-das-gesagt",
+    "title": "Warum habe ich das gesagt",
+    "cluster": "selbsterkenntnis",
+    "perspective": "Aus Elenas Sicht",
+    "scene_tags": [
+      "selbstreflexion",
+      "gruebeln",
+      "ehrlichkeit",
+      "veraenderung"
+    ]
+  },
+  {
+    "slug": "warum-ich-bleibe",
+    "title": "Warum ich bleibe",
+    "cluster": "bindung",
+    "perspective": "Aus Leas Sicht",
+    "scene_tags": [
+      "trauma-bindung",
+      "love-bombing",
+      "entwertung",
+      "verlustangst",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "was-habe-ich-gerade-gesagt",
+    "title": "Was habe ich gerade gesagt?",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Fabians Sicht",
+    "scene_tags": [
+      "double-bind",
+      "wahrnehmungszweifel",
+      "nonverbale-kommunikation",
+      "gaslighting",
+      "auf-eierschalen-gehen"
+    ]
+  },
+  {
+    "slug": "was-habe-ich-uebersehen",
+    "title": "Was habe ich übersehen",
+    "cluster": "selbsterkenntnis",
+    "perspective": "Aus Doreens Sicht",
+    "scene_tags": [
+      "selbstreflexion",
+      "ehrlichkeit",
+      "beziehungsmuster",
+      "veraenderung"
+    ]
+  },
+  {
+    "slug": "was-moechtest-du-eigentlich",
+    "title": "Was möchtest du eigentlich?",
+    "cluster": "kodependenz",
+    "perspective": "Aus Bernds Sicht",
+    "scene_tags": [
+      "selbstaufgabe",
+      "selbstfuersorge",
+      "selbstwert",
+      "beduerfnisse"
+    ]
+  },
+  {
+    "slug": "wenn-du-mich-lieben-wuerdest",
+    "title": "Wenn du mich lieben würdest",
+    "cluster": "dynamiken",
+    "perspective": "Aus Timos Sicht",
+    "scene_tags": [
+      "emotionale-erpressung",
+      "schuldgefuehle",
+      "grenzverletzung",
+      "kontrolle",
+      "sich-klein-fuehlen"
+    ]
+  },
+  {
+    "slug": "wenn-es-ihm-gut-geht",
+    "title": "Wenn es ihm gut geht",
+    "cluster": "kodependenz",
+    "perspective": "Aus Miriams Sicht",
+    "scene_tags": [
+      "fuersorge",
+      "selbstwert",
+      "beziehungsmuster",
+      "ambivalenz"
+    ]
+  },
+  {
+    "slug": "wenn-hausarbeit-liebe-beweisen-soll",
+    "title": "Wenn Hausarbeit Liebe beweisen soll",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Martins Sicht",
+    "scene_tags": [
+      "bedingte-zuwendung",
+      "emotionale-erpressung",
+      "erwartungsdruck",
+      "haushalt",
+      "aufrechnen"
+    ]
+  },
+  {
+    "slug": "wer-war-ich-nochmal",
+    "title": "Wer war ich nochmal",
+    "cluster": "selbstreflexion",
+    "perspective": "Aus Aylins Sicht",
+    "scene_tags": [
+      "fawning",
+      "selbstverlust",
+      "anpassung",
+      "erschoepfung",
+      "wiederkehrendes-muster"
+    ]
+  },
+  {
+    "slug": "wieder-dieser-traum",
+    "title": "Wieder dieser Traum",
+    "cluster": "trauma",
+    "perspective": "Aus Deniz' Sicht",
+    "scene_tags": [
+      "albtraeume",
+      "wiedererleben",
+      "angst",
+      "koerpererinnerung"
+    ]
+  },
+  {
+    "slug": "wir-haben-normal-gefruehstueckt",
+    "title": "Wir haben normal gefrühstückt",
+    "cluster": "vertrauensbruch",
+    "perspective": "Aus Sabines Sicht",
+    "scene_tags": [
+      "vertrauensbruch",
+      "untreue",
+      "trigger",
+      "hoffnung",
+      "sicherheit"
+    ]
+  },
+  {
+    "slug": "wir-sind-seelenverwandt",
+    "title": "Wir sind Seelenverwandte",
+    "cluster": "narzissmus-spielarten",
+    "perspective": "Aus Katharinas Sicht",
+    "scene_tags": [
+      "spiritueller-narzissmus",
+      "love-bombing",
+      "zukunftsversprechen",
+      "idealisierung-abwertung"
+    ]
+  },
+  {
+    "slug": "wo-bist-du-gerade",
+    "title": "Wo bist du gerade?",
+    "cluster": "dynamiken",
+    "perspective": "Aus Elifs Sicht",
+    "scene_tags": [
+      "kontrolle",
+      "eifersucht",
+      "misstrauen",
+      "isolation",
+      "auf-eierschalen-gehen"
+    ]
+  },
+  {
+    "slug": "zusammenzucken",
+    "title": "Er hebt nur die Hand",
+    "cluster": "trauma",
+    "perspective": "Aus Jonas' Sicht",
+    "scene_tags": [
+      "stressreaktion",
+      "koerpererinnerung",
+      "hypervigilanz",
+      "angst"
+    ]
+  },
+  {
+    "slug": "zwanzig-minuten-ohne-bildschirm",
+    "title": "Zwanzig Minuten ohne Bildschirm",
+    "cluster": "liebessprachen",
+    "perspective": "Aus Claudias Sicht",
+    "scene_tags": [
+      "liebessprachen",
+      "zeit",
+      "einsamkeit-zu-zweit",
+      "alltag"
+    ]
+  },
+  {
+    "slug": "zwei-wochen-ohne-sie",
+    "title": "Zwei Wochen ohne sie",
+    "cluster": "emotionaler-missbrauch",
+    "perspective": "Aus Christophs Sicht",
+    "scene_tags": [
+      "trennung",
+      "erleichterung",
+      "dauerstress",
+      "klarheit",
+      "ambivalenz"
+    ]
+  },
+  {
+    "slug": "zwischen-bleiben-und-gehen",
+    "title": "Zwischen Bleiben und Gehen",
+    "cluster": "trennung",
+    "perspective": "Aus Janas Sicht",
+    "scene_tags": [
+      "zerrissenheit",
+      "verlustangst",
+      "erschoepfung",
+      "entscheidung",
+      "wiederkehrendes-muster",
+      "selbstzweifel"
+    ]
+  },
+  {
+    "slug": "zwischen-himmel-und-abgrund",
+    "title": "Zwischen Himmel und Abgrund",
+    "cluster": "bindung",
+    "perspective": "Aus Tims Sicht",
+    "scene_tags": [
+      "borderline",
+      "idealisierung-abwertung",
+      "verlustangst",
+      "push-pull",
+      "naehe-distanz"
+    ]
+  },
+  {
+    "slug": "zwoelf-rosen-und-kein-satz",
+    "title": "Zwölf Rosen und kein Satz",
+    "cluster": "liebessprachen",
+    "perspective": "Aus Ninas Sicht",
+    "scene_tags": [
+      "liebessprachen",
+      "zeit",
+      "missverstaendnis",
+      "einsamkeit-zu-zweit"
+    ]
+  }
+]

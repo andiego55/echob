@@ -18,6 +18,8 @@ import { TEST_CATEGORY_LABELS, type TestCategory } from '@/selftests'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { hypothesesApi } from '@/api/hypotheses'
 import { caseArtifactsApi } from '@/api/caseArtifacts'
+import { resonanzApi } from '@/api/resonanz'
+import ResonanzUebernahme from '@/components/app/ResonanzUebernahme'
 import { caseDocumentsApi, KIND_LABELS } from '@/api/caseDocuments'
 import {
   RELATIONSHIP_TYPE_LABELS,
@@ -173,6 +175,13 @@ export default function CaseDetailPage() {
             hasModules={(personProfile?.completed_modules?.length ?? 0) > 0}
             summaryText={personProfile?.summary_text ?? null}
           />
+        </div>
+
+        {/* Wiedererkanntes steht weit oben, und zwar bewusst gegen die sonstige
+            Ordnung: Es ist die Karte, die als erste etwas zeigt. Wer eine Woche dabei
+            ist, hat hier oft schon zwoelf Eintraege und sonst ueberall Leerzustaende. */}
+        <div className="mt-6">
+          <ResonanzUeberblickKarte caseId={caseId!} />
         </div>
 
         {/* Themendialog-Zusammenfassungen */}
@@ -620,6 +629,92 @@ function TestResultsCard({ caseId }: { caseId: string }) {
             )
           })}
         </div>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Wiedererkanntes auf dem Fall-Überblick.
+ *
+ * **Warum diese Karte gerade dann etwas wert ist, wenn die anderen leer sind.** Wer eine
+ * Woche dabei ist, hat oft keine eigene Szene und keinen Bericht — aber vielleicht zwölf
+ * erfundene Szenen, bei denen er getippt hat. Diese Karte ist der einzige Ort, an dem das
+ * sichtbar wird, und für viele der erste, an dem der Fall überhaupt etwas zeigt.
+ *
+ * **Warum die Wirkung und nicht das Muster.** Von den beiden Achsen steht hier die, die
+ * die Person über sich selbst meist nicht ausspricht: nicht was der andere tut, sondern
+ * was es mit ihr macht. Auf dem Überblick ist Platz für einen Satz — dann für diesen.
+ */
+function ResonanzUeberblickKarte({ caseId }: { caseId: string }) {
+  const { data } = useQuery({
+    queryKey: ['resonanz-ueberblick', caseId],
+    queryFn: () => resonanzApi.ueberblick(caseId),
+    enabled: !!caseId,
+    retry: false,
+  })
+
+  const a = data?.auswertung
+  const oben = (a?.wirkungen ?? []).slice(0, 3)
+  const offen = (data?.eintraege ?? []).filter(e => e.case_id === null).length
+
+  return (
+    <div className="card">
+      {/* Steht ganz oben in der Karte: Wer zwoelf Szenen markiert hat und sich dann
+          anmeldet, soll das nicht suchen muessen. */}
+      <ResonanzUebernahme caseId={caseId} />
+
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="section-label mb-0.5">Wiedererkanntes</p>
+          <p className="text-sm font-medium text-navy">
+            {a && a.wiedererkannt > 0
+              ? `${a.wiedererkannt} von ${a.gesamt} Szenen wiedererkannt`
+              : 'Noch nichts markiert'}
+          </p>
+        </div>
+        <Link
+          to={`/app/cases/${caseId}/resonanz`}
+          className="shrink-0 text-xs font-semibold text-accent hover:underline"
+        >
+          Ansehen →
+        </Link>
+      </div>
+
+      {oben.length > 0 ? (
+        <>
+          <ul className="space-y-2">
+            {oben.map(w => (
+              <li
+                key={w.name}
+                className="flex items-baseline justify-between gap-3 rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5"
+              >
+                <span className="min-w-0">
+                  <span className="block text-xs font-semibold text-navy">{w.name}</span>
+                  <span className="mt-0.5 block text-[0.7rem] leading-snug text-brand-muted">
+                    {w.hinweis}
+                  </span>
+                </span>
+                <span className="whitespace-nowrap text-xs text-brand-muted">
+                  {w.anzahl} {w.anzahl === 1 ? 'Szene' : 'Szenen'}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {offen > 0 && (
+            <p className="mt-2.5 text-[0.7rem] text-brand-muted/70">
+              {offen} {offen === 1 ? 'Einordnung ist' : 'Einordnungen sind'} noch keinem Fall
+              zugeordnet.
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="text-xs leading-relaxed text-brand-muted/70">
+          Auf <Link to="/szenen" className="font-medium text-accent hover:underline">/szenen</Link>{' '}
+          liegen erfundene Beziehungsszenen. Kommt dir eine bekannt vor, genügt ein Tipp auf
+          „Kenne ich" — du musst nichts erklären. Was sich daraus zusammensetzt, steht dann
+          hier.
+        </p>
       )}
     </div>
   )

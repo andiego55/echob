@@ -26,6 +26,7 @@ _USER_TABLES = (
     "person_profiles", "echo_chat_sessions", "user_profiles", "payments",
     "ai_usage_log", "user_consents", "professional_profiles",
     "professional_assignments", "professional_appointments",
+    "scene_resonance",
 )
 
 # Tabellen mit Daten in der Fachpersonen-Rolle (Spalte professional_user_id).
@@ -140,6 +141,7 @@ _DELETE_STEPS = (
     ("case_hypotheses", "user_id = $1"),
     ("person_profiles", "user_id = $1"),
     ("echo_chat_sessions", "user_id = $1"),
+    ("scene_resonance", "user_id = $1"),
     ("professional_echo_messages", "professional_user_id = $1"),
     ("professional_echo_summaries", "professional_user_id = $1"),
     ("professional_echo_sessions", "professional_user_id = $1"),
@@ -170,6 +172,24 @@ async def delete_user_data(
     """Löscht in EINER Transaktion alle Daten der Person. Gibt Lösch-Zähler je Tabelle zurück."""
     counts: dict = {}
     async with conn.transaction():
+        # Der oeffentliche Zaehler auf den Szenenseiten ist anonym: Er traegt keine
+        # Kennung, ist keinem Menschen mehr zuzuordnen und faellt damit streng genommen
+        # nicht unter Art. 17. Wir zaehlen ihn trotzdem herunter, und zwar aus einem
+        # einfachen Grund: Wir KOENNEN es, weil die eigene Zeile noch da ist. Ein
+        # Beitrag, den jemand geleistet hat und dessen Spur wir loeschen koennten, aber
+        # stehen lassen, waere genau die Luecke zwischen "alles wird geloescht" und dem,
+        # was wirklich passiert. Muss VOR dem Loeschen der Zeilen laufen.
+        await conn.execute(
+            """
+            UPDATE scene_resonance_counts c
+               SET anzahl = GREATEST(0, c.anzahl - meins.anzahl)
+              FROM (SELECT scene_slug, reaction, COUNT(*) AS anzahl
+                      FROM scene_resonance WHERE user_id = $1
+                     GROUP BY scene_slug, reaction) AS meins
+             WHERE c.scene_slug = meins.scene_slug AND c.reaction = meins.reaction
+            """,
+            user_id,
+        )
         for table, where in _DELETE_STEPS:
             result = await conn.execute(f"DELETE FROM {table} WHERE {where}", user_id)
             counts[table] = _affected(result)

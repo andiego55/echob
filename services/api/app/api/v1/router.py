@@ -55,11 +55,13 @@ from app.api.v1.routers import (
     profile,
     pseudonymous,
     reports,
+    resonanz,
     reviews,
     scales,
     scenes,
     student,
     subscription,
+    szenen_oeffentlich,
     test_results,
     topic_summaries,
     waitlist,
@@ -74,6 +76,9 @@ v1_router.include_router(health.router)
 v1_router.include_router(waitlist.router)
 v1_router.include_router(contact.router)
 
+# ── Beziehungsszenen: oeffentliche Zaehler, ohne Anmeldung ────────────────────
+v1_router.include_router(szenen_oeffentlich.router)
+
 # ── Fachpersonen-Verzeichnis (öffentlich, "Fachperson finden") ─────────────────
 v1_router.include_router(directory.router)
 v1_router.include_router(directory_profile.router)  # authentifiziert: /directory/me
@@ -82,6 +87,7 @@ v1_router.include_router(admin_router)               # nur Admin (Gruender): /ad
 # ── Phase 1: Kern-App ─────────────────────────────────────────────────────────
 v1_router.include_router(cases.router)
 v1_router.include_router(scenes.router)
+v1_router.include_router(resonanz.router)
 v1_router.include_router(echo.router)
 v1_router.include_router(scales.router)
 v1_router.include_router(reports.router)

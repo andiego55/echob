@@ -28,11 +28,12 @@ KontextTeil = Literal[
     "hypothesen",
     "erkenntnisse",
     "dokumente",
+    "resonanz",
 ]
 
 ALLE_TEILE: tuple[str, ...] = (
     "szenen", "muster", "selbstauskunft", "fallprofil",
-    "themen", "hypothesen", "erkenntnisse", "dokumente",
+    "themen", "hypothesen", "erkenntnisse", "dokumente", "resonanz",
 )
 
 #: Wort und Erklaerung je Teil — genau so, wie sie im Band stehen.
@@ -72,6 +73,10 @@ LABELS: dict[str, dict[str, str]] = {
     "dokumente": {
         "label": "Dokumente",
         "hinweis": "Beigelegte Briefe, Chatverläufe, Mitschriften.",
+    },
+    "resonanz": {
+        "label": "Wiedererkanntes",
+        "hinweis": "Erfundene Szenen, die dir bekannt vorkamen. Kein Bericht, ein Hinweis.",
     },
 }
 

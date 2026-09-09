@@ -60,6 +60,8 @@ REGELN: tuple[Regel, ...] = (
           "Kontoerstellung - im Massenbetrieb waere es Missbrauch."),
     Regel("/api/v1/directory", 60, 60,
           "Oeffentliches Verzeichnis: Blaettern ja, systematischer Abgriff nein."),
+    Regel("/api/v1/szenen", 40, 60,
+          "Oeffentliche Szenen-Reaktionen: Ein Mensch tippt beim Lesen, kein Skript."),
     Regel("", 300, 60,
           "Auffangnetz gegen Schleifen im Frontend. Von Hand nicht erreichbar."),
 )
