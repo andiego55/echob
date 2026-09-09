@@ -121,64 +121,220 @@ async def test_ein_zweiter_klick_loescht_die_zuordnung_nicht(welt):
     assert antwort.json()["case_id"] == str(case_id)
 
 
-# ── Aus der Notiz eine Szene ─────────────────────────────────────────────────
-async def test_aus_der_notiz_wird_eine_eigene_szene(welt):
-    pool, user, case_id, slug, _ = welt
-    meins = "Bei mir war es nicht beim Essen, sondern im Auto auf dem Rückweg."
-    with _client(user) as c:
-        c.put(f"/api/v1/resonanz/{slug}",
-              json={"reaction": "kenne_ich", "distress": 4, "note": meins})
-        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+# ── Von der Reaktion zur eigenen Szene ───────────────────────────────────────
+#
+# Der Weg heisst jetzt: markieren -> ausarbeiten -> uebernehmen. Die Stufe dazwischen ist
+# kein Formularzwang, sondern der Punkt des Features: Wer eine erfundene Szene liest und
+# direkt danach die eigene aufschreibt, uebernimmt ihre Einzelheiten. Eine geliehene Szene
+# laesst sich hinterher nicht mehr von einer erlebten unterscheiden.
 
-    assert antwort.status_code == 201, antwort.text
-    async with pool.acquire() as conn:
-        szene = await conn.fetchrow(
-            "SELECT title, description, distress_score, pattern_tags FROM scenes "
-            "WHERE id = $1", uuid.UUID(antwort.json()["scene_id"]))
-
-    assert crypto.decrypt(szene["description"]) == meins
-    assert szene["distress_score"] == 4
-    # Der Titel verweist auf den Anlass, damit die Szene in einem halben Jahr noch
-    # einzuordnen ist.
-    assert szenen_verzeichnis.szene(slug)["title"] in szene["title"]
+_MEINS = (
+    "Es war beim Abholen der Kinder, am Freitagnachmittag vor der Kita. Sie hat vor der "
+    "Erzieherin gesagt, dass ich die Termine nie im Kopf habe."
+)
+_ANDERS = (
+    "In der Geschichte sind Freunde dabei und es geht um den Beruf. Bei mir ist niemand "
+    "dabei ausser einer Fremden, und es geht immer um Organisation."
+)
 
 
-async def test_die_muster_der_erfundenen_szene_werden_nicht_mitgenommen(welt):
-    """Geliehene Muster waeren eine Behauptung, die niemand aufgestellt hat.
+def _volle_fassung(**mehr):
+    fassung = {"titel": "Vor der Kita", "what": _MEINS, "anders": _ANDERS}
+    fassung.update(mehr)
+    return {"ausarbeitung": fassung}
 
-    Die Musterklassen der Content-Szene beschreiben, was DORT geschieht. Sie in die
-    eigene Szene zu uebernehmen hiesse, aus "das kenne ich" ein "bei mir lief es genauso
-    ab" zu machen - und diese Tags wuerden anschliessend gezaehlt, in Berichten gezeigt
-    und womoeglich einer Fachperson vorgelegt.
+
+async def test_ohne_ausarbeitung_entsteht_keine_szene(welt):
+    """Die Huerde, um die es geht.
+
+    Vorher genuegten eine Reaktion und drei Saetze. Jetzt sagt der Endpunkt, was fehlt -
+    und legt nichts an.
     """
     pool, user, case_id, slug, _ = welt
     with _client(user) as c:
         c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich", "note": "Kurz."})
         antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
 
+    assert antwort.status_code == 422
+    assert "Was ist passiert?" in antwort.json()["detail"]
     async with pool.acquire() as conn:
-        tags = await conn.fetchval(
-            "SELECT pattern_tags FROM scenes WHERE id = $1",
-            uuid.UUID(antwort.json()["scene_id"]))
-    assert tags in ("[]", [], None), f"Geliehene Muster in der eigenen Szene: {tags}"
+        assert await conn.fetchval(
+            "SELECT COUNT(*) FROM scenes WHERE user_id = $1", user) == 0
 
 
-async def test_ohne_notiz_gibt_es_nichts_zu_uebernehmen(welt):
+async def test_der_erste_gedanke_allein_reicht_nicht(welt):
+    """Die Notiz von der Leseseite ist ausdruecklich keine Szene.
+
+    Sie entsteht unter dem unmittelbaren Eindruck der Geschichte - genau dort ist die
+    Vermischung am groessten. Sie darf ein Ausgangspunkt sein, nie der Inhalt.
+    """
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}",
+              json={"reaction": "kenne_ich", "note": _MEINS + " " + _ANDERS})
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+    assert antwort.status_code == 422
+
+
+async def test_eine_halbe_fassung_reicht_auch_nicht(welt):
+    """Ohne die Vergleichsfrage keine Szene.
+
+    "Was ist bei dir anders als in der Geschichte?" ist die einzige Frage, die es nur hier
+    gibt, und sie laesst sich nur aus der eigenen Erinnerung beantworten. Sie ist deshalb
+    Pflicht, obwohl fuenf der sechs anderen es nicht sind.
+    """
     pool, user, case_id, slug, _ = welt
     with _client(user) as c:
         c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung",
+              json={"ausarbeitung": {"titel": "Vor der Kita", "what": _MEINS}})
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+
+    assert antwort.status_code == 422
+    assert "anders als in der Geschichte" in antwort.json()["detail"]
+
+
+async def test_ein_wort_ist_keine_beschreibung(welt):
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung",
+              json={"ausarbeitung": {"titel": "X", "what": "War so.", "anders": "Nix."}})
         antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
     assert antwort.status_code == 422
-    assert "Schreib zuerst auf" in antwort.json()["detail"]
+
+
+async def test_aus_der_fassung_wird_eine_szene(welt):
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich", "distress": 4})
+        c.put(f"/api/v1/resonanz/{slug}/fassung",
+              json=_volle_fassung(react="Ich habe gelacht und nichts gesagt."))
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+
+    assert antwort.status_code == 201, antwort.text
+    async with pool.acquire() as conn:
+        szene = await conn.fetchrow(
+            "SELECT title, description, user_reaction, distress_score, input_mode "
+            "FROM scenes WHERE id = $1", uuid.UUID(antwort.json()["scene_id"]))
+
+    text = crypto.decrypt(szene["description"])
+    assert _MEINS in text
+    assert szene["title"] == "Vor der Kita"
+    assert crypto.decrypt(szene["user_reaction"]) == "Ich habe gelacht und nichts gesagt."
+    assert szene["distress_score"] == 4
+    # Dieselbe Erfassungsart wie bei der gefuehrten Eingabe: Die Szene soll von einer
+    # direkt geschriebenen nicht zu unterscheiden sein.
+    assert szene["input_mode"] == "guided"
+
+
+async def test_nichts_aus_der_erfundenen_szene_wandert_mit(welt):
+    """Der Kern der ganzen Umstellung.
+
+    Weder der Titel noch der Text noch die Musterklassen der Geschichte gehen in die eigene
+    Akte. Die erste Fassung dieses Features setzte den fremden Titel als Ueberschrift ein -
+    die geliehene Zeile stand damit als Erstes in der eigenen Akte.
+    """
+    pool, user, case_id, slug, _ = welt
+    fremd = szenen_verzeichnis.szene(slug)
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+
+    async with pool.acquire() as conn:
+        szene = await conn.fetchrow(
+            "SELECT title, description, pattern_tags FROM scenes WHERE id = $1",
+            uuid.UUID(antwort.json()["scene_id"]))
+
+    assert fremd["title"] not in szene["title"]
+    text = crypto.decrypt(szene["description"]) or ""
+    assert fremd["title"] not in text
+    assert szene["pattern_tags"] in ("[]", [], None), "Geliehene Muster in der eigenen Szene."
+
+
+async def test_der_vergleich_steht_nicht_in_der_szene(welt):
+    """"Was ist anders als in der Geschichte" erzwingt beim Schreiben die Trennung.
+
+    Im fertigen Ereignis hat der Vergleich mit einer Erfindung nichts zu suchen: Wer die
+    Szene in einem halben Jahr liest, soll sein Erlebnis vorfinden, nicht dessen
+    Entstehungsgeschichte. Und eine Fachperson, der die Szene vorgelegt wird, erst recht.
+    """
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
+        antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
+
+    async with pool.acquire() as conn:
+        beschreibung = crypto.decrypt(await conn.fetchval(
+            "SELECT description FROM scenes WHERE id = $1",
+            uuid.UUID(antwort.json()["scene_id"]))) or ""
+    assert _ANDERS not in beschreibung
+    assert "Geschichte" not in beschreibung
 
 
 async def test_zweimal_uebernehmen_gibt_es_nicht(welt):
     pool, user, case_id, slug, _ = welt
     with _client(user) as c:
-        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich", "note": "Kurz."})
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
         c.post(f"/api/v1/resonanz/{slug}/szene")
         antwort = c.post(f"/api/v1/resonanz/{slug}/szene")
     assert antwort.status_code == 409
+
+
+async def test_die_fassung_ist_ein_entwurf_und_darf_luecken_haben(welt):
+    """Wer bei Frage drei aufhoert, soll seine drei Antworten wiederfinden.
+
+    Das Aufschreiben eines belastenden Ereignisses bricht man ab. Ein Speichern, das
+    Vollstaendigkeit verlangt, verlangt sie genau dann, wenn sie am wenigsten geht.
+    """
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        antwort = c.put(f"/api/v1/resonanz/{slug}/fassung",
+                        json={"ausarbeitung": {"what": "Nur ein Anfang."}})
+        assert antwort.status_code == 200, antwort.text
+        wieder = c.get("/api/v1/resonanz").json()["eintraege"][0]
+
+    assert wieder["ausarbeitung"]["what"] == "Nur ein Anfang."
+    assert wieder["fehlt_noch"], "Der Server muss sagen, was noch fehlt."
+
+
+async def test_die_fassung_liegt_verschluesselt_in_der_datenbank(welt):
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung", json=_volle_fassung())
+
+    async with pool.acquire() as conn:
+        roh = await conn.fetchval(
+            "SELECT ausarbeitung::text FROM scene_resonance WHERE user_id = $1", user)
+    if crypto.encryption_enabled():
+        assert _MEINS not in (roh or ""), "Die Fassung steht im Klartext in der Datenbank."
+
+
+async def test_unbekannte_felder_kommen_nicht_durch(welt):
+    """Was hier hineinkommt, landet spaeter im Text einer Szene."""
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        c.put(f"/api/v1/resonanz/{slug}", json={"reaction": "kenne_ich"})
+        c.put(f"/api/v1/resonanz/{slug}/fassung",
+              json={"ausarbeitung": {"what": "Etwas.", "erfunden": "Sollte weg sein."}})
+        wieder = c.get("/api/v1/resonanz").json()["eintraege"][0]
+    assert "erfunden" not in wieder["ausarbeitung"]
+
+
+async def test_die_fragen_kommen_vom_server(welt):
+    """Eine zweite Fragenliste im Frontend waere die Stelle, an der beide auseinanderlaufen."""
+    pool, user, case_id, slug, _ = welt
+    with _client(user) as c:
+        antwort = c.get("/api/v1/resonanz").json()
+    keys = [f["key"] for f in antwort["fragen"]]
+    assert "what" in keys and "anders" in keys
+    pflicht = [f["key"] for f in antwort["fragen"] if f["pflicht"]]
+    assert set(pflicht) == {"what", "anders"}
 
 
 # ── Die Uebernahme nach der Anmeldung ────────────────────────────────────────

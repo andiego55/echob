@@ -12,6 +12,7 @@ Die Regeln, die hier durchgesetzt werden, und zwar an genau einer Stelle:
 """
 from __future__ import annotations
 
+import json as _json
 from collections import Counter
 from typing import Any
 from uuid import UUID
@@ -19,7 +20,7 @@ from uuid import UUID
 import asyncpg
 
 from app.core import crypto
-from app.services import szenen_verzeichnis
+from app.services import resonanz_fassung, szenen_verzeichnis
 from app.services.pattern_tags import GROUP_OF, PATTERN_GROUPS
 from app.services.resonanz_katalog import (
     REAKTION_LABELS,
@@ -140,7 +141,7 @@ async def setzen(
                 case_id    = COALESCE(EXCLUDED.case_id, scene_resonance.case_id),
                 updated_at = NOW()
             RETURNING id, scene_slug, case_id, reaction, frequency, distress, note,
-                      promoted_scene_id, created_at, updated_at
+                      ausarbeitung, promoted_scene_id, created_at, updated_at
             """,
             user_id, slug, case_id, reaktion, frequency, distress, crypto.encrypt(sauber),
         )
@@ -184,11 +185,51 @@ async def fall_zuordnen(
     return ergebnis.endswith(" 1")
 
 
+async def fassung_speichern(
+    conn: asyncpg.Connection, user_id: UUID, slug: str, roh: object
+) -> dict[str, Any] | None:
+    """Die eigene Fassung sichern — als Entwurf, jederzeit unvollstaendig erlaubt.
+
+    Absichtlich ohne Vollstaendigkeitspruefung: Wer bei Frage drei aufhoert, weil das
+    Aufschreiben gerade zu viel wird, soll seine drei Antworten wiederfinden. Geprueft wird
+    erst dort, wo daraus eine Szene werden soll.
+    """
+    if not szenen_verzeichnis.kennt(slug):
+        return None
+    sauber = resonanz_fassung.bereinigen(roh)
+    zeile = await conn.fetchrow(
+        """
+        UPDATE scene_resonance
+           SET ausarbeitung = $3::jsonb,
+               ausgearbeitet_at = CASE WHEN $4 THEN NOW() ELSE ausgearbeitet_at END,
+               updated_at = NOW()
+         WHERE user_id = $1 AND scene_slug = $2
+        RETURNING id, scene_slug, case_id, reaction, frequency, distress, note,
+                  ausarbeitung, promoted_scene_id, created_at, updated_at
+        """,
+        user_id, slug,
+        _json.dumps(crypto.encrypt_json_strings(sauber)),
+        bool(sauber),
+    )
+    return _aufbereiten(dict(zeile)) if zeile else None
+
+
 # ── Lesen ────────────────────────────────────────────────────────────────────
 def _aufbereiten(zeile: dict[str, Any]) -> dict[str, Any]:
     """Eine Datenbankzeile um das anreichern, was nur das Verzeichnis weiss."""
     daten = dict(zeile)
     daten["note"] = crypto.decrypt(daten.get("note"))
+
+    roh = daten.get("ausarbeitung")
+    if isinstance(roh, str):
+        roh = _json.loads(roh)
+    fassung = crypto.decrypt_json_strings(roh) if roh else {}
+    daten["ausarbeitung"] = fassung if isinstance(fassung, dict) else {}
+    # Was noch fehlt, entscheidet der Server - nicht das Frontend. Sonst haette eine
+    # zweite Fassung derselben Regel drueben gestanden, und die beiden waeren
+    # auseinandergelaufen: Der Knopf waere aktiv gewesen und der Endpunkt haette 422
+    # geantwortet.
+    daten["fehlt_noch"] = resonanz_fassung.fehlt_noch(daten["ausarbeitung"])
     szene = szenen_verzeichnis.szene(daten["scene_slug"]) or {}
     daten["title"] = szene.get("title")
     daten["cluster"] = szene.get("cluster")
@@ -213,14 +254,14 @@ async def liste(
     if case_id is None:
         zeilen = await conn.fetch(
             "SELECT id, scene_slug, case_id, reaction, frequency, distress, note, "
-            "       promoted_scene_id, created_at, updated_at "
+            "       ausarbeitung, promoted_scene_id, created_at, updated_at "
             "FROM scene_resonance WHERE user_id = $1 ORDER BY updated_at DESC",
             user_id,
         )
     else:
         zeilen = await conn.fetch(
             "SELECT id, scene_slug, case_id, reaction, frequency, distress, note, "
-            "       promoted_scene_id, created_at, updated_at "
+            "       ausarbeitung, promoted_scene_id, created_at, updated_at "
             "FROM scene_resonance WHERE user_id = $1 AND (case_id = $2 OR case_id IS NULL) "
             "ORDER BY updated_at DESC",
             user_id, case_id,

@@ -16,18 +16,23 @@ import logging
 from uuid import UUID
 
 import asyncpg
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.resonanz import (
+    FRAGEN_KATALOG,
     FallZuordnung,
+    FassungSpeichern,
+    Nachfrage,
+    NachfrageAntwort,
     ResonanzAuswertung,
     ResonanzEintrag,
     ResonanzSetzen,
     ResonanzUeberblick,
 )
-from app.services import resonanz_service, szenen_verzeichnis
+from app.services import resonanz_fassung, resonanz_service, szenen_verzeichnis
+from app.services.subscription_service import enforce_echo_prompt_limit
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/resonanz", tags=["resonanz"])
@@ -73,6 +78,7 @@ async def ueberblick(
         return ResonanzUeberblick(
             eintraege=[ResonanzEintrag(**e) for e in eintraege],
             auswertung=ResonanzAuswertung(**auswertung),
+            fragen=FRAGEN_KATALOG,
         )
 
 
@@ -141,14 +147,108 @@ async def zuordnen(
         return ResonanzEintrag(**passend)
 
 
+@router.put(
+    "/{slug}/fassung",
+    response_model=ResonanzEintrag,
+    summary="Die eigene Fassung sichern (Entwurf)",
+)
+async def fassung_speichern(
+    slug: str,
+    body: FassungSpeichern,
+    user: dict = Depends(get_current_user),
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> ResonanzEintrag:
+    async with pool.acquire() as conn:
+        eintrag = await resonanz_service.fassung_speichern(
+            conn, UUID(user["user_id"]), slug, body.ausarbeitung
+        )
+        if eintrag is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                "Markiere die Szene zuerst als wiedererkannt.",
+            )
+        return ResonanzEintrag(**eintrag)
+
+
+@router.post(
+    "/{slug}/nachfragen",
+    response_model=NachfrageAntwort,
+    summary="Echo liest die eigene Fassung gegen die erfundene Geschichte",
+    description=(
+        "Gibt bis zu drei Rückfragen zurück und **speichert nichts**. Echo schreibt hier "
+        "nicht — es fragt nach, vor allem dort, wo Einzelheiten aus der gelesenen "
+        "Geschichte in die eigene Beschreibung geraten sind."
+    ),
+)
+async def nachfragen(
+    slug: str,
+    request: Request,
+    user: dict = Depends(get_current_user),
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> NachfrageAntwort:
+    user_id = UUID(user["user_id"])
+    szene = szenen_verzeichnis.szene(slug)
+    if szene is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Diese Szene gibt es nicht.")
+
+    echo_svc = request.app.state.echo_service
+    if echo_svc is None:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Echo ist gerade nicht da.")
+
+    async with pool.acquire() as conn:
+        # Faellt unter den Tagesdeckel, wird aber nicht einzeln abgerechnet - wie die
+        # Artefakt-Destillation. Sonst zoegerte man beim Klicken, und das Nachfragen lebt
+        # davon, dass es benutzt wird.
+        await enforce_echo_prompt_limit(str(user_id), conn)
+        eintraege = await resonanz_service.liste(conn, user_id)
+
+    eigener = next((e for e in eintraege if e["scene_slug"] == slug), None)
+    if eigener is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Keine Reaktion zu dieser Szene.")
+
+    fassung = eigener.get("ausarbeitung") or {}
+    if not any((v or "").strip() for v in fassung.values()):
+        return NachfrageAntwort(
+            fragen=[],
+            hinweis="Schreib erst ein paar Sätze — dann schaue ich mir an, was noch fehlt.",
+        )
+
+    roh = await echo_svc.resonanz_nachfragen(
+        geschichte=szenen_verzeichnis.erzaehltext(slug),
+        geschichte_titel=szene["title"],
+        fassung=fassung,
+        fragen_labels={f["key"]: f["label"] for f in resonanz_fassung.FRAGEN},
+    )
+
+    # Nur Fragen zu Feldern, die es gibt, und hoechstens drei. Ein Modell, das sich ein
+    # Feld ausdenkt, erzeugte sonst eine Frage, die nirgends angezeigt wird - und die
+    # Person sieht "Echo hat nachgefragt" ohne eine Frage.
+    gefiltert: list[Nachfrage] = []
+    gesehen: set[str] = set()
+    for f in (roh.get("fragen") or []):
+        if not isinstance(f, dict):
+            continue
+        feld, frage = f.get("feld"), (f.get("frage") or "").strip()
+        if feld not in resonanz_fassung.ALLE_KEYS or not frage or feld in gesehen:
+            continue
+        gesehen.add(feld)
+        gefiltert.append(Nachfrage(feld=feld, frage=frage[:400], art=f.get("art")))
+        if len(gefiltert) == 3:
+            break
+
+    hinweis = roh.get("hinweis")
+    if not gefiltert and not hinweis:
+        hinweis = "Ich habe nichts gefunden, wonach ich fragen müsste. Das trägt so."
+    return NachfrageAntwort(fragen=gefiltert, hinweis=hinweis)
+
+
 @router.post(
     "/{slug}/szene",
     status_code=status.HTTP_201_CREATED,
-    summary="Aus der Notiz eine eigene Szene machen",
+    summary="Aus der eigenen Fassung eine Szene machen",
     description=(
-        "Legt aus der Anmerkung zu einer wiedererkannten Szene eine echte Fall-Szene an. "
-        "Der Text der erfundenen Szene wird NICHT übernommen — nur, was die Person selbst "
-        "geschrieben hat."
+        "Legt aus der ausgearbeiteten Fassung eine Fall-Szene an. Weder Text noch Titel "
+        "noch Muster der erfundenen Szene werden übernommen."
     ),
 )
 async def zu_szene_machen(
@@ -156,59 +256,70 @@ async def zu_szene_machen(
     user: dict = Depends(get_current_user),
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
+    """Der letzte Schritt — und der einzige, der eine Szene erzeugt.
+
+    **Warum hier eine Huerde steht.** Bis September 2026 genuegten eine Reaktion und drei
+    Saetze. Zu wenig fuer das, was eine Szene in diesem System ist: die praezise
+    Beschreibung eines Ereignisses, die in die Musterberechnung geht, in Berichte, und
+    womoeglich einer Fachperson vorgelegt wird.
+
+    Schlimmer als die Ungenauigkeit war ihre Richtung. Wer eine erfundene Szene liest und
+    direkt danach die eigene aufschreibt, uebernimmt ihre Einzelheiten - eine geliehene
+    Szene laesst sich hinterher nicht mehr von einer erlebten unterscheiden. Die erste
+    Fassung setzte sogar den Titel der Geschichte in die eigene Akte.
+
+    Deshalb entsteht die Szene ausschliesslich aus ``ausarbeitung``: aus den Antworten auf
+    dieselben gefuehrten Fragen, die die Szenenerfassung sonst auch stellt.
+    """
     user_id = UUID(user["user_id"])
     async with pool.acquire() as conn:
-        zeile = await conn.fetchrow(
-            "SELECT case_id, note, distress, promoted_scene_id FROM scene_resonance "
-            "WHERE user_id = $1 AND scene_slug = $2",
-            user_id, slug,
-        )
-        if zeile is None:
+        eintraege = await resonanz_service.liste(conn, user_id)
+        eigener = next((e for e in eintraege if e["scene_slug"] == slug), None)
+        if eigener is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Keine Reaktion zu dieser Szene.")
-        if zeile["promoted_scene_id"]:
+        if eigener["promoted_scene_id"]:
             raise HTTPException(
                 status.HTTP_409_CONFLICT,
                 "Daraus ist bereits eine eigene Szene geworden.",
             )
 
-        fall = zeile["case_id"] or await _einziger_fall(conn, user_id)
+        fall = eigener["case_id"] or await _einziger_fall(conn, user_id)
         if fall is None:
             raise HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
                 "Ordne die Szene zuerst einem Fall zu.",
             )
 
-        notiz = crypto.decrypt(zeile["note"])
-        if not (notiz or "").strip():
+        fassung = eigener.get("ausarbeitung") or {}
+        offen = resonanz_fassung.fehlt_noch(fassung)
+        if offen:
             raise HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
-                "Schreib zuerst auf, wie es bei dir war — daraus wird die Szene.",
+                "Dafuer fehlt noch: " + ", ".join(offen),
             )
 
-        szene = szenen_verzeichnis.szene(slug) or {}
-        # Die Muster der erfundenen Szene werden NICHT uebernommen. Sie beschreiben, was
-        # dort geschieht, nicht was hier geschehen ist - und eine eigene Szene mit
-        # geliehenen Mustern waere eine Behauptung ueber das Leben dieser Person, die
-        # niemand aufgestellt hat. Die Zuordnung passiert wie bei jeder Szene spaeter.
-        neu = await conn.fetchrow(
+        # Titel und Text kommen AUSSCHLIESSLICH aus dem, was die Person geschrieben hat.
+        # Weder der Titel der erfundenen Szene noch ihr Text noch ihre Musterklassen gehen
+        # mit: Sie beschreiben, was DORT geschieht. Die Muster ordnet dieselbe Auswertung
+        # zu wie bei jeder anderen Szene auch.
+        neue = await conn.fetchrow(
             """
-            INSERT INTO scenes (case_id, user_id, title, description, distress_score,
-                                pattern_tags, input_mode, confirmed_by_user)
-            VALUES ($1, $2, $3, $4, $5, $6::jsonb, 'guided', true)
+            INSERT INTO scenes (case_id, user_id, title, description, user_reaction,
+                                distress_score, pattern_tags, input_mode, confirmed_by_user)
+            VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 'guided', true)
             RETURNING id, scene_no
             """,
             fall, user_id,
-            # Der Titel verweist auf den Anlass, statt ihn zu verschweigen: Wer die Szene
-            # in einem halben Jahr wiederfindet, soll erkennen, woher sie kam.
-            f'Wiedererkannt: „{szene.get("title", slug)}"',
-            crypto.encrypt(notiz.strip()),
-            zeile["distress"],
+            fassung["titel"][:200],
+            crypto.encrypt(resonanz_fassung.als_szenentext(fassung)),
+            crypto.encrypt(fassung.get("react") or None),
+            eigener.get("distress"),
             json.dumps([]),
         )
         await conn.execute(
             "UPDATE scene_resonance SET promoted_scene_id = $3, updated_at = NOW() "
             "WHERE user_id = $1 AND scene_slug = $2",
-            user_id, slug, neu["id"],
+            user_id, slug, neue["id"],
         )
-        logger.info("Resonanz zu Szene gemacht: scene_id=%s case_id=%s", neu["id"], fall)
-        return {"scene_id": str(neu["id"]), "scene_no": neu["scene_no"], "case_id": str(fall)}
+        logger.info("Fassung zu Szene gemacht: scene_id=%s case_id=%s", neue["id"], fall)
+        return {"scene_id": str(neue["id"]), "scene_no": neue["scene_no"], "case_id": str(fall)}

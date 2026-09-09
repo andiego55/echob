@@ -88,10 +88,22 @@ export const SKALEN: Skala[] = [
   },
 ]
 
-export const NOTIZ_FRAGE = 'Was ist bei dir anders?'
+/**
+ * Das Feld auf der Leseseite — und was es ausdrücklich NICHT ist.
+ *
+ * Es hieß einmal „Was ist bei dir anders?", und aus seinem Inhalt wurde mit einem Klick
+ * eine Fall-Szene. Das war der Fehler dieses Features: Ein Text, der im unmittelbaren
+ * Eindruck einer erfundenen Geschichte entsteht, übernimmt ihre Einzelheiten — und eine
+ * geliehene Szene lässt sich hinterher nicht mehr von einer erlebten unterscheiden.
+ *
+ * Jetzt heißt es, was es ist: ein erster Gedanke. In der Ausarbeitung im Fall wird er der
+ * Person vorgelegt — als etwas zu Prüfendes, nicht als Inhalt.
+ */
+export const NOTIZ_FRAGE = 'Was ging dir dabei durch den Kopf?'
 export const NOTIZ_HINWEIS =
-  'Ein paar Sätze genügen. Was in der Szene nicht stimmt, was bei dir anders lief, '
-  + 'woran du denken musstest.'
+  'Ein erster Gedanke, mehr muss es hier nicht sein. Eine Szene wird daraus nicht — '
+  + 'die schreibst du später in Ruhe in deinem Fall, mit ein paar Fragen, die helfen, '
+  + 'dein Erlebnis von dieser Geschichte zu trennen.'
 export const MAX_NOTIZ = 2000
 
 // ── Zahlen in Sätze ─────────────────────────────────────────────────────────

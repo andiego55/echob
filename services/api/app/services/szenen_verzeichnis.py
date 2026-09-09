@@ -63,6 +63,23 @@ def _nach_slug() -> dict[str, dict[str, Any]]:
     return verzeichnis
 
 
+@lru_cache(maxsize=1)
+def _erzaehltexte() -> dict[str, str]:
+    """Die Erzähltexte, getrennt von allem anderen.
+
+    Getrennt, damit der Text gar nicht erst in dem Eintrag steckt, den :func:`szene`
+    zurückgibt — und damit nirgends versehentlich in einer API-Antwort landet. Er ist zwar
+    öffentlich (jeder kann die Seite lesen), gehört aber in keine Antwort über die Resonanz
+    eines Menschen; jedes Feld, das dort mitfährt, ohne gebraucht zu werden, ist eines zu
+    viel.
+    """
+    return {
+        s["slug"]: (s.get("body") or "")
+        for s in _rohdaten()
+        if isinstance(s.get("slug"), str) and s["slug"]
+    }
+
+
 def kennt(slug: str) -> bool:
     """Gibt es diese Szene? Das Tor für jede Schreiboperation."""
     return slug in _nach_slug()
@@ -71,6 +88,20 @@ def kennt(slug: str) -> bool:
 def szene(slug: str) -> dict[str, Any] | None:
     """Titel, Cluster, Schlagwörter und beide abgeleiteten Achsen — oder ``None``."""
     return _nach_slug().get(slug)
+
+
+def erzaehltext(slug: str) -> str:
+    """Der Erzähltext einer Szene.
+
+    Gebraucht für genau eine Sache: Wenn jemand seine eigene Fassung schreibt, vergleicht
+    Echo sie gegen diese Geschichte und fragt nach, wo Einzelheiten aus ihr hereingerutscht
+    sind. Titel und Schlagwörter reichen dafür nicht — sie verraten nicht, dass es ein
+    Abendessen mit Freunden war.
+
+    Eigene Ablage statt eines Feldes in :func:`szene`, damit der Text nicht versehentlich
+    in eine API-Antwort gerät — siehe :func:`_erzaehltexte`.
+    """
+    return _erzaehltexte().get(slug, "")
 
 
 def anzahl() -> int:

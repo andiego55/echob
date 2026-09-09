@@ -13,6 +13,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.services.resonanz_fassung import FRAGEN
 from app.services.resonanz_service import MAX_ZEICHEN_NOTIZ
 
 Reaktion = Literal["kenne_ich", "kannte_ich", "andere_seite", "nicht_meins"]
@@ -90,6 +91,15 @@ class ResonanzEintrag(BaseModel):
     #: Die Szene gibt es nicht mehr. Die Zeile bleibt, die Karte bleibt leer.
     verwaist: bool = False
 
+    #: Die eigene Fassung: Antworten auf die geführten Fragen. Leer, solange niemand
+    #: angefangen hat.
+    ausarbeitung: dict[str, str] = Field(default_factory=dict)
+    #: Was noch fehlt, bis daraus eine Szene werden darf — als lesbare Labels.
+    #:
+    #: Der Server entscheidet das, nicht das Frontend. Stünde die Regel zweimal, liefen
+    #: beide Fassungen auseinander: Der Knopf wäre aktiv und der Endpunkt antwortete 422.
+    fehlt_noch: list[str] = Field(default_factory=list)
+
 
 class WirkungsZeile(BaseModel):
     name: str
@@ -125,9 +135,53 @@ class ResonanzAuswertung(BaseModel):
 class ResonanzUeberblick(BaseModel):
     eintraege: list[ResonanzEintrag]
     auswertung: ResonanzAuswertung
+    #: Die geführten Fragen — damit die Oberfläche sie nicht ein zweites Mal führt.
+    fragen: list[Frage] = Field(default_factory=list)
 
 
 class FallZuordnung(BaseModel):
     """``null`` löst die Zuordnung wieder."""
 
     case_id: UUID | None = None
+
+
+# ── Die eigene Fassung ───────────────────────────────────────────────────────
+class FassungSpeichern(BaseModel):
+    """Die Antworten, wie sie gerade im Formular stehen.
+
+    Bewusst ohne Pflichtfelder: Wer bei Frage drei aufhört, weil das Aufschreiben gerade zu
+    viel wird, soll seine drei Antworten wiederfinden. Geprüft wird erst dort, wo daraus
+    eine Szene werden soll.
+    """
+
+    ausarbeitung: dict[str, str] = Field(default_factory=dict)
+
+
+class Frage(BaseModel):
+    key: str
+    label: str
+    hinweis: str | None = None
+    pflicht: bool
+
+
+#: Die Fragen gehen mit der Übersicht ans Frontend statt dort noch einmal zu stehen.
+#:
+#: Eine zweite Liste drüben wäre die naheliegende Lösung und die schlechtere: Ändert jemand
+#: hier einen Wortlaut, fragt die Oberfläche weiter das Alte — und der Text, der in der
+#: Szene landet, trüge die neue Überschrift über der alten Antwort.
+FRAGEN_KATALOG: list[Frage] = [Frage(**f) for f in FRAGEN]
+
+
+class Nachfrage(BaseModel):
+    """Eine Rückfrage von Echo, verortet an dem Feld, um das es geht."""
+
+    feld: str
+    frage: str
+    #: geliehen · unschaerfe · deutung · eigene_bewegung
+    art: str | None = None
+
+
+class NachfrageAntwort(BaseModel):
+    fragen: list[Nachfrage]
+    #: Steht nur da, wenn es keine Fragen gibt — dann sagt es, woran das liegt.
+    hinweis: str | None = None

@@ -4,9 +4,16 @@
  * **Der Entwurfsgedanke: eine Geste, dann freiwillig mehr.** Wer diese Szenen liest, liest
  * sie oft nachts und selten in Verfassung, ein Formular auszufüllen. Der erste Schritt ist
  * deshalb ein einziger Fingertipp, der nichts verlangt und nichts verspricht. Alles
- * Weitere — zwei Skalen, ein Textfeld, am Ende die eigene Szene — klappt danach auf und
- * darf ignoriert werden. Ein Pflichtfeld an dieser Stelle würde genau die Menschen
- * aussperren, für die das Wiedererkennen der einzige Zugang ist.
+ * Weitere — zwei Skalen, ein Feld für den ersten Gedanken — klappt danach auf und darf
+ * ignoriert werden. Ein Pflichtfeld an dieser Stelle würde genau die Menschen aussperren,
+ * für die das Wiedererkennen der einzige Zugang ist.
+ *
+ * **Was hier NICHT mehr passiert: eine Szene entstehen lassen.** Bis September 2026 wurde
+ * aus dem Textfeld mit einem Klick eine Fall-Szene. Das war der Fehler des Features. Wer
+ * eine erfundene Geschichte liest und direkt danach die eigene aufschreibt, übernimmt
+ * ihre Einzelheiten, ohne es zu merken — und eine geliehene Szene lässt sich hinterher
+ * nicht mehr von einer erlebten unterscheiden, obwohl sie in dieselbe Musterberechnung
+ * geht. Ausgearbeitet wird jetzt im Fall, mit Abstand: `ResonanzFassung.tsx`.
  *
  * **Ohne Konto passiert trotzdem etwas.** Die Reaktion zählt in eine anonyme Zahl, und
  * unter der Szene steht dann „147 Menschen kennen das". Bei diesem Material ist das keine
@@ -123,7 +130,6 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
   const [anonymeWahl, setAnonymeWahl] = useState<Reaktion | null>(null)
   const [notiz, setNotiz] = useState('')
   const [notizGesichert, setNotizGesichert] = useState(false)
-  const [uebernommen, setUebernommen] = useState<number | null>(null)
   const [fehler, setFehler] = useState<string | null>(null)
 
   // Was dieser Browser ohne Konto schon markiert hat. Erst im Effekt: Beim Vorrendern
@@ -258,15 +264,6 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
     )
   }
 
-  const zuSzene = useMutation({
-    mutationFn: () => resonanzApi.zuSzeneMachen(slug),
-    onSuccess: (d) => {
-      setUebernommen(d.scene_no)
-      qc.invalidateQueries({ queryKey: ['resonanz-ueberblick'] })
-    },
-    onError: () => setFehler('Das hat gerade nicht geklappt.'),
-  })
-
   const satz = zaehlerSatz(zaehler, gewaehlt)
   const offen = istWiedererkannt(gewaehlt)
 
@@ -396,28 +393,28 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
             </div>
           </div>
 
-          {/* Der eigentliche Zug: aus drei Sätzen wird eigenes Material. */}
-          {eigener?.note && !eigener.promoted_scene_id && uebernommen === null && (
-            <div className="rounded-brand border border-accent/25 bg-accent/[0.04] px-5 py-4">
-              <p className="text-[0.88rem] leading-relaxed text-brand-text">
-                Das, was du gerade geschrieben hast, ist eine eigene Szene. Wenn du magst,
-                übernehmen wir sie in deinen Fall — dann kann Echo damit arbeiten.
-              </p>
-              <button
-                type="button"
-                onClick={() => zuSzene.mutate()}
-                disabled={zuSzene.isPending}
-                className="mt-3 text-[0.88rem] font-semibold text-accent hover:underline disabled:opacity-50"
-              >
-                {zuSzene.isPending ? 'Wird übernommen …' : 'Daraus eine eigene Szene machen →'}
-              </button>
-            </div>
-          )}
+          {/* KEIN Knopf „daraus eine Szene machen“. Er stand hier bis September 2026
+              und war der Fehler dieses Features: Aus drei Saetzen, geschrieben im
+              unmittelbaren Eindruck einer erfundenen Geschichte, wurde eine Fall-Szene -
+              also Material, das spaeter in die Musterberechnung geht, in Berichte, und
+              womoeglich einer Fachperson vorgelegt wird.
 
-          {(uebernommen !== null || eigener?.promoted_scene_id) && (
+              Wer eine Geschichte liest und direkt danach die eigene aufschreibt,
+              uebernimmt ihre Einzelheiten, ohne es zu merken. Eine geliehene Szene laesst
+              sich hinterher nicht mehr von einer erlebten unterscheiden - und das ist
+              genau die Sorte Fehler, die nie auffaellt.
+
+              Ausgearbeitet wird im Fall, mit Abstand und mit den gefuehrten Fragen
+              (ResonanzFassung.tsx). Von hier fuehrt nur ein Hinweis dorthin. */}
+          {eigener?.promoted_scene_id ? (
             <p className="rounded-brand bg-green-50 px-5 py-3 text-[0.88rem] text-green-900">
-              Übernommen{uebernommen !== null ? ` als Szene ${uebernommen}` : ''}. Du findest
-              sie bei deinen Szenen.
+              Daraus ist bei dir eine eigene Szene geworden.
+            </p>
+          ) : (
+            <p className="rounded-brand bg-navy/[0.03] px-5 py-3 text-[0.86rem] leading-relaxed text-brand-muted">
+              Unter <span className="font-medium text-navy">Wiedererkanntes</span> in deinem
+              Fall kannst du das in Ruhe ausarbeiten — mit ein paar Fragen, die helfen,
+              dein Erlebnis von dieser Geschichte zu trennen. Erst daraus wird eine Szene.
             </p>
           )}
 

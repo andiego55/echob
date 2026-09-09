@@ -59,8 +59,11 @@ for (const file of walk(contentDir)) {
   const rel = path.relative(webRoot, file)
   const err = (m) => errors.push(`${rel}: ${m}`)
   let fm
+  let rumpf = ''
   try {
-    fm = matter(fs.readFileSync(file, 'utf-8')).data
+    const geparst = matter(fs.readFileSync(file, 'utf-8'))
+    fm = geparst.data
+    rumpf = geparst.content
   } catch (e) {
     err(`Frontmatter nicht parsebar: ${e.message}`)
     continue
@@ -98,7 +101,7 @@ for (const file of walk(contentDir)) {
   if (!fm.draft && !fm.reviewed_by?.name)
     err('reviewed_by fehlt — fachliche Prüfung ist Pflicht zur Veröffentlichung')
 
-  pages.push({ fm, rel })
+  pages.push({ fm, rel, rumpf })
 }
 
 // Slugs müssen global eindeutig sein (bodies.ts mappt per Slug).
@@ -180,6 +183,7 @@ console.log(`  counts.generated.ts: ${szenen} Szenen, ${tests} Selbsttests`)
 // Also eine schlanke Kopie, aus derselben Quelle und mit derselben Pruefung wie das
 // Manifest. Sie wird eingecheckt; test_szenen_verzeichnis.py schlaegt an, wenn jemand
 // eine Szene aendert und `npm run content` vergisst.
+const rumpfNachSlug = new Map(published.map((p) => [p.fm.slug, p.rumpf]))
 const szenenVerzeichnis = manifest
   .filter((m) => m.type === 'scene')
   .map((m) => ({
@@ -188,6 +192,11 @@ const szenenVerzeichnis = manifest
     cluster: m.cluster,
     perspective: m.perspective ?? null,
     scene_tags: m.scene_tags ?? [],
+    // Der Erzaehltext selbst. Gebraucht wird er fuer genau eine Sache: Wenn jemand seine
+    // eigene Fassung schreibt, vergleicht Echo sie gegen diese Geschichte und fragt nach,
+    // wo Einzelheiten aus ihr hereingerutscht sind. Ohne den Text ginge das nicht - Titel
+    // und Schlagwoerter verraten nicht, dass es ein Abendessen mit Freunden war.
+    body: (rumpfNachSlug.get(m.slug) ?? '').trim(),
   }))
 
 const backendData = path.resolve(webRoot, '..', '..', 'services', 'api', 'app', 'data')

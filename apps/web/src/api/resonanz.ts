@@ -28,6 +28,36 @@ export interface ResonanzEintrag {
   wirkungen: string[]
   /** Die Szene gibt es nicht mehr — die Karte bleibt, der Titel fehlt. */
   verwaist: boolean
+  /** Die eigene Fassung: Antworten auf die gefuehrten Fragen. */
+  ausarbeitung: Record<string, string>
+  /**
+   * Was noch fehlt, bis daraus eine Szene werden darf — lesbare Labels vom Server.
+   *
+   * Bewusst nicht im Frontend nachgerechnet: Stuende die Regel zweimal, liefen beide
+   * auseinander, und der Knopf waere aktiv, waehrend der Endpunkt 422 antwortet.
+   */
+  fehlt_noch: string[]
+}
+
+/** Eine gefuehrte Frage. Kommt vom Server, damit sie nur an einer Stelle steht. */
+export interface ResonanzFrage {
+  key: string
+  label: string
+  hinweis: string | null
+  pflicht: boolean
+}
+
+/** Eine Rueckfrage von Echo, verortet an dem Feld, um das es geht. */
+export interface Nachfrage {
+  feld: string
+  frage: string
+  /** geliehen · unschaerfe · deutung · eigene_bewegung */
+  art: string | null
+}
+
+export interface NachfrageAntwort {
+  fragen: Nachfrage[]
+  hinweis: string | null
 }
 
 export interface WirkungsZeile {
@@ -55,6 +85,8 @@ export interface ResonanzAuswertung {
 export interface ResonanzUeberblick {
   eintraege: ResonanzEintrag[]
   auswertung: ResonanzAuswertung
+  /** Die gefuehrten Fragen — damit die Oberflaeche sie nicht ein zweites Mal fuehrt. */
+  fragen: ResonanzFrage[]
 }
 
 export interface ResonanzEingabe {
@@ -96,6 +128,14 @@ export const resonanzApi = {
     apiClient
       .patch<ResonanzEintrag>(`/resonanz/${slug}/fall`, { case_id: caseId })
       .then(r => r.data),
+
+  fassungSpeichern: (slug: string, ausarbeitung: Record<string, string>) =>
+    apiClient
+      .put<ResonanzEintrag>(`/resonanz/${slug}/fassung`, { ausarbeitung })
+      .then(r => r.data),
+
+  nachfragen: (slug: string) =>
+    apiClient.post<NachfrageAntwort>(`/resonanz/${slug}/nachfragen`).then(r => r.data),
 
   zuSzeneMachen: (slug: string) =>
     apiClient

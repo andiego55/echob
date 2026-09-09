@@ -24,8 +24,9 @@ import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import ResonanzUebernahme from '@/components/app/ResonanzUebernahme'
+import ResonanzFassung from '@/components/app/ResonanzFassung'
 import { ListSkeleton } from '@/components/Skeleton'
-import { resonanzApi, type ResonanzEintrag } from '@/api/resonanz'
+import { resonanzApi, type ResonanzEintrag, type ResonanzFrage } from '@/api/resonanz'
 import { REAKTIONS_INFOS, REAKTION_LABEL, SKALEN, istWiedererkannt, type Reaktion } from '@/lib/resonanz'
 
 type Filter = 'alle' | Reaktion
@@ -61,14 +62,18 @@ function LeerZustand({ caseId }: { caseId: string }) {
 }
 
 function EintragsKarte({
-  eintrag, caseId, onZuordnen, onSzene, zuordnenLaeuft, szeneLaeuft,
+  eintrag, caseId, fragen, offen, onZuordnen, onOeffnen, onSchliessen, onUebernommen,
+  zuordnenLaeuft,
 }: {
   eintrag: ResonanzEintrag
   caseId: string
+  fragen: ResonanzFrage[]
+  offen: boolean
   onZuordnen: (slug: string) => void
-  onSzene: (slug: string) => void
+  onOeffnen: (slug: string) => void
+  onSchliessen: () => void
+  onUebernommen: (nr: number) => void
   zuordnenLaeuft: boolean
-  szeneLaeuft: boolean
 }) {
   const e = eintrag
   return (
@@ -144,14 +149,20 @@ function EintragsKarte({
             Gehört zu diesem Fall
           </button>
         )}
-        {e.note && !e.promoted_scene_id && !e.verwaist && (
+        {/* Der einzige Weg zu einer Szene fuehrt ueber die Ausarbeitung. Der Knopf
+            heisst deshalb nicht „Szene anlegen“ - er oeffnet ein Menue, in dem die
+            gefuehrten Fragen stehen und Echo gegen die erfundene Geschichte liest. */}
+        {!e.promoted_scene_id && !e.verwaist && (
           <button
             type="button"
-            onClick={() => onSzene(e.scene_slug)}
-            disabled={szeneLaeuft}
-            className="font-semibold text-accent hover:underline disabled:opacity-50"
+            onClick={() => (offen ? onSchliessen() : onOeffnen(e.scene_slug))}
+            className="font-semibold text-accent hover:underline"
           >
-            Daraus eine eigene Szene machen →
+            {offen
+              ? 'Ausarbeitung schließen'
+              : Object.keys(e.ausarbeitung).length > 0
+                ? 'Fassung weiterschreiben →'
+                : 'In eigene Worte fassen →'}
           </button>
         )}
         {e.promoted_scene_id && (
@@ -163,6 +174,15 @@ function EintragsKarte({
           </Link>
         )}
       </div>
+
+      {offen && (
+        <ResonanzFassung
+          eintrag={e}
+          fragen={fragen}
+          onSchliessen={onSchliessen}
+          onUebernommen={onUebernommen}
+        />
+      )}
     </li>
   )
 }
@@ -171,6 +191,8 @@ export default function ResonanzPage() {
   const { caseId } = useParams<{ caseId: string }>()
   const qc = useQueryClient()
   const [filter, setFilter] = useState<Filter>('alle')
+  const [offenerSlug, setOffenerSlug] = useState<string | null>(null)
+  const [geradeUebernommen, setGeradeUebernommen] = useState<number | null>(null)
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['resonanz-ueberblick', caseId],
@@ -186,10 +208,11 @@ export default function ResonanzPage() {
     mutationFn: (slug: string) => resonanzApi.zuordnen(slug, caseId!),
     onSuccess: frisch,
   })
-  const zuSzene = useMutation({
-    mutationFn: (slug: string) => resonanzApi.zuSzeneMachen(slug),
-    onSuccess: () => { frisch(); qc.invalidateQueries({ queryKey: ['scenes', caseId] }) },
-  })
+  function uebernommen(nr: number) {
+    setOffenerSlug(null)
+    setGeradeUebernommen(nr)
+    qc.invalidateQueries({ queryKey: ['scenes', caseId] })
+  }
 
   const eintraege = data?.eintraege ?? []
   const a = data?.auswertung
@@ -220,6 +243,15 @@ export default function ResonanzPage() {
         </div>
 
         <ResonanzUebernahme caseId={caseId} />
+
+        {geradeUebernommen !== null && (
+          <p className="mb-4 rounded-brand bg-green-50 px-5 py-3 text-[0.88rem] text-green-900">
+            Übernommen als Szene {geradeUebernommen}.{' '}
+            <Link to={`/app/cases/${caseId}/scenes`} className="font-semibold underline">
+              Zu deinen Szenen
+            </Link>
+          </p>
+        )}
 
         {isLoading && <ListSkeleton rows={3} label="Wird geladen" />}
         {error && <Fehlermeldung error={error} />}
@@ -348,10 +380,13 @@ export default function ResonanzPage() {
                   key={e.id}
                   eintrag={e}
                   caseId={caseId!}
+                  fragen={data.fragen}
+                  offen={offenerSlug === e.scene_slug}
                   onZuordnen={slug => zuordnen.mutate(slug)}
-                  onSzene={slug => zuSzene.mutate(slug)}
+                  onOeffnen={setOffenerSlug}
+                  onSchliessen={() => setOffenerSlug(null)}
+                  onUebernommen={uebernommen}
                   zuordnenLaeuft={zuordnen.isPending}
-                  szeneLaeuft={zuSzene.isPending}
                 />
               ))}
             </ul>

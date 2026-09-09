@@ -721,6 +721,66 @@ class EchoService:
             logger.error("extract_artifacts: ungültige JSON-Antwort vom Modell.")
             return {"kandidaten": [], "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
 
+    async def resonanz_nachfragen(
+        self,
+        *,
+        geschichte: str,
+        geschichte_titel: str,
+        fassung: dict[str, str],
+        fragen_labels: dict[str, str],
+    ) -> dict[str, Any]:
+        """Rückfragen zu einer eigenen Fassung — **speichert nichts**.
+
+        **Warum es diesen Aufruf gibt und was er ausdrücklich nicht tut.** Er schreibt
+        nicht. Formulierte Echo die Szene besser, wäre es am Ende Echos Szene — und für
+        eine Fallakte, aus der später Muster berechnet und Berichte gebaut werden, ist das
+        genau der falsche Tausch.
+
+        Er tut das eine, was an dieser Stelle nur ein Modell kann: **beides nebeneinander
+        lesen.** Wer eine erfundene Geschichte liest und direkt danach die eigene
+        aufschreibt, übernimmt ihre Einzelheiten, ohne es zu merken — den Ort, die
+        Nebenfiguren, den Anlass. Der Mensch selbst kann das kaum bemerken, ein Mensch, der
+        ihm zuhört, auch nicht (er kennt die Geschichte nicht). Ein Vergleich beider Texte
+        findet es.
+
+        Nicht das teure Modell, keine hohe Temperatur: Nachfragen sollen wenig streuen, und
+        der Aufruf wird nicht einzeln abgerechnet.
+        """
+        if not self._use_openai:
+            return {
+                "fragen": [],
+                "hinweis": "Echo läuft im Demo-Modus — ohne OpenAI-Schlüssel gibt es "
+                           "keine Rückfragen. Deine Fassung kannst du trotzdem speichern.",
+            }
+
+        antworten = "\n\n".join(
+            f"[{key}] {fragen_labels.get(key, key)}\n{wert}"
+            for key, wert in fassung.items()
+            if wert and wert.strip()
+        ) or "(noch nichts ausgefüllt)"
+
+        response = await self._chat(
+            model=self._model_fast,
+            messages=[
+                {"role": "system", "content": _load_prompt("resonanz_nachfrage_prompt.md")},
+                {"role": "user", "content": (
+                    f"Die erfundene Geschichte („{geschichte_titel}“):\n"
+                    f"---\n{geschichte}\n---\n\n"
+                    f"Seine eigene Fassung:\n---\n{antworten}\n---\n\n"
+                    f"Stelle jetzt deine Rückfragen."
+                )},
+            ],
+            max_tokens=700,
+            temperature=None if self._reasoning else 0.3,
+            response_format={"type": "json_object"},
+        )
+        import json as _rj
+        try:
+            return _rj.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("resonanz_nachfragen: ungültige JSON-Antwort vom Modell.")
+            return {"fragen": [], "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
+
     async def generate_hypothesis_summary(
         self, *, hypothesis_type: str, history: list[dict[str, str]],
     ) -> str:
