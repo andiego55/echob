@@ -17,7 +17,7 @@
  */
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import Avatar from '@/components/Avatar'
 import AvatarPicker from '@/components/AvatarPicker'
@@ -44,11 +44,27 @@ export default function CaseNewPage() {
   const [avatar, setAvatar]               = useState<string | undefined>()
   const [avatarOffen, setAvatarOffen]     = useState(false)
 
+  // Ist das der erste Fall? Entscheidet, ob nach dem Anlegen der Einstieg kommt.
+  // Bewusst aus dem vorhandenen Bestand abgeleitet und nicht aus einer Markierung im
+  // Browser: Wer das Geraet wechselt, soll nicht noch einmal durch die Einfuehrung.
+  const { data: bestand } = useQuery({ queryKey: ['cases'], queryFn: casesApi.list })
+  const erster = (bestand?.cases?.length ?? 0) === 0
+
   const mutation = useMutation({
     mutationFn: casesApi.create,
     onSuccess: (newCase) => {
       queryClient.invalidateQueries({ queryKey: ['cases'] })
-      navigate(`/app/cases/${newCase.id}/scenes`)
+      // Beim ERSTEN Fall zuerst der Einstieg: Wer sich gerade angemeldet hat, landete
+      // sonst direkt vor der leeren Szenenliste - also vor der Aufforderung, ein
+      // belastendes Ereignis aus dem eigenen Leben aufzuschreiben. Fuer viele der
+      // schwerste denkbare erste Schritt, und wer ihn nicht schafft, kommt nicht wieder.
+      //
+      // Nur beim ersten: Wer schon einen Fall hat, kennt die App und braucht keine
+      // Einfuehrung. Und die Seite taucht nie von selbst wieder auf - ein Ding, das man
+      // wegdruecken muss, wird zu etwas, das man wegdrueckt.
+      navigate(erster
+        ? `/app/cases/${newCase.id}/einstieg`
+        : `/app/cases/${newCase.id}/scenes`)
     },
   })
 

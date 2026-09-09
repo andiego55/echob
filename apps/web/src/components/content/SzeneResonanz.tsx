@@ -49,39 +49,7 @@ import {
   type Zaehler,
 } from '@/lib/resonanz'
 import { oeffentlicheResonanzApi, resonanzApi } from '@/api/resonanz'
-
-// ── Die vier Marken ─────────────────────────────────────────────────────────
-// Gezeichnet statt Emoji: Ein 🙋 neben einer Szene über Erschöpfung trifft den Ton nicht,
-// und Emoji als Abzeichen sind hier ohnehin nicht die Sprache des Hauses.
-//
-// Die Formen erzählen die Bedeutung: voller Punkt = jetzt, gestrichelter Ring = vorbei,
-// gespiegelte Hälfte = die andere Seite, leerer Ring = kenne ich nicht.
-function Marke({ art }: { art: Reaktion }) {
-  const gemeinsam = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.4 }
-  return (
-    <svg viewBox="0 0 20 20" className="h-[18px] w-[18px] flex-shrink-0" aria-hidden="true">
-      {art === 'kenne_ich' && (
-        <>
-          <circle cx="10" cy="10" r="7.4" {...gemeinsam} />
-          <circle cx="10" cy="10" r="3.4" fill="currentColor" />
-        </>
-      )}
-      {art === 'kannte_ich' && (
-        <>
-          <circle cx="10" cy="10" r="7.4" {...gemeinsam} strokeDasharray="2.2 2" />
-          <circle cx="10" cy="10" r="3.4" fill="currentColor" opacity="0.45" />
-        </>
-      )}
-      {art === 'andere_seite' && (
-        <>
-          <circle cx="10" cy="10" r="7.4" {...gemeinsam} />
-          <path d="M10 2.6 A7.4 7.4 0 0 1 10 17.4 Z" fill="currentColor" opacity="0.9" />
-        </>
-      )}
-      {art === 'nicht_meins' && <circle cx="10" cy="10" r="7.4" {...gemeinsam} />}
-    </svg>
-  )
-}
+import ReaktionsMarke from '@/components/content/ReaktionsMarke'
 
 // ── Eine Skala ──────────────────────────────────────────────────────────────
 function Skalenreihe({
@@ -299,7 +267,7 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
               ].join(' ')}
             >
               <span className={`mt-0.5 ${aktiv ? 'text-accent' : 'text-brand-muted'}`}>
-                <Marke art={info.key} />
+                <ReaktionsMarke art={info.key} />
               </span>
               <span className="min-w-0">
                 <span className={`block text-[0.94rem] font-semibold ${aktiv ? 'text-navy' : 'text-brand-text'}`}>

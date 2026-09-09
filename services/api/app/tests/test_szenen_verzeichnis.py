@@ -118,3 +118,38 @@ def test_fast_jede_szene_faellt_auf_mindestens_eine_achse():
         f"{len(stumm)} Szenen fallen auf keine Achse und blieben im Ueberblick stumm: "
         f"{sorted(stumm)[:10]}"
     )
+
+
+# ── Die fuenf Szenen fuer den Einstieg ───────────────────────────────────────
+def test_der_einstieg_streut_ueber_verschiedene_wirkungen():
+    """Fuenf aus demselben Cluster sagten fast nichts.
+
+    Wer alle fuenf wiedererkennt, haette eine Facette bestaetigt; wer keine wiedererkennt,
+    haette nur diese eine ausgeschlossen. Eine Szene je Wirkung ergibt nach zwei Minuten
+    eine erste Richtung - und genau dafuer steht der Einstieg da.
+    """
+    import asyncio
+
+    from app.api.v1.routers.szenen_oeffentlich import einstieg
+
+    for _ in range(5):          # gewuerfelt, also mehrfach pruefen
+        slugs = asyncio.run(einstieg())
+        assert len(slugs) == 5
+        assert len(set(slugs)) == 5, "keine Szene doppelt"
+
+        # Jede Szene bringt die Wirkung mit, fuer die sie gewaehlt wurde - zusammen
+        # muessen mindestens fuenf verschiedene abgedeckt sein.
+        abgedeckt = set()
+        for slug in slugs:
+            abgedeckt |= set((szenen_verzeichnis.szene(slug) or {}).get("wirkungen", []))
+        assert len(abgedeckt) >= 5
+
+
+def test_der_einstieg_liefert_nur_bekannte_szenen():
+    """Sonst laeuft der erste Durchgang eines neuen Kontos in ein 404."""
+    import asyncio
+
+    from app.api.v1.routers.szenen_oeffentlich import einstieg
+
+    for slug in asyncio.run(einstieg()):
+        assert szenen_verzeichnis.kennt(slug)

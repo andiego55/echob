@@ -121,6 +121,9 @@ export const oeffentlicheResonanzApi = {
       })
       .then(r => r.data.zaehler),
 
+  /** Fuenf Szenen fuer den ersten Durchgang - je eine aus fuenf Wirkungen. */
+  einstieg: () => apiClient.get<string[]>('/szenen/einstieg').then(r => r.data),
+
   reagieren: (slug: string, reaction: Reaktion) =>
     apiClient
       .post<Zaehler>(`/szenen/${slug}/resonanz`, { reaction })

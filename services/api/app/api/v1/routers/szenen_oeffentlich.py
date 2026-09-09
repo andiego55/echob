@@ -18,6 +18,8 @@ widerspricht dem, ohne zu belehren.
 """
 from __future__ import annotations
 
+import random
+
 import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
@@ -28,6 +30,7 @@ from app.schemas.resonanz import (
     SzenenZaehlerResponse,
 )
 from app.services import resonanz_service, szenen_verzeichnis
+from app.services.resonanz_katalog import WIRKUNGEN
 
 router = APIRouter(prefix="/szenen", tags=["szenen"])
 
@@ -56,6 +59,46 @@ async def zaehler_lesen(
     return SzenenZaehlerResponse(
         zaehler={slug: OeffentlicheZaehler(**werte) for slug, werte in roh.items()}
     )
+
+
+@router.get(
+    "/einstieg",
+    response_model=list[str],
+    summary="Fünf Szenen für den ersten Durchgang",
+    description=(
+        "Slugs für den Einstieg nach der Anmeldung — je eine Szene aus fünf "
+        "verschiedenen Wirkungen. Titel und Zitat holt sich die Oberfläche aus dem "
+        "Manifest; hier wird nur ausgewählt."
+    ),
+)
+async def einstieg() -> list[str]:
+    """Fünf Szenen, die über fünf verschiedene Wirkungen streuen.
+
+    **Warum nicht fünf zufällige.** Fünf Szenen aus demselben Cluster sagen fast nichts:
+    Wer alle fünf wiedererkennt, hat eine Facette bestätigt, und wer keine wiedererkennt,
+    hat nur diese eine Facette ausgeschlossen. Eine Szene je Wirkung dagegen ergibt nach
+    zwei Minuten eine erste Richtung — und genau dafür steht der Einstieg da.
+
+    **Warum überhaupt gewürfelt wird.** Feste fünf hätten den Vorteil, dass man sie
+    kuratieren kann, und den Nachteil, dass jeder Mensch dieselben fünf sieht — die
+    öffentlichen Zähler wären dann keine Aussage mehr über Wiedererkennung, sondern über
+    die Startseite.
+    """
+    nach_wirkung: dict[str, list[str]] = {}
+    for slug in szenen_verzeichnis.alle_slugs():
+        for wirkung in (szenen_verzeichnis.szene(slug) or {}).get("wirkungen", []):
+            nach_wirkung.setdefault(wirkung, []).append(slug)
+
+    # Reihenfolge der Achse, nicht Zufall: Sie geht von der Verunsicherung ueber die
+    # Anspannung zum Nicht-Loskommen. Der Durchgang liest sich dadurch als Bogen.
+    gewaehlt: list[str] = []
+    for wirkung in WIRKUNGEN:
+        kandidaten = [s for s in nach_wirkung.get(wirkung, []) if s not in gewaehlt]
+        if kandidaten:
+            gewaehlt.append(random.choice(kandidaten))
+        if len(gewaehlt) == 5:
+            break
+    return gewaehlt
 
 
 @router.post(
