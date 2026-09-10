@@ -884,7 +884,7 @@ export interface PersonProfile {
 
 export type ShareElementType =
   | 'case_info' | 'onboarding' | 'all_scenes' | 'scene'
-  | 'scales' | 'reports' | 'topic_summaries' | 'person_profile' | 'self_profile'
+  | 'scales' | 'gefuehlsbild' | 'reports' | 'topic_summaries' | 'person_profile' | 'self_profile'
   | 'hypotheses' | 'test_results'
   | 'documents' | 'artifacts'
 
@@ -894,6 +894,7 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   all_scenes:      'Alle Szenen',
   scene:           'Einzelne Szenen',
   scales:          'Skalen',
+  gefuehlsbild:    'Gefühlsbild (aktuellster Stand)',
   reports:         'Berichte',
   topic_summaries: 'Themendialog-Zusammenfassungen',
   person_profile:  'Fragebogen zur Fallperson',
@@ -1174,6 +1175,22 @@ export interface SharedCaseArtifact {
   created_at: string
 }
 
+/**
+ * Das freigegebene Gefühlsbild — beschnitten auf das, was die Person gebilligt hat.
+ *
+ * Der Rohtext, den sie beim Zusammenstellen getippt hat, ist bewusst nicht dabei: Gelesen
+ * und bestätigt hat sie den fertigen Text. Die Szenen sind **erfunden** — sie hat sie
+ * wiedererkannt, sie sind ihr nicht passiert, und die Oberfläche muss das dazusagen.
+ */
+export interface SharedGefuehlsbild {
+  bericht: string | null
+  bestaetigt_at: string | null
+  woerter: { key: string; label: string; familie: string }[]
+  achsen: { key: string; label: string; links: string; rechts: string; wert: number }[]
+  ecke: string | null
+  szenen: { title: string; wirkungen: string[] }[]
+}
+
 export interface SharedCaseBundle {
   case_id: string
   client_display_name: string
@@ -1199,6 +1216,8 @@ export interface SharedCaseBundle {
   artifacts?: SharedCaseArtifact[]
   /** Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon. */
   artifacts_ueberholt?: number
+  /** Das jüngste **bestätigte** Gefühlsbild. Entwürfe gehen nie mit. */
+  gefuehlsbild?: SharedGefuehlsbild | null
   notes: ProfessionalNote | null
   echo_summaries: ProfessionalEchoSummary[]
 }

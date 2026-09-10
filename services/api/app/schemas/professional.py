@@ -17,6 +17,7 @@ ShareElementType = Literal[
     "scales", "reports", "topic_summaries", "person_profile", "self_profile",
     "hypotheses", "test_results",
     "documents", "artifacts",
+    "gefuehlsbild",
 ]
 
 

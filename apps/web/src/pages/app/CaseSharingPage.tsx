@@ -17,8 +17,17 @@ import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen } from '@/lib/einwilligung'
 
-const CATEGORY_ELEMENTS: ShareElementType[] = [
-  'case_info', 'onboarding', 'all_scenes', 'scales',
+/**
+ * Die ankreuzbaren Inhalte — alle bis auf `scene`, das weiter unten einzeln steht.
+ *
+ * **Exportiert, weil hier etwas lautlos schiefgehen kann.** Ein neuer freigebbarer Inhalt
+ * entsteht an vier Stellen: Datenbank, Schema, `SHARE_ELEMENT_LABELS`, diese Liste. Fehlt
+ * er nur hier, gibt es ihn überall — nur ankreuzen kann ihn niemand, und kein Test, kein
+ * Typ und keine Warnung sagt etwas. Genau das war beim Gefühlsbild der Fall.
+ * `tests/freigabe-elemente.test.ts` vergleicht die Liste deshalb mit den Etiketten.
+ */
+export const CATEGORY_ELEMENTS: ShareElementType[] = [
+  'case_info', 'onboarding', 'all_scenes', 'scales', 'gefuehlsbild',
   'reports', 'topic_summaries', 'person_profile', 'self_profile', 'hypotheses', 'test_results',
   'documents', 'artifacts',
 ]

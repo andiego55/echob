@@ -18,14 +18,15 @@ import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
 import Avatar from '@/components/Avatar'
 import {
   IconBook, IconChart, IconChat, IconCheck, IconClipboard, IconDoc,
-  IconFolder, IconLink, IconLock, IconSparkles, IconUsers,
+  IconFolder, IconKompass, IconLink, IconLock, IconSparkles, IconUsers,
 } from '@/components/professional/ProfIcons'
 import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS,
   SCALE_LABELS, SHARE_ELEMENT_LABELS,
 } from '@/types'
 import type {
-  ProfessionalNote, SharedCaseBundle, ScaleKey, GlossaryTerm, NoteTemplate, SessionNote,
+  ProfessionalNote, SharedCaseBundle, SharedGefuehlsbild, ScaleKey, GlossaryTerm,
+  NoteTemplate, SessionNote,
 } from '@/types'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
@@ -640,6 +641,12 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           </Section>
         )}
 
+        {has('gefuehlsbild') && (
+          <Section title="Gefühlsbild" icon={<IconKompass />}>
+            <GefuehlsbildPanel bild={bundle.gefuehlsbild} />
+          </Section>
+        )}
+
         {has('topic_summaries') && bundle.topic_summaries.length > 0 && (
           <Section title="Themendialog-Zusammenfassungen" icon={<IconChat />}>
             <div className="space-y-2">
@@ -1161,6 +1168,131 @@ function SummaryItem({ s, onDelete, deleting, onUpdate, updating }: {
         <MarkdownMessage content={s.summary_text} />
       </div>
     </details>
+  )
+}
+
+/**
+ * Das freigegebene Gefühlsbild.
+ *
+ * **Drei Dinge muss diese Ansicht sagen, sonst richtet sie Schaden an.**
+ *
+ * *Wem es gehört.* Es ist die Aussage der Person über sich selbst, kein Befund und keine
+ * Einschätzung von uns. Wer das verwechselt, hält ihr in der Sitzung ihre eigenen Worte
+ * als Diagnose vor.
+ *
+ * *Wann es entstand.* Ein Gefühlsbild von vor sechs Wochen als „so geht es ihr" zu lesen
+ * wäre falscher als gar keines.
+ *
+ * *Dass die Szenen erfunden sind.* Sie hat sie wiedererkannt, nicht erlebt. Ohne den
+ * Hinweis steht ein Vorfall in der Akte, den es nie gab — der teuerste Fehler, den dieses
+ * Feature machen kann.
+ *
+ * Die Achsen bekommen bewusst **keine Ampel** wie die Skalen: „angenehm 20/100" ist kein
+ * Messwert, der in den roten Bereich läuft, sondern ein Ort zwischen zwei Polen.
+ */
+function GefuehlsbildPanel({ bild }: { bild: SharedGefuehlsbild | null | undefined }) {
+  if (!bild) {
+    return (
+      <p className="text-sm text-brand-muted">
+        Freigegeben — aber noch kein Gefühlsbild bestätigt. Entwürfe werden nie geteilt.
+      </p>
+    )
+  }
+  return (
+    <div className="space-y-4">
+      <p className="rounded-brand bg-brand-bg px-3 py-2 text-xs leading-relaxed text-brand-muted">
+        {bild.bestaetigt_at
+          ? <>Am <strong className="text-navy">{fmtSummaryDate(bild.bestaetigt_at)}</strong> von der Person selbst zusammengestellt und bestätigt. </>
+          : 'Von der Person selbst zusammengestellt und bestätigt. '}
+        Ihre eigene Aussage, keine Einschätzung von uns — und eine Momentaufnahme:
+        Sie kann heute anders empfinden.
+      </p>
+
+      {bild.bericht && (
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-brand-text">{bild.bericht}</p>
+      )}
+
+      {bild.achsen.length > 0 && (
+        <div className="space-y-3.5">
+          {bild.ecke && (
+            <p className="text-xs text-brand-muted">
+              Sie verortet sich im Bereich <strong className="text-accent">{bild.ecke}</strong>.
+            </p>
+          )}
+          {bild.achsen.map(a => {
+            const wert = Math.min(100, Math.max(0, Math.round(a.wert)))
+            return (
+              <div key={a.key}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-xs font-medium text-navy">{a.label}</span>
+                  <span className="shrink-0 text-sm font-bold tabular-nums text-navy">
+                    {wert}<span className="text-[10px] font-normal text-brand-muted">/100</span>
+                  </span>
+                </div>
+                {/* Ein Punkt auf einer Strecke, kein gefuellter Balken: Es geht um einen
+                    Ort zwischen zwei Polen, nicht um eine Menge. */}
+                <div className="relative mt-1.5 h-2.5 rounded-full bg-brand-border/70">
+                  {/* Die Bahn ist um einen halben Punkt eingerueckt, damit er bei 0 und 100
+                      nicht ueber den Rand haengt. */}
+                  <div className="absolute inset-x-2 top-1/2">
+                    <span
+                      className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-accent shadow-sm"
+                      style={{ left: `${wert}%` }}
+                    />
+                  </div>
+                </div>
+                {/* Label und Wert stehen ueber der Bahn statt daneben: Nebeneinander blieb
+                    fuer die Pole so wenig Platz, dass aus „unangenehm" und „angenehm" auf
+                    einem schmalen Bildschirm ein Wort wurde. */}
+                <div className="mt-1 flex justify-between gap-3 text-[0.68rem] text-brand-muted">
+                  <span>{a.links}</span><span className="text-right">{a.rechts}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {bild.woerter.length > 0 && (
+        <div>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-brand-muted">
+            Angetippte Wörter
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {bild.woerter.map(w => (
+              <span key={w.key} className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent" title={w.familie}>
+                {w.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {bild.szenen.length > 0 && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted">
+            Wiedererkannte Szenen
+          </p>
+          <p className="mt-0.5 text-[0.7rem] leading-relaxed text-brand-muted">
+            Erfundene Beispielszenen aus EchoB, in denen sie sich wiedererkannt hat.
+            <strong className="text-navy"> Keine Berichte über Ereignisse</strong> — nichts
+            davon ist ihr so passiert.
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            {bild.szenen.map(s => (
+              <li key={s.title} className="rounded-brand border border-brand-border bg-white px-3 py-2">
+                <span className="text-sm text-navy">„{s.title}“</span>
+                {s.wirkungen.length > 0 && (
+                  <span className="ml-1.5 text-[0.7rem] text-brand-muted">
+                    wirkt: {s.wirkungen.join(', ')}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   )
 }
 

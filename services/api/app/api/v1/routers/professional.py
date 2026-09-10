@@ -117,6 +117,50 @@ def _public_row(row, fields: tuple[str, ...] = ()):
     return d
 
 
+def _gefuehlsbild_fuer_fachperson(bild):
+    """Das jüngste bestätigte Gefühlsbild, auf das beschnitten, was freigegeben wurde.
+
+    **Was bewusst nicht mitgeht: ``eigenes``.** Das ist der Rohtext, den die Person beim
+    Zusammenstellen getippt hat — Material, kein Ergebnis. Gelesen und gebilligt hat sie
+    den fertigen Text, und darin wiegen ihre eigenen Worte am schwersten, sie stehen also
+    drin. Den Zettel davor mitzuschicken hieße etwas zu teilen, das sie in dieser Form nie
+    freigegeben hat.
+
+    **Die Szenen gehen nur als Titel mit**, und die Oberfläche sagt dazu, dass sie erfunden
+    sind. Eine Fachperson, die „Beim Abendessen wurde ich zur Pointe" als Bericht liest,
+    hat einen Vorfall in der Akte, den es nie gab.
+
+    Achsen kommen fertig beschriftet aus dem Katalog statt als nackte Zahl mit einem
+    Wortlaut, den die Oberfläche noch einmal selbst führen müsste.
+    """
+    if not bild:
+        return None
+    from app.services import gefuehlsbild_katalog as gb_katalog
+
+    feld = bild.get("feld") or {}
+    achsen = [
+        {
+            "key": a["key"], "label": a["label"],
+            "links": a["links"], "rechts": a["rechts"],
+            "wert": feld[a["key"]],
+        }
+        for a in (*gb_katalog.FELD_ACHSEN, *gb_katalog.REGLER)
+        if feld.get(a["key"]) is not None
+    ]
+    return {
+        "bericht": bild.get("bericht"),
+        "bestaetigt_at": bild.get("bestaetigt_at"),
+        "woerter": bild.get("woerter_labels") or [],
+        "achsen": achsen,
+        "ecke": bild.get("ecke"),
+        "szenen": [
+            {"title": s["title"], "wirkungen": s.get("wirkungen") or []}
+            for s in (bild.get("szenen_titel") or [])
+            if s.get("title")
+        ],
+    }
+
+
 def _public_profile(row):
     """Fachlich relevante Profilteile: modules + summary + freie Selbstbeschreibung.
     Keine IDs, kein Abo/Billing (plan, trial_started_at, subscription_ends_at)."""
@@ -850,6 +894,8 @@ async def case_detail(
         "documents": [_public_row(d) for d in bundle.documents],
         "artifacts": [_public_row(a) for a in bundle.artifacts],
         "artifacts_ueberholt": bundle.artifacts_ueberholt,
+        # Wie es der Person zuletzt ging - von ihr selbst zusammengestellt und bestaetigt.
+        "gefuehlsbild": _gefuehlsbild_fuer_fachperson(bundle.gefuehlsbild),
         "notes": (
             crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
             if note_row else None

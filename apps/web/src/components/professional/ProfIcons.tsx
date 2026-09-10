@@ -66,3 +66,7 @@ export const IconFolder = ({ className }: P) => (
 export const IconBook = ({ className }: P) => (
   <svg {...attrs(className)}><path d="M12 6.5C9.8 5.1 6.4 5.1 4 6v12c2.4-.9 5.8-.9 8 .5 2.2-1.4 5.6-1.4 8-.5V6c-2.4-.9-5.8-.9-8 .5Z" /><path d="M12 6.5V19" /></svg>
 )
+/** Kompass — fuer das Gefuehlsbild: ein Punkt in einem Feld, keine Messung. */
+export const IconKompass = ({ className }: P) => (
+  <svg {...attrs(className)}><circle cx="12" cy="12" r="8.5" /><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z" /></svg>
+)
