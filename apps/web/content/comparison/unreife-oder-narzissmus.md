@@ -19,7 +19,7 @@ safety_tags: []
 links:
   parent: emotionale-unreife
   glossary: [mentalisierung, egozentrik, narzisstische-zufuhr, hoovering, idealisierung-abwertung]
-  related: [narzissmus-in-beziehungen, verdeckter-narzissmus, narzisstische-spielarten]
+  related: [narzissmus-in-beziehungen, verdeckter-narzissmus, narzisstische-spielarten, borderline-oder-narzissmus]
 faq:
   - question: "Ist jeder Narzisst emotional unreif?"
     answer: "Im Prinzip ja – narzisstische Muster setzen voraus, dass die Fähigkeit fehlt, andere als eigenständige Menschen mit eigenem Innenleben zu behandeln. Umgekehrt gilt es nicht: Die meisten emotional unreifen Menschen sind nicht narzisstisch. Emotionale Unreife ist der größere Kreis, narzisstische Muster sind ein kleinerer Kreis darin."

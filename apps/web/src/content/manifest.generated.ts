@@ -269,6 +269,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "chronische-leere",
+    "title": "Chronische Leere – kein Gefühl, sondern dessen Abwesenheit",
+    "description": "Ein anhaltendes Gefühl von Leere, unabhängig davon, ob gerade etwas Schönes passiert. Viele Betroffene nennen es das Schlimmste – und es erklärt einiges, was von außen unlogisch aussieht.",
+    "cluster": "borderline",
+    "search_intent": "chronische leere borderline innere leere gefuehl bedeutung",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du dieses Gefühl von Leere, das auch dann bleibt, wenn eigentlich alles in Ordnung ist? Magst du beschreiben, wann es am stärksten ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "chronische-leere",
+      "borderline"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "emotionale-dysregulation",
+        "identitaetsdiffusion",
+        "favorite-person"
+      ],
+      "related": [
+        "borderline-von-innen",
+        "borderline-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das dasselbe wie Depression?",
+        "answer": "Nein, auch wenn beides zusammen vorkommen kann. Eine depressive Episode ist ein Zustand mit Anfang und Ende, in dem meist auch Antrieb und Schlaf betroffen sind. Die Leere hier ist eher ein Grundrauschen, das unabhängig von der Stimmung bestehen bleibt – auch an guten Tagen."
+      },
+      {
+        "question": "Warum suchen manche Menschen dann Streit oder Risiko?",
+        "answer": "Weil Intensität die Leere übertönt. Etwas zu spüren ist besser, als nichts zu spüren. Das ist keine Charakterfrage, sondern eine Rechnung, die unter diesen Bedingungen aufgeht – und einer der Gründe, warum sich manche Beziehungen im Konflikt lebendiger anfühlen als im Frieden."
+      }
+    ],
+    "url": "/glossar/chronische-leere"
+  },
+  {
+    "type": "glossary",
     "slug": "coercive-control",
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose.",
@@ -581,6 +633,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "emotionale-dysregulation",
+    "title": "Emotionale Dysregulation – schneller hoch, höher, langsamer zurück",
+    "description": "Nicht die Art der Gefühle unterscheidet sich, sondern ihr Verlauf: Sie kommen schneller, steigen höher und brauchen länger, bis sie abklingen. Was das im Alltag bedeutet – und wo trotzdem Spielraum ist.",
+    "cluster": "borderline",
+    "search_intent": "emotionale dysregulation bedeutung borderline gefuehle regulieren",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation anschauen, in der ein Gefühl schneller da war, als du denken konntest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "emotionale-dysregulation",
+      "borderline",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "chronische-leere",
+        "impulsivitaet",
+        "emotionale-ueberflutung"
+      ],
+      "related": [
+        "emotionsregulation",
+        "borderline-behandlung",
+        "co-regulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Dysregulation dasselbe wie Übertreiben?",
+        "answer": "Nein. Übertreiben unterstellt eine Wahl. Gemeint ist ein Verlauf, den man nicht willentlich steuert: Anstieg, Höhe und Dauer der Erregung. Beeinflussbar ist etwas anderes – was man in diesem Zustand tut, und was danach passiert."
+      },
+      {
+        "question": "Kann man das trainieren?",
+        "answer": "Den Abstand zwischen Reiz und Handlung ja, und genau darauf zielen Fertigkeitentrainings. Die Welle selbst verschwindet dadurch nicht sofort, aber sie wird über Zeit flacher, weil weniger Eskalationen weniger Nachbeben erzeugen."
+      }
+    ],
+    "url": "/glossar/emotionale-dysregulation"
+  },
+  {
+    "type": "glossary",
     "slug": "emotionale-einsamkeit",
     "title": "Emotionale Einsamkeit – allein sein, während jemand da ist",
     "description": "Emotionale Einsamkeit ist nicht das Alleinsein, sondern sein Gegenteil: das Gefühl, in Gesellschaft nicht vorzukommen. Woran du sie erkennst und warum sie so schwer zu erklären ist.",
@@ -854,6 +958,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/extinktionsburst"
+  },
+  {
+    "type": "glossary",
+    "slug": "favorite-person",
+    "title": "Favorite Person – der eine Mensch, an dem alles hängt",
+    "description": "Ein Begriff aus der Betroffenen-Community, nicht aus dem Lehrbuch: der Mensch, dessen Stimmung den eigenen Tag bestimmt. Warum das ein ehrliches Wort ist – und zugleich eine Warnung.",
+    "cluster": "borderline",
+    "search_intent": "favorite person borderline fp bedeutung erklaerung",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Gibt es einen Menschen, dessen Antwortzeiten deinen Tag bestimmen? Magst du anschauen, was das mit euch beiden macht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "favorite-person",
+      "verlassenheitsangst",
+      "borderline"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "chronische-leere",
+        "identitaetsdiffusion",
+        "spaltung"
+      ],
+      "related": [
+        "borderline-von-innen",
+        "beziehung-mit-borderline",
+        "verlustangst"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Favorite Person ein Fachbegriff?",
+        "answer": "Nein. Der Ausdruck stammt aus Foren und sozialen Netzwerken und steht in keinem Diagnosesystem. Er beschreibt trotzdem etwas Reales und wird deshalb hier erklärt – mit dem Hinweis, dass er weder eine Diagnose noch eine Rollenzuweisung ist."
+      },
+      {
+        "question": "Ist es für die andere Person ein Kompliment?",
+        "answer": "Es fühlt sich anfangs oft so an: gebraucht werden, wichtig sein, der eine Mensch sein, der es versteht. Auf Dauer ist es eine Last, die niemand tragen kann – und wenn sie zusammenbricht, tritt genau das ein, wovor die Angst gewarnt hat. Die Aufgabe ist deshalb nicht, die Bindung zu kappen, sondern die Last auf mehrere Schultern zu verteilen."
+      }
+    ],
+    "url": "/glossar/favorite-person"
   },
   {
     "type": "glossary",
@@ -1337,6 +1493,110 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/idealisierung-abwertung"
+  },
+  {
+    "type": "glossary",
+    "slug": "identitaetsdiffusion",
+    "title": "Identitätsdiffusion – wer bin ich, wenn du nicht da bist",
+    "description": "Ein Selbstbild, das nicht trägt: Werte, Ziele, Vorlieben und sogar das Gefühl, wer man ist, verändern sich mit den Menschen, mit denen man zusammen ist. Kein Mangel an Charakter, sondern an Kontinuität.",
+    "cluster": "borderline",
+    "search_intent": "identitaetsdiffusion borderline selbstbild instabil wer bin ich",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, was von dir übrig bleibt, wenn du gerade mit niemandem in Kontakt bist – und wie sich das anfühlt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "identitaetsdiffusion",
+      "chronische-leere",
+      "selbstverlust"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "chronische-leere",
+        "favorite-person",
+        "spaltung"
+      ],
+      "related": [
+        "borderline-von-innen",
+        "sich-selbst-verlieren",
+        "selbstliebe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das nicht bei allen so, dass man sich anpasst?",
+        "answer": "Anpassung kennt jeder. Der Unterschied liegt darin, ob darunter etwas gleich bleibt. Wer sich anpasst, bleibt trotzdem derselbe Mensch mit denselben Überzeugungen. Hier verändert sich das Innere mit, und danach fehlt der Bezugspunkt, um zu sagen, was man eigentlich selbst wollte."
+      },
+      {
+        "question": "Was hilft dagegen?",
+        "answer": "Kontinuität im Kleinen. Dinge, die unabhängig von Menschen bestehen bleiben: eine Tätigkeit, ein Ort, eine Gewohnheit, ein Notizbuch, in dem die eigenen Sätze stehen. Das klingt bescheiden und ist genau der Stoff, aus dem Selbstbild über Zeit entsteht."
+      }
+    ],
+    "url": "/glossar/identitaetsdiffusion"
+  },
+  {
+    "type": "glossary",
+    "slug": "impulsivitaet",
+    "title": "Impulsivität – der Abstand zwischen Impuls und Handlung",
+    "description": "Nicht die Stärke des Impulses entscheidet, sondern die Lücke dahinter. Wo sie klein ist, wird aus einem Gedanken sofort eine Handlung – mit Folgen, die dieselbe Person kurz darauf selbst nicht versteht.",
+    "cluster": "borderline",
+    "search_intent": "impulsivitaet bedeutung borderline impulskontrolle beziehung",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der du etwas getan hast, das du eine Stunde später nicht mehr verstanden hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "impulsivitaet",
+      "emotionale-dysregulation",
+      "borderline"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "emotionale-dysregulation",
+        "spaltung",
+        "chronische-leere"
+      ],
+      "related": [
+        "borderline-oder-bipolar",
+        "borderline-behandlung",
+        "emotionen-regulieren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Impulsivität immer schädlich?",
+        "answer": "Nein. Dieselbe Eigenschaft steckt hinter Spontaneität, Mut und schnellen Entscheidungen. Zum Problem wird sie, wenn sie in Bereiche greift, die schwer zurückzuholen sind – Geld, Sicherheit, Beziehungen, Gesundheit."
+      },
+      {
+        "question": "Was vergrößert die Lücke?",
+        "answer": "Alles, was Zeit einbaut, ohne die Spannung wegdiskutieren zu wollen: den Raum verlassen, den Körper über kalte Reize oder Bewegung herunterfahren, feste Regeln für heikle Bereiche, die schon vorher gelten. Vorsätze allein wirken in dem Moment nicht, in dem sie gebraucht werden."
+      }
+    ],
+    "url": "/glossar/impulsivitaet"
   },
   {
     "type": "glossary",
@@ -2712,6 +2972,64 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "selbstverletzung",
+    "title": "Selbstverletzung – was sie meistens ist und was sie selten ist",
+    "description": "In den allermeisten Fällen ist sie ein Versuch, unerträgliche Anspannung zu beenden – kein Suizidversuch und fast nie ein Druckmittel. Was Angehörige wissen sollten und was hilft.",
+    "cluster": "borderline",
+    "search_intent": "selbstverletzung borderline angehoerige was tun reagieren",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Wenn du selbst betroffen bist oder jemanden begleitest: Magst du beschreiben, was in den Stunden davor passiert – und was danach anders ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "selbstverletzung",
+      "emotionale-dysregulation",
+      "scham"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "emotionale-dysregulation",
+        "chronische-leere",
+        "scham"
+      ],
+      "related": [
+        "borderline-behandlung",
+        "borderline-von-innen",
+        "krisentelefone"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Selbstverletzung ein Suizidversuch?",
+        "answer": "In aller Regel nicht, und die Unterscheidung ist wichtig. Meistens ist sie der Versuch, einen unerträglichen Zustand zu beenden – Anspannung zu senken oder aus innerer Taubheit herauszukommen. Beides kann nebeneinander vorkommen, und das erhöhte Risiko ernst zu nehmen ist trotzdem richtig. Im Zweifel gilt: direkt nachfragen, ohne Umschreibung."
+      },
+      {
+        "question": "Ist es Erpressung, wenn jemand davon erzählt?",
+        "answer": "Fast nie. Meistens ist es das Gegenteil – ein Versuch, etwas mitzuteilen, das sonst nicht sagbar ist. Es gibt Fälle, in denen Selbstverletzung als Druckmittel eingesetzt wird, und dann ist das eine Grenzüberschreitung, die benannt gehört. Der Unterschied lässt sich nicht mitten in einer Krise klären, sondern nur über Zeit und mit fachlicher Begleitung."
+      },
+      {
+        "question": "Wie reagiere ich als Angehöriger?",
+        "answer": "Ruhig, ohne Schock und ohne Strafe. Versorgung sicherstellen, wenn nötig medizinische Hilfe holen. Nicht verhandeln, nicht drohen, keine Versprechen abnehmen, die im nächsten Zustand nicht halten. Und: Das ist nichts, was du allein tragen sollst – hol dir selbst Unterstützung."
+      }
+    ],
+    "url": "/glossar/selbstverletzung"
+  },
+  {
+    "type": "glossary",
     "slug": "selbstverurteilung",
     "title": "Selbstverurteilung – wenn aus einem Fehler ein Urteil wird",
     "description": "Der Unterschied zwischen ich habe etwas Schlechtes getan und ich bin schlecht – und warum die zweite Variante Veränderung nicht befeuert, sondern verhindert.",
@@ -2779,6 +3097,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/situative-gewalt"
+  },
+  {
+    "type": "glossary",
+    "slug": "spaltung",
+    "title": "Spaltung – wenn nur noch eine Wahrheit in den Raum passt",
+    "description": "Unter starker Anspannung bricht die Fähigkeit weg, Gutes und Schlechtes an einem Menschen gleichzeitig zu halten. Übrig bleibt eines von beidem – und es füllt alles aus.",
+    "cluster": "borderline",
+    "search_intent": "spaltung borderline splitting schwarz weiss denken erklaerung",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du den Moment, in dem jemand für dich plötzlich nur noch schlecht war – oder du für jemanden? Magst du dir so eine Situation ansehen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "spaltung",
+      "borderline",
+      "idealisierung-abwertung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "idealisierung-abwertung",
+        "emotionale-dysregulation",
+        "mentalisierung"
+      ],
+      "related": [
+        "borderline-in-beziehungen",
+        "borderline-oder-narzissmus"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Spaltung absichtlich?",
+        "answer": "Nein. Sie ist ein Zusammenbruch der Verarbeitung, kein Zug im Spiel. Wer spaltet, erlebt in dem Moment wirklich, dass die andere Person nur noch die eine Seite hat. Das ist genau der Grund, warum Argumente nichts ausrichten: Es fehlt nicht die Information, es fehlt die Fähigkeit, zwei Dinge gleichzeitig zu halten."
+      },
+      {
+        "question": "Wie reagiere ich, wenn jemand gerade spaltet?",
+        "answer": "Nicht mit Beweisen. Wirksamer ist, das Gefühl anzuerkennen, ohne der Behauptung zuzustimmen, und ruhig dazubleiben. Der Zustand geht vorüber, meist innerhalb von Stunden. Was in dieser Zeit gesagt wurde, lässt sich danach besprechen – vorher nicht."
+      }
+    ],
+    "url": "/glossar/spaltung"
   },
   {
     "type": "glossary",
@@ -3051,6 +3420,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/uebergriffigkeit"
+  },
+  {
+    "type": "glossary",
+    "slug": "validierung",
+    "title": "Validierung – bestätigen, was gefühlt wird, nicht was behauptet wird",
+    "description": "Die wirksamste Bewegung neben starken Gefühlen und die am häufigsten missverstandene: Validierung ist keine Zustimmung. Sie erkennt an, dass ein Gefühl da ist und Gründe hat – ohne der Deutung recht zu geben.",
+    "cluster": "borderline",
+    "search_intent": "validierung bedeutung dbt beispiel partner beruhigen borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der du erklärt hast und nichts angekommen ist – und ausprobieren, wie derselbe Moment mit einem anderen Satz gelaufen wäre?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "validierung",
+      "emotionale-dysregulation"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "spaltung",
+        "emotionale-dysregulation",
+        "aktives-zuhoeren"
+      ],
+      "related": [
+        "beziehung-mit-borderline",
+        "co-regulation",
+        "aktives-zuhoeren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Gebe ich damit nicht einer falschen Behauptung recht?",
+        "answer": "Nein, und darin liegt der ganze Trick. Validiert wird das Gefühl, nicht die Deutung. Ich sehe, dass du gerade sicher bist, dass ich gehen will, und das muss sich furchtbar anfühlen ist keine Zustimmung zu der Behauptung, du wolltest gehen. Der eigene Standpunkt kommt danach, ruhig und ohne Gegenrede."
+      },
+      {
+        "question": "Was ist der häufigste Fehler dabei?",
+        "answer": "Das Wort aber. Es hebt alles auf, was davor stand. Ich verstehe dich, aber du übertreibst ist keine Validierung, sondern eine höflich verpackte Zurückweisung. Ersatz ist ein schlichtes und – oder ein Punkt und ein neuer Satz."
+      }
+    ],
+    "url": "/glossar/validierung"
   },
   {
     "type": "glossary",
@@ -3340,6 +3760,135 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/hilfe/angst-verlassen-zu-werden"
+  },
+  {
+    "type": "problem",
+    "slug": "ich-glaube-ich-habe-borderline",
+    "title": "Ich glaube, ich habe Borderline – was jetzt sinnvoll ist",
+    "description": "Wenn du dich in den Beschreibungen wiedererkennst: warum Selbsterkennen kein Befund ist, was eine Abklärung tatsächlich bringt, und was du tun kannst, bevor du einen Termin hast.",
+    "cluster": "borderline",
+    "search_intent": "habe ich borderline selbsttest abklaerung diagnose bekommen was tun",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation der letzten Wochen anschauen, in der du dich selbst nicht wiedererkannt hast – und beschreiben, wie es dir davor und danach ging?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "chronische-leere",
+      "identitaetsdiffusion",
+      "scham"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "chronische-leere",
+        "identitaetsdiffusion",
+        "emotionale-dysregulation",
+        "scham"
+      ],
+      "related": [
+        "borderline-von-innen",
+        "borderline-behandlung",
+        "professionelle-hilfe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Kann ich mich selbst diagnostizieren?",
+        "answer": "Nein, und das ist hier keine Formalie. Die Merkmale überschneiden sich stark mit anderen Zuständen – mit Traumafolgen, mit ADHS, mit Depressionen, mit dem, was eine sehr belastende Beziehung aus einem Menschen macht. Sich selbst zuzuordnen führt oft zu einem Etikett, das die falsche Behandlung nach sich zieht. Wiedererkennen ist ein guter Grund für eine Abklärung, kein Ergebnis."
+      },
+      {
+        "question": "Ist eine Diagnose nicht eher schädlich?",
+        "answer": "Sie hat zwei Seiten. Sie stigmatisiert – auch im Gesundheitswesen, das ist gut dokumentiert. Und sie öffnet den Zugang zu Behandlungen, die für genau dieses Muster entwickelt wurden und die wirken. Wer den Zugang braucht, für den überwiegt in aller Regel die zweite Seite."
+      },
+      {
+        "question": "Was mache ich, solange ich keinen Therapieplatz habe?",
+        "answer": "Drei Dinge mit Wirkung: Anspannung mitschreiben, um den eigenen Verlauf kennenzulernen. Einen Krisenplan aufschreiben, solange es dir gut geht – auf Papier, für den Moment, in dem klares Denken nicht verfügbar ist. Und Fertigkeiten üben, die den Körper schnell herunterfahren. Nichts davon ersetzt Therapie, alles davon vergrößert den Abstand zwischen Reiz und Reaktion."
+      },
+      {
+        "question": "Wird das je aufhören?",
+        "answer": "Die Verlaufsdaten sind an dieser Stelle deutlich freundlicher als der Ruf der Diagnose. In Längsschnittstudien über zehn Jahre erfüllt die große Mehrheit der behandelten Menschen die Kriterien irgendwann nicht mehr. Am schnellsten gehen die auffälligen Verhaltensweisen zurück, am längsten halten sich Leeregefühl und Beziehungsschwierigkeiten. Es ist ein Zustand, kein Wesen."
+      }
+    ],
+    "url": "/hilfe/ich-glaube-ich-habe-borderline"
+  },
+  {
+    "type": "problem",
+    "slug": "ist-mein-partner-borderline",
+    "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
+    "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung.",
+    "cluster": "borderline",
+    "search_intent": "ist mein partner borderline test anzeichen freundin borderlinerin",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Statt nach einem Namen zu suchen: Magst du eine konkrete Situation der letzten Wochen beschreiben, die dich nicht loslässt – und wie es dir danach ging?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "borderline",
+      "hypervigilanz",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "spaltung",
+        "hypervigilanz",
+        "validierung"
+      ],
+      "related": [
+        "wenn-die-diagnose-im-raum-steht",
+        "beziehung-mit-borderline",
+        "sich-selbst-verlieren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Gibt es einen Test, mit dem ich das prüfen kann?",
+        "answer": "Für jemand anderen nicht, und das ist keine Vorsicht, sondern ein prinzipielles Problem. Die Kriterien beziehen sich zu großen Teilen auf inneres Erleben – Leeregefühl, Selbstbild, Angst. Dazu hast du keinen Zugang. Was du beobachtest, ist Verhalten, und dasselbe Verhalten kann sehr verschiedene Ursachen haben, von Erschöpfung über Trauma bis hin zu der schlichten Möglichkeit, dass die Beziehung nicht guttut."
+      },
+      {
+        "question": "Aber alles passt doch genau?",
+        "answer": "Dieses Gefühl entsteht zuverlässig, und zwar auch dann, wenn die Zuordnung falsch ist. Beschreibungen von Beziehungsmustern sind so formuliert, dass sich viele Menschen darin wiederfinden – und wer mit einer Vermutung liest, findet Bestätigung. Das ist kein Zeichen dafür, dass du dich irrst, sondern nur dafür, dass Wiedererkennen kein Beweis ist."
+      },
+      {
+        "question": "Was mache ich stattdessen?",
+        "answer": "Beschreibe dein eigenes Erleben so genau wie möglich: Was passiert, wie oft, was macht es mit dir, und was ist danach anders. Diese Beschreibung ist belastbarer als jede Zuordnung, sie ist nicht angreifbar, und sie führt zu den Fragen, die tatsächlich zu einer Entscheidung führen."
+      }
+    ],
+    "url": "/hilfe/ist-mein-partner-borderline"
   },
   {
     "type": "problem",
@@ -4180,6 +4729,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-lange-shirt-im-sommer",
+    "title": "Das lange Shirt im Sommer",
+    "description": "Eine Szene über den Moment, in dem jemand etwas bemerkt, das nicht besprochen werden soll – und über die Frage, wie man fragt. Ich-Perspektive, fiktiv.",
+    "cluster": "borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tobias Sicht",
+    "pull_quote": "Ich habe drei Tage überlegt, wie man so etwas fragt, ohne dass es klingt wie eine Anklage. Am Ende habe ich einfach gefragt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Gibt es etwas, das du bemerkt hast und nicht ansprichst? Magst du anschauen, was dich zurückhält?"
+    },
+    "scene_tags": [
+      "selbstverletzung",
+      "scham",
+      "hypervigilanz"
+    ],
+    "url": "/szenen/das-lange-shirt-im-sommer"
+  },
+  {
+    "type": "scene",
     "slug": "das-nein-das-ich-zurueckgenommen-habe",
     "title": "Das Nein, das ich zurückgenommen habe",
     "description": "Eine fiktive Szene: Sie hat abgesagt, zum ersten Mal seit Jahren. Zwei Stunden später ruft sie zurück und sagt zu. Über die Schwerkraft, die ein Nein zurückzieht.",
@@ -4654,6 +5229,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/der-satz-den-ich-zu-marie-gesagt-haette"
+  },
+  {
+    "type": "scene",
+    "slug": "der-schalter",
+    "title": "Der Schalter",
+    "description": "Eine Szene über den Moment, in dem aus dem wichtigsten Menschen der Feind wird – ohne Ereignis dazwischen. Ich-Perspektive, fiktiv, keine Diagnose.",
+    "cluster": "borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Bens Sicht",
+    "pull_quote": "Zwischen dem einen Satz und dem nächsten liegt nichts. Kein Streit, kein Vorfall. Nur ein Umschalten, und ich bin ein anderer Mensch geworden.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diesen Umschwung von einem Moment zum nächsten? Magst du beschreiben, was du dabei mit dir selbst machst?"
+    },
+    "scene_tags": [
+      "spaltung",
+      "idealisierung-abwertung",
+      "borderline",
+      "wahrnehmungszweifel"
+    ],
+    "url": "/szenen/der-schalter"
   },
   {
     "type": "scene",
@@ -5968,6 +6570,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-gehe-bevor-du-gehst",
+    "title": "Ich gehe, bevor du gehst",
+    "description": "Eine Szene über den Moment, in dem jemand die Beziehung beendet, um dem Verlassenwerden zuvorzukommen. Ich-Perspektive, fiktiv, keine Diagnose.",
+    "cluster": "borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Noras Sicht",
+    "pull_quote": "Ich habe es gesagt, bevor er es sagen konnte. Danach war ich nicht erleichtert. Ich war nur schneller gewesen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du den Impuls, etwas selbst zu beenden, bevor es dir genommen wird? Magst du anschauen, was direkt davor passiert ist?"
+    },
+    "scene_tags": [
+      "verlassenheitsangst",
+      "impulsivitaet",
+      "spaltung",
+      "borderline"
+    ],
+    "url": "/szenen/ich-gehe-bevor-du-gehst"
+  },
+  {
+    "type": "scene",
     "slug": "ich-hab-mich-geaendert",
     "title": "Ich hab mich geändert",
     "description": "Eine Szene über Hoovering – die Nachricht Wochen nach der Trennung, in der plötzlich alles anders sein soll. Aus der Ich-Perspektive, fiktiv.",
@@ -6525,6 +7154,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/ich-wusste-es-bevor-sie-anrief"
+  },
+  {
+    "type": "scene",
+    "slug": "ihr-lieblingsmensch",
+    "title": "Ihr Lieblingsmensch",
+    "description": "Eine Szene darüber, wie es sich anfühlt, für einen anderen Menschen der Fixpunkt zu sein – anfangs schmeichelhaft, später wie ein Amt. Ich-Perspektive, fiktiv.",
+    "cluster": "borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jonas Sicht",
+    "pull_quote": "Es hat mit einem Kompliment angefangen. Du bist der Einzige, der mich versteht. Ein Jahr später ist daraus ein Dienstplan geworden.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, für jemanden unentbehrlich zu sein? Magst du anschauen, wann daraus eine Last geworden ist?"
+    },
+    "scene_tags": [
+      "favorite-person",
+      "hypervigilanz",
+      "erschoepfung",
+      "verlassenheitsangst"
+    ],
+    "url": "/szenen/ihr-lieblingsmensch"
   },
   {
     "type": "scene",
@@ -7617,6 +8273,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "sie-ist-zurueckgekommen",
+    "title": "Sie ist zurückgekommen",
+    "description": "Eine Szene über den Morgen nach einer Eskalation – und über den einen Satz, der etwas verändert, weil er nicht erklärt, sondern zurücknimmt. Ich-Perspektive, fiktiv.",
+    "cluster": "borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Davids Sicht",
+    "pull_quote": "Sie hat nicht erklärt, warum sie es gesagt hat. Sie hat gesagt, dass es nicht wahr war. Das ist ein Unterschied, den ich vorher nicht kannte.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, wie bei euch die Zeit nach einem Bruch aussieht – und was ein Zurückkommen für dich glaubwürdig machen würde?"
+    },
+    "scene_tags": [
+      "validierung",
+      "reparaturversuch",
+      "borderline",
+      "spaltung"
+    ],
+    "url": "/szenen/sie-ist-zurueckgekommen"
+  },
+  {
+    "type": "scene",
     "slug": "sie-stand-in-der-wohnung",
     "title": "Sie stand in der Wohnung",
     "description": "Eine fiktive Szene: Er hatte gesagt, sie soll nicht kommen. Als er aus dem Bad kommt, steht sie im Flur. Über eine Grenze, bei der nichts passiert ist – und die trotzdem etwas verändert hat.",
@@ -7839,6 +8522,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "klarheit"
     ],
     "url": "/szenen/unter-der-wut"
+  },
+  {
+    "type": "scene",
+    "slug": "vierzig-entwuerfe",
+    "title": "Vierzig Entwürfe",
+    "description": "Eine Szene über die Stunden zwischen einer gelesenen Nachricht und der Antwort – und darüber, wie viel Arbeit es ist, normal zu klingen. Ich-Perspektive, fiktiv.",
+    "cluster": "borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Elifs Sicht",
+    "pull_quote": "Am Ende habe ich geschrieben: Alles gut, bis morgen. Vier Wörter. Zwei Stunden.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das, eine Nachricht immer wieder umzuschreiben, damit sie nicht zu viel verrät? Magst du anschauen, wovor du dich dabei schützt?"
+    },
+    "scene_tags": [
+      "verlassenheitsangst",
+      "favorite-person",
+      "chronische-leere",
+      "scham"
+    ],
+    "url": "/szenen/vierzig-entwuerfe"
   },
   {
     "type": "scene",
@@ -8092,6 +8802,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/wenn-hausarbeit-liebe-beweisen-soll"
+  },
+  {
+    "type": "scene",
+    "slug": "wer-bin-ich-wenn-du-schweigst",
+    "title": "Wer bin ich, wenn du schweigst",
+    "description": "Eine Szene über ein Wochenende allein und die Frage, was von einem Menschen übrig bleibt, wenn niemand hinsieht. Ich-Perspektive, fiktiv.",
+    "cluster": "borderline",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Hannas Sicht",
+    "pull_quote": "Ich habe zwei Tage allein verbracht und danach nicht gewusst, was ich in dieser Zeit eigentlich gewollt habe. Nicht gemacht. Gewollt.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie es dir geht, wenn niemand da ist – und was dir dabei über dich selbst auffällt?"
+    },
+    "scene_tags": [
+      "identitaetsdiffusion",
+      "chronische-leere",
+      "borderline"
+    ],
+    "url": "/szenen/wer-bin-ich-wenn-du-schweigst"
   },
   {
     "type": "scene",
@@ -8354,7 +9090,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "slug": "zwischen-himmel-und-abgrund",
     "title": "Zwischen Himmel und Abgrund",
     "description": "Eine Szene über intensive Beziehungsdynamik – Idealisierung, Angst vorm Verlassenwerden und plötzliche Kälte, an einem einzigen Tag. Ich-Perspektive, fiktiv, keine Diagnose.",
-    "cluster": "bindung",
+    "cluster": "borderline",
     "updated": "2026-07-18",
     "author": {
       "name": "EchoB-Redaktion"
@@ -8479,6 +9215,76 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/beobachtung-gefuehl"
+  },
+  {
+    "type": "topic",
+    "slug": "beziehung-mit-borderline",
+    "title": "In Beziehung bleiben, ohne sich zu verlieren",
+    "description": "Wie man neben starken Gefühlen stehen kann, ohne sie zu bestätigen oder wegzuerklären: Validierung statt Diskussion, Grenzen, die nicht wie Verlassen klingen – und der ehrliche Punkt, an dem es keine Beziehungsfrage mehr ist.",
+    "cluster": "borderline",
+    "search_intent": "umgang mit borderline partner beziehung grenzen setzen validierung",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation anschauen, in der du alles erklärt hast und trotzdem nichts angekommen ist – und überlegen, was du in dem Moment gebraucht hättest?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "validierung",
+      "verlassenheitsangst",
+      "hypervigilanz",
+      "erschoepfung"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "validierung",
+        "spaltung",
+        "hypervigilanz",
+        "intermittierende-verstaerkung"
+      ],
+      "related": [
+        "wenn-die-grenze-steht",
+        "sich-selbst-verlieren",
+        "co-regulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie setze ich eine Grenze, ohne dass es wie Verlassen wirkt?",
+        "answer": "Indem du die Grenze und die Rückkehr in denselben Satz packst. Nicht nur ich gehe jetzt raus, sondern ich gehe jetzt für eine Stunde raus und bin um acht wieder da. Der zweite Teil ist der eigentliche. Eine Grenze allein wird in diesem Zustand als Abbruch gehört, eine Grenze mit angekündigter Rückkehr als Pause – und danach musst du wirklich um acht da sein, sonst ist es das letzte Mal, dass der Satz gewirkt hat."
+      },
+      {
+        "question": "Soll ich im Streit nachgeben, damit es aufhört?",
+        "answer": "Kurzfristig hilft es, langfristig macht es alles schlimmer. Wenn Nachgeben immer erst auf dem Höhepunkt kommt, lernt das System, dass der Höhepunkt der Weg ist. Das ist keine Absicht auf der anderen Seite, sondern der bekannteste Lernmechanismus überhaupt. Besser ist, früh und ruhig entgegenzukommen – und auf dem Höhepunkt nichts Neues zuzugestehen."
+      },
+      {
+        "question": "Ich bin nur noch erschöpft. Ist das schon Mitgefühlsmüdigkeit?",
+        "answer": "Wahrscheinlich eher Daueralarm. Wer über Monate darauf achtet, wie die Stimmung im Raum steht, arbeitet permanent im Hintergrund. Typische Zeichen: Du liest Nachrichten mehrfach, bevor du sie abschickst, du planst deine Woche nach der zu erwartenden Reaktion, du merkst erst an körperlichen Anzeichen, dass es dir schlecht geht. Das ist ein Zustand, der behandelt gehört – deiner, nicht ihrer."
+      },
+      {
+        "question": "Ist meine Beziehung Missbrauch oder Krankheit?",
+        "answer": "Diese Unterscheidung lässt sich nicht am Etikett treffen, sondern am Verhalten. Entscheidend ist, was zwischen den Krisen passiert: Gibt es Reparatur, Verantwortungsübernahme, Interesse an deinem Erleben? Dann ist es schwer, aber gemeinsam. Wird stattdessen dauerhaft kontrolliert, isoliert, gedroht oder körperlich zugegriffen, ist es unabhängig von jeder Diagnose Gewalt – und dann gelten andere Regeln als Geduld."
+      }
+    ],
+    "url": "/wissen/beziehung-mit-borderline"
   },
   {
     "type": "topic",
@@ -8694,6 +9500,339 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/blinde-flecken"
+  },
+  {
+    "type": "topic",
+    "slug": "borderline-behandlung",
+    "title": "Behandlung und Verlauf: was wirklich hilft",
+    "description": "Vier Verfahren sind gut untersucht, und alle greifen an derselben Stelle an. Dazu die Nachricht, die in kaum einem Ratgeber steht: Der Verlauf ist deutlich besser als der Ruf – und was das für Angehörige bedeutet.",
+    "cluster": "borderline",
+    "search_intent": "borderline therapie dbt schematherapie behandlung heilbar verlauf",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Behandlungswege gelesen. Magst du überlegen, was dich bisher davon abgehalten hat, dir Unterstützung zu suchen – oder was du von einer Behandlung erwarten würdest?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "validierung",
+      "emotionale-dysregulation"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "emotionale-dysregulation",
+        "validierung",
+        "mentalisierung",
+        "schema"
+      ],
+      "related": [
+        "professionelle-hilfe",
+        "paartherapie-finden",
+        "borderline-von-innen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Borderline heilbar?",
+        "answer": "Heilbar ist ein Wort aus der Körpermedizin und passt schlecht. Was die Daten zeigen: In Längsschnittstudien über zehn Jahre und länger erfüllt die große Mehrheit der behandelten Menschen die diagnostischen Kriterien irgendwann nicht mehr, und diese Verbesserungen halten überwiegend an. Was länger bleibt, sind das Gefühl innerer Leere und Schwierigkeiten in nahen Beziehungen. Es ist also ein Zustand mit gutem Verlauf, kein lebenslanges Urteil."
+      },
+      {
+        "question": "Welche Therapie ist die beste?",
+        "answer": "Es gibt nicht die eine. Vier Verfahren sind gut untersucht: DBT, Mentalisierungsbasierte Therapie, Schematherapie und die übertragungsfokussierte Psychotherapie. In direkten Vergleichen nehmen sich die Ergebnisse wenig. Wichtiger als die Marke sind drei Dinge: dass das Verfahren für dieses Muster gemacht ist, dass es eine klare Struktur samt Krisenplan hat, und dass die Beziehung zur Behandelnden trägt."
+      },
+      {
+        "question": "Helfen Medikamente?",
+        "answer": "Kein Medikament behandelt das Muster selbst – das ist der Stand der Leitlinien und wird oft missverstanden. Medikamente können bei begleitenden Beschwerden sinnvoll sein, etwa bei einer Depression oder starken Schlafstörungen, und sie können in Krisen vorübergehend eine Rolle spielen. Als Dauerlösung ersetzen sie die Psychotherapie nicht."
+      },
+      {
+        "question": "Was kann ich als Angehöriger tun, während wir auf einen Platz warten?",
+        "answer": "Zwei Dinge, die messbar etwas bringen: Verlässlichkeit im Kleinen – angekündigte Rückkehr wirklich einhalten – und eigene Unterstützung suchen, statt zu warten, bis du ausgebrannt bist. Für Angehörige gibt es eigene Kurse und Gruppen, teils an denselben Kliniken. Was nicht hilft, ist die Rolle der Ersatztherapeutin zu übernehmen."
+      }
+    ],
+    "url": "/wissen/borderline-behandlung"
+  },
+  {
+    "type": "topic",
+    "slug": "borderline-in-beziehungen",
+    "title": "Borderline in Beziehungen: was dahintersteckt – und was nicht",
+    "description": "Borderline ist kein Charakter und kein Vorwurf, sondern ein Muster aus drei Teilen: schnelle heftige Gefühle, Angst vor dem Verlassenwerden und ein Denken, das unter Druck kippt. Was das in einer Beziehung macht – von beiden Seiten gelesen.",
+    "cluster": "borderline",
+    "search_intent": "borderline beziehung partner erkennen anzeichen verstehen umgang",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Borderline-Muster gelesen. Magst du eine Situation anschauen, in der aus großer Nähe innerhalb von Minuten große Kälte wurde – und beschreiben, was du in dem Moment gedacht hast?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "bindung"
+    ],
+    "scene_tags": [
+      "borderline",
+      "verlassenheitsangst",
+      "spaltung",
+      "emotionale-dysregulation"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "children": [
+        "borderline-von-innen",
+        "beziehung-mit-borderline",
+        "borderline-behandlung",
+        "wenn-die-diagnose-im-raum-steht"
+      ],
+      "glossary": [
+        "spaltung",
+        "emotionale-dysregulation",
+        "chronische-leere",
+        "identitaetsdiffusion",
+        "validierung"
+      ],
+      "comparison": [
+        "borderline-oder-narzissmus",
+        "borderline-oder-bipolar"
+      ],
+      "related": [
+        "verlustangst",
+        "emotionale-unreife",
+        "beziehungstrauma"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Borderline dasselbe wie eine schwierige Persönlichkeit?",
+        "answer": "Nein. Gemeint ist ein bestimmtes, gut beschriebenes Muster: sehr schnelle und sehr starke Gefühle, eine tiefe Angst vor dem Verlassenwerden, ein unsicheres Bild von sich selbst und impulsives Verhalten unter Druck. Wer als schwierig gilt, weil er widerspricht oder anstrengend ist, hat damit nichts zu tun. Der Begriff wird oft als Schimpfwort benutzt, und genau das macht ihn für die Betroffenen so teuer."
+      },
+      {
+        "question": "Kann ich bei meiner Partnerin oder meinem Partner Borderline erkennen?",
+        "answer": "Erkennen im Sinn von feststellen: nein. Eine Diagnose stellt eine Fachperson, im Gespräch, über längere Zeit, und sie braucht die Innenperspektive des Menschen selbst. Von außen siehst du Verhalten, nicht das Erleben dahinter – und dasselbe Verhalten kann sehr verschiedene Gründe haben. Was du sehr wohl beschreiben kannst, ist dein eigenes Erleben in dieser Beziehung. Das ist keine schwächere Auskunft, es ist die einzige, für die du zuständig bist."
+      },
+      {
+        "question": "Ist eine Beziehung mit Borderline zum Scheitern verurteilt?",
+        "answer": "Nein, und die Datenlage ist an dieser Stelle deutlich freundlicher als der Ruf des Begriffs. In Längsschnittstudien über zehn Jahre erfüllt die große Mehrheit der behandelten Menschen die Kriterien irgendwann nicht mehr. Impulsives Verhalten lässt dabei am schnellsten nach, das Gefühl innerer Leere und die Schwierigkeiten in Beziehungen halten sich am längsten. Was eine Beziehung wirklich gefährdet, ist nicht die Diagnose, sondern ob beide Seiten Verantwortung für ihren Teil übernehmen."
+      },
+      {
+        "question": "Warum wechselt die Stimmung so schnell von Nähe zu Kälte?",
+        "answer": "Weil unter starker Anspannung die Fähigkeit wegbricht, zwei Wahrheiten gleichzeitig zu halten. Solange das Gefühl da ist, ist es die ganze Wahrheit: Du bist entweder der Mensch, der bleibt, oder der, der geht – beides zusammen geht in diesem Moment nicht. Fachlich heißt das Spaltung. Es ist kein Trick und keine Strafe, sondern ein Zusammenbruch der Verarbeitung, der von innen genauso erschreckend ist wie von außen."
+      },
+      {
+        "question": "Muss ich alles aushalten, wenn es eine Erklärung gibt?",
+        "answer": "Nein. Eine Erklärung sagt, warum etwas passiert ist. Sie sagt nicht, dass es weiter passieren darf. Ein dysregulierter Zustand erklärt einen Ausbruch; er verpflichtet dich nicht, ihn zu absorbieren. Der Satz, der beides zusammenhält: Ich glaube dir, dass du es nicht steuern konntest, und ich bleibe trotzdem dabei, dass ich so nicht behandelt werden will."
+      }
+    ],
+    "url": "/wissen/borderline-in-beziehungen"
+  },
+  {
+    "type": "comparison",
+    "slug": "borderline-oder-bipolar",
+    "title": "Borderline oder bipolar? Dauer und Auslöser trennen die beiden",
+    "description": "Die häufigste Verwechslung überhaupt – und die folgenreichste, weil die Behandlungen verschieden sind. Der Unterschied liegt nicht in der Heftigkeit der Stimmungen, sondern in ihrer Dauer und darin, woran sie hängen.",
+    "cluster": "borderline",
+    "search_intent": "borderline oder bipolar unterschied stimmungsschwankungen verwechslung",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der die Stimmung gekippt ist – und dabei versuchen, den Auslöser und die Dauer möglichst genau zu beschreiben?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "emotionale-dysregulation",
+      "borderline"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "emotionale-dysregulation",
+        "impulsivitaet",
+        "chronische-leere"
+      ],
+      "related": [
+        "borderline-behandlung",
+        "emotionsregulation",
+        "professionelle-hilfe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Kann man beides gleichzeitig haben?",
+        "answer": "Ja. Beide kommen zusammen vor, häufiger als es der Zufall erwarten ließe, und dann braucht es beide Behandlungswege. Genau deshalb ist die Unterscheidung Sache einer Fachperson und nicht einer Merkmalsliste im Internet."
+      },
+      {
+        "question": "Warum ist die Verwechslung ein Problem?",
+        "answer": "Weil die Behandlungen auseinandergehen. Bei einer bipolaren Störung sind Medikamente zur Stimmungsstabilisierung zentral. Bei einem Borderline-Muster behandelt kein Medikament das Muster selbst, dort wirkt Psychotherapie. Eine falsche Zuordnung kostet deshalb nicht nur Zeit, sondern führt zu Behandlungen, die am Kern vorbeigehen."
+      },
+      {
+        "question": "Woran erkenne ich den Unterschied im Alltag am ehesten?",
+        "answer": "An zwei Fragen. Wie lange hält der Zustand an – Stunden oder Wochen? Und hängt er an etwas, das zwischen euch passiert ist, oder kommt er unabhängig davon? Stunden und an einem zwischenmenschlichen Auslöser spricht eher für das eine, Wochen und ohne erkennbaren Anlass eher für das andere. Das ist ein Hinweis, kein Befund."
+      }
+    ],
+    "url": "/wissen/borderline-oder-bipolar"
+  },
+  {
+    "type": "comparison",
+    "slug": "borderline-oder-narzissmus",
+    "title": "Borderline oder Narzissmus? Die Angst verrät den Unterschied",
+    "description": "Von außen sieht beides ähnlich aus: erst Idealisierung, dann Abwertung. Darunter liegen zwei verschiedene Ängste – verlassen zu werden oder entlarvt zu werden. Fünf Prüfsteine, ohne Ferndiagnose.",
+    "cluster": "borderline",
+    "search_intent": "borderline oder narzissmus unterschied narzisst borderlinerin erkennen",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du versuchst gerade einzuordnen, was du erlebst. Magst du eine Situation anschauen, in der aus großer Nähe plötzlich Abwertung wurde – und beschreiben, was danach passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "borderline",
+      "spaltung",
+      "idealisierung-abwertung",
+      "verlassenheitsangst"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "spaltung",
+        "idealisierung-abwertung",
+        "narzisstische-zufuhr",
+        "hoovering",
+        "chronische-leere"
+      ],
+      "related": [
+        "narzissmus-in-beziehungen",
+        "verdeckter-narzissmus",
+        "unreife-oder-narzissmus"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Kann jemand beides haben?",
+        "answer": "Ja, und das ist häufiger als die klare Zuordnung. Persönlichkeitsmuster überschneiden sich stark, und gerade zwischen diesen beiden gibt es viele Mischformen. Die Frage ist deshalb selten entweder oder, sondern eher: Welcher Anteil ist im Moment am Steuer? Für dich ist ohnehin die praktische Frage wichtiger als die Zuordnung – was passiert nach einem Bruch."
+      },
+      {
+        "question": "Warum wirkt am Anfang beides gleich?",
+        "answer": "Weil beide Muster mit ungewöhnlich schneller, sehr intensiver Nähe beginnen können. Der Unterschied liegt im Motiv, und das sieht man am Anfang nicht: Bei der einen Seite ist die Nähe echt und deshalb bedrohlich, bei der anderen ist sie ein Mittel, um Bewunderung und Bestätigung zu sichern. Erst wenn es unbequem wird, trennen sich die Wege."
+      },
+      {
+        "question": "Hilft mir die Unterscheidung überhaupt?",
+        "answer": "Für den Umgang ja, für ein Urteil nein. Wenn die Angst vor dem Verlassenwerden treibt, wirkt Verlässlichkeit und ruhiges Dabeibleiben. Wenn die Angst vor Entlarvung treibt, wirkt dasselbe nicht – dort ist Abstand meist das Wirksamere. Beides ersetzt keine Diagnose, und keine Diagnose ersetzt die Frage, ob es dir in dieser Beziehung gut geht."
+      }
+    ],
+    "url": "/wissen/borderline-oder-narzissmus"
+  },
+  {
+    "type": "topic",
+    "slug": "borderline-von-innen",
+    "title": "Borderline von innen: wie sich das anfühlt, wenn man es ist",
+    "description": "Fast alles, was über Borderline geschrieben wird, ist für die Menschen daneben geschrieben. Dieser Text ist für die, die gemeint sind: über Lautstärke statt Übertreibung, über die Scham danach – und über den Hebel, der wirklich etwas ändert.",
+    "cluster": "borderline",
+    "search_intent": "borderline betroffene erleben innenperspektive scham selbstbild",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation anschauen, in der du hinterher nicht mehr verstanden hast, warum du so reagiert hast – und was du gebraucht hättest, damit es anders läuft?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "chronische-leere",
+      "scham",
+      "verlassenheitsangst",
+      "identitaetsdiffusion"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "chronische-leere",
+        "identitaetsdiffusion",
+        "spaltung",
+        "favorite-person",
+        "selbstverletzung"
+      ],
+      "related": [
+        "borderline-behandlung",
+        "selbstmitgefuehl",
+        "emotionsregulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Bin ich zu viel für andere?",
+        "answer": "Das ist der Satz, den fast alle mit sich herumtragen, und er trifft die Sache nicht. Zu viel wäre eine Aussage über deinen Wert. Was tatsächlich vorliegt, ist eine Aussage über Lautstärke: Deine Gefühle kommen schneller, steigen höher und brauchen länger nach unten als bei den meisten. Das ist anstrengend, für dich zuerst. Es macht dich nicht zu einem Zuviel an Mensch."
+      },
+      {
+        "question": "Warum schäme ich mich hinterher so sehr?",
+        "answer": "Weil du in einem Zustand handelst, in dem dein Denken eingeschränkt ist, und den Zustand danach mit einem klaren Kopf beurteilst. Diese Lücke füllt sich mit Scham. Das Tückische daran: Scham drängt zum Verschwinden, nicht zum Zurückkommen – und genau das Zurückkommen wäre der wirksamste Schritt."
+      },
+      {
+        "question": "Kann ich lernen, das zu steuern?",
+        "answer": "Teilweise, und zwar an einer bestimmten Stelle. Ob eine Welle kommt, entscheidest du kaum. Was du beeinflussen kannst, ist der Abstand zwischen Welle und Handlung – und das, was danach passiert. Beides wird in Therapieverfahren wie DBT gezielt geübt, und beides ist genau der Teil, der in Beziehungen zählt."
+      },
+      {
+        "question": "Muss ich meiner Partnerin oder meinem Partner von der Diagnose erzählen?",
+        "answer": "Du musst gar nichts. Es kann entlasten, weil es Verhalten erklärbar macht, und es kann belasten, weil ein Etikett auch als Erklärung für alles benutzt wird – von anderen und von dir selbst. Hilfreicher als das Wort ist meistens die Beschreibung: was bei dir passiert, was du in solchen Momenten brauchst und was nicht hilft."
+      }
+    ],
+    "url": "/wissen/borderline-von-innen"
   },
   {
     "type": "topic",
@@ -12011,7 +13150,8 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "related": [
         "narzissmus-in-beziehungen",
         "verdeckter-narzissmus",
-        "narzisstische-spielarten"
+        "narzisstische-spielarten",
+        "borderline-oder-narzissmus"
       ]
     },
     "faq": [
@@ -12738,6 +13878,71 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "wenn-die-diagnose-im-raum-steht",
+    "title": "Wenn die Diagnose im Raum steht",
+    "description": "Drei Situationen: Du vermutest etwas. Jemand sagt es über sich selbst. Oder jemand hat es im Streit über dich gesagt. Warum der Verdacht allein schon die Beziehung verändert – und was stattdessen weiterhilft.",
+    "cluster": "borderline",
+    "search_intent": "ist mein partner borderline verdacht diagnose ansprechen etikett",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, was du in eurer Beziehung tatsächlich erlebst – ohne ein Wort dafür zu suchen, sondern anhand einer konkreten Situation?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "borderline",
+      "wahrnehmungszweifel",
+      "spaltung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "spaltung",
+        "taeter-opfer-umkehr",
+        "realitaetsverdrehung"
+      ],
+      "related": [
+        "beziehung-mit-borderline",
+        "an-eigener-wahrnehmung-zweifeln",
+        "emotionale-unreife-abgrenzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Soll ich meinen Verdacht ansprechen?",
+        "answer": "Den Verdacht nicht, das Erleben ja. Der Unterschied ist groß: Ich glaube, du hast Borderline macht aus einem Gespräch eine Zuschreibung, gegen die sich niemand wehren kann, ohne sie zu bestätigen. Mir geht es seit Monaten so, dass ich abends im Auto sitzen bleibe, bevor ich hochkomme benennt dasselbe Problem, ohne jemanden zu etikettieren – und lässt sich nicht wegdiskutieren, weil es deine Erfahrung ist."
+      },
+      {
+        "question": "Was, wenn die Diagnose wirklich gestellt wurde?",
+        "answer": "Dann ist sie eine Information über Behandlungswege, nicht über den Wert eines Menschen und nicht über die Verteilung von Schuld in eurem letzten Streit. Sie erklärt Verhalten und ersetzt keine Verantwortung. Nützlich ist sie dort, wo sie zu Hilfe führt. Schädlich wird sie, sobald sie jedes Gespräch beendet – von beiden Seiten aus."
+      },
+      {
+        "question": "Mein Partner sagt, ich sei die Borderlinerin. Stimmt das?",
+        "answer": "Das kann in einem Streit niemand feststellen, auch dein Partner nicht. Eine Diagnose entsteht in mehreren Gesprächen mit einer Fachperson, mit deiner Innenperspektive und über Zeit. Ein Etikett, das im Konflikt vergeben wird, hat eine andere Funktion: Es verschiebt das Thema von dem, worum es ging, auf die Frage, ob du zurechnungsfähig bist. Wenn dich der Zweifel trotzdem nicht loslässt, ist der richtige Adressat eine Fachperson, nicht die Beziehung."
+      },
+      {
+        "question": "Hilft ein Selbsttest im Internet weiter?",
+        "answer": "Für die Frage, ob jemand anderes eine Persönlichkeitsstörung hat, gibt es keinen seriösen Test – aus einem grundsätzlichen Grund: Du hast keinen Zugang zum Erleben eines anderen Menschen, und genau darauf käme es an. Für das eigene Erleben können Fragebögen ein Anstoß sein, mehr nicht. Ein Ergebnis ersetzt keine Abklärung."
+      }
+    ],
+    "url": "/wissen/wenn-die-diagnose-im-raum-steht"
+  },
+  {
+    "type": "topic",
     "slug": "wenn-die-grenze-steht",
     "title": "Wenn die Grenze steht: was danach passiert",
     "description": "Der schwere Teil beginnt nach dem Nein. Warum Widerstand am Anfang zunimmt statt abzunehmen, warum Schuldgefühle kein Beweis für ein Unrecht sind – und warum die Reaktion auf deine Grenze mehr über die Beziehung sagt als Jahre von Gesprächen.",
@@ -13103,6 +14308,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Bindungsangst – Definition und Anzeichen",
     "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt."
   },
+  "/glossar/chronische-leere": {
+    "title": "Chronische Leere – kein Gefühl, sondern dessen Abwesenheit",
+    "description": "Ein anhaltendes Gefühl von Leere, unabhängig davon, ob gerade etwas Schönes passiert. Viele Betroffene nennen es das Schlimmste – und es erklärt einiges, was von außen unlogisch aussieht."
+  },
   "/glossar/coercive-control": {
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose."
@@ -13139,6 +14348,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Emotionale Ansteckung – wenn seine Stimmung deine wird",
     "description": "Gefühle springen in Sekunden über, ganz ohne Worte. Das ist die Grundlage von Mitgefühl und zugleich der Grund, warum man abends eine Laune mit sich trägt, die man morgens nicht hatte."
   },
+  "/glossar/emotionale-dysregulation": {
+    "title": "Emotionale Dysregulation – schneller hoch, höher, langsamer zurück",
+    "description": "Nicht die Art der Gefühle unterscheidet sich, sondern ihr Verlauf: Sie kommen schneller, steigen höher und brauchen länger, bis sie abklingen. Was das im Alltag bedeutet – und wo trotzdem Spielraum ist."
+  },
   "/glossar/emotionale-einsamkeit": {
     "title": "Emotionale Einsamkeit – allein sein, während jemand da ist",
     "description": "Emotionale Einsamkeit ist nicht das Alleinsein, sondern sein Gegenteil: das Gefühl, in Gesellschaft nicht vorzukommen. Woran du sie erkennst und warum sie so schwer zu erklären ist."
@@ -13170,6 +14383,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/extinktionsburst": {
     "title": "Extinktionsburst – warum es erst schlimmer wird",
     "description": "Ein Verhalten, das jahrelang funktioniert hat, hört nicht auf, wenn es nicht mehr wirkt – es wird zuerst lauter. Warum die ersten Wochen nach einer Grenze die schwersten sind und was das über den Erfolg aussagt."
+  },
+  "/glossar/favorite-person": {
+    "title": "Favorite Person – der eine Mensch, an dem alles hängt",
+    "description": "Ein Begriff aus der Betroffenen-Community, nicht aus dem Lehrbuch: der Mensch, dessen Stimmung den eigenen Tag bestimmt. Warum das ein ehrliches Wort ist – und zugleich eine Warnung."
   },
   "/glossar/fawning": {
     "title": "Fawning – wenn Anpassung zur Schutzstrategie wird",
@@ -13226,6 +14443,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/idealisierung-abwertung": {
     "title": "Idealisierung und Abwertung – von der Wolke in den Keller",
     "description": "Der Wechsel von überschwänglicher Idealisierung zu plötzlicher Abwertung ist ein Kernmuster narzisstischer Dynamiken. Warum dieses Auf und Ab so stark bindet und was hilft. Ohne Diagnose."
+  },
+  "/glossar/identitaetsdiffusion": {
+    "title": "Identitätsdiffusion – wer bin ich, wenn du nicht da bist",
+    "description": "Ein Selbstbild, das nicht trägt: Werte, Ziele, Vorlieben und sogar das Gefühl, wer man ist, verändern sich mit den Menschen, mit denen man zusammen ist. Kein Mangel an Charakter, sondern an Kontinuität."
+  },
+  "/glossar/impulsivitaet": {
+    "title": "Impulsivität – der Abstand zwischen Impuls und Handlung",
+    "description": "Nicht die Stärke des Impulses entscheidet, sondern die Lücke dahinter. Wo sie klein ist, wird aus einem Gedanken sofort eine Handlung – mit Folgen, die dieselbe Person kurz darauf selbst nicht versteht."
   },
   "/glossar/innerer-antreiber": {
     "title": "Innerer Antreiber – der Motor, der keiner ist",
@@ -13387,6 +14612,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Selbsttäuschung – kein Lügen, sondern Nichthinsehen",
     "description": "Selbsttäuschung ist selten eine bewusste Lüge. Sie ist die Fähigkeit, etwas zu wissen und gleichzeitig nicht zu wissen – und sie hat eine Schutzfunktion."
   },
+  "/glossar/selbstverletzung": {
+    "title": "Selbstverletzung – was sie meistens ist und was sie selten ist",
+    "description": "In den allermeisten Fällen ist sie ein Versuch, unerträgliche Anspannung zu beenden – kein Suizidversuch und fast nie ein Druckmittel. Was Angehörige wissen sollten und was hilft."
+  },
   "/glossar/selbstverurteilung": {
     "title": "Selbstverurteilung – wenn aus einem Fehler ein Urteil wird",
     "description": "Der Unterschied zwischen ich habe etwas Schlechtes getan und ich bin schlecht – und warum die zweite Variante Veränderung nicht befeuert, sondern verhindert."
@@ -13394,6 +14623,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/situative-gewalt": {
     "title": "Situative Gewalt und Kontrollgewalt – warum die Unterscheidung zählt",
     "description": "In der Forschung werden zwei sehr verschiedene Muster getrennt: Gewalt aus eskalierenden Konflikten und Gewalt als Mittel der Kontrolle. Sie führen zu unterschiedlichen Wegen."
+  },
+  "/glossar/spaltung": {
+    "title": "Spaltung – wenn nur noch eine Wahrheit in den Raum passt",
+    "description": "Unter starker Anspannung bricht die Fähigkeit weg, Gutes und Schlechtes an einem Menschen gleichzeitig zu halten. Übrig bleibt eines von beidem – und es füllt alles aus."
   },
   "/glossar/spiritueller-narzissmus": {
     "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
@@ -13427,6 +14660,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Übergriffigkeit – wenn ein erkennbares Nein übergangen wird",
     "description": "Nicht die Schwere entscheidet, sondern das Übergehen. Was Übergriffigkeit von Kontrolle und Drohung unterscheidet und warum ein Nein nicht ausgesprochen sein muss."
   },
+  "/glossar/validierung": {
+    "title": "Validierung – bestätigen, was gefühlt wird, nicht was behauptet wird",
+    "description": "Die wirksamste Bewegung neben starken Gefühlen und die am häufigsten missverstandene: Validierung ist keine Zustimmung. Sie erkennt an, dass ein Gefühl da ist und Gründe hat – ohne der Deutung recht zu geben."
+  },
   "/glossar/verachtung": {
     "title": "Verachtung – das gefährlichste Gift für eine Beziehung",
     "description": "Warum Verachtung – Spott, Augenrollen, Herabsetzung – laut Paarforschung der stärkste Vorbote einer Trennung ist, und was ihr entgegenwirkt. Ohne Diagnose."
@@ -13458,6 +14695,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/hilfe/angst-verlassen-zu-werden": {
     "title": "Ständige Angst, verlassen zu werden – was dahinter steckt",
     "description": "Wenn die Angst, verlassen zu werden, dein Denken und Handeln bestimmt: woran das liegen kann und was im Moment der Panik konkret hilft."
+  },
+  "/hilfe/ich-glaube-ich-habe-borderline": {
+    "title": "Ich glaube, ich habe Borderline – was jetzt sinnvoll ist",
+    "description": "Wenn du dich in den Beschreibungen wiedererkennst: warum Selbsterkennen kein Befund ist, was eine Abklärung tatsächlich bringt, und was du tun kannst, bevor du einen Termin hast."
+  },
+  "/hilfe/ist-mein-partner-borderline": {
+    "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
+    "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung."
   },
   "/hilfe/soll-ich-mich-trennen": {
     "title": "„Soll ich mich trennen?\" – Wenn du nicht mehr weiterweißt",
@@ -13575,6 +14820,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das Konto, von dem ich nichts wusste",
     "description": "Eine fiktive Szene: Ein Brief bringt ans Licht, dass es einen Bereich gab, aus dem sie herausgehalten wurde. Über Vertrauensbruch ohne Affäre."
   },
+  "/szenen/das-lange-shirt-im-sommer": {
+    "title": "Das lange Shirt im Sommer",
+    "description": "Eine Szene über den Moment, in dem jemand etwas bemerkt, das nicht besprochen werden soll – und über die Frage, wie man fragt. Ich-Perspektive, fiktiv."
+  },
   "/szenen/das-nein-das-ich-zurueckgenommen-habe": {
     "title": "Das Nein, das ich zurückgenommen habe",
     "description": "Eine fiktive Szene: Sie hat abgesagt, zum ersten Mal seit Jahren. Zwei Stunden später ruft sie zurück und sagt zu. Über die Schwerkraft, die ein Nein zurückzieht."
@@ -13642,6 +14891,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/der-satz-den-ich-zu-marie-gesagt-haette": {
     "title": "Der Satz, den ich zu Marie gesagt hätte",
     "description": "Eine fiktive Szene: Sie hat einen Fehler im Quartalsbericht übersehen und sagt sich Dinge, die sie ihrer besten Freundin nie sagen würde. Über den Unterschied zwischen zwei Tonlagen für dieselbe Sache."
+  },
+  "/szenen/der-schalter": {
+    "title": "Der Schalter",
+    "description": "Eine Szene über den Moment, in dem aus dem wichtigsten Menschen der Feind wird – ohne Ereignis dazwischen. Ich-Perspektive, fiktiv, keine Diagnose."
   },
   "/szenen/der-schluessel-im-schloss": {
     "title": "Der Schlüssel im Schloss",
@@ -13831,6 +15084,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich brauch eine Pause",
     "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/ich-gehe-bevor-du-gehst": {
+    "title": "Ich gehe, bevor du gehst",
+    "description": "Eine Szene über den Moment, in dem jemand die Beziehung beendet, um dem Verlassenwerden zuvorzukommen. Ich-Perspektive, fiktiv, keine Diagnose."
+  },
   "/szenen/ich-hab-mich-geaendert": {
     "title": "Ich hab mich geändert",
     "description": "Eine Szene über Hoovering – die Nachricht Wochen nach der Trennung, in der plötzlich alles anders sein soll. Aus der Ich-Perspektive, fiktiv."
@@ -13910,6 +15167,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-wusste-es-bevor-sie-anrief": {
     "title": "Ich wusste es, bevor sie anrief",
     "description": "Eine fiktive Szene: Er spürt an der Art, wie das Telefon klingelt, in welcher Stimmung seine Schwester ist. Über eine Antenne, die man als Kind entwickelt und als Erwachsener nicht abstellen kann."
+  },
+  "/szenen/ihr-lieblingsmensch": {
+    "title": "Ihr Lieblingsmensch",
+    "description": "Eine Szene darüber, wie es sich anfühlt, für einen anderen Menschen der Fixpunkt zu sein – anfangs schmeichelhaft, später wie ein Amt. Ich-Perspektive, fiktiv."
   },
   "/szenen/ihr-name-in-meinem-kopf": {
     "title": "Ihr Name in meinem Kopf",
@@ -14067,6 +15328,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sie hat recht gehabt, und ich wusste es sofort",
     "description": "Eine fiktive Szene: Eine Kritik trifft, sie widerspricht drei Tage lang – und weiß von der ersten Sekunde an, dass sie stimmt. Über den Abstand zwischen Erkennen und Zugeben."
   },
+  "/szenen/sie-ist-zurueckgekommen": {
+    "title": "Sie ist zurückgekommen",
+    "description": "Eine Szene über den Morgen nach einer Eskalation – und über den einen Satz, der etwas verändert, weil er nicht erklärt, sondern zurücknimmt. Ich-Perspektive, fiktiv."
+  },
   "/szenen/sie-stand-in-der-wohnung": {
     "title": "Sie stand in der Wohnung",
     "description": "Eine fiktive Szene: Er hatte gesagt, sie soll nicht kommen. Als er aus dem Bad kommt, steht sie im Flur. Über eine Grenze, bei der nichts passiert ist – und die trotzdem etwas verändert hat."
@@ -14098,6 +15363,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/unter-der-wut": {
     "title": "Unter der Wut",
     "description": "Eine Szene über die Wut, die eine Verletzung verdeckt – und den Moment, in dem klar wird, was darunter eigentlich wehtut. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/vierzig-entwuerfe": {
+    "title": "Vierzig Entwürfe",
+    "description": "Eine Szene über die Stunden zwischen einer gelesenen Nachricht und der Antwort – und darüber, wie viel Arbeit es ist, normal zu klingen. Ich-Perspektive, fiktiv."
   },
   "/szenen/war-das-wirklich-so": {
     "title": "War das wirklich so?",
@@ -14134,6 +15403,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/wenn-hausarbeit-liebe-beweisen-soll": {
     "title": "Wenn Hausarbeit Liebe beweisen soll",
     "description": "Eine fiktive Szene: Er hat gekocht, eingekauft, geputzt – eine Sache blieb liegen, und daran entzündet sich alles. Über bedingte Zuwendung und Aufgaben, die zum Beweis der Liebe werden."
+  },
+  "/szenen/wer-bin-ich-wenn-du-schweigst": {
+    "title": "Wer bin ich, wenn du schweigst",
+    "description": "Eine Szene über ein Wochenende allein und die Frage, was von einem Menschen übrig bleibt, wenn niemand hinsieht. Ich-Perspektive, fiktiv."
   },
   "/szenen/wer-war-ich-nochmal": {
     "title": "Wer war ich nochmal",
@@ -14187,6 +15460,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",
     "description": "Wie du zwischen dem, was passiert ist, dem, was du fühlst, und dem, was du daraus schließt, unterscheidest – das Kernwerkzeug der Gewaltfreien Kommunikation."
   },
+  "/wissen/beziehung-mit-borderline": {
+    "title": "In Beziehung bleiben, ohne sich zu verlieren",
+    "description": "Wie man neben starken Gefühlen stehen kann, ohne sie zu bestätigen oder wegzuerklären: Validierung statt Diskussion, Grenzen, die nicht wie Verlassen klingen – und der ehrliche Punkt, an dem es keine Beziehungsfrage mehr ist."
+  },
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
     "description": "Was Beziehungsmuster sind, wie sie entstehen und wie du sie bei dir erkennst – verständlich erklärt, ohne Diagnose."
@@ -14202,6 +15479,26 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/blinde-flecken": {
     "title": "Blinde Flecken: das, was alle sehen außer dir",
     "description": "Jeder hat Anteile, die andere kennen und er selbst nicht. Wie das Johari-Fenster funktioniert, welche blinden Flecken in Beziehungen am häufigsten sind und wie man Rückmeldung bekommt, die wirklich etwas zeigt."
+  },
+  "/wissen/borderline-behandlung": {
+    "title": "Behandlung und Verlauf: was wirklich hilft",
+    "description": "Vier Verfahren sind gut untersucht, und alle greifen an derselben Stelle an. Dazu die Nachricht, die in kaum einem Ratgeber steht: Der Verlauf ist deutlich besser als der Ruf – und was das für Angehörige bedeutet."
+  },
+  "/wissen/borderline-in-beziehungen": {
+    "title": "Borderline in Beziehungen: was dahintersteckt – und was nicht",
+    "description": "Borderline ist kein Charakter und kein Vorwurf, sondern ein Muster aus drei Teilen: schnelle heftige Gefühle, Angst vor dem Verlassenwerden und ein Denken, das unter Druck kippt. Was das in einer Beziehung macht – von beiden Seiten gelesen."
+  },
+  "/wissen/borderline-oder-bipolar": {
+    "title": "Borderline oder bipolar? Dauer und Auslöser trennen die beiden",
+    "description": "Die häufigste Verwechslung überhaupt – und die folgenreichste, weil die Behandlungen verschieden sind. Der Unterschied liegt nicht in der Heftigkeit der Stimmungen, sondern in ihrer Dauer und darin, woran sie hängen."
+  },
+  "/wissen/borderline-oder-narzissmus": {
+    "title": "Borderline oder Narzissmus? Die Angst verrät den Unterschied",
+    "description": "Von außen sieht beides ähnlich aus: erst Idealisierung, dann Abwertung. Darunter liegen zwei verschiedene Ängste – verlassen zu werden oder entlarvt zu werden. Fünf Prüfsteine, ohne Ferndiagnose."
+  },
+  "/wissen/borderline-von-innen": {
+    "title": "Borderline von innen: wie sich das anfühlt, wenn man es ist",
+    "description": "Fast alles, was über Borderline geschrieben wird, ist für die Menschen daneben geschrieben. Dieser Text ist für die, die gemeint sind: über Lautstärke statt Übertreibung, über die Scham danach – und über den Hebel, der wirklich etwas ändert."
   },
   "/wissen/co-regulation": {
     "title": "Co-Regulation: warum wir uns aneinander beruhigen",
@@ -14486,6 +15783,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/wege-aus-der-kodependenz": {
     "title": "Wege aus der Kodependenz: was wirklich hilft",
     "description": "Öfter Nein sagen reicht nicht. Was tatsächlich hilft, wenn die eigenen Bedürfnisse über Jahre unsichtbar waren – in Schritten, die klein genug sind, um sie zu gehen."
+  },
+  "/wissen/wenn-die-diagnose-im-raum-steht": {
+    "title": "Wenn die Diagnose im Raum steht",
+    "description": "Drei Situationen: Du vermutest etwas. Jemand sagt es über sich selbst. Oder jemand hat es im Streit über dich gesagt. Warum der Verdacht allein schon die Beziehung verändert – und was stattdessen weiterhilft."
   },
   "/wissen/wenn-die-grenze-steht": {
     "title": "Wenn die Grenze steht: was danach passiert",

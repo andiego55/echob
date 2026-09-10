@@ -27,6 +27,7 @@ export const CLUSTERS = [
   'narzissmus', // Narzissmus in Beziehungen (narzisstische Missbrauchsdynamik)
   'narzissmus-spielarten', // Spielarten des Narzissmus (grandios, verdeckt/vulnerabel, spirituell, kommunal)
   'emotionale-unreife', // Emotionale Unreife (Lindsay Gibson) – Kapazitaetsgrenze statt Diagnose, Abgrenzung zu Narzissmus
+  'borderline', // Borderline-Muster in Beziehungen – Verlassenheitsangst, Dysregulation, Spaltung; strikt nicht-diagnostisch
   'trauma', // Trauma & PTBS-Belastung durch Beziehungen
   'kodependenz', // Kodependenz & Selbstliebe-Defizit (Ross Rosenberg, Human Magnet Syndrome)
   'bindung', // Bindung & Nähe
@@ -140,6 +141,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   narzissmus: 'Narzissmus',
   'narzissmus-spielarten': 'Narzissmus-Spielarten',
   'emotionale-unreife': 'Emotionale Unreife',
+  borderline: 'Borderline',
   trauma: 'Trauma & PTBS',
   kodependenz: 'Kodependenz',
   bindung: 'Bindung & Nähe',

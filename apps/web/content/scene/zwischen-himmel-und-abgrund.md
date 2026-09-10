@@ -3,7 +3,7 @@ type: scene
 slug: zwischen-himmel-und-abgrund
 title: "Zwischen Himmel und Abgrund"
 description: "Eine Szene über intensive Beziehungsdynamik – Idealisierung, Angst vorm Verlassenwerden und plötzliche Kälte, an einem einzigen Tag. Ich-Perspektive, fiktiv, keine Diagnose."
-cluster: bindung
+cluster: borderline
 updated: "2026-07-18"
 author:
   name: EchoB-Redaktion

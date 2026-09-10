@@ -259,6 +259,7 @@ TAG_ZU_WIRKUNG: dict[str, str] = {
     # Mich verlieren
     "selbstverlust": "Mich verlieren",
     "selbstaufgabe": "Mich verlieren",
+    "identitaetsdiffusion": "Mich verlieren",
     "erlerntes-verhalten": "Mich verlieren",
     "rollenumkehr": "Mich verlieren",
     "abhaengigkeit": "Mich verlieren",
@@ -272,6 +273,7 @@ TAG_ZU_WIRKUNG: dict[str, str] = {
     "grenzen": "Die Schuld tragen",
     # Nicht loskommen
     "gruebeln": "Nicht loskommen",
+    "verlassenheitsangst": "Nicht loskommen",
     "wiederkehrendes-muster": "Nicht loskommen",
     "trauma-bindung": "Nicht loskommen",
     "verlustangst": "Nicht loskommen",
@@ -297,6 +299,11 @@ TAG_ZU_WIRKUNG: dict[str, str] = {
     "aufbruch": "Wieder zu mir kommen",
     "wiederentdeckung": "Wieder zu mir kommen",
     "konsequenz": "Wieder zu mir kommen",
+    # Aus dem Borderline-Kreis. Bewusst NUR dieses eine: `spaltung`, `chronische-leere`,
+    # `favorite-person`, `impulsivitaet` und `selbstverletzung` bleiben unzugeordnet, weil
+    # sie je nach Erzaehlrichtung etwas anderes bewirken - von innen etwas anderes als von
+    # aussen. Ein falsch einsortiertes Schlagwort ist schlechter als ein fehlendes.
+    "validierung": "Wieder zu mir kommen",
 }
 
 # Ein Tippfehler in den Tabellen oben wuerde eine Klasse erfinden, die niemand kennt, und
