@@ -153,3 +153,41 @@ def test_der_einstieg_liefert_nur_bekannte_szenen():
 
     for slug in asyncio.run(einstieg()):
         assert szenen_verzeichnis.kennt(slug)
+
+
+def test_der_einstieg_endet_nicht_nur_in_lasten():
+    """Fuenf Szenen, die ausschliesslich Belastendes zeigen, sind der erste Eindruck.
+
+    Fuer jemanden, dem es ohnehin schlecht geht - und sie behaupten nebenbei, die Sammlung
+    kenne nichts anderes. "Wieder zu mir kommen" ist deshalb gesetzt. Dieselbe Ueberlegung
+    wie bei der Familie "zugewandt" im Wortfeld.
+    """
+    import asyncio
+
+    from app.api.v1.routers.szenen_oeffentlich import einstieg
+
+    for _ in range(5):
+        abgedeckt = set()
+        for slug in asyncio.run(einstieg()):
+            abgedeckt |= set((szenen_verzeichnis.szene(slug) or {}).get("wirkungen", []))
+        assert "Wieder zu mir kommen" in abgedeckt
+
+
+def test_der_einstieg_zeigt_nicht_immer_dieselben_wirkungen():
+    """Der Fehler, der vorher drinsteckte, ohne dass ein Test ihn sah.
+
+    Die Schleife lief die Achse ab und brach bei fuenf ab - es waren also IMMER die ersten
+    fuenf Gruppen, und die hinteren kamen im Einstieg nie vor. Gewuerfelt wurde nur noch
+    innerhalb der Gruppe, was der alte Streuungs-Test nicht bemerkt: Fuenf verschiedene
+    Wirkungen waren es ja.
+    """
+    import asyncio
+
+    from app.api.v1.routers.szenen_oeffentlich import einstieg
+
+    gesehen: set[str] = set()
+    for _ in range(12):
+        for slug in asyncio.run(einstieg()):
+            gesehen |= set((szenen_verzeichnis.szene(slug) or {}).get("wirkungen", []))
+    # Mit festen fuenf Gruppen kaeme man ueber deren Wirkungen nicht hinaus.
+    assert len(gesehen) > 5, sorted(gesehen)

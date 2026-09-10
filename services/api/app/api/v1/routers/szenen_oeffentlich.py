@@ -32,6 +32,10 @@ from app.schemas.resonanz import (
 from app.services import resonanz_service, szenen_verzeichnis
 from app.services.resonanz_katalog import WIRKUNGEN
 
+#: Diese Wirkung ist im Einstieg immer dabei — Begruendung am Endpunkt.
+_ZUM_SCHLUSS = "Wieder zu mir kommen"
+assert _ZUM_SCHLUSS in WIRKUNGEN
+
 router = APIRouter(prefix="/szenen", tags=["szenen"])
 
 #: Wie viele Szenen eine Abfrage auf einmal nachschlagen darf.
@@ -83,21 +87,40 @@ async def einstieg() -> list[str]:
     kuratieren kann, und den Nachteil, dass jeder Mensch dieselben fünf sieht — die
     öffentlichen Zähler wären dann keine Aussage mehr über Wiedererkennung, sondern über
     die Startseite.
+
+    **Und eine ist gesetzt.** „Wieder zu mir kommen" ist immer dabei, sofern es dafür
+    Szenen gibt. Fünf Szenen, die ausschließlich Lasten zeigen, wären der erste Eindruck
+    für jemanden, dem es ohnehin schlecht geht — und sie behaupteten nebenbei, die Sammlung
+    kenne nichts anderes.
     """
     nach_wirkung: dict[str, list[str]] = {}
     for slug in szenen_verzeichnis.alle_slugs():
         for wirkung in (szenen_verzeichnis.szene(slug) or {}).get("wirkungen", []):
             nach_wirkung.setdefault(wirkung, []).append(slug)
 
+    # **Welche fuenf der neun Wirkungen.** Vorher lief die Schleife die Achse ab und brach
+    # bei fuenf ab - es waren also immer dieselben fuenf, und die hinteren vier Gruppen
+    # ("Mich verlieren", "Die Schuld tragen", "Nicht loskommen", "Wieder zu mir kommen")
+    # kamen im Einstieg nie vor. Gewuerfelt wurde nur noch innerhalb der Gruppe.
+    #
+    # Jetzt rotieren die Gruppen. Eine ist dabei gesetzt: **"Wieder zu mir kommen"**. Fuenf
+    # Szenen, die ausschliesslich Lasten zeigen, sind der erste Eindruck des Produkts fuer
+    # jemanden, dem es ohnehin schlecht geht - und sie behaupten nebenbei, die Sammlung
+    # kenne nichts anderes. Sie steht am Ende der Achse und damit am Ende des Durchgangs.
+    andere = [w for w in WIRKUNGEN if w != _ZUM_SCHLUSS and nach_wirkung.get(w)]
+    ausgewaehlt = set(random.sample(andere, min(4, len(andere))))
+    if nach_wirkung.get(_ZUM_SCHLUSS):
+        ausgewaehlt.add(_ZUM_SCHLUSS)
+
     # Reihenfolge der Achse, nicht Zufall: Sie geht von der Verunsicherung ueber die
     # Anspannung zum Nicht-Loskommen. Der Durchgang liest sich dadurch als Bogen.
     gewaehlt: list[str] = []
     for wirkung in WIRKUNGEN:
+        if wirkung not in ausgewaehlt:
+            continue
         kandidaten = [s for s in nach_wirkung.get(wirkung, []) if s not in gewaehlt]
         if kandidaten:
             gewaehlt.append(random.choice(kandidaten))
-        if len(gewaehlt) == 5:
-            break
     return gewaehlt
 
 

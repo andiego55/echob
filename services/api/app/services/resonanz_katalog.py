@@ -103,6 +103,18 @@ WIRKUNGEN: tuple[str, ...] = (
     "Mich verlieren",
     "Die Schuld tragen",
     "Nicht loskommen",
+    # Die neunte steht bewusst am Ende: Sie ist der Gegenpol zu „Mich verlieren", und der
+    # Bogen der Achse endet damit nicht im Feststecken.
+    #
+    # **Warum es sie überhaupt gibt.** Acht Gruppen, acht Lasten — eine Achse, die nur
+    # Belastendes kennt, erzeugt ein Bild, in dem nur Belastendes vorkommt, und der Mensch
+    # liest hinterher, dass es ihm ausschließlich schlecht geht. Dieselbe Überlegung wie bei
+    # der Familie „zugewandt" im Wortfeld.
+    #
+    # Sichtbar wurde die Lücke an einem echten Fall: „Ich habe wieder Musik gehört" handelt
+    # vom Wiederfinden, trug aber nur „Mich verlieren" (aus dem Schlagwort *selbstverlust*)
+    # — die Szene stand in der Auswertung als ihr eigenes Gegenteil.
+    "Wieder zu mir kommen",
 )
 
 #: Was die Gruppe meint - fuer die Anzeige im Ueberblick, wo die Ueberschrift allein zu
@@ -116,6 +128,7 @@ WIRKUNG_HINWEISE: dict[str, str] = {
     "Mich verlieren": "Anpassen, nachgeben, die eigenen Konturen aufgeben.",
     "Die Schuld tragen": "Sich verantwortlich fühlen für das, was geschieht.",
     "Nicht loskommen": "Grübeln, sehnen, hängen bleiben.",
+    "Wieder zu mir kommen": "Klarer sehen, aufatmen, wieder Boden unter den Füßen.",
 }
 
 # ── Die Zuordnung ────────────────────────────────────────────────────────────
@@ -267,6 +280,23 @@ TAG_ZU_WIRKUNG: dict[str, str] = {
     "heilungsphantasie": "Nicht loskommen",
     "loslassen": "Nicht loskommen",
     "kontaktabbruch": "Nicht loskommen",
+    # Wieder zu mir kommen
+    #
+    # Hier stehen nur Schlagwoerter, die die Bewegung wirklich tragen. Bewusst NICHT dabei:
+    # *sicherheit* — zehn seiner elf Szenen handeln vom Bruch der Sicherheit
+    # (Vertrauensbruch, Grenzverletzung), es waere die Achse genau falsch herum. Ebenso
+    # *entscheidung* („Zwischen Bleiben und Gehen" ist Ambivalenz, kein Aufbruch) und
+    # *verbindung*, das ebenso oft dort steht, wo sie fehlt.
+    "selbstfuersorge": "Wieder zu mir kommen",
+    "klarheit": "Wieder zu mir kommen",
+    "veraenderung": "Wieder zu mir kommen",
+    "ehrlichkeit": "Wieder zu mir kommen",
+    "selbstreflexion": "Wieder zu mir kommen",
+    "erleichterung": "Wieder zu mir kommen",
+    "ressource": "Wieder zu mir kommen",
+    "aufbruch": "Wieder zu mir kommen",
+    "wiederentdeckung": "Wieder zu mir kommen",
+    "konsequenz": "Wieder zu mir kommen",
 }
 
 # Ein Tippfehler in den Tabellen oben wuerde eine Klasse erfinden, die niemand kennt, und
