@@ -19,6 +19,7 @@ import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { hypothesesApi } from '@/api/hypotheses'
 import { caseArtifactsApi } from '@/api/caseArtifacts'
 import { resonanzApi } from '@/api/resonanz'
+import { gefuehlsbildApi } from '@/api/gefuehlsbild'
 import ResonanzUebernahme from '@/components/app/ResonanzUebernahme'
 import { caseDocumentsApi, KIND_LABELS } from '@/api/caseDocuments'
 import {
@@ -182,6 +183,13 @@ export default function CaseDetailPage() {
             ist, hat hier oft schon zwoelf Eintraege und sonst ueberall Leerzustaende. */}
         <div className="mt-6">
           <ResonanzUeberblickKarte caseId={caseId!} />
+        </div>
+
+        {/* Direkt darunter das Gefuehlsbild: die einzige Aussage im Fall, die
+            ausdruecklich ueber das Jetzt gemacht wurde - und die einzige, die von selbst
+            veraltet. Weiter unten stuende sie unter lauter Dingen, die bleiben. */}
+        <div className="mt-6">
+          <GefuehlsbildUeberblickKarte caseId={caseId!} />
         </div>
 
         {/* Themendialog-Zusammenfassungen */}
@@ -714,6 +722,120 @@ function ResonanzUeberblickKarte({ caseId }: { caseId: string }) {
           liegen erfundene Beziehungsszenen. Kommt dir eine bekannt vor, genügt ein Tipp auf
           „Kenne ich" — du musst nichts erklären. Was sich daraus zusammensetzt, steht dann
           hier.
+        </p>
+      )}
+    </div>
+  )
+}
+
+/** „vor 3 Tagen", „vor 5 Wochen" — grob genug, dass niemand nachrechnet. */
+function alterAlsText(iso: string): string {
+  const tage = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
+  if (tage <= 0) return 'heute'
+  if (tage === 1) return 'gestern'
+  if (tage < 14) return `vor ${tage} Tagen`
+  const wochen = Math.floor(tage / 7)
+  if (wochen < 9) return `vor ${wochen} Wochen`
+  const monate = Math.floor(tage / 30)
+  return `vor ${monate} ${monate === 1 ? 'Monat' : 'Monaten'}`
+}
+
+/** Ab hier ist ein Gefühlsbild kein Gegenwartsbericht mehr, sondern Geschichte. */
+const ALT_AB_TAGEN = 21
+
+/**
+ * Das Gefühlsbild auf dem Fall-Überblick.
+ *
+ * **Warum es hier steht.** Es ist die einzige Aussage im ganzen Fall, die die Person
+ * ausdrücklich über ihr Jetzt getroffen hat. Stünde sie nur hinter einem Reiter, fände sie
+ * niemand, der nicht schon weiß, dass es sie gibt.
+ *
+ * **Warum das Alter mitläuft.** Ein Gefühlsbild verfällt. Von vor sechs Wochen als „so
+ * geht es mir" gelesen ist es falscher als keines — deshalb steht immer daneben, wann es
+ * entstand, und ab drei Wochen fragt die Karte von selbst nach einem neuen.
+ *
+ * **Warum nicht der Text.** Die Ecke und die Wörter sagen genug, um sich zu erinnern. Der
+ * Text ist das Persönlichste im Fall; er soll nicht auf einer Übersichtsseite stehen, die
+ * man mal eben jemandem zeigt.
+ *
+ * Der Endpunkt ist bewusst nicht `stand`: Der legte bei jedem Besuch einen Entwurf an.
+ */
+function GefuehlsbildUeberblickKarte({ caseId }: { caseId: string }) {
+  const { data } = useQuery({
+    queryKey: ['gefuehlsbild-ueberblick', caseId],
+    queryFn: () => gefuehlsbildApi.ueberblick(caseId),
+    enabled: !!caseId,
+    retry: false,
+  })
+
+  const bild = data?.aktuell ?? null
+  const tage = bild?.bestaetigt_at
+    ? Math.floor((Date.now() - new Date(bild.bestaetigt_at).getTime()) / 86400000)
+    : null
+  const alt = tage !== null && tage >= ALT_AB_TAGEN
+
+  return (
+    <div className="card">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="section-label mb-0.5">Gefühlsbild</p>
+          <p className="text-sm font-medium text-navy">
+            {bild
+              ? `Zuletzt ${alterAlsText(bild.bestaetigt_at!)}`
+              : data?.entwurf_begonnen
+                ? 'Angefangen'
+                : 'Noch keins'}
+          </p>
+        </div>
+        <Link
+          to={`/app/cases/${caseId}/gefuehlsbild`}
+          className="shrink-0 text-xs font-semibold text-accent hover:underline"
+        >
+          {data?.entwurf_begonnen && !bild ? 'Weitermachen →' : bild ? 'Neues machen →' : 'Anfangen →'}
+        </Link>
+      </div>
+
+      {bild ? (
+        <>
+          <div className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+            {bild.ecke && (
+              <p className="text-sm font-semibold text-navy">{bild.ecke}</p>
+            )}
+            {bild.woerter_labels.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {bild.woerter_labels.map(w => (
+                  <span
+                    key={w.key}
+                    className="rounded-full bg-accent/10 px-2.5 py-0.5 text-[0.7rem] font-medium text-accent"
+                  >
+                    {w.label}
+                  </span>
+                ))}
+              </div>
+            )}
+            {!bild.ecke && bild.woerter_labels.length === 0 && (
+              <p className="text-xs text-brand-muted">
+                Steht als Text im Gefühlsbild.
+              </p>
+            )}
+          </div>
+          {alt && (
+            <p className="mt-2.5 text-[0.7rem] leading-relaxed text-brand-muted/70">
+              Das ist eine Weile her. Ein neues zeigt dir, ob sich etwas bewegt hat — und
+              zwei nebeneinander sagen mehr als eines.
+            </p>
+          )}
+          {!alt && (data?.anzahl ?? 0) > 1 && (
+            <p className="mt-2.5 text-[0.7rem] text-brand-muted/70">
+              {data!.anzahl} Momentaufnahmen im Verlauf.
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="text-xs leading-relaxed text-brand-muted/70">
+          {data?.entwurf_begonnen
+            ? 'Du hast angefangen, aber noch nichts bestätigt. Erst das Bestätigen macht daraus eine Aussage — vorher sieht sie niemand, auch Echo nicht.'
+            : 'Wie geht es dir in dieser Beziehung gerade? Du musst es nicht aufschreiben: Zeig auf erfundene Szenen, die sich anfühlen wie du, zieh einen Punkt über ein Feld oder tipp ein paar Wörter an. Echo macht daraus einen Text, den du änderst, bis er stimmt.'}
         </p>
       )}
     </div>

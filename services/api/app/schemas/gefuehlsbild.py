@@ -113,6 +113,22 @@ class GefuehlsbildStand(BaseModel):
     max_worte: int = MAX_WORTE
 
 
+class GefuehlsbildUeberblick(BaseModel):
+    """Was die Fall-Übersicht braucht — und sonst nichts.
+
+    Getrennt von ``GefuehlsbildStand``, weil das Holen des Stands einen Entwurf **anlegt**.
+    Die Übersichtsseite wird bei jedem Besuch geöffnet; täte sie das, entstünde für jeden
+    Fall eine leere Momentaufnahme, nur weil jemand auf die Startseite geschaut hat.
+    """
+
+    #: Das jüngste bestätigte — oder nichts.
+    aktuell: Gefuehlsbild | None = None
+    #: Liegt ein angefangener Entwurf da? Macht aus „Öffnen" ein „Weitermachen".
+    entwurf_begonnen: bool = False
+    #: Wie viele es insgesamt schon gab. Erst ab zwei entsteht ein Verlauf.
+    anzahl: int = 0
+
+
 def kataloge() -> dict[str, Any]:
     """Die drei Listen, die jede Antwort mitgibt."""
     return {

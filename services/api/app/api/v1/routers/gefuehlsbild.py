@@ -19,6 +19,7 @@ from app.schemas.gefuehlsbild import (
     Gefuehlsbild,
     GefuehlsbildSichern,
     GefuehlsbildStand,
+    GefuehlsbildUeberblick,
     GefuehlsbildVorschlag,
     kataloge,
 )
@@ -52,6 +53,33 @@ async def stand(
             entwurf=Gefuehlsbild(**entwurf),
             verlauf=[Gefuehlsbild(**b) for b in vergangen],
             **kataloge(),
+        )
+
+
+@router.get(
+    "/ueberblick",
+    response_model=GefuehlsbildUeberblick,
+    summary="Fuer die Fall-Uebersicht — legt nichts an",
+)
+async def ueberblick(
+    case_id: UUID,
+    user: dict = Depends(get_current_user),
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> GefuehlsbildUeberblick:
+    """Das juengste bestaetigte Gefuehlsbild plus zwei Zahlen.
+
+    Der Unterschied zu ``GET ""`` ist der ganze Zweck: Dort entsteht ein Entwurf, hier
+    nicht. Lesen darf nicht schreiben — schon gar nicht auf einer Seite, die jeder Besuch
+    oeffnet.
+    """
+    user_id = UUID(user["user_id"])
+    async with pool.acquire() as conn:
+        await _fall_gehoert(conn, case_id, user_id)
+        stand = await dienst.ueberblick(conn, case_id, user_id)
+        return GefuehlsbildUeberblick(
+            aktuell=Gefuehlsbild(**stand["aktuell"]) if stand["aktuell"] else None,
+            entwurf_begonnen=stand["entwurf_begonnen"],
+            anzahl=stand["anzahl"],
         )
 
 

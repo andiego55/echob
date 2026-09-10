@@ -199,6 +199,29 @@ async def aktuelles(
     return zeilen[0] if zeilen else None
 
 
+async def ueberblick(
+    conn: asyncpg.Connection, case_id: UUID, user_id: UUID
+) -> dict[str, Any]:
+    """Was der Fall-Überblick über das Gefühlsbild wissen muss — **ohne etwas anzulegen**.
+
+    Der Unterschied zu ``entwurf_holen_oder_anlegen`` ist der ganze Grund, warum es diese
+    Funktion gibt: Die Überblicksseite wird bei jedem Besuch geöffnet. Legte sie dabei
+    einen Entwurf an, entstünde für jeden Fall eine leere Momentaufnahme, nur weil jemand
+    auf die Startseite geschaut hat. Lesen darf nicht schreiben.
+    """
+    letztes = await aktuelles(conn, case_id, user_id)
+    entwurf = await conn.fetchrow(
+        f"SELECT {_SPALTEN} FROM feeling_snapshots "
+        "WHERE case_id = $1 AND user_id = $2 AND status = 'entwurf'", case_id, user_id,
+    )
+    begonnen = bool(entwurf) and not ist_leer(_aufbereiten(dict(entwurf)))
+    anzahl = await conn.fetchval(
+        "SELECT COUNT(*) FROM feeling_snapshots "
+        "WHERE case_id = $1 AND user_id = $2 AND status = 'bestaetigt'", case_id, user_id,
+    )
+    return {"aktuell": letztes, "entwurf_begonnen": begonnen, "anzahl": anzahl or 0}
+
+
 # ── Echo ─────────────────────────────────────────────────────────────────────
 def als_prompt_eingabe(bild: dict[str, Any]) -> str:
     """Die Angaben, wie Echo sie zum Schreiben bekommt.

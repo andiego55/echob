@@ -53,6 +53,21 @@ export interface GefuehlsbildVorschlag {
   hinweis: string | null
 }
 
+/**
+ * Was die Fall-Übersicht braucht — **und was `stand` dort verbieten würde.**
+ *
+ * `stand` legt einen Entwurf an. Die Übersicht wird bei jedem Besuch geöffnet; riefe sie
+ * `stand`, entstünde für jeden Fall eine leere Momentaufnahme, nur weil jemand auf die
+ * Startseite geschaut hat.
+ */
+export interface GefuehlsbildUeberblick {
+  /** Das jüngste bestätigte — oder nichts. */
+  aktuell: Gefuehlsbild | null
+  /** Liegt ein angefangener Entwurf da? Macht aus „Öffnen“ ein „Weitermachen“. */
+  entwurf_begonnen: boolean
+  anzahl: number
+}
+
 /** `null`/weggelassen heißt „nicht angefasst" — sonst löscht ein Schritt die anderen. */
 export interface GefuehlsbildTeil {
   szenen?: string[] | null
@@ -67,6 +82,11 @@ const basis = (caseId: string) => `/cases/${caseId}/gefuehlsbild`
 export const gefuehlsbildApi = {
   stand: (caseId: string) =>
     apiClient.get<GefuehlsbildStand>(basis(caseId)).then(r => r.data),
+
+  ueberblick: (caseId: string) =>
+    apiClient
+      .get<GefuehlsbildUeberblick>(`${basis(caseId)}/ueberblick`)
+      .then(r => r.data),
 
   sichern: (caseId: string, teil: GefuehlsbildTeil) =>
     apiClient.put<Gefuehlsbild>(basis(caseId), teil).then(r => r.data),
