@@ -33,6 +33,40 @@ import {
 
 const SZENEN = CONTENT_MANIFEST.filter(m => m.type === 'scene')
 
+/** Woher eine vorschlagbare Szene kommt — die Reihenfolge ist die Reihenfolge im Bild. */
+export const VORSCHLAGSQUELLEN = [
+  { key: 'beide', titel: 'Habt ihr beide gewählt' },
+  { key: 'meine', titel: 'Nur von dir' },
+  { key: 'ihre', titel: 'Nur von ihr/ihm' },
+] as const
+
+/**
+ * Die vorschlagbaren Szenen, getrennt nach Herkunft.
+ *
+ * **Eine Runde braucht keine Überschneidung.** Vorschlagen kann man aus beiden Regalen —
+ * das war schon immer so, nur unsichtbar: Alle Szenen lagen in einer Reihe, und wessen
+ * Szene man da anbot, sah man nicht. Dabei ist genau das der Zug. „Ich möchte über deine
+ * reden" ist eine andere Geste als „lass uns über meine reden", und beide sollen möglich
+ * und erkennbar sein.
+ *
+ * Verwaiste Einträge (Szene aus dem Verzeichnis verschwunden) fallen raus — sonst schlüge
+ * jemand eine Szene vor, die die andere Person nicht öffnen kann.
+ */
+export function herkunftAusRegal(regal: {
+  meine: RegalEintrag[]
+  ihre: RegalEintrag[]
+  gemeinsam: string[]
+} | undefined) {
+  const gemeinsam = new Set(regal?.gemeinsam ?? [])
+  const meine = (regal?.meine ?? []).filter(p => !p.verwaist)
+  const ihre = (regal?.ihre ?? []).filter(p => !p.verwaist)
+  return {
+    beide: meine.filter(p => gemeinsam.has(p.scene_slug)),
+    meine: meine.filter(p => !gemeinsam.has(p.scene_slug)),
+    ihre: ihre.filter(p => !gemeinsam.has(p.scene_slug)),
+  }
+}
+
 const ART_TEXT: Record<PaarSzenenArt, { label: string; was: string }> = {
   getrennt: {
     label: 'Getrennt beantworten',
@@ -383,6 +417,8 @@ export default function CoupleSzenenPage() {
     refetchInterval: (q) => (q.state.data?.runde?.status === 'laeuft' ? 15_000 : false),
   })
 
+  const herkunft = useMemo(() => herkunftAusRegal(data?.regal), [data])
+
   const frisch = () => qc.invalidateQueries({ queryKey: ['paar-szenen', coupleId] })
   const melden = (e: unknown) => {
     const d = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
@@ -549,17 +585,31 @@ export default function CoupleSzenenPage() {
                   </label>
 
                   <div className="mt-5 border-t border-brand-border pt-5">
-                    {data.regal.meine.length + data.regal.ihre.length > 0 && (
-                      <>
-                        <p className="mb-2 text-[0.82rem] font-semibold text-navy">
-                          Aus eurem Regal
-                        </p>
-                        <div className="mb-4 flex flex-wrap gap-2">
-                          {[...data.regal.meine, ...data.regal.ihre]
-                            .filter((p, i, alle) =>
-                              !p.verwaist
-                              && alle.findIndex(x => x.scene_slug === p.scene_slug) === i)
-                            .map(p => (
+                    {/* Getrennt nach Herkunft, nicht in einen Topf.
+                        Eine Runde braucht KEINE Ueberschneidung - vorschlagen kann man aus
+                        beiden Regalen. Nur sah man das vorher nicht: Alle Szenen lagen in
+                        einer Reihe, und wessen Szene man da anbietet, war unsichtbar. Genau
+                        das ist aber der Zug. „Ich moechte ueber deine reden" ist eine
+                        andere Geste als „lass uns ueber meine reden", und beide sollen
+                        moeglich und erkennbar sein. */}
+                    {/* Die Antwort auf „und wenn wir nichts gemeinsam haben?" steht dort,
+                        wo die Frage entsteht - nicht in einer Hilfeseite. */}
+                    {herkunft.beide.length === 0
+                      && herkunft.meine.length + herkunft.ihre.length > 0 && (
+                      <p className="mb-4 max-w-[54ch] text-[0.8rem] leading-relaxed text-brand-muted">
+                        Ihr habt noch keine Szene doppelt gewählt. Das ist kein Hindernis —
+                        eine Runde braucht keine gemeinsame Szene, nur eine, über die ihr
+                        beide reden wollt.
+                      </p>
+                    )}
+                    {VORSCHLAGSQUELLEN.map(({ key, titel }) => {
+                      const liste = herkunft[key]
+                      if (liste.length === 0) return null
+                      return (
+                        <div key={key} className="mb-4">
+                          <p className="mb-2 text-[0.82rem] font-semibold text-navy">{titel}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {liste.map(p => (
                               <button
                                 key={p.scene_slug}
                                 type="button"
@@ -574,9 +624,10 @@ export default function CoupleSzenenPage() {
                                 {p.title}
                               </button>
                             ))}
+                          </div>
                         </div>
-                      </>
-                    )}
+                      )
+                    })}
                     <button
                       type="button"
                       disabled={!vorschlagSlug || vorschlagen.isPending}
@@ -587,7 +638,9 @@ export default function CoupleSzenenPage() {
                     </button>
                     {!vorschlagSlug && (
                       <p className="mt-2 text-[0.8rem] text-brand-muted">
-                        Wähl zuerst eine Szene aus dem Regal.
+                        {data.regal.meine.length + data.regal.ihre.length === 0
+                          ? 'Stellt oben eine Szene ins Regal — eine von euch beiden genügt.'
+                          : 'Wähl zuerst eine Szene aus.'}
                       </p>
                     )}
                   </div>
