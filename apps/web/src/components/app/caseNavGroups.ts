@@ -30,6 +30,7 @@ export const GRUPPEN: Gruppe[] = [
     label: 'Verstehen',
     kinder: [
       { path: '/echo', label: 'Echo' },
+      { path: '/gefuehlsbild', label: 'Gefühlsbild' },
       { path: '/scales', label: 'Muster' },
       { path: '/review', label: 'Verlauf' },
       { path: '/artifacts', label: 'Erkenntnisse' },
