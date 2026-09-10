@@ -12,6 +12,7 @@ etwas verändert hat, sieht man nur, wenn das Alte stehen bleibt.
 from __future__ import annotations
 
 import json as _json
+from collections import Counter
 from typing import Any
 from uuid import UUID
 
@@ -20,7 +21,7 @@ from fastapi import HTTPException, status
 
 from app.core import crypto
 from app.services import gefuehlsbild_katalog as katalog
-from app.services import szenen_verzeichnis
+from app.services import resonanz_katalog, szenen_verzeichnis
 
 
 def _aufbereiten(zeile: dict[str, Any]) -> dict[str, Any]:
@@ -223,25 +224,96 @@ async def ueberblick(
 
 
 # ── Echo ─────────────────────────────────────────────────────────────────────
+#: So viele Schlagwoerter gehen hoechstens mit. Sieben Szenen brächten sonst gut dreissig,
+#: und eine Liste, die laenger ist als der gewuenschte Text, wird zur Aufgabenliste.
+_MAX_STICHWORTE = 12
+
+
+def _gezaehlte_wirkungen(szenen: list[dict[str, Any]]) -> list[tuple[str, int]]:
+    """Die Wirkungen aller gewählten Szenen, häufigste zuerst, mit ihrer Zahl.
+
+    Zweimal dieselbe Wirkung ist ein Hinweis und keine Wiederholung: Wer zwei Szenen wählt,
+    die beide erschöpfen, sagt das deutlicher als jemand, bei dem sich die Wirkungen
+    verteilen. Ohne die Zahl sähe das Modell beides gleich.
+    """
+    zaehler = Counter(w for s in szenen for w in (s.get("wirkungen") or []))
+    return zaehler.most_common()
+
+
+def _stichworte(szenen: list[dict[str, Any]]) -> list[str]:
+    """Die Schlagwörter der gewählten Szenen — lesbar, ohne Wiederholung, gedeckelt.
+
+    Sie kommen aus dem Verzeichnis und nicht aus der Anfrage, und sie stehen hier, weil die
+    Wirkungsachse nur Lasten kennt: Ohne *wiederentdeckung, klarheit, aufbruch* bliebe von
+    einer Szene übers Wiederfinden nur „Mich verlieren" übrig — das Modell schriebe sie in
+    ihr Gegenteil um.
+
+    **Was ein Verhalten benennt, bleibt draußen.** Genau dafür gibt es ``TAG_ZU_MUSTER``:
+    Dort steht, welche Schlagwörter sagen, was die ANDERE Person tut — *gaslighting*,
+    *isolation*, *entwertung*. In einem Text über die eigenen Gefühle haben die nichts
+    verloren. Ein Modell, das sie sieht, benutzt sie (dreimal beobachtet, auf drei Ebenen),
+    und dann steht dort „Ich fühle mich gegaslightet" — eine Diagnose über eine Abwesende,
+    in der Ich-Form der Person, aus einer erfundenen Geschichte abgeleitet. Übrig bleibt,
+    was die Szene mit einem MACHT: *wahrnehmungszweifel*, *erschoepfung*, *aufbruch*.
+    """
+    gesehen: list[str] = []
+    for s in szenen:
+        eintrag = szenen_verzeichnis.szene(s.get("slug") or "") or {}
+        for tag in eintrag.get("scene_tags") or []:
+            if tag in resonanz_katalog.TAG_ZU_MUSTER:
+                continue
+            wort = tag.replace("-", " ")
+            if wort not in gesehen:
+                gesehen.append(wort)
+    return gesehen[:_MAX_STICHWORTE]
 def als_prompt_eingabe(bild: dict[str, Any]) -> str:
     """Die Angaben, wie Echo sie zum Schreiben bekommt.
 
-    Die Szenen stehen mit dem ausdrücklichen Hinweis da, dass sie erfunden sind — ohne ihn
-    schriebe ein Modell „Beim Abendessen wurde ich zur Pointe" in die Ich-Form, und die
-    Person läse einen Bericht über ein Ereignis, das nie stattgefunden hat.
+    **Die Szenen gehen ohne ihre Titel hinüber, und das ist keine Sparsamkeit.** Ein Modell,
+    das den Titel kennt, benutzt ihn — nicht als behauptetes Ereignis (davor schützt der
+    Fiktionshinweis), sondern als Vergleich: „Es fühlt sich an wie *Der Morgen danach*."
+    Damit steht im Text über die eigenen Gefühle plötzlich der Name einer fremden
+    Geschichte, und der Mensch liest eine Literaturangabe statt eines Satzes über sich.
+    Beobachtet, nicht befürchtet.
+
+    Dagegen hilft keine Anweisung, sondern nur, dass der Titel gar nicht erst ankommt: Was
+    ein Modell nie gesehen hat, kann es nicht zitieren. Es bekommt stattdessen die
+    **Gefühlsspur** der Szene — die Namen der Wirkungen und die Schlagwörter, die die Szene
+    tragen. Genau die soll es herauslesen und einarbeiten.
+
+    **Und dieselbe Regel gilt eine Ebene tiefer.** Der erste Versuch schickte zu jeder
+    Wirkung ihren Erklärsatz mit („Kraftlos, überflutet, innerlich am Ende"). Das Modell
+    schrieb ihn ab: *„Es ist eine Kraftlosigkeit, die mich überflutet."* Statt des Menschen
+    stand der Katalog im Text. Ein Modell nimmt, was greifbar ist — also geht nur der nackte
+    Name der Kategorie hinüber, und die Worte kommen aus dem, was die Person selbst
+    angetippt und geschrieben hat. Auch das ist gemessen, nicht vermutet.
+
+    Die Schlagwörter stehen dabei nicht zur Zierde: Die Wirkungsachse kennt nur Lasten. Eine
+    Szene übers Wiederfinden trägt deshalb „Mich verlieren" (aus *selbstverlust*) und sonst
+    nichts — ohne *wiederentdeckung, klarheit, aufbruch* daneben läse ein Modell die Szene
+    in ihr Gegenteil um. Auch das ist beobachtet.
     """
     teile: list[str] = []
 
     if bild["szenen_titel"]:
-        zeilen = [
-            f'- „{s["title"]}"' + (f' — wirkt auf: {", ".join(s["wirkungen"])}'
-                                   if s["wirkungen"] else '')
-            for s in bild["szenen_titel"] if s["title"]
-        ]
-        teile.append(
-            "ERFUNDENE SZENEN, die sich für ihn anfühlen wie er gerade "
-            "(sie sind FIKTION — nichts davon ist ihm passiert):\n" + "\n".join(zeilen)
-        )
+        zeilen: list[str] = []
+        for wirkung, anzahl in _gezaehlte_wirkungen(bild["szenen_titel"]):
+            zeilen.append(f"- {wirkung}" + (f" ({anzahl}×)" if anzahl > 1 else ""))
+        stichworte = _stichworte(bild["szenen_titel"])
+        if stichworte:
+            zeilen.append("- Worum die Szenen kreisen: " + ", ".join(stichworte))
+        if zeilen:
+            teile.append(
+                "WORAN ER SICH WIEDERERKANNT HAT — RICHTUNG, KEINE SPRACHE.\n"
+                "Er hat auf erfundene Szenen gezeigt und gesagt: Das fühlt sich an wie ich "
+                "gerade. Unten stehen die Ablage-Kategorien dieser Szenen. Sie sagen etwas "
+                "über sein GEFÜHL und nichts über sein Leben; nichts davon ist ihm "
+                "passiert. Sie zeigen dir, WOHIN der Text gehört — die WORTE dafür nimmst "
+                "du aus dem, was er selbst angetippt und geschrieben hat. Übernimm keine "
+                "dieser Vokabeln, und erwähne die Szenen mit keinem Wort, auch nicht als "
+                "Vergleich:\n"
+                + "\n".join(zeilen)
+            )
 
     feld = bild.get("feld") or {}
     if feld:
@@ -259,9 +331,12 @@ def als_prompt_eingabe(bild: dict[str, Any]) -> str:
             teile.append("DAS FELD UND DIE REGLER:\n" + "\n".join(zeilen))
 
     if bild["woerter_labels"]:
+        # Ohne den Familiennamen: „leer (kraftlos)" liess das Modell „kraftlos" schreiben -
+        # ein Wort aus unserer Ablage, das die Person nie angetippt hat. Dieselbe Lektion
+        # wie bei den Titeln und den Erklaersaetzen, drei Ebenen tief.
         teile.append(
-            "ANGETIPPTE WÖRTER:\n"
-            + "\n".join(f'- {w["label"]} ({w["familie"]})' for w in bild["woerter_labels"])
+            "SEINE ANGETIPPTEN WÖRTER (die Sprache des Textes kommt von hier):\n"
+            + "\n".join(f'- {w["label"]}' for w in bild["woerter_labels"])
         )
 
     if (bild.get("eigenes") or "").strip():

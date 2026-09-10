@@ -9,6 +9,11 @@ Feature sonst etwas behaupten würde, das niemand gesagt hat:
   einzige, die immer schon so war — und der Verlauf ist der eigentliche Wert.
 * **Die Szenen sind Fiktion.** Was Echo zum Schreiben bekommt, muss das ausdrücklich sagen,
   sonst steht am Ende ein Bericht in der Ich-Form über ein Ereignis, das nie stattfand.
+* **Und Echo bekommt nur, was im Text stehen darf.** Ein Modell benutzt, was es sieht — mit
+  dem Titel schrieb es „Es fühlt sich an wie ‚Der Morgen danach'", mit dem Erklärsatz zur
+  Wirkung schrieb es den Katalog ab, mit dem Verhaltens-Schlagwort schriebe es eine
+  Diagnose. Dagegen hilft keine Anweisung, nur Weglassen. Drei Tests halten fest, was
+  draußen bleibt.
 
 Läuft gegen die echte Datenbank (Transaktion, wird zurückgerollt).
 """
@@ -25,6 +30,7 @@ from app.core import crypto
 from app.services import gefuehlsbild_katalog as katalog
 from app.services import gefuehlsbild_service as dienst
 from app.services import szenen_verzeichnis
+from app.services.resonanz_katalog import TAG_ZU_MUSTER, WIRKUNG_HINWEISE
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
 
@@ -191,8 +197,89 @@ async def test_echo_erfaehrt_ausdruecklich_dass_die_szenen_erfunden_sind(db):
     user, case_id = await _fall(db)
     bild = await dienst.entwurf_sichern(db, case_id, user, szenen=[_slug()])
     eingabe = dienst.als_prompt_eingabe(bild)
-    assert "FIKTION" in eingabe
+    assert "erfundene Szenen" in eingabe
     assert "nichts davon ist ihm passiert" in eingabe
+
+
+async def test_kein_szenentitel_erreicht_das_modell(db):
+    """Der Fehler, den erst ein echter Durchlauf gezeigt hat.
+
+    Mit dem Titel in der Hand benutzt ein Modell ihn - nicht als behauptetes Ereignis
+    (davor schuetzt der Fiktionshinweis), sondern als Vergleich: "Es fuehlt sich an wie
+    'Der Morgen danach'." Dann steht im Text ueber die eigenen Gefuehle der Name einer
+    fremden Geschichte.
+
+    Dagegen hilft keine Anweisung, sondern nur, dass der Titel gar nicht ankommt. Genau
+    das steht hier: Was nie im Prompt stand, kann nicht im Text landen.
+    """
+    user, case_id = await _fall(db)
+    slugs = szenen_verzeichnis.alle_slugs()[:3]
+    bild = await dienst.entwurf_sichern(db, case_id, user, szenen=slugs)
+    eingabe = dienst.als_prompt_eingabe(bild)
+
+    assert bild["szenen_titel"], "sonst prueft der Test nichts"
+    for szene in bild["szenen_titel"]:
+        assert szene["title"] not in eingabe, szene["title"]
+        assert szene["slug"] not in eingabe, szene["slug"]
+
+
+async def test_die_szenen_geben_ihre_gefuehlsspur_mit(db):
+    """Was statt der Titel hinuebergeht - und warum die Stichwoerter dazugehoeren.
+
+    Die Wirkungsachse kennt nur Lasten. Eine Szene uebers Wiederfinden traegt deshalb
+    "Mich verlieren" (aus dem Schlagwort *selbstverlust*) und sonst nichts; ohne
+    *wiederentdeckung* und *aufbruch* daneben liest ein Modell die Szene in ihr Gegenteil
+    um. Beobachtet an einem echten Durchlauf.
+    """
+    user, case_id = await _fall(db)
+    musik = next(
+        (s for s in szenen_verzeichnis.alle_slugs()
+         if "wiederentdeckung" in ((szenen_verzeichnis.szene(s) or {}).get("scene_tags") or [])),
+        None,
+    )
+    if musik is None:
+        pytest.skip("keine Szene mit dem Schlagwort wiederentdeckung")
+
+    bild = await dienst.entwurf_sichern(db, case_id, user, szenen=[musik])
+    eingabe = dienst.als_prompt_eingabe(bild)
+    assert "wiederentdeckung" in eingabe
+    for wirkung in bild["szenen_titel"][0]["wirkungen"]:
+        assert wirkung in eingabe
+
+    # Aber NUR der Name der Wirkung, nicht ihr Erklaersatz. Mit dem Satz im Prompt schrieb
+    # das Modell ihn ab: aus "Kraftlos, ueberflutet, innerlich am Ende" wurde "Es ist eine
+    # Kraftlosigkeit, die mich ueberflutet". Statt des Menschen stand der Katalog im Text.
+    for hinweis in WIRKUNG_HINWEISE.values():
+        assert hinweis not in eingabe
+
+
+async def test_was_die_andere_person_tut_geht_nicht_mit(db):
+    """Sonst steht am Ende eine Diagnose in seiner Ich-Form.
+
+    Die Schlagwoerter einer Szene mischen zweierlei: was die andere Person TUT
+    (*gaslighting*, *isolation*) und was es mit ihm MACHT (*wahrnehmungszweifel*). Ein
+    Modell benutzt, was es sieht - dreimal beobachtet. Saehe es die erste Sorte, schriebe
+    es "Ich fuehle mich gegaslightet": eine Deutung ueber eine Abwesende, abgeleitet aus
+    einer erfundenen Geschichte, formuliert in seinen Worten.
+
+    Die Trennung gibt es schon - `TAG_ZU_MUSTER` ist genau die Liste der Verhaltenswoerter.
+    """
+    user, case_id = await _fall(db)
+    verhalten = next(
+        (s for s in szenen_verzeichnis.alle_slugs()
+         if any(t in TAG_ZU_MUSTER for t in ((szenen_verzeichnis.szene(s) or {}).get("scene_tags") or []))),
+        None,
+    )
+    if verhalten is None:
+        pytest.skip("keine Szene mit einem Verhaltens-Schlagwort")
+
+    bild = await dienst.entwurf_sichern(db, case_id, user, szenen=[verhalten])
+    eingabe = dienst.als_prompt_eingabe(bild)
+    tags = szenen_verzeichnis.szene(verhalten)["scene_tags"]
+    draussen = [t for t in tags if t in TAG_ZU_MUSTER]
+    assert draussen, "sonst prueft der Test nichts"
+    for tag in draussen:
+        assert tag.replace("-", " ") not in eingabe, tag
 
 
 async def test_die_eigenen_worte_werden_als_schwerer_gekennzeichnet(db):
