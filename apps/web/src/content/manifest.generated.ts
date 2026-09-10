@@ -269,6 +269,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "borderline",
+    "title": "Borderline – was der Begriff bezeichnet",
+    "description": "Ein Muster aus starker Gefühlsschwankung, Angst vor dem Verlassenwerden, unsicherem Selbstbild und Impulsivität. Was heute damit gemeint ist, woher der irreführende Name kommt und was der Begriff nicht ist.",
+    "cluster": "borderline",
+    "search_intent": "borderline bedeutung was ist das definition erklaerung einfach",
+    "updated": "2026-09-10",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast den Begriff nachgeschlagen. Magst du beschreiben, was dich hergeführt hat – eine Situation, ein Satz, eine Vermutung?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "borderline",
+      "spaltung",
+      "verlassenheitsangst",
+      "emotionale-dysregulation"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "borderline-in-beziehungen",
+      "glossary": [
+        "spaltung",
+        "emotionale-dysregulation",
+        "chronische-leere",
+        "identitaetsdiffusion",
+        "impulsivitaet"
+      ],
+      "comparison": [
+        "borderline-oder-narzissmus",
+        "borderline-oder-bipolar"
+      ],
+      "related": [
+        "borderline-in-beziehungen",
+        "wenn-die-diagnose-im-raum-steht",
+        "borderline-behandlung"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was bedeutet Borderline in einfachen Worten?",
+        "answer": "Gefühle kommen schneller, treffen härter und brauchen länger, bis sie abklingen. Dazu eine große Angst davor, verlassen zu werden, ein Selbstbild, das schwankt, und Handlungen, die im Zustand hoher Anspannung geschehen und hinterher selbst nicht mehr verständlich sind. Der Name sagt darüber nichts – er ist ein historisches Überbleibsel."
+      },
+      {
+        "question": "Ist Borderline eine Krankheit oder ein Charakterzug?",
+        "answer": "Weder noch, wenn man es genau nimmt. Im DSM-5 ist es eine Diagnose, im ICD-11 nur noch eine nähere Bestimmung zu einer Einschätzung des Schweregrads. Beschrieben wird ein Muster, das unterschiedlich stark ausgeprägt sein kann und sich über die Zeit verändert – kein Wesenszug und kein feststehendes Etikett."
+      },
+      {
+        "question": "Wie häufig ist das?",
+        "answer": "In der Allgemeinbevölkerung wird meist ein Anteil von etwa ein bis zwei Prozent angegeben, in klinischen Zusammenhängen deutlich mehr. Diagnostiziert werden überwiegend Frauen, und Fachleute gehen davon aus, dass ein Teil dieses Unterschieds auf die Diagnosepraxis zurückgeht und nicht auf die tatsächliche Verteilung."
+      },
+      {
+        "question": "Kann ich das bei jemandem erkennen?",
+        "answer": "Nein. Die Merkmale betreffen zu großen Teilen inneres Erleben, zu dem du von außen keinen Zugang hast, und dasselbe Verhalten kann sehr verschiedene Gründe haben. Eine Einschätzung entsteht in mehreren Gesprächen mit einer Fachperson, über Zeit."
+      }
+    ],
+    "url": "/glossar/borderline"
+  },
+  {
+    "type": "glossary",
     "slug": "chronische-leere",
     "title": "Chronische Leere – kein Gefühl, sondern dessen Abwesenheit",
     "description": "Ein anhaltendes Gefühl von Leere, unabhängig davon, ob gerade etwas Schönes passiert. Viele Betroffene nennen es das Schlimmste – und es erklärt einiges, was von außen unlogisch aussieht.",
@@ -9609,6 +9676,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
         "wenn-die-diagnose-im-raum-steht"
       ],
       "glossary": [
+        "borderline",
         "spaltung",
         "emotionale-dysregulation",
         "chronische-leere",
@@ -13911,6 +13979,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "links": {
       "parent": "borderline-in-beziehungen",
       "glossary": [
+        "borderline",
         "spaltung",
         "taeter-opfer-umkehr",
         "realitaetsverdrehung"
@@ -14307,6 +14376,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/bindungsangst": {
     "title": "Bindungsangst – Definition und Anzeichen",
     "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt."
+  },
+  "/glossar/borderline": {
+    "title": "Borderline – was der Begriff bezeichnet",
+    "description": "Ein Muster aus starker Gefühlsschwankung, Angst vor dem Verlassenwerden, unsicherem Selbstbild und Impulsivität. Was heute damit gemeint ist, woher der irreführende Name kommt und was der Begriff nicht ist."
   },
   "/glossar/chronische-leere": {
     "title": "Chronische Leere – kein Gefühl, sondern dessen Abwesenheit",

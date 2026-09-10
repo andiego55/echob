@@ -19,7 +19,7 @@ scene_tags: [borderline, wahrnehmungszweifel, spaltung]
 safety_tags: []
 links:
   parent: borderline-in-beziehungen
-  glossary: [spaltung, taeter-opfer-umkehr, realitaetsverdrehung]
+  glossary: [borderline, spaltung, taeter-opfer-umkehr, realitaetsverdrehung]
   related: [beziehung-mit-borderline, an-eigener-wahrnehmung-zweifeln, emotionale-unreife-abgrenzen]
 faq:
   - question: "Soll ich meinen Verdacht ansprechen?"

@@ -19,7 +19,7 @@ scene_tags: [borderline, verlassenheitsangst, spaltung, emotionale-dysregulation
 safety_tags: [krise]
 links:
   children: [borderline-von-innen, beziehung-mit-borderline, borderline-behandlung, wenn-die-diagnose-im-raum-steht]
-  glossary: [spaltung, emotionale-dysregulation, chronische-leere, identitaetsdiffusion, validierung]
+  glossary: [borderline, spaltung, emotionale-dysregulation, chronische-leere, identitaetsdiffusion, validierung]
   comparison: [borderline-oder-narzissmus, borderline-oder-bipolar]
   related: [verlustangst, emotionale-unreife, beziehungstrauma]
 faq:
