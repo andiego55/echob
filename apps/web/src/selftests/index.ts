@@ -20,6 +20,7 @@ import { nachDemVertrauensbruch } from './tests/nach-dem-vertrauensbruch'
 import { wieRedeIchMitMir } from './tests/wie-rede-ich-mit-mir'
 import { wieEhrlichBinIchMitMir } from './tests/wie-ehrlich-bin-ich-mit-mir'
 import { meineGrenzen } from './tests/meine-grenzen'
+import { starkeGefuehle } from './tests/starke-gefuehle'
 
 export const SELF_TESTS: SelfTest[] = [
   beziehungsgesundheit,
@@ -41,6 +42,7 @@ export const SELF_TESTS: SelfTest[] = [
   wieEhrlichBinIchMitMir,
   verliereIchMich,
   kodependenteMuster,
+  starkeGefuehle,
   eigenerAnteil,
 ]
 

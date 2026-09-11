@@ -47,6 +47,8 @@ Die Merkmale, um die es geht, sind nicht exklusiv. Sie überschneiden sich stark
 
 Deshalb ist Selbstzuordnung riskant. Nicht weil du dir nichts einbilden dürftest, sondern weil das falsche Etikett zur falschen Behandlung führt.
 
+Ein Zwischenschritt, der beim Sortieren hilft: Der Selbsttest [Starke Gefühle, schnelle Wechsel](/selbsttests/starke-gefuehle) fragt nicht, was du hast, sondern wie deine Gefühle verlaufen – Tempo, Wucht, was danach passiert. Das ist das, worüber du tatsächlich Auskunft geben kannst, und es ist eine brauchbare Vorbereitung auf ein Erstgespräch.
+
 ## Was eine Abklärung tatsächlich bringt
 
 Nicht ein Urteil über dich. Drei praktische Dinge:

@@ -194,8 +194,12 @@ function ResultView({ test, result, onRetake, loggedIn, savedState }: {
   const severe = result.flags.some((f) => (CRITICAL_FLAGS as readonly string[]).includes(f))
   // Selbst-Test: die harte Hilfe-Box nur bei echten kritischen Angaben (Flags),
   // nicht schon bei einer „alarm"-Dimension wie Mikrokontrolle. Betroffenen-Test: wie gehabt.
-  const isSelf = test.safetyVariant === 'self'
-  const showSafety = test.safety && (severe || (!isSelf && (result.overall?.band?.tone === 'alert' || result.dimensions.some((d) => d.band?.tone === 'alert'))))
+  // Bei selbstgerichteten Tests haengt die harte Hilfe-Box nur an echten Flags: Ein hoher
+  // Wert auf einer Skala wie „Meine Gefuehle kommen schnell" ist keine Gefahrenlage, und ein
+  // roter Kasten darauf wuerde jemandem Alarm ausloesen, der gerade ehrlich ueber sich
+  // nachgedacht hat.
+  const nurBeiFlags = test.safetyVariant === 'self' || test.safetyVariant === 'krise'
+  const showSafety = test.safety && (severe || (!nurBeiFlags && (result.overall?.band?.tone === 'alert' || result.dimensions.some((d) => d.band?.tone === 'alert'))))
   // Kritische Angaben (Kindesentzug, Gewalt …) sind unabhängig vom Durchschnitt ernst.
   const overallBand: TestBand | undefined = severe
     ? { min: 0, label: 'Ernst zu nehmen', tone: 'alert', text: 'Unabhängig vom Gesamtwert: Du hast Dinge angegeben, die schwer wiegen (siehe Hinweis unten). Bitte nimm das ernst.' }
@@ -374,9 +378,10 @@ const FLAG_LABELS: Record<string, string> = {
   'trennungsdrohung-ohne-reparatur': 'Trennungsdrohung als Druckmittel – ohne Klärung danach',
   'trennungsdrohung-haeufig': 'wiederholte Trennungsdrohungen',
   'coercive-control': 'systematische Isolation oder Kontrolle (Coercive Control)',
+  selbstgefaehrdung: 'Gedanken daran, dir selbst etwas anzutun',
 }
 
-function SafetyBox({ variant, flags }: { variant: 'victim' | 'self'; flags: string[] }) {
+function SafetyBox({ variant, flags }: { variant: 'victim' | 'self' | 'krise'; flags: string[] }) {
   const shown = flags.filter((f) => FLAG_LABELS[f])
   return (
     <div className="mt-8 rounded-brand border border-red-200 bg-red-50 px-5 py-4">
@@ -386,7 +391,17 @@ function SafetyBox({ variant, flags }: { variant: 'victim' | 'self'; flags: stri
           {shown.map((f) => <li key={f}>{FLAG_LABELS[f]}</li>)}
         </ul>
       )}
-      {variant === 'self' ? (
+      {variant === 'krise' ? (
+        <p className="mt-2 text-[0.9rem] leading-relaxed text-red-700">
+          Dass du das angegeben hast, zählt – unabhängig davon, wie hoch oder niedrig der Gesamtwert
+          ausgefallen ist. Du musst nicht erst begründen, dass es schlimm genug ist. Die
+          Telefonseelsorge ist rund um die Uhr, kostenlos und anonym erreichbar:{' '}
+          <strong>0800 111 0 111</strong> oder <strong>0800 111 0 222</strong>. Für schnelle
+          fachliche Hilfe gibt es in jeder Region einen <strong>psychiatrischen Krisendienst</strong>;
+          Termine vermittelt auch die <strong>116 117</strong>. Bei akuter Gefahr: <strong>112</strong>.
+          Wenn du in Behandlung bist, ist jetzt der Moment für deinen Krisenplan.
+        </p>
+      ) : variant === 'self' ? (
         <p className="mt-2 text-[0.9rem] leading-relaxed text-red-700">
           Das ehrlich zuzugeben, ist ein wichtiger, mutiger Schritt. Manche dieser Muster – vor allem Drohungen mit den
           Kindern und körperliche Gewalt – schaden anderen ernsthaft und können strafbar sein. Du musst das nicht allein

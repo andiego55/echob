@@ -100,8 +100,15 @@ export interface SelfTest {
   echo: { opening_question: string }
   /** zeigt einen Krisen-/Sicherheitshinweis (z. B. Coercive Control). */
   safety?: boolean
-  /** 'victim' = Betroffenen-Hilfe (Default), 'self' = Selbstreflexion über eigenes Verhalten. */
-  safetyVariant?: 'victim' | 'self'
+  /**
+   * 'victim' = Betroffenen-Hilfe (Default), 'self' = Selbstreflexion über eigenes Verhalten,
+   * 'krise' = Gefährdung der eigenen Person.
+   *
+   * Die dritte Variante gibt es, weil die beiden ersten an dieser Stelle falsche Nummern
+   * nennen: Wer angibt, sich selbst etwas anzutun, braucht weder Gewaltberatung noch das
+   * Hilfetelefon gegen häusliche Gewalt, sondern Telefonseelsorge und Krisendienst.
+   */
+  safetyVariant?: 'victim' | 'self' | 'krise'
   disclaimer?: string
 }
 
@@ -112,6 +119,9 @@ export const CRITICAL_FLAGS = [
   'kindesentzug-ohne-reparatur',
   'trennungsdrohung-ohne-reparatur',
   'coercive-control',
+  // Eigene Gefährdung. Steht hier, weil sie unabhängig vom Durchschnitt zählt: Ein
+  // unauffälliger Gesamtwert darf die Angabe nicht zudecken.
+  'selbstgefaehrdung',
 ] as const
 
 /** Antwort je Frage: scale/single → number; multi → number[]; text → string. */

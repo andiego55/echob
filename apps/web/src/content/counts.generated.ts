@@ -2,4 +2,4 @@
 // Zahlen fuer Navigations-Abzeichen. Bewusst getrennt vom Manifest: Wer nur die Anzahl
 // braucht, soll nicht die Daten laden.
 export const SCENE_COUNT = 185
-export const TEST_COUNT = 20
+export const TEST_COUNT = 21

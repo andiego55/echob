@@ -80,6 +80,8 @@ Drei Stellen, an denen sich etwas bewegen lässt – keine davon heißt, sich zu
 
 **Danach.** Hier liegt der größte Hebel, und er wird am häufigsten ausgelassen. Zurückzukommen – nicht mit Selbstverurteilung, sondern mit einem klaren Satz: *Was ich gestern gesagt habe, war nicht wahr, und es tut mir leid. Ich war in einem Zustand, in dem ich nur noch eine Sache sehen konnte.* Das ist ein [Reparaturversuch](/glossar/reparaturversuch), und für Beziehungen ist er wichtiger als die Frage, wie oft es eskaliert.
 
+Wenn du sortieren willst, wo bei dir am meisten Bewegung ist, hilft der Selbsttest [Starke Gefühle, schnelle Wechsel](/selbsttests/starke-gefuehle). Er stellt keine Diagnose – er schaut auf sechs Bereiche und zeigt, welcher davon gerade am meisten kostet.
+
 ## Was du niemandem schuldest
 
 Du schuldest niemandem, deine Diagnose als Ausweis mitzuführen. Du schuldest niemandem, dich für die Wucht deiner Gefühle zu entschuldigen. Und du schuldest niemandem, in einer Beziehung zu bleiben, in der du schlecht behandelt wirst – die Diagnose macht dich nicht zur Schuldigen jedes Konflikts, und Menschen mit diesem Muster geraten überdurchschnittlich oft an Gegenüber, die genau das ausnutzen.
