@@ -42,6 +42,7 @@ export const CLUSTERS = [
   'liebessprachen', // Liebessprachen (Gary Chapman) – wie Zuneigung ankommt
   'grenzen', // Grenzen setzen
   'konflikt', // Konflikt & Streit
+  'mental-load', // Mental Load & Fairness – wer an alles denkt, Aufgabenverteilung, Elternschaft
   'gefuehle', // Gefühle verstehen
 ] as const
 export type Cluster = (typeof CLUSTERS)[number]
@@ -156,6 +157,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   liebessprachen: 'Liebessprachen',
   grenzen: 'Grenzen setzen',
   konflikt: 'Konflikt & Streit',
+  'mental-load': 'Mental Load & Fairness',
   gefuehle: 'Gefühle verstehen',
 }
 

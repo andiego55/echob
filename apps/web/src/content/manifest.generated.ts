@@ -336,6 +336,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "care-arbeit",
+    "title": "Care-Arbeit – die unbezahlte Sorgearbeit",
+    "description": "Alles, was getan werden muss, damit Menschen versorgt sind: Haushalt, Kinder, Pflege, Organisation. Unbezahlt, meistens unsichtbar, und ungleich verteilt – der Gender Care Gap in Zahlen.",
+    "cluster": "mental-load",
+    "search_intent": "care arbeit bedeutung gender care gap unbezahlte sorgearbeit zahlen",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du überschlagen, wie viele Stunden in der Woche bei dir für Sorgearbeit draufgehen – und wie das bei der anderen Person aussieht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "care-arbeit",
+      "aufgabenverteilung",
+      "mental-load"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "mental-load",
+        "zweite-schicht",
+        "default-elternteil"
+      ],
+      "related": [
+        "fair-verteilen",
+        "mental-load-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie groß ist der Unterschied zwischen Frauen und Männern?",
+        "answer": "Der sogenannte Gender Care Gap beschreibt genau diesen Abstand. Für Deutschland liegt er bei gut vierzig Prozent: Frauen leisten pro Tag deutlich mehr unbezahlte Sorgearbeit als Männer. Der Abstand ist bei Paaren ohne Kinder klein und springt mit dem ersten Kind stark nach oben – und er geht danach kaum wieder zurück."
+      },
+      {
+        "question": "Zählt Pflege auch dazu?",
+        "answer": "Ja, und sie wird meistens vergessen. Die Versorgung alter oder kranker Angehöriger ist Care-Arbeit, sie trifft überwiegend Frauen in der Lebensmitte, und sie fällt oft in genau die Jahre, in denen auch Kinder noch Betreuung brauchen."
+      }
+    ],
+    "url": "/glossar/care-arbeit"
+  },
+  {
+    "type": "glossary",
     "slug": "chronische-leere",
     "title": "Chronische Leere – kein Gefühl, sondern dessen Abwesenheit",
     "description": "Ein anhaltendes Gefühl von Leere, unabhängig davon, ob gerade etwas Schönes passiert. Viele Betroffene nennen es das Schlimmste – und es erklärt einiges, was von außen unlogisch aussieht.",
@@ -425,6 +476,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/coercive-control"
+  },
+  {
+    "type": "glossary",
+    "slug": "default-elternteil",
+    "title": "Default-Elternteil – wen die Schule anruft",
+    "description": "Der Elternteil, bei dem automatisch alles landet: Anrufe, Fragen, Zuständigkeit. Wie diese Rolle in wenigen Wochen entsteht, warum sie sich selbst verstärkt und was sie kostet.",
+    "cluster": "mental-load",
+    "search_intent": "default parent bedeutung hauptelternteil kita ruft immer mich an",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wer bei euch angerufen wird, wenn etwas ist – und wie das so gekommen ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "elternschaft",
+      "mental-load",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "mental-load",
+        "care-arbeit",
+        "standardhoheit"
+      ],
+      "related": [
+        "beziehung-nach-der-geburt",
+        "zustaendigkeit-statt-aufgaben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie entsteht diese Rolle?",
+        "answer": "Fast immer über die erste Zeit nach der Geburt. Wer in diesen Monaten überwiegend allein zuständig ist, weiß danach tausend Dinge mehr – und ab da ist es in jeder einzelnen Situation schneller, wenn diese Person es macht. Aus einem Umstand wird binnen weniger Wochen eine Struktur, ohne dass jemand sie beschlossen hätte."
+      },
+      {
+        "question": "Lässt sich das umdrehen?",
+        "answer": "Ja, aber nicht durch Absprachen allein. Es braucht Zeiten, in denen der andere Elternteil wirklich allein und ausschließlich zuständig ist – mehrere Stunden am Stück, ohne Anleitung und ohne Rückfragen. Nur so entsteht eigenes Wissen. Zusätzlich hilft es sehr, die Kontaktdaten bei Kita, Schule und Ärztin ausdrücklich umzustellen."
+      }
+    ],
+    "url": "/glossar/default-elternteil"
   },
   {
     "type": "glossary",
@@ -697,6 +799,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/emotionale-ansteckung"
+  },
+  {
+    "type": "glossary",
+    "slug": "emotionale-arbeit",
+    "title": "Emotionale Arbeit – und was der Begriff ursprünglich meinte",
+    "description": "Gefühle steuern, damit eine Situation funktioniert: die eigenen und die der anderen. Was Arlie Hochschild damit meinte, wie der Begriff sich verschoben hat – und warum die Unterscheidung zum Mental Load nützlich ist.",
+    "cluster": "mental-load",
+    "search_intent": "emotionale arbeit bedeutung emotional labor hochschild beziehung",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wessen Stimmung du im Alltag mitregulierst – und was das mit dir macht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "anerkennung",
+      "care-arbeit",
+      "mental-load"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "mental-load",
+        "care-arbeit",
+        "emotionaler-kontostand"
+      ],
+      "related": [
+        "mental-load-in-beziehungen",
+        "co-regulation",
+        "emotionsregulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zum Mental Load?",
+        "answer": "Mental Load ist das Denken an Dinge: Termine, Vorräte, Fristen. Emotionale Arbeit ist das Regulieren von Stimmungen: die eigene herunterfahren, damit es nicht eskaliert, die des anderen auffangen, zwischen zwei Streitenden vermitteln, an Geburtstage denken und daran, dass jemand gekränkt sein könnte. Beides fällt oft bei derselben Person an, ist aber verschieden anstrengend."
+      },
+      {
+        "question": "Stimmt es, dass der Begriff ursprünglich etwas anderes meinte?",
+        "answer": "Ja. Arlie Hochschild prägte emotional labor 1983 für bezahlte Arbeit, in der die Darstellung von Gefühlen zum Job gehört – das Lächeln der Flugbegleiterin, die Freundlichkeit an der Kasse. Die Ausweitung auf unbezahlte Beziehungsarbeit kam später, und Hochschild selbst hat sie kritisiert, weil der Begriff dadurch fast alles bedeuten kann. Nützlich bleibt er trotzdem, wenn man sagt, was man meint."
+      }
+    ],
+    "url": "/glossar/emotionale-arbeit"
   },
   {
     "type": "glossary",
@@ -2187,6 +2341,61 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "mental-load",
+    "title": "Mental Load – die Arbeit, an alles zu denken",
+    "description": "Nicht die Tätigkeit, sondern das Denken darum herum: daran denken, entscheiden, nachhalten, die Folgen tragen. Warum sich diese Last durch Mithilfe nicht verkleinern lässt.",
+    "cluster": "mental-load",
+    "search_intent": "mental load bedeutung definition einfach erklaert beziehung",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du aufzählen, woran du heute gedacht hast, ohne dass es jemand gesagt hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "mental-load",
+      "care-arbeit",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "care-arbeit",
+        "emotionale-arbeit",
+        "default-elternteil",
+        "standardhoheit"
+      ],
+      "comparison": [
+        "helfen-oder-zustaendig-sein"
+      ],
+      "related": [
+        "mental-load-in-beziehungen",
+        "zustaendigkeit-statt-aufgaben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Woher kommt der Begriff?",
+        "answer": "Aus der Arbeits- und Kognitionsforschung, wo mental load die geistige Beanspruchung bei einer Tätigkeit meint. Populär für den Haushalt wurde er 2017 durch den Comic der französischen Zeichnerin Emma, der im Deutschen als Du hättest ja was sagen können bekannt ist. Der Comic beschreibt genau die Pointe: Wer gefragt werden muss, hat die Last nicht übernommen."
+      },
+      {
+        "question": "Ist Mental Load dasselbe wie Hausarbeit?",
+        "answer": "Nein, es ist die Schicht darüber. Hausarbeit ist das Tun, Mental Load das Planen, Erinnern und Nachhalten. Man kann die Hausarbeit zur Hälfte übernehmen und null Prozent der Last tragen – nämlich dann, wenn einem jeder Handgriff gesagt wird."
+      }
+    ],
+    "url": "/glossar/mental-load"
+  },
+  {
+    "type": "glossary",
     "slug": "mentalisierung",
     "title": "Mentalisierung – hinter Verhalten ein Innenleben vermuten",
     "description": "Mentalisierung ist die Fähigkeit, eigenes und fremdes Verhalten als Ausdruck von Gedanken und Gefühlen zu verstehen. Sie ist begrenzt, bricht unter Stress ab – und ist der Kern dessen, was emotionale Reife ausmacht.",
@@ -3252,6 +3461,60 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "standardhoheit",
+    "title": "Standardhoheit – wenn Abgeben an Bedingungen hängt",
+    "description": "Ein Bereich wird übergeben und weiter bewertet. Die andere Seite hört auf mitzudenken, weil Mitdenken sich nicht auszahlt. In der Forschung heißt das Gatekeeping – und es ist keine Schuldfrage, sondern eine Stellschraube.",
+    "cluster": "mental-load",
+    "search_intent": "gatekeeping partnerschaft kontrolle haushalt nicht abgeben koennen perfektionismus",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, was du tust, wenn jemand etwas anders macht als du es gemacht hättest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "standardhoheit",
+      "mental-load",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "mental-load",
+        "strategische-unfaehigkeit",
+        "default-elternteil"
+      ],
+      "comparison": [
+        "mental-load-oder-standard"
+      ],
+      "related": [
+        "zustaendigkeit-statt-aufgaben",
+        "der-innere-kritiker"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das nicht einfach ein Vorwurf an die, die sowieso alles machen?",
+        "answer": "Das wäre es, wenn damit die Ungleichverteilung wegerklärt würde. Die ist belegt und bleibt bestehen. Der Begriff beschreibt etwas anderes und Nützliches: die eine Stelle, an der die tragende Person selbst etwas bewegen kann, ohne auf die Einsicht eines anderen angewiesen zu sein."
+      },
+      {
+        "question": "Woran merke ich, dass ich es tue?",
+        "answer": "An dem, was du tust, wenn etwas anders gemacht wurde. Kommentieren, umsortieren, hinterher heimlich nacharbeiten, beim nächsten Mal vorsichtshalber selbst machen – das sind die vier üblichen Formen, und die letzte ist die folgenreichste, weil sie unsichtbar bleibt."
+      }
+    ],
+    "url": "/glossar/standardhoheit"
+  },
+  {
+    "type": "glossary",
     "slug": "stonewalling",
     "title": "Stonewalling – die verschlossene Tür im selben Haus",
     "description": "Stonewalling ist der vollständige Rückzug aus dem Gespräch: keine Antwort, kein Blick, manchmal tagelang. Warum es sich für beide Seiten so unterschiedlich anfühlt und was hilft.",
@@ -3283,6 +3546,59 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/stonewalling"
+  },
+  {
+    "type": "glossary",
+    "slug": "strategische-unfaehigkeit",
+    "title": "Strategische Unfähigkeit – wenn Nichtkönnen bequem ist",
+    "description": "Etwas misslingt ausgerechnet dort, wo es unangenehm ist, während anderswo erhebliche Kompetenz vorliegt. Was der Begriff meint, woran man ihn festmacht – und warum er viel zu schnell vergeben wird.",
+    "cluster": "mental-load",
+    "search_intent": "weaponized incompetence bedeutung absichtlich schlecht machen haushalt partner",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der etwas nicht geklappt hat – und ehrlich prüfen, ob es am Können lag?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "aufgabenverteilung",
+      "mental-load",
+      "anerkennung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "standardhoheit",
+        "mental-load"
+      ],
+      "comparison": [
+        "mental-load-oder-standard"
+      ],
+      "related": [
+        "mental-load-als-vorwurf",
+        "zustaendigkeit-statt-aufgaben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Woran mache ich das fest?",
+        "answer": "An drei Dingen zusammen: Es misslingt nur in unangenehmen Bereichen, während anderswo Kompetenz vorliegt. Es bessert sich über Monate nicht, obwohl es erklärt wurde. Und das Misslingen hat zuverlässig die Folge, dass jemand anderes es übernimmt. Trifft nur eines davon zu, ist es wahrscheinlich schlicht Unerfahrenheit."
+      },
+      {
+        "question": "Warum ist der Begriff heikel?",
+        "answer": "Weil er eine Absicht unterstellt, die selten nachweisbar ist. Das meiste, was so genannt wird, ist Übungsmangel plus eine Zuständigkeit, die nie übergeben wurde. Wer den Vorwurf zu schnell erhebt, macht jedes Lernen unmöglich – denn Lernen sieht am Anfang genau wie Unfähigkeit aus."
+      }
+    ],
+    "url": "/glossar/strategische-unfaehigkeit"
   },
   {
     "type": "glossary",
@@ -3744,6 +4060,52 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/glossar/zirkulaere-frage"
   },
   {
+    "type": "glossary",
+    "slug": "zweite-schicht",
+    "title": "Zweite Schicht – der Arbeitstag nach dem Arbeitstag",
+    "description": "Arlie Hochschilds Befund von 1989: Frauen, die erwerbstätig sind, arbeiten zu Hause weiter, während Männer Feierabend haben. Was seitdem passiert ist und was nicht.",
+    "cluster": "mental-load",
+    "search_intent": "zweite schicht hochschild second shift bedeutung doppelbelastung",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie bei euch der Abend nach Feierabend aussieht – für jeden von euch beiden?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "care-arbeit",
+      "erschoepfung",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "care-arbeit",
+        "mental-load"
+      ],
+      "related": [
+        "fair-verteilen",
+        "mental-load-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist der Befund nicht veraltet?",
+        "answer": "Die Zahlen haben sich verschoben, das Muster nicht. Männer beteiligen sich heute deutlich mehr als 1989. Der Abstand ist trotzdem geblieben, und er springt weiterhin mit dem ersten Kind nach oben. Was sich am wenigsten verändert hat, ist der unsichtbare Teil – wer plant und daran denkt."
+      }
+    ],
+    "url": "/glossar/zweite-schicht"
+  },
+  {
     "type": "problem",
     "slug": "an-eigener-wahrnehmung-zweifeln",
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
@@ -3898,6 +4260,72 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "problem",
+    "slug": "ich-muss-an-alles-denken",
+    "title": "Ich muss an alles denken – und keiner sieht es",
+    "description": "Abends ist nichts geschafft und du bist trotzdem leer. Woher diese besondere Müdigkeit kommt, warum sie so schwer zu erklären ist und was du tun kannst, bevor du das nächste Gespräch führst.",
+    "cluster": "mental-load",
+    "search_intent": "ich muss an alles denken erschoepft haushalt partner merkt nichts",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du einmal aufzählen, woran du seit heute Morgen gedacht hast, ohne dass es jemand gesagt hat – und wie es dir beim Aufzählen geht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "mental-load",
+      "erschoepfung",
+      "anerkennung",
+      "care-arbeit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "mental-load",
+        "default-elternteil",
+        "care-arbeit"
+      ],
+      "related": [
+        "zustaendigkeit-statt-aufgaben",
+        "fair-verteilen",
+        "sich-selbst-verlieren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum bin ich so müde, obwohl ich nichts geschafft habe?",
+        "answer": "Weil das Denken die Arbeit war. Im Kopf laufen zu haben, was ansteht, was fehlt, was wann erledigt sein muss und was passiert, wenn nicht – das läuft den ganzen Tag im Hintergrund und hat keinen Feierabend. Es produziert nur nichts, was man am Abend vorzeigen könnte, und deshalb hält man die eigene Erschöpfung für unbegründet."
+      },
+      {
+        "question": "Wie erkläre ich das, ohne dass es wie Vorwurf klingt?",
+        "answer": "Indem du es zeigst statt es zu behaupten. Zwei Wochen lang aufschreiben, woran du gedacht hast, ohne dass es jemand gesagt hat. Eine Liste diskutiert sich anders als ein Gefühl: Über ein Gefühl kann man streiten, über sechzig Zeilen schwerer. Und sie hilft zuerst dir selbst, weil du das erste Mal siehst, was du eigentlich trägst."
+      },
+      {
+        "question": "Ich will nicht die Nörglerin sein. Wie komme ich da raus?",
+        "answer": "Indem du aufhörst, Aufgaben zu verteilen, und stattdessen Bereiche übergibst. Die Rolle der Nörglerin entsteht nicht aus deinem Tonfall, sondern aus deiner Position: Wer erinnern muss, wirkt nörgelnd, egal wie freundlich er es tut. Diese Rolle verschwindet erst, wenn jemand anders selbst daran denkt."
+      },
+      {
+        "question": "Was, wenn Reden nichts bringt?",
+        "answer": "Dann liegt es oft daran, dass Aufgaben besprochen wurden statt Zuständigkeiten – oder dass eine Übergabe in den ersten Wochen abgebrochen wurde, weil es schlechter lief. Beides ist reparierbar. Wenn Gespräche darüber dagegen regelmäßig damit enden, dass du an deiner Wahrnehmung zweifelst, ist das ein anderes Thema."
+      }
+    ],
+    "url": "/hilfe/ich-muss-an-alles-denken"
+  },
+  {
+    "type": "problem",
     "slug": "ist-mein-partner-borderline",
     "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
     "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung.",
@@ -3956,6 +4384,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/hilfe/ist-mein-partner-borderline"
+  },
+  {
+    "type": "problem",
+    "slug": "mir-macht-man-es-nie-recht",
+    "title": "Ich mache es, und es ist trotzdem falsch",
+    "description": "Du übernimmst etwas – es war das Falsche, zu spät oder nicht so gemeint. Was dahinterstecken kann, wie du herausfindest, was bei euch vorliegt, und was du tun kannst, ohne recht haben zu müssen.",
+    "cluster": "mental-load",
+    "search_intent": "partnerin nie zufrieden haushalt kritik mache alles falsch beziehung",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine konkrete Situation anschauen, in der du etwas übernommen hast und es trotzdem nicht gepasst hat – möglichst genau, mit dem, was danach kam?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "anerkennung",
+      "standardhoheit",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "standardhoheit",
+        "mental-load",
+        "strategische-unfaehigkeit"
+      ],
+      "comparison": [
+        "mental-load-oder-standard",
+        "helfen-oder-zustaendig-sein"
+      ],
+      "related": [
+        "mental-load-als-vorwurf",
+        "zustaendigkeit-statt-aufgaben",
+        "fair-streiten"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Bin ich wirklich so unfähig, wie es sich anfühlt?",
+        "answer": "Sehr wahrscheinlich nicht. Wer in einem Bereich zwei Jahre Vorsprung hat, ist darin besser – das ist Übung, keine Begabung. Wenn dir dieselben Menschen im Beruf Verantwortung übertragen, spricht das dagegen, dass es an deiner Fähigkeit liegt. Was fehlt, ist meistens nicht Können, sondern Zuständigkeit samt der Zeit, sie zu erwerben."
+      },
+      {
+        "question": "Wie finde ich heraus, ob die Kritik berechtigt ist?",
+        "answer": "Übernimm einen ganzen Bereich für acht Wochen und führe ihn auf deine Weise. Wird es danach ruhiger, war es ein Verteilungsproblem und ist jetzt kleiner. Kommt Nachbesserung, geht es um den Standard. Kommt sofort ein neuer Vorwurf woanders, ging es nie um Aufgaben."
+      },
+      {
+        "question": "Warum ärgert mich das so, obwohl es nur um Haushalt geht?",
+        "answer": "Weil es nicht um Haushalt geht. Dauerhaft zu hören, dass das eigene Tun nicht genügt, trifft den Selbstwert, und irgendwann hört man auf, es zu versuchen – nicht aus Trotz, sondern weil Anstrengung ohne Wirkung ermüdet. Genau dieses Aufhören wird dann als Beweis gelesen, dass es schon immer so war."
+      },
+      {
+        "question": "Was, wenn wirklich ich das Problem bin?",
+        "answer": "Das kommt vor, und es ist keine Katastrophe. Der Prüfstein: Fallen dir konkrete Gegenbeispiele ein – Dinge, an die du von selbst gedacht hast, bevor sie jemand gesagt hat? Wenn dir dazu nichts einfällt, sondern nur Gegenvorwürfe, ist das ein Hinweis. Damit lässt sich arbeiten, und zwar leichter als mit der Frage, wer schuld ist."
+      }
+    ],
+    "url": "/hilfe/mir-macht-man-es-nie-recht"
   },
   {
     "type": "problem",
@@ -4962,6 +5459,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-anruf-aus-der-kita",
+    "title": "Der Anruf aus der Kita",
+    "description": "Eine Szene über die Rolle, die niemand vergeben hat und alle kennen: Wer angerufen wird, wenn etwas ist. Ich-Perspektive, fiktiv.",
+    "cluster": "mental-load",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Julias Sicht",
+    "pull_quote": "Sie rufen immer mich an. Ich sitze im Meeting, und mein Handy leuchtet, und noch bevor ich drangehe, weiß ich, dass mein Nachmittag weg ist.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wer bei euch angerufen wird, wenn etwas ist – und wie diese Rolle entstanden ist?"
+    },
+    "scene_tags": [
+      "elternschaft",
+      "mental-load",
+      "aufgabenverteilung",
+      "erschoepfung"
+    ],
+    "url": "/szenen/der-anruf-aus-der-kita"
+  },
+  {
+    "type": "scene",
     "slug": "der-beste-mensch-im-raum",
     "title": "Der beste Mensch im Raum",
     "description": "Eine fiktive Szene: Beim Benefiz sind alle hingerissen, wie großzügig und selbstlos sie ist. Nur er weiß, wie wenig von dieser Wärme zu Hause ankommt. Über kommunalen Narzissmus – Größe über Güte.",
@@ -5546,6 +6070,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "sich-klein-fuehlen"
     ],
     "url": "/szenen/die-liste"
+  },
+  {
+    "type": "scene",
+    "slug": "die-liste-in-meinem-kopf",
+    "title": "Die Liste in meinem Kopf",
+    "description": "Eine Szene über die Viertelstunde vor dem Einschlafen, in der der Tag noch einmal von vorn anfängt. Ich-Perspektive, fiktiv.",
+    "cluster": "mental-load",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Katharinas Sicht",
+    "pull_quote": "Er schläft nach vier Minuten. Ich liege daneben und gehe durch, was morgen ist, übermorgen, nächste Woche, und was passiert, wenn ich es vergesse.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du diese Viertelstunde vor dem Einschlafen? Magst du aufschreiben, was in dieser Zeit bei dir durchläuft?"
+    },
+    "scene_tags": [
+      "mental-load",
+      "erschoepfung",
+      "care-arbeit",
+      "anerkennung"
+    ],
+    "url": "/szenen/die-liste-in-meinem-kopf"
   },
   {
     "type": "scene",
@@ -6717,6 +7268,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/ich-habe-die-augen-verdreht"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-doch-eingekauft",
+    "title": "Ich habe doch eingekauft",
+    "description": "Eine Szene über den Unterschied zwischen etwas tun und etwas verantworten – erzählt von dem, der etwas getan hat und nicht versteht, warum es nicht zählt. Ich-Perspektive, fiktiv.",
+    "cluster": "mental-load",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Michaels Sicht",
+    "pull_quote": "Ich stehe mit sechs Tüten in der Küche und warte auf irgendwas. Sie sagt: Und die Windeln? Und ich merke, wie mir der ganze Nachmittag abhandenkommt.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, etwas gemacht zu haben und trotzdem nicht anzukommen? Magst du beschreiben, was du dir in dem Moment gewünscht hättest?"
+    },
+    "scene_tags": [
+      "anerkennung",
+      "mental-load",
+      "aufgabenverteilung"
+    ],
+    "url": "/szenen/ich-habe-doch-eingekauft"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-es-anders-gemacht",
+    "title": "Ich habe es anders gemacht",
+    "description": "Eine Szene über den Moment, in dem etwas Übernommenes zurückkorrigiert wird – und darüber, was das mit der Lust am nächsten Mal macht. Ich-Perspektive, fiktiv.",
+    "cluster": "mental-load",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ninas Sicht",
+    "pull_quote": "Er hat nichts Böses gesagt. Er hat nur die Hälfte noch mal gemacht, während ich danebenstand.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das, etwas übernommen zu haben und dann korrigiert zu werden? Magst du anschauen, was das mit dir gemacht hat?"
+    },
+    "scene_tags": [
+      "standardhoheit",
+      "aufgabenverteilung",
+      "anerkennung"
+    ],
+    "url": "/szenen/ich-habe-es-anders-gemacht"
   },
   {
     "type": "scene",
@@ -8173,6 +8776,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "sag-mir-einfach-was-ich-tun-soll",
+    "title": "Sag mir einfach, was ich tun soll",
+    "description": "Eine Szene über ein ehrlich gemeintes Angebot, das jedes Mal die Stimmung verschlechtert – und über den Moment, in dem einer versteht, warum. Ich-Perspektive, fiktiv.",
+    "cluster": "mental-load",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Simons Sicht",
+    "pull_quote": "Ich biete an, alles zu machen, was sie sagt. Und ich verstehe bis heute nicht, warum dieser Satz sie jedes Mal wütend macht.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, etwas anzubieten und damit alles schlimmer zu machen? Magst du so eine Situation genauer anschauen?"
+    },
+    "scene_tags": [
+      "mental-load",
+      "aufgabenverteilung",
+      "anerkennung"
+    ],
+    "url": "/szenen/sag-mir-einfach-was-ich-tun-soll"
+  },
+  {
+    "type": "scene",
     "slug": "schau-wie-geduldig-ich-mit-dir-bin",
     "title": "Schau, wie geduldig ich mit dir bin",
     "description": "Eine fiktive Szene: Vor Freunden lobt sie sich selbst dafür, wie viel sie mit ihm aushält – und macht ihn so zum schwierigen Fall, den sie großmütig erträgt. Über kommunalen Narzissmus als moralische Überlegenheit.",
@@ -8198,6 +8827,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/schau-wie-geduldig-ich-mit-dir-bin"
+  },
+  {
+    "type": "scene",
+    "slug": "sechs-wochen-nach-der-geburt",
+    "title": "Sechs Wochen",
+    "description": "Eine Szene über die Wochen, in denen sich Rollen festlegen, ohne dass jemand sie beschlossen hat. Ich-Perspektive, fiktiv.",
+    "cluster": "mental-load",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Sarahs Sicht",
+    "pull_quote": "Er fragt mich, ob sie Hunger hat. Er fragt mich das jeden Abend, und jedes Mal antworte ich, und jedes Mal wird der Abstand ein bisschen größer.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, wie bei euch nach der Geburt die Zuständigkeiten entstanden sind – und wer wann allein zuständig war?"
+    },
+    "scene_tags": [
+      "elternschaft",
+      "mental-load",
+      "erschoepfung",
+      "aufgabenverteilung"
+    ],
+    "url": "/szenen/sechs-wochen-nach-der-geburt"
   },
   {
     "type": "scene",
@@ -8954,6 +9610,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "wir-haben-es-nie-besprochen",
+    "title": "Wir haben es nie besprochen",
+    "description": "Eine Szene über einen Mann, der den Überblick über alles trägt – und darüber, dass für diese Erfahrung kaum Worte bereitliegen. Ich-Perspektive, fiktiv.",
+    "cluster": "mental-load",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Martins Sicht",
+    "pull_quote": "Wenn ich sage, dass ich an alles denken muss, lachen die Leute. Ein Mann, der sich über Mental Load beschwert – das ist offenbar ein Witz.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie bei euch die Verteilung entstanden ist – und ob ihr sie je ausdrücklich vereinbart habt?"
+    },
+    "scene_tags": [
+      "mental-load",
+      "care-arbeit",
+      "anerkennung",
+      "erschoepfung"
+    ],
+    "url": "/szenen/wir-haben-es-nie-besprochen"
+  },
+  {
+    "type": "scene",
     "slug": "wir-haben-normal-gefruehstueckt",
     "title": "Wir haben normal gefrühstückt",
     "description": "Eine fiktive Szene: Ein Jahr danach, ein völlig gewöhnlicher Samstagmorgen — und dann eine Kleinigkeit, die alles wieder aufreißt. Über Rückschläge und die Frage, ob das Fortschritt ist.",
@@ -9352,6 +10035,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/beziehung-mit-borderline"
+  },
+  {
+    "type": "topic",
+    "slug": "beziehung-nach-der-geburt",
+    "title": "Beziehung nach der Geburt: das Fenster, in dem sich alles festlegt",
+    "description": "Bei den meisten Paaren sinkt die Zufriedenheit nach der Geburt deutlich – und kaum jemand sagt es vorher. Warum das nicht an euch liegt, wie sich Rollen in wenigen Wochen zementieren und was in dieser Zeit tatsächlich hilft.",
+    "cluster": "mental-load",
+    "search_intent": "beziehung nach geburt krise streit erstes jahr rollenverteilung eltern werden",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation aus den letzten Wochen anschauen, in der ihr aneinandergeraten seid – und dabei mitdenken, wie viel Schlaf ihr beide hattet?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "elternschaft",
+      "mental-load",
+      "erschoepfung",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "default-elternteil",
+        "care-arbeit",
+        "mental-load"
+      ],
+      "related": [
+        "fair-verteilen",
+        "zustaendigkeit-statt-aufgaben",
+        "co-regulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist es normal, dass wir seit der Geburt mehr streiten?",
+        "answer": "Ja, und zwar so verbreitet, dass es in der Paarforschung ein eigener Befund ist: Bei der Mehrheit der Paare sinkt die Beziehungszufriedenheit im ersten Jahr nach der Geburt spürbar. Das heißt nicht, dass mit eurer Beziehung etwas nicht stimmt. Es heißt, dass ihr in einer Lage seid, die fast alle unterschätzen – chronischer Schlafmangel, ein völlig neuer Alltag, und eine Rollenverteilung, die sich nebenbei festlegt."
+      },
+      {
+        "question": "Warum landet fast alles bei einem von uns?",
+        "answer": "Weil Kompetenz durch Alleinverantwortung entsteht, nicht durch Zusehen. Wer in den ersten Monaten die meiste Zeit allein mit dem Kind verbringt, weiß nach kurzer Zeit tausend Dinge, die der andere nicht weiß – und ab da ist es jedes Mal schneller, wenn diese Person es macht. Aus einem Umstand wird in wenigen Wochen eine Struktur."
+      },
+      {
+        "question": "Was ist der wirksamste einzelne Schritt?",
+        "answer": "Dass der zweite Elternteil früh und regelmäßig allein mit dem Kind ist. Nicht dabei, sondern allein und zuständig, über mehrere Stunden. Das ist der einzige Weg, auf dem eigene Routinen und eigenes Wissen entstehen – und damit der einzige, der die Last wirklich verschiebt. Alles andere bleibt Assistenz."
+      },
+      {
+        "question": "Wann ist es mehr als Erschöpfung?",
+        "answer": "Wenn die Stimmung über zwei Wochen anhaltend gedrückt ist, wenn Freude an nichts mehr aufkommt, wenn Angst oder Gedanken da sind, die dir Angst machen. Eine Wochenbettdepression betrifft etwa jede achte Mutter – und auch Väter, seltener erkannt und selten gefragt. Das ist behandelbar und kein Zeichen von Schwäche. Sprich mit deiner Hebamme, deiner Ärztin oder dem Kinderarzt."
+      }
+    ],
+    "url": "/wissen/beziehung-nach-der-geburt"
   },
   {
     "type": "topic",
@@ -10992,6 +11743,71 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "fair-verteilen",
+    "title": "Fair verteilen, wenn 50/50 nicht geht",
+    "description": "Gleich ist selten gerecht und fast nie möglich. Drei brauchbare Maßstäbe statt Aufgaben zählen, warum unverplante Zeit der ehrlichste davon ist – und der Punkt, den fast niemand mitrechnet: was eine Verteilung über Jahre kostet.",
+    "cluster": "mental-load",
+    "search_intent": "gerechte aufgabenverteilung partnerschaft fairness haushalt teilzeit vereinbarung",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie bei euch die Verteilung entstanden ist – und ob ihr sie je ausdrücklich vereinbart habt?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "aufgabenverteilung",
+      "care-arbeit",
+      "mental-load"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "care-arbeit",
+        "zweite-schicht",
+        "mental-load"
+      ],
+      "related": [
+        "zustaendigkeit-statt-aufgaben",
+        "beziehung-nach-der-geburt",
+        "fair-streiten"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Muss alles halbe-halbe sein?",
+        "answer": "Nein, und dieser Maßstab führt meistens in die Irre. Wer sechzig Stunden arbeitet und wer zwanzig arbeitet, können nicht dieselbe Menge Hausarbeit übernehmen, ohne dass es unfair wird. Tragfähig ist eine Verteilung, über die geredet wurde – auch eine ungleiche. Untragbar ist eine, die einfach entstanden ist, auch eine fast gleiche."
+      },
+      {
+        "question": "Was ist der beste Maßstab, wenn nicht die Aufgabenzahl?",
+        "answer": "Unverplante Zeit. Nicht wer wie viele Tätigkeiten macht, sondern wie viele Stunden in der Woche jeder hat, in denen niemand etwas von ihm will und er nichts nachhalten muss. Dieser Maßstab erwischt den unsichtbaren Teil mit, den Aufgabenlisten übersehen – und bei den meisten Paaren fällt das Ergebnis deutlicher aus als erwartet."
+      },
+      {
+        "question": "Wir haben uns bewusst für Teilzeit entschieden. Ist das dann geklärt?",
+        "answer": "Für den Alltag vielleicht. Für die Lebenszeit oft nicht. Wer über Jahre reduziert, zahlt mit Einkommen, Rente, beruflichem Fortkommen und mit Abhängigkeit im Trennungsfall. Das ist kein Argument gegen die Entscheidung, sondern dafür, diese Kosten ausdrücklich in die Rechnung zu nehmen und gemeinsam zu tragen, statt sie einer Person stillschweigend aufzuladen."
+      },
+      {
+        "question": "Wie oft sollte man das überprüfen?",
+        "answer": "Immer dann, wenn sich etwas ändert – neue Stelle, Schuleintritt, Pflegefall – und ansonsten einmal im Jahr. Eine Verteilung ist keine Verfassung. Was daran am meisten hilft, ist der befristete Charakter: Für die nächsten sechs Monate machen wir es so ist leichter zu vereinbaren als eine Regel für immer, und wird deshalb eher eingehalten."
+      }
+    ],
+    "url": "/wissen/fair-verteilen"
+  },
+  {
+    "type": "topic",
     "slug": "gaslighting-erkennen",
     "title": "Gaslighting erkennen: wenn deine Wahrnehmung zum Streitpunkt wird",
     "description": "Was Gaslighting wirklich ist, an welchen Sätzen und Mustern du es erkennst, warum es deine Wahrnehmung so tief erschüttert – und wie du deinen Boden zurückgewinnst. Ein Deep Dive, behutsam und ohne Ferndiagnose.",
@@ -11385,6 +12201,63 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/grenzen-setzen-lernen"
+  },
+  {
+    "type": "comparison",
+    "slug": "helfen-oder-zustaendig-sein",
+    "title": "Helfen oder zuständig sein? Der Unterschied, der alles erklärt",
+    "description": "Wer hilft, arbeitet an fremder Arbeit. Wer zuständig ist, trägt sie. Fünf Stellen, an denen der Unterschied sichtbar wird – und warum das freundlichste Angebot in dieser Sache nichts verschiebt.",
+    "cluster": "mental-load",
+    "search_intent": "helfen oder zustaendig unterschied haushalt mithelfen partnerschaft",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wer bei euch entscheidet, was zu tun ist – und wie es sich anfühlt, in dieser Rolle zu sein?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "mental-load",
+      "aufgabenverteilung",
+      "anerkennung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "mental-load",
+        "default-elternteil",
+        "emotionale-arbeit"
+      ],
+      "related": [
+        "zustaendigkeit-statt-aufgaben",
+        "fair-verteilen",
+        "mental-load-als-vorwurf"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Helfen denn schlecht?",
+        "answer": "Nein. Hilfe ist gut und oft genau das Richtige – bei einer Arbeit, die jemand anderem gehört. Das Problem entsteht erst, wenn die gemeinsame Arbeit eines Haushalts dauerhaft einer Person gehört und die andere darin hilft. Dann ist das Wort selbst die Information: Wer hilft, hat sich zuvor für unzuständig erklärt."
+      },
+      {
+        "question": "Aber irgendjemand muss doch den Überblick haben.",
+        "answer": "Über das Ganze ja. Über jeden einzelnen Bereich nein. Der Unterschied ist genau der: Ein Paar kann sich die Bereiche so aufteilen, dass jeder in seinen Bereichen vollständig zuständig ist – dann gibt es zwei Menschen mit Überblick über ihr Gebiet statt einen mit Überblick über alles."
+      },
+      {
+        "question": "Wie merke ich, auf welcher Seite ich stehe?",
+        "answer": "An einer einzigen Frage: Fällt dir etwas auf, bevor es jemand sagt? Wer den Wäschekorb sieht und denkt heute Abend Wäsche, ist zuständig. Wer ihn sieht und nichts denkt, ist es nicht – und das ist keine Charakterfrage, sondern eine Frage der Gewohnheit und der Zuständigkeit, die sich ändern lässt."
+      }
+    ],
+    "url": "/wissen/helfen-oder-zustaendig-sein"
   },
   {
     "type": "topic",
@@ -12059,6 +12932,212 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/loslassen-nach-trennung"
+  },
+  {
+    "type": "topic",
+    "slug": "mental-load-als-vorwurf",
+    "title": "Wenn nichts recht ist: Mental Load als Vorwurf",
+    "description": "Der Begriff beschreibt etwas Reales und lässt sich zugleich so einsetzen, dass die andere Seite nicht gewinnen kann. Drei Formen, in denen das passiert – und der Test, der beides auseinanderhält.",
+    "cluster": "mental-load",
+    "search_intent": "mental load vorwurf ungerecht kritik partnerin nie genug haushalt streit",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der du etwas übernommen hast und es trotzdem falsch war – und beschreiben, was danach passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "anerkennung",
+      "standardhoheit",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "standardhoheit",
+        "strategische-unfaehigkeit",
+        "mental-load"
+      ],
+      "comparison": [
+        "mental-load-oder-standard"
+      ],
+      "related": [
+        "zustaendigkeit-statt-aufgaben",
+        "taeter-opfer-umkehr",
+        "fair-streiten"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist es in Ordnung, diesen Vorwurf unfair zu finden?",
+        "answer": "Ja. Ein Begriff kann etwas Wahres beschreiben und trotzdem so eingesetzt werden, dass er kein Gespräch mehr zulässt. Beides gleichzeitig ernst zu nehmen ist keine Ausrede, sondern die einzige Haltung, aus der sich etwas ändert. Wer nur eines von beidem gelten lässt, führt entweder einen Kampf oder eine Kapitulation."
+      },
+      {
+        "question": "Woran erkenne ich den Unterschied zwischen berechtigt und unfair?",
+        "answer": "An dem, was passiert, wenn du einen ganzen Bereich übernimmst und ihn auf deine Weise führst. Wird es ruhiger, war es ein Verteilungsproblem. Kommt Korrektur, geht es um den Standard. Kommt sofort der nächste Vorwurf an anderer Stelle, geht es um etwas anderes als um Aufgaben."
+      },
+      {
+        "question": "Und wenn der Vorwurf einfach stimmt?",
+        "answer": "Dann fühlt es sich trotzdem ungerecht an, und das ist normal. Etwas Unangenehmes und Richtiges gesagt zu bekommen erzeugt fast dieselbe Empfindung wie eine Ungerechtigkeit. Der Unterschied zeigt sich daran, ob du beim ehrlichen Nachdenken Beispiele findest, die dagegen sprechen – oder nur Gegenvorwürfe."
+      },
+      {
+        "question": "Wann ist es kein Beziehungsstreit mehr?",
+        "answer": "Wenn dauerhaft jede deiner Wahrnehmungen für falsch erklärt wird, wenn Zuwendung an Leistung gekoppelt ist, wenn du über Zeit, Geld oder Kontakte Rechenschaft ablegen musst. Dann geht es nicht um Aufgabenverteilung, sondern um Kontrolle – dafür gibt es eigene Seiten."
+      }
+    ],
+    "url": "/wissen/mental-load-als-vorwurf"
+  },
+  {
+    "type": "topic",
+    "slug": "mental-load-in-beziehungen",
+    "title": "Mental Load: wer an alles denken muss",
+    "description": "Der Streit geht nie um die Spülmaschine. Er geht darum, wer daran denken muss, dass sie ausgeräumt gehört. Was Mental Load wirklich ist, warum sag mir was ich tun soll die Last nicht teilt – und was tatsächlich hilft.",
+    "cluster": "mental-load",
+    "search_intent": "mental load beziehung bedeutung aufgabenverteilung unsichtbare arbeit partnerschaft",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Mental Load gelesen. Magst du eine Situation der letzten Woche anschauen, in der du an etwas gedacht hast, an das sonst niemand gedacht hätte – und wie es dir damit ging?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "mental-load",
+      "care-arbeit",
+      "aufgabenverteilung",
+      "anerkennung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "zustaendigkeit-statt-aufgaben",
+        "fair-verteilen",
+        "beziehung-nach-der-geburt",
+        "mental-load-als-vorwurf"
+      ],
+      "glossary": [
+        "mental-load",
+        "care-arbeit",
+        "emotionale-arbeit",
+        "default-elternteil",
+        "standardhoheit"
+      ],
+      "comparison": [
+        "helfen-oder-zustaendig-sein"
+      ],
+      "related": [
+        "beduerfnisse-aeussern",
+        "fair-streiten",
+        "emotionaler-kontostand"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was genau ist Mental Load?",
+        "answer": "Nicht die Arbeit selbst, sondern das Denken darum herum: daran denken, dass etwas ansteht, entscheiden wie und wann, den Überblick behalten, ob es passiert ist, und die Folgen tragen, wenn nicht. Man kann jede einzelne Aufgabe abgeben und die Last trotzdem vollständig behalten – das ist der Kern des Problems und der Grund, warum Zählen von Aufgaben nichts klärt."
+      },
+      {
+        "question": "Warum hilft es nicht, wenn ich sage, was zu tun ist?",
+        "answer": "Weil genau das die Last bestätigt. Wer Anweisungen gibt, bleibt zuständig: Er muss weiterhin daran denken, den Überblick behalten und nachhalten. Die Bitte sag mir einfach, was ich tun soll ist fast immer freundlich gemeint und verschiebt trotzdem nichts. Verschoben wird erst, wenn ein ganzer Bereich übergeht, inklusive des Denkens daran."
+      },
+      {
+        "question": "Ist das nicht einfach ein Frauenthema?",
+        "answer": "Die Zahlen sind eindeutig: Frauen leisten in Deutschland deutlich mehr unbezahlte Sorgearbeit, der Abstand liegt bei gut vierzig Prozent. Das zu benennen ist keine Schuldzuweisung, sondern die Beschreibung einer Ausgangslage. Und es gibt Beziehungen, in denen ein Mann die Last trägt – der hat dann zusätzlich das Problem, dass für seine Erfahrung keine Sprache bereitliegt."
+      },
+      {
+        "question": "Wir haben es besprochen, und es ändert sich trotzdem nichts. Woran liegt das?",
+        "answer": "Meistens daran, dass Aufgaben besprochen wurden und nicht Zuständigkeiten. Eine Aufgabe ist erledigt und kommt zurück; eine Zuständigkeit bleibt. Der zweite häufige Grund: Die übergebene Zuständigkeit wird weiter kontrolliert und korrigiert. Wer nachgebessert bekommt, hört auf mitzudenken – nicht aus Trotz, sondern weil Mitdenken sich nicht auszahlt."
+      },
+      {
+        "question": "Ab wann ist das kein Verteilungsproblem mehr?",
+        "answer": "Wenn Gespräche darüber regelmäßig damit enden, dass du an deiner Wahrnehmung zweifelst, wenn dir Zeit, Geld oder Kontakte zugeteilt werden, oder wenn Aufgaben als Druckmittel eingesetzt werden. Dann geht es nicht mehr um Fairness im Haushalt, sondern um Kontrolle – siehe die Seiten zu Coercive Control und emotionalem Missbrauch."
+      }
+    ],
+    "url": "/wissen/mental-load-in-beziehungen"
+  },
+  {
+    "type": "comparison",
+    "slug": "mental-load-oder-standard",
+    "title": "Zu viel Last oder zu hoher Standard?",
+    "description": "Zwei sehr verschiedene Ursachen sehen im Alltag gleich aus: Eine Person macht alles. Woran man erkennt, welche vorliegt – und warum die Antwort meistens teilweise beides lautet.",
+    "cluster": "mental-load",
+    "search_intent": "perfektionismus haushalt abgeben koennen kontrolle partnerin laesst nicht los",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der jemand etwas anders gemacht hat als du – und beschreiben, was du in dem Moment gedacht und getan hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "standardhoheit",
+      "mental-load",
+      "aufgabenverteilung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "standardhoheit",
+        "mental-load",
+        "strategische-unfaehigkeit"
+      ],
+      "related": [
+        "zustaendigkeit-statt-aufgaben",
+        "mental-load-als-vorwurf",
+        "der-innere-kritiker"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das nicht nur eine Art, der Frau die Schuld zu geben?",
+        "answer": "Es wäre eine, wenn es die Ungleichverteilung wegerklären sollte. Das tut es nicht: Die Ausgangslage ist gut belegt, und in der großen Mehrheit der Fälle trägt eine Person deutlich mehr, ohne das je gewählt zu haben. Die Frage nach dem Standard ist trotzdem wichtig, weil sie die eine Stelle beschreibt, an der die tragende Person selbst etwas bewegen kann – und die ist wertvoll, gerade wenn man sonst auf die Einsicht anderer angewiesen ist."
+      },
+      {
+        "question": "Was, wenn der Standard objektiv nötig ist?",
+        "answer": "Manche Standards sind nicht verhandelbar – Medikamente, Allergien, Sicherheit. Die meisten sind es. Ein brauchbarer Prüfstein: Würde es jemandem schaden, wenn es anders gemacht wird, oder würde es dir nur nicht gefallen? Beides ist zulässig, aber nur das Erste ist ein Argument."
+      },
+      {
+        "question": "Wie finde ich heraus, was bei uns vorliegt?",
+        "answer": "Übergib einen Bereich vollständig und schau acht Wochen lang zu, ohne einzugreifen. Was du in diesen Wochen tust, ist die Antwort: Wenn du korrigierst, nachbesserst oder heimlich nacharbeitest, liegt mindestens auch ein Standardthema vor. Wenn es dir gelingt und nichts passiert, war es Verteilung."
+      }
+    ],
+    "url": "/wissen/mental-load-oder-standard"
   },
   {
     "type": "topic",
@@ -14341,6 +15420,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/wenn-selbstliebe-nicht-funktioniert"
+  },
+  {
+    "type": "topic",
+    "slug": "zustaendigkeit-statt-aufgaben",
+    "title": "Zuständigkeit statt Aufgaben: wie man Last wirklich übergibt",
+    "description": "Eine Aufgabe ist erledigt und kommt zurück. Eine Zuständigkeit bleibt. Was zu einer echten Übergabe gehört, warum es drei Wochen lang schlechter wird – und an welchen drei Stellen es meistens scheitert.",
+    "cluster": "mental-load",
+    "search_intent": "aufgaben verteilen partnerschaft zustaendigkeiten haushalt gerecht organisieren",
+    "updated": "2026-09-11",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du einen Bereich anschauen, den du gern abgeben würdest – und überlegen, was dich bisher daran gehindert hat?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "mental-load",
+      "aufgabenverteilung",
+      "standardhoheit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "mental-load-in-beziehungen",
+      "glossary": [
+        "mental-load",
+        "standardhoheit",
+        "default-elternteil"
+      ],
+      "comparison": [
+        "helfen-oder-zustaendig-sein",
+        "mental-load-oder-standard"
+      ],
+      "related": [
+        "fair-verteilen",
+        "beduerfnisse-aeussern",
+        "wenn-die-grenze-steht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was gehört zu einer Zuständigkeit dazu?",
+        "answer": "Fünf Dinge, und die ersten beiden sind die entscheidenden: daran denken, dass etwas ansteht; entscheiden, wie und wann; es tun; nachhalten, ob es passiert ist; die Folgen tragen, wenn nicht. Wer nur den dritten Punkt übernimmt, hat eine Aufgabe bekommen, keine Zuständigkeit – und die Last liegt weiter dort, wo sie lag."
+      },
+      {
+        "question": "Was, wenn er oder sie es schlechter macht?",
+        "answer": "Am Anfang stimmt das oft sogar, und das ist kein Argument, sondern eine Lernkurve. Wer einen Bereich zwei Jahre führt, ist darin besser als jemand am zweiten Tag. Die Frage ist nicht, ob es sofort genauso gut wird, sondern ob das Ergebnis am Ende gut genug ist. Unterschiedlich ist nicht schlechter – und wer nachbessert, bekommt die Zuständigkeit zurück, meistens dauerhaft."
+      },
+      {
+        "question": "Wir haben alles aufgeteilt und trotzdem streiten wir weiter. Warum?",
+        "answer": "Meistens aus einem von drei Gründen: Es wurden Tätigkeiten aufgeteilt statt Bereiche; das Wissen wurde nicht mit übergeben, sodass jede Frage zurückkommt; oder die Übergabe wurde nach zwei Wochen abgebrochen, weil es in dieser Zeit tatsächlich schlechter lief. Alle drei sind reparierbar, wenn man sie benennt."
+      },
+      {
+        "question": "Kann man Zuständigkeit für alles übergeben?",
+        "answer": "Nein, und das ist wichtig. Für Bereiche mit Anfang und Ende funktioniert es gut: Essen, Wäsche, Termine eines Kindes, Auto, Finanzen, Geschenke. Nicht übergeben lässt sich, dass es allen gut geht oder dass die Stimmung stimmt – das sind keine Bereiche, sondern Erwartungen. Wer sie als Zuständigkeit formuliert, produziert ein Versprechen, das niemand halten kann."
+      }
+    ],
+    "url": "/wissen/zustaendigkeit-statt-aufgaben"
   }
 ]
 
@@ -14381,6 +15528,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Borderline – was der Begriff bezeichnet",
     "description": "Ein Muster aus starker Gefühlsschwankung, Angst vor dem Verlassenwerden, unsicherem Selbstbild und Impulsivität. Was heute damit gemeint ist, woher der irreführende Name kommt und was der Begriff nicht ist."
   },
+  "/glossar/care-arbeit": {
+    "title": "Care-Arbeit – die unbezahlte Sorgearbeit",
+    "description": "Alles, was getan werden muss, damit Menschen versorgt sind: Haushalt, Kinder, Pflege, Organisation. Unbezahlt, meistens unsichtbar, und ungleich verteilt – der Gender Care Gap in Zahlen."
+  },
   "/glossar/chronische-leere": {
     "title": "Chronische Leere – kein Gefühl, sondern dessen Abwesenheit",
     "description": "Ein anhaltendes Gefühl von Leere, unabhängig davon, ob gerade etwas Schönes passiert. Viele Betroffene nennen es das Schlimmste – und es erklärt einiges, was von außen unlogisch aussieht."
@@ -14388,6 +15539,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/coercive-control": {
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose."
+  },
+  "/glossar/default-elternteil": {
+    "title": "Default-Elternteil – wen die Schule anruft",
+    "description": "Der Elternteil, bei dem automatisch alles landet: Anrufe, Fragen, Zuständigkeit. Wie diese Rolle in wenigen Wochen entsteht, warum sie sich selbst verstärkt und was sie kostet."
   },
   "/glossar/differenzierung": {
     "title": "Differenzierung des Selbst – nah bleiben, ohne zu verschmelzen",
@@ -14420,6 +15575,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/emotionale-ansteckung": {
     "title": "Emotionale Ansteckung – wenn seine Stimmung deine wird",
     "description": "Gefühle springen in Sekunden über, ganz ohne Worte. Das ist die Grundlage von Mitgefühl und zugleich der Grund, warum man abends eine Laune mit sich trägt, die man morgens nicht hatte."
+  },
+  "/glossar/emotionale-arbeit": {
+    "title": "Emotionale Arbeit – und was der Begriff ursprünglich meinte",
+    "description": "Gefühle steuern, damit eine Situation funktioniert: die eigenen und die der anderen. Was Arlie Hochschild damit meinte, wie der Begriff sich verschoben hat – und warum die Unterscheidung zum Mental Load nützlich ist."
   },
   "/glossar/emotionale-dysregulation": {
     "title": "Emotionale Dysregulation – schneller hoch, höher, langsamer zurück",
@@ -14585,6 +15744,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Love Bombing – der überwältigende Anfang",
     "description": "Love Bombing ist eine Flut aus Zuneigung, Aufmerksamkeit und Zukunftsversprechen ganz am Anfang – so intensiv, dass sie schnell bindet und später als Druckmittel dient. Woran du es erkennst. Ohne Diagnose."
   },
+  "/glossar/mental-load": {
+    "title": "Mental Load – die Arbeit, an alles zu denken",
+    "description": "Nicht die Tätigkeit, sondern das Denken darum herum: daran denken, entscheiden, nachhalten, die Folgen tragen. Warum sich diese Last durch Mithilfe nicht verkleinern lässt."
+  },
   "/glossar/mentalisierung": {
     "title": "Mentalisierung – hinter Verhalten ein Innenleben vermuten",
     "description": "Mentalisierung ist die Fähigkeit, eigenes und fremdes Verhalten als Ausdruck von Gedanken und Gefühlen zu verstehen. Sie ist begrenzt, bricht unter Stress ab – und ist der Kern dessen, was emotionale Reife ausmacht."
@@ -14705,9 +15868,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Spiritueller Narzissmus – Überlegenheit durch Erleuchtung",
     "description": "Beim spirituellen Narzissmus wird Spiritualität zum Podest: mehr Bewusstheit, höhere Schwingung, weiter entwickelt. Deine Gefühle werden als Ego abgetan. Woran du das erkennst und wie es verunsichert. Ohne Diagnose."
   },
+  "/glossar/standardhoheit": {
+    "title": "Standardhoheit – wenn Abgeben an Bedingungen hängt",
+    "description": "Ein Bereich wird übergeben und weiter bewertet. Die andere Seite hört auf mitzudenken, weil Mitdenken sich nicht auszahlt. In der Forschung heißt das Gatekeeping – und es ist keine Schuldfrage, sondern eine Stellschraube."
+  },
   "/glossar/stonewalling": {
     "title": "Stonewalling – die verschlossene Tür im selben Haus",
     "description": "Stonewalling ist der vollständige Rückzug aus dem Gespräch: keine Antwort, kein Blick, manchmal tagelang. Warum es sich für beide Seiten so unterschiedlich anfühlt und was hilft."
+  },
+  "/glossar/strategische-unfaehigkeit": {
+    "title": "Strategische Unfähigkeit – wenn Nichtkönnen bequem ist",
+    "description": "Etwas misslingt ausgerechnet dort, wo es unangenehm ist, während anderswo erhebliche Kompetenz vorliegt. Was der Begriff meint, woran man ihn festmacht – und warum er viel zu schnell vergeben wird."
   },
   "/glossar/taeter-opfer-umkehr": {
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
@@ -14761,6 +15932,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Zirkuläre Frage – über die Sicht eines Dritten sprechen",
     "description": "Das bekannteste Werkzeug der systemischen Arbeit: nicht fragen, wie es dir geht, sondern was ein anderer über dich sagen würde. Warum das Gespräche öffnet, die frontal blockiert sind."
   },
+  "/glossar/zweite-schicht": {
+    "title": "Zweite Schicht – der Arbeitstag nach dem Arbeitstag",
+    "description": "Arlie Hochschilds Befund von 1989: Frauen, die erwerbstätig sind, arbeiten zu Hause weiter, während Männer Feierabend haben. Was seitdem passiert ist und was nicht."
+  },
   "/hilfe/an-eigener-wahrnehmung-zweifeln": {
     "title": "„Bilde ich mir das ein?“ – Wenn du an deiner Wahrnehmung zweifelst",
     "description": "Immer öfter unsicher, was in deiner Beziehung wirklich passiert ist? Woran ständige Selbstzweifel liegen können und wie du wieder Boden unter die Füße bekommst – ohne vorschnelles Urteil."
@@ -14773,9 +15948,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich glaube, ich habe Borderline – was jetzt sinnvoll ist",
     "description": "Wenn du dich in den Beschreibungen wiedererkennst: warum Selbsterkennen kein Befund ist, was eine Abklärung tatsächlich bringt, und was du tun kannst, bevor du einen Termin hast."
   },
+  "/hilfe/ich-muss-an-alles-denken": {
+    "title": "Ich muss an alles denken – und keiner sieht es",
+    "description": "Abends ist nichts geschafft und du bist trotzdem leer. Woher diese besondere Müdigkeit kommt, warum sie so schwer zu erklären ist und was du tun kannst, bevor du das nächste Gespräch führst."
+  },
   "/hilfe/ist-mein-partner-borderline": {
     "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
     "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung."
+  },
+  "/hilfe/mir-macht-man-es-nie-recht": {
+    "title": "Ich mache es, und es ist trotzdem falsch",
+    "description": "Du übernimmst etwas – es war das Falsche, zu spät oder nicht so gemeint. Was dahinterstecken kann, wie du herausfindest, was bei euch vorliegt, und was du tun kannst, ohne recht haben zu müssen."
   },
   "/hilfe/soll-ich-mich-trennen": {
     "title": "„Soll ich mich trennen?\" – Wenn du nicht mehr weiterweißt",
@@ -14917,6 +16100,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Deine Ex hätte",
     "description": "Eine Szene über den ständigen Vergleich – wenn man an einem Menschen gemessen wird, gegen den man nicht gewinnen kann. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/der-anruf-aus-der-kita": {
+    "title": "Der Anruf aus der Kita",
+    "description": "Eine Szene über die Rolle, die niemand vergeben hat und alle kennen: Wer angerufen wird, wenn etwas ist. Ich-Perspektive, fiktiv."
+  },
   "/szenen/der-beste-mensch-im-raum": {
     "title": "Der beste Mensch im Raum",
     "description": "Eine fiktive Szene: Beim Benefiz sind alle hingerissen, wie großzügig und selbstlos sie ist. Nur er weiß, wie wenig von dieser Wärme zu Hause ankommt. Über kommunalen Narzissmus – Größe über Güte."
@@ -15000,6 +16187,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-liste": {
     "title": "Die Liste",
     "description": "Eine Szene über das Aufrechnen – wenn jeder alte Fehler aufbewahrt und im nächsten Streit wieder hervorgeholt wird. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-liste-in-meinem-kopf": {
+    "title": "Die Liste in meinem Kopf",
+    "description": "Eine Szene über die Viertelstunde vor dem Einschlafen, in der der Tag noch einmal von vorn anfängt. Ich-Perspektive, fiktiv."
   },
   "/szenen/die-neue-ist-schon-da": {
     "title": "Die Neue ist schon da",
@@ -15168,6 +16359,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-habe-die-augen-verdreht": {
     "title": "Ich habe die Augen verdreht",
     "description": "Eine fiktive Szene: Er erwischt sich dabei, wie er über seine Frau spottet – und erkennt den Blick. Über Verachtung von der anderen Seite."
+  },
+  "/szenen/ich-habe-doch-eingekauft": {
+    "title": "Ich habe doch eingekauft",
+    "description": "Eine Szene über den Unterschied zwischen etwas tun und etwas verantworten – erzählt von dem, der etwas getan hat und nicht versteht, warum es nicht zählt. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-habe-es-anders-gemacht": {
+    "title": "Ich habe es anders gemacht",
+    "description": "Eine Szene über den Moment, in dem etwas Übernommenes zurückkorrigiert wird – und darüber, was das mit der Lust am nächsten Mal macht. Ich-Perspektive, fiktiv."
   },
   "/szenen/ich-habe-es-doch-gezeigt": {
     "title": "Ich habe es doch gezeigt",
@@ -15377,9 +16576,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sag einfach nichts, Papa",
     "description": "Eine fiktive Szene: Ein Kind, das die Stimmung im Auto liest, bevor die Eltern es tun, und den Vater zum Schweigen bittet, um den Frieden zu retten. Über Kinder im Elternkonflikt und die Last, die sie tragen."
   },
+  "/szenen/sag-mir-einfach-was-ich-tun-soll": {
+    "title": "Sag mir einfach, was ich tun soll",
+    "description": "Eine Szene über ein ehrlich gemeintes Angebot, das jedes Mal die Stimmung verschlechtert – und über den Moment, in dem einer versteht, warum. Ich-Perspektive, fiktiv."
+  },
   "/szenen/schau-wie-geduldig-ich-mit-dir-bin": {
     "title": "Schau, wie geduldig ich mit dir bin",
     "description": "Eine fiktive Szene: Vor Freunden lobt sie sich selbst dafür, wie viel sie mit ihm aushält – und macht ihn so zum schwierigen Fall, den sie großmütig erträgt. Über kommunalen Narzissmus als moralische Überlegenheit."
+  },
+  "/szenen/sechs-wochen-nach-der-geburt": {
+    "title": "Sechs Wochen",
+    "description": "Eine Szene über die Wochen, in denen sich Rollen festlegen, ohne dass jemand sie beschlossen hat. Ich-Perspektive, fiktiv."
   },
   "/szenen/seine-laune-im-auto": {
     "title": "Seine Laune im Auto",
@@ -15489,6 +16696,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Wieder dieser Traum",
     "description": "Eine fiktive Szene: Um kurz nach vier wacht er auf, das Herz rast, das Kissen ist nass – schon wieder derselbe Traum. Über Albträume, die die Nacht zurückerobern, lange nachdem alles vorbei ist."
   },
+  "/szenen/wir-haben-es-nie-besprochen": {
+    "title": "Wir haben es nie besprochen",
+    "description": "Eine Szene über einen Mann, der den Überblick über alles trägt – und darüber, dass für diese Erfahrung kaum Worte bereitliegen. Ich-Perspektive, fiktiv."
+  },
   "/szenen/wir-haben-normal-gefruehstueckt": {
     "title": "Wir haben normal gefrühstückt",
     "description": "Eine fiktive Szene: Ein Jahr danach, ein völlig gewöhnlicher Samstagmorgen — und dann eine Kleinigkeit, die alles wieder aufreißt. Über Rückschläge und die Frage, ob das Fortschritt ist."
@@ -15536,6 +16747,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/beziehung-mit-borderline": {
     "title": "In Beziehung bleiben, ohne sich zu verlieren",
     "description": "Wie man neben starken Gefühlen stehen kann, ohne sie zu bestätigen oder wegzuerklären: Validierung statt Diskussion, Grenzen, die nicht wie Verlassen klingen – und der ehrliche Punkt, an dem es keine Beziehungsfrage mehr ist."
+  },
+  "/wissen/beziehung-nach-der-geburt": {
+    "title": "Beziehung nach der Geburt: das Fenster, in dem sich alles festlegt",
+    "description": "Bei den meisten Paaren sinkt die Zufriedenheit nach der Geburt deutlich – und kaum jemand sagt es vorher. Warum das nicht an euch liegt, wie sich Rollen in wenigen Wochen zementieren und was in dieser Zeit tatsächlich hilft."
   },
   "/wissen/beziehungsmuster": {
     "title": "Beziehungsmuster erkennen: Was sich wiederholt – und warum",
@@ -15653,6 +16868,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Fair streiten: wie Konflikte verbinden statt verletzen",
     "description": "Warum Streiten nicht das Problem ist, sondern die Art zu streiten – mit Regeln für faire Konflikte, dem Unterschied zwischen Klärung und Verletzung und Wegen aus der Eskalation. Ohne Diagnose."
   },
+  "/wissen/fair-verteilen": {
+    "title": "Fair verteilen, wenn 50/50 nicht geht",
+    "description": "Gleich ist selten gerecht und fast nie möglich. Drei brauchbare Maßstäbe statt Aufgaben zählen, warum unverplante Zeit der ehrlichste davon ist – und der Punkt, den fast niemand mitrechnet: was eine Verteilung über Jahre kostet."
+  },
   "/wissen/gaslighting-erkennen": {
     "title": "Gaslighting erkennen: wenn deine Wahrnehmung zum Streitpunkt wird",
     "description": "Was Gaslighting wirklich ist, an welchen Sätzen und Mustern du es erkennst, warum es deine Wahrnehmung so tief erschüttert – und wie du deinen Boden zurückgewinnst. Ein Deep Dive, behutsam und ohne Ferndiagnose."
@@ -15680,6 +16899,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/grenzen-setzen-lernen": {
     "title": "Grenzen setzen lernen: der Anfang liegt bei dir selbst",
     "description": "Wie man Grenzen setzt, ohne die Beziehung zu riskieren – warum eine Grenze zuerst innere Klarheit braucht, wie man sie freundlich, aber bestimmt kommuniziert, und was der Unterschied zu einer Mauer ist. Ohne Diagnose."
+  },
+  "/wissen/helfen-oder-zustaendig-sein": {
+    "title": "Helfen oder zuständig sein? Der Unterschied, der alles erklärt",
+    "description": "Wer hilft, arbeitet an fremder Arbeit. Wer zuständig ist, trägt sie. Fünf Stellen, an denen der Unterschied sichtbar wird – und warum das freundlichste Angebot in dieser Sache nichts verschiebt."
   },
   "/wissen/human-magnet-syndrome": {
     "title": "Human Magnet Syndrome: die Thesen von Ross Rosenberg",
@@ -15728,6 +16951,18 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/loslassen-nach-trennung": {
     "title": "Loslassen lernen: über eine Trennung hinwegkommen",
     "description": "Warum Loslassen nach einer Trennung so schwerfällt, warum die Erinnerung dich täuscht und was wirklich hilft – von Kontaktabbruch über das Unterbrechen des Grübelns bis zurück zu dir selbst. Ohne Zeitdruck, ohne Diagnose."
+  },
+  "/wissen/mental-load-als-vorwurf": {
+    "title": "Wenn nichts recht ist: Mental Load als Vorwurf",
+    "description": "Der Begriff beschreibt etwas Reales und lässt sich zugleich so einsetzen, dass die andere Seite nicht gewinnen kann. Drei Formen, in denen das passiert – und der Test, der beides auseinanderhält."
+  },
+  "/wissen/mental-load-in-beziehungen": {
+    "title": "Mental Load: wer an alles denken muss",
+    "description": "Der Streit geht nie um die Spülmaschine. Er geht darum, wer daran denken muss, dass sie ausgeräumt gehört. Was Mental Load wirklich ist, warum sag mir was ich tun soll die Last nicht teilt – und was tatsächlich hilft."
+  },
+  "/wissen/mental-load-oder-standard": {
+    "title": "Zu viel Last oder zu hoher Standard?",
+    "description": "Zwei sehr verschiedene Ursachen sehen im Alltag gleich aus: Eine Person macht alles. Woran man erkennt, welche vorliegt – und warum die Antwort meistens teilweise beides lautet."
   },
   "/wissen/nach-dem-gaslighting": {
     "title": "Nach dem Gaslighting: der Wahrnehmung wieder vertrauen",
@@ -15880,5 +17115,9 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/wenn-selbstliebe-nicht-funktioniert": {
     "title": "Wenn Selbstliebe nicht funktioniert: die ehrliche Gegenrede",
     "description": "Manchmal hilft mehr Selbstliebe nicht – weil das Problem nicht in dir liegt. Über Ratschläge, die Verantwortung umdrehen, Affirmationen die nach hinten losgehen, und was stattdessen zählt."
+  },
+  "/wissen/zustaendigkeit-statt-aufgaben": {
+    "title": "Zuständigkeit statt Aufgaben: wie man Last wirklich übergibt",
+    "description": "Eine Aufgabe ist erledigt und kommt zurück. Eine Zuständigkeit bleibt. Was zu einer echten Übergabe gehört, warum es drei Wochen lang schlechter wird – und an welchen drei Stellen es meistens scheitert."
   }
 }

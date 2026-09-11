@@ -32,6 +32,8 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   verlustangst: 'Verlustangst',
   'push-pull': 'Push-Pull-Dynamik',
   'emotionale-vernachlaessigung': 'Emotionale Vernachlässigung',
+  'care-arbeit': 'Care-Arbeit',
+  'mental-load': 'Mental Load',
   borderline: 'Borderline',
   identitaetsdiffusion: 'Identitätsdiffusion',
   impulsivitaet: 'Impulsivität',

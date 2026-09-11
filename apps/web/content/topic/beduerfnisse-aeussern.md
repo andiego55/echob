@@ -26,6 +26,8 @@ faq:
 
 „Dir ist doch egal, wie es mir geht." – „Nie hilfst du im Haushalt." – „Immer muss ich alles allein regeln." Solche Sätze klingen nach einem Bedürfnis, sind aber in Wahrheit Anklagen. Und Anklagen bekommen selten, was sie eigentlich wollen: gesehen zu werden.
 
+Wenn es dabei um Haushalt und Aufgaben geht, lohnt zuerst ein Blick auf die Verteilung selbst – siehe [Mental Load](/wissen/mental-load-in-beziehungen). Denn manche Vorwürfe sind keine schlecht formulierten Bedürfnisse, sondern zutreffende Beschreibungen einer Lage, die sich nicht wegformulieren lässt.
+
 Hinter fast jedem Vorwurf steckt ein unerfülltes Bedürfnis. Der Weg zu mehr Verbindung führt darüber, dieses Bedürfnis freizulegen – und es auszusprechen, bevor es zum Vorwurf gärt.
 
 ## Vorwurf und Bitte sind nicht dasselbe
