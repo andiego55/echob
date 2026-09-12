@@ -32,6 +32,8 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   verlustangst: 'Verlustangst',
   'push-pull': 'Push-Pull-Dynamik',
   'emotionale-vernachlaessigung': 'Emotionale Vernachlässigung',
+  adhs: 'ADHS',
+  reizueberflutung: 'Reizüberflutung',
   'care-arbeit': 'Care-Arbeit',
   'co-elternschaft': 'Co-Elternschaft',
   'trennung-mit-kindern': 'Trennung mit Kindern',

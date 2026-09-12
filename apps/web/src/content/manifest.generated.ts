@@ -171,6 +171,65 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "autistischer-burnout",
+    "title": "Autistischer Burnout – wenn nichts mehr geht",
+    "description": "Kein klassischer Erschöpfungszustand aus zu viel Arbeit, sondern die Folge jahrelanger Anpassung. Woran man ihn erkennt, wie er sich von einer Depression unterscheidet und was tatsächlich hilft.",
+    "cluster": "neurodivergenz",
+    "search_intent": "autistischer burnout symptome erholung unterschied depression",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was dir zuletzt schwerer fiel als früher – und seit wann?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "autistischer-burnout",
+      "masking",
+      "erschoepfung",
+      "autismus"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "masking",
+        "reizueberflutung",
+        "emotionale-dysregulation"
+      ],
+      "related": [
+        "wenn-es-zu-viel-wird",
+        "autismus-in-der-beziehung",
+        "professionelle-hilfe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie unterscheidet er sich von einer Depression?",
+        "answer": "Die Überschneidung ist groß, und beides kann gleichzeitig vorliegen. Typisch für den autistischen Burnout ist, dass Fähigkeiten wegbrechen, die vorher da waren – sprechen, planen, den Alltag bewältigen –, dass Reizempfindlichkeit deutlich zunimmt und dass Erholung durch Reizreduktion hilft. Diese Unterscheidung gehört in fachliche Hände, nicht in Selbstbeurteilung."
+      },
+      {
+        "question": "Wie lange dauert es?",
+        "answer": "Deutlich länger, als die meisten erwarten – oft Monate. Wer nach zwei Wochen Urlaub zurückkehrt und wieder dasselbe Pensum aufnimmt, landet in aller Regel erneut dort. Was den Verlauf am stärksten bestimmt, ist, ob sich die Bedingungen ändern."
+      },
+      {
+        "question": "Ist das ein anerkannter Begriff?",
+        "answer": "Er wird in der Forschung zunehmend beschrieben, ist aber keine eigenständige Diagnose. Für die Praxis ist er trotzdem nützlich, weil er einen Zustand benennt, der als Depression oder Faulheit fehlgedeutet wird – mit entsprechend falschen Ratschlägen."
+      }
+    ],
+    "url": "/glossar/autistischer-burnout"
+  },
+  {
+    "type": "glossary",
     "slug": "beduerfnis-und-strategie",
     "title": "Bedürfnis und Strategie – zwei Dinge, die oft verwechselt werden",
     "description": "Ein Bedürfnis ist das, was du brauchst. Eine Strategie ist ein Weg, es zu erfüllen. Warum die Unterscheidung Streit auflöst, der sonst unlösbar wirkt.",
@@ -681,6 +740,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/dissoziation"
+  },
+  {
+    "type": "glossary",
+    "slug": "doppeltes-empathieproblem",
+    "title": "Doppeltes Empathieproblem – das Missverständnis geht in beide Richtungen",
+    "description": "Die verbreitete Vorstellung, autistischen Menschen fehle Empathie, greift zu kurz. Untersuchungen zeigen ein wechselseitiges Übersetzungsproblem – mit erheblichen Folgen dafür, wie man es angeht.",
+    "cluster": "neurodivergenz",
+    "search_intent": "double empathy problem milton bedeutung autismus empathie mythos",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der ihr aneinander vorbeigeredet habt – und beide Seiten beschreiben?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "autismus",
+      "neurodivergenz",
+      "masking"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "masking",
+        "mentalisierung",
+        "reizueberflutung"
+      ],
+      "related": [
+        "autismus-in-der-beziehung",
+        "neurodivergenz-oder-unreife"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wer hat das beschrieben?",
+        "answer": "Der Sozialwissenschaftler Damian Milton hat die Überlegung 2012 formuliert. Inzwischen gibt es Untersuchungen, die in dieselbe Richtung weisen: Autistische Menschen verständigen sich untereinander gut, nichtautistische ebenfalls – die Verständigungsprobleme häufen sich zwischen den Gruppen."
+      },
+      {
+        "question": "Heißt das, niemand ist schuld?",
+        "answer": "Es heißt, dass die Ursache nicht bei einer Person liegt, sondern zwischen zweien. Das ändert die Aufgabe: Statt dass eine Seite lernt, normal zu sein, übersetzen beide. Verantwortung verschwindet dadurch nicht – sie verteilt sich."
+      }
+    ],
+    "url": "/glossar/doppeltes-empathieproblem"
   },
   {
     "type": "glossary",
@@ -1307,6 +1417,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "exekutive-funktionen",
+    "title": "Exekutive Funktionen – die Strecke zwischen Wissen und Tun",
+    "description": "Anfangen, dranbleiben, umschalten, Impulse bremsen, den Überblick über die Zeit behalten. Wo diese Funktionen schwach sind, entsteht ein Umsetzungsproblem – das von außen aussieht wie ein Wollen-Problem.",
+    "cluster": "neurodivergenz",
+    "search_intent": "exekutive funktionen bedeutung adhs erklaerung erwachsene",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, an welcher Stelle es bei dir hakt – am Anfangen, am Dranbleiben oder am Umschalten?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "exekutive-funktionen",
+      "adhs",
+      "neurodivergenz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "zeitblindheit",
+        "hyperfokus",
+        "mental-load"
+      ],
+      "related": [
+        "adhs-in-der-beziehung",
+        "systeme-statt-vorsaetze"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was gehört alles dazu?",
+        "answer": "Vor allem sechs Dinge: eine Handlung beginnen, sie gegen Ablenkung verteidigen, zwischen Aufgaben umschalten, Informationen kurzzeitig im Kopf halten, einen Impuls unterdrücken und die vergehende Zeit einschätzen. Jede davon kann einzeln schwach sein – deshalb sieht ADHS bei zwei Menschen selten gleich aus."
+      },
+      {
+        "question": "Lassen sie sich trainieren?",
+        "answer": "Nur begrenzt, und das ist die wichtigste praktische Erkenntnis. Wirksamer als Training ist Entlastung: Aufgaben nach außen verlagern, damit sie diese Funktionen gar nicht erst brauchen. Ein Kalender mit Alarm ersetzt Zeitgefühl, ein fester Platz ersetzt Merken, eine sichtbare Liste ersetzt Überblick."
+      }
+    ],
+    "url": "/glossar/exekutive-funktionen"
+  },
+  {
+    "type": "glossary",
     "slug": "extinktionsburst",
     "title": "Extinktionsburst – warum es erst schlimmer wird",
     "description": "Ein Verhalten, das jahrelang funktioniert hat, hört nicht auf, wenn es nicht mehr wirkt – es wird zuerst lauter. Warum die ersten Wochen nach einer Grenze die schwersten sind und was das über den Erfolg aussagt.",
@@ -1737,6 +1898,56 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/hoovering"
+  },
+  {
+    "type": "glossary",
+    "slug": "hyperfokus",
+    "title": "Hyperfokus – die andere Hälfte der Aufmerksamkeitsstörung",
+    "description": "Stundenlang versunken, ohne Hunger, ohne Zeitgefühl, ohne Ansprechbarkeit. Warum das kein Widerspruch zu ADHS ist, sondern derselbe Mechanismus – und was es in einer Beziehung auslöst.",
+    "cluster": "neurodivergenz",
+    "search_intent": "hyperfokus adhs bedeutung erklaerung beziehung stundenlang versunken",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wann du zuletzt völlig versunken warst – und wie es der anderen Person damit ging?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "hyperfokus",
+      "adhs",
+      "exekutive-funktionen"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "zeitblindheit"
+      ],
+      "related": [
+        "systeme-statt-vorsaetze",
+        "adhs-in-der-beziehung"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie passt Hyperfokus zu einer Aufmerksamkeitsstörung?",
+        "answer": "Sehr gut, wenn man den Kern anders fasst: Es geht nicht um zu wenig Aufmerksamkeit, sondern um mangelnde Steuerbarkeit. Die Aufmerksamkeit lässt sich schwer dorthin lenken, wo sie gebraucht wird – und ebenso schwer von dort abziehen, wo sie hängen geblieben ist."
+      },
+      {
+        "question": "Warum ist das in Beziehungen ein Thema?",
+        "answer": "Weil es unmittelbar verletzend wirkt. Wer stundenlang versunken ist und dabei nicht reagiert, sendet eine Botschaft, die er nicht meint. Besonders bitter wird es, wenn der Hyperfokus am Anfang einer Beziehung der anderen Person galt und später etwas anderem gilt – das wird oft als Liebesverlust gelesen und ist meistens keiner."
+      }
+    ],
+    "url": "/glossar/hyperfokus"
   },
   {
     "type": "glossary",
@@ -2551,6 +2762,59 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "masking",
+    "title": "Masking – die Anstrengung, unauffällig zu wirken",
+    "description": "Blickkontakt trainieren, Reaktionen kopieren, Erschöpfung verbergen. Warum Masking funktioniert, was es kostet – und warum es der Hauptgrund dafür ist, dass Frauen so spät erkannt werden.",
+    "cluster": "neurodivergenz",
+    "search_intent": "masking autismus adhs bedeutung frauen spaete diagnose erschoepfung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, wo du dich anstrengst, normal zu wirken – und was das kostet?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "masking",
+      "autismus",
+      "adhs",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "autistischer-burnout",
+        "reizueberflutung",
+        "doppeltes-empathieproblem"
+      ],
+      "related": [
+        "autismus-in-der-beziehung",
+        "wenn-die-diagnose-spaet-kommt",
+        "wenn-es-zu-viel-wird"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Masking absichtlich?",
+        "answer": "Teilweise. Vieles davon wurde in der Kindheit gelernt und läuft automatisch ab – oft ohne dass die Person es benennen könnte. Bewusst wird es meistens erst, wenn jemand anfängt, es wegzulassen, und merkt, wie viel Kraft es gebunden hat."
+      },
+      {
+        "question": "Warum bricht jemand zu Hause zusammen, der draußen funktioniert?",
+        "answer": "Weil zu Hause die Maske fällt. Das wirkt für Angehörige oft, als bekämen sie die schlechteste Version ab – tatsächlich bekommen sie die einzige ungefilterte. Das ist ein Vertrauensbeweis, auch wenn es sich nicht so anfühlt."
+      }
+    ],
+    "url": "/glossar/masking"
+  },
+  {
+    "type": "glossary",
     "slug": "mental-load",
     "title": "Mental Load – die Arbeit, an alles zu denken",
     "description": "Nicht die Tätigkeit, sondern das Denken darum herum: daran denken, entscheiden, nachhalten, die Folgen tragen. Warum sich diese Last durch Mithilfe nicht verkleinern lässt.",
@@ -3145,6 +3409,59 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/realitaetsverdrehung"
+  },
+  {
+    "type": "glossary",
+    "slug": "reizueberflutung",
+    "title": "Reizüberflutung – wenn die Verarbeitung nicht mehr nachkommt",
+    "description": "Licht, Geräusche, Gerüche, Gespräche, alles gleichzeitig und nichts im Hintergrund. Was dabei passiert, warum Reden dann nicht funktioniert und was vorher vereinbart gehört.",
+    "cluster": "neurodivergenz",
+    "search_intent": "reizueberflutung symptome autismus adhs was tun partner",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation anschauen, in der es einem von euch zu viel wurde – und was direkt davor los war?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "reizueberflutung",
+      "autismus",
+      "adhs",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "masking",
+        "autistischer-burnout",
+        "emotionale-dysregulation"
+      ],
+      "related": [
+        "wenn-es-zu-viel-wird",
+        "autismus-in-der-beziehung",
+        "co-regulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was passiert bei Reizüberflutung genau?",
+        "answer": "Reize werden nicht ausreichend gefiltert und summieren sich: Licht, Geräusche, Gerüche, Berührungen, mehrere Gespräche, dazu die soziale Verarbeitung. Wenn die Kapazität aufgebraucht ist, fällt zuerst weg, was am aufwendigsten ist – Sprechen, Höflichkeit, Impulssteuerung."
+      },
+      {
+        "question": "Warum hilft Reden dann nicht?",
+        "answer": "Weil Sprechen selbst Verarbeitung kostet. Die Frage was ist denn los? verlangt genau die Leistung, die gerade nicht verfügbar ist, und erhöht damit die Last. Wirksam ist stattdessen, Reize zu senken: Licht runter, Geräusche aus, Rückzug mit verabredetem Ende."
+      }
+    ],
+    "url": "/glossar/reizueberflutung"
   },
   {
     "type": "glossary",
@@ -4449,6 +4766,56 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "zeitblindheit",
+    "title": "Zeitblindheit – wenn Zeit kein Gefühl hat",
+    "description": "Nicht Unpünktlichkeit aus Nachlässigkeit, sondern ein fehlendes inneres Maß für vergehende Zeit. Was das im Alltag anrichtet und welche zwei Hilfsmittel am zuverlässigsten wirken.",
+    "cluster": "neurodivergenz",
+    "search_intent": "zeitblindheit adhs bedeutung unpuenktlich zeitgefuehl fehlt",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wo bei dir regelmäßig Zeit verschwindet – und was in den Minuten davor passiert?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "zeitblindheit",
+      "adhs",
+      "exekutive-funktionen"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "hyperfokus"
+      ],
+      "related": [
+        "systeme-statt-vorsaetze",
+        "adhs-oder-desinteresse"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das nicht einfach schlechte Planung?",
+        "answer": "Planung setzt voraus, dass man einschätzen kann, wie lange etwas dauert. Genau diese Einschätzung ist hier unzuverlässig – Aufgaben werden regelmäßig um ein Vielfaches unterschätzt. Wer nicht spürt, dass vierzig Minuten vergangen sind, kann noch so gut planen wollen."
+      },
+      {
+        "question": "Was hilft am zuverlässigsten?",
+        "answer": "Zwei Dinge: sichtbare Zeit und doppelte Erinnerungen. Eine Uhr, an der man Zeit ablaufen sieht, macht aus einer abstrakten Größe eine sichtbare. Und zwei Alarme – einer zur Vorbereitung, einer zum Losgehen – lösen das häufigste Problem, nämlich rechtzeitig anzufangen statt rechtzeitig loszugehen."
+      }
+    ],
+    "url": "/glossar/zeitblindheit"
+  },
+  {
+    "type": "glossary",
     "slug": "zirkulaere-frage",
     "title": "Zirkuläre Frage – über die Sicht eines Dritten sprechen",
     "description": "Das bekannteste Werkzeug der systemischen Arbeit: nicht fragen, wie es dir geht, sondern was ein anderer über dich sagen würde. Warum das Gespräche öffnet, die frontal blockiert sind.",
@@ -4480,6 +4847,63 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/zirkulaere-frage"
+  },
+  {
+    "type": "glossary",
+    "slug": "zurueckweisungsempfindlichkeit",
+    "title": "Zurückweisungsempfindlichkeit – wenn Kritik körperlich wehtut",
+    "description": "Eine Bemerkung, die andere abschütteln, trifft wie ein Schlag. Warum das in ADHS-Beziehungen so häufig vorkommt, was die Vorgeschichte damit zu tun hat – und warum der Begriff keine Diagnose ist.",
+    "cluster": "neurodivergenz",
+    "search_intent": "rejection sensitive dysphoria rsd adhs kritik empfindlich bedeutung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation anschauen, in der eine kleine Bemerkung eine große Reaktion ausgelöst hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "adhs",
+      "scham",
+      "anerkennung",
+      "neurodivergenz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "scham",
+        "exekutive-funktionen",
+        "emotionale-dysregulation"
+      ],
+      "related": [
+        "von-der-managerin-zur-partnerin",
+        "adhs-oder-desinteresse",
+        "ich-vergesse-alles-und-sie-ist-verletzt"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das eine anerkannte Diagnose?",
+        "answer": "Nein. Der Ausdruck stammt aus der ADHS-Fachliteratur und wird dort seit einigen Jahren benutzt; in den Klassifikationssystemen steht er nicht. Er beschreibt trotzdem etwas, das viele Betroffene sofort wiedererkennen – und er sollte deshalb als Beschreibung verwendet werden, nicht als Befund."
+      },
+      {
+        "question": "Warum ist die Reaktion so heftig?",
+        "answer": "Zwei Dinge kommen zusammen. Gefühle steigen schneller und höher, und es gibt eine Vorgeschichte: Wer seit der Grundschule hört, er strenge sich nicht genug an, hat einige tausend Kritikerfahrungen gesammelt. Eine neue Bemerkung trifft dann nicht allein, sondern zusammen mit allen davor."
+      },
+      {
+        "question": "Wie spreche ich Kritik an, ohne das auszulösen?",
+        "answer": "Vollständig vermeiden lässt es sich nicht. Was hilft: konkret statt grundsätzlich (diese eine Sache statt immer), zeitnah statt gesammelt, unter vier Augen, und mit einem klaren Ende. Und das Wichtigste: die Beziehung nicht in Frage stellen, während es um eine Sache geht."
+      }
+    ],
+    "url": "/glossar/zurueckweisungsempfindlichkeit"
   },
   {
     "type": "glossary",
@@ -4611,6 +5035,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/hilfe/angst-verlassen-zu-werden"
+  },
+  {
+    "type": "problem",
+    "slug": "bin-ich-neurodivergent",
+    "title": "Bin ich neurodivergent?",
+    "description": "Du erkennst dich in Beschreibungen wieder und weißt nicht, was das bedeutet. Warum Wiedererkennen kein Befund ist, was genauso aussieht – und was eine Abklärung tatsächlich bringt.",
+    "cluster": "neurodivergenz",
+    "search_intent": "bin ich adhs autistisch test erwachsene selbstdiagnose abklaerung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, was dich hergeführt hat – eine Situation, ein Video, ein Satz, in dem du dich wiedererkannt hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "neurodivergenz",
+      "adhs",
+      "autismus",
+      "masking"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "masking",
+        "zurueckweisungsempfindlichkeit",
+        "hyperfokus"
+      ],
+      "related": [
+        "wenn-die-diagnose-spaet-kommt",
+        "systeme-statt-vorsaetze",
+        "professionelle-hilfe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Kann ich mich selbst diagnostizieren?",
+        "answer": "Nein, und das ist hier keine Formalie. Die Merkmale überschneiden sich stark mit anderen Zuständen – Traumafolgen, Depression, Schlafmangel, Erschöpfung, Schilddrüsenerkrankungen und schlicht ein überfülltes Leben sehen ähnlich aus. Selbstzuordnung führt oft zum falschen Etikett und damit zur falschen Behandlung."
+      },
+      {
+        "question": "Ist das nicht gerade ein Trend?",
+        "answer": "Die Aufmerksamkeit ist gestiegen, und das hat zwei Seiten. Viele Menschen, die jahrzehntelang durchs Raster fielen, finden jetzt eine Erklärung – vor allem Frauen. Gleichzeitig werden alltägliche Schwierigkeiten schnell zu einer Diagnose erklärt. Beides gleichzeitig ernst zu nehmen ist die einzige brauchbare Haltung: Wiedererkennen ist ein guter Grund für eine Abklärung, kein Ergebnis."
+      },
+      {
+        "question": "Was bringt mir eine Diagnose überhaupt?",
+        "answer": "Drei Dinge: Zugang zu wirksamer Behandlung, eine Reihenfolge, wenn mehreres zusammenkommt, und eine Erklärung, die vieles anders aussehen lässt. Was sie nicht bringt: eine Entlastung von Verantwortung. Sie sagt, warum etwas schwerfällt, nicht, dass die Folgen bei anderen landen dürfen."
+      },
+      {
+        "question": "Was mache ich, solange ich keinen Termin habe?",
+        "answer": "Systeme bauen. Sie helfen unabhängig von jeder Diagnose, und sie sind gleichzeitig die beste Vorbereitung: Wenn du zwei Monate lang notierst, was regelmäßig misslingt und was hilft, hast du für das Erstgespräch mehr Material als die meisten."
+      }
+    ],
+    "url": "/hilfe/bin-ich-neurodivergent"
   },
   {
     "type": "problem",
@@ -4813,6 +5304,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "problem",
+    "slug": "ich-vergesse-alles-und-sie-ist-verletzt",
+    "title": "Ich vergesse alles – und sie ist verletzt",
+    "description": "Du hast es ernst gemeint und es ist trotzdem nicht passiert. Warum Versprechen hier nichts nützen, warum Entschuldigungen abnutzen und welcher zweite Halbsatz den ganzen Unterschied macht.",
+    "cluster": "neurodivergenz",
+    "search_intent": "adhs vergesse alles partnerin verletzt schuldgefuehle beziehung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation anschauen, in der du etwas vergessen hast – und beschreiben, was danach in dir passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "adhs",
+      "exekutive-funktionen",
+      "scham",
+      "anerkennung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "zurueckweisungsempfindlichkeit",
+        "zeitblindheit",
+        "scham"
+      ],
+      "related": [
+        "systeme-statt-vorsaetze",
+        "von-der-managerin-zur-partnerin",
+        "wenn-die-diagnose-spaet-kommt"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum reicht es nicht, wenn ich mich entschuldige?",
+        "answer": "Weil eine Entschuldigung ohne Änderung mit jeder Wiederholung weniger wert wird. Nach dem zwanzigsten Mal hört die andere Seite nicht mehr das Bedauern, sondern die Wahrscheinlichkeit, dass es wieder passiert. Was den Unterschied macht, ist der zweite Halbsatz: was du einrichtest, damit es nicht wieder passiert."
+      },
+      {
+        "question": "Ich verspreche es und meine es ernst. Warum klappt es trotzdem nicht?",
+        "answer": "Weil ein Versprechen im ruhigen Moment gegeben und im Alltag gebraucht wird – und dort ist genau das nicht verfügbar, was es abrufen müsste. Versprechen sind deshalb bei Umsetzungsschwierigkeiten die unwirksamste aller Maßnahmen. Was wirkt, sind Auslöser außerhalb des eigenen Kopfes."
+      },
+      {
+        "question": "Ich schäme mich so sehr, dass ich das Thema meide. Normal?",
+        "answer": "Sehr verbreitet, und es ist der teuerste Teil. Scham drängt zum Verschwinden, nicht zum Zurückkommen – und aus Sicht der anderen Person sieht das Verschwinden wie Gleichgültigkeit aus. Damit wird aus einer Vergesslichkeit ein Beziehungsproblem."
+      },
+      {
+        "question": "Bin ich einfach ein schlechter Partner?",
+        "answer": "Unwahrscheinlich. Was du beschreibst, ist eine Umsetzungsschwierigkeit mit einer langen Vorgeschichte an Kritik. Was du der anderen Person schuldest, ist nicht Fehlerlosigkeit, sondern zwei Dinge: die Wirkung ernst zu nehmen und etwas einzurichten, das nicht von deiner Tagesform abhängt."
+      }
+    ],
+    "url": "/hilfe/ich-vergesse-alles-und-sie-ist-verletzt"
+  },
+  {
+    "type": "problem",
     "slug": "ist-mein-partner-borderline",
     "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
     "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung.",
@@ -5007,6 +5565,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/hilfe/mein-kind-will-nicht-zum-anderen"
+  },
+  {
+    "type": "problem",
+    "slug": "mein-partner-hoert-mir-nicht-zu",
+    "title": "Mein Partner hört mir nicht zu",
+    "description": "Du erzählst etwas, und es kommt nichts an. Vier Gründe, die von außen gleich aussehen, ein Test, der sie trennt – und was du tun kannst, das nicht schon zehnmal gescheitert ist.",
+    "cluster": "neurodivergenz",
+    "search_intent": "partner hoert nicht zu vergisst alles interessiert sich nicht beziehung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation der letzten Tage anschauen, in der du etwas erzählt hast und nichts angekommen ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "adhs",
+      "anerkennung",
+      "neurodivergenz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "hyperfokus",
+        "doppeltes-empathieproblem"
+      ],
+      "comparison": [
+        "adhs-oder-desinteresse",
+        "neurodivergenz-oder-unreife"
+      ],
+      "related": [
+        "systeme-statt-vorsaetze",
+        "von-der-managerin-zur-partnerin",
+        "aktives-zuhoeren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Er nickt und weiß es zehn Minuten später nicht mehr. Wie kann das sein?",
+        "answer": "Weil Hören und Behalten zwei verschiedene Vorgänge sind. Wenn im Kopf gerade drei andere Dinge laufen, wird Gehörtes verarbeitet und nicht abgelegt. Das ist keine Höflichkeitslüge, es fühlt sich für beide Seiten unglaubwürdig an und ist trotzdem der Normalfall bei Aufmerksamkeitsschwierigkeiten."
+      },
+      {
+        "question": "Was hilft im Moment des Gesprächs?",
+        "answer": "Drei Dinge, die zusammen mehr bringen als jede Ermahnung: erst Aufmerksamkeit herstellen, dann reden – also nicht aus dem Nebenzimmer, nicht bei laufendem Bildschirm. Kurz halten, ein Thema. Und Wichtiges sofort sichtbar machen, statt es zu übergeben: Termin gemeinsam in den Kalender, während ihr redet."
+      },
+      {
+        "question": "Ich will nicht immer alles wiederholen müssen.",
+        "answer": "Das ist berechtigt und trotzdem der falsche Kampfplatz. Wiederholen und Erinnern halten die Rollenverteilung fest, in der du die Verwaltung übernimmst. Der Ausweg führt nicht über mehr Disziplin auf der anderen Seite, sondern darüber, das Erinnern an ein System abzugeben, das keiner von euch ist."
+      },
+      {
+        "question": "Ab wann ist es doch Desinteresse?",
+        "answer": "Wenn es nur bei dir passiert und nicht in anderen Bereichen, wenn nichts von selbst zurückkommt und wenn sich auch mit funktionierenden Erinnerungssystemen nichts ändert. Dann geht es nicht mehr ums Können."
+      }
+    ],
+    "url": "/hilfe/mein-partner-hoert-mir-nicht-zu"
   },
   {
     "type": "problem",
@@ -7190,6 +7817,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "du-hoerst-mir-nie-zu",
+    "title": "Du hörst mir nie zu",
+    "description": "Eine Szene über den Moment, in dem aus dreihundert Kleinigkeiten eine Überzeugung geworden ist – und über die Frage, ob sie stimmt. Ich-Perspektive, fiktiv.",
+    "cluster": "neurodivergenz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Carlas Sicht",
+    "pull_quote": "Ich habe ihm von der Untersuchung erzählt. Am Donnerstag hat er gefragt, ob ich diese Woche noch was vorhabe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du das Gefühl, nicht anzukommen? Magst du anschauen, welchen Schluss du daraus gezogen hast?"
+    },
+    "scene_tags": [
+      "adhs",
+      "anerkennung",
+      "neurodivergenz",
+      "erschoepfung"
+    ],
+    "url": "/szenen/du-hoerst-mir-nie-zu"
+  },
+  {
+    "type": "scene",
     "slug": "du-machst-das-eh-besser",
     "title": "Du machst das eh besser",
     "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv.",
@@ -7464,6 +8118,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "elternschaft"
     ],
     "url": "/szenen/er-nennt-sie-mama"
+  },
+  {
+    "type": "scene",
+    "slug": "er-sagt-es-einfach",
+    "title": "Er sagt es einfach",
+    "description": "Eine Szene über einen Satz ohne Verpackung – erst als Kränkung gelesen, später als das Verlässlichste an dieser Beziehung. Ich-Perspektive, fiktiv.",
+    "cluster": "neurodivergenz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jasmins Sicht",
+    "pull_quote": "Am Anfang dachte ich, er sei kalt. Inzwischen ist er der einzige Mensch, bei dem ich nie überlegen muss, was gemeint war.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wo ihr aneinander vorbeiredet – und was ihr jeweils voraussetzt?"
+    },
+    "scene_tags": [
+      "autismus",
+      "neurodivergenz",
+      "anerkennung"
+    ],
+    "url": "/szenen/er-sagt-es-einfach"
   },
   {
     "type": "scene",
@@ -7914,6 +8594,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-bin-nicht-deine-mutter",
+    "title": "Ich bin nicht deine Mutter",
+    "description": "Eine Szene über einen Satz, der im Streit fällt und danach nicht mehr wegzukriegen ist – und über die Rolle, in die beide gerutscht sind. Ich-Perspektive, fiktiv.",
+    "cluster": "neurodivergenz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Kais Sicht",
+    "pull_quote": "Sie hat es gesagt, und es stimmte, und ich konnte nichts dagegen sagen. Ich habe seit vier Jahren nicht mehr allein an etwas gedacht.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie bei euch entschieden wird, was zu tun ist – und wann das so geworden ist?"
+    },
+    "scene_tags": [
+      "adhs",
+      "mental-load",
+      "anerkennung",
+      "erschoepfung"
+    ],
+    "url": "/szenen/ich-bin-nicht-deine-mutter"
+  },
+  {
+    "type": "scene",
     "slug": "ich-brauch-eine-pause",
     "title": "Ich brauch eine Pause",
     "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv.",
@@ -8156,6 +8863,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "elternschaft"
     ],
     "url": "/szenen/ich-habe-es-vor-ihr-gesagt"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-es-wirklich-gewollt",
+    "title": "Ich habe es wirklich gewollt",
+    "description": "Eine Szene über die Strecke zwischen einem ernst gemeinten Vorsatz und dem, was am Abend nicht passiert ist. Ich-Perspektive, fiktiv.",
+    "cluster": "neurodivergenz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Maltes Sicht",
+    "pull_quote": "Ich habe morgens daran gedacht. Ich habe mittags daran gedacht. Und um sieben stehe ich in der Küche und habe es nicht gemacht.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du die Lücke zwischen Vornehmen und Tun? Magst du eine Situation anschauen, in der sie dich eingeholt hat?"
+    },
+    "scene_tags": [
+      "adhs",
+      "exekutive-funktionen",
+      "scham",
+      "anerkennung"
+    ],
+    "url": "/szenen/ich-habe-es-wirklich-gewollt"
   },
   {
     "type": "scene",
@@ -9224,6 +9958,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "mit-siebenunddreissig",
+    "title": "Mit siebenunddreißig",
+    "description": "Eine Szene über einen Bericht über das eigene Kind, in dem eine Frau sich selbst erkennt – und über die Trauer, die nach der Erleichterung kommt. Ich-Perspektive, fiktiv.",
+    "cluster": "neurodivergenz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Steffis Sicht",
+    "pull_quote": "Ich saß mit dem Bericht über meine Tochter in der Hand und habe gedacht: Das bin ich. Das ist die Beschreibung meines ganzen Lebens.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was sich für dich verändert hat, seit es eine Erklärung gibt?"
+    },
+    "scene_tags": [
+      "adhs",
+      "masking",
+      "neurodivergenz",
+      "scham"
+    ],
+    "url": "/szenen/mit-siebenunddreissig"
+  },
+  {
+    "type": "scene",
     "slug": "mitten-am-tag",
     "title": "Mitten am Tag",
     "description": "Eine fiktive Szene: An der Supermarktkasse, zwischen Milch und Brot, ist plötzlich alles wieder da – so echt, als geschehe es jetzt. Über einen Flashback, der sich ungefragt in einen ganz normalen Moment drängt.",
@@ -9689,6 +10450,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/sie-hat-die-kinder-erwaehnt"
+  },
+  {
+    "type": "scene",
+    "slug": "sie-hat-drei-mal-gefragt",
+    "title": "Sie hat dreimal gefragt",
+    "description": "Eine Szene über Erinnerungen, die als Hilfe gemeint sind und als Urteil ankommen – und über den Rückzug, der daraus folgt. Ich-Perspektive, fiktiv.",
+    "cluster": "neurodivergenz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Oles Sicht",
+    "pull_quote": "Beim dritten Mal habe ich nichts mehr gesagt. Nicht aus Trotz. Weil mir klar wurde, dass ich in diesem Haushalt jemand bin, den man erinnert.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du das Gefühl, verwaltet zu werden? Magst du anschauen, was das mit dir macht?"
+    },
+    "scene_tags": [
+      "adhs",
+      "anerkennung",
+      "scham",
+      "mental-load"
+    ],
+    "url": "/szenen/sie-hat-drei-mal-gefragt"
   },
   {
     "type": "scene",
@@ -10554,6 +11342,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "zu-laut-zu-hell-zu-viel",
+    "title": "Zu laut, zu hell, zu viel",
+    "description": "Eine Szene über eine Familienfeier, die von außen schön aussieht – und von innen nach zwei Stunden nicht mehr auszuhalten ist. Ich-Perspektive, fiktiv.",
+    "cluster": "neurodivergenz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Riekes Sicht",
+    "pull_quote": "Ich sitze zwischen zwanzig Menschen, die alle nett sind, und in meinem Kopf ist ein Ton, der immer lauter wird.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du den Punkt, an dem es zu viel wird? Magst du beschreiben, woran du es zuerst merkst?"
+    },
+    "scene_tags": [
+      "reizueberflutung",
+      "autismus",
+      "masking",
+      "erschoepfung"
+    ],
+    "url": "/szenen/zu-laut-zu-hell-zu-viel"
+  },
+  {
+    "type": "scene",
     "slug": "zusammenzucken",
     "title": "Er hebt nur die Hand",
     "description": "Eine fiktive Szene: Ein Kollege greift nach einem Buch im Regal über ihm – und er zuckt zusammen, als käme ein Schlag. Über den Schreck, der im Körper geblieben ist, obwohl die Gefahr vorbei ist.",
@@ -10722,6 +11537,215 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/zwoelf-rosen-und-kein-satz"
+  },
+  {
+    "type": "topic",
+    "slug": "adhs-in-der-beziehung",
+    "title": "ADHS in der Beziehung: warum Wollen nicht reicht",
+    "description": "Er hat zugehört, er war einverstanden, er hat es ernst gemeint – und es ist wieder nicht passiert. Warum ein Umsetzungsproblem von außen exakt wie Gleichgültigkeit aussieht, und was daraus für beide folgt.",
+    "cluster": "neurodivergenz",
+    "search_intent": "adhs beziehung partner erwachsene auswirkungen streit vergesslich",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über ADHS in Beziehungen gelesen. Magst du eine Situation der letzten Woche anschauen, in der etwas verabredet war und nicht passiert ist – und beschreiben, was du daraus geschlossen hast?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "adhs",
+      "exekutive-funktionen",
+      "neurodivergenz",
+      "anerkennung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "autismus-in-der-beziehung",
+        "von-der-managerin-zur-partnerin",
+        "systeme-statt-vorsaetze",
+        "wenn-es-zu-viel-wird",
+        "wenn-die-diagnose-spaet-kommt"
+      ],
+      "glossary": [
+        "exekutive-funktionen",
+        "zeitblindheit",
+        "hyperfokus",
+        "zurueckweisungsempfindlichkeit"
+      ],
+      "comparison": [
+        "adhs-oder-desinteresse",
+        "neurodivergenz-oder-unreife"
+      ],
+      "related": [
+        "mental-load-in-beziehungen",
+        "emotionale-unreife-abgrenzen",
+        "emotionsregulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist ADHS eine Ausrede für unzuverlässiges Verhalten?",
+        "answer": "Nein, und diese Unterscheidung trägt den ganzen Themenbereich. Eine Erklärung sagt, warum etwas schwerfällt. Sie sagt nicht, dass die Folgen bei jemand anderem landen dürfen. Der Satz, der beides zusammenhält: ADHS erklärt, warum du es vergessen hast. Es erklärt nicht, warum du nichts eingerichtet hast, damit du es nicht vergisst."
+      },
+      {
+        "question": "Warum funktioniert Erinnern nicht?",
+        "answer": "Weil Erinnern das Problem verschiebt statt es zu lösen. Wer erinnert, übernimmt damit die Planung, das Nachhalten und die Verantwortung – und wird zur Instanz, die nervt. Die andere Seite bleibt in der Rolle desjenigen, der Ansagen bekommt. Was tatsächlich hilft, sind Systeme außerhalb beider Köpfe: Kalender mit Erinnerung, sichtbare Listen, feste Abläufe."
+      },
+      {
+        "question": "Kann eine Beziehung mit ADHS gut funktionieren?",
+        "answer": "Ja, und zwar erheblich besser, sobald es benannt ist. Der Unterschied zwischen einer belasteten und einer funktionierenden Beziehung liegt selten in der Schwere der Symptome, sondern darin, ob beide dieselbe Erklärung für das Geschehen haben. Solange die eine Seite Gleichgültigkeit liest, wo Umsetzungsschwierigkeit ist, sammelt sich Kränkung an, die niemand auflösen kann."
+      },
+      {
+        "question": "Meine Partnerin hat erst mit vierzig die Diagnose bekommen. Warum so spät?",
+        "answer": "Weil ADHS bei Mädchen und Frauen systematisch übersehen wird. Es zeigt sich häufiger als Verträumtheit, innere Unruhe und Erschöpfung statt als sichtbare Zappeligkeit – und viele lernen früh, es zu überspielen. Sehr oft fällt es erst auf, wenn das eigene Kind eine Diagnose bekommt und die Beschreibung bekannt vorkommt."
+      },
+      {
+        "question": "Hilft Medikation?",
+        "answer": "Bei vielen deutlich, und sie gehört zu den am besten untersuchten Behandlungen in der Psychiatrie. Sie ersetzt keine Struktur und keine Absprachen: Medikamente verbessern die Voraussetzungen für Umsetzung, sie richten aber keine Systeme ein. Über Nutzen und Nebenwirkungen entscheidet die behandelnde Fachperson, nicht eine Website."
+      }
+    ],
+    "url": "/wissen/adhs-in-der-beziehung"
+  },
+  {
+    "type": "comparison",
+    "slug": "adhs-oder-desinteresse",
+    "title": "ADHS oder Desinteresse? Fünf Prüfsteine",
+    "description": "Vergessene Zusagen sehen von außen immer gleich aus. Fünf Fragen, die zwischen Umsetzungsschwierigkeit und Gleichgültigkeit unterscheiden – und die praktischste davon kostet acht Wochen.",
+    "cluster": "neurodivergenz",
+    "search_intent": "partner vergisst alles absichtlich desinteresse adhs unterschied",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine konkrete Zusage anschauen, die nicht eingehalten wurde – und beschreiben, was danach passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "adhs",
+      "anerkennung",
+      "exekutive-funktionen"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "zeitblindheit",
+        "zurueckweisungsempfindlichkeit"
+      ],
+      "related": [
+        "von-der-managerin-zur-partnerin",
+        "systeme-statt-vorsaetze",
+        "emotionale-unreife-abgrenzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist der aussagekräftigste Prüfstein?",
+        "answer": "Ob es auch dort passiert, wo es ihm selbst schadet. Wer Gleichgültigkeit zeigt, ist bei den eigenen Anliegen zuverlässig – die Steuererklärung für die eigene Rückzahlung, das Hobby, der Freundeskreis. Eine Umsetzungsschwierigkeit macht vor eigenen Zielen nicht halt und richtet dort oft den größten Schaden an."
+      },
+      {
+        "question": "Und wenn beides zutrifft?",
+        "answer": "Das kommt vor. Eine Diagnose schützt nicht davor, sich in einer Beziehung auch bequem einzurichten. Der Unterschied zeigt sich dann daran, was auf einen klaren Hinweis folgt: Wer die Wirkung ernst nimmt und etwas einrichtet, hat ein Umsetzungsproblem. Wer erklärt und nichts ändert, benutzt die Erklärung."
+      },
+      {
+        "question": "Wie prüfe ich das, ohne ihn auszufragen?",
+        "answer": "Über ein System statt über ein Gespräch. Vereinbart für einen einzigen Bereich einen Kalendereintrag mit Alarm und ein Ende des Erinnerns – acht Wochen lang. Wenn das reicht, war es Umsetzung. Wenn selbst mit funktionierendem Auslöser nichts passiert, ist die Frage eine andere."
+      }
+    ],
+    "url": "/wissen/adhs-oder-desinteresse"
+  },
+  {
+    "type": "topic",
+    "slug": "autismus-in-der-beziehung",
+    "title": "Autismus in der Beziehung: das Missverständnis geht in beide Richtungen",
+    "description": "Die verbreitete Erzählung lautet, autistischen Menschen fehle Empathie. Die Forschung beschreibt etwas anderes: eine wechselseitige Übersetzungslücke. Was das für eine Beziehung ändert – und was praktisch hilft.",
+    "cluster": "neurodivergenz",
+    "search_intent": "autismus beziehung partner asperger kommunikation missverstaendnisse",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der ihr aneinander vorbeigeredet habt – und beide beschreiben, was ihr in dem Moment gemeint habt?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "autismus",
+      "neurodivergenz",
+      "reizueberflutung",
+      "masking"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "doppeltes-empathieproblem",
+        "masking",
+        "reizueberflutung",
+        "autistischer-burnout"
+      ],
+      "comparison": [
+        "neurodivergenz-oder-unreife"
+      ],
+      "related": [
+        "wenn-es-zu-viel-wird",
+        "systeme-statt-vorsaetze",
+        "emotionale-unreife-abgrenzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Fehlt autistischen Menschen Empathie?",
+        "answer": "So verkürzt ist es falsch. Unterschieden wird zwischen dem Erkennen fremder Zustände und dem Mitfühlen. Das Mitfühlen ist häufig stark ausgeprägt, manchmal überwältigend. Was schwerer fällt, ist das automatische Ablesen: Mimik, Tonfall, Andeutungen. Und dieses Nichtverstehen ist wechselseitig – nichtautistische Menschen lesen autistische Signale genauso schlecht."
+      },
+      {
+        "question": "Warum sagt er nie, dass es schön war?",
+        "answer": "Weil in vielen Fällen die Annahme gilt, dass Selbstverständliches nicht ausgesprochen werden muss. Das ist keine Gleichgültigkeit, sondern eine andere Voreinstellung darüber, was gesagt gehört. Die Lösung ist unromantisch und wirksam: es ausdrücklich zu vereinbaren. Ein Satz, der auf Wunsch gesagt wird, ist nicht weniger wert als einer, der von selbst kommt – er kostet nur eine Absprache mehr."
+      },
+      {
+        "question": "Er zieht sich nach Familienfeiern stundenlang zurück. Ist das Ablehnung?",
+        "answer": "In aller Regel nicht. Nach reizintensiven Situationen ist Erholungszeit nötig, und sie ist nicht verhandelbar wie Lust oder Unlust. Hilfreich ist, das vorher zu planen statt es nachher zu deuten: eine verabredete Rückzugszeit mit klarem Ende nimmt beiden die Kränkung."
+      },
+      {
+        "question": "Kann eine Beziehung zwischen autistischen und nichtautistischen Menschen gut sein?",
+        "answer": "Ja, und der entscheidende Unterschied ist selten die Schwere der Merkmale, sondern ob sie benannt sind. Solange beide die Unterschiede als Charakterurteil lesen – kalt, anstrengend, egoistisch –, sammelt sich Kränkung. Sobald sie als Übersetzungsproblem verstanden werden, wird daraus eine lösbare Aufgabe."
+      }
+    ],
+    "url": "/wissen/autismus-in-der-beziehung"
   },
   {
     "type": "topic",
@@ -14722,6 +15746,64 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/neue-partner-und-patchwork"
   },
   {
+    "type": "comparison",
+    "slug": "neurodivergenz-oder-unreife",
+    "title": "Neurodivergenz oder emotionale Unreife?",
+    "description": "Beides sieht im Streit ähnlich aus: Es kommt nichts zurück. Drei Achsen, die es trennen – Verlauf, Reichweite und vor allem die Reaktion auf eine klare Rückmeldung.",
+    "cluster": "neurodivergenz",
+    "search_intent": "adhs oder emotional unreif autismus unterschied partner erkennt nicht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der du deutlich gesagt hast, was dich verletzt hat – und beschreiben, was danach kam?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "neurodivergenz",
+      "adhs",
+      "autismus",
+      "anerkennung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "doppeltes-empathieproblem",
+        "mentalisierung",
+        "exekutive-funktionen"
+      ],
+      "related": [
+        "emotionale-unreife-abgrenzen",
+        "emotionale-unreife",
+        "autismus-in-der-beziehung"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Kann jemand beides haben?",
+        "answer": "Ja, und das ist eher die Regel als die Ausnahme. Eine Diagnose macht niemanden reif, und emotionale Unreife verschwindet nicht durch eine Erklärung. Die Unterscheidung dient deshalb nicht der Etikettierung, sondern der Frage, was hilft: Systeme und Übersetzung bei dem einen, Verantwortungsübernahme und Grenzen bei dem anderen."
+      },
+      {
+        "question": "Was ist der schärfste Unterschied?",
+        "answer": "Die Reaktion auf eine klare Rückmeldung. Wer eine Wirkung nicht bemerkt hat und sie nach einem deutlichen Hinweis ernst nimmt, hatte eine Wahrnehmungslücke. Wer sie nach dem zehnten Hinweis weiter erzeugt und die Diagnose als Begründung nennt, hat keine Kapazitätsgrenze, sondern eine Haltung."
+      },
+      {
+        "question": "Ist es fair, das überhaupt zu unterscheiden?",
+        "answer": "Es ist notwendig, und zwar in beide Richtungen. Wer eine Neurodivergenz als Charakterfehler behandelt, verlangt Unmögliches. Wer jedes Verhalten mit einer Diagnose erklärt, entzieht der anderen Person jedes Recht auf Widerspruch. Beide Fehler sind verbreitet, und beide beenden das Gespräch."
+      }
+    ],
+    "url": "/wissen/neurodivergenz-oder-unreife"
+  },
+  {
     "type": "topic",
     "slug": "paartherapie",
     "title": "Paartherapie: die Ansätze im Vergleich – und was davon belegt ist",
@@ -15314,6 +16396,71 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/sich-trennen"
+  },
+  {
+    "type": "topic",
+    "slug": "systeme-statt-vorsaetze",
+    "title": "Systeme statt Vorsätze",
+    "description": "Ein Vorsatz wird in Ruhe gefasst und im Alltag gebraucht – genau dort ist er nicht verfügbar. Was stattdessen trägt: alles aus dem Kopf heraus, sichtbar, mit Auslöser. Und die eine Regel, an der sich jedes System messen lässt.",
+    "cluster": "neurodivergenz",
+    "search_intent": "adhs alltag organisieren tipps struktur erwachsene partnerschaft",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Sache anschauen, die bei euch regelmäßig untergeht – und überlegen, welcher Auslöser sie sichtbar machen würde?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "adhs",
+      "exekutive-funktionen",
+      "neurodivergenz",
+      "mental-load"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "zeitblindheit",
+        "hyperfokus"
+      ],
+      "related": [
+        "von-der-managerin-zur-partnerin",
+        "zustaendigkeit-statt-aufgaben",
+        "mental-load-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Woran erkenne ich ein gutes System?",
+        "answer": "An einer einzigen Regel: Ein System, das Disziplin braucht, ist kein System. Wenn es nur funktioniert, solange jemand daran denkt, es zu benutzen, hat es das Problem nicht gelöst, sondern verschoben. Gute Systeme haben einen Auslöser, der von außen kommt – eine Uhrzeit, einen Ort, ein Ereignis."
+      },
+      {
+        "question": "Warum scheitern die meisten Apps?",
+        "answer": "Weil sie Pflege brauchen. Eine Liste, die täglich sortiert werden muss, ist selbst eine Aufgabe – und die geht als Erstes unter. Was hält, ist meistens unspektakulär: ein Kalender mit lauten Erinnerungen, ein Zettel an der Tür, ein fester Platz für den Schlüssel."
+      },
+      {
+        "question": "Was ist ein Wenn-dann-Plan?",
+        "answer": "Eine Verabredung mit sich selbst, die einen Auslöser mit einer Handlung verknüpft: Wenn ich den Mantel aufhänge, lege ich den Schlüssel in die Schale. Das ist gut untersucht und wirkt deutlich besser als ein allgemeiner Vorsatz, weil nicht die Absicht abgerufen werden muss, sondern eine Situation die Handlung auslöst."
+      },
+      {
+        "question": "Wie viele Systeme auf einmal?",
+        "answer": "Eines. Der häufigste Fehler ist der Neuanfang mit fünf Neuerungen an einem Sonntagabend – er hält knapp zwei Wochen. Ein System, das nach acht Wochen noch läuft, ist mehr wert als fünf, die nach zehn Tagen alle weg sind."
+      }
+    ],
+    "url": "/wissen/systeme-statt-vorsaetze"
   },
   {
     "type": "topic",
@@ -16133,6 +17280,72 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "von-der-managerin-zur-partnerin",
+    "title": "Von der Managerin zur Partnerin",
+    "description": "Die Rolle, in die viele Beziehungen mit ADHS rutschen: Einer plant und erinnert, der andere führt aus. Warum das beiden schadet, was es mit der Anziehung macht – und wie man wieder herauskommt.",
+    "cluster": "neurodivergenz",
+    "search_intent": "adhs partner wie mutter kind dynamik beziehung erinnern nerven",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie bei euch entschieden wird, was zu tun ist – und wie es sich anfühlt, in dieser Rolle zu sein?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "adhs",
+      "mental-load",
+      "anerkennung",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "exekutive-funktionen",
+        "zurueckweisungsempfindlichkeit",
+        "mental-load"
+      ],
+      "related": [
+        "systeme-statt-vorsaetze",
+        "mental-load-in-beziehungen",
+        "zustaendigkeit-statt-aufgaben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie kommt man aus dieser Rolle heraus?",
+        "answer": "Nicht dadurch, dass die eine Seite weniger erinnert und alles zusammenbricht, und auch nicht dadurch, dass sich die andere mehr anstrengt. Der Weg führt über eine dritte Instanz: Systeme, die das Erinnern übernehmen. Ein Kalender mit Alarm ist keine Bevormundung; er ist der Ersatz für eine Rolle, die kein Mensch in einer Partnerschaft haben sollte."
+      },
+      {
+        "question": "Was macht diese Dynamik mit der Anziehung?",
+        "answer": "Sie beschädigt sie zuverlässig, und darüber wird selten gesprochen. Wer über Jahre die Verantwortung für einen erwachsenen Menschen mitträgt, empfindet ihn irgendwann anders – und wer sich dauerhaft in Bewährung erlebt, ebenfalls. Das ist kein Zeichen fehlender Liebe, sondern eine Folge der Rollenverteilung."
+      },
+      {
+        "question": "Und wenn ohne Erinnern wirklich nichts passiert?",
+        "answer": "Dann ist das eine Information und keine Widerlegung. Der Schluss lautet dann nicht mehr erinnern, sondern besser einrichten: kleinere Bereiche, klarere Übergaben, verlässlichere Systeme, gegebenenfalls Behandlung. Was nicht funktioniert, ist die Rolle einfach abzugeben und darauf zu warten, dass es von allein anders wird."
+      },
+      {
+        "question": "Ich bin die Managerin und will die Kontrolle eigentlich nicht abgeben. Normal?",
+        "answer": "Häufig, ja. Die Rolle ist anstrengend und gibt zugleich Sicherheit und Bedeutung. Wer sie loslässt, muss aushalten, dass Dinge anders und zunächst schlechter laufen. Diese Phase ist der eigentliche Test – und der Punkt, an dem die meisten Versuche abgebrochen werden."
+      }
+    ],
+    "url": "/wissen/von-der-managerin-zur-partnerin"
+  },
+  {
+    "type": "topic",
     "slug": "war-das-schon-gewalt",
     "title": "War das schon Gewalt? Eine Einordnung ohne Urteil",
     "description": "Festhalten, den Weg versperren, etwas werfen: die Frage, die Betroffene jahrelang mit sich herumtragen. Was Fachleute unterscheiden, warum die Schwere der falsche Maßstab ist und woran du dich stattdessen orientieren kannst.",
@@ -16455,6 +17668,76 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "wenn-die-diagnose-spaet-kommt",
+    "title": "Wenn die Diagnose spät kommt",
+    "description": "Mit vierzig eine Erklärung für vierzig Jahre zu bekommen, ist Erleichterung und Trauer zugleich. Warum es Frauen besonders oft trifft, was es mit einer Beziehung macht – und der Fehler, der danach am häufigsten passiert.",
+    "cluster": "neurodivergenz",
+    "search_intent": "adhs diagnose erwachsene spaet frauen autismus spaetdiagnose beziehung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was sich seit der Diagnose verändert hat – im Guten wie im Schwierigen?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "adhs",
+      "masking",
+      "neurodivergenz",
+      "anerkennung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "masking",
+        "exekutive-funktionen",
+        "zurueckweisungsempfindlichkeit",
+        "autistischer-burnout"
+      ],
+      "comparison": [
+        "neurodivergenz-oder-unreife"
+      ],
+      "related": [
+        "systeme-statt-vorsaetze",
+        "autismus-in-der-beziehung",
+        "professionelle-hilfe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum werden Frauen so oft erst spät erkannt?",
+        "answer": "Weil die verbreiteten Bilder von ADHS und Autismus an Jungen entstanden sind. Bei Mädchen zeigt sich ADHS häufiger als Verträumtheit und innere Unruhe statt als sichtbare Zappeligkeit, und viele lernen früh, Auffälligkeiten zu überspielen. Sehr häufig fällt es erst auf, wenn das eigene Kind eine Diagnose bekommt und die Beschreibung bekannt vorkommt."
+      },
+      {
+        "question": "Ist es zu spät, wenn ich schon vierzig bin?",
+        "answer": "Nein. Eine Diagnose ändert nicht die Vergangenheit, aber sie ändert drei Dinge in der Gegenwart: den Zugang zu wirksamer Behandlung, die Erklärung für das, was immer schwerfiel, und die Möglichkeit, Systeme zu bauen statt sich weiter zusammenzureißen. Viele beschreiben die Jahre nach der Diagnose als die ersten, in denen sie sich nicht mehr für faul halten."
+      },
+      {
+        "question": "Warum bin ich traurig, obwohl ich erleichtert bin?",
+        "answer": "Weil beides zusammengehört. Mit der Erklärung kommt die Rechnung: all die Jahre, in denen man sich für unfähig gehalten hat, die Kritik, die man geglaubt hat, die Wege, die man nicht gegangen ist. Diese Trauer ist eine angemessene Reaktion und kein Zeichen dafür, dass die Diagnose falsch war."
+      },
+      {
+        "question": "Wie komme ich an eine Abklärung?",
+        "answer": "Über die Terminservicestelle 116 117, über eine psychotherapeutische Sprechstunde oder über eine spezialisierte Ambulanz. Wartezeiten sind lang, das ist die Regel. Hilfreich für das Erstgespräch: Zeugnisse, Berichte aus der Schulzeit und die Einschätzung von Menschen, die einen als Kind kannten – die Diagnostik im Erwachsenenalter stützt sich stark darauf."
+      }
+    ],
+    "url": "/wissen/wenn-die-diagnose-spaet-kommt"
+  },
+  {
+    "type": "topic",
     "slug": "wenn-die-grenze-steht",
     "title": "Wenn die Grenze steht: was danach passiert",
     "description": "Der schwere Teil beginnt nach dem Nein. Warum Widerstand am Anfang zunimmt statt abzunehmen, warum Schuldgefühle kein Beweis für ein Unrecht sind – und warum die Reaktion auf deine Grenze mehr über die Beziehung sagt als Jahre von Gesprächen.",
@@ -16586,6 +17869,73 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/wenn-es-zu-schnell-geht"
+  },
+  {
+    "type": "topic",
+    "slug": "wenn-es-zu-viel-wird",
+    "title": "Wenn es zu viel wird: Überlastung, Rückzug, Aussetzer",
+    "description": "Ein Mensch geht mitten im Gespräch aus dem Raum, wird laut oder verstummt völlig. Was in solchen Momenten passiert, warum Reden dann nicht funktioniert – und wie man das vorher regelt statt hinterher zu deuten.",
+    "cluster": "neurodivergenz",
+    "search_intent": "reizueberflutung partner rueckzug meltdown shutdown autismus adhs",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation anschauen, in der einer von euch den Raum verlassen hat – und beschreiben, was in den Minuten davor los war?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "reizueberflutung",
+      "autismus",
+      "adhs",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "adhs-in-der-beziehung",
+      "glossary": [
+        "reizueberflutung",
+        "autistischer-burnout",
+        "masking",
+        "emotionale-dysregulation"
+      ],
+      "related": [
+        "autismus-in-der-beziehung",
+        "systeme-statt-vorsaetze",
+        "co-regulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist der Rückzug gegen mich gerichtet?",
+        "answer": "In aller Regel nicht. Bei Überlastung geht es um Reize und Verarbeitungslast, nicht um Zuneigung. Das Bittere daran ist, dass es sich für die andere Seite exakt wie Zurückweisung anfühlt – und dass Nachsetzen in diesem Moment alles verschlimmert, weil es die Last erhöht statt sie zu senken."
+      },
+      {
+        "question": "Was ist der Unterschied zwischen einem Meltdown und einem Shutdown?",
+        "answer": "Beides sind Reaktionen auf Überlastung, sie sehen nur entgegengesetzt aus. Beim Meltdown bricht es nach außen: laut, ungesteuert, überwältigend. Beim Shutdown nach innen: kein Wort mehr, keine Regung, manchmal auch keine Bewegung. Ein Shutdown wird häufig als Trotz oder Schweigen als Strafe missverstanden und ist das Gegenteil davon."
+      },
+      {
+        "question": "Warum kann er in dem Moment nicht einfach sagen, was los ist?",
+        "answer": "Weil Sprechen selbst Verarbeitung braucht, und genau die ist gerade knapp. Deshalb bringt es fast nie etwas, mitten in der Überlastung nach dem Grund zu fragen. Was hilft, ist ein vorher vereinbartes Zeichen – ein Wort, eine Geste –, das nicht erklärt werden muss."
+      },
+      {
+        "question": "Wie lange dauert die Erholung?",
+        "answer": "Sehr unterschiedlich: von zwanzig Minuten bis zu Tagen. Wichtiger als die Dauer ist die Planbarkeit. Eine verabredete Rückzugszeit mit klarem Ende nimmt beiden den schlimmsten Teil – der eine muss nicht kämpfen, die andere weiß, wann es weitergeht."
+      }
+    ],
+    "url": "/wissen/wenn-es-zu-viel-wird"
   },
   {
     "type": "topic",
@@ -16948,6 +18298,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ambivalenz – wenn du hin- und hergerissen bist",
     "description": "Was Ambivalenz bedeutet, warum sie gerade in Beziehungsfragen so belastend ist und warum sie kein Zeichen von Schwäche oder Unentschlossenheit ist."
   },
+  "/glossar/autistischer-burnout": {
+    "title": "Autistischer Burnout – wenn nichts mehr geht",
+    "description": "Kein klassischer Erschöpfungszustand aus zu viel Arbeit, sondern die Folge jahrelanger Anpassung. Woran man ihn erkennt, wie er sich von einer Depression unterscheidet und was tatsächlich hilft."
+  },
   "/glossar/beduerfnis-und-strategie": {
     "title": "Bedürfnis und Strategie – zwei Dinge, die oft verwechselt werden",
     "description": "Ein Bedürfnis ist das, was du brauchst. Eine Strategie ist ein Weg, es zu erfüllen. Warum die Unterscheidung Streit auflöst, der sonst unlösbar wirkt."
@@ -16995,6 +18349,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/dissoziation": {
     "title": "Dissoziation – wenn der Kopf sich abkoppelt, um zu schützen",
     "description": "Dissoziation ist ein innerlicher Rückzug: Man fühlt sich fern, taub oder wie abgeschnitten. Warum das ein Schutz ist, wie es sich zeigt und was zurück in den Körper hilft. Ohne Diagnose."
+  },
+  "/glossar/doppeltes-empathieproblem": {
+    "title": "Doppeltes Empathieproblem – das Missverständnis geht in beide Richtungen",
+    "description": "Die verbreitete Vorstellung, autistischen Menschen fehle Empathie, greift zu kurz. Untersuchungen zeigen ein wechselseitiges Übersetzungsproblem – mit erheblichen Folgen dafür, wie man es angeht."
   },
   "/glossar/double-bind": {
     "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
@@ -17060,6 +18418,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Eskalationsspirale – wie aus einer Kleinigkeit ein großer Streit wird",
     "description": "Wie sich Konflikte hochschaukeln, warum jede Reaktion die nächste verschärft und an welcher Stelle man aus der Spirale aussteigen kann. Ohne Diagnose."
   },
+  "/glossar/exekutive-funktionen": {
+    "title": "Exekutive Funktionen – die Strecke zwischen Wissen und Tun",
+    "description": "Anfangen, dranbleiben, umschalten, Impulse bremsen, den Überblick über die Zeit behalten. Wo diese Funktionen schwach sind, entsteht ein Umsetzungsproblem – das von außen aussieht wie ein Wollen-Problem."
+  },
   "/glossar/extinktionsburst": {
     "title": "Extinktionsburst – warum es erst schlimmer wird",
     "description": "Ein Verhalten, das jahrelang funktioniert hat, hört nicht auf, wenn es nicht mehr wirkt – es wird zuerst lauter. Warum die ersten Wochen nach einer Grenze die schwersten sind und was das über den Erfolg aussagt."
@@ -17107,6 +18469,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/hoovering": {
     "title": "Hoovering – das Zurückholen, wenn du gehen willst",
     "description": "Hoovering ist der Versuch, dich wieder einzusaugen, sobald du auf Abstand gehst – mit plötzlicher Wärme, Versprechen oder Krisen. Warum es so schwer zu widerstehen ist und was hilft. Ohne Diagnose."
+  },
+  "/glossar/hyperfokus": {
+    "title": "Hyperfokus – die andere Hälfte der Aufmerksamkeitsstörung",
+    "description": "Stundenlang versunken, ohne Hunger, ohne Zeitgefühl, ohne Ansprechbarkeit. Warum das kein Widerspruch zu ADHS ist, sondern derselbe Mechanismus – und was es in einer Beziehung auslöst."
   },
   "/glossar/hypervigilanz": {
     "title": "Hypervigilanz – ständig in Alarmbereitschaft",
@@ -17196,6 +18562,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Loyalitätskonflikt – die Frage, die ein Kind nicht beantworten kann",
     "description": "Ein Kind gerät zwischen die Eltern und müsste sich entscheiden, wem es guttut. Es entscheidet sich nicht, sondern beginnt zu managen – und genau das ist der Schadensmechanismus nach einer Trennung."
   },
+  "/glossar/masking": {
+    "title": "Masking – die Anstrengung, unauffällig zu wirken",
+    "description": "Blickkontakt trainieren, Reaktionen kopieren, Erschöpfung verbergen. Warum Masking funktioniert, was es kostet – und warum es der Hauptgrund dafür ist, dass Frauen so spät erkannt werden."
+  },
   "/glossar/mental-load": {
     "title": "Mental Load – die Arbeit, an alles zu denken",
     "description": "Nicht die Tätigkeit, sondern das Denken darum herum: daran denken, entscheiden, nachhalten, die Folgen tragen. Warum sich diese Last durch Mithilfe nicht verkleinern lässt."
@@ -17259,6 +18629,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/realitaetsverdrehung": {
     "title": "Realitätsverdrehung – wenn deine Erinnerung zum Streitpunkt wird",
     "description": "Realitätsverdrehung ist der Kern von Gaslighting: Fakten, Erinnerungen und Gefühle werden umgedeutet oder geleugnet, bis du an dir selbst zweifelst. Wie sie funktioniert und was hilft. Ohne Diagnose."
+  },
+  "/glossar/reizueberflutung": {
+    "title": "Reizüberflutung – wenn die Verarbeitung nicht mehr nachkommt",
+    "description": "Licht, Geräusche, Gerüche, Gespräche, alles gleichzeitig und nichts im Hintergrund. Was dabei passiert, warum Reden dann nicht funktioniert und was vorher vereinbart gehört."
   },
   "/glossar/reparaturversuch": {
     "title": "Reparaturversuch – die kleine Geste, die einen Streit rettet",
@@ -17396,9 +18770,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Wut – der missverstandene Bote",
     "description": "Warum Wut kein Feind ist, sondern ein Signal, was oft unter ihr liegt und wie man ihre Energie nutzen kann, ohne von ihr überrollt zu werden. Ohne Diagnose."
   },
+  "/glossar/zeitblindheit": {
+    "title": "Zeitblindheit – wenn Zeit kein Gefühl hat",
+    "description": "Nicht Unpünktlichkeit aus Nachlässigkeit, sondern ein fehlendes inneres Maß für vergehende Zeit. Was das im Alltag anrichtet und welche zwei Hilfsmittel am zuverlässigsten wirken."
+  },
   "/glossar/zirkulaere-frage": {
     "title": "Zirkuläre Frage – über die Sicht eines Dritten sprechen",
     "description": "Das bekannteste Werkzeug der systemischen Arbeit: nicht fragen, wie es dir geht, sondern was ein anderer über dich sagen würde. Warum das Gespräche öffnet, die frontal blockiert sind."
+  },
+  "/glossar/zurueckweisungsempfindlichkeit": {
+    "title": "Zurückweisungsempfindlichkeit – wenn Kritik körperlich wehtut",
+    "description": "Eine Bemerkung, die andere abschütteln, trifft wie ein Schlag. Warum das in ADHS-Beziehungen so häufig vorkommt, was die Vorgeschichte damit zu tun hat – und warum der Begriff keine Diagnose ist."
   },
   "/glossar/zweite-schicht": {
     "title": "Zweite Schicht – der Arbeitstag nach dem Arbeitstag",
@@ -17412,6 +18794,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ständige Angst, verlassen zu werden – was dahinter steckt",
     "description": "Wenn die Angst, verlassen zu werden, dein Denken und Handeln bestimmt: woran das liegen kann und was im Moment der Panik konkret hilft."
   },
+  "/hilfe/bin-ich-neurodivergent": {
+    "title": "Bin ich neurodivergent?",
+    "description": "Du erkennst dich in Beschreibungen wieder und weißt nicht, was das bedeutet. Warum Wiedererkennen kein Befund ist, was genauso aussieht – und was eine Abklärung tatsächlich bringt."
+  },
   "/hilfe/ich-glaube-ich-habe-borderline": {
     "title": "Ich glaube, ich habe Borderline – was jetzt sinnvoll ist",
     "description": "Wenn du dich in den Beschreibungen wiedererkennst: warum Selbsterkennen kein Befund ist, was eine Abklärung tatsächlich bringt, und was du tun kannst, bevor du einen Termin hast."
@@ -17424,6 +18810,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich sehe mein Kind zu wenig",
     "description": "Alle zwei Wochen ein Wochenende, und dazwischen ein leeres Zimmer. Warum gewöhnliche Zeit mehr trägt als besondere, wie man im Alltag vorkommt, ohne dabei zu sein – und was gegen die Verlockung des Freizeitprogramms hilft."
   },
+  "/hilfe/ich-vergesse-alles-und-sie-ist-verletzt": {
+    "title": "Ich vergesse alles – und sie ist verletzt",
+    "description": "Du hast es ernst gemeint und es ist trotzdem nicht passiert. Warum Versprechen hier nichts nützen, warum Entschuldigungen abnutzen und welcher zweite Halbsatz den ganzen Unterschied macht."
+  },
   "/hilfe/ist-mein-partner-borderline": {
     "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
     "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung."
@@ -17435,6 +18825,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/hilfe/mein-kind-will-nicht-zum-anderen": {
     "title": "Mein Kind will nicht zum anderen Elternteil",
     "description": "Ein Satz, der sofort alles in Frage stellt – und der sehr verschiedene Gründe haben kann. Wie du herausfindest, worum es geht, ohne dein Kind auszufragen, und warum Absagen der falsche erste Schritt ist."
+  },
+  "/hilfe/mein-partner-hoert-mir-nicht-zu": {
+    "title": "Mein Partner hört mir nicht zu",
+    "description": "Du erzählst etwas, und es kommt nichts an. Vier Gründe, die von außen gleich aussehen, ein Test, der sie trennt – und was du tun kannst, das nicht schon zehnmal gescheitert ist."
   },
   "/hilfe/mir-macht-man-es-nie-recht": {
     "title": "Ich mache es, und es ist trotzdem falsch",
@@ -17740,6 +19134,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Du hast dich verändert",
     "description": "Eine fiktive Szene: Nach vier Monaten mit einer neuen Klarheit hört er den Satz, den er gefürchtet hat – und merkt beim Nachdenken, dass darin gar kein Vorwurf steckt."
   },
+  "/szenen/du-hoerst-mir-nie-zu": {
+    "title": "Du hörst mir nie zu",
+    "description": "Eine Szene über den Moment, in dem aus dreihundert Kleinigkeiten eine Überzeugung geworden ist – und über die Frage, ob sie stimmt. Ich-Perspektive, fiktiv."
+  },
   "/szenen/du-machst-das-eh-besser": {
     "title": "Du machst das eh besser",
     "description": "Eine Szene über vorgetäuschte Unfähigkeit und ungleiche Last – wenn einer alles trägt, weil der andere alles „nicht kann\". Aus der Ich-Perspektive, fiktiv."
@@ -17779,6 +19177,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/er-nennt-sie-mama": {
     "title": "Er nennt sie Mama",
     "description": "Eine Szene über ein Wort, das ein Kind beiläufig benutzt – und über das, was es bei der auslöst, die es hört. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/er-sagt-es-einfach": {
+    "title": "Er sagt es einfach",
+    "description": "Eine Szene über einen Satz ohne Verpackung – erst als Kränkung gelesen, später als das Verlässlichste an dieser Beziehung. Ich-Perspektive, fiktiv."
   },
   "/szenen/er-sagt-es-nie": {
     "title": "Er sagt es nie",
@@ -17844,6 +19246,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Hauptsache, alle sehen es",
     "description": "Eine fiktive Szene: Er postet jede gute Tat, spendet nur mit Publikum – und zählt zu Hause die Cent. Über kommunalen Narzissmus, bei dem Großzügigkeit vor allem eine Bühne braucht."
   },
+  "/szenen/ich-bin-nicht-deine-mutter": {
+    "title": "Ich bin nicht deine Mutter",
+    "description": "Eine Szene über einen Satz, der im Streit fällt und danach nicht mehr wegzukriegen ist – und über die Rolle, in die beide gerutscht sind. Ich-Perspektive, fiktiv."
+  },
   "/szenen/ich-brauch-eine-pause": {
     "title": "Ich brauch eine Pause",
     "description": "Eine Szene über den Moment, in dem jemand mitten im Streit bewusst aussteigt – nicht als Rückzug, sondern um die Eskalation zu stoppen. Aus der Ich-Perspektive, fiktiv."
@@ -17879,6 +19285,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-habe-es-vor-ihr-gesagt": {
     "title": "Ich habe es vor ihr gesagt",
     "description": "Eine Szene über einen Satz am Telefon, der nicht für Kinderohren war – und darüber, was danach zu tun ist. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-habe-es-wirklich-gewollt": {
+    "title": "Ich habe es wirklich gewollt",
+    "description": "Eine Szene über die Strecke zwischen einem ernst gemeinten Vorsatz und dem, was am Abend nicht passiert ist. Ich-Perspektive, fiktiv."
   },
   "/szenen/ich-habe-es-zugegeben-und-nichts-ist-passiert": {
     "title": "Ich habe es zugegeben, und nichts ist passiert",
@@ -18032,6 +19442,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Meine Grenze war eine Forderung",
     "description": "Eine fiktive Szene: Sie merkt in einem Gespräch, dass ihr Satz über eine Grenze in Wahrheit eine Vorschrift war – und dass jedes Nein deshalb wie ein Übergriff wirken musste."
   },
+  "/szenen/mit-siebenunddreissig": {
+    "title": "Mit siebenunddreißig",
+    "description": "Eine Szene über einen Bericht über das eigene Kind, in dem eine Frau sich selbst erkennt – und über die Trauer, die nach der Erleichterung kommt. Ich-Perspektive, fiktiv."
+  },
   "/szenen/mitten-am-tag": {
     "title": "Mitten am Tag",
     "description": "Eine fiktive Szene: An der Supermarktkasse, zwischen Milch und Brot, ist plötzlich alles wieder da – so echt, als geschehe es jetzt. Über einen Flashback, der sich ungefragt in einen ganz normalen Moment drängt."
@@ -18099,6 +19513,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/sie-hat-die-kinder-erwaehnt": {
     "title": "Sie hat die Kinder erwähnt",
     "description": "Eine fiktive Szene: Mitten im Streit fällt ein Satz über die Kinder, und ab da ist die Auseinandersetzung vorbei. Über eine Drohung, gegen die es keine Verhandlung gibt."
+  },
+  "/szenen/sie-hat-drei-mal-gefragt": {
+    "title": "Sie hat dreimal gefragt",
+    "description": "Eine Szene über Erinnerungen, die als Hilfe gemeint sind und als Urteil ankommen – und über den Rückzug, der daraus folgt. Ich-Perspektive, fiktiv."
   },
   "/szenen/sie-hat-es-gehoert": {
     "title": "Sie hat es gehört",
@@ -18224,6 +19642,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Wo bist du gerade?",
     "description": "Eine Szene über Kontrolle und Eifersucht – wenn Fürsorge zur Überwachung wird und dein Radius Woche für Woche kleiner. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/zu-laut-zu-hell-zu-viel": {
+    "title": "Zu laut, zu hell, zu viel",
+    "description": "Eine Szene über eine Familienfeier, die von außen schön aussieht – und von innen nach zwei Stunden nicht mehr auszuhalten ist. Ich-Perspektive, fiktiv."
+  },
   "/szenen/zusammenzucken": {
     "title": "Er hebt nur die Hand",
     "description": "Eine fiktive Szene: Ein Kollege greift nach einem Buch im Regal über ihm – und er zuckt zusammen, als käme ein Schlag. Über den Schreck, der im Körper geblieben ist, obwohl die Gefahr vorbei ist."
@@ -18247,6 +19669,18 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/zwoelf-rosen-und-kein-satz": {
     "title": "Zwölf Rosen und kein Satz",
     "description": "Eine fiktive Szene: Zum Jahrestag bringt er zwölf Rosen mit und einen gut reservierten Tisch. Sie hätte sich ein Gespräch gewünscht. Über Geschenke, die alles richtig machen und trotzdem nichts erreichen."
+  },
+  "/wissen/adhs-in-der-beziehung": {
+    "title": "ADHS in der Beziehung: warum Wollen nicht reicht",
+    "description": "Er hat zugehört, er war einverstanden, er hat es ernst gemeint – und es ist wieder nicht passiert. Warum ein Umsetzungsproblem von außen exakt wie Gleichgültigkeit aussieht, und was daraus für beide folgt."
+  },
+  "/wissen/adhs-oder-desinteresse": {
+    "title": "ADHS oder Desinteresse? Fünf Prüfsteine",
+    "description": "Vergessene Zusagen sehen von außen immer gleich aus. Fünf Fragen, die zwischen Umsetzungsschwierigkeit und Gleichgültigkeit unterscheiden – und die praktischste davon kostet acht Wochen."
+  },
+  "/wissen/autismus-in-der-beziehung": {
+    "title": "Autismus in der Beziehung: das Missverständnis geht in beide Richtungen",
+    "description": "Die verbreitete Erzählung lautet, autistischen Menschen fehle Empathie. Die Forschung beschreibt etwas anderes: eine wechselseitige Übersetzungslücke. Was das für eine Beziehung ändert – und was praktisch hilft."
   },
   "/wissen/beduerfnisse-aeussern": {
     "title": "Bedürfnisse äußern statt Vorwürfe: die Kunst der Ich-Botschaft",
@@ -18524,6 +19958,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Neue Partner und Patchwork",
     "description": "Wann man ein Kind vorstellt, welche Rolle eine neue Partnerin am Anfang haben sollte – und warum der häufigste Fehler nicht zu früh ist, sondern zu viel Erziehung zu schnell."
   },
+  "/wissen/neurodivergenz-oder-unreife": {
+    "title": "Neurodivergenz oder emotionale Unreife?",
+    "description": "Beides sieht im Streit ähnlich aus: Es kommt nichts zurück. Drei Achsen, die es trennen – Verlauf, Reichweite und vor allem die Reaktion auf eine klare Rückmeldung."
+  },
   "/wissen/paartherapie": {
     "title": "Paartherapie: die Ansätze im Vergleich – und was davon belegt ist",
     "description": "EFT, IBCT, Verhaltenstherapie, systemisch, Gottman: was die Ansätze unterscheidet, wie gut sie belegt sind und was den Erfolg tatsächlich stärker vorhersagt als die Methode."
@@ -18567,6 +20005,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/sich-trennen": {
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",
     "description": "Warum die Trennungsfrage so schwer ist, welche Zweifel dazugehören und wie du Schritt für Schritt zu mehr Klarheit findest – ohne dass dir jemand die Entscheidung abnimmt."
+  },
+  "/wissen/systeme-statt-vorsaetze": {
+    "title": "Systeme statt Vorsätze",
+    "description": "Ein Vorsatz wird in Ruhe gefasst und im Alltag gebraucht – genau dort ist er nicht verfügbar. Was stattdessen trägt: alles aus dem Kopf heraus, sichtbar, mit Auslöser. Und die eine Regel, an der sich jedes System messen lässt."
   },
   "/wissen/systemische-paartherapie": {
     "title": "Systemische Paartherapie: das Problem liegt zwischen euch, nicht in einem",
@@ -18620,6 +20062,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Vertrauensbruch: die sechs Ebenen, die kaum jemand benennt",
     "description": "Vertrauensbruch ist mehr als Untreue. Auch eine Trennungsdrohung im Streit, das Drohen mit den Kindern oder tagelanges Schweigen brechen etwas. Die sechs Ebenen, was sie gemeinsam haben und woran du erkennst, ob Reparatur möglich ist."
   },
+  "/wissen/von-der-managerin-zur-partnerin": {
+    "title": "Von der Managerin zur Partnerin",
+    "description": "Die Rolle, in die viele Beziehungen mit ADHS rutschen: Einer plant und erinnert, der andere führt aus. Warum das beiden schadet, was es mit der Anziehung macht – und wie man wieder herauskommt."
+  },
   "/wissen/war-das-schon-gewalt": {
     "title": "War das schon Gewalt? Eine Einordnung ohne Urteil",
     "description": "Festhalten, den Weg versperren, etwas werfen: die Frage, die Betroffene jahrelang mit sich herumtragen. Was Fachleute unterscheiden, warum die Schwere der falsche Maßstab ist und woran du dich stattdessen orientieren kannst."
@@ -18640,6 +20086,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Wenn die Diagnose im Raum steht",
     "description": "Drei Situationen: Du vermutest etwas. Jemand sagt es über sich selbst. Oder jemand hat es im Streit über dich gesagt. Warum der Verdacht allein schon die Beziehung verändert – und was stattdessen weiterhilft."
   },
+  "/wissen/wenn-die-diagnose-spaet-kommt": {
+    "title": "Wenn die Diagnose spät kommt",
+    "description": "Mit vierzig eine Erklärung für vierzig Jahre zu bekommen, ist Erleichterung und Trauer zugleich. Warum es Frauen besonders oft trifft, was es mit einer Beziehung macht – und der Fehler, der danach am häufigsten passiert."
+  },
   "/wissen/wenn-die-grenze-steht": {
     "title": "Wenn die Grenze steht: was danach passiert",
     "description": "Der schwere Teil beginnt nach dem Nein. Warum Widerstand am Anfang zunimmt statt abzunehmen, warum Schuldgefühle kein Beweis für ein Unrecht sind – und warum die Reaktion auf deine Grenze mehr über die Beziehung sagt als Jahre von Gesprächen."
@@ -18647,6 +20097,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/wenn-es-zu-schnell-geht": {
     "title": "Wenn es zu schnell geht: Intensität als Warnzeichen",
     "description": "Überwältigende Nähe in den ersten Wochen, große Worte, Zukunftspläne nach zwei Treffen. Wann Intensität einfach Verliebtheit ist – und woran du merkst, dass sie etwas anderes ist."
+  },
+  "/wissen/wenn-es-zu-viel-wird": {
+    "title": "Wenn es zu viel wird: Überlastung, Rückzug, Aussetzer",
+    "description": "Ein Mensch geht mitten im Gespräch aus dem Raum, wird laut oder verstummt völlig. Was in solchen Momenten passiert, warum Reden dann nicht funktioniert – und wie man das vorher regelt statt hinterher zu deuten."
   },
   "/wissen/wenn-grenzen-nicht-reichen": {
     "title": "Wenn Grenzen nicht reichen – und wann sie schaden",

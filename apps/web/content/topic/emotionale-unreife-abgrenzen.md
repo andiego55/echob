@@ -79,6 +79,8 @@ ADHS sieht von außen aus wie Rücksichtslosigkeit: Termine vergessen, unterbrec
 
 **Der Unterschied liegt zwischen Absicht und Ausführung.** Bei ADHS ist die Zuwendung da und die Umsetzung fällt aus. Die Reue ist echt – und wiederholt sich trotzdem, was für beide Seiten zermürbend ist. Bei emotionaler Unreife bleibt schon die Zuwendung aus, und die Reue ist selten mehr als ein Satz, der den Konflikt beendet.
 
+Ausführlich steht diese Unterscheidung unter [Neurodivergenz oder emotionale Unreife](/wissen/neurodivergenz-oder-unreife); was ADHS in einer Beziehung anrichtet und was hilft, unter [ADHS in der Beziehung](/wissen/adhs-in-der-beziehung).
+
 **Prüffrage:** Vergisst die Person, was dir wichtig ist – oder war es ihr nie wichtig? Wer sich zehnmal ehrlich entschuldigt und beim elften Mal wieder vergisst, hat ein anderes Problem als jemand, der beim ersten Mal ausweicht.
 
 ## Depression, Erschöpfung, Burnout

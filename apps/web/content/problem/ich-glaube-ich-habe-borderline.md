@@ -41,7 +41,7 @@ Was jetzt sinnvoll ist, hat wenig mit dem Wort zu tun und viel mit dem, was du d
 Die Merkmale, um die es geht, sind nicht exklusiv. Sie überschneiden sich stark mit anderen Zuständen:
 
 - **Traumafolgen**, besonders nach langer Belastung in der Kindheit – siehe [Komplextrauma](/glossar/komplextrauma).
-- **ADHS**, bei dem emotionale Impulsivität und schnelle Stimmungswechsel dazugehören.
+- **[ADHS](/wissen/adhs-in-der-beziehung)**, bei dem emotionale Impulsivität und schnelle Stimmungswechsel dazugehören.
 - **Depressionen**, aus denen sich Leere und Antriebslosigkeit erklären lassen.
 - Und: **eine Beziehung, die dich fertigmacht.** Wer über Monate in Unvorhersehbarkeit lebt, entwickelt Reaktionen, die einer Störung ähneln und keine sind.
 
