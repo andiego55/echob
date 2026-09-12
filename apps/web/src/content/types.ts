@@ -42,6 +42,7 @@ export const CLUSTERS = [
   'therapie', // Therapie & Coaching
   'kommunikation', // Kommunikation
   'liebessprachen', // Liebessprachen (Gary Chapman) – wie Zuneigung ankommt
+  'sexualitaet', // Sexualität & Begehren – reagierendes Verlangen, Lustdiskrepanz, Berührung
   'grenzen', // Grenzen setzen
   'konflikt', // Konflikt & Streit
   'mental-load', // Mental Load & Fairness – wer an alles denkt, Aufgabenverteilung, Elternschaft
@@ -159,6 +160,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   therapie: 'Therapie & Coaching',
   kommunikation: 'Kommunikation',
   liebessprachen: 'Liebessprachen',
+  sexualitaet: 'Sexualität & Begehren',
   grenzen: 'Grenzen setzen',
   konflikt: 'Konflikt & Streit',
   'mental-load': 'Mental Load & Fairness',

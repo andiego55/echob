@@ -45,6 +45,13 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   impulsivitaet: 'Impulsivität',
   selbstverletzung: 'Selbstverletzung',
   verlassenheitsangst: 'Verlassenheitsangst',
+
+  // Cluster Sexualität & Begehren
+  sexualitaet: 'Sexualität',
+  beruehrung: 'Berührung',
+  koerpergefuehl: 'Körpergefühl',
+  // koerpererinnerung steht schon weiter unten bei Trauma & PTBS-Belastung.
+
   kontrolle: 'Kontrolle',
   eifersucht: 'Eifersucht',
   misstrauen: 'Misstrauen',

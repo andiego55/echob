@@ -828,6 +828,63 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "duales-kontrollmodell",
+    "title": "Duales Kontrollmodell – Gaspedal und Bremse",
+    "description": "Sexuelle Erregung hat zwei Systeme: eines, das anregt, und eines, das hemmt. In langen Beziehungen liegt das Problem fast nie am Gas, sondern an der Bremse – und die tritt niemand absichtlich.",
+    "cluster": "sexualitaet",
+    "search_intent": "duales kontrollmodell erregung hemmung gaspedal bremse sexualitaet erklaert",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du sammeln, was bei dir zuverlässig auf die Bremse tritt – im Kopf, im Raum, zwischen euch?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "begehren",
+      "druck"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "reagierendes-verlangen",
+        "erregung-und-verlangen",
+        "lustdiskrepanz",
+        "sensualitaetstraining"
+      ],
+      "related": [
+        "lust-und-begehren",
+        "beruehrung-ohne-absicht",
+        "ungleiches-verlangen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zu einer einfachen Skala von wenig bis viel Lust?",
+        "answer": "Eine Skala hat einen Regler, das Modell hat zwei Pedale. Zwei Menschen mit gleich wenig Lust können völlig verschiedene Lagen haben: Bei dem einen kommt wenig Anregung an, bei der anderen ist die Anregung da und wird laufend gehemmt. Das sind gegensätzliche Ausgangspunkte, und was dem einen hilft, hilft der anderen nicht."
+      },
+      {
+        "question": "Warum hilft mehr Anregung oft nicht?",
+        "answer": "Weil Gas geben bei getretener Bremse nichts bewegt. Wo Erschöpfung, ungeklärter Streit, Sorge um den eigenen Körper oder die Erwartung, dass gleich etwas erwartet wird, im Raum stehen, führt mehr Initiative meistens nur zu mehr Druck – und Druck steht auf fast jeder Bremsliste ganz oben."
+      },
+      {
+        "question": "Kann man sich die Bremse abgewöhnen?",
+        "answer": "Meistens nicht, und es ist auch nicht das Ziel. Die Hemmung ist kein Fehler, sondern eine sinnvolle Einrichtung: Sie sorgt dafür, dass Erregung nicht zur falschen Zeit am falschen Ort passiert. Nützlicher ist, die eigenen Bremsen zu kennen und die wegzuräumen, die sich wegräumen lassen – der volle Wäschekorb im Blickfeld ist eine, die Angst vor einer Diagnose eine ganz andere."
+      }
+    ],
+    "url": "/glossar/duales-kontrollmodell"
+  },
+  {
+    "type": "glossary",
     "slug": "egozentrik",
     "title": "Egozentrik – übersehen, nicht überheben",
     "description": "Egozentrik meint die Unfähigkeit, die eigene Perspektive zu verlassen – nicht das Gefühl, mehr wert zu sein. Der Unterschied zum Narzissmus ist klein im Erleben und groß in den Folgen.",
@@ -1380,6 +1437,65 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/entdeckungstag"
+  },
+  {
+    "type": "glossary",
+    "slug": "erregung-und-verlangen",
+    "title": "Erregung und Verlangen – zwei Dinge, die nicht dasselbe sind",
+    "description": "Der Körper kann reagieren, ohne dass jemand es will – und umgekehrt. Warum die beiden Vorgänge auseinanderlaufen und warum diese Unterscheidung für Betroffene sexueller Gewalt entscheidend ist.",
+    "cluster": "sexualitaet",
+    "search_intent": "koerperliche erregung obwohl nicht gewollt arousal nonconcordance bedeutung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was dein Körper getan hat – und was du in dem Moment wolltest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "scham",
+      "koerpergefuehl"
+    ],
+    "safety_tags": [
+      "gewalt"
+    ],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "reagierendes-verlangen",
+        "duales-kontrollmodell",
+        "einvernehmlichkeit",
+        "sexuelle-nebenwirkungen"
+      ],
+      "related": [
+        "nach-einer-verletzung",
+        "lust-und-begehren",
+        "wenn-koerper-sich-veraendern"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Mein Körper hat reagiert, obwohl ich es nicht wollte. Heißt das, ich wollte es doch?",
+        "answer": "Nein. Körperliche Erregung ist eine Reaktion auf sexuell bedeutsame Reize, nicht auf gewollte. Das sind zwei verschiedene Vorgänge, die im Gehirn an verschiedenen Stellen entstehen und regelmäßig auseinanderlaufen. Eine körperliche Reaktion während eines Übergriffs ist kein Einverständnis und kein Beleg für ein heimliches Wollen – sie ist Physiologie."
+      },
+      {
+        "question": "Und umgekehrt?",
+        "answer": "Kommt genauso vor. Jemand will sehr wohl und der Körper zieht nicht mit: keine Feuchtigkeit, keine Erektion, kein Aufbau von Erregung. Auch das ist kein Widerspruch und selten ein Zeichen mangelnder Zuneigung. Häufige Ursachen sind Anspannung, Medikamente, Schmerzen, Erschöpfung und Alkohol."
+      },
+      {
+        "question": "Wie zuverlässig laufen die beiden überhaupt zusammen?",
+        "answer": "Weniger, als die meisten annehmen. In Studien, die körperliche Reaktion und selbst berichtetes Erleben gleichzeitig messen, ist die Übereinstimmung durchgängig gering – und sie ist bei Frauen deutlich geringer als bei Männern. Das ist ein Befund über Messungen, keine Aussage über einzelne Menschen."
+      }
+    ],
+    "url": "/glossar/erregung-und-verlangen"
   },
   {
     "type": "glossary",
@@ -2762,6 +2878,67 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "lustdiskrepanz",
+    "title": "Lustdiskrepanz – der Unterschied, nicht der Mangel",
+    "description": "Wenn einer öfter will als die andere. Warum es keine richtige Menge gibt, wieso die Rollen weniger fest sind als sie wirken – und was aus dem Unterschied einen Konflikt macht.",
+    "cluster": "sexualitaet",
+    "search_intent": "lustdiskrepanz unterschiedliches verlangen bedeutung definition beziehung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, was der Unterschied zwischen euch mit dir macht – und was du daraus über dich schließt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "lustdiskrepanz",
+      "sexualitaet",
+      "begehren",
+      "druck"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "ungleiches-verlangen",
+      "glossary": [
+        "reagierendes-verlangen",
+        "duales-kontrollmodell",
+        "einvernehmlichkeit",
+        "sexuelle-skripte"
+      ],
+      "comparison": [
+        "lustlosigkeit-oder-beziehungsproblem"
+      ],
+      "related": [
+        "ungleiches-verlangen",
+        "ueber-sex-reden",
+        "lust-und-begehren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ab wann ist ein Unterschied eine Lustdiskrepanz?",
+        "answer": "Es gibt keine Schwelle, und das ist der Punkt. Unterschiedliches Verlangen haben praktisch alle Paare; zum Thema wird es erst, wenn der Unterschied gedeutet wird – als Ablehnung, als Defekt, als Beweis für nachlassende Liebe. Nicht die Differenz belastet, sondern die Bedeutung, die ihr gegeben wird."
+      },
+      {
+        "question": "Ist die Person mit weniger Verlangen das Problem?",
+        "answer": "Nein, und diese Zuschreibung ist der häufigste Fehler. Ein Unterschied hat zwei Seiten; man kann ihn genauso gut von der anderen her beschreiben. Sobald einer von beiden zum Fall erklärt wird, geht es nicht mehr um die Sache, sondern um Verteidigung – und die Person mit weniger Verlangen bekommt zusätzlich zu allem anderen noch die Rolle der Schuldigen."
+      },
+      {
+        "question": "Bleiben die Rollen immer gleich verteilt?",
+        "answer": "Häufig über lange Strecken, aber keineswegs zwingend. Nach Krankheit, Geburt, Trennungsdrohung oder einem geklärten Konflikt drehen sie sich bei manchen Paaren um – gelegentlich innerhalb von Wochen. Das ist ein Hinweis darauf, dass es sich weniger um feste Eigenschaften handelt als um eine Lage, in der zwei Menschen gerade stehen."
+      }
+    ],
+    "url": "/glossar/lustdiskrepanz"
+  },
+  {
+    "type": "glossary",
     "slug": "masking",
     "title": "Masking – die Anstrengung, unauffällig zu wirken",
     "description": "Blickkontakt trainieren, Reaktionen kopieren, Erschöpfung verbergen. Warum Masking funktioniert, was es kostet – und warum es der Hauptgrund dafür ist, dass Frauen so spät erkannt werden.",
@@ -3378,6 +3555,65 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "reagierendes-verlangen",
+    "title": "Reagierendes Verlangen – wenn Lust erst unterwegs entsteht",
+    "description": "Bei vielen Menschen kommt die Lust nicht vor der Situation, sondern in ihr. Was das Modell besagt, woher es stammt und warum die falsche Reihenfolge so viele Paare in die Irre führt.",
+    "cluster": "sexualitaet",
+    "search_intent": "reagierendes verlangen responsive desire bedeutung definition erklaert",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wann bei dir zuletzt Lust entstanden ist – und ob sie vor oder in der Situation da war?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "begehren",
+      "sexualitaet",
+      "lustdiskrepanz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "duales-kontrollmodell",
+        "erregung-und-verlangen",
+        "lustdiskrepanz"
+      ],
+      "comparison": [
+        "spontanes-oder-reagierendes-verlangen"
+      ],
+      "related": [
+        "lust-und-begehren",
+        "ungleiches-verlangen",
+        "beruehrung-ohne-absicht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist reagierendes Verlangen ein Problem?",
+        "answer": "Nein, es ist eine Art, wie Lust entsteht – und eine sehr verbreitete. Zum Problem wird es erst durch die Erwartung, Verlangen müsse sich von selbst melden. Wer darauf wartet, wartet unter Umständen dauerhaft und schließt dann auf ein Defizit, wo eine andere Reihenfolge vorliegt."
+      },
+      {
+        "question": "Betrifft das nur Frauen?",
+        "answer": "Nein. Die Forschung dazu stammt überwiegend aus der Arbeit mit Frauen, und in den Zahlen ist es bei Frauen häufiger. Männer mit reagierendem Verlangen gibt es aber reichlich – sie haben zusätzlich das Problem, dass für ihre Erfahrung kein Bild bereitliegt und sie das Ausbleiben spontaner Lust schnell für ein körperliches Versagen halten."
+      },
+      {
+        "question": "Heißt das, man soll Sex haben, obwohl man keine Lust hat?",
+        "answer": "Nein, und diese Verwechslung ist folgenreich. Der Unterschied liegt zwischen Bereitschaft und Überwindung. Bereitschaft heißt, sich auf eine Situation einzulassen, offen dafür, dass Lust entsteht – mit dem jederzeitigen Recht aufzuhören, wenn sie nicht entsteht. Überwindung heißt, gegen das eigene Empfinden mitzumachen. Das eine kann Lust wecken, das andere zerstört sie zuverlässig."
+      }
+    ],
+    "url": "/glossar/reagierendes-verlangen"
+  },
+  {
+    "type": "glossary",
     "slug": "realitaetsverdrehung",
     "title": "Realitätsverdrehung – wenn deine Erinnerung zum Streitpunkt wird",
     "description": "Realitätsverdrehung ist der Kern von Gaslighting: Fakten, Erinnerungen und Gefühle werden umgedeutet oder geleugnet, bis du an dir selbst zweifelst. Wie sie funktioniert und was hilft. Ohne Diagnose.",
@@ -3966,6 +4202,177 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/selbstverurteilung"
+  },
+  {
+    "type": "glossary",
+    "slug": "sensualitaetstraining",
+    "title": "Sensualitätstraining – Berührung ohne Ziel",
+    "description": "Das älteste und immer noch wirksamste Verfahren der Sexualtherapie arbeitet mit einem Verbot: Für eine Weile findet ausdrücklich kein Sex statt. Wie die Stufen aussehen und warum die Absprache halten muss.",
+    "cluster": "sexualitaet",
+    "search_intent": "sensate focus sensualitaetstraining uebung anleitung masters johnson",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, was passiert, wenn ihr euch berührt – bei dir und, so wie du es einschätzt, beim anderen?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "beruehrung",
+      "sexualitaet",
+      "naehe-distanz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "beruehrung-ohne-absicht",
+      "glossary": [
+        "duales-kontrollmodell",
+        "reagierendes-verlangen",
+        "lustdiskrepanz"
+      ],
+      "related": [
+        "beruehrung-ohne-absicht",
+        "ungleiches-verlangen",
+        "nach-einer-verletzung"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum soll ausgerechnet ein Verbot helfen?",
+        "answer": "Weil nicht Nähe verboten wird, sondern die Frage. Wo jede Berührung bedeuten könnte, dass gleich mehr erwartet wird, entsteht Anspannung – und Anspannung tritt zuverlässig auf die Bremse. Nimmt man die Erwartung heraus, wird Berührung wieder harmlos, und aus harmloser Berührung entsteht bei vielen Menschen überhaupt erst Verlangen."
+      },
+      {
+        "question": "Wie lange dauert das?",
+        "answer": "Üblicherweise einige Wochen, in Stufen, mit zwei bis drei Verabredungen pro Woche. Wichtiger als die Dauer ist die Verlässlichkeit: Die Absprache wirkt nur, solange sie gilt. Ein einziges Mal, bei dem doch mehr daraus wird, stellt die alte Anspannung vollständig wieder her."
+      },
+      {
+        "question": "Kann man das ohne Begleitung machen?",
+        "answer": "Die ersten Stufen ja, wenn zwischen euch grundsätzlich Vertrauen besteht und beide es wollen. Fachliche Begleitung ist ratsam, wenn Schmerzen im Spiel sind, wenn es eine Gewalt- oder Missbrauchserfahrung gibt oder wenn schon der Gedanke an Berührung starke Abwehr auslöst. Dann ist Selbstversuch nicht mutiger, sondern riskanter."
+      }
+    ],
+    "url": "/glossar/sensualitaetstraining"
+  },
+  {
+    "type": "glossary",
+    "slug": "sexuelle-nebenwirkungen",
+    "title": "Sexuelle Nebenwirkungen – wenn das Medikament die Lust nimmt",
+    "description": "Antidepressiva, Blutdruckmittel, Hormonpräparate: Verlangen und Erregbarkeit hängen an mehr Substanzen, als die meisten wissen. Was häufig vorkommt, was sich ändern lässt – und warum niemand eigenmächtig absetzen sollte.",
+    "cluster": "sexualitaet",
+    "search_intent": "antidepressiva keine lust nebenwirkung medikament libido verlust ssri",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du zeitlich einordnen, wann sich etwas verändert hat – und was in dieselbe Zeit fiel?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "koerpergefuehl",
+      "scham"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "wenn-koerper-sich-veraendern",
+      "glossary": [
+        "erregung-und-verlangen",
+        "lustdiskrepanz",
+        "reagierendes-verlangen"
+      ],
+      "comparison": [
+        "lustlosigkeit-oder-beziehungsproblem"
+      ],
+      "related": [
+        "wenn-koerper-sich-veraendern",
+        "lust-und-begehren",
+        "professionelle-hilfe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Soll ich das Medikament einfach absetzen?",
+        "answer": "Nein, auf keinen Fall eigenmächtig. Bei Antidepressiva kann abruptes Absetzen erhebliche Absetzerscheinungen auslösen und die Grunderkrankung zurückbringen, und eine unbehandelte Depression senkt das Verlangen ohnehin. Der richtige Weg führt über die verordnende Person: Dosis anpassen, Zeitpunkt der Einnahme verschieben, Präparat wechseln – es gibt Spielraum, aber er gehört in fachliche Hände."
+      },
+      {
+        "question": "Warum spricht darüber niemand?",
+        "answer": "Weil auf beiden Seiten Hemmung besteht. Viele Behandelnde fragen nicht aktiv danach, und viele Patientinnen und Patienten bringen es von sich aus nicht zur Sprache. Die Folge ist, dass Betroffene die Veränderung sich selbst oder der Beziehung zuschreiben – und dass eine gut behandelbare Ursache jahrelang unbemerkt bleibt."
+      },
+      {
+        "question": "Wie merke ich, ob es am Medikament liegt?",
+        "answer": "Der stärkste Hinweis ist der zeitliche Zusammenhang: Die Veränderung setzt in den Wochen nach Beginn oder nach einer Dosiserhöhung ein. Ein zweiter Hinweis ist die Breite – wenn Verlangen überhaupt nicht mehr vorkommt, auch nicht allein und nicht in Fantasien, spricht das eher für eine körperliche Ursache als für die Beziehung."
+      }
+    ],
+    "url": "/glossar/sexuelle-nebenwirkungen"
+  },
+  {
+    "type": "glossary",
+    "slug": "sexuelle-skripte",
+    "title": "Sexuelle Skripte – das Drehbuch, das niemand geschrieben hat",
+    "description": "Wer wann was tut, was zählt und wann es vorbei ist: Sexualität folgt erlernten Abläufen, die sich wie Natur anfühlen. Woher die Skripte kommen und woran man merkt, dass man einem folgt.",
+    "cluster": "sexualitaet",
+    "search_intent": "sexuelle skripte script theorie erwartungen sexualitaet gelernt",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, wie ein üblicher Ablauf bei euch aussieht – und an welcher Stelle du aussteigen würdest, wenn du dürftest?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "scham",
+      "begehren"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "lustdiskrepanz",
+        "reagierendes-verlangen",
+        "einvernehmlichkeit"
+      ],
+      "related": [
+        "ueber-sex-reden",
+        "lust-und-begehren",
+        "ungleiches-verlangen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist ein Skript etwas Schlechtes?",
+        "answer": "Nein. Skripte machen Situationen überhaupt erst handhabbar – ohne sie müsste jede Begegnung neu verhandelt werden. Problematisch wird ein Skript erst, wenn es unsichtbar bleibt. Dann gilt es als Natur, und wer davon abweicht, hält sich für falsch, statt zu merken, dass er einer Konvention nicht entspricht."
+      },
+      {
+        "question": "Was ist das verbreitetste Skript?",
+        "answer": "Eine feste Abfolge mit Penetration als Mittelpunkt und dem Orgasmus als Ende – meistens seinem. Alles davor gilt als Vorbereitung, was danach kommt, kommt nicht vor. Dieses Skript erzeugt zuverlässig Misserfolg, weil es einen einzigen richtigen Ablauf definiert und alle Abweichungen zu Störungen erklärt."
+      },
+      {
+        "question": "Wie ändert man ein Skript?",
+        "answer": "Indem man es zuerst ausspricht. Solange beide annehmen, das Übliche sei das Selbstverständliche, gibt es nichts zu verhandeln. Der erste Schritt ist deshalb kein sexueller, sondern ein Gespräch – und zwar außerhalb der Situation, nicht in ihr."
+      }
+    ],
+    "url": "/glossar/sexuelle-skripte"
   },
   {
     "type": "glossary",
@@ -7264,6 +7671,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "die-hand-auf-der-huefte",
+    "title": "Die Hand auf der Hüfte",
+    "description": "Eine Szene über eine Berührung, die längst eine Frage ist, und über das Ausweichen, das man kommen hört. Ich-Perspektive, fiktiv.",
+    "cluster": "sexualitaet",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Nils' Sicht",
+    "pull_quote": "Ich lege die Hand hin und weiß in derselben Sekunde, dass ich damit etwas gefragt habe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation der letzten Wochen anschauen, in der du gefragt hast – und beschreiben, wie es dir danach ging?"
+    },
+    "scene_tags": [
+      "lustdiskrepanz",
+      "sexualitaet",
+      "sehnsucht",
+      "druck"
+    ],
+    "url": "/szenen/die-hand-auf-der-huefte"
+  },
+  {
+    "type": "scene",
     "slug": "die-hand-in-meinem-nacken",
     "title": "Die Hand in meinem Nacken",
     "description": "Eine fiktive Szene: Eine beiläufige Berührung in der Küche, und plötzlich ist alles wieder da. Über die Sprache des Körpers, die keine Worte braucht und trotzdem verlernt werden kann.",
@@ -7317,6 +7751,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/die-kueche-die-niemand-sieht"
+  },
+  {
+    "type": "scene",
+    "slug": "die-landstrasse-nach-hause",
+    "title": "Die Landstraße nach Hause",
+    "description": "Eine Szene über das schwerste Gespräch in vielen Beziehungen – geführt bei Tempo achtzig, weil man sich dabei nicht ansehen muss. Ich-Perspektive, fiktiv.",
+    "cluster": "sexualitaet",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Tareks Sicht",
+    "pull_quote": "Ich habe es dreimal im Bett versucht. Das ist der schlechteste Ort der Welt für dieses Gespräch, und ich habe drei Jahre gebraucht, um das zu merken.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du formulieren, was du deinem Gegenüber gern sagen würdest – und anschauen, was dich bisher davon abgehalten hat?"
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "scham",
+      "ehrlichkeit"
+    ],
+    "url": "/szenen/die-landstrasse-nach-hause"
   },
   {
     "type": "scene",
@@ -8175,6 +8635,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "er-wartet-bis-ich-es-sage",
+    "title": "Er wartet, bis ich es sage",
+    "description": "Eine Szene über Nähe nach einem Vertrauensbruch: ein Körper, der sich erinnert, und ein Tempo, das nur einer bestimmen kann. Ich-Perspektive, fiktiv.",
+    "cluster": "sexualitaet",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Marlenes Sicht",
+    "pull_quote": "Mein Kopf hat ihm verziehen. Mein Rücken nicht. Der macht sich immer noch steif, wenn er von hinten kommt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was sich seit damals verändert hat, wenn ihr euch nahekommt – körperlich und in Gedanken?"
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "beruehrung",
+      "koerpererinnerung",
+      "selbstfuersorge"
+    ],
+    "url": "/szenen/er-wartet-bis-ich-es-sage"
+  },
+  {
+    "type": "scene",
     "slug": "er-will-nicht-mitkommen",
     "title": "Er will nicht mitkommen",
     "description": "Eine Szene über einen Freitag, an dem ein Kind im Flur stehen bleibt – und über die Sätze, die man in solchen Momenten nicht sagen sollte. Ich-Perspektive, fiktiv.",
@@ -8311,6 +8798,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/es-fuehlt-sich-flach-an"
+  },
+  {
+    "type": "scene",
+    "slug": "es-geht-ja-schnell",
+    "title": "Es geht ja schnell",
+    "description": "Eine Szene über ein Ja, das keines war, und darüber, was regelmäßiges Mitmachen mit der Lust anstellt. Ich-Perspektive, fiktiv.",
+    "cluster": "sexualitaet",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Gesas Sicht",
+    "pull_quote": "Ich habe ja gesagt. Niemand hat mich zu irgendetwas gezwungen. Und trotzdem liege ich danach da und bin weiter weg als vorher.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, wann du zuletzt zugestimmt hast, ohne es zu wollen – und was dich zum Ja gebracht hat?"
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "selbstaufgabe",
+      "scham"
+    ],
+    "url": "/szenen/es-geht-ja-schnell"
   },
   {
     "type": "scene",
@@ -9144,6 +9657,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "erschoepfung"
     ],
     "url": "/szenen/ich-muss-nicht-sofort"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-rechne-im-dunkeln",
+    "title": "Ich rechne im Dunkeln",
+    "description": "Eine Szene über die andere Seite derselben Nacht: das Ausweichen, das Schuldgefühl danach und die Rechnung, die im Kopf mitläuft. Ich-Perspektive, fiktiv.",
+    "cluster": "sexualitaet",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Hannas Sicht",
+    "pull_quote": "Ich merke seine Hand, bevor sie da ist. Am Rhythmus, wie er atmet.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was in dir passiert, kurz bevor die Frage im Raum steht?"
+    },
+    "scene_tags": [
+      "lustdiskrepanz",
+      "sexualitaet",
+      "schuldgefuehle",
+      "naehe-distanz"
+    ],
+    "url": "/szenen/ich-rechne-im-dunkeln"
   },
   {
     "type": "scene",
@@ -10399,6 +10939,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "sechs-wochen-nichts",
+    "title": "Sechs Wochen nichts",
+    "description": "Eine Szene über eine Absprache, die zuerst absurd klang: berühren, ohne dass etwas daraus wird. Ich-Perspektive, fiktiv.",
+    "cluster": "sexualitaet",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Veras Sicht",
+    "pull_quote": "Ich habe gedacht, das ist der bescheuertste Vorschlag, den ich je gehört habe. Kein Sex, damit wir wieder Sex haben.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wann ihr euch zuletzt berührt habt, ohne dass eine Frage im Raum stand?"
+    },
+    "scene_tags": [
+      "beruehrung",
+      "sexualitaet",
+      "naehe-distanz",
+      "veraenderung"
+    ],
+    "url": "/szenen/sechs-wochen-nichts"
+  },
+  {
+    "type": "scene",
     "slug": "seine-laune-im-auto",
     "title": "Seine Laune im Auto",
     "description": "Eine fiktive Szene: Er steigt gut gelaunt ins Auto und kommt schlecht gelaunt zu Hause an, ohne dass ein Wort gefallen wäre. Über emotionale Ansteckung und die Grenze, die nicht zwischen zwei Menschen verläuft.",
@@ -10423,6 +10990,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/seine-laune-im-auto"
+  },
+  {
+    "type": "scene",
+    "slug": "seite-vier-unten-links",
+    "title": "Seite vier, unten links",
+    "description": "Eine Szene über einen Beipackzettel, ein verlorenes Jahr und die Erleichterung, die sich erst wie Wut anfühlt. Ich-Perspektive, fiktiv.",
+    "cluster": "sexualitaet",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Bastians Sicht",
+    "pull_quote": "Vierzehn Monate. Ich habe vierzehn Monate lang gedacht, ich hätte aufgehört, sie zu wollen.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du zeitlich einordnen, wann sich bei dir etwas verändert hat – und was in dieselbe Zeit fiel?"
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "koerpergefuehl",
+      "erleichterung"
+    ],
+    "url": "/szenen/seite-vier-unten-links"
   },
   {
     "type": "scene",
@@ -11822,6 +12415,71 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/beobachtung-gefuehl"
+  },
+  {
+    "type": "topic",
+    "slug": "beruehrung-ohne-absicht",
+    "title": "Berührung ohne Absicht",
+    "description": "Der wirksamste Schritt bei sexuellen Schwierigkeiten ist kein sexueller: Nähe wieder von der Frage zu trennen, ob mehr daraus wird. Woher die Idee stammt, wie eine Verabredung aussieht – und warum sie funktioniert.",
+    "cluster": "sexualitaet",
+    "search_intent": "sensualitaetstraining sensate focus beruehrung ohne sex naehe wieder aufbauen",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wann ihr euch zuletzt berührt habt, ohne dass eine Frage im Raum stand?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "beruehrung",
+      "sexualitaet",
+      "naehe-distanz",
+      "lustdiskrepanz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "sensualitaetstraining",
+        "reagierendes-verlangen",
+        "duales-kontrollmodell"
+      ],
+      "related": [
+        "ungleiches-verlangen",
+        "ueber-sex-reden",
+        "lust-und-begehren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie kann Verzicht die Lust zurückbringen?",
+        "answer": "Weil nicht auf Nähe verzichtet wird, sondern auf die Frage. Wo jede Berührung bedeuten könnte, dass gleich mehr erwartet wird, entsteht Anspannung – und Anspannung tritt die Bremse. Nimmt man die Erwartung heraus, wird Berührung wieder harmlos, und aus harmloser Berührung entsteht bei vielen Menschen überhaupt erst Verlangen."
+      },
+      {
+        "question": "Woher kommt diese Idee?",
+        "answer": "Aus der Sexualtherapie. Masters und Johnson haben in den sechziger Jahren ein Vorgehen entwickelt, das heute meist Sensualitätstraining oder Sensate Focus heißt: Paare berühren sich in mehreren Stufen, wobei zunächst ausdrücklich kein Sex stattfindet. Es gehört bis heute zu den Standardverfahren."
+      },
+      {
+        "question": "Wie lange macht man das?",
+        "answer": "Meistens einige Wochen, in Stufen. Wichtiger als die Dauer ist die Verlässlichkeit der Absprache: Sie wirkt nur, wenn sie wirklich gilt. Ein einziges Mal, bei dem doch mehr daraus wird, stellt die alte Anspannung vollständig wieder her – dann steht die Frage wieder im Raum."
+      },
+      {
+        "question": "Und wenn wir dabei merken, dass wir uns gar nicht mehr berühren mögen?",
+        "answer": "Auch das ist ein Ergebnis, und ein wichtiges. Es sagt allerdings selten etwas über den Körper und meistens etwas über das, was zwischen euch unausgesprochen ist. Dann ist der nächste Schritt kein sexueller, sondern ein Gespräch – gegebenenfalls mit Begleitung."
+      }
+    ],
+    "url": "/wissen/beruehrung-ohne-absicht"
   },
   {
     "type": "topic",
@@ -15120,6 +15778,142 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "lust-und-begehren",
+    "title": "Lust und Begehren: warum es nicht von selbst kommt",
+    "description": "Das verbreitete Bild ist falsch. Bei sehr vielen Menschen entsteht Verlangen nicht spontan, sondern erst unterwegs – als Antwort auf etwas. Was daraus für lange Beziehungen folgt, und was Lust tatsächlich bremst.",
+    "cluster": "sexualitaet",
+    "search_intent": "keine lust mehr beziehung libido verlangen sexualitaet langzeitbeziehung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Du hast über Verlangen gelesen. Magst du anschauen, wann bei dir zuletzt Lust entstanden ist – und was in den Stunden davor los war?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "sexualitaet",
+      "begehren",
+      "lustdiskrepanz",
+      "beruehrung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "ungleiches-verlangen",
+        "beruehrung-ohne-absicht",
+        "ueber-sex-reden",
+        "nach-einer-verletzung",
+        "wenn-koerper-sich-veraendern"
+      ],
+      "glossary": [
+        "reagierendes-verlangen",
+        "duales-kontrollmodell",
+        "lustdiskrepanz",
+        "erregung-und-verlangen",
+        "sexuelle-skripte"
+      ],
+      "comparison": [
+        "spontanes-oder-reagierendes-verlangen",
+        "lustlosigkeit-oder-beziehungsproblem"
+      ],
+      "related": [
+        "mental-load-in-beziehungen",
+        "liebessprachen",
+        "einvernehmlichkeit"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist es normal, dass die Lust in einer langen Beziehung nachlässt?",
+        "answer": "Dass sich die Art des Verlangens verändert, ist der Normalfall. Am Anfang entsteht Lust oft wie von selbst, weil Neuheit und Unsicherheit stark anregen. Später entsteht sie eher als Antwort – auf Berührung, auf Ruhe, auf einen guten Abend. Wer diese Verschiebung nicht kennt, hält sie für Liebesverlust, und genau diese Fehldeutung richtet mehr Schaden an als die Verschiebung selbst."
+      },
+      {
+        "question": "Ich habe einfach keine Lust. Stimmt etwas mit mir nicht?",
+        "answer": "Sehr wahrscheinlich nicht. Bei vielen Menschen kommt Verlangen nicht vor der Situation, sondern in ihr. Wer darauf wartet, dass die Lust sich vorher meldet, wartet unter Umständen ewig – und schließt dann auf ein Defizit, wo eine andere Reihenfolge vorliegt. Es lohnt sich trotzdem, körperliche und medikamentöse Ursachen abklären zu lassen."
+      },
+      {
+        "question": "Was bremst Lust am stärksten?",
+        "answer": "In langen Beziehungen selten die Gewohnheit allein. Am häufigsten sind es vier Dinge: Erschöpfung, ungeklärter Konflikt, das Gefühl, für alles zuständig zu sein – und Druck. Der letzte Punkt wird am meisten unterschätzt: Sobald jede Berührung eine Frage enthält, verschwindet die Möglichkeit, überhaupt Lust zu bekommen."
+      },
+      {
+        "question": "Wir haben seit Monaten keinen Sex. Ist die Beziehung damit vorbei?",
+        "answer": "Nein. Längere Pausen kommen in fast allen langen Beziehungen vor, und sie sagen für sich genommen wenig. Aussagekräftiger ist, ob darüber gesprochen werden kann und ob es außerhalb von Sex noch körperliche Nähe gibt. Wo beides fehlt, wird aus einer Pause ein Zustand."
+      }
+    ],
+    "url": "/wissen/lust-und-begehren"
+  },
+  {
+    "type": "comparison",
+    "slug": "lustlosigkeit-oder-beziehungsproblem",
+    "title": "Liegt es am Körper, am Alltag oder an uns?",
+    "description": "Drei sehr verschiedene Ursachen führen zum selben Ergebnis. Sechs Fragen, die sie auseinanderhalten – und die Reihenfolge, in der man sie stellen sollte.",
+    "cluster": "sexualitaet",
+    "search_intent": "keine lust ursache koerperlich oder beziehung libidoverlust abklaeren",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du zeitlich einordnen, wann sich etwas verändert hat – und was sonst noch in diese Zeit fiel?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sexualitaet",
+      "begehren",
+      "lustdiskrepanz"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "sexuelle-nebenwirkungen",
+        "reagierendes-verlangen",
+        "lustdiskrepanz"
+      ],
+      "related": [
+        "wenn-koerper-sich-veraendern",
+        "ungleiches-verlangen",
+        "mental-load-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Womit sollte man anfangen?",
+        "answer": "Mit dem Körper, auch wenn es unromantisch klingt. Er ist am schnellsten zu prüfen und am häufigsten behandelbar – und eine Beziehung wegen einer unbehandelten Nebenwirkung in Frage zu stellen, wäre der teuerste denkbare Irrtum."
+      },
+      {
+        "question": "Ist die Frage nach Lust auf andere nicht heikel?",
+        "answer": "Sie ist unangenehm und diagnostisch nützlich. Fachlich wird zwischen einem allgemeinen und einem situationsbezogenen Nachlassen unterschieden: Wenn Verlangen überhaupt nicht mehr vorkommt – auch nicht allein, nicht in Fantasien –, deutet das eher auf Körper oder Erschöpfung. Kommt es vor, nur nicht in der Beziehung, deutet es eher auf die Beziehung. Das ist ein Hinweis und kein Urteil, und es ist kein Beleg für Untreue."
+      },
+      {
+        "question": "Kann es alles drei gleichzeitig sein?",
+        "answer": "Meistens ist es das. Erschöpfung senkt das Verlangen, das Ausbleiben erzeugt Druck, Druck erzeugt Vermeidung, Vermeidung erzeugt Konflikt – und der senkt das Verlangen weiter. Deshalb ist die Frage nach der einen Ursache selten zielführend; nützlicher ist, an welcher Stelle sich der Kreis am leichtesten unterbrechen lässt."
+      }
+    ],
+    "url": "/wissen/lustlosigkeit-oder-beziehungsproblem"
+  },
+  {
+    "type": "topic",
     "slug": "mental-load-als-vorwurf",
     "title": "Wenn nichts recht ist: Mental Load als Vorwurf",
     "description": "Der Begriff beschreibt etwas Reales und lässt sich zugleich so einsetzen, dass die andere Seite nicht gewinnen kann. Drei Formen, in denen das passiert – und der Test, der beides auseinanderhält.",
@@ -15443,6 +16237,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/nach-der-affaere"
+  },
+  {
+    "type": "topic",
+    "slug": "nach-einer-verletzung",
+    "title": "Nähe nach einer Verletzung",
+    "description": "Nach einer Affäre, einer überschrittenen Grenze oder einer Gewalterfahrung ist Berührung nicht mehr neutral. Warum der Körper sich erinnert, wem das Tempo gehört – und was die andere Seite auf keinen Fall tun sollte.",
+    "cluster": "sexualitaet",
+    "search_intent": "sex nach affaere wieder naehe zulassen trauma beruehrung schwierig",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was sich seit damals verändert hat, wenn ihr euch nahekommt – körperlich und in Gedanken?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "sexualitaet",
+      "beruehrung",
+      "scham",
+      "koerpererinnerung"
+    ],
+    "safety_tags": [
+      "gewalt"
+    ],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "erregung-und-verlangen",
+        "einvernehmlichkeit",
+        "trigger",
+        "sensualitaetstraining"
+      ],
+      "related": [
+        "beruehrung-ohne-absicht",
+        "nach-der-affaere",
+        "beziehungstrauma"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum reagiert mein Körper anders, als ich will?",
+        "answer": "Weil körperliche Erregung und Wollen zwei verschiedene Vorgänge sind, die nicht zuverlässig zusammenlaufen. Der Körper kann reagieren, ohne dass jemand es möchte – und umgekehrt. Diese Unterscheidung ist besonders wichtig für Menschen, die während eines Übergriffs eine körperliche Reaktion hatten und daraus schließen, sie hätten es gewollt. Sie hatten es nicht."
+      },
+      {
+        "question": "Wie lange dauert es, bis wieder etwas geht?",
+        "answer": "Es gibt keine Frist, und der Versuch, eine zu setzen, verlängert es. Was den Verlauf am stärksten beeinflusst, ist nicht die Zeit, sondern die Kontrolle: Wenn die verletzte Seite jederzeit aufhören kann, ohne dass es Folgen hat, entsteht Sicherheit – und ohne Sicherheit passiert nichts."
+      },
+      {
+        "question": "Wir hatten nach der Affäre sehr viel Sex. Ist das falsch?",
+        "answer": "Nein, es ist eines von zwei häufigen Mustern. Manche Paare erleben eine Phase intensiver Sexualität, andere gar keine – beides kommt vor und beides ist zunächst normal. Wichtig wird die Frage erst später: ob damit etwas verarbeitet oder etwas übertönt wurde."
+      },
+      {
+        "question": "Was, wenn es um Gewalt in unserer Beziehung ging?",
+        "answer": "Dann geht es nicht zuerst um Nähe, sondern um Sicherheit, und dieser Text ist der falsche Ausgangspunkt. Hilfetelefon Gewalt gegen Frauen 116 016, Hilfetelefon Gewalt an Männern 0800 123 99 00, bei akuter Gefahr 110. Alles Weitere gehört in fachliche Begleitung, nicht in eine Absprache zwischen euch beiden."
+      }
+    ],
+    "url": "/wissen/nach-einer-verletzung"
   },
   {
     "type": "topic",
@@ -16399,6 +17262,63 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/sich-trennen"
   },
   {
+    "type": "comparison",
+    "slug": "spontanes-oder-reagierendes-verlangen",
+    "title": "Spontanes oder reagierendes Verlangen?",
+    "description": "Zwei Arten, wie Lust entsteht – und nur eine davon kommt in den üblichen Erzählungen vor. Woran du erkennst, wie es bei dir läuft, und was praktisch daraus folgt.",
+    "cluster": "sexualitaet",
+    "search_intent": "reagierendes verlangen responsive desire bedeutung unterschied spontan",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wann bei dir zuletzt Lust entstanden ist – und ob sie vor oder in der Situation da war?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "begehren",
+      "sexualitaet",
+      "reagierendes-verlangen"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "reagierendes-verlangen",
+        "duales-kontrollmodell",
+        "erregung-und-verlangen"
+      ],
+      "related": [
+        "ungleiches-verlangen",
+        "beruehrung-ohne-absicht",
+        "lust-und-begehren"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist eines von beidem normaler?",
+        "answer": "Nein, und die verbreitete Annahme, spontanes Verlangen sei der Normalfall, stammt aus Erzählungen und nicht aus Daten. Reagierendes Verlangen ist weit verbreitet, besonders in langen Beziehungen und häufiger bei Frauen – aber keineswegs nur."
+      },
+      {
+        "question": "Ist das eine feste Eigenschaft?",
+        "answer": "Nein. Dieselbe Person kann in einer Lebensphase eher spontan und in einer anderen eher reagierend erleben. Frisch verliebt sein, Stress, Schlaf, Medikamente und die Beziehungssituation verschieben es erheblich. Es ist eher eine Beschreibung des Moments als ein Typ."
+      },
+      {
+        "question": "Was folgt praktisch daraus?",
+        "answer": "Vor allem eine andere Reihenfolge: nicht warten, bis Lust kommt, sondern die Bedingungen schaffen, unter denen sie entstehen kann – und dabei ergebnisoffen bleiben. Das setzt voraus, dass Aufhören jederzeit möglich ist und nicht als Absage gilt."
+      }
+    ],
+    "url": "/wissen/spontanes-oder-reagierendes-verlangen"
+  },
+  {
     "type": "topic",
     "slug": "systeme-statt-vorsaetze",
     "title": "Systeme statt Vorsätze",
@@ -16710,6 +17630,142 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/trennung-mit-kindern"
+  },
+  {
+    "type": "topic",
+    "slug": "ueber-sex-reden",
+    "title": "Über Sex reden, ohne dass es kippt",
+    "description": "Das schwerste Gespräch in vielen Beziehungen. Drei Orte, an denen es nie stattfinden sollte, ein Einstiegssatz, der funktioniert – und die zwei Themen, die es zuverlässig zerstören.",
+    "cluster": "sexualitaet",
+    "search_intent": "ueber sex sprechen partner gespraech wuensche ansprechen beziehung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du formulieren, was du deinem Gegenüber gern sagen würdest – und anschauen, was dich bisher davon abgehalten hat?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "sexualitaet",
+      "scham",
+      "lustdiskrepanz",
+      "beruehrung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "sexuelle-skripte",
+        "einvernehmlichkeit",
+        "lustdiskrepanz"
+      ],
+      "related": [
+        "ungleiches-verlangen",
+        "beruehrung-ohne-absicht",
+        "beduerfnisse-aeussern"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wann ist der richtige Zeitpunkt?",
+        "answer": "Fast nie der, der sich anbietet. Drei Orte scheiden aus: im Bett, direkt nach einer Absage und direkt nach dem Sex. An allen dreien ist mindestens einer verletzlich, und was dort gesagt wird, bleibt hängen. Gut funktionieren Gespräche im Gehen, im Auto, beim Kochen – Situationen ohne Blickkontakt und mit einer Beschäftigung nebenher."
+      },
+      {
+        "question": "Wie fange ich an?",
+        "answer": "Mit einem Satz über dich, nicht über den anderen, und mit einer Ankündigung. Ich möchte über etwas reden, das mir unangenehm ist, und ich will dir keinen Vorwurf machen. Die Ankündigung ist wichtiger, als sie aussieht: Sie nimmt der anderen Seite die Alarmbereitschaft, mit der jedes solche Gespräch sonst beginnt."
+      },
+      {
+        "question": "Was zerstört so ein Gespräch am zuverlässigsten?",
+        "answer": "Zwei Dinge. Vergleiche – mit früher, mit anderen Partnern, mit anderen Paaren. Und Zahlen. Beides macht aus einem Gespräch über Wünsche eine Bewertung, und niemand spricht offen über Wünsche, während er bewertet wird."
+      },
+      {
+        "question": "Und wenn ich gar nicht weiß, was ich will?",
+        "answer": "Dann ist genau das der erste Satz. Sehr viele Menschen haben nie gelernt, das eigene Wollen zu benennen, und beginnen mit dem Naheliegenden: was sich nicht gut anfühlt. Auch das ist eine Auskunft, und sie ist mehr wert als eine erfundene Antwort."
+      }
+    ],
+    "url": "/wissen/ueber-sex-reden"
+  },
+  {
+    "type": "topic",
+    "slug": "ungleiches-verlangen",
+    "title": "Ungleiches Verlangen: wenn einer öfter will",
+    "description": "Das häufigste sexuelle Thema in Beziehungen – und das mit den meisten falschen Schlüssen. Warum niemand zu viel oder zu wenig hat, wie die Frage-Ausweich-Schleife entsteht und was sie unterbricht.",
+    "cluster": "sexualitaet",
+    "search_intent": "unterschiedliches sexuelles verlangen partner will oefter lustdiskrepanz",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation der letzten Wochen anschauen, in der einer von euch gefragt hat – und beschreiben, wie es beiden danach ging?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "lustdiskrepanz",
+      "sexualitaet",
+      "begehren",
+      "druck"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "lustdiskrepanz",
+        "reagierendes-verlangen",
+        "einvernehmlichkeit",
+        "duales-kontrollmodell"
+      ],
+      "comparison": [
+        "lustlosigkeit-oder-beziehungsproblem"
+      ],
+      "related": [
+        "beruehrung-ohne-absicht",
+        "ueber-sex-reden",
+        "mental-load-in-beziehungen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wer hat denn nun das Problem?",
+        "answer": "Niemand allein, und genau diese Frage hält den Konflikt am Leben. Es gibt keine richtige Menge. Was vorliegt, ist ein Unterschied zwischen zwei Menschen – und Unterschiede haben immer zwei Seiten. Sobald einer von beiden zum Fall erklärt wird, ist das Gespräch beendet, weil sich dann nur noch verteidigt wird."
+      },
+      {
+        "question": "Soll ich einfach mitmachen, damit Ruhe ist?",
+        "answer": "Kurzfristig entlastet das, langfristig ist es die zuverlässigste Methode, das Verlangen weiter zu senken. Wer regelmäßig gegen das eigene Empfinden zustimmt, verknüpft Sex mit Überwindung – und der Körper merkt sich das. Besser ist ein ehrliches Nein mit einem Ja an anderer Stelle: keine Lust auf Sex, aber Lust darauf, nebeneinander zu liegen."
+      },
+      {
+        "question": "Wie soll ich ein Nein sagen, ohne ihn zu verletzen?",
+        "answer": "Indem du zwei Dinge trennst: die Sache und die Person. Nein zur Sache, Ja zur Person – ich möchte jetzt keinen Sex, und ich möchte dich. Das klingt konstruiert und wirkt: Der Schmerz beim Abgelehntwerden entsteht selten an der Sache, sondern an dem, was man daraus über sich schließt."
+      },
+      {
+        "question": "Wir zählen inzwischen. Ist das schlimm?",
+        "answer": "Es ist ein verlässliches Zeichen dafür, dass die Sache zur Bilanz geworden ist. Zählen entsteht aus Mangel und verschärft ihn: Wer zählt, prüft, und wer geprüft wird, ist nicht frei. Der erste sinnvolle Schritt ist meistens, die Zahl aus dem Gespräch zu nehmen und über etwas anderes zu reden – über Berührung."
+      }
+    ],
+    "url": "/wissen/ungleiches-verlangen"
   },
   {
     "type": "comparison",
@@ -18007,6 +19063,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "wenn-koerper-sich-veraendern",
+    "title": "Wenn Körper sich verändern",
+    "description": "Bevor ihr an eurer Beziehung zweifelt, lohnt der Blick auf Medikamente, Hormone, Schmerzen und Schlaf. Was sich tatsächlich auswirkt, was sich behandeln lässt – und der Satz, der dabei am häufigsten fehlt.",
+    "cluster": "sexualitaet",
+    "search_intent": "libidoverlust medikamente antidepressiva wechseljahre schmerzen lust koerper",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du überlegen, ob sich zeitlich etwas verändert hat – ein Medikament, eine Erkrankung, eine Lebensphase – und wann genau?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "sexualitaet",
+      "begehren",
+      "koerpergefuehl",
+      "scham"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "lust-und-begehren",
+      "glossary": [
+        "sexuelle-nebenwirkungen",
+        "lustdiskrepanz",
+        "erregung-und-verlangen"
+      ],
+      "comparison": [
+        "lustlosigkeit-oder-beziehungsproblem"
+      ],
+      "related": [
+        "ungleiches-verlangen",
+        "beziehung-nach-der-geburt",
+        "professionelle-hilfe"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Können Antidepressiva die Lust nehmen?",
+        "answer": "Ja, und zwar häufig. Sexuelle Nebenwirkungen gehören zu den bekanntesten Begleitwirkungen bestimmter Antidepressiva – vermindertes Verlangen, verzögerter oder ausbleibender Orgasmus, geringere Erregbarkeit. Sie werden trotzdem selten von selbst angesprochen. Wichtig: nichts eigenmächtig absetzen, sondern die verordnende Person darauf ansprechen. Es gibt Alternativen und Anpassungen."
+      },
+      {
+        "question": "Was ändert sich in den Wechseljahren?",
+        "answer": "Häufig zweierlei: das Verlangen kann nachlassen, und es können körperliche Beschwerden dazukommen – Trockenheit, Brennen, Schmerzen beim Sex. Der zweite Teil ist gut behandelbar und wird oft still ertragen. Wer Schmerzen hat, entwickelt zuverlässig Vermeidung, und die wird dann für Lustlosigkeit gehalten."
+      },
+      {
+        "question": "Muss ich mit sowas zum Arzt?",
+        "answer": "Es lohnt sich, gerade wenn die Veränderung plötzlich kam. Abgeklärt gehören unter anderem Schilddrüse, Blutdruckmedikamente, Schmerzursachen und hormonelle Fragen. Vieles davon ist behandelbar – und eine Beziehung wegen einer unbehandelten körperlichen Ursache in Frage zu stellen, wäre bitter."
+      },
+      {
+        "question": "Ändert sich das mit dem Alter zwangsläufig?",
+        "answer": "Manches ändert sich: Erregung braucht oft mehr Zeit und mehr direkte Berührung, spontanes Verlangen wird seltener. Was sich nicht zwangsläufig ändert, ist die Fähigkeit zu Lust und Nähe. Viele Paare berichten, dass Sexualität später anders und nicht schlechter wird – vorausgesetzt, die Erwartung passt sich an."
+      }
+    ],
+    "url": "/wissen/wenn-koerper-sich-veraendern"
+  },
+  {
+    "type": "topic",
     "slug": "wenn-kooperation-nicht-geht",
     "title": "Wenn Kooperation nicht geht – Hochkonflikt und Gefährdung",
     "description": "Zwei sehr verschiedene Lagen werden ständig verwechselt: ein Konflikt, an dem beide mitwirken, und eine Gefährdung, die von einer Seite ausgeht. Der Rat, sich zusammenzureißen, hilft im ersten Fall und ist im zweiten gefährlich.",
@@ -18359,6 +19484,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Double Bind – die Falle der widersprüchlichen Botschaft",
     "description": "Ein Double Bind ist eine Zwickmühle aus zwei widersprüchlichen Botschaften, bei der jede Reaktion falsch ist – und das Benennen des Widerspruchs verboten scheint. Warum das so tief verunsichert. Ohne Diagnose."
   },
+  "/glossar/duales-kontrollmodell": {
+    "title": "Duales Kontrollmodell – Gaspedal und Bremse",
+    "description": "Sexuelle Erregung hat zwei Systeme: eines, das anregt, und eines, das hemmt. In langen Beziehungen liegt das Problem fast nie am Gas, sondern an der Bremse – und die tritt niemand absichtlich."
+  },
   "/glossar/egozentrik": {
     "title": "Egozentrik – übersehen, nicht überheben",
     "description": "Egozentrik meint die Unfähigkeit, die eigene Perspektive zu verlassen – nicht das Gefühl, mehr wert zu sein. Der Unterschied zum Narzissmus ist klein im Erleben und groß in den Folgen."
@@ -18414,6 +19543,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/entdeckungstag": {
     "title": "Entdeckungstag – der Tag, an dem du es erfährst",
     "description": "Der Tag der Entdeckung hat eine eigene Wucht: Schock, körperliche Reaktionen, Erinnerungen, die sich rückwirkend verändern. Was in diesen Stunden normal ist und was du zuerst brauchst."
+  },
+  "/glossar/erregung-und-verlangen": {
+    "title": "Erregung und Verlangen – zwei Dinge, die nicht dasselbe sind",
+    "description": "Der Körper kann reagieren, ohne dass jemand es will – und umgekehrt. Warum die beiden Vorgänge auseinanderlaufen und warum diese Unterscheidung für Betroffene sexueller Gewalt entscheidend ist."
   },
   "/glossar/eskalationsspirale": {
     "title": "Eskalationsspirale – wie aus einer Kleinigkeit ein großer Streit wird",
@@ -18563,6 +19696,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Loyalitätskonflikt – die Frage, die ein Kind nicht beantworten kann",
     "description": "Ein Kind gerät zwischen die Eltern und müsste sich entscheiden, wem es guttut. Es entscheidet sich nicht, sondern beginnt zu managen – und genau das ist der Schadensmechanismus nach einer Trennung."
   },
+  "/glossar/lustdiskrepanz": {
+    "title": "Lustdiskrepanz – der Unterschied, nicht der Mangel",
+    "description": "Wenn einer öfter will als die andere. Warum es keine richtige Menge gibt, wieso die Rollen weniger fest sind als sie wirken – und was aus dem Unterschied einen Konflikt macht."
+  },
   "/glossar/masking": {
     "title": "Masking – die Anstrengung, unauffällig zu wirken",
     "description": "Blickkontakt trainieren, Reaktionen kopieren, Erschöpfung verbergen. Warum Masking funktioniert, was es kostet – und warum es der Hauptgrund dafür ist, dass Frauen so spät erkannt werden."
@@ -18627,6 +19764,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Rationalisierung – der bessere Grund im Nachhinein",
     "description": "Der nachträgliche gute Grund für etwas, das andere Ursachen hatte. Wie man sie von echter Einsicht unterscheidet und warum sie meistens Scham vermeidet."
   },
+  "/glossar/reagierendes-verlangen": {
+    "title": "Reagierendes Verlangen – wenn Lust erst unterwegs entsteht",
+    "description": "Bei vielen Menschen kommt die Lust nicht vor der Situation, sondern in ihr. Was das Modell besagt, woher es stammt und warum die falsche Reihenfolge so viele Paare in die Irre führt."
+  },
   "/glossar/realitaetsverdrehung": {
     "title": "Realitätsverdrehung – wenn deine Erinnerung zum Streitpunkt wird",
     "description": "Realitätsverdrehung ist der Kern von Gaslighting: Fakten, Erinnerungen und Gefühle werden umgedeutet oder geleugnet, bis du an dir selbst zweifelst. Wie sie funktioniert und was hilft. Ohne Diagnose."
@@ -18690,6 +19831,18 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/selbstverurteilung": {
     "title": "Selbstverurteilung – wenn aus einem Fehler ein Urteil wird",
     "description": "Der Unterschied zwischen ich habe etwas Schlechtes getan und ich bin schlecht – und warum die zweite Variante Veränderung nicht befeuert, sondern verhindert."
+  },
+  "/glossar/sensualitaetstraining": {
+    "title": "Sensualitätstraining – Berührung ohne Ziel",
+    "description": "Das älteste und immer noch wirksamste Verfahren der Sexualtherapie arbeitet mit einem Verbot: Für eine Weile findet ausdrücklich kein Sex statt. Wie die Stufen aussehen und warum die Absprache halten muss."
+  },
+  "/glossar/sexuelle-nebenwirkungen": {
+    "title": "Sexuelle Nebenwirkungen – wenn das Medikament die Lust nimmt",
+    "description": "Antidepressiva, Blutdruckmittel, Hormonpräparate: Verlangen und Erregbarkeit hängen an mehr Substanzen, als die meisten wissen. Was häufig vorkommt, was sich ändern lässt – und warum niemand eigenmächtig absetzen sollte."
+  },
+  "/glossar/sexuelle-skripte": {
+    "title": "Sexuelle Skripte – das Drehbuch, das niemand geschrieben hat",
+    "description": "Wer wann was tut, was zählt und wann es vorbei ist: Sexualität folgt erlernten Abläufen, die sich wie Natur anfühlen. Woher die Skripte kommen und woran man merkt, dass man einem folgt."
   },
   "/glossar/situative-gewalt": {
     "title": "Situative Gewalt und Kontrollgewalt – warum die Unterscheidung zählt",
@@ -19055,6 +20208,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Die gekränkte Stille",
     "description": "Eine fiktive Szene: Eine harmlose Bemerkung, und sie zieht sich tagelang beleidigt zurück – bis er hinterherläuft und sich für ihre Kränkung entschuldigt. Über den verdeckt-vulnerablen Typ, der über Rückzug und Opferrolle bestraft."
   },
+  "/szenen/die-hand-auf-der-huefte": {
+    "title": "Die Hand auf der Hüfte",
+    "description": "Eine Szene über eine Berührung, die längst eine Frage ist, und über das Ausweichen, das man kommen hört. Ich-Perspektive, fiktiv."
+  },
   "/szenen/die-hand-in-meinem-nacken": {
     "title": "Die Hand in meinem Nacken",
     "description": "Eine fiktive Szene: Eine beiläufige Berührung in der Küche, und plötzlich ist alles wieder da. Über die Sprache des Körpers, die keine Worte braucht und trotzdem verlernt werden kann."
@@ -19062,6 +20219,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-kueche-die-niemand-sieht": {
     "title": "Die Küche, die niemand sieht",
     "description": "Eine fiktive Szene: Sie räumt seit Wochen die Küche auf, bevor er nach Hause kommt. Er sagt nie etwas dazu. Über Zuwendung, die unsichtbar bleibt, weil sie in der falschen Sprache gegeben wird."
+  },
+  "/szenen/die-landstrasse-nach-hause": {
+    "title": "Die Landstraße nach Hause",
+    "description": "Eine Szene über das schwerste Gespräch in vielen Beziehungen – geführt bei Tempo achtzig, weil man sich dabei nicht ansehen muss. Ich-Perspektive, fiktiv."
   },
   "/szenen/die-leere-seite-vom-bett": {
     "title": "Die leere Seite vom Bett",
@@ -19187,6 +20348,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Er sagt es nie",
     "description": "Eine fiktive Szene: Er tut alles für sie, aber er sagt nichts. Über die Sehnsucht nach einem Satz, der nie kommt, und die Frage, ob man um Worte bitten darf."
   },
+  "/szenen/er-wartet-bis-ich-es-sage": {
+    "title": "Er wartet, bis ich es sage",
+    "description": "Eine Szene über Nähe nach einem Vertrauensbruch: ein Körper, der sich erinnert, und ein Tempo, das nur einer bestimmen kann. Ich-Perspektive, fiktiv."
+  },
   "/szenen/er-will-nicht-mitkommen": {
     "title": "Er will nicht mitkommen",
     "description": "Eine Szene über einen Freitag, an dem ein Kind im Flur stehen bleibt – und über die Sätze, die man in solchen Momenten nicht sagen sollte. Ich-Perspektive, fiktiv."
@@ -19206,6 +20371,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/es-fuehlt-sich-flach-an": {
     "title": "Es fühlt sich flach an",
     "description": "Eine fiktive Szene: Der neue Mann ist verlässlich, freundlich und ruhig – und sie langweilt sich fast. Über das, was nach einer sehr intensiven Beziehung mit dem eigenen Maßstab passiert."
+  },
+  "/szenen/es-geht-ja-schnell": {
+    "title": "Es geht ja schnell",
+    "description": "Eine Szene über ein Ja, das keines war, und darüber, was regelmäßiges Mitmachen mit der Lust anstellt. Ich-Perspektive, fiktiv."
   },
   "/szenen/es-ging-nie-um-mich": {
     "title": "Es ging nie um mich",
@@ -19326,6 +20495,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-muss-nicht-sofort": {
     "title": "Ich muss nicht sofort",
     "description": "Eine Szene über eine kleine, große Grenze – nicht mehr auf jede Nachricht sofort zu reagieren und die eigene Zeit zurückzuerobern. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/ich-rechne-im-dunkeln": {
+    "title": "Ich rechne im Dunkeln",
+    "description": "Eine Szene über die andere Seite derselben Nacht: das Ausweichen, das Schuldgefühl danach und die Rechnung, die im Kopf mitläuft. Ich-Perspektive, fiktiv."
   },
   "/szenen/ich-rufe-an-um-zu-erzaehlen": {
     "title": "Ich rufe an, um etwas zu erzählen",
@@ -19507,9 +20680,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sechs Wochen",
     "description": "Eine Szene über die Wochen, in denen sich Rollen festlegen, ohne dass jemand sie beschlossen hat. Ich-Perspektive, fiktiv."
   },
+  "/szenen/sechs-wochen-nichts": {
+    "title": "Sechs Wochen nichts",
+    "description": "Eine Szene über eine Absprache, die zuerst absurd klang: berühren, ohne dass etwas daraus wird. Ich-Perspektive, fiktiv."
+  },
   "/szenen/seine-laune-im-auto": {
     "title": "Seine Laune im Auto",
     "description": "Eine fiktive Szene: Er steigt gut gelaunt ins Auto und kommt schlecht gelaunt zu Hause an, ohne dass ein Wort gefallen wäre. Über emotionale Ansteckung und die Grenze, die nicht zwischen zwei Menschen verläuft."
+  },
+  "/szenen/seite-vier-unten-links": {
+    "title": "Seite vier, unten links",
+    "description": "Eine Szene über einen Beipackzettel, ein verlorenes Jahr und die Erleichterung, die sich erst wie Wut anfühlt. Ich-Perspektive, fiktiv."
   },
   "/szenen/sie-hat-die-kinder-erwaehnt": {
     "title": "Sie hat die Kinder erwähnt",
@@ -19690,6 +20871,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/beobachtung-gefuehl": {
     "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",
     "description": "Wie du zwischen dem, was passiert ist, dem, was du fühlst, und dem, was du daraus schließt, unterscheidest – das Kernwerkzeug der Gewaltfreien Kommunikation."
+  },
+  "/wissen/beruehrung-ohne-absicht": {
+    "title": "Berührung ohne Absicht",
+    "description": "Der wirksamste Schritt bei sexuellen Schwierigkeiten ist kein sexueller: Nähe wieder von der Frage zu trennen, ob mehr daraus wird. Woher die Idee stammt, wie eine Verabredung aussieht – und warum sie funktioniert."
   },
   "/wissen/betreuungsmodelle": {
     "title": "Wechselmodell, Residenzmodell, Nestmodell",
@@ -19919,6 +21104,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Loslassen lernen: über eine Trennung hinwegkommen",
     "description": "Warum Loslassen nach einer Trennung so schwerfällt, warum die Erinnerung dich täuscht und was wirklich hilft – von Kontaktabbruch über das Unterbrechen des Grübelns bis zurück zu dir selbst. Ohne Zeitdruck, ohne Diagnose."
   },
+  "/wissen/lust-und-begehren": {
+    "title": "Lust und Begehren: warum es nicht von selbst kommt",
+    "description": "Das verbreitete Bild ist falsch. Bei sehr vielen Menschen entsteht Verlangen nicht spontan, sondern erst unterwegs – als Antwort auf etwas. Was daraus für lange Beziehungen folgt, und was Lust tatsächlich bremst."
+  },
+  "/wissen/lustlosigkeit-oder-beziehungsproblem": {
+    "title": "Liegt es am Körper, am Alltag oder an uns?",
+    "description": "Drei sehr verschiedene Ursachen führen zum selben Ergebnis. Sechs Fragen, die sie auseinanderhalten – und die Reihenfolge, in der man sie stellen sollte."
+  },
   "/wissen/mental-load-als-vorwurf": {
     "title": "Wenn nichts recht ist: Mental Load als Vorwurf",
     "description": "Der Begriff beschreibt etwas Reales und lässt sich zugleich so einsetzen, dass die andere Seite nicht gewinnen kann. Drei Formen, in denen das passiert – und der Test, der beides auseinanderhält."
@@ -19938,6 +21131,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/nach-der-affaere": {
     "title": "Nach der Affäre: die drei Phasen und was sie brauchen",
     "description": "Die Wochen und Monate nach einem Vertrauensbruch verlaufen in Phasen. Was in welcher Phase hilft, welche Fehler fast alle Paare machen und woran du merkst, dass ihr feststeckt."
+  },
+  "/wissen/nach-einer-verletzung": {
+    "title": "Nähe nach einer Verletzung",
+    "description": "Nach einer Affäre, einer überschrittenen Grenze oder einer Gewalterfahrung ist Berührung nicht mehr neutral. Warum der Körper sich erinnert, wem das Tempo gehört – und was die andere Seite auf keinen Fall tun sollte."
   },
   "/wissen/nach-toxischer-beziehung": {
     "title": "Nach einer toxischen Beziehung: warum die Angst bleibt – und wie Heilung geht",
@@ -20007,6 +21204,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sich trennen: zwischen Zweifel, Schuld und Klarheit",
     "description": "Warum die Trennungsfrage so schwer ist, welche Zweifel dazugehören und wie du Schritt für Schritt zu mehr Klarheit findest – ohne dass dir jemand die Entscheidung abnimmt."
   },
+  "/wissen/spontanes-oder-reagierendes-verlangen": {
+    "title": "Spontanes oder reagierendes Verlangen?",
+    "description": "Zwei Arten, wie Lust entsteht – und nur eine davon kommt in den üblichen Erzählungen vor. Woran du erkennst, wie es bei dir läuft, und was praktisch daraus folgt."
+  },
   "/wissen/systeme-statt-vorsaetze": {
     "title": "Systeme statt Vorsätze",
     "description": "Ein Vorsatz wird in Ruhe gefasst und im Alltag gebraucht – genau dort ist er nicht verfügbar. Was stattdessen trägt: alles aus dem Kopf heraus, sichtbar, mit Auslöser. Und die eine Regel, an der sich jedes System messen lässt."
@@ -20026,6 +21227,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/trennung-mit-kindern": {
     "title": "Trennung mit Kindern: worauf es wirklich ankommt",
     "description": "Die verbreitetste Angst ist die falsche. Nicht die Trennung selbst belastet Kinder auf Dauer, sondern der Konflikt, der nach ihr weiterläuft – und ob das Kind hineingezogen wird. Was daraus für die ersten Monate folgt."
+  },
+  "/wissen/ueber-sex-reden": {
+    "title": "Über Sex reden, ohne dass es kippt",
+    "description": "Das schwerste Gespräch in vielen Beziehungen. Drei Orte, an denen es nie stattfinden sollte, ein Einstiegssatz, der funktioniert – und die zwei Themen, die es zuverlässig zerstören."
+  },
+  "/wissen/ungleiches-verlangen": {
+    "title": "Ungleiches Verlangen: wenn einer öfter will",
+    "description": "Das häufigste sexuelle Thema in Beziehungen – und das mit den meisten falschen Schlüssen. Warum niemand zu viel oder zu wenig hat, wie die Frage-Ausweich-Schleife entsteht und was sie unterbricht."
   },
   "/wissen/unreife-oder-narzissmus": {
     "title": "Emotionale Unreife oder Narzissmus? Woran du den Unterschied merkst",
@@ -20106,6 +21315,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/wenn-grenzen-nicht-reichen": {
     "title": "Wenn Grenzen nicht reichen – und wann sie schaden",
     "description": "Grenzen sind ein Werkzeug für Beziehungen, die im Kern tragen. Wo Macht ungleich verteilt ist, kann der Rat nach klareren Grenzen gefährlich werden – und Grenz-Sprache lässt sich hervorragend als Waffe benutzen. Beides gehört gesagt."
+  },
+  "/wissen/wenn-koerper-sich-veraendern": {
+    "title": "Wenn Körper sich verändern",
+    "description": "Bevor ihr an eurer Beziehung zweifelt, lohnt der Blick auf Medikamente, Hormone, Schmerzen und Schlaf. Was sich tatsächlich auswirkt, was sich behandeln lässt – und der Satz, der dabei am häufigsten fehlt."
   },
   "/wissen/wenn-kooperation-nicht-geht": {
     "title": "Wenn Kooperation nicht geht – Hochkonflikt und Gefährdung",
