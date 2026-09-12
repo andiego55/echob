@@ -6313,7 +6313,8 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "scene_tags": [
       "trennung-mit-kindern",
       "elternschaft",
-      "co-elternschaft"
+      "co-elternschaft",
+      "loyalitaetskonflikt"
     ],
     "url": "/szenen/das-erste-weihnachten"
   },
@@ -8141,7 +8142,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "scene_tags": [
       "autismus",
       "neurodivergenz",
-      "anerkennung"
+      "klarheit"
     ],
     "url": "/szenen/er-sagt-es-einfach"
   },

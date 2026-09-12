@@ -14,7 +14,7 @@ pull_quote: "Wir haben die Geschenke gezählt. Nicht gesagt, dass wir zählen. A
 echo:
   mode: stabilize
   opening_question: "Magst du anschauen, wie ihr Feiertage regelt – und was daran gerade am meisten wehtut?"
-scene_tags: [trennung-mit-kindern, elternschaft, co-elternschaft]
+scene_tags: [trennung-mit-kindern, elternschaft, co-elternschaft, loyalitaetskonflikt]
 ---
 
 Vierzehn Uhr bis achtzehn Uhr bei mir, danach zu ihrer Mutter. So stand es in der Vereinbarung, die wir im Oktober geschrieben haben, sehr vernünftig, mit Uhrzeiten.

@@ -14,7 +14,7 @@ pull_quote: "Am Anfang dachte ich, er sei kalt. Inzwischen ist er der einzige Me
 echo:
   mode: clarity
   opening_question: "Magst du anschauen, wo ihr aneinander vorbeiredet – und was ihr jeweils voraussetzt?"
-scene_tags: [autismus, neurodivergenz, anerkennung]
+scene_tags: [autismus, neurodivergenz, klarheit]
 ---
 
 „Die Suppe ist zu salzig."

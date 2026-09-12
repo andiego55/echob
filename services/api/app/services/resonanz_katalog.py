@@ -248,8 +248,14 @@ TAG_ZU_WIRKUNG: dict[str, str] = {
     "emotionale-ueberforderung": "Erschöpft sein",
     "ohnmacht": "Erschöpft sein",
     "nachwirkung": "Erschöpft sein",
+    # An alles denken muessen hat keinen Feierabend - das ist die Erschoepfung, die
+    # abends nichts Vorzeigbares hinterlaesst.
+    "mental-load": "Erschöpft sein",
     # Allein sein, auch zu zweit
     "einsamkeit-zu-zweit": "Allein sein, auch zu zweit",
+    # Unsichtbare Arbeit und uebersehene Muehe. Das Schlagwort meint durchgehend das
+    # FEHLEN von Anerkennung - genau die Erfahrung, die diese Gruppe beschreibt.
+    "anerkennung": "Allein sein, auch zu zweit",
     "sehnsucht": "Allein sein, auch zu zweit",
     "vermissen": "Allein sein, auch zu zweit",
     "trauer": "Allein sein, auch zu zweit",
@@ -268,6 +274,9 @@ TAG_ZU_WIRKUNG: dict[str, str] = {
     "selbstbestimmung": "Mich verlieren",
     # Die Schuld tragen
     "schuldgefuehle": "Die Schuld tragen",
+    # Wer zwischen zwei Menschen steht, fuehlt sich fuer beide verantwortlich - beim Kind
+    # in der Mitte genauso wie beim Elternteil, der es dort stehen sieht.
+    "loyalitaetskonflikt": "Die Schuld tragen",
     "verantwortung": "Die Schuld tragen",
     "grenze": "Die Schuld tragen",
     "grenzen": "Die Schuld tragen",
