@@ -52,6 +52,11 @@ const SCENE_TAG_LABELS: Record<string, string> = {
   koerpergefuehl: 'Körpergefühl',
   // koerpererinnerung steht schon weiter unten bei Trauma & PTBS-Belastung.
 
+  // Cluster Sucht in der Beziehung – nur die Umlaut-Fälle; sucht, alkohol,
+  // medikamente, geheimhaltung, suchtdruck leiten sich sauber ab.
+  gluecksspiel: 'Glücksspiel',
+  rueckfall: 'Rückfall',
+
   kontrolle: 'Kontrolle',
   eifersucht: 'Eifersucht',
   misstrauen: 'Misstrauen',

@@ -31,6 +31,7 @@ export const CLUSTERS = [
   'neurodivergenz', // ADHS & Neurodiversitaet in Beziehungen – Umsetzung statt Wollen, doppeltes Empathieproblem
   'trauma', // Trauma & PTBS-Belastung durch Beziehungen
   'kodependenz', // Kodependenz & Selbstliebe-Defizit (Ross Rosenberg, Human Magnet Syndrome)
+  'sucht', // Sucht in der Beziehung – Alkohol, Medikamente, Glücksspiel; Angehörige, Kinder
   'bindung', // Bindung & Nähe
   'trennung', // Trennung
   'trennung-mit-kindern', // Trennung mit Kindern – Co-Elternschaft, Betreuung, Loyalitätskonflikt
@@ -149,6 +150,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   neurodivergenz: 'ADHS & Neurodiversität',
   trauma: 'Trauma & PTBS',
   kodependenz: 'Kodependenz',
+  sucht: 'Sucht in der Beziehung',
   bindung: 'Bindung & Nähe',
   trennung: 'Trennung',
   'trennung-mit-kindern': 'Trennung mit Kindern',

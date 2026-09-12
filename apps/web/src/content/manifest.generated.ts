@@ -550,6 +550,70 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "co-abhaengigkeit",
+    "title": "Co-Abhängigkeit – ein Begriff mit zwei Seiten",
+    "description": "Er beschreibt etwas Reales und wird zugleich benutzt, um Angehörigen die Mitverantwortung zuzuschieben. Was daran brauchbar ist, was nicht, und warum er keine Diagnose ist.",
+    "cluster": "sucht",
+    "search_intent": "co-abhaengigkeit bedeutung angehoerige alkoholiker test symptome",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was du aufgibst, damit es bei euch läuft – und wann du damit angefangen hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "enabling",
+      "selbstaufgabe",
+      "fuersorge"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "als-angehoeriger-ueberleben",
+      "glossary": [
+        "enabling",
+        "rettersyndrom",
+        "suchterkrankung"
+      ],
+      "comparison": [
+        "helfen-oder-ermoeglichen"
+      ],
+      "related": [
+        "als-angehoeriger-ueberleben",
+        "kodependenz",
+        "sucht-in-der-beziehung"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Bin ich co-abhängig, wenn ich mich um ihn kümmere?",
+        "answer": "Sich zu kümmern macht niemanden co-abhängig. Der Begriff meint etwas Engeres: dass das eigene Leben sich vollständig nach dem Zustand eines anderen ausrichtet und dabei verschwindet. Der Prüfstein ist nicht, wie viel du tust, sondern was von dir noch übrig ist, wenn du es tust."
+      },
+      {
+        "question": "Ist Co-Abhängigkeit eine Diagnose?",
+        "answer": "Nein. Der Begriff steht in keinem Klassifikationssystem, es gibt keine anerkannten Kriterien und keine belastbare Forschungsgrundlage. Er stammt aus der Selbsthilfe der siebziger Jahre und ist eine Beschreibung, keine Feststellung. Wer damit etikettiert wird, sollte das wissen."
+      },
+      {
+        "question": "Warum wird der Begriff kritisiert?",
+        "answer": "Weil er in der Praxis oft die Richtung umdreht. Aus Wer trägt hier eine Last wird Was ist mit dir nicht in Ordnung, dass du das mitträgst – und plötzlich hat die Angehörige eine Störung. Besonders problematisch wird das, wo Gewalt oder Kontrolle im Spiel sind: Dort erklärt der Begriff das Opfer zum Teil des Problems."
+      },
+      {
+        "question": "Was ist dann brauchbar daran?",
+        "answer": "Die Beobachtung, dass Angehörige über Jahre eigene Muster entwickeln, die auch nach dem Ende der Beziehung weiterlaufen: alles vorausdenken, keine eigenen Bedürfnisse anmelden, sich für die Stimmung anderer verantwortlich fühlen. Das ist real und behandelbar – und es ist ein Grund für eigene Hilfe, nicht für Selbstvorwürfe."
+      }
+    ],
+    "url": "/glossar/co-abhaengigkeit"
+  },
+  {
+    "type": "glossary",
     "slug": "coercive-control",
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose.",
@@ -1440,6 +1504,69 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "entzug",
+    "title": "Entzug – und warum er ärztlich begleitet gehört",
+    "description": "Der Körper hat sich angepasst, und beim Weglassen kommt die Gegenreaktion. Bei Alkohol und Beruhigungsmitteln kann sie lebensgefährlich werden – deshalb ist kalter Entzug kein Beweis guten Willens.",
+    "cluster": "sucht",
+    "search_intent": "alkoholentzug symptome gefaehrlich delir kalter entzug zuhause",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, wie es ihm an Tagen geht, an denen er nichts getrunken hat?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "medikamente"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "qualifizierter-entzug",
+        "suchtdruck",
+        "kontrollverlust"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "medikamente-die-stille-sucht",
+        "wie-spreche-ich-ihn-darauf-an"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Kann Alkoholentzug wirklich tödlich sein?",
+        "answer": "Ja. Bei körperlicher Abhängigkeit können ein Krampfanfall und ein Delirium tremens auftreten, und das Delir ist unbehandelt lebensbedrohlich. Es beginnt typischerweise ein bis drei Tage nach dem letzten Konsum – oft also, wenn alle schon aufgeatmet haben. Das ist der Grund, warum bei täglichem oder hochdosiertem Konsum eine ärztlich begleitete Entgiftung gilt und nicht der Küchentisch."
+      },
+      {
+        "question": "Wann muss ich den Notruf wählen?",
+        "answer": "Bei Krampfanfall, Verwirrtheit, Halluzinationen, starkem Zittern mit Schwitzen und Herzrasen, hohem Blutdruck oder Fieber im Entzug. 112. Diese Zeichen gehören nicht abgewartet und nicht zu Hause beobachtet."
+      },
+      {
+        "question": "Und bei Schlaf- und Beruhigungsmitteln?",
+        "answer": "Dort gilt dasselbe, teils noch ausgeprägter. Ein abruptes Absetzen von Benzodiazepinen kann Krampfanfälle und schwere Verwirrtheitszustände auslösen. Abgesetzt wird ausschleichend über Wochen bis Monate, ärztlich begleitet – nie durch Wegnehmen oder Verstecken der Packung."
+      },
+      {
+        "question": "Reicht eine Entgiftung, damit es vorbei ist?",
+        "answer": "Nein, und diese Erwartung ist einer der häufigsten Gründe für Enttäuschung. Die Entgiftung beseitigt die körperliche Anpassung in Tagen. Was danach kommt – Suchtdruck, Auslöser, alte Gewohnheiten – ist der eigentliche Teil und braucht eine Entwöhnungsbehandlung."
+      }
+    ],
+    "url": "/glossar/entzug"
+  },
+  {
+    "type": "glossary",
     "slug": "erregung-und-verlangen",
     "title": "Erregung und Verlangen – zwei Dinge, die nicht dasselbe sind",
     "description": "Der Körper kann reagieren, ohne dass jemand es will – und umgekehrt. Warum die beiden Vorgänge auseinanderlaufen und warum diese Unterscheidung für Betroffene sexueller Gewalt entscheidend ist.",
@@ -1739,6 +1866,66 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/flashback"
+  },
+  {
+    "type": "glossary",
+    "slug": "funktionierende-abhaengigkeit",
+    "title": "Funktionierende Abhängigkeit – warum niemand dir glaubt",
+    "description": "Wer arbeitet, zahlt und nach außen unauffällig bleibt, gilt nicht als süchtig – auch vor sich selbst nicht. Warum das Funktionieren den Zustand stabilisiert und was es für Angehörige besonders macht.",
+    "cluster": "sucht",
+    "search_intent": "funktionierender alkoholiker erkennen unauffaellig trinkt jeden abend",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was andere sehen, wenn sie ihn sehen – und was du siehst?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "geheimhaltung",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "kontrollverlust",
+        "co-abhaengigkeit"
+      ],
+      "comparison": [
+        "viel-trinken-oder-abhaengig"
+      ],
+      "related": [
+        "wenn-die-luege-das-problem-wird",
+        "sucht-in-der-beziehung",
+        "medikamente-die-stille-sucht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das ein anerkannter Fachbegriff?",
+        "answer": "Nein, er ist umgangssprachlich. Diagnostisch gibt es keine eigene Kategorie dafür – die Kriterien einer Abhängigkeit können erfüllt sein, während jemand beruflich und sozial unauffällig bleibt. Der Begriff beschreibt also keinen eigenen Zustand, sondern einen Verlauf, in dem die Folgen noch nicht sichtbar geworden sind."
+      },
+      {
+        "question": "Warum glaubt mir niemand?",
+        "answer": "Weil andere ihn nur in Situationen erleben, in denen er funktioniert – bei der Arbeit, beim Grillfest, am Telefon. Das häusliche Bild kennt niemand außer dir. Dazu kommt, dass viele Menschen ein festes Bild von Sucht im Kopf haben, in das ein zuverlässiger, gepflegter, berufstätiger Mensch nicht passt. Du widersprichst dann nicht einer Beobachtung, sondern einem Klischee."
+      },
+      {
+        "question": "Ist es weniger schlimm, wenn jemand funktioniert?",
+        "answer": "Für die Beziehung eher nicht, und medizinisch auch nicht: Die körperlichen Folgen entstehen unabhängig davon, ob jemand pünktlich zur Arbeit geht. Das Funktionieren verzögert nur den Zeitpunkt, an dem etwas passiert – oft um viele Jahre. Deshalb dauert es bei dieser Gruppe im Schnitt länger bis zur ersten Behandlung."
+      }
+    ],
+    "url": "/glossar/funktionierende-abhaengigkeit"
   },
   {
     "type": "glossary",
@@ -2729,6 +2916,64 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "kontrollverlust",
+    "title": "Kontrollverlust – warum Vorsätze hier nichts beweisen",
+    "description": "Nicht die Entscheidung zu trinken geht verloren, sondern die über Menge und Ende. Warum ein gescheiterter Vorsatz mehr aussagt als jede Trinkmenge – und was das für Versprechen bedeutet.",
+    "cluster": "sucht",
+    "search_intent": "kontrollverlust alkohol bedeutung kann nicht aufhoeren nur ein glas",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du an ein Versprechen denken, das er ernst gemeint und nicht gehalten hat – und beschreiben, was du daraus geschlossen hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "kontrollverlust",
+      "alkohol"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "suchtdruck",
+        "rueckfall"
+      ],
+      "comparison": [
+        "viel-trinken-oder-abhaengig"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "wie-spreche-ich-ihn-darauf-an"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Er hält seine Vorsätze manchmal doch ein. Ist es dann kein Kontrollverlust?",
+        "answer": "Nicht unbedingt. Kontrollverlust bedeutet nicht, dass jemand nie mehr aufhören kann, sondern dass es nicht mehr verlässlich gelingt. Gerade die gelungenen Wochen sind der Grund, warum das Problem so lange bestreitbar bleibt – für ihn und für dich. Ein trockener Monat widerlegt keine Abhängigkeit; er zeigt, dass Willenskraft kurzfristig reicht und langfristig nicht."
+      },
+      {
+        "question": "Warum verspricht er etwas, das er nicht halten kann?",
+        "answer": "Weil er es in dem Moment meint. Das ist der Punkt, den Angehörige am schwersten glauben: Die meisten dieser Versprechen sind nicht taktisch. Sie werden nüchtern und ehrlich gegeben – und dann kommt der Suchtdruck, und die Lage sieht anders aus. Deshalb ist ein gebrochenes Versprechen hier ein Symptom und kein Charakterbeweis, so bitter das für die Beziehung ist."
+      },
+      {
+        "question": "Heißt das, ich kann seinen Zusagen nie mehr trauen?",
+        "answer": "Zusagen über den Konsum sind in der aktiven Phase keine belastbare Grundlage – nicht wegen böser Absicht, sondern weil sie nicht in seiner Verfügung stehen. Für dich folgt daraus keine Verachtung, sondern eine praktische Konsequenz: Plane nach dem, was du beobachtest, nicht nach dem, was angekündigt wurde."
+      }
+    ],
+    "url": "/glossar/kontrollverlust"
+  },
+  {
+    "type": "glossary",
     "slug": "liebesdialekt",
     "title": "Liebesdialekt – die konkrete Form zählt",
     "description": "Zwei Menschen können dieselbe Liebessprache sprechen und sich trotzdem verfehlen, weil ihnen die konkrete Form nicht passt. Warum der Dialekt oft wichtiger ist als die Sprache.",
@@ -3521,6 +3766,67 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "qualifizierter-entzug",
+    "title": "Qualifizierter Entzug – warum Entgiftung nicht Behandlung ist",
+    "description": "Der Unterschied, an dem in Deutschland die meisten Behandlungen scheitern: Entgiftung dauert Tage, Entwöhnung Monate. Wer was bezahlt, wie man hineinkommt und wo die Suchtberatung dabei steht.",
+    "cluster": "sucht",
+    "search_intent": "qualifizierter entzug entwoehnung reha alkohol ablauf kosten beantragen",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, was bisher an Hilfe versucht wurde – und woran es jeweils gescheitert ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "veraenderung",
+      "alkohol"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "entzug",
+        "trockener-alkoholiker",
+        "rueckfall",
+        "suchtdruck"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "wenn-er-trocken-wird",
+        "als-angehoeriger-ueberleben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was kostet eine Entwöhnungsbehandlung?",
+        "answer": "Für die Betroffenen in aller Regel nichts an Behandlungskosten. Kostenträger ist bei Erwerbstätigen meistens die Deutsche Rentenversicherung, sonst die Krankenkasse. Die Anträge sind umfangreich, und genau dabei helfen Suchtberatungsstellen – kostenlos. Das ist einer der Hauptgründe, warum der Weg über eine Beratungsstelle deutlich häufiger zum Ziel führt als der Versuch, es allein zu organisieren."
+      },
+      {
+        "question": "Wie lange dauert das alles?",
+        "answer": "Die Entgiftung wenige Tage, ein qualifizierter Entzug etwa zwei bis drei Wochen, eine stationäre Entwöhnung je nach Verlauf mehrere Monate, eine ambulante entsprechend länger bei geringerer Dichte. Zwischen Antrag und Beginn liegen oft Wochen – deshalb lohnt es sich, den Antrag zu stellen, sobald jemand bereit ist, und nicht erst, wenn die Bereitschaft geprüft wurde."
+      },
+      {
+        "question": "Kann man auch ambulant behandelt werden?",
+        "answer": "Ja. Ambulante Rehabilitation gibt es bei vielen Suchtberatungsstellen, und sie ist für viele Menschen der realistischere Weg, weil Arbeitsplatz und Familie bestehen bleiben. Wann was passt, hängt vom Schweregrad, vom Umfeld und von früheren Versuchen ab – das ist genau die Frage, die eine Beratungsstelle einschätzen kann."
+      },
+      {
+        "question": "Was kann ich als Angehörige tun, ohne ihn?",
+        "answer": "Dich informieren und den Weg vorbereiten. Du kannst zur Suchtberatung gehen, fragen, was in eurer Region wie lange dauert und was ein Antrag braucht – ohne ihn und ohne seine Zustimmung. Wenn der Moment kommt, in dem er bereit ist, ist dieser Moment oft kurz. Dann zählt, ob jemand weiß, wo man anruft."
+      }
+    ],
+    "url": "/glossar/qualifizierter-entzug"
+  },
+  {
+    "type": "glossary",
     "slug": "rationalisierung",
     "title": "Rationalisierung – der bessere Grund im Nachhinein",
     "description": "Der nachträgliche gute Grund für etwas, das andere Ursachen hatte. Wie man sie von echter Einsicht unterscheidet und warum sie meistens Scham vermeidet.",
@@ -3804,6 +4110,68 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/rettersyndrom"
+  },
+  {
+    "type": "glossary",
+    "slug": "rueckfall",
+    "title": "Rückfall – Teil des Verlaufs, keine Verpflichtung für dich",
+    "description": "Rückfälle gehören zu Suchterkrankungen wie zu anderen chronischen Krankheiten auch. Warum das trotzdem nicht heißt, dass du unbegrenzt mittragen musst – und was man vorher verabreden kann.",
+    "cluster": "sucht",
+    "search_intent": "rueckfall alkohol was tun wieder getrunken partner enttaeuscht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was in dir passiert ist, als du es gemerkt hast?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "rueckfall",
+      "enttaeuschung",
+      "hoffnung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchtdruck",
+        "qualifizierter-entzug",
+        "kontrollverlust",
+        "trockener-alkoholiker"
+      ],
+      "related": [
+        "wenn-er-trocken-wird",
+        "sucht-in-der-beziehung",
+        "soll-ich-bei-einem-suechtigen-bleiben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Bedeutet ein Rückfall, dass alles umsonst war?",
+        "answer": "Nein. In der Suchtmedizin gelten Rückfälle als Teil des Verlaufs, ähnlich wie bei anderen chronischen Erkrankungen, bei denen niemand von Scheitern spricht, wenn die Werte wieder steigen. Entscheidend ist weniger, ob ein Rückfall passiert, sondern was danach geschieht: wie schnell er beendet wird und ob Hilfe geholt wird."
+      },
+      {
+        "question": "Muss ich deshalb bleiben?",
+        "answer": "Nein, und diese beiden Sätze widersprechen sich nicht. Dass ein Rückfall zum Krankheitsverlauf gehört, ist eine medizinische Aussage. Ob du weiter so leben willst, ist eine andere Frage, und sie gehört dir. Aus dem Verlauf einer Erkrankung folgt keine Pflicht für Angehörige."
+      },
+      {
+        "question": "Was sage ich, wenn ich es merke?",
+        "answer": "Möglichst wenig im Moment selbst und nichts, was du am nächsten Tag zurücknehmen musst. Nützlich ist, was vorher verabredet war – deshalb lohnt es sich, im nüchternen Zustand zu besprechen, was im Fall eines Rückfalls passiert. Alles, was im Affekt entschieden wird, hält selten und beschädigt oft."
+      },
+      {
+        "question": "Wie erkenne ich, dass sich einer anbahnt?",
+        "answer": "Meistens nicht am Trinken, sondern vorher: Rückzug aus der Nachsorge, ausgelassene Gruppentermine, wachsende Gereiztheit, Kontakt zu alten Zusammenhängen, das Gerede von einem Glas, das doch möglich sein müsste. In der Fachsprache heißt das Rückfallprozess – er beginnt lange vor dem ersten Schluck."
+      }
+    ],
+    "url": "/glossar/rueckfall"
   },
   {
     "type": "glossary",
@@ -4638,6 +5006,126 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "suchtdruck",
+    "title": "Suchtdruck – das Verlangen, das in Wellen kommt",
+    "description": "Craving ist nicht Lust und nicht Schwäche, sondern eine gelernte Reaktion auf Auslöser. Warum er nach dem Entzug erst richtig anfängt und warum er in etwa zwanzig Minuten wieder abebbt.",
+    "cluster": "sucht",
+    "search_intent": "suchtdruck craving alkohol verlangen was hilft ausloeser",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, in welchen Situationen es bei ihm besonders schwer wird – und was in diesen Situationen sonst noch los ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "suchtdruck",
+      "alkohol"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "rueckfall",
+        "entzug",
+        "kontrollverlust",
+        "qualifizierter-entzug"
+      ],
+      "related": [
+        "wenn-er-trocken-wird",
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Hört der Suchtdruck irgendwann auf?",
+        "answer": "Er wird seltener und schwächer, aber er kann auch nach Jahren noch auftreten – ausgelöst von einem Geruch, einem Lied, einem Ort, einer bestimmten Belastung. Das ist der Grund, warum in der Suchtmedizin von Remission und nicht von Heilung gesprochen wird. Für den Alltag heißt es nicht, dass jemand ständig gefährdet ist, sondern dass Auslöser bekannt sein sollten."
+      },
+      {
+        "question": "Ist Suchtdruck dasselbe wie Entzug?",
+        "answer": "Nein. Entzug ist die körperliche Gegenreaktion beim Wegfall der Substanz und dauert Tage. Suchtdruck ist ein erlerntes Verlangen, das an Situationen gekoppelt ist, und kann Jahre nach der letzten Entgiftung auftreten. Deshalb reicht eine Entgiftung allein nicht: Sie erreicht den einen Teil und lässt den anderen unberührt."
+      },
+      {
+        "question": "Was hilft in dem Moment?",
+        "answer": "Zeit gewinnen. Eine Welle Suchtdruck steigt an und ebbt wieder ab, meistens innerhalb von etwa zwanzig Minuten – wer diese Zeit überbrückt, hat sie überstanden. Praktisch heißt das: die Situation verlassen, jemanden anrufen, etwas Körperliches tun. In Behandlungen wird genau das geübt, weil es im Ernstfall abrufbar sein muss."
+      },
+      {
+        "question": "Kann ich als Angehörige dabei etwas tun?",
+        "answer": "Du kannst wissen, was seine Auslöser sind, und du kannst nicht sein Frühwarnsystem sein. Das ist der Unterschied. Wer die Aufgabe übernimmt, den Suchtdruck des anderen zu überwachen, ist wieder in der Rolle der Aufsicht – und die hat schon vorher nicht funktioniert."
+      }
+    ],
+    "url": "/glossar/suchtdruck"
+  },
+  {
+    "type": "glossary",
+    "slug": "suchterkrankung",
+    "title": "Suchterkrankung – warum die Mengenfrage nicht weiterführt",
+    "description": "Abhängigkeit wird nicht über Mengen definiert, sondern über drei Kennzeichen: nachlassende Kontrolle, wachsender Vorrang, körperliche Anpassung. Was das für Angehörige praktisch bedeutet.",
+    "cluster": "sucht",
+    "search_intent": "sucht definition abhaengigkeit kriterien icd was ist eine suchterkrankung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, was passiert, wenn er sich vornimmt, weniger zu trinken?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "kontrollverlust",
+      "alkohol"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "kontrollverlust",
+        "entzug",
+        "funktionierende-abhaengigkeit",
+        "suchtdruck"
+      ],
+      "comparison": [
+        "viel-trinken-oder-abhaengig"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "mein-partner-trinkt-zu-viel"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Sucht eine Krankheit oder eine Willensfrage?",
+        "answer": "Sie ist als Erkrankung klassifiziert, und das ist mehr als eine Formulierung: Es gibt körperliche Anpassungen, es gibt Behandlungen, es gibt Verläufe. Zugleich taugt das Krankheitsmodell nicht als Ausrede – wer krank ist, bleibt für sein Verhalten verantwortlich. Beides gilt gleichzeitig, und Angehörige, die sich zwischen den beiden Sätzen entscheiden sollen, kommen deshalb nie zu einem Ergebnis."
+      },
+      {
+        "question": "Gibt es Sucht auch ohne Substanz?",
+        "answer": "Ja. Die Glücksspielstörung ist als eigenständige Diagnose anerkannt, die Computerspielstörung inzwischen ebenfalls. Was sie mit den Substanzabhängigkeiten teilt, ist der Kern: Kontrollverlust, Vorrang vor anderem, Weitermachen trotz Schaden."
+      },
+      {
+        "question": "Kann jemand geheilt werden?",
+        "answer": "Suchterkrankungen sind behandelbar und sehr viele Menschen leben dauerhaft abstinent. Der Fachbegriff dafür ist Remission, nicht Heilung: Die erhöhte Anfälligkeit bleibt, weshalb bei Alkohol in der Regel dauerhafte Abstinenz das Ziel ist und nicht kontrolliertes Trinken. Für Angehörige heißt das: Besserung ist realistisch, Sorglosigkeit nicht."
+      }
+    ],
+    "url": "/glossar/suchterkrankung"
+  },
+  {
+    "type": "glossary",
     "slug": "taeter-opfer-umkehr",
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose.",
@@ -4805,6 +5293,63 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/trigger"
+  },
+  {
+    "type": "glossary",
+    "slug": "trockener-alkoholiker",
+    "title": "Trockener Alkoholiker – abstinent, aber unverändert",
+    "description": "Der Begriff aus der Selbsthilfe für Menschen, die nicht mehr trinken und ansonsten geblieben sind, wie sie waren. Warum das erklärt, dass Nüchternheit allein die Beziehung selten rettet.",
+    "cluster": "sucht",
+    "search_intent": "trockener alkoholiker verhalten gereizt trotz abstinenz beziehung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, was sich seit der Abstinenz verändert hat – und was gleich geblieben ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "veraenderung",
+      "zerrissenheit"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "wenn-er-trocken-wird",
+      "glossary": [
+        "qualifizierter-entzug",
+        "rueckfall",
+        "suchtdruck",
+        "suchterkrankung"
+      ],
+      "related": [
+        "wenn-er-trocken-wird",
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das ein Fachbegriff?",
+        "answer": "Nein, er stammt aus der Selbsthilfe und ist dort seit Jahrzehnten gebräuchlich. Diagnostisch gibt es ihn nicht. Als Unterscheidung ist er trotzdem nützlich, weil er beschreibt, was viele Angehörige erleben und wofür sonst die Worte fehlen: Es hat sich alles geändert und nichts."
+      },
+      {
+        "question": "Warum ist er nüchtern gereizter als vorher?",
+        "answer": "Weil eine Bewältigungsstrategie weggefallen ist, ohne dass eine andere da wäre. Alkohol war jahrelang das Mittel gegen Anspannung, Unsicherheit und Ärger. Wenn es fehlt und nichts an seine Stelle tritt, liegt alles ungefiltert an der Oberfläche. Das ist kein Rückschritt, sondern der Zustand ohne Betäubung – und der Grund, warum eine Entwöhnungsbehandlung mehr umfasst als das Weglassen."
+      },
+      {
+        "question": "Muss ich das aushalten?",
+        "answer": "Aushalten musst du gar nichts, und das gilt hier wie überall. Was sich sagen lässt: Diese Phase ist häufig und sie ist behandelbar, wenn beide Hilfe haben. Wo sie sich über Jahre nicht ändert und niemand daran arbeitet, ist es keine Übergangsphase mehr, sondern der Zustand – und darüber darfst du genauso entscheiden wie über jeden anderen."
+      }
+    ],
+    "url": "/glossar/trockener-alkoholiker"
   },
   {
     "type": "glossary",
@@ -6044,6 +6589,80 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "problem",
+    "slug": "mein-partner-trinkt-zu-viel",
+    "title": "Mein Partner trinkt zu viel – und ich weiß nicht mehr weiter",
+    "description": "Was du in den nächsten Tagen tun kannst, ohne auf seine Einsicht zu warten. Die vier Dinge, die nichts bringen, und der eine Anruf, der die Lage tatsächlich verändert.",
+    "cluster": "sucht",
+    "search_intent": "mein mann trinkt zu viel was tun partnerin alkohol hilfe",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, wie ein Abend bei euch abläuft – und woran du merkst, welcher Abend es wird?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "erschoepfung",
+      "geheimhaltung"
+    ],
+    "safety_tags": [
+      "gewalt",
+      "krise"
+    ],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "kontrollverlust",
+        "funktionierende-abhaengigkeit",
+        "co-abhaengigkeit"
+      ],
+      "comparison": [
+        "viel-trinken-oder-abhaengig",
+        "helfen-oder-ermoeglichen"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben",
+        "wie-spreche-ich-ihn-darauf-an"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was kann ich heute tun, ohne dass er mitmacht?",
+        "answer": "Eine Suchtberatungsstelle anrufen. Sie beraten Angehörige ausdrücklich allein – kostenlos, vertraulich, ohne Diagnose und ohne dass er davon wissen oder zustimmen muss. Das ist der einzige wirksame Schritt in diesem ganzen Feld, der ausschließlich von dir abhängt, und die meisten Angehörigen gehen ihn erst nach Jahren."
+      },
+      {
+        "question": "Soll ich ihm ein Ultimatum stellen?",
+        "answer": "Nur wenn du es einlösen wirst. Ein angekündigter und dann nicht vollzogener Schritt verschiebt die Grenze nach hinten und macht jede weitere Ansage unglaubwürdig – nach dem dritten Mal ist sie nichts mehr wert. Sinnvoller sind Ansagen über dein eigenes Verhalten, weil die ausschließlich von dir abhängen und deshalb halten."
+      },
+      {
+        "question": "Ich habe Angst, dass etwas passiert, wenn ich nichts mehr auffange.",
+        "answer": "Diese Angst ist der Grund, warum Angehörige jahrelang weitermachen, und sie ist nicht unbegründet. Sie gilt nur nicht pauschal: Bei Gefahr für Leib und Leben wird gehandelt, 112. Bei allem Alltäglichen – Geld, Termine, Erklärungen nach außen – verlängert das Auffangen den Zustand, statt ihn abzuwenden."
+      },
+      {
+        "question": "Er sagt, ich übertreibe. Wie kann ich sicher sein?",
+        "answer": "Du musst es nicht sein. Für deine Entscheidungen reicht deine eigene Erfahrung: Wenn du Abende nicht mehr planen kannst, wenn du prüfst, wenn Gespräche darüber immer gleich ausgehen – dann liegt ein Problem vor, unabhängig davon, welche Diagnose am Ende zutrifft. Die Beweisfrage bindet enorm viel Kraft und führt selten irgendwohin."
+      }
+    ],
+    "url": "/hilfe/mein-partner-trinkt-zu-viel"
+  },
+  {
+    "type": "problem",
     "slug": "mir-macht-man-es-nie-recht",
     "title": "Ich mache es, und es ist trotzdem falsch",
     "description": "Du übernimmst etwas – es war das Falsche, zu spät oder nicht so gemeint. Was dahinterstecken kann, wie du herausfindest, was bei euch vorliegt, und was du tun kannst, ohne recht haben zu müssen.",
@@ -6110,6 +6729,79 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/hilfe/mir-macht-man-es-nie-recht"
+  },
+  {
+    "type": "problem",
+    "slug": "soll-ich-bei-einem-suechtigen-bleiben",
+    "title": "Soll ich bei einem süchtigen Menschen bleiben?",
+    "description": "Die Frage, die niemand ehrlich beantwortet – weil beide üblichen Antworten falsch sind. Was gegen die Treuepflicht spricht, was gegen den schnellen Absprung, und die vier Dinge, die keine Abwägung mehr sind.",
+    "cluster": "sucht",
+    "search_intent": "soll ich meinen alkoholiker verlassen bleiben trennen sucht partner",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, wie dein Leben in zwei Jahren aussieht, wenn sich nichts ändert – und was dieser Gedanke mit dir macht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "sucht",
+      "zerrissenheit",
+      "schuldgefuehle",
+      "erschoepfung"
+    ],
+    "safety_tags": [
+      "gewalt",
+      "krise"
+    ],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "co-abhaengigkeit",
+        "rueckfall",
+        "trockener-alkoholiker"
+      ],
+      "comparison": [
+        "trennen-oder-bleiben",
+        "helfen-oder-ermoeglichen"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben",
+        "wenn-er-trocken-wird"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist es nicht herzlos, einen kranken Menschen zu verlassen?",
+        "answer": "Diese Frage stellt sich nur bei dieser einen Erkrankung so, und das ist bemerkenswert. Es gibt keine Pflicht, eine Krankheit bis zum eigenen Zusammenbruch zu begleiten – bei keiner. Wer geht, entzieht keine Behandlung; Behandlung leisten Fachleute. Und Bleiben ist keine Tugend, wenn es dich auslöscht: Am Ende sind zwei Menschen krank statt einem."
+      },
+      {
+        "question": "Wenn ich gehe, bricht er zusammen. Bin ich dann schuld?",
+        "answer": "Nein. Diese Angst ist real und sie wird oft ausgesprochen – manchmal von ihm selbst. Trotzdem: Der Verlauf einer Suchterkrankung hängt nicht daran, ob du bleibst. Es gibt Menschen, die nach einer Trennung abstürzen, und es gibt Menschen, die danach in Behandlung gehen. Beides kommt vor, und beides ist nicht deine Entscheidung gewesen."
+      },
+      {
+        "question": "Wie lange soll ich noch warten?",
+        "answer": "Eine ehrliche allgemeine Frist gibt es nicht. Was hilft, ist eine andere Frage: Woran würdest du merken, dass es zu viel ist? Wer das im Klaren formuliert – nicht im Streit – hat einen Maßstab, der auch dann noch gilt, wenn eine gute Woche dazwischenkommt. Und gute Wochen sind der Grund, warum viele Angehörige zehn Jahre lang keine Entscheidung treffen."
+      },
+      {
+        "question": "Kann eine Beziehung eine Suchterkrankung überstehen?",
+        "answer": "Ja, es gibt solche Beziehungen, und sie sind keine Ausnahme. Was sie meistens gemeinsam haben: Beide waren in Behandlung, nicht nur einer. Die Nüchternheit allein reicht selten, weil danach alles offenliegt, was jahrelang überlagert war – siehe Wenn er trocken wird. Wer das weiß, geht anders in diese Phase."
+      }
+    ],
+    "url": "/hilfe/soll-ich-bei-einem-suechtigen-bleiben"
   },
   {
     "type": "problem",
@@ -6198,6 +6890,76 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/hilfe/staendige-eifersucht"
+  },
+  {
+    "type": "problem",
+    "slug": "wie-spreche-ich-ihn-darauf-an",
+    "title": "Wie spreche ich ihn auf sein Trinken an?",
+    "description": "Warum jedes bisherige Gespräch gleich ausgegangen ist – und wie eines aussieht, das nicht auf ein Geständnis zielt. Drei Zeitpunkte, die ausscheiden, ein Einstieg, der trägt, und was du realistisch erwarten kannst.",
+    "cluster": "sucht",
+    "search_intent": "alkoholproblem ansprechen partner gespraech wie sage ich es",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du formulieren, was du ihm gern sagen würdest – und anschauen, wie die letzten Male ausgegangen sind?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "konfliktvermeidung",
+      "scham"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "kontrollverlust",
+        "qualifizierter-entzug"
+      ],
+      "comparison": [
+        "viel-trinken-oder-abhaengig",
+        "helfen-oder-ermoeglichen"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "mein-partner-trinkt-zu-viel",
+        "als-angehoeriger-ueberleben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Soll ich abwarten, bis er nüchtern ist?",
+        "answer": "Unbedingt. Ein Gespräch im Rausch führt zu nichts, das am nächsten Tag noch gilt – es wird vergessen, verzerrt oder als Angriff erinnert. Ebenso ungeeignet ist der Morgen danach: Da ist die Scham am größten, und aus Scham entsteht Abwehr, keine Einsicht. Bleibt der nüchterne Zeitpunkt ohne akuten Anlass, und der muss meistens absichtlich hergestellt werden."
+      },
+      {
+        "question": "Was, wenn er es einfach abstreitet?",
+        "answer": "Damit ist zu rechnen, und es bedeutet nicht, dass das Gespräch umsonst war. Das Ziel kann nicht das Geständnis sein – Sucht ist auf Verleugnung angewiesen, und ein einzelnes Gespräch hebt sie nicht auf. Was ein Gespräch leisten kann: dass er weiß, dass du es siehst, dass du es nicht mehr mitträgst, und was du ab jetzt tust. Das bleibt hängen, auch wenn er in dem Moment widerspricht."
+      },
+      {
+        "question": "Hilft es, wenn die ganze Familie zusammen mit ihm spricht?",
+        "answer": "Eine gemeinsame Konfrontation kann wirken und kann viel Schaden anrichten – sie wird oft als Hinterhalt erlebt. Wenn, dann vorbereitet mit einer Suchtberatungsstelle, nicht spontan am Küchentisch. Die Beratungsstellen kennen dieses Format und begleiten es; das ist einer der Gründe, dort anzurufen, bevor etwas Großes geplant wird."
+      },
+      {
+        "question": "Was sage ich, wenn er fragt, was ich denn erwarte?",
+        "answer": "Genau darauf solltest du eine Antwort parat haben, und zwar eine kleine. Nicht hör auf zu trinken, sondern etwas Überprüfbares: ein Termin bei der Suchtberatung, ein Hausarztgespräch, vier Wochen ohne. Große Forderungen lassen sich abwehren, kleine konkrete nicht so leicht – und sie liefern eine Information, die ihr beide braucht."
+      }
+    ],
+    "url": "/hilfe/wie-spreche-ich-ihn-darauf-an"
   },
   {
     "type": "scene",
@@ -7365,6 +8127,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "der-kontoauszug",
+    "title": "Der Kontoauszug",
+    "description": "Eine Szene über einen Brief von der Bank, vierzehn Monate, die niemand bemerkt hat, und die Frage, wie man weiterlebt, wenn das Geld weg ist. Ich-Perspektive, fiktiv.",
+    "cluster": "sucht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Oles Sicht",
+    "pull_quote": "Ich habe nach dem dritten Blatt aufgehört zu lesen und angefangen zu zählen, wie viele Abende ich neben ihr gesessen habe, während es lief.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, wann du es erfahren hast – und was du seitdem als Erstes geregelt hast?"
+    },
+    "scene_tags": [
+      "sucht",
+      "gluecksspiel",
+      "schock",
+      "ohnmacht"
+    ],
+    "url": "/szenen/der-kontoauszug"
+  },
+  {
+    "type": "scene",
     "slug": "der-kruemel",
     "title": "Der Krümel",
     "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv.",
@@ -7643,6 +8432,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "die-flasche-hinter-den-buechern",
+    "title": "Die Flasche hinter den Büchern",
+    "description": "Eine Szene über einen Fund beim Saubermachen und über den Moment, in dem klar wird, dass zwei Jahre Zweifel unnötig waren. Ich-Perspektive, fiktiv.",
+    "cluster": "sucht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ankes Sicht",
+    "pull_quote": "Ich habe sie eine Weile in der Hand gehalten und war erleichtert. Das ist der Teil, den ich niemandem erzählen kann.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was du siehst – und was passiert, wenn du es ansprichst?"
+    },
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "geheimhaltung",
+      "wahrnehmungszweifel"
+    ],
+    "url": "/szenen/die-flasche-hinter-den-buechern"
+  },
+  {
+    "type": "scene",
     "slug": "die-gekraenkte-stille",
     "title": "Die gekränkte Stille",
     "description": "Eine fiktive Szene: Eine harmlose Bemerkung, und sie zieht sich tagelang beleidigt zurück – bis er hinterherläuft und sich für ihre Kränkung entschuldigt. Über den verdeckt-vulnerablen Typ, der über Rückzug und Opferrolle bestraft.",
@@ -7916,6 +8732,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "wiederkehrendes-muster"
     ],
     "url": "/szenen/die-scham-danach"
+  },
+  {
+    "type": "scene",
+    "slug": "die-schublade-im-nachttisch",
+    "title": "Die Schublade im Nachttisch",
+    "description": "Eine Szene über eine Abhängigkeit, die mit einem Rezept anfing, nach nichts riecht und in kein Bild passt. Ich-Perspektive, fiktiv.",
+    "cluster": "sucht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Dagmars Sicht",
+    "pull_quote": "Ich bin keine Süchtige. Ich habe ein Rezept. Diesen Satz habe ich mir sieben Jahre lang gesagt, und er hat jedes Mal funktioniert.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du zeitlich einordnen, wann es angefangen hat – und was damals los war?"
+    },
+    "scene_tags": [
+      "sucht",
+      "medikamente",
+      "scham",
+      "selbstaufgabe"
+    ],
+    "url": "/szenen/die-schublade-im-nachttisch"
   },
   {
     "type": "scene",
@@ -8939,6 +9782,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "es-war-nur-eins",
+    "title": "Es war nur eins",
+    "description": "Eine Szene von der anderen Seite: über eine Lüge, die schneller da ist als der Gedanke, und über die Scham, die keinen Ausgang hat. Ich-Perspektive, fiktiv.",
+    "cluster": "sucht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Holgers Sicht",
+    "pull_quote": "Sie hat gefragt, wie viel. Und bevor ich überhaupt nachgedacht habe, war die Zahl schon draußen, und es war die falsche.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was in dir passiert, kurz bevor du etwas kleiner machst, als es war?"
+    },
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "scham",
+      "kontrollverlust"
+    ],
+    "url": "/szenen/es-war-nur-eins"
+  },
+  {
+    "type": "scene",
     "slug": "es-wird-leiser",
     "title": "Es wird leiser",
     "description": "Eine Szene über emotionalen Rückzug – keine Streits, kein Drama, nur ein langsames Weniger, bis man sich nebeneinander fremd wird. Aus der Ich-Perspektive, fiktiv.",
@@ -9435,6 +10305,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "ich-habe-fuer-ihn-angerufen",
+    "title": "Ich habe für ihn angerufen",
+    "description": "Eine Szene über eine Krankmeldung, die aus Zuneigung kommt, und über den Satz, der sie mit einem Mal in anderem Licht zeigt. Ich-Perspektive, fiktiv.",
+    "cluster": "sucht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Brittas Sicht",
+    "pull_quote": "Sie hat mich nicht verurteilt. Sie hat nur gefragt, wie oft ich das schon gemacht habe. Ich habe angefangen zu rechnen und bin bei elf aufgehört.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Sache nennen, die du in der letzten Woche für ihn geregelt hast – und überlegen, was passiert wäre, wenn du es gelassen hättest?"
+    },
+    "scene_tags": [
+      "sucht",
+      "enabling",
+      "schuldgefuehle",
+      "fuersorge"
+    ],
+    "url": "/szenen/ich-habe-fuer-ihn-angerufen"
+  },
+  {
+    "type": "scene",
     "slug": "ich-habe-mir-ein-bad-eingelassen",
     "title": "Ich habe mir ein Bad eingelassen",
     "description": "Eine fiktive Szene: Sie tut alles, was in den Beiträgen über Selbstfürsorge steht, und fühlt sich danach genauso erschöpft. Über den Unterschied zwischen einem Bad und einem Nein.",
@@ -9573,6 +10470,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/ich-habe-zu-viel-gesagt-und-zu-frueh"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-hoere-das-auto",
+    "title": "Ich höre das Auto",
+    "description": "Eine Szene über eine Kindheit, in der man am Motorgeräusch erkannte, welcher Abend es wird – erzählt von einer Erwachsenen, die es immer noch hört. Ich-Perspektive, fiktiv.",
+    "cluster": "sucht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Jasmins Sicht",
+    "pull_quote": "Ich habe an der Art, wie er eingeparkt hat, gehört, welcher Abend es wird. Ich war neun und konnte das.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, woran du als Kind erkannt hast, wie der Abend wird – und wo du das heute noch tust?"
+    },
+    "scene_tags": [
+      "sucht",
+      "elternschaft",
+      "hypervigilanz",
+      "verantwortung"
+    ],
+    "url": "/szenen/ich-hoere-das-auto"
   },
   {
     "type": "scene",
@@ -10993,6 +11917,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "seit-er-nicht-mehr-trinkt",
+    "title": "Seit er nicht mehr trinkt",
+    "description": "Eine Szene über die Zeit nach dem Entzug, in der alles besser sein sollte und alles schwerer wird – und über eine Wut, die zwölf Jahre gewartet hat. Ich-Perspektive, fiktiv.",
+    "cluster": "sucht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ruths Sicht",
+    "pull_quote": "Ich habe die ganze Zeit gedacht, wenn er aufhört, wird es gut. Niemand hat mir gesagt, dass dann erst die Rechnung kommt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was sich verändert hat, seit er nicht mehr trinkt – und was davon dich überrascht hat?"
+    },
+    "scene_tags": [
+      "sucht",
+      "veraenderung",
+      "zerrissenheit",
+      "erschoepfung"
+    ],
+    "url": "/szenen/seit-er-nicht-mehr-trinkt"
+  },
+  {
+    "type": "scene",
     "slug": "seite-vier-unten-links",
     "title": "Seite vier, unten links",
     "description": "Eine Szene über einen Beipackzettel, ein verlorenes Jahr und die Erleichterung, die sich erst wie Wut anfühlt. Ich-Perspektive, fiktiv.",
@@ -12270,6 +13221,77 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/adhs-oder-desinteresse"
+  },
+  {
+    "type": "topic",
+    "slug": "als-angehoeriger-ueberleben",
+    "title": "Als Angehöriger überleben",
+    "description": "Du hast einen eigenen Anspruch auf Hilfe – kostenlos, vertraulich und ohne dass die suchtkranke Person davon wissen muss. Was tatsächlich hilft, was nicht, und die drei Sätze, die am meisten entlasten.",
+    "cluster": "sucht",
+    "search_intent": "angehoerige suchtkranker hilfe was tun selbsthilfe al-anon beratung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du aufzählen, was du in der letzten Woche wegen ihm getan, verschoben oder abgesagt hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "sucht",
+      "erschoepfung",
+      "selbstfuersorge"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "co-abhaengigkeit",
+        "rueckfall",
+        "suchtdruck",
+        "qualifizierter-entzug"
+      ],
+      "comparison": [
+        "helfen-oder-ermoeglichen"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "kodependenz",
+        "wenn-die-grenze-steht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Muss mein Partner mitkommen, damit ich zur Suchtberatung kann?",
+        "answer": "Nein. Suchtberatungsstellen beraten ausdrücklich auch Angehörige – allein, kostenlos und vertraulich, ohne dass die suchtkranke Person davon erfahren oder zustimmen muss. Das ist der am häufigsten übersehene Punkt im ganzen Feld: Viele Angehörige warten jahrelang darauf, dass der andere endlich bereit ist, obwohl sie längst selbst hätten anfangen können."
+      },
+      {
+        "question": "Ist es nicht Verrat, hinter seinem Rücken über ihn zu reden?",
+        "answer": "Du redest über dein Leben, das gerade von einer Erkrankung mitbestimmt wird, die nicht deine ist. Das ist kein Verrat, sondern der Umgang mit einer Lage, in der du dich befindest. Und praktisch: Beratung ist schweigepflichtig, es geht nichts nach außen und schon gar nicht an ihn."
+      },
+      {
+        "question": "Was bringt eine Selbsthilfegruppe, wenn dort niemand mein Problem lösen kann?",
+        "answer": "Sie löst nicht das Problem, sie beendet die Isolation – und die ist bei Angehörigen oft das Schlimmste. Der Wert liegt in dem, was sonst nirgends passiert: mit Menschen zu sprechen, die keine Erklärung brauchen, die nicht raten und die dieselben Sätze kennen. Al-Anon ist kostenlos und ausschließlich für Angehörige da."
+      },
+      {
+        "question": "Wann ist der Punkt, an dem ich gehen sollte?",
+        "answer": "Diesen Punkt kann dir niemand von außen setzen, und wer es tut, kennt deine Lage nicht. Was du dir stattdessen selbst sagen kannst: Formuliere vorher, woran du merken würdest, dass es zu viel ist – im Klaren, nicht im Streit. Grenzen, die im Voraus feststehen, halten; Grenzen, die im Streit entstehen, werden am nächsten Morgen zurückgenommen."
+      }
+    ],
+    "url": "/wissen/als-angehoeriger-ueberleben"
   },
   {
     "type": "topic",
@@ -14984,6 +16006,67 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "comparison",
+    "slug": "helfen-oder-ermoeglichen",
+    "title": "Helfe ich ihm oder halte ich es am Laufen?",
+    "description": "Von innen sehen beide gleich aus, weil beide aus Zuneigung kommen. Eine einzige Frage trennt sie – und sechs Alltagssituationen, an denen sich das durchspielen lässt.",
+    "cluster": "sucht",
+    "search_intent": "enabling erkennen helfen oder ermoeglichen sucht partner unterstuetzen",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Sache nennen, die du in der letzten Woche für ihn geregelt hast – und überlegen, was passiert wäre, wenn du es gelassen hättest?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "enabling",
+      "fuersorge"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "co-abhaengigkeit",
+        "enabling",
+        "rettersyndrom"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben",
+        "kodependenz"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Heißt das, ich soll ihn hängen lassen?",
+        "answer": "Nein. Die Unterscheidung verläuft nicht zwischen Zuwendung und Kälte, sondern zwischen dem Menschen und der Erkrankung. Du kannst jemanden zum Arzt begleiten, mit ihm kochen, ihn nachts anhören – und trotzdem aufhören, seine Ausfälle beim Arbeitgeber zu erklären. Das eine wendet sich an ihn, das andere schützt den Konsum."
+      },
+      {
+        "question": "Und wenn wirklich etwas Schlimmes passiert, weil ich nichts mehr auffange?",
+        "answer": "Diese Sorge ist der Grund, warum Angehörige weitermachen, und sie ist nicht unbegründet. Deshalb gilt sie nicht pauschal: Bei Gefahr für Leib und Leben wird aufgefangen – Notarzt, 112, Aufsicht für Kinder. Die Unterscheidung betrifft die alltäglichen Folgen: Geld, Termine, Erklärungen nach außen, Aufräumen."
+      },
+      {
+        "question": "Ist Enabling nicht nur ein Vorwurf an Angehörige?",
+        "answer": "Der Begriff wird oft so verwendet, und in dieser Form ist er unbrauchbar. Wer auffängt, tut das aus Zuneigung, aus Angst oder weil es sonst niemand tut – nicht aus Schwäche. Die Unterscheidung ist als Werkzeug gedacht, nicht als Urteil. Der Satz, der hier trägt, gilt auch anderswo: Fürsorglichkeit erklärt vielleicht, warum jemand länger bleibt; sie erklärt niemals, warum jemand anders sich schlecht verhält."
+      },
+      {
+        "question": "Muss ich das alles auf einmal aufgeben?",
+        "answer": "Besser nicht. Wer über Nacht sämtliche Netze wegzieht, löst eine Krise aus, die niemand auffangen kann – und nimmt sie meistens innerhalb einer Woche zurück, was alles schlimmer macht als vorher. Nützlicher ist, mit einer einzigen Sache anzufangen, die man wirklich durchhält, und sie vorher anzukündigen."
+      }
+    ],
+    "url": "/wissen/helfen-oder-ermoeglichen"
+  },
+  {
+    "type": "comparison",
     "slug": "helfen-oder-zustaendig-sein",
     "title": "Helfen oder zuständig sein? Der Unterschied, der alles erklärt",
     "description": "Wer hilft, arbeitet an fremder Arbeit. Wer zuständig ist, trägt sie. Fünf Stellen, an denen der Unterschied sichtbar wird – und warum das freundlichste Angebot in dieser Sache nichts verschiebt.",
@@ -15295,6 +16378,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/integrative-verhaltenstherapie-fuer-paare"
+  },
+  {
+    "type": "topic",
+    "slug": "kinder-in-suchtfamilien",
+    "title": "Kinder in Suchtfamilien",
+    "description": "Schätzungen zufolge wachsen in Deutschland rund drei Millionen Kinder mit einem suchtkranken Elternteil auf. Die drei ungeschriebenen Regeln, was Kindern tatsächlich schadet – und der eine Faktor, der den Unterschied macht.",
+    "cluster": "sucht",
+    "search_intent": "kinder alkoholiker eltern folgen was tun schuetzen suchtfamilie",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was dein Kind mitbekommt – und was du bisher versucht hast, von ihm fernzuhalten?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "sucht",
+      "elternschaft",
+      "parentifizierung",
+      "geheimhaltung"
+    ],
+    "safety_tags": [
+      "krise",
+      "gewalt"
+    ],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "co-abhaengigkeit",
+        "parentifizierung"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben",
+        "das-kind-in-der-mitte"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Soll ich mit meinem Kind über die Sucht sprechen?",
+        "answer": "Ja, altersangemessen und ohne Details. Kinder merken alles und erklären sich das Unerklärte selbst – meistens mit sich als Ursache. Ein Kind, das weiß, dass Papa krank ist, dass die Krankheit einen Namen hat und dass es nicht daran schuld ist, trägt eine deutlich kleinere Last als eines, das rätselt. Das Schweigen schützt nicht das Kind, es schützt die Erwachsenen."
+      },
+      {
+        "question": "Mein Kind kümmert sich mehr um mich als umgekehrt. Wie schlimm ist das?",
+        "answer": "Es hat einen Namen – Parentifizierung – und es ist ernst zu nehmen, weil es sich anfühlt wie Reife und Nähe. Kinder, die trösten, vermitteln und den Haushalt mittragen, wirken erstaunlich erwachsen; sie zahlen dafür später. Der Ausweg ist nicht, das Kind zurückzuweisen, sondern die Aufgaben, die es übernommen hat, an Erwachsene zurückzugeben."
+      },
+      {
+        "question": "Wo bekommen Kinder Hilfe, ohne dass ich alles offenlegen muss?",
+        "answer": "NACOA Deutschland ist auf Kinder aus Suchtfamilien spezialisiert, auch auf erwachsene. Viele Suchtberatungsstellen haben eigene Kindergruppen, oft kostenlos. Für das Kind selbst: die Nummer gegen Kummer, 116 111, kostenlos und anonym. Und die Suchtberatung berät auch dich als Elternteil, ohne dass der andere davon wissen muss."
+      },
+      {
+        "question": "Ab wann muss ich mein Kind schützen, auch gegen den anderen Elternteil?",
+        "answer": "Wenn die Aufsicht nicht sichergestellt ist, wenn im Rausch gefahren wird, wenn es Gewalt gibt oder das Kind Angst hat, allein mit dem Elternteil zu sein. Dann wird nicht mehr abgewogen. Das Jugendamt ist dabei keine Drohkulisse, sondern die Stelle, die Familien in solchen Lagen unterstützt – Beratung dort ist kostenlos, auch für einen Elternteil allein."
+      }
+    ],
+    "url": "/wissen/kinder-in-suchtfamilien"
   },
   {
     "type": "topic",
@@ -15911,6 +17063,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/lustlosigkeit-oder-beziehungsproblem"
+  },
+  {
+    "type": "topic",
+    "slug": "medikamente-die-stille-sucht",
+    "title": "Medikamente: die stille Sucht",
+    "description": "Sie beginnt beim Arzt, sie riecht nach nichts, und sie trifft überdurchschnittlich oft Frauen und ältere Menschen. Warum Beruhigungs- und Schlafmittel so leicht übersehen werden – und warum das Absetzen ärztlich begleitet gehört.",
+    "cluster": "sucht",
+    "search_intent": "tablettensucht partnerin schlaftabletten abhaengig benzodiazepine absetzen",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du zeitlich einordnen, wann die Tabletten dazukamen – und was sich seitdem verändert hat?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "sucht",
+      "medikamente",
+      "geheimhaltung",
+      "scham"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "entzug",
+        "funktionierende-abhaengigkeit",
+        "qualifizierter-entzug"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "wenn-die-luege-das-problem-wird",
+        "als-angehoeriger-ueberleben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Sie hat die Tabletten doch verschrieben bekommen. Kann das trotzdem Sucht sein?",
+        "answer": "Ja, und das ist der Regelfall bei dieser Form. Eine Verordnung schützt nicht vor Abhängigkeit, sie ist bei Beruhigungs- und Schlafmitteln oft der Anfang. Der übliche Verlauf beginnt mit einer nachvollziehbaren Indikation – Schlaflosigkeit, Angst, eine akute Krise –, und aus einer kurzen Verordnung wird über Monate eine dauerhafte."
+      },
+      {
+        "question": "Kann man Schlaf- oder Beruhigungsmittel einfach weglassen?",
+        "answer": "Nein, das kann gefährlich werden. Ein abrupter Entzug von Benzodiazepinen kann zu Krampfanfällen und schweren Zuständen führen. Abgesetzt wird ausschleichend und ärztlich begleitet, bei längerer Einnahme über Wochen bis Monate. Bitte niemals Tabletten wegnehmen oder verstecken, um jemandem zu helfen – das ist der gefährlichste gut gemeinte Schritt in diesem ganzen Bereich."
+      },
+      {
+        "question": "Warum merkt es so lange niemand?",
+        "answer": "Weil nichts sichtbar ist. Kein Geruch, kein Torkeln, keine leeren Flaschen im Altglas, und die Packung liegt legal im Schrank. Was auffällt, sieht nach etwas anderem aus: Müdigkeit, Wortfindungsstörungen, Gleichgültigkeit, Stürze bei Älteren. Das wird regelmäßig dem Alter, der Erschöpfung oder einer Depression zugeschrieben."
+      },
+      {
+        "question": "Trifft es tatsächlich häufiger Frauen?",
+        "answer": "Bei Beruhigungs- und Schlafmitteln zeigen die Verordnungsdaten seit Jahrzehnten eine deutliche Schieflage: Frauen bekommen diese Mittel häufiger verschrieben, ältere Frauen besonders. Das ist ein Muster im Verordnungsverhalten, keine Aussage über einzelne Menschen – und es erklärt, warum diese Form von Abhängigkeit in der öffentlichen Vorstellung von Sucht praktisch nicht vorkommt."
+      }
+    ],
+    "url": "/wissen/medikamente-die-stille-sucht"
   },
   {
     "type": "topic",
@@ -17320,6 +18541,95 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "sucht-in-der-beziehung",
+    "title": "Sucht in der Beziehung: was sie mit zwei Menschen macht",
+    "description": "Nicht die Menge entscheidet, sondern der Kontrollverlust – und was die Beziehung zuerst beschädigt, ist selten die Substanz. Was Sucht ist, was sie zwischen zwei Menschen anrichtet und was Angehörigen tatsächlich hilft.",
+    "cluster": "sucht",
+    "search_intent": "partner alkoholiker was tun sucht beziehung angehoerige hilfe",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Du hast über Sucht in Beziehungen gelesen. Magst du beschreiben, wie ein normaler Abend bei euch abläuft – und woran du merkst, welcher Abend es wird?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "kontrollverlust",
+      "geheimhaltung"
+    ],
+    "safety_tags": [
+      "gewalt",
+      "krise"
+    ],
+    "links": {
+      "children": [
+        "wenn-die-luege-das-problem-wird",
+        "als-angehoeriger-ueberleben",
+        "wenn-er-trocken-wird",
+        "kinder-in-suchtfamilien",
+        "verhaltenssucht-in-der-beziehung",
+        "medikamente-die-stille-sucht"
+      ],
+      "glossary": [
+        "suchterkrankung",
+        "kontrollverlust",
+        "co-abhaengigkeit",
+        "rueckfall",
+        "qualifizierter-entzug",
+        "funktionierende-abhaengigkeit"
+      ],
+      "comparison": [
+        "helfen-oder-ermoeglichen",
+        "viel-trinken-oder-abhaengig"
+      ],
+      "related": [
+        "kodependenz",
+        "enabling",
+        "grenzen-setzen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ab wann ist es Sucht?",
+        "answer": "Nicht ab einer bestimmten Menge. Die Klassifikationssysteme fragen nach etwas anderem: ob die Kontrolle über Beginn, Menge und Ende nachlässt, ob der Konsum Vorrang vor anderen Dingen bekommt, und ob der Körper sich angepasst hat – Toleranz und Entzugserscheinungen. Jemand kann viel trinken ohne abhängig zu sein, und jemand kann bei kleinen Mengen abhängig sein. Die Mengenfrage führt in der Praxis fast immer in eine Sackgasse, weil sie sich endlos verhandeln lässt."
+      },
+      {
+        "question": "Bin ich schuld daran?",
+        "answer": "Nein. Aus der Angehörigenarbeit stammen drei Sätze, die genau das festhalten: Du hast es nicht verursacht, du kannst es nicht kontrollieren, du kannst es nicht heilen. Sie klingen hart und sind eine Entlastung – sie nehmen dir eine Verantwortung ab, die du nie hattest und deshalb auch nie einlösen konntest."
+      },
+      {
+        "question": "Soll ich Alkohol im Haus verstecken oder wegschütten?",
+        "answer": "Es wirkt selten und es kostet viel. Wer trinken will, kommt an Alkohol, und die Kontrolle verlagert das Problem in eure Beziehung: Aus einer Suchterkrankung wird ein Machtkampf zwischen euch, in dem du die Rolle der Aufpasserin bekommst und er die des Ertappten. Beide Rollen machen es schwerer, nicht leichter."
+      },
+      {
+        "question": "Kann man einfach von heute auf morgen aufhören?",
+        "answer": "Bei Alkohol und Beruhigungsmitteln kann das gefährlich sein. Ein abrupter Entzug kann zu Krampfanfällen und einem Delir führen, das lebensbedrohlich ist. Entgiftung gehört deshalb ärztlich begleitet – bei Alkohol, Benzodiazepinen und Schlafmitteln ausdrücklich. Bitte nicht auf eigene Faust und nicht als Beweis guten Willens."
+      },
+      {
+        "question": "Wie lange soll ich noch warten?",
+        "answer": "Darauf gibt es keine ehrliche allgemeine Antwort, und jede Seite, die eine gibt, verkauft dir etwas. Was sich sagen lässt: Warten ist nur dann eine Strategie, wenn du in der Zwischenzeit dein eigenes Leben nicht aufgibst. Und es gibt eine Grenze, an der nicht mehr abgewogen wird – körperliche Gewalt, Gefährdung von Kindern, Autofahren im Rausch."
+      }
+    ],
+    "url": "/wissen/sucht-in-der-beziehung"
+  },
+  {
+    "type": "topic",
     "slug": "systeme-statt-vorsaetze",
     "title": "Systeme statt Vorsätze",
     "description": "Ein Vorsatz wird in Ruhe gefasst und im Alltag gebraucht – genau dort ist er nicht verfügbar. Was stattdessen trägt: alles aus dem Kopf heraus, sichtbar, mit Auslöser. Und die eine Regel, an der sich jedes System messen lässt.",
@@ -18022,6 +19332,75 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "verhaltenssucht-in-der-beziehung",
+    "title": "Wenn es keine Substanz gibt: Glücksspiel, Gaming, Pornografie",
+    "description": "Ohne Fahne und ohne Entzugszittern ist der Kontrollverlust genauso echt – und beim Glücksspiel oft schneller existenzbedrohend. Was anerkannt ist, was umstritten ist und was Angehörige zuerst tun sollten.",
+    "cluster": "sucht",
+    "search_intent": "spielsucht partner schulden gaming pornosucht beziehung was tun",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, woran du gemerkt hast, dass etwas nicht stimmt – und was passiert ist, als du es angesprochen hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "sucht",
+      "gluecksspiel",
+      "geheimhaltung",
+      "kontrollverlust"
+    ],
+    "safety_tags": [
+      "krise"
+    ],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "kontrollverlust",
+        "suchtdruck",
+        "funktionierende-abhaengigkeit"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "wenn-die-luege-das-problem-wird",
+        "als-angehoeriger-ueberleben"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist Spielsucht eine anerkannte Erkrankung?",
+        "answer": "Ja. Glücksspielstörung ist in den Klassifikationssystemen als eigenständige Diagnose geführt und war die erste anerkannte Verhaltenssucht. Auch die Computerspielstörung ist inzwischen in der ICD-11 aufgenommen, allerdings mit deutlich enger gefassten Kriterien, als die alltägliche Verwendung des Wortes Spielsucht vermuten lässt."
+      },
+      {
+        "question": "Und Pornosucht?",
+        "answer": "Der Begriff ist als Diagnose nicht anerkannt und fachlich umstritten. Was es gibt, ist die Kategorie zwanghaftes Sexualverhalten in der ICD-11 – bewusst nicht als Sucht eingeordnet. Praktisch heißt das: Das Leiden ist real, die Etikettierung als Sucht hilft aber selten, und Scham ist hier ein größerer Faktor als bei allen anderen Formen. Der nützlichere Zugang führt über die Frage, was mit der Ehrlichkeit zwischen euch passiert ist."
+      },
+      {
+        "question": "Warum fällt es so viel später auf als Alkohol?",
+        "answer": "Weil es kein körperliches Zeichen gibt. Keine Fahne, kein Zittern, kein Geruch. Beim Glücksspiel kommt hinzu, dass sich der Schaden vollständig verstecken lässt, solange Konten getrennt sind – viele Angehörige erfahren es erst durch einen Brief oder einen Anruf. Das ist der Grund, warum Verhaltenssüchte häufig erst in einem sehr fortgeschrittenen Stadium sichtbar werden."
+      },
+      {
+        "question": "Soll ich die Schulden übernehmen?",
+        "answer": "Nicht ohne Beratung, und in aller Regel nicht durch Bürgschaft oder Kreditaufnahme auf deinen Namen. Schulden zu übernehmen nimmt der Sucht genau die Folge ab, die sonst zur Behandlung führt – und es kann dich mit in die Haftung ziehen. Der richtige Weg führt über eine anerkannte Schuldnerberatung, die kostenlos ist, und über die Suchtberatung."
+      }
+    ],
+    "url": "/wissen/verhaltenssucht-in-der-beziehung"
+  },
+  {
+    "type": "topic",
     "slug": "verhaltenstherapeutische-paartherapie",
     "title": "Verhaltenstherapeutische Paartherapie (CBCT): konkret, überprüfbar, üben",
     "description": "Der älteste und am längsten untersuchte Zweig der Paartherapie: Gesprächsregeln, Problemlösetraining, Arbeit an Erwartungen. Was er leistet, wo seine Grenzen liegen.",
@@ -18334,6 +19713,68 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/vertrauensbruch"
+  },
+  {
+    "type": "comparison",
+    "slug": "viel-trinken-oder-abhaengig",
+    "title": "Viel trinken oder abhängig?",
+    "description": "Die Mengenfrage lässt sich endlos verhandeln und führt deshalb nirgendwohin. Sechs Fragen, die tatsächlich unterscheiden – und warum die Antwort für dich weniger ändert, als du hoffst.",
+    "cluster": "sucht",
+    "search_intent": "wann ist man alkoholiker ab wieviel abhaengig anzeichen erkennen",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation der letzten Wochen anschauen, in der er weniger trinken wollte – und beschreiben, wie sie ausgegangen ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "sucht",
+      "alkohol",
+      "kontrollverlust"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "kontrollverlust",
+        "funktionierende-abhaengigkeit",
+        "entzug"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "mein-partner-trinkt-zu-viel",
+        "wie-spreche-ich-ihn-darauf-an"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Gibt es eine Menge, ab der es kritisch wird?",
+        "answer": "Es gibt Orientierungswerte für risikoarmen Konsum, und die liegen niedriger, als die meisten annehmen – die Bundeszentrale für gesundheitliche Aufklärung nennt für Männer bis 24 Gramm reinen Alkohol pro Tag, für Frauen bis 12, an mindestens zwei Tagen pro Woche gar nichts. 24 Gramm entsprechen etwa einem halben Liter Bier. Diese Werte sagen aber etwas über gesundheitliches Risiko, nicht über Abhängigkeit. Beides ist nicht dasselbe."
+      },
+      {
+        "question": "Er funktioniert doch. Kann er trotzdem abhängig sein?",
+        "answer": "Ja, und das ist häufiger als das Bild vom Menschen am Boden. Wer arbeitet, den Führerschein hat und die Familie versorgt, wird von niemandem für abhängig gehalten – auch von sich selbst nicht. Das Funktionieren ist dabei kein Gegenbeweis, sondern oft das, was den Zustand über Jahre stabil hält."
+      },
+      {
+        "question": "Bringt es etwas, wenn ich ihm einen Selbsttest zeige?",
+        "answer": "In der Regel wenig, wenn es als Beweismittel gemeint ist. Fragebögen sind für die Selbsteinschätzung gebaut, nicht für die Fremdüberführung, und ein Testergebnis, das jemandem vorgelegt wird, löst Abwehr aus statt Einsicht. Nützlicher ist der Hinweis, dass eine Suchtberatung kostenlos und anonym auch nur zum Sortieren da ist – ohne Verpflichtung zu irgendetwas."
+      },
+      {
+        "question": "Wenn er nicht abhängig ist, ist es dann kein Problem?",
+        "answer": "Nein. Es gibt schädlichen Konsum unterhalb der Abhängigkeit, und für die Beziehung zählt ohnehin etwas anderes: ob du dich verlässlich auf ihn beziehen kannst. Wenn Abende nicht planbar sind, wenn du kontrollierst, wenn Gespräche darüber immer gleich ausgehen – dann liegt ein Problem vor, egal welches Etikett am Ende passt."
+      }
+    ],
+    "url": "/wissen/viel-trinken-oder-abhaengig"
   },
   {
     "type": "topic",
@@ -18860,6 +20301,139 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/wenn-die-grenze-steht"
+  },
+  {
+    "type": "topic",
+    "slug": "wenn-die-luege-das-problem-wird",
+    "title": "Wenn die Lüge das Problem wird",
+    "description": "Angehörige berichten fast immer dasselbe: Nicht der Alkohol hat die Beziehung zerstört, sondern dass irgendwann nichts mehr glaubwürdig war. Warum Sucht lügen muss und was das Suchen mit dir macht.",
+    "cluster": "sucht",
+    "search_intent": "partner luegt wegen alkohol vertrauen kaputt heimlich trinken",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, wann du zuletzt etwas nachgeprüft hast – und was in dir vorging, während du es getan hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "sucht",
+      "geheimhaltung",
+      "alkohol",
+      "wahrnehmungszweifel"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "suchterkrankung",
+        "funktionierende-abhaengigkeit",
+        "kontrollverlust"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben",
+        "vertrauen-wieder-aufbauen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Lügt er mich absichtlich an?",
+        "answer": "Die Frage nach der Absicht führt selten weiter. Was sich beobachten lässt: Sucht ist auf Geheimhaltung angewiesen, und wer verbergen muss, wird lügen – auch jemand, der sonst ehrlich ist und sich dafür verachtet. Das ist keine Entlastung für dich, denn die Wirkung auf dich ist dieselbe. Aber es erklärt, warum Appelle an die Ehrlichkeit regelmäßig ins Leere gehen."
+      },
+      {
+        "question": "Warum lügt er selbst dann, wenn ich es sowieso sehe?",
+        "answer": "Weil die Lüge in diesem Moment nicht dich täuschen soll, sondern ihn selbst. Das Eingeständnis wäre das Eingeständnis der Sucht, und davor steht die Scham. Deshalb wirken Beweise so wenig: Du widerlegst eine Aussage, aber du widerlegst nicht den Grund, warum sie gemacht wurde."
+      },
+      {
+        "question": "Ich kontrolliere inzwischen ständig. Ist das schon krankhaft?",
+        "answer": "Es ist die logische Reaktion darauf, dass Auskünfte nicht mehr tragen – jeder Mensch würde anfangen zu prüfen. Krankhaft ist der Zustand, nicht du. Trotzdem lohnt sich der nüchterne Blick auf die Kosten: Kontrolle bindet enorm viel Aufmerksamkeit, sie beruhigt nie länger als bis zum nächsten Zweifel, und sie verändert, wer du in dieser Beziehung bist."
+      },
+      {
+        "question": "Wird es nach dem Aufhören wieder gut?",
+        "answer": "Nicht automatisch und nicht schnell. Vertrauen kehrt nicht mit der Nüchternheit zurück, sondern über Zeit und über Nachprüfbarkeit – und der Weg dorthin ist derselbe wie nach jedem anderen Vertrauensbruch. Was ihn hier zusätzlich erschwert: Rückfälle gehören zum Verlauf, und jeder wirft das Vertrauen weiter zurück als die Nüchternheit es aufgebaut hat."
+      }
+    ],
+    "url": "/wissen/wenn-die-luege-das-problem-wird"
+  },
+  {
+    "type": "topic",
+    "slug": "wenn-er-trocken-wird",
+    "title": "Wenn er trocken wird – und es schwerer wird statt leichter",
+    "description": "Der am wenigsten erwartete Teil: Nüchternheit macht die Beziehung zuerst oft härter. Warum die alten Rollen wegbrechen, warum die Wut jetzt erst kommt und warum viele Paare genau in dieser Phase auseinandergehen.",
+    "cluster": "sucht",
+    "search_intent": "partner trocken beziehung schwierig nach entzug nuechtern probleme",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, was sich verändert hat, seit er nicht mehr trinkt – und was davon dich überrascht hat?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "gefuehle"
+    ],
+    "scene_tags": [
+      "sucht",
+      "veraenderung",
+      "zerrissenheit",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "sucht-in-der-beziehung",
+      "glossary": [
+        "trockener-alkoholiker",
+        "rueckfall",
+        "suchtdruck",
+        "qualifizierter-entzug"
+      ],
+      "related": [
+        "sucht-in-der-beziehung",
+        "als-angehoeriger-ueberleben",
+        "vertrauen-wieder-aufbauen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum bin ich jetzt wütender als vorher?",
+        "answer": "Weil Wut vorher keinen Platz hatte. Solange jemand krank und gefährdet ist, verbietet man sie sich – man funktioniert. Wenn die Gefahr nachlässt, kommt nach, was jahrelang aufgeschoben wurde. Das ist keine Undankbarkeit und kein schlechtes Timing, sondern die übliche Reihenfolge: Erst wenn es sicher genug ist, darf gefühlt werden."
+      },
+      {
+        "question": "Er ist nüchtern, aber schwierig wie eh und je. Woran liegt das?",
+        "answer": "Daran, dass Abstinenz und Veränderung zwei verschiedene Dinge sind. In der Selbsthilfesprache heißt jemand, der nicht mehr trinkt, aber ansonsten unverändert ist, ein trockener Alkoholiker – reizbar, kontrollierend, schnell gekränkt. Die Substanz ist weg, das, wofür sie eingesetzt wurde, ist es nicht. Deshalb gehört zu jeder Behandlung mehr als Entgiftung."
+      },
+      {
+        "question": "Muss ich jetzt dankbar sein?",
+        "answer": "Nein. Der Satz ich habe doch aufgehört, was willst du noch klingt nachvollziehbar und ist trotzdem eine Rechnung, die nicht aufgeht: Aufhören stellt den Ausgangszustand her, es gleicht nichts aus. Dankbarkeit lässt sich außerdem nicht verlangen. Was du schuldest, ist Fairness – nicht Erleichterung auf Kommando."
+      },
+      {
+        "question": "Warum fühle ich mich überflüssig, seit es ihm besser geht?",
+        "answer": "Weil du jahrelang eine Aufgabe hattest, die dich vollständig ausgefüllt hat. Wer organisiert, auffängt und vorausdenkt, hat eine Rolle – und die fällt mit der Nüchternheit weg. Das ist einer der häufigsten und am wenigsten ausgesprochenen Gründe dafür, dass es Angehörigen in der Genesungsphase schlechter geht als vorher."
+      }
+    ],
+    "url": "/wissen/wenn-er-trocken-wird"
   },
   {
     "type": "topic",
@@ -19456,6 +21030,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Chronische Leere – kein Gefühl, sondern dessen Abwesenheit",
     "description": "Ein anhaltendes Gefühl von Leere, unabhängig davon, ob gerade etwas Schönes passiert. Viele Betroffene nennen es das Schlimmste – und es erklärt einiges, was von außen unlogisch aussieht."
   },
+  "/glossar/co-abhaengigkeit": {
+    "title": "Co-Abhängigkeit – ein Begriff mit zwei Seiten",
+    "description": "Er beschreibt etwas Reales und wird zugleich benutzt, um Angehörigen die Mitverantwortung zuzuschieben. Was daran brauchbar ist, was nicht, und warum er keine Diagnose ist."
+  },
   "/glossar/coercive-control": {
     "title": "Coercive Control – wenn Kontrolle zur Atmosphäre wird",
     "description": "Coercive Control (Zwangskontrolle) ist kein einzelner Vorfall, sondern ein Muster: Einschränkung, Abwertung und Regeln, die den Alltag verengen. Warum es von außen so schwer zu sehen ist – ohne Diagnose."
@@ -19544,6 +21122,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Entdeckungstag – der Tag, an dem du es erfährst",
     "description": "Der Tag der Entdeckung hat eine eigene Wucht: Schock, körperliche Reaktionen, Erinnerungen, die sich rückwirkend verändern. Was in diesen Stunden normal ist und was du zuerst brauchst."
   },
+  "/glossar/entzug": {
+    "title": "Entzug – und warum er ärztlich begleitet gehört",
+    "description": "Der Körper hat sich angepasst, und beim Weglassen kommt die Gegenreaktion. Bei Alkohol und Beruhigungsmitteln kann sie lebensgefährlich werden – deshalb ist kalter Entzug kein Beweis guten Willens."
+  },
   "/glossar/erregung-und-verlangen": {
     "title": "Erregung und Verlangen – zwei Dinge, die nicht dasselbe sind",
     "description": "Der Körper kann reagieren, ohne dass jemand es will – und umgekehrt. Warum die beiden Vorgänge auseinanderlaufen und warum diese Unterscheidung für Betroffene sexueller Gewalt entscheidend ist."
@@ -19571,6 +21153,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/flashback": {
     "title": "Flashback – wenn Vergangenes sich wie Gegenwart anfühlt",
     "description": "Bei einem Flashback wird eine belastende Erinnerung so lebendig, dass sie sich anfühlt, als geschehe sie jetzt. Was dabei im Gehirn passiert und wie du dich zurück in die Gegenwart holst. Ohne Diagnose."
+  },
+  "/glossar/funktionierende-abhaengigkeit": {
+    "title": "Funktionierende Abhängigkeit – warum niemand dir glaubt",
+    "description": "Wer arbeitet, zahlt und nach außen unauffällig bleibt, gilt nicht als süchtig – auch vor sich selbst nicht. Warum das Funktionieren den Zustand stabilisiert und was es für Angehörige besonders macht."
   },
   "/glossar/gaslighting": {
     "title": "Gaslighting – Definition und Beispiele",
@@ -19680,6 +21266,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Kontaktabbruch (No Contact) – warum Abstand nach der Trennung hilft",
     "description": "Kontaktabbruch bedeutet, nach einer Trennung bewusst keinen Kontakt zu halten. Warum das keine Strafe ist, sondern hilft zu heilen – und wie man es mit gemeinsamen Kindern handhabt. Ohne Diagnose."
   },
+  "/glossar/kontrollverlust": {
+    "title": "Kontrollverlust – warum Vorsätze hier nichts beweisen",
+    "description": "Nicht die Entscheidung zu trinken geht verloren, sondern die über Menge und Ende. Warum ein gescheiterter Vorsatz mehr aussagt als jede Trinkmenge – und was das für Versprechen bedeutet."
+  },
   "/glossar/liebesdialekt": {
     "title": "Liebesdialekt – die konkrete Form zählt",
     "description": "Zwei Menschen können dieselbe Liebessprache sprechen und sich trotzdem verfehlen, weil ihnen die konkrete Form nicht passt. Warum der Dialekt oft wichtiger ist als die Sprache."
@@ -19760,6 +21350,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Posttraumatische Belastungsstörung (PTBS) – einfach erklärt",
     "description": "Was eine posttraumatische Belastungsstörung ist, welche vier Symptomgruppen typisch sind und warum sie eine normale Reaktion auf eine unnormale Belastung ist. Ohne Ferndiagnose."
   },
+  "/glossar/qualifizierter-entzug": {
+    "title": "Qualifizierter Entzug – warum Entgiftung nicht Behandlung ist",
+    "description": "Der Unterschied, an dem in Deutschland die meisten Behandlungen scheitern: Entgiftung dauert Tage, Entwöhnung Monate. Wer was bezahlt, wie man hineinkommt und wo die Suchtberatung dabei steht."
+  },
   "/glossar/rationalisierung": {
     "title": "Rationalisierung – der bessere Grund im Nachhinein",
     "description": "Der nachträgliche gute Grund für etwas, das andere Ursachen hatte. Wie man sie von echter Einsicht unterscheidet und warum sie meistens Scham vermeidet."
@@ -19787,6 +21381,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/rettersyndrom": {
     "title": "Rettersyndrom – helfen, um gebraucht zu werden",
     "description": "Beim Rettersyndrom wird Helfen zur Rolle. Woran du merkst, dass aus Fürsorge ein Muster geworden ist, und warum Retten und Retten-Wollen der anderen Person oft schadet."
+  },
+  "/glossar/rueckfall": {
+    "title": "Rückfall – Teil des Verlaufs, keine Verpflichtung für dich",
+    "description": "Rückfälle gehören zu Suchterkrankungen wie zu anderen chronischen Krankheiten auch. Warum das trotzdem nicht heißt, dass du unbegrenzt mittragen musst – und was man vorher verabreden kann."
   },
   "/glossar/scham": {
     "title": "Scham – das Gefühl, nicht zu genügen",
@@ -19868,6 +21466,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Strategische Unfähigkeit – wenn Nichtkönnen bequem ist",
     "description": "Etwas misslingt ausgerechnet dort, wo es unangenehm ist, während anderswo erhebliche Kompetenz vorliegt. Was der Begriff meint, woran man ihn festmacht – und warum er viel zu schnell vergeben wird."
   },
+  "/glossar/suchtdruck": {
+    "title": "Suchtdruck – das Verlangen, das in Wellen kommt",
+    "description": "Craving ist nicht Lust und nicht Schwäche, sondern eine gelernte Reaktion auf Auslöser. Warum er nach dem Entzug erst richtig anfängt und warum er in etwa zwanzig Minuten wieder abebbt."
+  },
+  "/glossar/suchterkrankung": {
+    "title": "Suchterkrankung – warum die Mengenfrage nicht weiterführt",
+    "description": "Abhängigkeit wird nicht über Mengen definiert, sondern über drei Kennzeichen: nachlassende Kontrolle, wachsender Vorrang, körperliche Anpassung. Was das für Angehörige praktisch bedeutet."
+  },
   "/glossar/taeter-opfer-umkehr": {
     "title": "Täter-Opfer-Umkehr – am Ende bist du schuld",
     "description": "Bei der Täter-Opfer-Umkehr wird, wer eine Verletzung anspricht, selbst zum Beschuldigten. Das englische Kürzel DARVO beschreibt das Muster. Warum es so verwirrt – und wie das Erkennen entlastet. Ohne Diagnose."
@@ -19887,6 +21493,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/trigger": {
     "title": "Trigger – der Auslöser, der die Vergangenheit zurückholt",
     "description": "Ein Trigger ist ein Reiz – ein Geruch, ein Ton, ein Satz –, der plötzlich alte, belastende Gefühle auslöst, als wäre die Gefahr wieder da. Warum das passiert und was im Moment hilft. Ohne Diagnose."
+  },
+  "/glossar/trockener-alkoholiker": {
+    "title": "Trockener Alkoholiker – abstinent, aber unverändert",
+    "description": "Der Begriff aus der Selbsthilfe für Menschen, die nicht mehr trinken und ansonsten geblieben sind, wie sie waren. Warum das erklärt, dass Nüchternheit allein die Beziehung selten rettet."
   },
   "/glossar/uebergriffigkeit": {
     "title": "Übergriffigkeit – wenn ein erkennbares Nein übergangen wird",
@@ -19984,9 +21594,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Mein Partner hört mir nicht zu",
     "description": "Du erzählst etwas, und es kommt nichts an. Vier Gründe, die von außen gleich aussehen, ein Test, der sie trennt – und was du tun kannst, das nicht schon zehnmal gescheitert ist."
   },
+  "/hilfe/mein-partner-trinkt-zu-viel": {
+    "title": "Mein Partner trinkt zu viel – und ich weiß nicht mehr weiter",
+    "description": "Was du in den nächsten Tagen tun kannst, ohne auf seine Einsicht zu warten. Die vier Dinge, die nichts bringen, und der eine Anruf, der die Lage tatsächlich verändert."
+  },
   "/hilfe/mir-macht-man-es-nie-recht": {
     "title": "Ich mache es, und es ist trotzdem falsch",
     "description": "Du übernimmst etwas – es war das Falsche, zu spät oder nicht so gemeint. Was dahinterstecken kann, wie du herausfindest, was bei euch vorliegt, und was du tun kannst, ohne recht haben zu müssen."
+  },
+  "/hilfe/soll-ich-bei-einem-suechtigen-bleiben": {
+    "title": "Soll ich bei einem süchtigen Menschen bleiben?",
+    "description": "Die Frage, die niemand ehrlich beantwortet – weil beide üblichen Antworten falsch sind. Was gegen die Treuepflicht spricht, was gegen den schnellen Absprung, und die vier Dinge, die keine Abwägung mehr sind."
   },
   "/hilfe/soll-ich-mich-trennen": {
     "title": "„Soll ich mich trennen?\" – Wenn du nicht mehr weiterweißt",
@@ -19995,6 +21613,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/hilfe/staendige-eifersucht": {
     "title": "Ständige Eifersucht – wenn Misstrauen euch beide erschöpft",
     "description": "Wenn Eifersucht dein Denken bestimmt und die Beziehung zermürbt: was dahinter stecken kann und was im Moment des Misstrauens konkret hilft."
+  },
+  "/hilfe/wie-spreche-ich-ihn-darauf-an": {
+    "title": "Wie spreche ich ihn auf sein Trinken an?",
+    "description": "Warum jedes bisherige Gespräch gleich ausgegangen ist – und wie eines aussieht, das nicht auf ein Geständnis zielt. Drei Zeitpunkte, die ausscheiden, ein Einstieg, der trägt, und was du realistisch erwarten kannst."
   },
   "/szenen/alle-finden-dich-schwierig": {
     "title": "Das sagen alle, nicht nur ich",
@@ -20164,6 +21786,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Der Konflikt ist vorbei. In mir nicht.",
     "description": "Eine fiktive Szene: Der Streit ist längst beigelegt, doch zwei Tage später bricht etwas in ihm zusammen. Über die verzögerte Nachwirkung von Konflikten, Übererregung und die Erschöpfung, die erst kommt, wenn es sicher ist."
   },
+  "/szenen/der-kontoauszug": {
+    "title": "Der Kontoauszug",
+    "description": "Eine Szene über einen Brief von der Bank, vierzehn Monate, die niemand bemerkt hat, und die Frage, wie man weiterlebt, wenn das Geld weg ist. Ich-Perspektive, fiktiv."
+  },
   "/szenen/der-kruemel": {
     "title": "Der Krümel",
     "description": "Eine Szene über Breadcrumbing – wie ein einziges Lebenszeichen nach Tagen der Stille genügt, um alle Hoffnung zurückzuholen. Aus der Ich-Perspektive, fiktiv."
@@ -20204,6 +21830,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Die eine Nachricht",
     "description": "Eine Szene über Breadcrumbing – genau so viel Aufmerksamkeit, dass die Hoffnung nicht stirbt, aber nie genug, dass etwas Echtes wird. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/die-flasche-hinter-den-buechern": {
+    "title": "Die Flasche hinter den Büchern",
+    "description": "Eine Szene über einen Fund beim Saubermachen und über den Moment, in dem klar wird, dass zwei Jahre Zweifel unnötig waren. Ich-Perspektive, fiktiv."
+  },
   "/szenen/die-gekraenkte-stille": {
     "title": "Die gekränkte Stille",
     "description": "Eine fiktive Szene: Eine harmlose Bemerkung, und sie zieht sich tagelang beleidigt zurück – bis er hinterherläuft und sich für ihre Kränkung entschuldigt. Über den verdeckt-vulnerablen Typ, der über Rückzug und Opferrolle bestraft."
@@ -20243,6 +21873,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/die-scham-danach": {
     "title": "Die Scham danach",
     "description": "Eine Szene über die Scham, die kommt, nachdem man sich gezeigt hat – und den Impuls, sich sofort wieder zu verstecken. Aus der Ich-Perspektive, fiktiv."
+  },
+  "/szenen/die-schublade-im-nachttisch": {
+    "title": "Die Schublade im Nachttisch",
+    "description": "Eine Szene über eine Abhängigkeit, die mit einem Rezept anfing, nach nichts riecht und in kein Bild passt. Ich-Perspektive, fiktiv."
   },
   "/szenen/die-tuer-war-offen": {
     "title": "Die Tür war offen",
@@ -20392,6 +22026,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Es war nie Absicht",
     "description": "Eine fiktive Szene: Sie räumt die Wohnung ihres verstorbenen Vaters aus und begreift, dass da nie jemand war, der zurückhalten konnte. Über die Trauer, die schwerer ist als Wut."
   },
+  "/szenen/es-war-nur-eins": {
+    "title": "Es war nur eins",
+    "description": "Eine Szene von der anderen Seite: über eine Lüge, die schneller da ist als der Gedanke, und über die Scham, die keinen Ausgang hat. Ich-Perspektive, fiktiv."
+  },
   "/szenen/es-wird-leiser": {
     "title": "Es wird leiser",
     "description": "Eine Szene über emotionalen Rückzug – keine Streits, kein Drama, nur ein langsames Weniger, bis man sich nebeneinander fremd wird. Aus der Ich-Perspektive, fiktiv."
@@ -20464,6 +22102,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich habe es zugegeben, und nichts ist passiert",
     "description": "Eine fiktive Szene: Er sagt nach Jahren zum ersten Mal 'Du hast recht, das war mein Fehler' – und die befürchtete Abrechnung bleibt aus. Über den Preis, den man erwartet, und den, der tatsächlich fällig wird."
   },
+  "/szenen/ich-habe-fuer-ihn-angerufen": {
+    "title": "Ich habe für ihn angerufen",
+    "description": "Eine Szene über eine Krankmeldung, die aus Zuneigung kommt, und über den Satz, der sie mit einem Mal in anderem Licht zeigt. Ich-Perspektive, fiktiv."
+  },
   "/szenen/ich-habe-mir-ein-bad-eingelassen": {
     "title": "Ich habe mir ein Bad eingelassen",
     "description": "Eine fiktive Szene: Sie tut alles, was in den Beiträgen über Selbstfürsorge steht, und fühlt sich danach genauso erschöpft. Über den Unterschied zwischen einem Bad und einem Nein."
@@ -20483,6 +22125,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-habe-zu-viel-gesagt-und-zu-frueh": {
     "title": "Ich habe zu viel gesagt, und zu früh",
     "description": "Eine fiktive Szene: Nach dem dritten Date hat sie alles erzählt und fühlt sich am nächsten Morgen nicht näher, sondern bloßgestellt. Über den Unterschied zwischen Zeigen und Ausschütten."
+  },
+  "/szenen/ich-hoere-das-auto": {
+    "title": "Ich höre das Auto",
+    "description": "Eine Szene über eine Kindheit, in der man am Motorgeräusch erkannte, welcher Abend es wird – erzählt von einer Erwachsenen, die es immer noch hört. Ich-Perspektive, fiktiv."
   },
   "/szenen/ich-lese-mit-und-hasse-mich-dafuer": {
     "title": "Ich lese mit und hasse mich dafür",
@@ -20688,6 +22334,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Seine Laune im Auto",
     "description": "Eine fiktive Szene: Er steigt gut gelaunt ins Auto und kommt schlecht gelaunt zu Hause an, ohne dass ein Wort gefallen wäre. Über emotionale Ansteckung und die Grenze, die nicht zwischen zwei Menschen verläuft."
   },
+  "/szenen/seit-er-nicht-mehr-trinkt": {
+    "title": "Seit er nicht mehr trinkt",
+    "description": "Eine Szene über die Zeit nach dem Entzug, in der alles besser sein sollte und alles schwerer wird – und über eine Wut, die zwölf Jahre gewartet hat. Ich-Perspektive, fiktiv."
+  },
   "/szenen/seite-vier-unten-links": {
     "title": "Seite vier, unten links",
     "description": "Eine Szene über einen Beipackzettel, ein verlorenes Jahr und die Erleichterung, die sich erst wie Wut anfühlt. Ich-Perspektive, fiktiv."
@@ -20859,6 +22509,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/adhs-oder-desinteresse": {
     "title": "ADHS oder Desinteresse? Fünf Prüfsteine",
     "description": "Vergessene Zusagen sehen von außen immer gleich aus. Fünf Fragen, die zwischen Umsetzungsschwierigkeit und Gleichgültigkeit unterscheiden – und die praktischste davon kostet acht Wochen."
+  },
+  "/wissen/als-angehoeriger-ueberleben": {
+    "title": "Als Angehöriger überleben",
+    "description": "Du hast einen eigenen Anspruch auf Hilfe – kostenlos, vertraulich und ohne dass die suchtkranke Person davon wissen muss. Was tatsächlich hilft, was nicht, und die drei Sätze, die am meisten entlasten."
   },
   "/wissen/autismus-in-der-beziehung": {
     "title": "Autismus in der Beziehung: das Missverständnis geht in beide Richtungen",
@@ -21048,6 +22702,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Grenzen setzen lernen: der Anfang liegt bei dir selbst",
     "description": "Wie man Grenzen setzt, ohne die Beziehung zu riskieren – warum eine Grenze zuerst innere Klarheit braucht, wie man sie freundlich, aber bestimmt kommuniziert, und was der Unterschied zu einer Mauer ist. Ohne Diagnose."
   },
+  "/wissen/helfen-oder-ermoeglichen": {
+    "title": "Helfe ich ihm oder halte ich es am Laufen?",
+    "description": "Von innen sehen beide gleich aus, weil beide aus Zuneigung kommen. Eine einzige Frage trennt sie – und sechs Alltagssituationen, an denen sich das durchspielen lässt."
+  },
   "/wissen/helfen-oder-zustaendig-sein": {
     "title": "Helfen oder zuständig sein? Der Unterschied, der alles erklärt",
     "description": "Wer hilft, arbeitet an fremder Arbeit. Wer zuständig ist, trägt sie. Fünf Stellen, an denen der Unterschied sichtbar wird – und warum das freundlichste Angebot in dieser Sache nichts verschiebt."
@@ -21067,6 +22725,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/integrative-verhaltenstherapie-fuer-paare": {
     "title": "Integrative Verhaltenstherapie für Paare (IBCT): Akzeptanz neben Veränderung",
     "description": "IBCT geht davon aus, dass manche Unterschiede zwischen zwei Menschen bleiben – und dass der Kampf dagegen mehr anrichtet als der Unterschied selbst. Vorgehen, Belege und Eignung."
+  },
+  "/wissen/kinder-in-suchtfamilien": {
+    "title": "Kinder in Suchtfamilien",
+    "description": "Schätzungen zufolge wachsen in Deutschland rund drei Millionen Kinder mit einem suchtkranken Elternteil auf. Die drei ungeschriebenen Regeln, was Kindern tatsächlich schadet – und der eine Faktor, der den Unterschied macht."
   },
   "/wissen/kindern-die-trennung-sagen": {
     "title": "Kindern die Trennung sagen",
@@ -21111,6 +22773,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/lustlosigkeit-oder-beziehungsproblem": {
     "title": "Liegt es am Körper, am Alltag oder an uns?",
     "description": "Drei sehr verschiedene Ursachen führen zum selben Ergebnis. Sechs Fragen, die sie auseinanderhalten – und die Reihenfolge, in der man sie stellen sollte."
+  },
+  "/wissen/medikamente-die-stille-sucht": {
+    "title": "Medikamente: die stille Sucht",
+    "description": "Sie beginnt beim Arzt, sie riecht nach nichts, und sie trifft überdurchschnittlich oft Frauen und ältere Menschen. Warum Beruhigungs- und Schlafmittel so leicht übersehen werden – und warum das Absetzen ärztlich begleitet gehört."
   },
   "/wissen/mental-load-als-vorwurf": {
     "title": "Wenn nichts recht ist: Mental Load als Vorwurf",
@@ -21208,6 +22874,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Spontanes oder reagierendes Verlangen?",
     "description": "Zwei Arten, wie Lust entsteht – und nur eine davon kommt in den üblichen Erzählungen vor. Woran du erkennst, wie es bei dir läuft, und was praktisch daraus folgt."
   },
+  "/wissen/sucht-in-der-beziehung": {
+    "title": "Sucht in der Beziehung: was sie mit zwei Menschen macht",
+    "description": "Nicht die Menge entscheidet, sondern der Kontrollverlust – und was die Beziehung zuerst beschädigt, ist selten die Substanz. Was Sucht ist, was sie zwischen zwei Menschen anrichtet und was Angehörigen tatsächlich hilft."
+  },
   "/wissen/systeme-statt-vorsaetze": {
     "title": "Systeme statt Vorsätze",
     "description": "Ein Vorsatz wird in Ruhe gefasst und im Alltag gebraucht – genau dort ist er nicht verfügbar. Was stattdessen trägt: alles aus dem Kopf heraus, sichtbar, mit Auslöser. Und die eine Regel, an der sich jedes System messen lässt."
@@ -21252,6 +22922,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Verdeckter Narzissmus: der leise, schwer greifbare Typ",
     "description": "Der verdeckte Narzissmus tritt nicht laut und grandios auf, sondern leise, empfindlich und oft in der Opferrolle. Woran du das Muster erkennst, warum es so verwirrt und wie du dich schützt. Ohne Ferndiagnose."
   },
+  "/wissen/verhaltenssucht-in-der-beziehung": {
+    "title": "Wenn es keine Substanz gibt: Glücksspiel, Gaming, Pornografie",
+    "description": "Ohne Fahne und ohne Entzugszittern ist der Kontrollverlust genauso echt – und beim Glücksspiel oft schneller existenzbedrohend. Was anerkannt ist, was umstritten ist und was Angehörige zuerst tun sollten."
+  },
   "/wissen/verhaltenstherapeutische-paartherapie": {
     "title": "Verhaltenstherapeutische Paartherapie (CBCT): konkret, überprüfbar, üben",
     "description": "Der älteste und am längsten untersuchte Zweig der Paartherapie: Gesprächsregeln, Problemlösetraining, Arbeit an Erwartungen. Was er leistet, wo seine Grenzen liegen."
@@ -21271,6 +22945,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/vertrauensbruch": {
     "title": "Vertrauensbruch: die sechs Ebenen, die kaum jemand benennt",
     "description": "Vertrauensbruch ist mehr als Untreue. Auch eine Trennungsdrohung im Streit, das Drohen mit den Kindern oder tagelanges Schweigen brechen etwas. Die sechs Ebenen, was sie gemeinsam haben und woran du erkennst, ob Reparatur möglich ist."
+  },
+  "/wissen/viel-trinken-oder-abhaengig": {
+    "title": "Viel trinken oder abhängig?",
+    "description": "Die Mengenfrage lässt sich endlos verhandeln und führt deshalb nirgendwohin. Sechs Fragen, die tatsächlich unterscheiden – und warum die Antwort für dich weniger ändert, als du hoffst."
   },
   "/wissen/von-der-managerin-zur-partnerin": {
     "title": "Von der Managerin zur Partnerin",
@@ -21303,6 +22981,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/wenn-die-grenze-steht": {
     "title": "Wenn die Grenze steht: was danach passiert",
     "description": "Der schwere Teil beginnt nach dem Nein. Warum Widerstand am Anfang zunimmt statt abzunehmen, warum Schuldgefühle kein Beweis für ein Unrecht sind – und warum die Reaktion auf deine Grenze mehr über die Beziehung sagt als Jahre von Gesprächen."
+  },
+  "/wissen/wenn-die-luege-das-problem-wird": {
+    "title": "Wenn die Lüge das Problem wird",
+    "description": "Angehörige berichten fast immer dasselbe: Nicht der Alkohol hat die Beziehung zerstört, sondern dass irgendwann nichts mehr glaubwürdig war. Warum Sucht lügen muss und was das Suchen mit dir macht."
+  },
+  "/wissen/wenn-er-trocken-wird": {
+    "title": "Wenn er trocken wird – und es schwerer wird statt leichter",
+    "description": "Der am wenigsten erwartete Teil: Nüchternheit macht die Beziehung zuerst oft härter. Warum die alten Rollen wegbrechen, warum die Wut jetzt erst kommt und warum viele Paare genau in dieser Phase auseinandergehen."
   },
   "/wissen/wenn-es-zu-schnell-geht": {
     "title": "Wenn es zu schnell geht: Intensität als Warnzeichen",
