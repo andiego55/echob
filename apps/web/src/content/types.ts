@@ -32,6 +32,7 @@ export const CLUSTERS = [
   'kodependenz', // Kodependenz & Selbstliebe-Defizit (Ross Rosenberg, Human Magnet Syndrome)
   'bindung', // Bindung & Nähe
   'trennung', // Trennung
+  'trennung-mit-kindern', // Trennung mit Kindern – Co-Elternschaft, Betreuung, Loyalitätskonflikt
   'liebeskummer', // Liebeskummer & Trennungsschmerz
   'selbstmitgefuehl', // Selbstliebe & Selbstmitgefuehl (Kristin Neff) - wie du mit dir umgehst
   'selbsterkenntnis', // Selbsterkenntnis & Ehrlichkeit mit sich - Introspektion, Eingestaendnisse, Verletzlichkeit
@@ -147,6 +148,7 @@ export const CLUSTER_LABELS: Record<Cluster, string> = {
   kodependenz: 'Kodependenz',
   bindung: 'Bindung & Nähe',
   trennung: 'Trennung',
+  'trennung-mit-kindern': 'Trennung mit Kindern',
   liebeskummer: 'Liebeskummer',
   selbstmitgefuehl: 'Selbstliebe & Selbstmitgefühl',
   selbsterkenntnis: 'Selbsterkenntnis & Ehrlichkeit',

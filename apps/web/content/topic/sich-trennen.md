@@ -28,6 +28,8 @@ Manche Menschen tragen die Trennungsfrage monatelang mit sich herum – manche j
 
 Dieser Text nimmt dir die Entscheidung nicht ab und drängt dich in keine Richtung. Er hilft dir, den eigenen Zweifeln mit etwas mehr Klarheit zu begegnen.
 
+Wenn Kinder da sind, kommt eine zweite Frage dazu, und sie hat eine erstaunlich klare Antwort: Nicht die Trennung selbst belastet Kinder auf Dauer, sondern der Konflikt, der nach ihr weiterläuft – siehe [Trennung mit Kindern](/wissen/trennung-mit-kindern).
+
 ## Warum die Frage so schwer ist
 
 Eine Trennung beendet nicht nur eine Beziehung, sondern auch eine Zukunft, die du dir vorgestellt hast. Deshalb geht es nie nur um „gut" oder „schlecht", sondern um viele Gefühle auf einmal. Dieses Hin- und Hergerissensein hat einen Namen: [Ambivalenz](/glossar/ambivalenz). Sie ist kein Zeichen von Schwäche, sondern ein Hinweis darauf, dass mehrere Dinge zugleich zählen.

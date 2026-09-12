@@ -269,6 +269,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "bindungstoleranz",
+    "title": "Bindungstoleranz – die Beziehung zum anderen Elternteil zulassen",
+    "description": "Die Fähigkeit, dem Kind seine Beziehung zum anderen Elternteil zu gönnen – auch wenn man selbst verletzt ist. Ein Maßstab im Familienrecht und zugleich das Wirksamste, was Eltern für ihr Kind tun können.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "bindungstoleranz bedeutung sorgerecht familiengericht foerderung umgang",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du prüfen, wie du reagierst, wenn dein Kind begeistert vom anderen Elternteil erzählt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "loyalitaetskonflikt",
+      "co-elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "loyalitaetskonflikt",
+        "umgangsrecht",
+        "elterliche-sorge"
+      ],
+      "related": [
+        "das-kind-in-der-mitte",
+        "co-elternschaft",
+        "trennung-mit-kindern"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Warum spielt das vor Gericht eine Rolle?",
+        "answer": "Weil das Gesetz beide Eltern verpflichtet, alles zu unterlassen, was das Verhältnis des Kindes zum anderen Elternteil beeinträchtigt. Wenn Gerichte über Sorge oder Aufenthalt entscheiden, schauen sie deshalb auch darauf, welcher Elternteil die Beziehung zum jeweils anderen eher fördert. Das ist einer von mehreren Gesichtspunkten, nicht der einzige."
+      },
+      {
+        "question": "Muss ich den anderen dann gut finden?",
+        "answer": "Nein. Es geht nicht um deine Meinung über ihn als Partner, sondern um seine Beziehung zum Kind. Du darfst ihn schlecht finden. Dein Kind darf ihn lieben. Beides gleichzeitig auszuhalten ist genau die Leistung, um die es geht."
+      }
+    ],
+    "url": "/glossar/bindungstoleranz"
+  },
+  {
+    "type": "glossary",
     "slug": "borderline",
     "title": "Borderline – was der Begriff bezeichnet",
     "description": "Ein Muster aus starker Gefühlsschwankung, Angst vor dem Verlassenwerden, unsicherem Selbstbild und Impulsivität. Was heute damit gemeint ist, woher der irreführende Name kommt und was der Begriff nicht ist.",
@@ -731,6 +783,113 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/einvernehmlichkeit"
+  },
+  {
+    "type": "glossary",
+    "slug": "elterliche-sorge",
+    "title": "Elterliche Sorge – wer entscheidet was",
+    "description": "Sorge und Umgang werden häufig verwechselt. Was zur elterlichen Sorge gehört, was auch getrennt lebende Eltern gemeinsam entscheiden – und was der Alltag desjenigen ist, bei dem das Kind gerade lebt.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "elterliche sorge sorgerecht bedeutung gemeinsames sorgerecht trennung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du sortieren, welche Entscheidungen bei euch strittig sind – und ob es dabei um Alltag oder um Grundsätzliches geht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "co-elternschaft",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "umgangsrecht",
+        "elternvereinbarung",
+        "bindungstoleranz"
+      ],
+      "related": [
+        "co-elternschaft",
+        "betreuungsmodelle"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Endet das gemeinsame Sorgerecht mit der Trennung?",
+        "answer": "Nein. Bei verheirateten Eltern bleibt die gemeinsame Sorge auch nach Trennung und Scheidung bestehen, solange nichts anderes beantragt und entschieden wird. Bei nicht verheirateten Eltern entsteht sie durch übereinstimmende Sorgeerklärungen, durch Heirat oder durch gerichtliche Entscheidung."
+      },
+      {
+        "question": "Was entscheidet man gemeinsam, was allein?",
+        "answer": "Grundsätzliches gemeinsam – Schulwahl, größere medizinische Eingriffe, Religion, Umzug ins Ausland, Namensfragen. Alltägliches entscheidet derjenige allein, bei dem das Kind sich gerade aufhält: Essen, Bettzeit, Freizeit, Kleidung. Diese Unterscheidung erspart sehr viel Streit, wenn man sie kennt."
+      },
+      {
+        "question": "Was ist das Aufenthaltsbestimmungsrecht?",
+        "answer": "Ein Teilbereich der Sorge: Es regelt, wo das Kind lebt. Bei gemeinsamer Sorge steht es beiden zu, was bedeutet, dass ein Umzug mit dem Kind über größere Entfernungen nicht im Alleingang entschieden werden kann. Bei Streit darüber entscheidet das Familiengericht."
+      }
+    ],
+    "url": "/glossar/elterliche-sorge"
+  },
+  {
+    "type": "glossary",
+    "slug": "elternvereinbarung",
+    "title": "Elternvereinbarung – das Aufgeschriebene",
+    "description": "Was zwei Eltern nach der Trennung verabreden, gehört auf Papier. Nicht aus Misstrauen, sondern weil es die Sorte Streit beendet, in der sich beide an etwas anderes erinnern. Was hineingehört.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "elternvereinbarung muster inhalt trennung absprachen kinder schriftlich",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du durchgehen, welche eurer Absprachen nirgends festgehalten sind – und welche davon zuletzt Streit ausgelöst haben?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "co-elternschaft",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "umgangsrecht",
+        "elterliche-sorge",
+        "parallele-elternschaft"
+      ],
+      "related": [
+        "co-elternschaft",
+        "betreuungsmodelle",
+        "wenn-kooperation-nicht-geht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist so eine Vereinbarung rechtlich bindend?",
+        "answer": "Eine private Absprache bindet zunächst vor allem im Verhältnis der Eltern zueinander. Rechtlich durchsetzbar wird eine Umgangsregelung, wenn sie vom Familiengericht gebilligt oder als Beschluss getroffen wird. Für den Alltag der meisten Familien reicht das Aufgeschriebene trotzdem – es beendet vor allem die Streitfrage, was eigentlich vereinbart war."
+      },
+      {
+        "question": "Wo bekommt man Hilfe beim Aufsetzen?",
+        "answer": "Beim Jugendamt und bei Beratungsstellen; beide Elternteile haben Anspruch auf Beratung bei Trennung und Scheidung, kostenlos. Auch Mediationsstellen begleiten so etwas. Wenn es um verbindliche und rechtlich belastbare Regelungen geht, gehört eine Fachanwaltskanzlei dazu."
+      }
+    ],
+    "url": "/glossar/elternvereinbarung"
   },
   {
     "type": "glossary",
@@ -2341,6 +2500,57 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "loyalitaetskonflikt",
+    "title": "Loyalitätskonflikt – die Frage, die ein Kind nicht beantworten kann",
+    "description": "Ein Kind gerät zwischen die Eltern und müsste sich entscheiden, wem es guttut. Es entscheidet sich nicht, sondern beginnt zu managen – und genau das ist der Schadensmechanismus nach einer Trennung.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "loyalitaetskonflikt kind bedeutung trennung anzeichen was tun",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was dein Kind bei dir über den anderen Elternteil erzählen darf – und was nicht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "loyalitaetskonflikt",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "parentifizierung",
+        "bindungstoleranz"
+      ],
+      "related": [
+        "das-kind-in-der-mitte",
+        "trennung-mit-kindern",
+        "co-elternschaft"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Woran erkennt man einen Loyalitätskonflikt?",
+        "answer": "Meistens daran, dass ein Kind in beiden Haushalten das Passende erzählt und in keinem alles. Weitere Zeichen: auffälliges Schweigen über den anderen Elternteil, Anspannung vor Übergaben, Trösten der Eltern, Bauchweh, und bei Jugendlichen eine plötzliche, sehr entschiedene Parteinahme."
+      },
+      {
+        "question": "Entsteht er nur bei Streit?",
+        "answer": "Nein. Er entsteht überall dort, wo ein Kind spürt, dass Zuneigung zum einen beim anderen etwas auslöst. Dafür reicht ein Seufzen. Offener Streit ist die auffälligste Form, aber nicht die häufigste."
+      }
+    ],
+    "url": "/glossar/loyalitaetskonflikt"
+  },
+  {
+    "type": "glossary",
     "slug": "mental-load",
     "title": "Mental Load – die Arbeit, an alles zu denken",
     "description": "Nicht die Tätigkeit, sondern das Denken darum herum: daran denken, entscheiden, nachhalten, die Folgen tragen. Warum sich diese Last durch Mithilfe nicht verkleinern lässt.",
@@ -2600,6 +2810,56 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "nestmodell",
+    "title": "Nestmodell – die Kinder bleiben, die Eltern wechseln",
+    "description": "Die schonendste Variante für Kinder und die anstrengendste für Eltern: Das Kind bleibt in der Wohnung, Mutter und Vater ziehen abwechselnd ein und aus. Warum es meistens eine Übergangslösung ist.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "nestmodell bedeutung erfahrungen kosten vor nachteile",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du überlegen, was für euch in den ersten Monaten nach der Trennung realistisch ist?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "elternschaft",
+      "co-elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "wechselmodell",
+        "elternvereinbarung"
+      ],
+      "related": [
+        "betreuungsmodelle",
+        "co-elternschaft"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie lange hält man das durch?",
+        "answer": "In der Praxis meistens einige Monate bis etwa ein Jahr. Es braucht entweder drei Wohnungen oder eine geteilte Zweitwohnung, und es verlangt viel Abstimmung über einen gemeinsam genutzten Raum – vom Kühlschrank bis zur Wäsche. Als Übergang in den ersten Monaten ist es oft wertvoll, als Dauerlösung selten."
+      },
+      {
+        "question": "Für wen eignet es sich?",
+        "answer": "Für Eltern, die sachlich miteinander umgehen können und finanziell Spielraum haben, und besonders in der ersten Zeit nach der Trennung, wenn ohnehin viel im Umbruch ist. Bei hohem Konflikt ist es ungeeignet, weil die gemeinsame Wohnung ständig neue Reibungspunkte erzeugt."
+      }
+    ],
+    "url": "/glossar/nestmodell"
+  },
+  {
+    "type": "glossary",
     "slug": "offenlegung",
     "title": "Offenlegung – warum die Wahrheit in Raten am meisten schadet",
     "description": "Nach einem Vertrauensbruch entscheidet weniger die Tat als die Art, wie ausgepackt wird. Warum die scheibchenweise Wahrheit den größten Schaden anrichtet.",
@@ -2631,6 +2891,58 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/offenlegung"
+  },
+  {
+    "type": "glossary",
+    "slug": "parallele-elternschaft",
+    "title": "Parallele Elternschaft – weniger Kontakt, mehr Struktur",
+    "description": "Wenn jede Absprache eskaliert, ist mehr Zusammenarbeit der falsche Weg. Parallele Elternschaft reduziert den Kontakt auf ein Minimum und legt dafür alles im Voraus fest – für Kinder oft die deutlich bessere Lösung.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "parallele elternschaft parallel parenting hochstrittig kontakt reduzieren",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du auflisten, worüber ihr euch regelmäßig abstimmen müsst – und was davon sich einmalig festlegen ließe?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "co-elternschaft",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "elternvereinbarung",
+        "umgangsrecht",
+        "loyalitaetskonflikt"
+      ],
+      "related": [
+        "co-elternschaft",
+        "wenn-kooperation-nicht-geht",
+        "betreuungsmodelle"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das nicht ein Eingeständnis des Scheiterns?",
+        "answer": "Nein, es ist eine Anpassung an die Lage. Für ein Kind zählt nicht, ob seine Eltern sich verstehen, sondern ob es aus ihrem Konflikt herausgehalten wird. Eine ruhige parallele Lösung erreicht das zuverlässiger als eine kooperative, die alle zwei Wochen zusammenbricht."
+      },
+      {
+        "question": "Wie sieht das konkret aus?",
+        "answer": "Alles wird einmal detailliert schriftlich festgelegt – Betreuungszeiten, Ferien und Feiertage für zwei Jahre, Übergabeorte, Informationswege, was bei Krankheit gilt. Danach gibt es fast nichts mehr zu verhandeln. Kommunikation nur schriftlich und sachlich, Übergaben an neutralen Orten, getrennte Alltagsregeln in beiden Haushalten."
+      }
+    ],
+    "url": "/glossar/parallele-elternschaft"
   },
   {
     "type": "glossary",
@@ -3806,6 +4118,62 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "glossary",
+    "slug": "umgangsrecht",
+    "title": "Umgangsrecht – ein Recht des Kindes",
+    "description": "Das Umgangsrecht gehört zuerst dem Kind, nicht den Eltern. Was daraus folgt, wer es einschränken kann und warum eigenmächtiges Verweigern der falsche Weg ist – auch bei berechtigter Sorge.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "umgangsrecht bedeutung kind vater verweigern regelung familiengericht",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du beschreiben, wie der Umgang bei euch geregelt ist – und wo es hakt?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "co-elternschaft",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "elterliche-sorge",
+        "bindungstoleranz",
+        "elternvereinbarung"
+      ],
+      "related": [
+        "betreuungsmodelle",
+        "wenn-kooperation-nicht-geht",
+        "ich-sehe-mein-kind-zu-wenig"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wem gehört das Umgangsrecht?",
+        "answer": "In erster Linie dem Kind: Es hat ein Recht auf Umgang mit beiden Elternteilen. Jeder Elternteil ist zum Umgang berechtigt und zugleich verpflichtet. Diese Blickrichtung erklärt vieles – etwa warum es kein Druckmittel zwischen Erwachsenen sein kann und warum es nicht gegen ausbleibenden Unterhalt aufgerechnet werden darf."
+      },
+      {
+        "question": "Darf ich den Umgang verweigern?",
+        "answer": "Eigenmächtig im Regelfall nicht, auch nicht bei Streit über Geld oder Absprachen. Bei ernsthaften Hinweisen auf eine Gefährdung des Kindes ist der richtige Weg nicht das stille Absagen, sondern unverzüglich Beratung, anwaltliche Hilfe und gegebenenfalls ein Eilantrag beim Familiengericht. Ein Gericht kann den Umgang einschränken, begleiten lassen oder aussetzen."
+      },
+      {
+        "question": "Was ist begleiteter Umgang?",
+        "answer": "Ein Umgang, der in Anwesenheit einer neutralen Fachkraft stattfindet, meist in Räumen einer Beratungsstelle. Er kommt in Betracht, wenn Kontakt stattfinden soll, unbegleitet aber nicht verantwortbar erscheint – oder um nach längerer Unterbrechung wieder anzufangen. Er ist eine Zwischenstufe, keine Bestrafung."
+      }
+    ],
+    "url": "/glossar/umgangsrecht"
+  },
+  {
+    "type": "glossary",
     "slug": "validierung",
     "title": "Validierung – bestätigen, was gefühlt wird, nicht was behauptet wird",
     "description": "Die wirksamste Bewegung neben starken Gefühlen und die am häufigsten missverstandene: Validierung ist keine Zustimmung. Sie erkennt an, dass ein Gefühl da ist und Gründe hat – ohne der Deutung recht zu geben.",
@@ -3956,6 +4324,60 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/glossar/vulnerabler-narzissmus"
+  },
+  {
+    "type": "glossary",
+    "slug": "wechselmodell",
+    "title": "Wechselmodell – Betreuung zu etwa gleichen Teilen",
+    "description": "Das Kind lebt in beiden Haushalten, oft im Wochenrhythmus. Was dafür nötig ist, was die Forschung dazu sagt und warum die guten Zahlen mit Vorsicht zu lesen sind.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "wechselmodell bedeutung voraussetzungen unterhalt erfahrungen",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du durchgehen, welche der Voraussetzungen bei euch erfüllt sind und welche nicht?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "co-elternschaft",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "nestmodell",
+        "umgangsrecht",
+        "elternvereinbarung"
+      ],
+      "comparison": [
+        "wechselmodell-oder-residenzmodell"
+      ],
+      "related": [
+        "betreuungsmodelle",
+        "co-elternschaft"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Muss es genau 50 zu 50 sein?",
+        "answer": "Nein. Von einem Wechselmodell spricht man üblicherweise, wenn die Betreuung annähernd gleich verteilt ist; verbreitet sind auch Aufteilungen wie 60 zu 40. Für die rechtliche Einordnung, etwa beim Unterhalt, kommt es allerdings auf die genaue Verteilung an – das ist eine Frage für die Beratung."
+      },
+      {
+        "question": "Was sind die wichtigsten Voraussetzungen?",
+        "answer": "Kurze Entfernung, passende Arbeitszeiten, doppelte Grundausstattung und ein Mindestmaß an Verständigung. Die letzte ist die härteste: Bei hohem Dauerkonflikt bedeutet ein hälftiges Modell doppelt so viele Berührungspunkte pro Woche."
+      }
+    ],
+    "url": "/glossar/wechselmodell"
   },
   {
     "type": "glossary",
@@ -4326,6 +4748,71 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "problem",
+    "slug": "ich-sehe-mein-kind-zu-wenig",
+    "title": "Ich sehe mein Kind zu wenig",
+    "description": "Alle zwei Wochen ein Wochenende, und dazwischen ein leeres Zimmer. Warum gewöhnliche Zeit mehr trägt als besondere, wie man im Alltag vorkommt, ohne dabei zu sein – und was gegen die Verlockung des Freizeitprogramms hilft.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "vater sieht kind zu wenig wochenendvater kontakt halten alltag",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, wie eure gemeinsame Zeit gerade aussieht – und was davon sich wie Alltag anfühlt und was wie Programm?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "elternschaft",
+      "erschoepfung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "umgangsrecht",
+        "bindungstoleranz",
+        "elternvereinbarung"
+      ],
+      "related": [
+        "betreuungsmodelle",
+        "co-elternschaft",
+        "mein-kind-will-nicht-zum-anderen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie halte ich zwischen den Besuchen Kontakt?",
+        "answer": "Regelmäßig und kurz statt selten und lang. Ein fester Videoanruf am immer gleichen Wochentag, eine Gutenachtnachricht, ein gemeinsames Hörbuch, das beide parallel hören. Für kleinere Kinder sind zehn Minuten mit einem festen Ritual mehr wert als eine Stunde ohne. Und: Kontakt sollte nicht davon abhängen, ob das Kind gerade Lust hat, sich zu melden – das ist deine Aufgabe, nicht seine."
+      },
+      {
+        "question": "Soll ich die Zeit besonders schön machen?",
+        "answer": "So wenig wie möglich. Freizeitprogramm erzeugt schöne Erinnerungen und wenig Nähe. Nähe entsteht in gewöhnlicher Zeit – zusammen einkaufen, Hausaufgaben, kochen, langweilen. Kinder erzählen beim Nebeneinanderher, nicht im Freizeitpark. Und ein Elternteil, der nur Ausnahmezustand ist, wird nie zur Alltagsperson."
+      },
+      {
+        "question": "Der andere Elternteil blockiert Termine. Was kann ich tun?",
+        "answer": "Zuerst schriftlich, sachlich, mit konkreten Terminvorschlägen – und dokumentieren, was zugesagt und was abgesagt wurde. Dann Beratung beim Jugendamt, beide Seiten haben Anspruch darauf. Wenn das nicht hilft, kann eine Umgangsregelung beim Familiengericht getroffen werden; sie ist dann verbindlich und im Streitfall durchsetzbar."
+      },
+      {
+        "question": "Ich halte das nicht aus. Ist es besser, mich zurückzuziehen?",
+        "answer": "Nein, auch wenn der Gedanke verständlich ist. Für ein Kind ist der Rückzug eines Elternteils eine Nachricht über den eigenen Wert, und die hält lange. Was du stattdessen brauchst, ist Unterstützung für dich – Beratung, Menschen zum Reden, gegebenenfalls Therapie. Der Schmerz gehört behandelt, nicht durch weniger Kontakt gelöst."
+      }
+    ],
+    "url": "/hilfe/ich-sehe-mein-kind-zu-wenig"
+  },
+  {
+    "type": "problem",
     "slug": "ist-mein-partner-borderline",
     "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
     "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung.",
@@ -4384,6 +4871,142 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/hilfe/ist-mein-partner-borderline"
+  },
+  {
+    "type": "problem",
+    "slug": "mein-ex-redet-schlecht-ueber-mich",
+    "title": "Mein Ex redet schlecht über mich vor den Kindern",
+    "description": "Der Reflex ist Richtigstellung, und sie funktioniert nicht. Was stattdessen wirkt, warum die Zeit auf deiner Seite ist – und ab wann es ein Fall für Beratung oder Gericht wird.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "ex redet schlecht ueber mich vor kindern was tun beeinflussung",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was dein Kind dir zuletzt erzählt hat – und wie du reagiert hast?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert"
+    ],
+    "scene_tags": [
+      "loyalitaetskonflikt",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "loyalitaetskonflikt",
+        "bindungstoleranz",
+        "taeter-opfer-umkehr"
+      ],
+      "comparison": [
+        "entfremdung-oder-schutz"
+      ],
+      "related": [
+        "das-kind-in-der-mitte",
+        "co-elternschaft",
+        "mein-kind-will-nicht-zum-anderen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Soll ich die Sachen richtigstellen?",
+        "answer": "So wenig wie möglich. Jede Richtigstellung macht aus dem Kind einen Schiedsrichter zwischen zwei Versionen, und das ist genau die Lage, die es krank macht. Was du sagen kannst, ist etwas über dich, ohne den anderen zu bewerten: Das sehe ich anders. Und dann Schluss – ohne Beweise, ohne Gegenerzählung."
+      },
+      {
+        "question": "Aber mein Kind glaubt das doch alles!",
+        "answer": "Kurzfristig oft ja. Langfristig gilt ein tröstlicher Befund: Kinder vergleichen über Jahre, was gesagt wird, mit dem, was sie erleben. Wenn du verlässlich bist, gewinnt am Ende die Erfahrung gegen die Erzählung. Das dauert oft länger, als man aushalten möchte, und es passiert."
+      },
+      {
+        "question": "Was mache ich, wenn mein Kind mir Vorwürfe macht, die es übernommen hat?",
+        "answer": "Das Gefühl anerkennen, ohne die Behauptung zu übernehmen. Du hörst dich an, als wärst du sauer auf mich – das darfst du sein. Ich sehe das anders, und ich rede mit deiner Mutter darüber, nicht mit dir. Damit nimmst du dein Kind ernst und gibst ihm den Konflikt zurück, wo er hingehört: zu den Erwachsenen."
+      },
+      {
+        "question": "Ab wann ist das ein Fall fürs Gericht?",
+        "answer": "Wenn es systematisch wird und der Kontakt darunter leidet. Eltern sind verpflichtet, alles zu unterlassen, was das Verhältnis des Kindes zum anderen Elternteil beeinträchtigt. Der Weg dorthin führt trotzdem zuerst über Beratung: Gerichte können Umgang regeln, aber Haltungen schlecht anordnen. Wenn es doch so weit kommt, hilft eine sachliche Dokumentation – Daten, Zitate, keine Bewertungen."
+      }
+    ],
+    "url": "/hilfe/mein-ex-redet-schlecht-ueber-mich"
+  },
+  {
+    "type": "problem",
+    "slug": "mein-kind-will-nicht-zum-anderen",
+    "title": "Mein Kind will nicht zum anderen Elternteil",
+    "description": "Ein Satz, der sofort alles in Frage stellt – und der sehr verschiedene Gründe haben kann. Wie du herausfindest, worum es geht, ohne dein Kind auszufragen, und warum Absagen der falsche erste Schritt ist.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "kind will nicht zum vater papa besuch verweigert was tun umgang",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was dein Kind genau gesagt hat und wann – und was in den Tagen davor passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "loyalitaetskonflikt",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "loyalitaetskonflikt",
+        "umgangsrecht",
+        "bindungstoleranz"
+      ],
+      "comparison": [
+        "entfremdung-oder-schutz"
+      ],
+      "related": [
+        "das-kind-in-der-mitte",
+        "co-elternschaft",
+        "wenn-kooperation-nicht-geht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Darf ich den Umgang absagen, wenn mein Kind nicht will?",
+        "answer": "Im Regelfall nicht einfach so. Der Umgang ist ein Recht des Kindes, und von dir wird erwartet, dass du ihn förderst – auch gegen kurzfristigen Widerstand, so wie du auch beim Zahnarzttermin nicht nachgibst. Etwas anderes gilt bei ernsthaften Hinweisen auf Gefährdung: Dann ist der Weg nicht die eigenmächtige Absage, sondern sofort Beratung und rechtliche Hilfe."
+      },
+      {
+        "question": "Woran erkenne ich, ob mehr dahintersteckt?",
+        "answer": "An der Art des Widerstands. Alltäglicher Unwillen ist wechselhaft, situationsbezogen und verschwindet meistens fünf Minuten nach der Übergabe. Ernst zu nehmen ist ein Widerstand, der anhält, körperlich wird, von konkreten Schilderungen begleitet ist oder mit deutlicher Angst einhergeht. Ein kurzer Anruf beim anderen Elternteil eine Stunde nach der Übergabe klärt oft mehr als jede Vermutung."
+      },
+      {
+        "question": "Was, wenn ich insgeheim erleichtert bin?",
+        "answer": "Das ist menschlich und ein wichtiger Punkt zur Selbstprüfung. Kinder spüren Erleichterung sofort und richten sich danach aus. Wenn du merkst, dass dir der Widerstand deines Kindes gelegen kommt, ist das kein Beweis für schlechte Absichten – aber ein guter Grund, besonders sorgfältig auf die eigene Reaktion zu achten."
+      },
+      {
+        "question": "Mein Kind ist danach immer aufgewühlt. Ist das ein schlechtes Zeichen?",
+        "answer": "Meistens nicht. Der Wechsel selbst ist anstrengend, und viele Kinder brauchen ein paar Stunden zum Ankommen. Kinder zeigen ihre Anspannung außerdem dort, wo sie sich sicher fühlen. Aufgewühlt nach der Rückkehr heißt deshalb häufiger es war viel als es war schlimm."
+      }
+    ],
+    "url": "/hilfe/mein-kind-will-nicht-zum-anderen"
   },
   {
     "type": "problem",
@@ -5043,6 +5666,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "das-erste-weihnachten",
+    "title": "Das erste Weihnachten",
+    "description": "Eine Szene über den 24. Dezember, der aufgeteilt wurde, und über den Wettbewerb, den niemand gewinnen kann. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Svens Sicht",
+    "pull_quote": "Wir haben die Geschenke gezählt. Nicht gesagt, dass wir zählen. Aber wir haben gezählt.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, wie ihr Feiertage regelt – und was daran gerade am meisten wehtut?"
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "elternschaft",
+      "co-elternschaft"
+    ],
+    "url": "/szenen/das-erste-weihnachten"
+  },
+  {
+    "type": "scene",
     "slug": "das-foto-von-mir-mit-neun",
     "title": "Das Foto von mir mit neun",
     "description": "Eine fiktive Szene: Beim Ausräumen findet er ein Kinderfoto von sich und merkt, dass er zu diesem Kind völlig anders reden würde als zu sich selbst. Über eine Übung, die albern klingt und trifft.",
@@ -5316,6 +5965,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "hypervigilanz"
     ],
     "url": "/szenen/das-lange-shirt-im-sommer"
+  },
+  {
+    "type": "scene",
+    "slug": "das-leere-kinderzimmer",
+    "title": "Das leere Kinderzimmer",
+    "description": "Eine Szene über Sonntagabend in einer Wohnung, die zwölf Tage lang zu still ist – und über die Versuchung, die Zeit besonders zu machen. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Philipps Sicht",
+    "pull_quote": "Ich habe drei Wochenenden hintereinander etwas unternommen, und sie hat sich jedes Mal gefreut. Erzählt hat sie mir nichts.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, wie eure gemeinsame Zeit aussieht – und wo darin Platz für Gewöhnliches ist?"
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "elternschaft",
+      "erschoepfung"
+    ],
+    "url": "/szenen/das-leere-kinderzimmer"
   },
   {
     "type": "scene",
@@ -6184,6 +6859,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "die-uebergabe-am-gartentor",
+    "title": "Die Übergabe am Gartentor",
+    "description": "Eine Szene über fünf Minuten am Freitagnachmittag, in denen zwei Erwachsene alles richtig machen wollen und ein Kind alles mitbekommt. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Kerstins Sicht",
+    "pull_quote": "Wir sagen beide nichts Falsches. Und trotzdem steht Emil zwischen uns wie zwischen zwei Autos, die nicht ausweichen.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Kennst du die Anspannung bei Übergaben? Magst du anschauen, was dein Kind dabei an dir ablesen kann?"
+    },
+    "scene_tags": [
+      "uebergabe",
+      "trennung-mit-kindern",
+      "co-elternschaft",
+      "loyalitaetskonflikt"
+    ],
+    "url": "/szenen/die-uebergabe-am-gartentor"
+  },
+  {
+    "type": "scene",
     "slug": "die-wand",
     "title": "Die Wand",
     "description": "Eine Szene über Stonewalling – wenn das Gegenüber mitten im Gespräch dichtmacht und eine Wand steht, wo eben noch ein Mensch war. Aus der Ich-Perspektive, fiktiv.",
@@ -6739,6 +7441,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "er-nennt-sie-mama",
+    "title": "Er nennt sie Mama",
+    "description": "Eine Szene über ein Wort, das ein Kind beiläufig benutzt – und über das, was es bei der auslöst, die es hört. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Franziskas Sicht",
+    "pull_quote": "Er hat es nicht zu mir gesagt. Er hat es am Telefon zu ihr gesagt, und ich stand daneben und habe zwei Sekunden gebraucht, um zu verstehen, wen er meint.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was dich an der neuen Situation am meisten trifft – und was davon dein Kind mitbekommt?"
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "loyalitaetskonflikt",
+      "elternschaft"
+    ],
+    "url": "/szenen/er-nennt-sie-mama"
+  },
+  {
+    "type": "scene",
     "slug": "er-sagt-es-nie",
     "title": "Er sagt es nie",
     "description": "Eine fiktive Szene: Er tut alles für sie, aber er sagt nichts. Über die Sehnsucht nach einem Satz, der nie kommt, und die Frage, ob man um Worte bitten darf.",
@@ -6763,6 +7491,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/er-sagt-es-nie"
+  },
+  {
+    "type": "scene",
+    "slug": "er-will-nicht-mitkommen",
+    "title": "Er will nicht mitkommen",
+    "description": "Eine Szene über einen Freitag, an dem ein Kind im Flur stehen bleibt – und über die Sätze, die man in solchen Momenten nicht sagen sollte. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Yvonnes Sicht",
+    "pull_quote": "Ich stehe im Flur meiner eigenen Wohnung und rede meinem Sohn zu, zu mir zu kommen. Es gibt keinen Satz, der das nicht schlimmer macht.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, wie es dir geht, wenn dein Kind nicht mitkommen will – und was du in dem Moment brauchst?"
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "loyalitaetskonflikt",
+      "uebergabe"
+    ],
+    "url": "/szenen/er-will-nicht-mitkommen"
   },
   {
     "type": "scene",
@@ -7376,6 +8130,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/ich-habe-es-ihr-gesagt"
+  },
+  {
+    "type": "scene",
+    "slug": "ich-habe-es-vor-ihr-gesagt",
+    "title": "Ich habe es vor ihr gesagt",
+    "description": "Eine Szene über einen Satz am Telefon, der nicht für Kinderohren war – und darüber, was danach zu tun ist. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Bettinas Sicht",
+    "pull_quote": "Sie hat im Nebenzimmer gemalt. Ich dachte, sie hört nicht zu. Zwei Tage später hat sie den Satz benutzt, wörtlich, mit meiner Betonung.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du anschauen, was dein Kind zuletzt mitbekommen hat – und wie du damit umgegangen bist?"
+    },
+    "scene_tags": [
+      "loyalitaetskonflikt",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "url": "/szenen/ich-habe-es-vor-ihr-gesagt"
   },
   {
     "type": "scene",
@@ -8940,6 +9720,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "sie-hat-es-ihm-schon-erzaehlt",
+    "title": "Sie hat es ihm schon erzählt",
+    "description": "Eine Szene über eine gute Nachricht, die auf dem Weg verloren geht – und über den Unterschied zwischen Absicht und Wirkung. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Claudias Sicht",
+    "pull_quote": "Ich habe mich auf sein Gesicht gefreut, wenn sie es erzählt. Als sie es erzählt hat, hat er genickt und gesagt: Ja, weiß ich schon.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie bei euch Informationen fließen – und was dabei zuletzt schiefgegangen ist?"
+    },
+    "scene_tags": [
+      "co-elternschaft",
+      "trennung-mit-kindern",
+      "anerkennung"
+    ],
+    "url": "/szenen/sie-hat-es-ihm-schon-erzaehlt"
+  },
+  {
+    "type": "scene",
     "slug": "sie-hat-nicht-gemerkt-was-passiert-ist",
     "title": "Sie hat nicht gemerkt, was passiert ist",
     "description": "Eine fiktive Szene: Er sagt zum ersten Mal einen freundlichen Satz über sich selbst, und seine Partnerin bemerkt es nicht einmal. Über einen Moment, der von außen nach nichts aussieht.",
@@ -9412,6 +10218,32 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "url": "/szenen/was-habe-ich-uebersehen"
+  },
+  {
+    "type": "scene",
+    "slug": "was-macht-mama-denn-so",
+    "title": "Was macht Mama denn so?",
+    "description": "Eine Szene über eine beiläufige Frage im Auto – und den Moment, in dem einer merkt, dass sie keine war. Ich-Perspektive, fiktiv.",
+    "cluster": "trennung-mit-kindern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Roberts Sicht",
+    "pull_quote": "Ich habe es nicht als Ausfragen gemeint. Aber meine Tochter hat vier Sekunden gebraucht, bis sie geantwortet hat, und in diesen vier Sekunden habe ich gehört, was ich getan habe.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Kennst du solche beiläufigen Fragen? Magst du anschauen, was du eigentlich wissen wolltest?"
+    },
+    "scene_tags": [
+      "loyalitaetskonflikt",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "url": "/szenen/was-macht-mama-denn-so"
   },
   {
     "type": "scene",
@@ -9965,6 +10797,74 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       ]
     },
     "url": "/wissen/beobachtung-gefuehl"
+  },
+  {
+    "type": "topic",
+    "slug": "betreuungsmodelle",
+    "title": "Wechselmodell, Residenzmodell, Nestmodell",
+    "description": "Drei Betreuungsformen im Vergleich, was die Forschung dazu wirklich sagt – und warum die Wahl des Modells weniger über das Wohl eines Kindes entscheidet als die Frage, wie viel Konflikt daran hängt.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "wechselmodell residenzmodell nestmodell vergleich vor nachteile alter kind",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du durchgehen, was bei euch praktisch möglich ist – Entfernung, Arbeitszeiten, Alter der Kinder – bevor es um das Modell geht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "co-elternschaft",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "wechselmodell",
+        "nestmodell",
+        "umgangsrecht",
+        "elternvereinbarung"
+      ],
+      "comparison": [
+        "wechselmodell-oder-residenzmodell"
+      ],
+      "related": [
+        "co-elternschaft",
+        "das-kind-in-der-mitte",
+        "wenn-kooperation-nicht-geht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist das Wechselmodell das beste für Kinder?",
+        "answer": "Im Durchschnitt geht es Kindern im Wechselmodell gut, oft besser als im klassischen Wochenendmodell. Bei dieser Aussage ist allerdings Vorsicht geboten: Eltern, die ein Wechselmodell wählen und durchhalten, haben meistens weniger Konflikt, wohnen näher beieinander und haben mehr Geld. Ein Teil des guten Ergebnisses liegt an diesen Voraussetzungen und nicht am Modell. Es ist eine gute Option, kein Rezept."
+      },
+      {
+        "question": "Ab welchem Alter geht ein Wechsel?",
+        "answer": "Je jünger das Kind, desto kürzer sollten die Abstände zwischen den Kontakten sein – für Kleinkinder sind viele kurze Wechsel leichter als wenige lange Trennungen von einer Bezugsperson. Mit dem Schulalter werden längere Blöcke leichter. Bei Jugendlichen entscheidet oft der eigene Alltag: Freunde, Verein, Schulweg wiegen dann schwerer als eine gerechte Aufteilung."
+      },
+      {
+        "question": "Was ist das Nestmodell?",
+        "answer": "Die Kinder bleiben in der Wohnung, die Eltern wechseln. Für Kinder ist es die schonendste Variante, weil ihr Alltag völlig unberührt bleibt. Für Eltern ist es teuer und anstrengend, weil drei Wohnungen nötig sind oder eine geteilte Zweitwohnung. Es wird deshalb meistens als Übergangslösung für einige Monate genutzt, selten dauerhaft."
+      },
+      {
+        "question": "Was, wenn wir uns nicht einigen?",
+        "answer": "Erst Beratung, dann Mediation, dann Gericht. Beratung beim Jugendamt ist kostenlos, und beide Elternteile haben Anspruch darauf. Vor Gericht wird im Regelfall zuerst auf eine Einigung hingewirkt; kommt sie nicht zustande, entscheidet das Familiengericht am Maßstab des Kindeswohls – und die Bereitschaft, dem Kind die Beziehung zum anderen Elternteil zu ermöglichen, spielt dabei eine Rolle."
+      }
+    ],
+    "url": "/wissen/betreuungsmodelle"
   },
   {
     "type": "topic",
@@ -10655,6 +11555,72 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "co-elternschaft",
+    "title": "Co-Elternschaft: aus der Liebesbeziehung wird eine Arbeitsbeziehung",
+    "description": "Ihr müsst euch nicht mögen und nicht verstehen. Ihr müsst Absprachen einhalten und sachlich bleiben. Konkrete Regeln für Kanal, Ton und Übergabe – und der realistische Plan B, wenn Kooperation nicht funktioniert.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "co elternschaft regeln kommunikation ex partner absprachen kinder",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Nachricht anschauen, die du zuletzt geschrieben hast – und prüfen, wie viel davon Information war und wie viel Beziehung?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "co-elternschaft",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "parallele-elternschaft",
+        "elternvereinbarung",
+        "bindungstoleranz",
+        "loyalitaetskonflikt"
+      ],
+      "related": [
+        "betreuungsmodelle",
+        "wenn-kooperation-nicht-geht",
+        "das-kind-in-der-mitte"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wir können nicht miteinander reden. Geht Co-Elternschaft trotzdem?",
+        "answer": "Ja, und zwar in einer Form, die weniger verlangt: parallele Elternschaft. Dabei wird der Kontakt auf ein Minimum reduziert und dafür alles verschriftlicht und festgelegt. Jeder Haushalt führt seinen Alltag nach eigenen Regeln, abgestimmt wird nur, was wirklich beide betrifft. Das ist kein Scheitern, sondern die konfliktärmere Lösung – und für das Kind deutlich besser als erzwungene Kooperation, die jedes Mal eskaliert."
+      },
+      {
+        "question": "Welcher Kanal ist der richtige?",
+        "answer": "Schriftlich und an einem Ort, der nicht auch privat ist. E-Mail oder eine App für Eltern, nicht der Messenger, in dem noch eure alten Nachrichten stehen. Schriftlich hat drei Vorteile: Man kann vor dem Absenden noch einmal lesen, es gibt keinen Tonfall, den man hineinlesen muss, und Absprachen sind später nachvollziehbar."
+      },
+      {
+        "question": "Wie schreibe ich, ohne dass es eskaliert?",
+        "answer": "Kurz, sachlich, freundlich, verbindlich. Eine Nachricht enthält eine Information oder eine Frage, sonst nichts – keine Bewertung, keine Vorgeschichte, keine Ironie. Wer sich das nicht zutraut, schreibt sie und schickt sie eine Stunde später ab. Diese eine Stunde ist die wirksamste Regel im ganzen Bereich."
+      },
+      {
+        "question": "Müssen in beiden Haushalten dieselben Regeln gelten?",
+        "answer": "Nein, und der Versuch führt zu ständigem Streit. Kinder kommen sehr gut damit zurecht, dass es bei Mama andere Regeln gibt als bei Papa – so wie in der Schule andere gelten als zu Hause. Abgestimmt gehört, was wirklich beide betrifft: Schule, Gesundheit, Geld, große Entscheidungen. Bettzeiten und Bildschirmregeln gehören meistens nicht dazu."
+      }
+    ],
+    "url": "/wissen/co-elternschaft"
+  },
+  {
+    "type": "topic",
     "slug": "co-regulation",
     "title": "Co-Regulation: warum wir uns aneinander beruhigen",
     "description": "Wie Menschen sich gegenseitig beruhigen, warum ein ruhiges Gegenüber ein aufgewühltes Nervensystem besänftigt und wieso Co-Regulation kein Zeichen von Abhängigkeit ist. Ohne Diagnose.",
@@ -10686,6 +11652,76 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/co-regulation"
+  },
+  {
+    "type": "topic",
+    "slug": "das-kind-in-der-mitte",
+    "title": "Das Kind in der Mitte: wie Loyalitätskonflikte entstehen",
+    "description": "Der Schadensmechanismus nach einer Trennung ist nicht der Streit, sondern die Frage, die ein Kind nicht beantworten kann: auf wessen Seite bin ich? Zwölf alltägliche Formen – und vier Regeln, die sie beenden.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "loyalitaetskonflikt kind trennung eltern zwischen den stuehlen anzeichen",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du einen der letzten Übergabemomente anschauen – und ehrlich prüfen, was dein Kind an dir ablesen konnte?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "loyalitaetskonflikt",
+      "trennung-mit-kindern",
+      "elternschaft",
+      "parentifizierung"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "loyalitaetskonflikt",
+        "bindungstoleranz",
+        "parentifizierung"
+      ],
+      "comparison": [
+        "entfremdung-oder-schutz"
+      ],
+      "related": [
+        "co-elternschaft",
+        "kindern-die-trennung-sagen",
+        "mein-ex-redet-schlecht-ueber-mich"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Woran merke ich, dass mein Kind in einem Loyalitätskonflikt steckt?",
+        "answer": "Häufig daran, dass es in beiden Haushalten das Passende erzählt und in keinem die ganze Wahrheit. Weitere Zeichen: Es erzählt vom anderen Elternteil auffällig wenig oder auffällig positiv, es tröstet euch, es wirkt beim Wechsel angespannt, es entwickelt Bauchweh vor Übergaben, oder es wird gegenüber dem Elternteil abweisend, bei dem es sich sicher fühlt."
+      },
+      {
+        "question": "Ich rede doch gar nicht schlecht über den anderen. Reicht das nicht?",
+        "answer": "Meistens nicht, weil die Botschaften unterhalb der Worte laufen: ein Seufzen, eine hochgezogene Augenbraue, eine Stille nach dem Namen. Kinder lesen Stimmung viel genauer als Sätze. Ein hilfreicher Prüfstein: Könnte dein Kind dir ohne Zögern erzählen, dass es ein schönes Wochenende hatte?"
+      },
+      {
+        "question": "Mein Kind will mich trösten. Ist das schlimm?",
+        "answer": "Es ist verständlich und sollte nicht zur Rolle werden. Ein Kind, das sich um seine Eltern kümmert, verschiebt die Reihenfolge – siehe Parentifizierung. Gegen einen Moment der Nähe spricht nichts. Gegen ein Kind, das den eigenen Kummer zurückhält, weil Mama es gerade nicht auch noch braucht, spricht sehr viel."
+      },
+      {
+        "question": "Was sage ich, wenn mein Kind fragt, wer schuld ist?",
+        "answer": "Eine wahre Antwort, die keine Bewertung enthält: Wir haben es beide nicht mehr hinbekommen als Paar, und das ist nichts, was du verstehen oder entscheiden musst. Die Versuchung, die eigene Version zu erzählen, ist groß, besonders wenn sie zutrifft. Ein Kind kann mit ihr nichts anfangen, außer sich zu entscheiden."
+      }
+    ],
+    "url": "/wissen/das-kind-in-der-mitte"
   },
   {
     "type": "topic",
@@ -11703,6 +12739,67 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/emotionsregulation"
   },
   {
+    "type": "comparison",
+    "slug": "entfremdung-oder-schutz",
+    "title": "Entfremdung oder Schutz? Wenn ein Kind einen Elternteil ablehnt",
+    "description": "Ein Kind lehnt einen Elternteil ab – das kann Beeinflussung sein oder ein guter Grund. Beide Deutungen werden als Waffe benutzt. Was sich unterscheiden lässt, was nicht, und warum diese Frage nicht ins Internet gehört.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "eltern kind entfremdung pas kind lehnt vater ab beeinflussung oder grund",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du möglichst genau beschreiben, was dein Kind gesagt hat – die Worte, nicht die Deutung – und wann sich etwas verändert hat?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "loyalitaetskonflikt",
+      "trennung-mit-kindern",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "loyalitaetskonflikt",
+        "bindungstoleranz",
+        "coercive-control"
+      ],
+      "related": [
+        "das-kind-in-der-mitte",
+        "wenn-kooperation-nicht-geht",
+        "mein-kind-will-nicht-zum-anderen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Gibt es Eltern-Kind-Entfremdung überhaupt?",
+        "answer": "Dass Kinder gegen einen Elternteil eingenommen werden, kommt vor und ist gut beschrieben. Umstritten ist etwas anderes: das Konzept eines Syndroms, das sich am Kind diagnostizieren ließe. Ein solches Syndrom ist in den Klassifikationssystemen nicht anerkannt, und der Begriff wird in Verfahren regelmäßig eingesetzt, um berechtigte Schutzanliegen zu entwerten. Beides gilt gleichzeitig."
+      },
+      {
+        "question": "Woran erkenne ich, ob mein Kind beeinflusst wird?",
+        "answer": "Mit Sicherheit gar nicht, und Vorsicht ist an dieser Stelle angebracht. Es gibt Hinweise, die eher in die eine oder andere Richtung deuten – etwa ob die Ablehnung Zwischentöne hat, ob das Kind eigene Erlebnisse schildert oder fremde Formulierungen benutzt, und ob sie sich auf eine Person beschränkt oder die ganze Familie umfasst. Keiner dieser Hinweise ist ein Beweis."
+      },
+      {
+        "question": "Was ist der häufigste Fehler in dieser Lage?",
+        "answer": "Druck. Wer sein Kind zum Kontakt drängt, es ausfragt oder ihm erklärt, dass es manipuliert wird, bestätigt aus Sicht des Kindes genau das, was es fürchtet. Wirksamer ist Verlässlichkeit ohne Bedingung: ein regelmäßiges Lebenszeichen, keine Vorwürfe, kein Ausfragen – und Geduld über Monate."
+      },
+      {
+        "question": "Wer klärt das dann?",
+        "answer": "Fachleute, die das Kind kennenlernen: Beratungsstellen, das Jugendamt, im gerichtlichen Verfahren ein Verfahrensbeistand, der ausschließlich die Interessen des Kindes vertritt, und bei Bedarf eine familienpsychologische Begutachtung. Das dauert und ist unbefriedigend – und es ist der einzige Weg, der beiden möglichen Wahrheiten gerecht werden kann."
+      }
+    ],
+    "url": "/wissen/entfremdung-oder-schutz"
+  },
+  {
     "type": "topic",
     "slug": "fair-streiten",
     "title": "Fair streiten: wie Konflikte verbinden statt verletzen",
@@ -12515,6 +13612,69 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/wissen/integrative-verhaltenstherapie-fuer-paare"
+  },
+  {
+    "type": "topic",
+    "slug": "kindern-die-trennung-sagen",
+    "title": "Kindern die Trennung sagen",
+    "description": "Wann der richtige Zeitpunkt ist, welche drei Sätze vorkommen müssen, was nicht gesagt wird – und warum das Gespräch kein Termin ist, sondern eine Tür, die monatelang offen bleibt.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "kindern trennung sagen wie erklaeren gespraech alter richtige zeitpunkt",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du durchgehen, was du deinem Kind sagen willst – und wo du dir unsicher bist, ob es zu viel oder zu wenig ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "elternschaft",
+      "loyalitaetskonflikt"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "loyalitaetskonflikt",
+        "elternvereinbarung"
+      ],
+      "related": [
+        "co-elternschaft",
+        "das-kind-in-der-mitte",
+        "betreuungsmodelle"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wann sagen wir es?",
+        "answer": "Wenn die Entscheidung feststeht und der grobe Plan steht – nicht früher und nicht später. Zu früh heißt: Das Kind trägt eine Unsicherheit mit, die ihr selbst noch nicht aufgelöst habt. Zu spät heißt: Es hat längst gemerkt, dass etwas ist, und niemand hat es benannt. Als Faustregel gilt ein bis zwei Wochen vor dem Auszug, damit Zeit für Fragen bleibt, aber nicht Monate der Ungewissheit."
+      },
+      {
+        "question": "Welche Sätze müssen vorkommen?",
+        "answer": "Drei. Es liegt nicht an dir – Kinder beziehen es fast immer auf sich, auch wenn sie es nicht sagen. Wir haben dich beide weiterhin lieb, und beide bleiben deine Eltern. Und dann etwas Konkretes: wo du wohnst, wann du wen siehst, was gleich bleibt. Der dritte Teil wird oft vergessen und ist der, an dem Kinder sich festhalten."
+      },
+      {
+        "question": "Was, wenn mein Kind gar nicht reagiert?",
+        "answer": "Das ist eine der häufigsten Reaktionen und keine Gleichgültigkeit. Viele Kinder brauchen Tage oder Wochen, bis etwas kommt, und dann oft an einer unerwarteten Stelle – beim Zähneputzen, im Auto, mitten in einem anderen Thema. Genau deshalb ist das Gespräch kein Termin, sondern der Anfang einer Reihe."
+      },
+      {
+        "question": "Sollen wir die Gründe erklären?",
+        "answer": "Nur in einer Fassung, die für Kinder gemacht ist: dass ihr euch als Paar nicht mehr gut versteht und beschlossen habt, getrennt zu leben. Nicht in der Fassung für Erwachsene. Untreue, Vorwürfe, Details der Beziehung gehören nicht dazu – nicht weil man Kinder anlügen sollte, sondern weil diese Informationen sie in eine Bewertung zwingen, die ihnen nicht zusteht."
+      }
+    ],
+    "url": "/wissen/kindern-die-trennung-sagen"
   },
   {
     "type": "topic",
@@ -13500,6 +14660,69 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "neue-partner-und-patchwork",
+    "title": "Neue Partner und Patchwork",
+    "description": "Wann man ein Kind vorstellt, welche Rolle eine neue Partnerin am Anfang haben sollte – und warum der häufigste Fehler nicht zu früh ist, sondern zu viel Erziehung zu schnell.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "neuen partner vorstellen kind wann patchwork stiefvater rolle regeln",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie es deinem Kind mit der neuen Situation geht – und was es von dir gerade am meisten braucht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "elternschaft",
+      "loyalitaetskonflikt"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "loyalitaetskonflikt",
+        "bindungstoleranz"
+      ],
+      "related": [
+        "das-kind-in-der-mitte",
+        "co-elternschaft",
+        "kindern-die-trennung-sagen"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wann stelle ich jemanden vor?",
+        "answer": "Wenn die Beziehung tragfähig ist, nicht wenn sie aufregend ist. Eine brauchbare Faustregel sind sechs bis zwölf Monate, aber die Zahl ist weniger wichtig als die Frage dahinter: Würdet ihr diese Person auch dann noch im Leben eures Kindes wollen, wenn die Verliebtheit weg ist? Für Kinder ist jede neue Person, die wieder verschwindet, ein weiterer Verlust."
+      },
+      {
+        "question": "Welche Rolle soll der neue Partner übernehmen?",
+        "answer": "Am Anfang die eines freundlichen Erwachsenen, nicht die eines Elternteils. Konkret heißt das: keine Erziehung, keine Regeln, keine Strafen. Diese Aufgaben bleiben beim leiblichen Elternteil, oft über Jahre. Der häufigste Fehler in Patchworkfamilien ist nicht ein zu frühes Kennenlernen, sondern zu viel Erziehungsanspruch zu schnell."
+      },
+      {
+        "question": "Mein Kind lehnt die neue Partnerin ab. Was tun?",
+        "answer": "Zunächst: nicht dagegenhalten. Ablehnung ist in dieser Lage die naheliegendste Reaktion, oft aus Loyalität zum anderen Elternteil, manchmal aus Angst, den eigenen Platz zu verlieren. Was hilft, ist Zeit, ein niedriger Anspruch und gemeinsame Zeit mit dir allein – die geht in Patchworkfamilien als Erstes verloren und fehlt am meisten."
+      },
+      {
+        "question": "Darf mein Kind die neue Partnerin Mama nennen?",
+        "answer": "Nur wenn es von selbst darauf kommt, und auch dann lohnt ein Gespräch. Für den anderen Elternteil ist es oft sehr verletzend, und das Kind gerät damit in genau die Lage, die es vermeiden will. Eigene Namen oder der Vorname sind fast immer die friedlichere Lösung."
+      }
+    ],
+    "url": "/wissen/neue-partner-und-patchwork"
+  },
+  {
+    "type": "topic",
     "slug": "paartherapie",
     "title": "Paartherapie: die Ansätze im Vergleich – und was davon belegt ist",
     "description": "EFT, IBCT, Verhaltenstherapie, systemisch, Gottman: was die Ansätze unterscheidet, wie gut sie belegt sind und was den Erfolg tatsächlich stärker vorhersagt als die Methode.",
@@ -14258,6 +15481,89 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/trennen-oder-bleiben"
   },
   {
+    "type": "topic",
+    "slug": "trennung-mit-kindern",
+    "title": "Trennung mit Kindern: worauf es wirklich ankommt",
+    "description": "Die verbreitetste Angst ist die falsche. Nicht die Trennung selbst belastet Kinder auf Dauer, sondern der Konflikt, der nach ihr weiterläuft – und ob das Kind hineingezogen wird. Was daraus für die ersten Monate folgt.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "trennung mit kindern was beachten folgen kinder scheidung eltern",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du eine Situation der letzten Wochen anschauen, in der dein Kind zwischen euch stand – und überlegen, was es in dem Moment gebraucht hätte?",
+      "cta_positions": [
+        "after-intro",
+        "after-reflection",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "beziehungsmuster",
+      "wahrnehmung"
+    ],
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "loyalitaetskonflikt",
+      "co-elternschaft",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "children": [
+        "kindern-die-trennung-sagen",
+        "co-elternschaft",
+        "betreuungsmodelle",
+        "das-kind-in-der-mitte",
+        "neue-partner-und-patchwork",
+        "wenn-kooperation-nicht-geht"
+      ],
+      "glossary": [
+        "loyalitaetskonflikt",
+        "bindungstoleranz",
+        "elterliche-sorge",
+        "umgangsrecht",
+        "elternvereinbarung"
+      ],
+      "comparison": [
+        "wechselmodell-oder-residenzmodell"
+      ],
+      "related": [
+        "sich-trennen",
+        "soll-ich-mich-trennen",
+        "liebeskummer"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Schadet eine Trennung meinem Kind?",
+        "answer": "Sie ist eine Belastung, und die meisten Kinder kommen gut durch sie hindurch. Was langfristig den Unterschied macht, ist nicht die Trennung selbst, sondern drei andere Dinge: wie viel Konflikt das Kind danach mitbekommt, ob die Beziehung zu beiden Eltern trägt, und wie stabil der Alltag bleibt. Alle drei sind beeinflussbar – anders als die Frage, ob man zusammenbleibt."
+      },
+      {
+        "question": "Sollten wir für die Kinder zusammenbleiben?",
+        "answer": "Wenn es ein Zuhause mit dauerhaftem Streit, Kälte oder Verachtung ist, ist die Antwort meistens nein. Kinder in solchen Familien geht es im Schnitt nicht besser als Kindern getrennter Eltern, oft schlechter. Die ehrliche Frage lautet deshalb nicht bleiben oder gehen, sondern: Bekommen wir den Konflikt in den Griff – zusammen oder getrennt?"
+      },
+      {
+        "question": "Wie sagen wir es unseren Kindern?",
+        "answer": "Nach Möglichkeit gemeinsam, in einem ruhigen Moment, mit einer Erklärung, die kindgerecht und wahr ist – und ohne Schuldzuweisung. Drei Sätze müssen vorkommen: Es liegt nicht an dir. Wir haben beide dich weiterhin lieb. Und so wird es jetzt konkret weitergehen. Ausführlich steht das auf einer eigenen Seite."
+      },
+      {
+        "question": "Wo bekommen wir Hilfe, die nichts kostet?",
+        "answer": "Beim Jugendamt. Beide Elternteile haben einen gesetzlichen Anspruch auf Beratung bei Trennung und Scheidung, kostenlos und auch dann, wenn nur einer von beiden kommt. Dieses Angebot ist erstaunlich wenig bekannt und ist genau für diese Lage gemacht – es geht dort um Beratung, nicht um Kontrolle. Dazu kommen Erziehungsberatungsstellen der Kommunen und der Wohlfahrtsverbände."
+      },
+      {
+        "question": "Was ist mit Streit? Streiten Eltern nicht immer?",
+        "answer": "Es geht nicht darum, nie uneinig zu sein. Es geht darum, was das Kind davon mitbekommt und ob es hineingezogen wird. Uneinigkeit, die zwischen Erwachsenen geklärt wird, ist unschädlich. Schädlich ist der Konflikt, der über das Kind läuft: als Bote, als Zeuge, als Informationsquelle, als Trost."
+      }
+    ],
+    "url": "/wissen/trennung-mit-kindern"
+  },
+  {
     "type": "comparison",
     "slug": "unreife-oder-narzissmus",
     "title": "Emotionale Unreife oder Narzissmus? Woran du den Unterschied merkst",
@@ -14957,6 +16263,64 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "url": "/wissen/warum-es-zu-hause-nicht-geht"
   },
   {
+    "type": "comparison",
+    "slug": "wechselmodell-oder-residenzmodell",
+    "title": "Wechselmodell oder Residenzmodell?",
+    "description": "Die meistgestellte Frage nach einer Trennung – und die, bei der die Antwort am wenigsten am Modell hängt. Sechs Fragen, die vorher zu klären sind, und was die Zahlen wirklich hergeben.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "wechselmodell oder residenzmodell besser entscheidung kind alter",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du die praktischen Voraussetzungen bei euch durchgehen – Entfernung, Arbeitszeiten, Konfliktniveau – bevor es um die Modellfrage geht?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "co-elternschaft",
+      "elternschaft"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "wechselmodell",
+        "nestmodell",
+        "umgangsrecht",
+        "elternvereinbarung"
+      ],
+      "related": [
+        "betreuungsmodelle",
+        "co-elternschaft",
+        "wenn-kooperation-nicht-geht"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Ist ein Wechselmodell gerechter?",
+        "answer": "Für die Eltern oft ja. Für das Kind ist Gerechtigkeit zwischen Erwachsenen kein Maßstab – es geht darum, ob der Alltag trägt. Ein Modell, das gerecht aufgeteilt ist und jede Woche Streit produziert, ist für ein Kind schlechter als ein ungleiches, das ruhig läuft."
+      },
+      {
+        "question": "Kann ein Wechselmodell gegen den Willen eines Elternteils angeordnet werden?",
+        "answer": "Grundsätzlich ist das möglich, wenn es dem Kindeswohl am besten entspricht – es ist aber nicht der Regelfall. Gerichte schauen dabei genau auf die Voraussetzungen, insbesondere darauf, ob die Eltern miteinander kommunizieren können. Für den eigenen Fall ist das eine Frage an eine Fachanwältin oder einen Fachanwalt für Familienrecht, nicht an eine Website."
+      },
+      {
+        "question": "Was ist mit dem Unterhalt?",
+        "answer": "Er hängt an der tatsächlichen Betreuung und an den Einkommen beider Seiten. Beim klassischen Residenzmodell zahlt in der Regel der Elternteil, bei dem das Kind nicht überwiegend lebt. Beim echten Wechselmodell wird anders gerechnet, weil beide betreuen. Weil das schnell kompliziert wird und sich Beträge jährlich ändern, gehört diese Frage zum Jugendamt oder in eine Rechtsberatung."
+      }
+    ],
+    "url": "/wissen/wechselmodell-oder-residenzmodell"
+  },
+  {
     "type": "topic",
     "slug": "wege-aus-der-kodependenz",
     "title": "Wege aus der Kodependenz: was wirklich hilft",
@@ -15292,6 +16656,78 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "topic",
+    "slug": "wenn-kooperation-nicht-geht",
+    "title": "Wenn Kooperation nicht geht – Hochkonflikt und Gefährdung",
+    "description": "Zwei sehr verschiedene Lagen werden ständig verwechselt: ein Konflikt, an dem beide mitwirken, und eine Gefährdung, die von einer Seite ausgeht. Der Rat, sich zusammenzureißen, hilft im ersten Fall und ist im zweiten gefährlich.",
+    "cluster": "trennung-mit-kindern",
+    "search_intent": "hochstrittige trennung kinder gewalt umgang gefaehrdung was tun",
+    "updated": "2026-09-12",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was konkret passiert, wenn ihr Kontakt habt – möglichst ohne Deutung, nur was gesagt und getan wird?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "trennung-mit-kindern",
+      "co-elternschaft",
+      "hypervigilanz"
+    ],
+    "safety_tags": [
+      "gewalt",
+      "kontrolle"
+    ],
+    "links": {
+      "parent": "trennung-mit-kindern",
+      "glossary": [
+        "parallele-elternschaft",
+        "coercive-control",
+        "umgangsrecht",
+        "elternvereinbarung"
+      ],
+      "comparison": [
+        "entfremdung-oder-schutz"
+      ],
+      "related": [
+        "co-elternschaft",
+        "emotionaler-missbrauch",
+        "war-das-schon-gewalt"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Was ist der Unterschied zwischen Hochkonflikt und Gefährdung?",
+        "answer": "Beim Hochkonflikt eskalieren beide Seiten, beide haben Anteil, und beide könnten deeskalieren. Bei einer Gefährdung geht die Bedrohung von einer Seite aus, und das Verhalten der anderen ändert daran nichts – Nachgeben verringert die Kontrolle nicht, es verschiebt sie. Die Unterscheidung ist wichtig, weil derselbe Rat im einen Fall hilft und im anderen schadet."
+      },
+      {
+        "question": "Was hilft bei Hochkonflikt, wenn Gespräche immer eskalieren?",
+        "answer": "Weniger Kontakt bei mehr Struktur. Alles einmal detailliert festlegen – Betreuungszeiten, Ferien, Feiertage, Übergabeorte, wer wen wann informiert – und danach möglichst nichts mehr verhandeln. Übergaben an neutralen Orten, Kommunikation ausschließlich schriftlich. Das nennt sich parallele Elternschaft und ist für Kinder deutlich besser als erzwungene Kooperation, die jedes Mal kippt."
+      },
+      {
+        "question": "Muss ich Umgang gewähren, wenn ich Angst habe?",
+        "answer": "Das Kind hat ein Recht auf Umgang mit beiden Eltern, und dieses Recht wird ernst genommen. Es gilt aber nicht um jeden Preis: Bei Gefährdung kann der Umgang eingeschränkt, begleitet oder ausgesetzt werden. Der richtige Weg ist nicht, ihn eigenmächtig zu verweigern – das wird dir angelastet –, sondern unverzüglich Beratung und rechtliche Hilfe zu holen und den begleiteten Umgang zu beantragen."
+      },
+      {
+        "question": "Warum wird mir nicht geglaubt?",
+        "answer": "Weil Kontrolle nach außen unauffällig aussieht und Betroffene oft angespannt und misstrauisch wirken, während die kontrollierende Seite ruhig und kooperativ auftritt. Dagegen hilft nur Dokumentation: Datum, Uhrzeit, wörtliche Zitate, Zeugen, Screenshots. Nicht als Waffe, sondern weil sonst Aussage gegen Aussage steht."
+      }
+    ],
+    "url": "/wissen/wenn-kooperation-nicht-geht"
+  },
+  {
+    "type": "topic",
     "slug": "wenn-liebe-nicht-ankommt",
     "title": "Wenn Liebe nicht ankommt: woran es liegt und was hilft",
     "description": "Ihr gebt euch beide Mühe, und trotzdem fühlt sich niemand gemeint. Wie du herausfindest, wo Zuneigung bei euch verloren geht – und woran du erkennst, dass es nicht mehr am Übersetzen liegt.",
@@ -15524,6 +16960,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Bindungsangst – Definition und Anzeichen",
     "description": "Was Bindungsangst bedeutet, wie sie sich von Verlustangst unterscheidet und woran du sie erkennst – kurz und klar erklärt."
   },
+  "/glossar/bindungstoleranz": {
+    "title": "Bindungstoleranz – die Beziehung zum anderen Elternteil zulassen",
+    "description": "Die Fähigkeit, dem Kind seine Beziehung zum anderen Elternteil zu gönnen – auch wenn man selbst verletzt ist. Ein Maßstab im Familienrecht und zugleich das Wirksamste, was Eltern für ihr Kind tun können."
+  },
   "/glossar/borderline": {
     "title": "Borderline – was der Begriff bezeichnet",
     "description": "Ein Muster aus starker Gefühlsschwankung, Angst vor dem Verlassenwerden, unsicherem Selbstbild und Impulsivität. Was heute damit gemeint ist, woher der irreführende Name kommt und was der Begriff nicht ist."
@@ -15567,6 +17007,14 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/einvernehmlichkeit": {
     "title": "Einvernehmlichkeit – vier Bedingungen, die alle gelten müssen",
     "description": "Zustimmung ist mehr als das Ausbleiben eines Widerspruchs. Freiwillig, widerruflich, situationsbezogen, erkennbar – und warum Nachgeben keine davon erfüllt."
+  },
+  "/glossar/elterliche-sorge": {
+    "title": "Elterliche Sorge – wer entscheidet was",
+    "description": "Sorge und Umgang werden häufig verwechselt. Was zur elterlichen Sorge gehört, was auch getrennt lebende Eltern gemeinsam entscheiden – und was der Alltag desjenigen ist, bei dem das Kind gerade lebt."
+  },
+  "/glossar/elternvereinbarung": {
+    "title": "Elternvereinbarung – das Aufgeschriebene",
+    "description": "Was zwei Eltern nach der Trennung verabreden, gehört auf Papier. Nicht aus Misstrauen, sondern weil es die Sorte Streit beendet, in der sich beide an etwas anderes erinnern. Was hineingehört."
   },
   "/glossar/emotionale-affaere": {
     "title": "Emotionale Affäre – Nähe ohne Berührung",
@@ -15744,6 +17192,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Love Bombing – der überwältigende Anfang",
     "description": "Love Bombing ist eine Flut aus Zuneigung, Aufmerksamkeit und Zukunftsversprechen ganz am Anfang – so intensiv, dass sie schnell bindet und später als Druckmittel dient. Woran du es erkennst. Ohne Diagnose."
   },
+  "/glossar/loyalitaetskonflikt": {
+    "title": "Loyalitätskonflikt – die Frage, die ein Kind nicht beantworten kann",
+    "description": "Ein Kind gerät zwischen die Eltern und müsste sich entscheiden, wem es guttut. Es entscheidet sich nicht, sondern beginnt zu managen – und genau das ist der Schadensmechanismus nach einer Trennung."
+  },
   "/glossar/mental-load": {
     "title": "Mental Load – die Arbeit, an alles zu denken",
     "description": "Nicht die Tätigkeit, sondern das Denken darum herum: daran denken, entscheiden, nachhalten, die Folgen tragen. Warum sich diese Last durch Mithilfe nicht verkleinern lässt."
@@ -15772,9 +17224,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Negativer Kreislauf – wenn zwei Reaktionen einander erzeugen",
     "description": "Das Muster, in dem beide auf den anderen reagieren und dadurch genau das auslösen, was sie vermeiden wollen. Der zentrale Begriff der emotionsfokussierten Paartherapie."
   },
+  "/glossar/nestmodell": {
+    "title": "Nestmodell – die Kinder bleiben, die Eltern wechseln",
+    "description": "Die schonendste Variante für Kinder und die anstrengendste für Eltern: Das Kind bleibt in der Wohnung, Mutter und Vater ziehen abwechselnd ein und aus. Warum es meistens eine Übergangslösung ist."
+  },
   "/glossar/offenlegung": {
     "title": "Offenlegung – warum die Wahrheit in Raten am meisten schadet",
     "description": "Nach einem Vertrauensbruch entscheidet weniger die Tat als die Art, wie ausgepackt wird. Warum die scheibchenweise Wahrheit den größten Schaden anrichtet."
+  },
+  "/glossar/parallele-elternschaft": {
+    "title": "Parallele Elternschaft – weniger Kontakt, mehr Struktur",
+    "description": "Wenn jede Absprache eskaliert, ist mehr Zusammenarbeit der falsche Weg. Parallele Elternschaft reduziert den Kontakt auf ein Minimum und legt dafür alles im Voraus fest – für Kinder oft die deutlich bessere Lösung."
   },
   "/glossar/parentifizierung": {
     "title": "Parentifizierung – wenn Kinder die Erwachsenen tragen",
@@ -15904,6 +17364,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Übergriffigkeit – wenn ein erkennbares Nein übergangen wird",
     "description": "Nicht die Schwere entscheidet, sondern das Übergehen. Was Übergriffigkeit von Kontrolle und Drohung unterscheidet und warum ein Nein nicht ausgesprochen sein muss."
   },
+  "/glossar/umgangsrecht": {
+    "title": "Umgangsrecht – ein Recht des Kindes",
+    "description": "Das Umgangsrecht gehört zuerst dem Kind, nicht den Eltern. Was daraus folgt, wer es einschränken kann und warum eigenmächtiges Verweigern der falsche Weg ist – auch bei berechtigter Sorge."
+  },
   "/glossar/validierung": {
     "title": "Validierung – bestätigen, was gefühlt wird, nicht was behauptet wird",
     "description": "Die wirksamste Bewegung neben starken Gefühlen und die am häufigsten missverstandene: Validierung ist keine Zustimmung. Sie erkennt an, dass ein Gefühl da ist und Gründe hat – ohne der Deutung recht zu geben."
@@ -15919,6 +17383,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/glossar/vulnerabler-narzissmus": {
     "title": "Vulnerabler Narzissmus – die verletzliche Seite",
     "description": "Der vulnerable Narzissmus ist die leise, empfindliche Ausprägung: unsicher, kränkbar, oft in der Opferrolle – und dennoch stark ich-bezogen. Wie er sich vom grandiosen Typ unterscheidet. Ohne Diagnose."
+  },
+  "/glossar/wechselmodell": {
+    "title": "Wechselmodell – Betreuung zu etwa gleichen Teilen",
+    "description": "Das Kind lebt in beiden Haushalten, oft im Wochenrhythmus. Was dafür nötig ist, was die Forschung dazu sagt und warum die guten Zahlen mit Vorsicht zu lesen sind."
   },
   "/glossar/wiederholungszwang": {
     "title": "Wiederholung – warum sich alte Muster neue Bühnen suchen",
@@ -15952,9 +17420,21 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Ich muss an alles denken – und keiner sieht es",
     "description": "Abends ist nichts geschafft und du bist trotzdem leer. Woher diese besondere Müdigkeit kommt, warum sie so schwer zu erklären ist und was du tun kannst, bevor du das nächste Gespräch führst."
   },
+  "/hilfe/ich-sehe-mein-kind-zu-wenig": {
+    "title": "Ich sehe mein Kind zu wenig",
+    "description": "Alle zwei Wochen ein Wochenende, und dazwischen ein leeres Zimmer. Warum gewöhnliche Zeit mehr trägt als besondere, wie man im Alltag vorkommt, ohne dabei zu sein – und was gegen die Verlockung des Freizeitprogramms hilft."
+  },
   "/hilfe/ist-mein-partner-borderline": {
     "title": "Ist mein Partner Borderline? Warum die Frage in die Irre führt",
     "description": "Die Frage ist verständlich, und sie ist die falsche. Von außen lässt sich kein Innenleben feststellen – aber es gibt eine Auskunft, die dir gehört und die dich weiterbringt als jede Zuordnung."
+  },
+  "/hilfe/mein-ex-redet-schlecht-ueber-mich": {
+    "title": "Mein Ex redet schlecht über mich vor den Kindern",
+    "description": "Der Reflex ist Richtigstellung, und sie funktioniert nicht. Was stattdessen wirkt, warum die Zeit auf deiner Seite ist – und ab wann es ein Fall für Beratung oder Gericht wird."
+  },
+  "/hilfe/mein-kind-will-nicht-zum-anderen": {
+    "title": "Mein Kind will nicht zum anderen Elternteil",
+    "description": "Ein Satz, der sofort alles in Frage stellt – und der sehr verschiedene Gründe haben kann. Wie du herausfindest, worum es geht, ohne dein Kind auszufragen, und warum Absagen der falsche erste Schritt ist."
   },
   "/hilfe/mir-macht-man-es-nie-recht": {
     "title": "Ich mache es, und es ist trotzdem falsch",
@@ -16040,6 +17520,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Das dritte Mal derselbe Satz",
     "description": "Eine fiktive Szene: Drei Frauen aus drei Beziehungen haben ihm dasselbe gesagt, und er hat es dreimal erklärt. Über den Moment, in dem eine Wiederholung zur Information wird."
   },
+  "/szenen/das-erste-weihnachten": {
+    "title": "Das erste Weihnachten",
+    "description": "Eine Szene über den 24. Dezember, der aufgeteilt wurde, und über den Wettbewerb, den niemand gewinnen kann. Ich-Perspektive, fiktiv."
+  },
   "/szenen/das-foto-von-mir-mit-neun": {
     "title": "Das Foto von mir mit neun",
     "description": "Eine fiktive Szene: Beim Ausräumen findet er ein Kinderfoto von sich und merkt, dass er zu diesem Kind völlig anders reden würde als zu sich selbst. Über eine Übung, die albern klingt und trifft."
@@ -16079,6 +17563,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/das-lange-shirt-im-sommer": {
     "title": "Das lange Shirt im Sommer",
     "description": "Eine Szene über den Moment, in dem jemand etwas bemerkt, das nicht besprochen werden soll – und über die Frage, wie man fragt. Ich-Perspektive, fiktiv."
+  },
+  "/szenen/das-leere-kinderzimmer": {
+    "title": "Das leere Kinderzimmer",
+    "description": "Eine Szene über Sonntagabend in einer Wohnung, die zwölf Tage lang zu still ist – und über die Versuchung, die Zeit besonders zu machen. Ich-Perspektive, fiktiv."
   },
   "/szenen/das-nein-das-ich-zurueckgenommen-habe": {
     "title": "Das Nein, das ich zurückgenommen habe",
@@ -16204,6 +17692,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Die Tür war offen",
     "description": "Eine Szene über den stillen Moment der Klarheit – kein großer Knall, nur eine kleine Szene, nach der man weiß, dass man geht. Aus der Ich-Perspektive, fiktiv."
   },
+  "/szenen/die-uebergabe-am-gartentor": {
+    "title": "Die Übergabe am Gartentor",
+    "description": "Eine Szene über fünf Minuten am Freitagnachmittag, in denen zwei Erwachsene alles richtig machen wollen und ein Kind alles mitbekommt. Ich-Perspektive, fiktiv."
+  },
   "/szenen/die-wand": {
     "title": "Die Wand",
     "description": "Eine Szene über Stonewalling – wenn das Gegenüber mitten im Gespräch dichtmacht und eine Wand steht, wo eben noch ein Mensch war. Aus der Ich-Perspektive, fiktiv."
@@ -16284,9 +17776,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Er hat meine Stimme nachgemacht",
     "description": "Eine fiktive Szene: Sie weint im Streit, und er ahmt sie nach. Über einen Moment, nach dem etwas anderes im Raum ist als vorher."
   },
+  "/szenen/er-nennt-sie-mama": {
+    "title": "Er nennt sie Mama",
+    "description": "Eine Szene über ein Wort, das ein Kind beiläufig benutzt – und über das, was es bei der auslöst, die es hört. Ich-Perspektive, fiktiv."
+  },
   "/szenen/er-sagt-es-nie": {
     "title": "Er sagt es nie",
     "description": "Eine fiktive Szene: Er tut alles für sie, aber er sagt nichts. Über die Sehnsucht nach einem Satz, der nie kommt, und die Frage, ob man um Worte bitten darf."
+  },
+  "/szenen/er-will-nicht-mitkommen": {
+    "title": "Er will nicht mitkommen",
+    "description": "Eine Szene über einen Freitag, an dem ein Kind im Flur stehen bleibt – und über die Sätze, die man in solchen Momenten nicht sagen sollte. Ich-Perspektive, fiktiv."
   },
   "/szenen/erst-der-rausch-dann-die-kaelte": {
     "title": "Erst der Rausch, dann die Kälte",
@@ -16375,6 +17875,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/ich-habe-es-ihr-gesagt": {
     "title": "Ich habe es ihr gesagt",
     "description": "Eine fiktive Szene: Er hat gestanden, und statt Erleichterung kommt etwas anderes. Über die Stunde nach dem Geständnis und die Erkenntnis, dass Ehrlichkeit nichts leichter macht."
+  },
+  "/szenen/ich-habe-es-vor-ihr-gesagt": {
+    "title": "Ich habe es vor ihr gesagt",
+    "description": "Eine Szene über einen Satz am Telefon, der nicht für Kinderohren war – und darüber, was danach zu tun ist. Ich-Perspektive, fiktiv."
   },
   "/szenen/ich-habe-es-zugegeben-und-nichts-ist-passiert": {
     "title": "Ich habe es zugegeben, und nichts ist passiert",
@@ -16600,6 +18104,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Sie hat es gehört",
     "description": "Eine fiktive Szene: Nachts krank, und das Gegenüber im Nebenzimmer steht nicht auf. Nicht mehr die Enttäuschung schmerzt, sondern dass er sie nicht einmal mehr erwartet hat. Über fehlende Fürsorge und stille Resignation."
   },
+  "/szenen/sie-hat-es-ihm-schon-erzaehlt": {
+    "title": "Sie hat es ihm schon erzählt",
+    "description": "Eine Szene über eine gute Nachricht, die auf dem Weg verloren geht – und über den Unterschied zwischen Absicht und Wirkung. Ich-Perspektive, fiktiv."
+  },
   "/szenen/sie-hat-nicht-gemerkt-was-passiert-ist": {
     "title": "Sie hat nicht gemerkt, was passiert ist",
     "description": "Eine fiktive Szene: Er sagt zum ersten Mal einen freundlichen Satz über sich selbst, und seine Partnerin bemerkt es nicht einmal. Über einen Moment, der von außen nach nichts aussieht."
@@ -16667,6 +18175,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/was-habe-ich-uebersehen": {
     "title": "Was habe ich übersehen",
     "description": "Eine fiktive Szene: Nach der Trennung geht sie die ersten Wochen noch einmal durch und findet die Hinweise, die von Anfang an da waren. Über den Unterschied zwischen nicht sehen und nicht sehen wollen."
+  },
+  "/szenen/was-macht-mama-denn-so": {
+    "title": "Was macht Mama denn so?",
+    "description": "Eine Szene über eine beiläufige Frage im Auto – und den Moment, in dem einer merkt, dass sie keine war. Ich-Perspektive, fiktiv."
   },
   "/szenen/was-moechtest-du-eigentlich": {
     "title": "Was möchtest du eigentlich?",
@@ -16744,6 +18256,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Beobachtung, Gefühl, Interpretation – trennen lernen",
     "description": "Wie du zwischen dem, was passiert ist, dem, was du fühlst, und dem, was du daraus schließt, unterscheidest – das Kernwerkzeug der Gewaltfreien Kommunikation."
   },
+  "/wissen/betreuungsmodelle": {
+    "title": "Wechselmodell, Residenzmodell, Nestmodell",
+    "description": "Drei Betreuungsformen im Vergleich, was die Forschung dazu wirklich sagt – und warum die Wahl des Modells weniger über das Wohl eines Kindes entscheidet als die Frage, wie viel Konflikt daran hängt."
+  },
   "/wissen/beziehung-mit-borderline": {
     "title": "In Beziehung bleiben, ohne sich zu verlieren",
     "description": "Wie man neben starken Gefühlen stehen kann, ohne sie zu bestätigen oder wegzuerklären: Validierung statt Diskussion, Grenzen, die nicht wie Verlassen klingen – und der ehrliche Punkt, an dem es keine Beziehungsfrage mehr ist."
@@ -16788,9 +18304,17 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Borderline von innen: wie sich das anfühlt, wenn man es ist",
     "description": "Fast alles, was über Borderline geschrieben wird, ist für die Menschen daneben geschrieben. Dieser Text ist für die, die gemeint sind: über Lautstärke statt Übertreibung, über die Scham danach – und über den Hebel, der wirklich etwas ändert."
   },
+  "/wissen/co-elternschaft": {
+    "title": "Co-Elternschaft: aus der Liebesbeziehung wird eine Arbeitsbeziehung",
+    "description": "Ihr müsst euch nicht mögen und nicht verstehen. Ihr müsst Absprachen einhalten und sachlich bleiben. Konkrete Regeln für Kanal, Ton und Übergabe – und der realistische Plan B, wenn Kooperation nicht funktioniert."
+  },
   "/wissen/co-regulation": {
     "title": "Co-Regulation: warum wir uns aneinander beruhigen",
     "description": "Wie Menschen sich gegenseitig beruhigen, warum ein ruhiges Gegenüber ein aufgewühltes Nervensystem besänftigt und wieso Co-Regulation kein Zeichen von Abhängigkeit ist. Ohne Diagnose."
+  },
+  "/wissen/das-kind-in-der-mitte": {
+    "title": "Das Kind in der Mitte: wie Loyalitätskonflikte entstehen",
+    "description": "Der Schadensmechanismus nach einer Trennung ist nicht der Streit, sondern die Frage, die ein Kind nicht beantworten kann: auf wessen Seite bin ich? Zwölf alltägliche Formen – und vier Regeln, die sie beenden."
   },
   "/wissen/der-innere-kritiker": {
     "title": "Der innere Kritiker: woher die Stimme kommt und was gegen sie hilft",
@@ -16864,6 +18388,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Emotionsregulation: das Toleranzfenster und was Gefühle steuert",
     "description": "Warum manche Menschen Gefühle schwer regulieren können, was das Toleranzfenster ist und wie sich Dysregulation auf Beziehungen auswirkt – erklärend, nicht entschuldigend."
   },
+  "/wissen/entfremdung-oder-schutz": {
+    "title": "Entfremdung oder Schutz? Wenn ein Kind einen Elternteil ablehnt",
+    "description": "Ein Kind lehnt einen Elternteil ab – das kann Beeinflussung sein oder ein guter Grund. Beide Deutungen werden als Waffe benutzt. Was sich unterscheiden lässt, was nicht, und warum diese Frage nicht ins Internet gehört."
+  },
   "/wissen/fair-streiten": {
     "title": "Fair streiten: wie Konflikte verbinden statt verletzen",
     "description": "Warum Streiten nicht das Problem ist, sondern die Art zu streiten – mit Regeln für faire Konflikte, dem Unterschied zwischen Klärung und Verletzung und Wegen aus der Eskalation. Ohne Diagnose."
@@ -16919,6 +18447,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/integrative-verhaltenstherapie-fuer-paare": {
     "title": "Integrative Verhaltenstherapie für Paare (IBCT): Akzeptanz neben Veränderung",
     "description": "IBCT geht davon aus, dass manche Unterschiede zwischen zwei Menschen bleiben – und dass der Kampf dagegen mehr anrichtet als der Unterschied selbst. Vorgehen, Belege und Eignung."
+  },
+  "/wissen/kindern-die-trennung-sagen": {
+    "title": "Kindern die Trennung sagen",
+    "description": "Wann der richtige Zeitpunkt ist, welche drei Sätze vorkommen müssen, was nicht gesagt wird – und warum das Gespräch kein Termin ist, sondern eine Tür, die monatelang offen bleibt."
   },
   "/wissen/kodependenz": {
     "title": "Kodependenz: wenn Fürsorge zur Falle wird",
@@ -16988,6 +18520,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Warum Nein sagen so schwerfällt – und was wirklich hilft",
     "description": "Woher die Angst vor dem Nein kommt, warum ein Ja aus Angst niemandem hilft und wie man freundlich Nein sagt, ohne sich endlos zu rechtfertigen. Ohne Diagnose."
   },
+  "/wissen/neue-partner-und-patchwork": {
+    "title": "Neue Partner und Patchwork",
+    "description": "Wann man ein Kind vorstellt, welche Rolle eine neue Partnerin am Anfang haben sollte – und warum der häufigste Fehler nicht zu früh ist, sondern zu viel Erziehung zu schnell."
+  },
   "/wissen/paartherapie": {
     "title": "Paartherapie: die Ansätze im Vergleich – und was davon belegt ist",
     "description": "EFT, IBCT, Verhaltenstherapie, systemisch, Gottman: was die Ansätze unterscheidet, wie gut sie belegt sind und was den Erfolg tatsächlich stärker vorhersagt als die Methode."
@@ -17044,6 +18580,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Trennen oder bleiben? Woran du Orientierung findest",
     "description": "Kein Test entscheidet für dich – aber diese Fragen und Merkmale helfen dir, ehrlicher hinzuschauen, ob Bleiben oder Gehen deiner Wahrheit näherkommt."
   },
+  "/wissen/trennung-mit-kindern": {
+    "title": "Trennung mit Kindern: worauf es wirklich ankommt",
+    "description": "Die verbreitetste Angst ist die falsche. Nicht die Trennung selbst belastet Kinder auf Dauer, sondern der Konflikt, der nach ihr weiterläuft – und ob das Kind hineingezogen wird. Was daraus für die ersten Monate folgt."
+  },
   "/wissen/unreife-oder-narzissmus": {
     "title": "Emotionale Unreife oder Narzissmus? Woran du den Unterschied merkst",
     "description": "Beides fühlt sich an, als käme nichts zurück. Aber Unreife ist eine Grenze, narzisstische Muster sind eine Strategie – und der Unterschied entscheidet darüber, was dich schützt. Fünf Prüfsteine, ohne Ferndiagnose."
@@ -17088,6 +18628,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Im Job kannst du es, zu Hause nicht – warum Grenzen kein Können sind",
     "description": "Wer bei der Arbeit klar Nein sagt und beim eigenen Partner nicht, hat kein Technikproblem. Grenzen scheitern nicht am Wissen, sondern am Einsatz – und manchmal ist die Angst dahinter keine Verzerrung, sondern eine richtige Messung."
   },
+  "/wissen/wechselmodell-oder-residenzmodell": {
+    "title": "Wechselmodell oder Residenzmodell?",
+    "description": "Die meistgestellte Frage nach einer Trennung – und die, bei der die Antwort am wenigsten am Modell hängt. Sechs Fragen, die vorher zu klären sind, und was die Zahlen wirklich hergeben."
+  },
   "/wissen/wege-aus-der-kodependenz": {
     "title": "Wege aus der Kodependenz: was wirklich hilft",
     "description": "Öfter Nein sagen reicht nicht. Was tatsächlich hilft, wenn die eigenen Bedürfnisse über Jahre unsichtbar waren – in Schritten, die klein genug sind, um sie zu gehen."
@@ -17107,6 +18651,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/wissen/wenn-grenzen-nicht-reichen": {
     "title": "Wenn Grenzen nicht reichen – und wann sie schaden",
     "description": "Grenzen sind ein Werkzeug für Beziehungen, die im Kern tragen. Wo Macht ungleich verteilt ist, kann der Rat nach klareren Grenzen gefährlich werden – und Grenz-Sprache lässt sich hervorragend als Waffe benutzen. Beides gehört gesagt."
+  },
+  "/wissen/wenn-kooperation-nicht-geht": {
+    "title": "Wenn Kooperation nicht geht – Hochkonflikt und Gefährdung",
+    "description": "Zwei sehr verschiedene Lagen werden ständig verwechselt: ein Konflikt, an dem beide mitwirken, und eine Gefährdung, die von einer Seite ausgeht. Der Rat, sich zusammenzureißen, hilft im ersten Fall und ist im zweiten gefährlich."
   },
   "/wissen/wenn-liebe-nicht-ankommt": {
     "title": "Wenn Liebe nicht ankommt: woran es liegt und was hilft",
