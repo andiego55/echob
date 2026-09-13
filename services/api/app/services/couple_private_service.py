@@ -124,24 +124,13 @@ async def add_private_message(conn, session_id, user_id, *, role, content, kind=
 
 
 # ── Der Begleiter zum ganzen Paarraum ────────────────────────────────────────
-
-async def load_room_private_messages(conn, couple_id, user_id) -> list[dict]:
-    rows = await conn.fetch(
-        "SELECT * FROM couple_private_messages "
-        "WHERE couple_id = $1 AND user_id = $2 ORDER BY created_at",
-        couple_id, user_id,
-    )
-    return [crypto.decrypt_fields(dict(r), "content") for r in rows]
-
-
-async def add_room_private_message(conn, couple_id, user_id, *, role, content,
-                                   kind="chat") -> dict:
-    row = await conn.fetchrow(
-        "INSERT INTO couple_private_messages (couple_id, user_id, role, kind, content) "
-        "VALUES ($1, $2, $3, $4, $5) RETURNING *",
-        couple_id, user_id, role, kind, crypto.encrypt(content),
-    )
-    return crypto.decrypt_fields(dict(row), "content")
+#
+# Hier standen einmal load_room_private_messages und add_room_private_message: der
+# Begleiter haengte direkt an der couple_id. Mit den Threads (couple_echo_threads) ist
+# er auf thread_id umgezogen, und seitdem laufen Lesen und Schreiben ueber
+# couple_companion_service. Die beiden Vorgaenger hatten null Aufrufer und sind
+# entfernt worden - ein unbenutzter Schreibpfad in couple_private_messages ist kein
+# harmloser Rest, sondern eine Tuer, die niemand mehr im Blick hat.
 
 
 async def build_companion_context(conn, link, user_id) -> str:
