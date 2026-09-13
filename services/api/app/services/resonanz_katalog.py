@@ -167,8 +167,31 @@ TAG_ZU_MUSTER: dict[str, str] = {
     "drohung": "Drohung",
     "emotionale-erpressung": "Drohung",
     "kind-im-elternkonflikt": "Kinder als Druckmittel",
-    "parentifizierung": "Kinder als Druckmittel",
     "loyalitaetsdruck": "Kinder als Druckmittel",
+    # `parentifizierung` stand hier und ist bewusst wieder heraus. Die Klasse meint laut
+    # Label-Leitfaden, dass "Kontakt zu Kindern, Sorgerecht oder die Elternrolle als HEBEL
+    # eingesetzt" werden - und fuehrt unter "Nein" ausdruecklich auf: "Kinder bekommen einen
+    # Streit mit -> belastend, aber kein Druckmittel." Genau das ist Parentifizierung: Ein
+    # Kind uebernimmt Aufgaben von Erwachsenen. Niemand wird damit unter Druck gesetzt.
+    #
+    # Sichtbar wurde es an "Immer die Grosse" - eine Tochter, die ihre Mutter troestet, seit
+    # sie denken kann. Dort gibt es keinen zweiten Elternteil, gegen den etwas eingesetzt
+    # wuerde; die Auswertung behauptete es trotzdem.
+    #
+    # Eine bessere Klasse gibt es nicht: "Emotionale Vernachlaessigung" verlangt laut
+    # Leitfaden, dass "nichts passiert" - bei Parentifizierung passiert reichlich, nur das
+    # Falsche. "Uebergriffigkeit" ist auf koerperliche und raeumliche Grenzen festgelegt.
+    # Also bleibt das Schlagwort unzugeordnet, nach der Regel oben: Ein falsch einsortiertes
+    # ist schlechter als ein fehlendes.
+    #
+    # Auf die Wirkungsachse gehoert es ebenso wenig, und zwar aus einem eigenen Grund: Die
+    # beiden Szenen erzaehlen aus entgegengesetzten Rollen - einmal das erwachsen gewordene
+    # Kind ("Immer die Grosse"), einmal der Vater, der es gerade tut ("Sie uebersetzt fuer
+    # uns"). Eine Wirkung waere nur fuer die eine Haelfte wahr.
+    #
+    # Beide Szenen fallen weiterhin auf Achsen: "Immer die Grosse" ueber grenzverletzung,
+    # schuldgefuehle und wiederkehrendes-muster, "Sie uebersetzt fuer uns" ueber
+    # kind-im-elternkonflikt, loyalitaetsdruck und einsamkeit-zu-zweit.
     "triangulierung": "Stimmung als Druckmittel",
     "bedingte-zuwendung": "Stimmung als Druckmittel",
     "entzug": "Stimmung als Druckmittel",
