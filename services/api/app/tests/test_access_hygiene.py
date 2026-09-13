@@ -41,6 +41,30 @@ Eigentümer-Tabelle (die Ablage einer Fachperson ist nicht das Tagebuch einer Kl
 zählt aber sehr wohl als **Bindung**, wenn eine Anweisung darüber einschränkt. Sonst
 stünden die Fachpersonen-Pfade, die sauber über ``professional_user_id = $1`` gehen,
 grundlos in der Ausnahmeliste.
+
+**Die bekannte Grenze — nachgemessen, bewusst so gelassen.** Eine Bindung spricht die
+*ganze* Funktion frei, nicht nur die eine Anweisung. Wer einmal bindet und daneben etwas
+Ungebundenes tut, kommt also durch. Das ist der übliche und richtige Weg — einmal Eigentum
+feststellen, dann mit der geprüften Id weiterarbeiten —, aber es ist eine Lücke.
+
+Am 13.09.2026 ausgezählt: Von 233 Anweisungen auf Eigentümer-Tabellen betrifft das **11
+Funktionen**, und alle 11 wurden einzeln angesehen. Sechs sind reine ``INSERT``s, die eine
+neue Zeile für die angemeldete Person anlegen — da fließt nichts ab. Fünf lesen, und zwar
+zu Recht: ``load_own_case_context`` über die zuvor geprüfte ``case_id``, ``dashboard_items``
+und ``export_for_user`` über beide Partner (genau ihr Zweck), ``fertig_melden`` zählt nur,
+und ``recover_pseudonymous`` *kann* nicht binden — es identifiziert die Person ja gerade
+erst.
+
+Eine Prüfung pro Anweisung träfe also 11 Funktionen und fände 0 Fehler. Sie würde nur die
+Ausnahmeliste um elf Einträge aufblähen, die „das ist der Normalfall" sagen — und eine
+Liste, die niemand mehr liest, ist genau der Friedhof, vor dem
+``test_die_ausnahmeliste_enthaelt_nichts_ueberfluessiges`` warnt. Deshalb bleibt es dabei.
+
+Und ein Maßstab für später: Dieser Wächter hat zwei Schichten — die Regel und den Test der
+Regel. Braucht er jemals eine dritte, ist das kein Zeichen von Gründlichkeit, sondern das
+Signal, dass er über seinen Nutzen hinausgewachsen ist. Der eigentliche Schutz steckt in
+``require_active_share`` und in den Bindungen im SQL; dies hier ist ein Rauchmelder, kein
+Feuerschutz.
 """
 import ast
 import re
