@@ -12,6 +12,12 @@
  * sah keine Antwort auf „was ist heute dran", sondern eine Wand. Jetzt: **Jetzt** (was
  * Aufmerksamkeit braucht), **Euer Rhythmus** (was wiederkehrt), **Weitermachen** (wo es
  * weitergeht). Was nur zum Nachschlagen da ist, liegt zugeklappt darunter.
+ *
+ * **Vor den drei Abschnitten steht die Landkarte** (`Einstiege`). Die Abschnitte zeigen
+ * *Zustand* — wie es steht, was wartet. Sie beantworten aber nicht, wo jemand hinsoll, der
+ * mit einem Anliegen hereinkommt: Der Raum hat sechs Wege, etwas zu sagen, und in der
+ * Reiterleiste heißen sie alle ungefähr „reden". Deshalb zuerst die Absicht, dann der
+ * Zustand.
  */
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -25,6 +31,7 @@ import CoupleNotices from './CoupleNotices'
 import SinceLastVisit from './SinceLastVisit'
 import { DashboardSkeleton } from '@/components/Skeleton'
 import DueAgreementsCard from './DueAgreementsCard'
+import Einstiege from './Einstiege'
 import WeeklyCheckinCard from './WeeklyCheckinCard'
 import ImpulseTeaser from './ImpulseTeaser'
 import HonestTeaser from './HonestTeaser'
@@ -81,6 +88,8 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
           </div>
         </div>
       </div>
+
+      <Einstiege coupleId={coupleId} />
 
       <Abschnitt titel="Jetzt" />
 

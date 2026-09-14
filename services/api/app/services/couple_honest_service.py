@@ -6,8 +6,16 @@ solange es zu heiß ist, um direkt zu reden — aber es ist eine Krücke, und we
 ablegt, lernt nie wieder ohne sie zu gehen.
 
 Hier hält Echo nur den Rahmen: wer dran ist, wann die Runde zu Ende ist. Den Inhalt rührt
-es nicht an. Dieses Modul ruft deshalb **keine** Methode des Echo-Dienstes auf — mit einer
-Ausnahme, und die ist Absicht: der Krisen-Triage. Siehe `pruefe_sicherheit`.
+es nicht an. Dieses Modul ruft deshalb **keine** Methode des Echo-Dienstes auf — und auch
+sonst fällt in diesem Bereich kein einziger Modellaufruf an. Genau das sagt die öffentliche
+Seite zu (*„Nichts davon liest eine KI"*), also darf es hier nicht still aufweichen.
+
+Die eine Prüfung, die trotzdem über jeden Text läuft, ist die **Krisen-Triage**, und sie
+kommt ohne Modell aus: ``_sicherheit()`` im Router ``couple_honest.py`` legt mit
+``safety_service.classify_keywords`` einen Stichwort-Boden unter den eigenen Beitrag.
+Blockiert wird nichts — der Hinweis steht daneben, die Entscheidung bleibt bei der Person.
+Sie liegt bewusst im Router und nicht hier: Dieses Modul soll auch aus Versehen keinen Weg
+zu einem Modell bekommen.
 
 **Die eine Regel, die alles trägt:** Wer zuhört, antwortet nicht. Zwei Bedingungen setzen
 sie durch (`darf_mitteilen`), und die Oberfläche zeigt schlicht kein Eingabefeld, solange
