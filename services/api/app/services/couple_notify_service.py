@@ -188,6 +188,19 @@ def share_proposed(fachperson: str) -> tuple[str, str]:
             "freizugeben. Ohne deine Zustimmung passiert nichts.")
 
 
+def share_requested(fachperson: str) -> tuple[str, str]:
+    """Die Fachperson hat von sich aus gebeten — beide erfahren es, keiner hat es angestoßen.
+
+    Schlug einer der beiden eine Freigabe vor, bekam der andere `share_proposed`. Bat die
+    Fachperson selbst darum, ging an niemanden etwas raus: Die Bitte lag still auf dem
+    Reiter „Freigaben", den ohne Anlass niemand öffnet. Eine Anfrage, von der beide nichts
+    wissen, ist keine Bitte, sondern ein Wartezimmer.
+    """
+    return ("couple_share_requested",
+            f"{_kurz(fachperson, 40)} bittet darum, euren Paarraum sehen zu dürfen. "
+            "Ihr entscheidet gemeinsam — ohne die Zustimmung von euch beiden passiert nichts.")
+
+
 def share_active() -> tuple[str, str]:
     return ("couple_share_active",
             "Die Freigabe eures Paarraums ist jetzt aktiv. Du kannst sie jederzeit "

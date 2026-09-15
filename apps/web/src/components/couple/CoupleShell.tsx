@@ -7,9 +7,13 @@
  *
  * **Warum zwei Ebenen.** Die Leiste war auf neun Reiter gewachsen und scrollte waagerecht.
  * Auf dem Telefon waren die hinteren dadurch unsichtbar, und nichts deutete an, dass dort
- * noch etwas ist — ausgerechnet Rückblick, Fortschritt und Einstellungen. Jetzt oben vier
+ * noch etwas ist — ausgerechnet Rückblick, Fortschritt und Einstellungen. Jetzt oben fünf
  * Gruppen (passen auf jeden Schirm), darunter die Unterreiter der aktiven Gruppe. Wer
  * „Klären" liest, ahnt, was darin liegt; „Mediation" allein sagte das nicht.
+ *
+ * Die obere Reihe ist auf 375 Pixel Breite ausgemessen und passt dort ohne Scrollen — mit
+ * schmalerem Innenabstand als auf dem Schreibtisch. Wer eine sechste Gruppe erwägt, misst
+ * bitte nach, statt zu schätzen: Bei px-4 lag „Wir" schon als fünfte außerhalb.
  *
  * Einstellungen sind aus der Reihe heraus und sitzen als Zahnrad rechts in der Kopfzeile —
  * sie sind kein Inhalt, sondern Verwaltung.
@@ -24,15 +28,30 @@ import InfoPopover from '@/components/InfoPopover'
 interface Reiter { path: string; label: string }
 interface Gruppe { label: string; kinder: Reiter[] }
 
-/** Die Gruppen bündeln nach dem, was man vorhat — nicht nach der Technik dahinter. */
-const GRUPPEN: Gruppe[] = [
+/**
+ * Die Gruppen bündeln nach dem, was man vorhat — nicht nach der Technik dahinter.
+ *
+ * **Warum „Üben" dazugekommen ist.** Szenen, Tests und Impulse sind dieselbe Übung: Es gibt
+ * vorbereitetes Material, beide antworten getrennt, und erst wenn beide fertig sind, sieht
+ * man das Ergebnis nebeneinander. Dieselbe Blindheitsregel, dieselbe Bewegung. Sie lagen
+ * trotzdem an drei verschiedenen Orten — Szenen unter „Reden", Tests und Impulse unter
+ * „Wir" —, weil sie nacheinander entstanden sind und jeweils dort angehängt wurden, wo
+ * gerade Platz war. Wer eine Übung für heute Abend sucht, musste das wissen.
+ *
+ * **Warum Szenen nicht unter „Reden" gehören.** Dort steht, was man sagt. Bei den Szenen
+ * sagt man nichts zueinander, man antwortet getrennt auf fremdes Material. Das ist ein
+ * anderer Vorgang, auch wenn hinterher ein Gespräch daraus werden kann.
+ *
+ * **Fünf statt vier Gruppen.** Die Grenze war nie die Zahl, sondern die Breite: Die alte
+ * Leiste scrollte, weil sie neun Reiter trug. Fünf kurze Wörter tun das nicht.
+ */
+export const GRUPPEN: Gruppe[] = [
   { label: 'Übersicht', kinder: [{ path: '', label: 'Übersicht' }] },
   {
     label: 'Reden',
     kinder: [
       { path: '/echo', label: 'Echo' },
       { path: '/mitteilen', label: 'Ehrlich mitteilen' },
-      { path: '/szenen', label: 'Szenen' },
       { path: '/fragen', label: 'Fragen' },
       { path: '/gespraeche', label: 'Gespräche' },
       { path: '/streit', label: 'Nach einem Streit' },
@@ -46,12 +65,18 @@ const GRUPPEN: Gruppe[] = [
     ],
   },
   {
+    label: 'Üben',
+    kinder: [
+      { path: '/szenen', label: 'Szenen' },
+      { path: '/tests', label: 'Tests' },
+      { path: '/impulse', label: 'Impulse' },
+    ],
+  },
+  {
     label: 'Wir',
     kinder: [
-      { path: '/impulse', label: 'Impulse' },
       { path: '/rueckblick', label: 'Rückblick' },
       { path: '/fortschritt', label: 'Fortschritt' },
-      { path: '/tests', label: 'Tests' },
       { path: '/freigaben', label: 'Freigaben' },
     ],
   },
@@ -59,10 +84,21 @@ const GRUPPEN: Gruppe[] = [
 
 const EINSTELLUNGEN = '/einstellungen'
 
+/**
+ * Unterseiten, die keinen eigenen Reiter haben, aber zu einem gehören.
+ *
+ * Ein einzelner Test liegt unter `/test/<slug>` (Einzahl), der Reiter heißt `/tests`. Die
+ * Präfixprüfung unten trifft ihn deshalb nicht, und wer einen Test ausfüllte, sah die Leiste
+ * auf „Übersicht" zurückfallen — als hätte er den Bereich verlassen.
+ */
+const ZUSATZPFADE: Record<string, string> = { '/test/': '/tests' }
+
 /** Welche Gruppe gehört zum aktuellen Pfad? Fällt auf „Übersicht" zurück. */
-function aktiveGruppe(rest: string): Gruppe {
+export function aktiveGruppe(rest: string): Gruppe {
+  const treffer = Object.entries(ZUSATZPFADE).find(([p]) => rest.startsWith(p))
+  const pfad = treffer ? treffer[1] : rest
   for (const g of GRUPPEN) {
-    if (g.kinder.some(k => k.path && rest.startsWith(k.path))) return g
+    if (g.kinder.some(k => k.path && pfad.startsWith(k.path))) return g
   }
   return GRUPPEN[0]
 }
@@ -182,8 +218,10 @@ export default function CoupleShell({
           den Reitern darf dagegen ruhig verschwinden, man liest es einmal beim Ankommen. */}
       <div className="sticky top-14 z-30 border-b border-brand-border bg-white">
         <div className="mx-auto max-w-[1100px] px-6">
-          {/* Vier kurze Woerter passen auf jeden Schirm; overflow-x bleibt als Netz,
-              falls jemand die Schrift hochstellt. */}
+          {/* Fuenf kurze Woerter passen auf jeden Schirm - aber nur knapp, und nur mit
+              schmalerem Innenabstand: Mit px-4 brauchte die Leiste auf einem 375er-Telefon
+              369 von 327 verfuegbaren Pixeln, "Wir" lag ausserhalb. Gemessen, nicht
+              geschaetzt. overflow-x bleibt als Netz, falls jemand die Schrift hochstellt. */}
           <nav className="flex gap-0 overflow-x-auto" aria-label="Bereiche des Paarraums">
             {GRUPPEN.map(g => {
               const aktiv = !inEinstellungen && g.label === gruppe.label
@@ -192,7 +230,7 @@ export default function CoupleShell({
                   key={g.label}
                   to={`${base}${g.kinder[0].path}`}
                   end={g.kinder[0].path === ''}
-                  className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 no-underline transition-colors ${
+                  className={`flex-shrink-0 px-2 py-3 text-sm font-medium border-b-2 no-underline transition-colors sm:px-4 ${
                     aktiv
                       ? 'border-accent text-accent'
                       : 'border-transparent text-brand-muted hover:text-brand-text hover:border-brand-border'

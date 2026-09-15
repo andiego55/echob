@@ -28,6 +28,7 @@ from fastapi import HTTPException
 
 from app.core import crypto
 from app.services import agreement_service
+from app.services import couple_notify_service as notify
 from app.services.couple_session_service import load_member_names
 from app.services.couple_therapy_service import require_couple_member
 
@@ -133,6 +134,45 @@ async def _out(conn, row: dict, *, names: dict[str, str] | None = None) -> dict[
     return eintrag
 
 
+async def dashboard_items(conn, couple_id, user_id) -> tuple[list[dict], list[dict]]:
+    """Offene Freigabe-Bitten für die Übersicht: wartet sie auf mich oder auf die andere?
+
+    **Warum das hier steht und eine Benachrichtigung nicht reicht.** Eine Benachrichtigung
+    ist ein Ereignis, eine offene Bitte ein Zustand. Wer die Meldung wegklickt, hat die
+    Bitte damit nicht beantwortet — sie muss sichtbar bleiben, bis jemand entscheidet.
+    Vorher lag sie ausschließlich auf dem Reiter „Freigaben", und den öffnet ohne Anlass
+    niemand: Eine Fachperson konnte wochenlang auf eine Antwort warten, die niemand
+    verweigert hatte.
+
+    Gibt (wartet auf mich, wartet auf die andere Person) zurück — dieselbe Form, die die
+    Übersicht auch von den Fragen und vom Ehrlichen Mitteilen bekommt.
+    """
+    await require_couple_member(conn, couple_id, user_id)
+    rows = await conn.fetch(
+        "SELECT s.id, COALESCE(p.display_name, 'Eine Fachperson') AS name, "
+        "       COALESCE(BOOL_OR(c.user_id = $2), false) AS zugestimmt "
+        "FROM couple_professional_shares s "
+        "LEFT JOIN professional_profiles p ON p.user_id = s.professional_user_id "
+        "LEFT JOIN couple_share_consents c ON c.share_id = s.id "
+        "WHERE s.couple_id = $1 AND s.status = 'pending' "
+        "GROUP BY s.id, p.display_name",
+        couple_id, user_id,
+    )
+    ziel = f"/app/paar/{couple_id}/freigaben"
+    fuer_mich = [
+        {"kind": "share_open", "title": r["name"],
+         "detail": "bittet darum, euren Paarraum sehen zu dürfen.", "target": ziel}
+        for r in rows if not r["zugestimmt"]
+    ]
+    fuer_sie = [
+        {"kind": "share_waiting", "title": r["name"],
+         "detail": "Du hast zugestimmt — es fehlt noch die Zustimmung der anderen Person.",
+         "target": ziel}
+        for r in rows if r["zugestimmt"]
+    ]
+    return fuer_mich, fuer_sie
+
+
 async def list_for_couple(conn, couple_id, user_id) -> list[dict[str, Any]]:
     """Alle Freigaben des Paarraums — offene, aktive und die beendeten als Nachweis."""
     link = await require_couple_member(conn, couple_id, user_id)
@@ -168,12 +208,30 @@ async def request_by_professional(conn, couple_id, professional_user_id, *,
     Sie darf bitten, aber nichts entscheiden: Es entsteht eine Freigabe ganz ohne
     Zustimmung — beide Personen müssen zustimmen, damit sie aktiv wird. Das nimmt dem Paar
     nichts und der Fachperson die Ohnmacht.
+
+    **Beide werden benachrichtigt, und das gehört hierher.** Schlägt eine der beiden
+    Personen eine Freigabe vor, bekommt die andere eine Nachricht. Bat die Fachperson selbst
+    darum, ging an niemanden etwas raus — die Bitte lag still auf dem Reiter „Freigaben",
+    den ohne Anlass niemand öffnet. Eine Fachperson konnte so wochenlang auf eine Antwort
+    warten, die ihr niemand verweigert hatte.
+
+    ``to_both`` statt ``to_partner``, weil hier niemand im Paar etwas angestoßen hat: Die
+    Bitte kommt von außen, also erfahren beide dasselbe. Der Fachperson verrät das nichts —
+    die Antwort des Endpunkts bleibt unverändert, egal ob es einen Raum gibt.
+
+    Die Zeile steht bewusst im Dienst und nicht im fachpersonenseitigen Router: Dort darf
+    laut ``test_only_one_module_hands_room_data_to_a_professional`` kein weiteres
+    ``couple_``-Modul importiert werden, damit niemand an ``require_released`` vorbeikommt.
+    Die Regel ist stumpf und soll es bleiben — eine Benachrichtigung ans Paar ist zwar
+    harmlos, aber die Ausnahme wäre teurer als der Umweg.
     """
     sauber = validate_elements(elements)
     share = await _create(conn, couple_id, professional_user_id,
                           origin="professional", initiated_by=professional_user_id,
                           message=message, elements=sauber)
-    return await _out(conn, share)
+    eintrag = await _out(conn, share)
+    await notify.to_both(conn, couple_id, notify.share_requested(eintrag["professional_name"]))
+    return eintrag
 
 
 async def _create(conn, couple_id, professional_user_id, *, origin, initiated_by,

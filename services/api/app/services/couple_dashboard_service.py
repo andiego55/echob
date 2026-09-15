@@ -17,6 +17,7 @@ from app.core.logging import get_logger
 from app.services.couple_companion_service import list_summaries
 from app.services.couple_honest_service import dashboard_items as honest_items
 from app.services.couple_honest_service import teaser as honest_teaser
+from app.services.couple_professional_service import dashboard_items as share_items
 from app.services.couple_progress_service import load_progress
 from app.services.couple_question_service import load_open_for_dashboard
 from app.services.couple_therapy_service import load_partner_profile, require_couple_member
@@ -105,8 +106,17 @@ async def load_dashboard(conn, couple_id, user_id) -> dict[str, Any]:
         logger.warning("Ehrliches Mitteilen konnte nicht in die Übersicht aufgenommen werden.")
         h_mich, h_sie, h_teaser = [], [], None
 
-    attention = fuer_mich + h_mich + attention
-    waiting = fuer_sie + h_sie + waiting
+    # Offene Freigabe-Bitten. Sie stehen GANZ vorn: Es ist die einzige Zeile auf dieser
+    # Seite, bei der jemand von aussen wartet - und die einzige mit einer Folge fuer Dritte.
+    # Gleiche Fehlertoleranz wie oben, aus demselben Grund.
+    try:
+        s_mich, s_sie = await share_items(conn, couple_id, user_id)
+    except Exception:  # noqa: BLE001
+        logger.warning("Offene Freigaben konnten nicht in die Übersicht aufgenommen werden.")
+        s_mich, s_sie = [], []
+
+    attention = s_mich + fuer_mich + h_mich + attention
+    waiting = s_sie + fuer_sie + h_sie + waiting
 
     # Eigene Echo-Zusammenfassungen — sie gehören auf die Übersicht, aber nur der
     # Person, die sie geführt hat.
