@@ -20,13 +20,21 @@
 import { useEffect, useId, useRef, useState } from 'react'
 
 export default function InfoPopover({
-  label, title, children, align = 'right',
+  label, title, children, align = 'right', ton = 'hell',
 }: {
   /** Was das Zeichen erklärt – für Screenreader und als Titel im Panel. */
   label: string
   title?: string
   children: React.ReactNode
   align?: 'left' | 'right'
+  /**
+   * Der Grund, auf dem das Zeichen sitzt — nicht seine Farbe, sondern die Umgebung.
+   *
+   * Die App-Kopfleiste ist navy. Mit den hellen Tönen wäre das Zeichen dort praktisch
+   * unsichtbar: ein Hilfeangebot, das man suchen muss, ist keines. Der Kasten selbst
+   * bleibt in beiden Fällen hell — er steht auf der Seite, nicht in der Leiste.
+   */
+  ton?: 'hell' | 'dunkel'
 }) {
   const [offen, setOffen] = useState(false)
   const huelle = useRef<HTMLDivElement>(null)
@@ -61,9 +69,13 @@ export default function InfoPopover({
         onClick={() => setOffen(o => !o)}
         onFocus={() => setOffen(true)}
         className={`grid h-7 w-7 place-items-center rounded-full border transition-colors ${
-          offen
-            ? 'border-accent bg-accent/10 text-accent'
-            : 'border-brand-border text-brand-muted hover:border-accent/50 hover:text-accent'
+          ton === 'dunkel'
+            ? offen
+              ? 'border-white/60 bg-white/15 text-white'
+              : 'border-white/25 text-white/70 hover:border-white/60 hover:text-white'
+            : offen
+              ? 'border-accent bg-accent/10 text-accent'
+              : 'border-brand-border text-brand-muted hover:border-accent/50 hover:text-accent'
         }`}
       >
         {/* Echo-Welle mit Fragezeichen – dasselbe Zeichen wie im Barometer, nur klein. */}

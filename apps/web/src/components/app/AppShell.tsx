@@ -11,6 +11,7 @@ import QuickExitButton from '@/components/app/QuickExit'
 import GearIcon from '@/components/icons/GearIcon'
 import EchoBLogo from '@/components/EchoBLogo'
 import MobileTabBar from './MobileTabBar'
+import SeitenHilfe from '@/components/SeitenHilfe'
 
 interface Props {
   children: React.ReactNode
@@ -76,6 +77,10 @@ export default function AppShell({ children }: Props) {
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Immer an derselben Stelle, auf jeder Seite — Hilfe, die man suchen muss,
+                ist keine. Der Text kommt aus lib/seitenhilfe und richtet sich nach der
+                Route; die Seite selbst reicht nichts durch und kann ihn nicht vergessen. */}
+            <SeitenHilfe ton="dunkel" />
             <QuickExitButton />
             <NavLink
               to="/app/settings"
