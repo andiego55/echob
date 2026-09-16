@@ -3,7 +3,7 @@
  * Zeigt NUR freigegebene Inhalte (Server liefert ein gefiltertes Bundle).
  * Bei Widerruf/keinem Zugriff antwortet der Server mit 404 → "Kein Zugriff".
  */
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
@@ -53,13 +53,34 @@ const TABS = [
   { key: 'faq', label: 'Fall-FAQ' },
   { key: 'collab', label: 'Zusammenarbeit' },
   { key: 'echo', label: 'Echo' },
-  { key: 'arbeitsmappe', label: 'Arbeitsmappe' },
-  { key: 'reports', label: 'Berichte' },
-  { key: 'notes', label: 'Notizen' },
+  // „Fallarbeit" buendelt Arbeitsmappe, Berichte und Notizen — genau wie „Zusammenarbeit"
+  // schon die vier Zuweisungsarten buendelt.
+  { key: 'fallarbeit', label: 'Fallarbeit' },
   { key: 'appointments', label: 'Termine' },
   { key: 'history', label: 'Verlauf' },
 ] as const
 type TabKey = (typeof TABS)[number]['key']
+
+/**
+ * Die drei Teile der Fallarbeit — was die FACHPERSON zu diesem Fall erarbeitet.
+ *
+ * **Warum sie zusammengehoeren.** Uebersicht, Fall-FAQ und Verlauf zeigen, was die
+ * Klientin beigetragen und freigegeben hat. Arbeitsmappe, Berichte und Notizen sind die
+ * andere Richtung: das eigene Material der Fachperson. Diese Grenze verlief quer durch
+ * eine Leiste aus neun gleich aussehenden Reitern, und wer sie nicht kannte, sah nur eine
+ * lange Reihe.
+ *
+ * **Warum nicht einfach kuerzen.** Keiner der drei ist entbehrlich: Die Arbeitsmappe traegt
+ * die Hypothesen, die Berichte gehen nach aussen, die Notizen sind Dokumentationspflicht.
+ * Es ging also nie ums Weglassen, sondern ums Sortieren.
+ */
+const FALLARBEIT_TEILE = [
+  { key: 'arbeitsmappe', label: 'Arbeitsmappe' },
+  { key: 'reports', label: 'Berichte' },
+  { key: 'notes', label: 'Notizen' },
+] as const
+type FallarbeitKey = (typeof FALLARBEIT_TEILE)[number]['key']
+const FALLARBEIT_KEYS = FALLARBEIT_TEILE.map(t => t.key) as string[]
 
 // „Zusammenarbeit" bündelt die vier Zuweisungsarten (früher eigene Reiter).
 const COLLAB_TYPES: { key: AssignmentType; label: string }[] = [
@@ -202,7 +223,7 @@ function CaseActivationGate({ caseId }: { caseId: string }) {
 }
 
 /** Hinweis + Schnellstart-Checkliste für den fiktiven Beispielfall (Spielwiese). */
-function DemoIntro({ onGoto }: { onGoto: (t: TabKey) => void }) {
+function DemoIntro({ onGoto }: { onGoto: (schluessel: string) => void }) {
   const [dismissed, setDismissed] = useState(
     () => typeof localStorage !== 'undefined' && localStorage.getItem('echob_demo_intro') === 'off',
   )
@@ -211,7 +232,8 @@ function DemoIntro({ onGoto }: { onGoto: (t: TabKey) => void }) {
     setDismissed(true)
     try { localStorage.setItem('echob_demo_intro', 'off') } catch { /* ignore */ }
   }
-  const steps: { label: string; tab: TabKey }[] = [
+  // Die Schluessel sind die alten - `waehleReiter` uebersetzt sie auf Fallarbeit.
+  const steps: { label: string; tab: string }[] = [
     { label: 'Bericht erzeugen', tab: 'reports' },
     { label: 'Sitzungsnotiz schreiben', tab: 'notes' },
     { label: 'Mit Echo sprechen', tab: 'echo' },
@@ -368,11 +390,28 @@ export default function ProfessionalCaseDetailPage() {
   const [searchParams] = useSearchParams()
   const [tab, setTab] = useState<TabKey>('ueber')
   const [collabSub, setCollabSub] = useState<AssignmentType>('dialog')
+  const [fallarbeitSub, setFallarbeitSub] = useState<FallarbeitKey>('arbeitsmappe')
+
+  /**
+   * Einen Reiter auswaehlen — auch ueber einen der alten Schluessel.
+   *
+   * `reports`, `notes`, `arbeitsmappe` und die vier Zuweisungsarten sind keine eigenen
+   * Reiter mehr, aber sie stehen weiterhin in Verweisen: `?tab=reports` kommt aus der
+   * Berichtsansicht zurueck, und die Demo-Einfuehrung schickt Leute gezielt dorthin. Diese
+   * Zuordnung gehoert an EINE Stelle. Stuende sie zweimal, waere die zweite irgendwann
+   * veraltet — und ein Verweis, der auf dem falschen Reiter landet, faellt niemandem auf:
+   * Die Seite laedt ja, nur eben anders als gemeint.
+   */
+  const waehleReiter = useCallback((schluessel: string) => {
+    if (COLLAB_KEYS.includes(schluessel)) { setTab('collab'); setCollabSub(schluessel as AssignmentType) }
+    else if (FALLARBEIT_KEYS.includes(schluessel)) { setTab('fallarbeit'); setFallarbeitSub(schluessel as FallarbeitKey) }
+    else if (TABS.some(x => x.key === schluessel)) setTab(schluessel as TabKey)
+  }, [])
+
   useEffect(() => {
     const t = searchParams.get('tab')
-    if (t && COLLAB_KEYS.includes(t)) { setTab('collab'); setCollabSub(t as AssignmentType) }
-    else if (t && TABS.some(x => x.key === t)) setTab(t as TabKey)
-  }, [searchParams])
+    if (t) waehleReiter(t)
+  }, [searchParams, waehleReiter])
   const { data: bundle, isLoading, isError } = useQuery({
     queryKey: ['prof-case', caseId],
     queryFn: () => professionalApi.caseDetail(caseId!),
@@ -431,7 +470,7 @@ export default function ProfessionalCaseDetailPage() {
             <p className="mt-1 text-xs text-brand-muted">Sie sehen nur die freigegebenen Inhalte dieses Falls.</p>
           </div>
         </div>
-        {bundle.is_demo && <DemoIntro onGoto={setTab} />}
+        {bundle.is_demo && <DemoIntro onGoto={waehleReiter} />}
         {!bundle.is_demo && !bundle.activated && <CaseActivationGate caseId={caseId!} />}
         {!bundle.is_demo && bundle.activated && <CaseSeatActive caseId={caseId!} />}
 
@@ -449,9 +488,9 @@ export default function ProfessionalCaseDetailPage() {
             updating={updateSummary.isPending}
           />
         )}
-        {tab === 'arbeitsmappe' && <ArbeitsmappePanel caseId={caseId!} />}
-        {tab === 'reports' && <ReportsPanel caseId={caseId!} />}
-        {tab === 'notes' && <NotesPanel caseId={caseId!} overview={bundle.notes} />}
+        {tab === 'fallarbeit' && (
+          <FallarbeitPanel caseId={caseId!} initialTeil={fallarbeitSub} notizen={bundle.notes} />
+        )}
         {tab === 'appointments' && <AppointmentsPanel caseId={caseId!} />}
         {tab === 'history' && <CaseHistoryPanel caseId={caseId!} />}
       </div>
@@ -483,6 +522,43 @@ function CollabPanel({ caseId, initialType }: { caseId: string; initialType: Ass
         ))}
       </div>
       <AssignmentTypePanel caseId={caseId} type={sub} />
+    </div>
+  )
+}
+
+/**
+ * Reiter „Fallarbeit": bündelt Arbeitsmappe, Berichte und Notizen mit Auswahl auf der Seite.
+ *
+ * Dieselbe Bauweise wie `CollabPanel` — bewusst, nicht aus Bequemlichkeit: Zwei Reiter, die
+ * auf derselben Leiste dasselbe versprechen, sollen sich auch gleich verhalten.
+ */
+function FallarbeitPanel({ caseId, initialTeil, notizen }: {
+  caseId: string; initialTeil: FallarbeitKey; notizen: ProfessionalNote | null
+}) {
+  const [teil, setTeil] = useState<FallarbeitKey>(initialTeil)
+  useEffect(() => { setTeil(initialTeil) }, [initialTeil])
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Teil der Fallarbeit">
+        {FALLARBEIT_TEILE.map(t => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={teil === t.key}
+            onClick={() => setTeil(t.key)}
+            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              teil === t.key
+                ? 'border-accent bg-accent text-white'
+                : 'border-brand-border bg-white text-brand-muted hover:border-accent/50 hover:text-accent'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {teil === 'arbeitsmappe' && <ArbeitsmappePanel caseId={caseId} />}
+      {teil === 'reports' && <ReportsPanel caseId={caseId} />}
+      {teil === 'notes' && <NotesPanel caseId={caseId} overview={notizen} />}
     </div>
   )
 }

@@ -21,17 +21,34 @@ import { SEITENHILFE, hilfeFuer } from '@/lib/seitenhilfe'
 const hier = dirname(fileURLToPath(import.meta.url))
 const APP = readFileSync(resolve(hier, '../src/App.tsx'), 'utf-8')
 
-/** Alle Routen des Nutzerbereichs, so wie sie in App.tsx stehen. */
-const ROUTEN = [...APP.matchAll(/path="(\/app[^"]*)"/g)].map(m => m[1])
+/**
+ * Alle Routen hinter der Anmeldung, so wie sie in App.tsx stehen.
+ *
+ * Die oeffentlichen Seiten (Startseite, Wissen, Glossar, Szenen) sind bewusst nicht dabei:
+ * Sie erklaeren sich durch ihren Inhalt, und ein Fragezeichen neben einem Artikel waere
+ * Beiwerk.
+ */
+const BEREICHE = ['/app', '/professional', '/institute', '/student']
+const ROUTEN = [...APP.matchAll(/path="(\/[^"]*)"/g)]
+  .map(m => m[1])
+  .filter(r => BEREICHE.some(b => r === b || r.startsWith(`${b}/`)))
 
 describe('Seitenhilfe', () => {
   it('findet ueberhaupt Routen in App.tsx', () => {
     // Ohne diese Schranke prueft der Test nichts und bleibt trotzdem gruen - dieselbe
     // Bauart Fehler, gegen die er geschrieben ist.
-    expect(ROUTEN.length).toBeGreaterThan(40)
+    expect(ROUTEN.length).toBeGreaterThan(90)
   })
 
-  it('erklaert jede Seite des Nutzerbereichs', () => {
+  it('deckt alle vier Bereiche ab, nicht nur einen', () => {
+    // Faellt ein Bereich aus dem Muster oben heraus, waeren seine Seiten unerklaert und
+    // der Test daneben trotzdem gruen.
+    for (const b of BEREICHE) {
+      expect(ROUTEN.filter(r => r.startsWith(b)).length, b).toBeGreaterThan(5)
+    }
+  })
+
+  it('erklaert jede Seite hinter der Anmeldung', () => {
     const ohne = ROUTEN.filter(r => !(r in SEITENHILFE))
     expect(ohne, `Diese Seiten haben keinen Hilfetext:\n  ${ohne.join('\n  ')}`).toEqual([])
   })
@@ -61,7 +78,7 @@ describe('Seitenhilfe', () => {
   })
 
   it('gibt fuer unbekannte Seiten null zurueck, statt etwas zu erfinden', () => {
-    expect(hilfeFuer('/professional/dashboard')).toBeNull()
+    expect(hilfeFuer('/impressum')).toBeNull()
     expect(hilfeFuer('/wissen/gaslighting-erkennen')).toBeNull()
   })
 })

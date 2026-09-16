@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { professionalApi } from '@/api/professional'
 import GearIcon from '@/components/icons/GearIcon'
+import SeitenHilfe from '@/components/SeitenHilfe'
 import EchoBLogo from '@/components/EchoBLogo'
 
 export default function ProfessionalShell({ children }: { children: React.ReactNode }) {
@@ -58,6 +59,7 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
           </nav>
 
           <div className="flex items-center gap-3">
+            <SeitenHilfe ton="dunkel" />
             <NavLink
               to="/professional/settings"
               title="Einstellungen"

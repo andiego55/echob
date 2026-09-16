@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { studentApi } from '@/api/student'
 import EchoBLogo from '@/components/EchoBLogo'
+import SeitenHilfe from '@/components/SeitenHilfe'
 
 const NAV = [
   { to: '/student/dashboard', label: 'Start', end: false },
@@ -55,6 +56,7 @@ export default function StudentShell({ children }: { children: React.ReactNode }
           </nav>
 
           <div className="flex items-center gap-3">
+            <SeitenHilfe ton="dunkel" />
             <span className="hidden sm:block text-xs text-white/40">{user?.email}</span>
             <button
               onClick={handleSignOut}

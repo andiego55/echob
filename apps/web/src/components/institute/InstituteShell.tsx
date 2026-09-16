@@ -8,6 +8,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import EchoBLogo from '@/components/EchoBLogo'
 import GearIcon from '@/components/icons/GearIcon'
+import SeitenHilfe from '@/components/SeitenHilfe'
 
 const NAV = [
   { to: '/institute/dashboard', label: 'Dashboard' },
@@ -60,6 +61,7 @@ export default function InstituteShell({ children }: { children: React.ReactNode
           </nav>
 
           <div className="flex items-center gap-3">
+            <SeitenHilfe ton="dunkel" />
             {/* Einrichtung (Zahnrad-Menü) */}
             <div className="relative">
               <button

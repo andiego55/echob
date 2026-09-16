@@ -379,6 +379,281 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     zweck: 'Ein Mediationsthema mit beiden Sichten und dem Vorschlag dazu.',
     schritte: ['Deine Sicht schreiben', 'Vorschlag lesen', 'Eine Brücke annehmen oder verwerfen'],
   },
+
+  // ── Fachpersonen ─────────────────────────────────────────────────────────
+  // Andere Ansprache als oben: Hier arbeitet jemand beruflich, und die Texte dürfen
+  // Fachbegriffe benutzen. Was sie nicht dürfen, ist Sorgfaltspflichten verschweigen —
+  // wo eine Grenze verläuft, steht sie im Tipp.
+  '/professional': {
+    titel: 'Postfach',
+    zweck: 'Was seit Ihrem letzten Besuch hereingekommen ist — über alle Klient:innen hinweg.',
+    schritte: ['Neue Freigaben und Rückmeldungen sichten', 'Von hier in den jeweiligen Fall springen'],
+  },
+  '/professional/dashboard': {
+    titel: 'Ihre Klient:innen',
+    zweck: 'Alle Fälle, die Ihnen freigegeben wurden, mit dem Stand der Zusammenarbeit.',
+    schritte: ['Einen Fall öffnen', 'Nach Status filtern', 'Eine neue Klientin einladen'],
+    tipp: 'Sie sehen ausschließlich, was die Klientin Ihnen ausdrücklich freigegeben hat — und nur so lange, wie sie es freigegeben lässt.',
+  },
+  '/professional/cases/:caseId': {
+    titel: 'Fall-Arbeitsplatz',
+    zweck: 'Alles zu einer Klientin an einem Ort: was sie freigegeben hat und was Sie daraus erarbeiten.',
+    schritte: [
+      'Übersicht, Fall-FAQ und Verlauf zeigen ihr Material',
+      'Fallarbeit bündelt Ihres: Arbeitsmappe, Berichte, Notizen',
+      'Zusammenarbeit: Dialoge, Fragebögen, Nachrichten und Ressourcen zuweisen',
+      'Echo arbeitet auf dem freigegebenen Material',
+    ],
+    tipp: 'Die Trennung der Reiter ist die Trennung der Herkunft: links, was von ihr kommt — rechts, was von Ihnen kommt.',
+  },
+  '/professional/cases/:caseId/echo': {
+    titel: 'Echo zum Fall',
+    zweck: 'Ein fachliches Gespräch über das freigegebene Material dieser Klientin.',
+    schritte: ['Fragen zum Fall stellen', 'Hypothesen durchdenken', 'Ergebnisse in die Arbeitsmappe übernehmen'],
+    tipp: 'Echo kennt hier ausschließlich Freigegebenes. Was die Klientin zurückhält, existiert für dieses Gespräch nicht — auch dann nicht, wenn Sie es aus der Sitzung wissen.',
+  },
+  '/professional/cases/:caseId/reports/:reportId': {
+    titel: 'Dieser Bericht',
+    zweck: 'Ein erstellter Bericht zum Lesen, Überarbeiten und Weitergeben.',
+    schritte: ['Text anpassen', 'Ausdrucken oder speichern'],
+    tipp: 'Ein erzeugter Bericht ist ein Entwurf, kein Befund. Die fachliche Verantwortung für das, was darin steht, bleibt bei Ihnen.',
+  },
+  '/professional/paarraum/:coupleId': {
+    titel: 'Paarraum',
+    zweck: 'Der gemeinsame Raum eines Paares — so weit beide ihn Ihnen freigegeben haben.',
+    schritte: ['Freigegebene Elemente ansehen', 'Mit Echo über das Material sprechen'],
+    tipp: 'Freigeben mussten hier beide. Widerrufen kann jeder allein — dann ist der Zugang sofort zu, ohne Vorwarnung.',
+  },
+  '/professional/couples/:coupleId/echo': {
+    titel: 'Echo zur Paar-Analyse',
+    zweck: 'Ein allparteiliches Gespräch über die beiden gekoppelten Fälle.',
+    schritte: ['Muster im Zusammenspiel besprechen', 'Beide Seiten nebeneinanderlegen'],
+    tipp: 'Allparteilich heißt: kein Ergebnis, das einer Seite recht gibt. Das ist Absicht und lässt sich nicht abstellen.',
+  },
+  '/professional/couples/:coupleId/reports/:reportId': {
+    titel: 'Paar-Bericht',
+    zweck: 'Ein Bericht über die gekoppelten Fälle beider Personen.',
+    schritte: ['Text anpassen', 'Ausdrucken oder speichern'],
+  },
+  '/professional/templates': {
+    titel: 'Ressourcen',
+    zweck: 'Ihre wiederverwendbaren Vorlagen: Fragebögen, Materialien, Texte für die Zuweisung.',
+    schritte: ['Eine Vorlage anlegen', 'Bestehende bearbeiten', 'Aus dem Fall heraus zuweisen'],
+    tipp: 'Was Sie zweimal geschrieben haben, gehört hierher. Die dritte Klientin bekommt es dann mit einem Klick.',
+  },
+  '/professional/report-templates': {
+    titel: 'Berichtsvorlagen',
+    zweck: 'Eigene Vorlagen dafür, wie ein Bericht aufgebaut sein soll.',
+    schritte: ['Eine Vorlage schreiben', 'Abschnitte und Tonfall festlegen', 'Beim Erstellen eines Berichts auswählen'],
+    tipp: 'Eine Vorlage ist eine Anweisung an Echo, kein Formular. Je genauer Sie beschreiben, was Sie erwarten, desto weniger müssen Sie danach umschreiben.',
+  },
+  '/professional/profil': {
+    titel: 'Ihr Verzeichnis-Profil',
+    zweck: 'Wie Sie im öffentlichen Fachpersonenverzeichnis erscheinen.',
+    schritte: ['Schwerpunkte und Arbeitsweise beschreiben', 'Erreichbarkeit angeben', 'Sichtbarkeit steuern'],
+    tipp: 'Menschen suchen hier nicht nach Methoden, sondern nach jemandem, bei dem sie sich sicher fühlen. Schreiben Sie entsprechend.',
+  },
+  '/professional/settings': {
+    titel: 'Einstellungen',
+    zweck: 'Wie Echo in Ihren Fällen arbeitet — Ausrichtung, Tonfall, Voreinstellungen.',
+    schritte: ['Therapeutischen Ansatz wählen', 'Konto und Abrechnung verwalten'],
+    tipp: 'Der gewählte Ansatz verändert, wie Echo formuliert und worauf es achtet — nicht, welche Daten es sieht.',
+  },
+  '/professional/register': {
+    titel: 'Als Fachperson anmelden',
+    zweck: 'Ihr Konto zum Fachpersonen-Zugang machen.',
+    schritte: ['Berufsgruppe und Qualifikation angeben', 'Auftragsverarbeitungsvertrag abschließen'],
+    tipp: 'Ohne den Auftragsverarbeitungsvertrag bleiben die Freigabefunktionen gesperrt. Das ist keine Formalie, sondern die Rechtsgrundlage dafür, dass Sie Fallinhalte überhaupt sehen dürfen.',
+  },
+
+  // ── Ausbildungsinstitut ──────────────────────────────────────────────────
+  '/institute/dashboard': {
+    titel: 'Institut',
+    zweck: 'Der Überblick: Kohorte, Kontingente, offene Einreichungen.',
+    schritte: ['Sehen, was Aufmerksamkeit braucht', 'In Kohorte, Aufgaben oder Einreichungen abzweigen'],
+  },
+  '/institute/students': {
+    titel: 'Studierende',
+    zweck: 'Wer in Ihrer Kohorte ist und wie weit die Einzelnen sind.',
+    schritte: ['Studierende einladen', 'Status verfolgen', 'Plätze verwalten'],
+    tipp: 'Eine Einladung verbraucht erst dann einen Platz, wenn sie angenommen wird.',
+  },
+  '/institute/cohort': {
+    titel: 'Kohorte im Blick',
+    zweck: 'Aggregierter Stand der ganzen Gruppe — wo es hakt, ohne in Einzelne hineinzusehen.',
+    schritte: ['Auffälligkeiten erkennen', 'Von hier zu einzelnen Studierenden gehen'],
+    tipp: 'Diese Seite zeigt bewusst Summen. Wer die Arbeit einer Person lesen will, geht über ihre Einreichung — das hinterlässt eine Spur und ist gewollt.',
+  },
+  '/institute/assignments': {
+    titel: 'Aufgaben',
+    zweck: 'Was die Studierenden bearbeiten sollen: Aufgaben, Reflexionen, Ressourcen.',
+    schritte: ['Eine Aufgabe erstellen', 'Der Kohorte oder Einzelnen zuweisen', 'Rückläufe verfolgen'],
+  },
+  '/institute/assignments/:id': {
+    titel: 'Diese Aufgabe',
+    zweck: 'Die Aufgabe selbst und was zurückgekommen ist.',
+    schritte: ['Aufgabe bearbeiten', 'Eingereichte Antworten lesen', 'Rückmeldung geben'],
+  },
+  '/institute/submissions': {
+    titel: 'Einreichungen',
+    zweck: 'Fallarbeiten, die zur Sichtung bereitliegen.',
+    schritte: ['Offene Einreichungen öffnen', 'Nach Stand sortieren'],
+  },
+  '/institute/submissions/:id': {
+    titel: 'Diese Einreichung',
+    zweck: 'Eine eingereichte Fallarbeit als Momentaufnahme — mit KI-gestützter Auswertung entlang Ihres Rasters.',
+    schritte: ['Die Arbeit lesen', 'Auswertung anfordern', 'Bewerten und zurückmelden'],
+    tipp: 'Die KI-Auswertung ist ein Vorschlag entlang Ihres Rasters, keine Note. Die Bewertung bleibt Ihre.',
+  },
+  '/institute/rubrics': {
+    titel: 'Bewertungsraster',
+    zweck: 'Woran eine Fallarbeit gemessen wird — und die Grundlage, auf der die KI auswertet.',
+    schritte: ['Ein Raster anlegen', 'Kriterien und Stufen beschreiben', 'Einer Aufgabe zuordnen'],
+    tipp: 'Je konkreter ein Kriterium beschrieben ist, desto brauchbarer die Auswertung. „Zeigt Fallverständnis" ergibt Floskeln, „benennt mindestens zwei alternative Deutungen" ergibt eine Aussage.',
+  },
+  '/institute/modules': {
+    titel: 'Lernmodule',
+    zweck: 'Eigene Module erstellen und verwalten — und sehen, was auf dem Marktplatz angeboten wird.',
+    schritte: ['Ein Modul anlegen', 'Studierende einschreiben', 'Im Marktplatz stöbern'],
+  },
+  '/institute/modules/:id': {
+    titel: 'Dieses Modul',
+    zweck: 'Inhalte, Leitfaden und Lektionen eines Lernmoduls.',
+    schritte: ['Lektionen schreiben und ordnen', 'Leitfaden hinterlegen', 'Einschreibung regeln'],
+  },
+  '/institute/marketplace': {
+    titel: 'Marktplatz',
+    zweck: 'Lernmodule anderer Institute, die zum Einsatz freigegeben sind.',
+    schritte: ['Angebote durchsehen', 'Ein Modul im Detail ansehen'],
+  },
+  '/institute/marketplace/:id': {
+    titel: 'Dieses Angebot',
+    zweck: 'Vorschau eines fremden Moduls — Aufbau und Umfang, ohne die Inhalte selbst.',
+    schritte: ['Inhaltsverzeichnis prüfen', 'Über eine Übernahme entscheiden'],
+  },
+  '/institute/examples/new': {
+    titel: 'Beispielfall erzeugen',
+    zweck: 'Einen erfundenen Fall von der KI erstellen lassen — als Übungsmaterial ohne echte Patienten.',
+    schritte: ['Rahmen vorgeben', 'Erzeugung starten und im Hintergrund laufen lassen'],
+    tipp: 'Hier entstehen keine echten Personendaten. Jede Fallperson bekommt eine erfundene Kennung, die zu keinem Konto gehört — deshalb stellt sich die Schweigepflicht in diesem Bereich gar nicht.',
+  },
+  '/institute/examples/:id': {
+    titel: 'Dieser Beispielfall',
+    zweck: 'Der erzeugte Fall zur Durchsicht, bevor er in die Ausbildung geht.',
+    schritte: ['Material prüfen', 'Ablegen oder verwerfen'],
+    tipp: 'Lesen Sie ihn einmal ganz, bevor Sie ihn freigeben. Ein erfundener Fall kann fachlich danebenliegen, und in der Ausbildung fällt das später schwer zu korrigieren.',
+  },
+  '/institute/settings': {
+    titel: 'Einstellungen des Instituts',
+    zweck: 'Der Haus-Stil: wie Echo mit Ihren Studierenden spricht.',
+    schritte: ['Ausrichtung festlegen', 'Konto verwalten'],
+    tipp: 'Was Sie hier einstellen, prägt das freie Gespräch der Studierenden. Es ersetzt keine Anleitung durch Sie.',
+  },
+  '/institute/register': {
+    titel: 'Institut anlegen',
+    zweck: 'Ihr Konto zum Ausbildungsinstitut machen.',
+    schritte: ['Einladungscode eingeben', 'Angaben zum Institut ergänzen'],
+  },
+
+  // ── Studierende ──────────────────────────────────────────────────────────
+  '/student/dashboard': {
+    titel: 'Start',
+    zweck: 'Was ansteht: offene Aufgaben, laufende Module, deine Fälle.',
+    schritte: ['Aufgaben öffnen', 'An einem Fall weiterarbeiten', 'Ein Modul fortsetzen'],
+  },
+  '/student/assignments': {
+    titel: 'Aufgaben',
+    zweck: 'Was dein Institut dir zugewiesen hat — Aufgaben, Reflexionen, Material.',
+    schritte: ['Eine Aufgabe öffnen', 'Bearbeiten und einreichen'],
+  },
+  '/student/modules': {
+    titel: 'Deine Module',
+    zweck: 'Die Lernmodule, in die du eingeschrieben bist, mit deinem Stand.',
+    schritte: ['Ein Modul fortsetzen', 'Fortschritt sehen'],
+  },
+  '/student/modules/:id': {
+    titel: 'Dieses Modul',
+    zweck: 'Lektionen lesen und abarbeiten.',
+    schritte: ['Lektion für Lektion durchgehen', 'Erledigtes abhaken'],
+  },
+  '/student/cases/:id': {
+    titel: 'Dein Übungsfall',
+    zweck: 'Deine eigene Arbeitskopie eines Falls — aufgebaut wie die echte Anwendung.',
+    schritte: ['Material sichten', 'Mit Echo arbeiten', 'Muster, Hypothesen und Berichte erarbeiten'],
+    tipp: 'Der Fall ist erfunden, das Vorgehen nicht. Was du hier übst, ist genau der Ablauf, den du später mit einer echten Klientin gehst.',
+  },
+  '/student/cases/:id/echo': {
+    titel: 'Echo zum Fall',
+    zweck: 'Ein fachliches Gespräch über deinen Übungsfall.',
+    schritte: ['Fragen stellen', 'Mehrere Gespräche nebeneinander führen'],
+  },
+  '/student/cases/:id/scales': {
+    titel: 'Muster und Skalen',
+    zweck: 'Wie sich die Lage der Fallperson über die Zeit darstellt.',
+    schritte: ['Muster ansehen', 'Verlauf der Werte verfolgen'],
+    tipp: 'Die Werte sind eine Einschätzung aus dem Material, kein Messergebnis. Übe, sie zu begründen statt sie zu zitieren.',
+  },
+  '/student/cases/:id/hypotheses': {
+    titel: 'Hypothesen',
+    zweck: 'Mögliche Erklärungen, geführt durchgesprochen.',
+    schritte: ['Einen Dialog beginnen', 'Arbeitshypothesen festhalten'],
+    tipp: 'Eine Hypothese, die du nicht verwerfen könntest, ist keine. Halte fest, woran du sie prüfen würdest.',
+  },
+  '/student/cases/:id/hypotheses/:hypId': {
+    titel: 'Hypothesen-Dialog',
+    zweck: 'Ein geführtes Gespräch entlang einer Erklärung.',
+    schritte: ['Fragen durchgehen', 'Ergebnis behalten oder verwerfen'],
+  },
+  '/student/cases/:id/notes': {
+    titel: 'Notizen',
+    zweck: 'Dein Sitzungsverlauf und dauerhafte Notizen zum Fall.',
+    schritte: ['Nach jeder Einheit notieren', 'Fallüberblick pflegen'],
+    tipp: 'Notieren gehört zum Handwerk, nicht zur Kür. Wer es hier übt, tut es später unter Zeitdruck auch.',
+  },
+  '/student/cases/:id/reports': {
+    titel: 'Berichte',
+    zweck: 'Die Berichte, die du zu diesem Fall erstellt hast.',
+    schritte: ['Einen Bericht erstellen', 'Frühere wiederlesen'],
+  },
+  '/student/cases/:id/reports/new': {
+    titel: 'Bericht erstellen',
+    zweck: 'Aus dem Fallmaterial einen zusammenhängenden Text erzeugen lassen.',
+    schritte: ['Art des Berichts wählen', 'Entwurf prüfen und überarbeiten'],
+    tipp: 'Nimm den Entwurf auseinander, bevor du ihn übernimmst. Genau daran wird sichtbar, ob du den Fall verstanden hast.',
+  },
+  '/student/cases/:id/reports/:reportId': {
+    titel: 'Dieser Bericht',
+    zweck: 'Ein Bericht zum Lesen und Überarbeiten.',
+    schritte: ['Text anpassen', 'Für die Einreichung vorbereiten'],
+  },
+  '/student/cases/:id/review': {
+    titel: 'Verlauf und Rückblick',
+    zweck: 'Wie sich der Fall über die Zeit entwickelt hat.',
+    schritte: ['Entwicklung ansehen', 'Einen Rückblick erzeugen lassen'],
+  },
+  '/student/cases/:id/couple': {
+    titel: 'Paar-Analyse',
+    zweck: 'Bei Fällen mit Partnerperson: beide Seiten nebeneinander, allparteilich.',
+    schritte: ['Zusammenspiel der Muster ansehen'],
+    tipp: 'Allparteilich heißt nicht neutral im Sinne von unbeteiligt, sondern: für beide zuständig. Das ist die schwerste Haltung in der Paararbeit und der Grund, warum man sie übt.',
+  },
+  '/student/cases/:id/roleplay': {
+    titel: 'Rollenspiel',
+    zweck: 'Echo spielt die ratsuchende Person — du führst das Gespräch.',
+    schritte: ['Ein Gespräch beginnen', 'Formulierungen ausprobieren', 'Danach durchgehen, was gewirkt hat'],
+    tipp: 'Du darfst hier danebengreifen. Genau dafür ist es da — und es ist der einzige Ort, an dem es niemanden trifft.',
+  },
+  '/student/cases/:id/submit': {
+    titel: 'Fallarbeit einreichen',
+    zweck: 'Deine Arbeit als Momentaufnahme an das Institut senden.',
+    schritte: ['Prüfen, was mitgeschickt wird', 'Einreichen'],
+    tipp: 'Eingereicht wird ein Abzug vom jetzigen Stand. Was du danach änderst, sieht dein Institut nicht mehr — die Einreichung friert den Moment ein.',
+  },
+  '/student/register': {
+    titel: 'Studierenden-Konto anlegen',
+    zweck: 'Mit dem Einladungscode deines Instituts beitreten.',
+    schritte: ['Code eingeben', 'Angaben ergänzen'],
+  },
 }
 
 /** Wie viele Abschnitte eines Musters feste Wörter sind — je mehr, desto genauer passt es. */
