@@ -1,3 +1,7 @@
+-- HINWEIS (2026-09): Szenen, Fragebogen, Skalen, Themen und Hypothesen dieses Falls ersetzt
+-- zz_111_beispielfaelle.sql, erzeugt aus services/api/app/services/demo_inhalt.py.
+-- Inhaltliche Aenderungen dort, nicht hier.
+--
 -- ── Beispiel-Partnerfall (Paar-Analyse): Marco K. ────────────────────────────
 -- Die GEGENPERSPEKTIVE zum Lena-Demofall (18_demo_case.sql): dieselbe Beziehung aus
 -- Marcos subjektiver Sicht. Erfunden, respektvoll, zur Demonstration der Paar-Analyse

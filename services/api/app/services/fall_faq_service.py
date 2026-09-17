@@ -454,7 +454,11 @@ async def _erzeuge_merkmalsbild(echo_svc, context: str, nummern: set[int]) -> di
     except Exception:           # noqa: BLE001
         logger.exception("Fall-FAQ: Merkmalsbild fehlgeschlagen — Antworten bleiben.")
         return None
+    return _merkmalsbild_aus(roh, nummern)
 
+
+def _merkmalsbild_aus(roh: dict, nummern: set[int]) -> dict | None:
+    """Prüft eine Merkmals-Antwort und rechnet die Anteile daraus."""
     achsen = _saubere_achsen(roh.get("achsen"), nummern)
     if not achsen:
         return None
@@ -464,6 +468,56 @@ async def _erzeuge_merkmalsbild(echo_svc, context: str, nummern: set[int]) -> di
         "cluster": _cluster_anteile(achsen),
         "materiallage": lage if isinstance(lage, dict) else {},
     }
+
+
+async def vorbereiteten_lauf_ablegen(
+    conn, *, professional_user_id, case_id, antworten: list[dict], merkmale: dict,
+    nummern: set[int],
+) -> str | None:
+    """Legt an der Demo-Freigabe einer Fachperson einen fertigen Lauf aus vorbereitetem Material an.
+
+    **Wozu.** Die Beispielfälle der Spielwiese sollen zeigen, was die Fall-FAQ leistet. Ein
+    echter Lauf ginge dort nicht: Auslösen kann ihn nur die Klient:in, und die gibt es nicht.
+    Die Antworten stehen deshalb vorbereitet in ``demo_fall_faq.py``.
+
+    **Dieselbe Prüfung wie ein Modelllauf.** Antworten und Achsen gehen durch
+    ``_saubere_antwort`` und ``_saubere_achsen``. Ein vorbereiteter Beleg auf eine Szene, die
+    es nicht gibt, fällt also genauso heraus wie ein erfundener — und die Anteile rechnet
+    dieselbe Stelle, die sie auch für echte Fälle rechnet.
+
+    **Nur an Demo-Freigaben**, und das steht in der Abfrage, nicht in einer Zusage:
+    Vorbereitete Antworten an einer echten Freigabe wären erfundene Aussagen über einen
+    echten Menschen.
+
+    Kein Kontingent, kein Modellaufruf. Hat die Freigabe schon einen Lauf, bleibt er, wie er
+    ist, und es kommt ``None`` zurück.
+    """
+    erlaubt = {f.id: f for f in katalog.KATALOG}
+    geprueft = [a for a in (_saubere_antwort(r, erlaubt, nummern) for r in antworten) if a]
+    auswertung = _merkmalsbild_aus(merkmale, nummern)
+
+    async with conn.transaction():
+        run_id = await conn.fetchval(
+            """
+            INSERT INTO case_faq_runs
+              (case_id, share_id, professional_user_id, owner_user_id, status,
+               katalog_fassung, fragen_geplant, fragen_beantwortet, auswertung,
+               angefordert_am, fertig_am)
+            SELECT s.case_id, s.id, s.professional_user_id, s.owner_user_id, 'fertig',
+                   $3, $4, $5, $6::jsonb, NOW(), NOW()
+              FROM case_shares s
+             WHERE s.case_id = $1 AND s.professional_user_id = $2 AND s.is_demo
+            ON CONFLICT (share_id) DO NOTHING
+            RETURNING id
+            """,
+            case_id, professional_user_id, KATALOG_FASSUNG, len(katalog.KATALOG),
+            len(geprueft),
+            json.dumps(crypto.encrypt_json_strings(auswertung)) if auswertung else None,
+        )
+        if run_id is None:
+            return None
+        await _schreibe_antworten(conn, run_id, geprueft)
+    return str(run_id)
 
 
 async def _schreibe_antworten(conn, run_id: str, antworten: list[dict]) -> None:

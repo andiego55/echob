@@ -234,6 +234,7 @@ function DemoIntro({ onGoto }: { onGoto: (schluessel: string) => void }) {
   }
   // Die Schluessel sind die alten - `waehleReiter` uebersetzt sie auf Fallarbeit.
   const steps: { label: string; tab: string }[] = [
+    { label: 'Fall-FAQ lesen', tab: 'faq' },
     { label: 'Bericht erzeugen', tab: 'reports' },
     { label: 'Sitzungsnotiz schreiben', tab: 'notes' },
     { label: 'Mit Echo sprechen', tab: 'echo' },

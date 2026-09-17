@@ -211,6 +211,11 @@ VERTRAUT_DEM_AUFRUFER = {
         "DEMO_CLIENT_USER_ID, DEMO_PARTNER_CASE_ID) — die Konstanten stehen im Modul, nichts "
         "davon kommt von außen. Vom Aufrufer übernimmt sie nur pid, die Id der angemeldeten "
         "Fachperson, für die die Spielwiese angelegt wird. Keine echten Nutzerdaten.",
+    "demo_migration.migration_sql":
+        "Führt kein SQL aus, sondern erzeugt den Text der Migration zz_111 — ein Werkzeug für "
+        "die Entwicklung, im Betrieb von niemandem aufgerufen. Jede Anweisung darin ist auf "
+        "die fest verdrahteten Demo-Fall-Ids oder auf is_demo-Freigaben beschränkt; "
+        "test_demo_inhalt hält die erzeugte Datei fest.",
     "fall_faq_service.lauf_anlegen":
         "Legt den Fragenlauf zu einer Freigabe an. Erreichbar nur über sicher_anlegen, und "
         "das bekommt von allen drei Aufrufern in case_shares.py eine bereits geladene "

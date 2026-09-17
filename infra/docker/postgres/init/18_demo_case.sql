@@ -1,3 +1,7 @@
+-- HINWEIS (2026-09): Szenen, Fragebogen, Skalen, Themen und Hypothesen dieses Falls ersetzt
+-- zz_111_beispielfaelle.sql, erzeugt aus services/api/app/services/demo_inhalt.py.
+-- Inhaltliche Aenderungen dort, nicht hier.
+--
 -- ── Beispielfall / Spielwiese für Fachpersonen ───────────────────────────────
 -- Ein fiktiver, klar gekennzeichneter Beispielfall, der jedem Profi-Account
 -- automatisch als „Spielwiese" angezeigt wird (Phase 1 der Vertriebsstrecke).
