@@ -18,7 +18,7 @@ scene_tags: [spaltung, borderline, idealisierung-abwertung]
 safety_tags: []
 links:
   parent: borderline-in-beziehungen
-  glossary: [idealisierung-abwertung, emotionale-dysregulation, mentalisierung]
+  glossary: [idealisierung-abwertung, emotionale-dysregulation, mentalisierung, projektive-identifizierung]
   related: [borderline-in-beziehungen, borderline-oder-narzissmus]
 faq:
   - question: "Ist Spaltung absichtlich?"

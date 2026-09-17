@@ -3705,7 +3705,7 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt.",
     "cluster": "dynamiken",
     "search_intent": "Projektion Psychologie Bedeutung",
-    "updated": "2026-07-14",
+    "updated": "2026-09-17",
     "author": {
       "name": "EchoB-Redaktion"
     },
@@ -3722,11 +3722,77 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "safety_tags": [],
     "links": {
       "parent": "eifersucht",
+      "glossary": [
+        "projektive-identifizierung"
+      ],
       "related": [
-        "beziehungsmuster"
+        "beziehungsmuster",
+        "ich-erkenne-mich-nicht-wieder"
       ]
     },
     "url": "/glossar/projektion"
+  },
+  {
+    "type": "glossary",
+    "slug": "projektive-identifizierung",
+    "title": "Projektive Identifizierung – wenn man wird, was einem vorgeworfen wird",
+    "description": "Ein Gefühl, das jemand nicht aushält, wird nicht nur dem anderen zugeschrieben, sondern in ihm geweckt – bis er es tatsächlich fühlt und zeigt. Warum sich der Vorwurf danach bestätigt anfühlt, und was den Kreis unterbricht.",
+    "cluster": "dynamiken",
+    "search_intent": "projektive identifizierung beziehung bedeutung beispiel einfach erklaert",
+    "updated": "2026-09-17",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du eine Situation anschauen, in der du dich selbst nicht wiedererkannt hast – und was kurz davor gesagt wurde?",
+      "cta_positions": [
+        "end"
+      ]
+    },
+    "scene_tags": [
+      "projektive-identifizierung",
+      "wahrnehmungszweifel",
+      "scham"
+    ],
+    "safety_tags": [],
+    "links": {
+      "parent": "beziehungsmuster",
+      "glossary": [
+        "projektion",
+        "spaltung",
+        "selbst-gaslighting",
+        "emotionale-ansteckung",
+        "mentalisierung"
+      ],
+      "related": [
+        "ich-erkenne-mich-nicht-wieder",
+        "an-eigener-wahrnehmung-zweifeln",
+        "emotionale-manipulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Wie merke ich, dass ich gerade etwas übernehme, das nicht meins ist?",
+        "answer": "Am deutlichsten daran, dass es dir fremd ist. Ein Gefühl, das du sonst kaum kennst, taucht fast nur bei dieser einen Person auf, kommt sehr schnell und in einer Stärke, die zum Anlass nicht passt. Und oft wird die andere Person in genau dem Moment ruhiger, in dem du laut wirst. Das ist kein Beweis, aber ein Hinweis, dem man nachgehen sollte."
+      },
+      {
+        "question": "Heißt das, ich bin für mein Verhalten nicht verantwortlich?",
+        "answer": "Nein. Der Begriff erklärt, woher der Druck kam – er macht aus einem Ausbruch keinen, der nicht stattgefunden hat. Beides gilt gleichzeitig: Du bist unter einem Druck laut geworden, den du nicht allein erzeugt hast, und du bist trotzdem laut geworden. Wer das eine gegen das andere ausspielt, verliert entweder die Selbstachtung oder die Verantwortung."
+      },
+      {
+        "question": "Macht die andere Person das absichtlich?",
+        "answer": "Meistens nicht. Projektive Identifizierung ist ein unbewusster Vorgang: Jemand hält ein Gefühl in sich nicht aus – Scham, Angst, Wut, Hilflosigkeit – und entlastet sich, indem es im Gegenüber auftaucht. Das ändert nichts an der Wirkung auf dich, aber es erklärt, warum die andere Person sich im Recht fühlt und warum Vorhaltungen dagegen so wenig bewirken."
+      },
+      {
+        "question": "Ist das ein wissenschaftlich belegter Begriff?",
+        "answer": "Es ist ein klinischer Begriff aus der Psychoanalyse, keiner, den man im Labor misst. Er beschreibt ein Muster, das in der therapeutischen Arbeit seit Jahrzehnten beobachtet und diskutiert wird, und ist gerade deshalb umstritten, weil er sich schwer prüfen lässt und leicht zu weit gefasst wird. Als Beschreibung ist er nützlich. Als Urteil über einen bestimmten Menschen taugt er nicht."
+      }
+    ],
+    "url": "/glossar/projektive-identifizierung"
   },
   {
     "type": "glossary",
@@ -4810,7 +4876,8 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       "glossary": [
         "idealisierung-abwertung",
         "emotionale-dysregulation",
-        "mentalisierung"
+        "mentalisierung",
+        "projektive-identifizierung"
       ],
       "related": [
         "borderline-in-beziehungen",
@@ -5936,13 +6003,15 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     "links": {
       "parent": "emotionale-manipulation",
       "glossary": [
-        "gaslighting"
+        "gaslighting",
+        "projektive-identifizierung"
       ],
       "comparison": [
         "gaslighting-oder-missverstaendnis"
       ],
       "related": [
-        "beziehungsmuster"
+        "beziehungsmuster",
+        "ich-erkenne-mich-nicht-wieder"
       ]
     },
     "url": "/hilfe/an-eigener-wahrnehmung-zweifeln"
@@ -6054,6 +6123,76 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
       }
     ],
     "url": "/hilfe/bin-ich-neurodivergent"
+  },
+  {
+    "type": "problem",
+    "slug": "ich-erkenne-mich-nicht-wieder",
+    "title": "In dieser Beziehung erkenne ich mich nicht wieder",
+    "description": "Sonst ruhig, und hier laut. Nie eifersüchtig, und hier kontrollierend. Warum Menschen in manchen Beziehungen zu dem werden, was ihnen vorgeworfen wird – und wie man aus dieser Rolle herauskommt, ohne sich dafür zu verurteilen.",
+    "cluster": "dynamiken",
+    "search_intent": "in der beziehung nicht mehr ich selbst erkenne mich nicht wieder werde laut aggressiv",
+    "updated": "2026-09-17",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du den letzten Moment beschreiben, in dem du dich nicht wiedererkannt hast – und was in der halben Stunde davor passiert ist?",
+      "cta_positions": [
+        "after-intro",
+        "end"
+      ]
+    },
+    "profile_modules": [
+      "wahrnehmung",
+      "selbstwert",
+      "beziehungsmuster"
+    ],
+    "scene_tags": [
+      "projektive-identifizierung",
+      "wahrnehmungszweifel",
+      "scham",
+      "schuldumkehr"
+    ],
+    "safety_tags": [
+      "gewalt"
+    ],
+    "links": {
+      "parent": "beziehungsmuster",
+      "glossary": [
+        "projektive-identifizierung",
+        "projektion",
+        "selbst-gaslighting",
+        "taeter-opfer-umkehr"
+      ],
+      "related": [
+        "an-eigener-wahrnehmung-zweifeln",
+        "emotionale-manipulation",
+        "emotionsregulation"
+      ]
+    },
+    "faq": [
+      {
+        "question": "Bin ich dann gar nicht schuld, wenn ich laut geworden bin?",
+        "answer": "Doch, für den Ausbruch selbst – und trotzdem nicht für alles, was dazu geführt hat. Beides stimmt gleichzeitig, und keins hebt das andere auf. Wer nur das Erste sieht, zerfleischt sich; wer nur das Zweite sieht, lernt nichts. Nützlicher als die Schuldfrage ist die Frage, was in der halben Stunde davor passiert ist."
+      },
+      {
+        "question": "Woran erkenne ich, ob es an mir liegt oder an der Dynamik?",
+        "answer": "Am Vergleich mit dem Rest deines Lebens. Wenn du bei der Arbeit, mit Freunden und in früheren Beziehungen ruhig bist und nur hier nicht, spricht das für die Dynamik. Wenn es überall so ist, lohnt der Blick auf dich selbst – nicht als Vorwurf, sondern weil du dann dort am meisten bewegen kannst."
+      },
+      {
+        "question": "Kann das auch in guten Beziehungen passieren?",
+        "answer": "Ja, in kleinem Maß in fast allen. Jeder gibt gelegentlich an den anderen weiter, was er selbst nicht aushält. Entscheidend ist, ob es selten ist und in beide Richtungen läuft – oder ob einer von beiden dauerhaft die Gefühle trägt, die dem anderen zu schwer sind."
+      },
+      {
+        "question": "Was, wenn es körperlich geworden ist?",
+        "answer": "Dann gilt diese Seite nur noch zur Hälfte. Druck erklärt, er rechtfertigt keine Gewalt – egal von wem sie ausging. Und wenn du Angst vor der anderen Person hast, geht es nicht mehr um eine Dynamik, sondern um Sicherheit. Hilfetelefon Gewalt gegen Frauen 116 016, Hilfetelefon Gewalt an Männern 0800 123 99 00, bei akuter Gefahr 110."
+      }
+    ],
+    "url": "/hilfe/ich-erkenne-mich-nicht-wieder"
   },
   {
     "type": "problem",
@@ -9588,6 +9727,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "erst-wenn-sie-laut-wird",
+    "title": "Erst wenn sie laut wird, wird es in mir still",
+    "description": "Eine Szene von der anderen Seite: über einen Mann, der in der Therapie merkt, dass er sich erst dann besser fühlt, wenn seine Frau die Fassung verliert. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-09-17",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Ralfs Sicht",
+    "pull_quote": "Sie hat gefragt, was ich gefühlt hätte, wenn meine Frau nicht laut geworden wäre. Ich hatte keine Antwort. Und dann doch eine.",
+    "echo": {
+      "mode": "clarity",
+      "opening_question": "Magst du anschauen, wie es dir geht, kurz nachdem der andere die Fassung verloren hat – und wie es dir kurz davor ging?"
+    },
+    "scene_tags": [
+      "projektive-identifizierung",
+      "scham",
+      "ehrlichkeit",
+      "wiederkehrendes-muster"
+    ],
+    "url": "/szenen/erst-wenn-sie-laut-wird"
+  },
+  {
+    "type": "scene",
     "slug": "es-fuehlt-sich-falsch-an-nett-zu-mir-zu-sein",
     "title": "Es fühlt sich falsch an, nett zu mir zu sein",
     "description": "Eine fiktive Szene: Sie soll in der Therapie einen freundlichen Satz zu sich selbst sagen und wird stattdessen wütend. Über eine Reaktion, die mehr erklärt als jede Übung.",
@@ -12246,6 +12412,33 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
   },
   {
     "type": "scene",
+    "slug": "siehst-du-genau-das-meine-ich",
+    "title": "Siehst du? Genau das meine ich.",
+    "description": "Eine Szene über einen Abend, an dem jemand, der sonst nie laut wird, die Schranktür knallt – und danach der eigenen Wahrnehmung nicht mehr traut. Ich-Perspektive, fiktiv.",
+    "cluster": "dynamiken",
+    "updated": "2026-09-17",
+    "author": {
+      "name": "EchoB-Redaktion"
+    },
+    "reviewed_by": {
+      "name": "EchoB-Redaktion"
+    },
+    "perspective": "Aus Fridas Sicht",
+    "pull_quote": "Er hatte recht. Ich war laut. Das ist der Teil, den ich seitdem nicht mehr aus dem Kopf bekomme.",
+    "echo": {
+      "mode": "stabilize",
+      "opening_question": "Magst du beschreiben, was in der halben Stunde passiert ist, bevor du dich nicht mehr wiedererkannt hast?"
+    },
+    "scene_tags": [
+      "projektive-identifizierung",
+      "wahrnehmungszweifel",
+      "scham",
+      "schuldumkehr"
+    ],
+    "url": "/szenen/siehst-du-genau-das-meine-ich"
+  },
+  {
+    "type": "scene",
     "slug": "solange-alles-gut-lief",
     "title": "Solange alles gut lief",
     "description": "Eine fiktive Szene: Er war der aufmerksamste Mensch, den sie kannte – bis er seinen Job verlor. Über Verständnis, das nur zur Verfügung steht, wenn es nichts kostet.",
@@ -13740,12 +13933,16 @@ export const CONTENT_MANIFEST: ContentMeta[] = [
     ],
     "safety_tags": [],
     "links": {
-      "children": [],
+      "children": [
+        "ich-erkenne-mich-nicht-wieder"
+      ],
       "related": [
         "emotionale-manipulation"
       ],
       "glossary": [
-        "gaslighting"
+        "gaslighting",
+        "projektion",
+        "projektive-identifizierung"
       ]
     },
     "url": "/wissen/beziehungsmuster"
@@ -21346,6 +21543,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Projektion – eigene Gefühle im anderen sehen",
     "description": "Was Projektion in der Psychologie bedeutet und wie sie in Beziehungen und bei Eifersucht eine Rolle spielen kann – kurz und klar erklärt."
   },
+  "/glossar/projektive-identifizierung": {
+    "title": "Projektive Identifizierung – wenn man wird, was einem vorgeworfen wird",
+    "description": "Ein Gefühl, das jemand nicht aushält, wird nicht nur dem anderen zugeschrieben, sondern in ihm geweckt – bis er es tatsächlich fühlt und zeigt. Warum sich der Vorwurf danach bestätigt anfühlt, und was den Kreis unterbricht."
+  },
   "/glossar/ptbs": {
     "title": "Posttraumatische Belastungsstörung (PTBS) – einfach erklärt",
     "description": "Was eine posttraumatische Belastungsstörung ist, welche vier Symptomgruppen typisch sind und warum sie eine normale Reaktion auf eine unnormale Belastung ist. Ohne Ferndiagnose."
@@ -21561,6 +21762,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/hilfe/bin-ich-neurodivergent": {
     "title": "Bin ich neurodivergent?",
     "description": "Du erkennst dich in Beschreibungen wieder und weißt nicht, was das bedeutet. Warum Wiedererkennen kein Befund ist, was genauso aussieht – und was eine Abklärung tatsächlich bringt."
+  },
+  "/hilfe/ich-erkenne-mich-nicht-wieder": {
+    "title": "In dieser Beziehung erkenne ich mich nicht wieder",
+    "description": "Sonst ruhig, und hier laut. Nie eifersüchtig, und hier kontrollierend. Warum Menschen in manchen Beziehungen zu dem werden, was ihnen vorgeworfen wird – und wie man aus dieser Rolle herauskommt, ohne sich dafür zu verurteilen."
   },
   "/hilfe/ich-glaube-ich-habe-borderline": {
     "title": "Ich glaube, ich habe Borderline – was jetzt sinnvoll ist",
@@ -21998,6 +22203,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
     "title": "Erst wenn ich liefere",
     "description": "Eine fiktive Szene: Wärme gibt es nur, wenn er funktioniert – geliefert, gelöst, erledigt. Über bedingte Zuwendung und die Erschöpfung, sich Nähe immer wieder verdienen zu müssen."
   },
+  "/szenen/erst-wenn-sie-laut-wird": {
+    "title": "Erst wenn sie laut wird, wird es in mir still",
+    "description": "Eine Szene von der anderen Seite: über einen Mann, der in der Therapie merkt, dass er sich erst dann besser fühlt, wenn seine Frau die Fassung verliert. Ich-Perspektive, fiktiv."
+  },
   "/szenen/es-fuehlt-sich-falsch-an-nett-zu-mir-zu-sein": {
     "title": "Es fühlt sich falsch an, nett zu mir zu sein",
     "description": "Eine fiktive Szene: Sie soll in der Therapie einen freundlichen Satz zu sich selbst sagen und wird stattdessen wütend. Über eine Reaktion, die mehr erklärt als jede Übung."
@@ -22381,6 +22590,10 @@ export const CONTENT_ROUTE_META: Record<string, { title: string; description: st
   "/szenen/sie-weinte-mehr-als-ich": {
     "title": "Sie weinte mehr als ich",
     "description": "Eine fiktive Szene: Er sagt endlich, dass ihn etwas verletzt hat – und tröstet zehn Minuten später sie, weil sie sich als schlechter Mensch fühlt. Über die Umkehrung der Fürsorgerichtung in der Partnerschaft."
+  },
+  "/szenen/siehst-du-genau-das-meine-ich": {
+    "title": "Siehst du? Genau das meine ich.",
+    "description": "Eine Szene über einen Abend, an dem jemand, der sonst nie laut wird, die Schranktür knallt – und danach der eigenen Wahrnehmung nicht mehr traut. Ich-Perspektive, fiktiv."
   },
   "/szenen/solange-alles-gut-lief": {
     "title": "Solange alles gut lief",

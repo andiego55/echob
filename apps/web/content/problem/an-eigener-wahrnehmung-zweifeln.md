@@ -19,9 +19,9 @@ scene_tags: [wahrnehmungszweifel]
 safety_tags: []
 links:
   parent: emotionale-manipulation
-  glossary: [gaslighting]
+  glossary: [gaslighting, projektive-identifizierung]
   comparison: [gaslighting-oder-missverstaendnis]
-  related: [beziehungsmuster]
+  related: [beziehungsmuster, ich-erkenne-mich-nicht-wieder]
 ---
 
 Du gehst aus einem Gespräch und bist dir nicht mehr sicher, was eigentlich passiert ist. Du wolltest etwas klären – und am Ende fragst du dich, ob *du* das Problem bist. Vielleicht hörst du dich selbst denken: „Vielleicht bilde ich mir das ja wirklich ein."
