@@ -9,6 +9,8 @@ import EchoSteeringForm, { type EchoModeOption, type EchoSteeringValue } from '@
 import AvvDocument, { AVV_DOC_VERSION, fassungPasstZumText } from '@/components/professional/AvvDocument'
 import BerufsgruppeFeld from '@/components/professional/BerufsgruppeFeld'
 import ArchivSection from '@/components/professional/ArchivSection'
+import { SchweigepflichtText } from '@/components/professional/SchweigepflichtHinweis'
+import { schweigepflichtHinweis } from '@/lib/schweigepflicht'
 import { apiErrorMessage } from '@/api/errors'
 import { professionalApi } from '@/api/professional'
 
@@ -97,6 +99,7 @@ export default function ProfessionalSettingsPage() {
         <PracticeSection />
         <BillingSection />
         <BerufsgruppeSection />
+        <SchweigepflichtSection />
         <AgreementSection />
         <ArchivSection />
       </div>
@@ -134,6 +137,63 @@ function BerufsgruppeSection() {
         </p>
       )}
       {speichern.isSuccess && <p className="mt-2 text-sm text-green-700">Gespeichert ✓</p>}
+    </div>
+  )
+}
+
+/**
+ * Der Hinweis zur Schweigepflicht — hier zum Nachlesen, bestätigt wird er an der Arbeit.
+ *
+ * **Warum nur nachlesen und nicht auch hier bestätigen.** Er soll dort stehen, wo er
+ * gebraucht wird: im Echo-Fenster und über dem Knopf, der einen Bericht erzeugt. Wer ihn
+ * in den Einstellungen abhakt, hat ihn gelesen, bevor die Frage anstand — und genau dann
+ * liest man ihn am flüchtigsten.
+ */
+function SchweigepflichtSection() {
+  const { data: me } = useQuery({ queryKey: ['professional-me'], queryFn: professionalApi.me })
+  const [offen, setOffen] = useState(false)
+  const hinweis = schweigepflichtHinweis(me?.unterliegt_203)
+  const fmt = (s: string) =>
+    new Date(s).toLocaleString('de-DE', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    })
+
+  return (
+    <div id="schweigepflicht" className="mt-8 card scroll-mt-24">
+      <h2 className="text-lg font-semibold text-navy">Schweigepflicht und die KI-Funktionen</h2>
+      <p className="mt-1 text-sm text-brand-muted">
+        Was beim Fragen an Echo und beim Erstellen eines Berichts übermittelt wird, wofür eine
+        Entbindung Ihrer Klient:in vorliegt — und wofür nicht.
+      </p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
+        <div>
+          <span className="text-brand-muted">Status:</span>{' '}
+          {me?.schweigepflicht_accepted
+            ? <span className="font-semibold text-green-700">gelesen ✓</span>
+            : <span className="font-semibold text-amber-700">steht beim nächsten KI-Aufruf</span>}
+        </div>
+        {me?.schweigepflicht_accepted_at && (
+          <div><span className="text-brand-muted">Gelesen am:</span>{' '}
+            <span className="font-medium text-navy">{fmt(me.schweigepflicht_accepted_at)}</span></div>
+        )}
+        {me?.schweigepflicht_accepted_version && (
+          <div><span className="text-brand-muted">Fassung:</span>{' '}
+            <span className="font-medium text-navy">{me.schweigepflicht_accepted_version}</span></div>
+        )}
+      </div>
+
+      <button
+        onClick={() => setOffen(o => !o)}
+        className="mt-4 text-sm font-semibold text-accent hover:underline"
+      >
+        {offen ? 'Hinweis ausblenden' : 'Hinweis ansehen'}
+      </button>
+      {offen && (
+        <div className="mt-4 border-t border-brand-border pt-4">
+          <SchweigepflichtText hinweis={hinweis} />
+        </div>
+      )}
     </div>
   )
 }

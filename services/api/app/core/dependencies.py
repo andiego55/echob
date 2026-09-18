@@ -142,14 +142,44 @@ async def get_current_professional(
         org = await ensure_org_for_professional(
             current_user["user_id"], conn, row["display_name"],
         )
-        # AVV-Status (Art. 28): steuert das Zustimmungs-Gate + serverseitige Durchsetzung.
+        # Beide Nachweise in einer Abfrage: der AVV (Art. 28 DSGVO) steuert den Zugriff auf
+        # echte Fälle, der KI-Hinweis (§ 203 StGB) das Tor vor den KI-Aufrufen.
         from app.services import agreement_service
-        avv = await agreement_service.get_avv_status(conn, current_user["user_id"])
+        zustimmungen = await agreement_service.lade_zustimmungen(conn, current_user["user_id"])
     return {
         **current_user, "professional": dict(row),
         "org_id": org["org_id"], "org_role": org["role"],
-        "avv": avv,
+        "zustimmungen": zustimmungen,
     }
+
+
+async def require_schweigepflicht_hinweis(
+    current: dict = Depends(get_current_professional),
+) -> None:
+    """Tor vor jedem KI-Aufruf, der Fallinhalte übermittelt (§ 203 StGB).
+
+    **Warum es das gibt.** Mit jeder Echo-Frage und jedem Bericht gehen der freigegebene
+    Fall *und* die eigenen Aufzeichnungen der Fachperson an den KI-Dienstleister. Für die
+    freigegebenen Inhalte hat die Klient:in ausdrücklich von der Schweigepflicht entbunden;
+    für die Sitzungsnotizen der Fachperson hat das niemand. Wer Berufsgeheimnisträger:in
+    ist, muss das wissen, bevor es zum ersten Mal passiert — nicht danach.
+
+    **Warum als Abhängigkeit und nicht als Prüfung in der Funktion.** So steht sie in der
+    Routendefinition und lässt sich von außen nachzählen: ``test_schweigepflicht_gate`` geht
+    jeden Endpunkt durch, der das Modell mit Fallkontext aufruft, und verlangt genau diese
+    Abhängigkeit. Eine Prüfung im Rumpf fände er nicht zuverlässig.
+
+    Kostet keine zusätzliche Abfrage — der Stand hängt schon an
+    ``get_current_professional``.
+    """
+    if not current.get("zustimmungen", {}).get("schweigepflicht_accepted"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Hinweis zur Schweigepflicht noch nicht bestätigt. "
+                "Er steht im Fachpersonenbereich und ist mit einem Klick erledigt."
+            ),
+        )
 
 
 async def get_current_institute(

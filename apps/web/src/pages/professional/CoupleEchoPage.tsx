@@ -15,6 +15,7 @@ import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { professionalApi } from '@/api/professional'
 import type { CoupleReportListItem, ProfessionalEchoMessage } from '@/types'
 import KiHinweis from '@/components/KiHinweis'
+import SchweigepflichtTor, { SchweigepflichtZeile } from '@/components/professional/SchweigepflichtHinweis'
 
 function fmtDay(iso: string): string {
   return new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' })
@@ -182,6 +183,8 @@ export default function CoupleEchoPage() {
               </div>
 
               <div className="mt-4 border-t border-brand-border pt-3">
+                {/* § 203 StGB: Hier gehen zwei Fälle gleichzeitig an die KI. */}
+                <SchweigepflichtTor>
                 <div className="flex gap-2">
                   <textarea
                     value={input}
@@ -196,6 +199,8 @@ export default function CoupleEchoPage() {
                 </div>
                 {/* Art. 50 KI-VO: am Eingabefeld, nicht in einem Dokument. */}
                 <KiHinweis className="mt-2" />
+                <div className="mt-1"><SchweigepflichtZeile /></div>
+                </SchweigepflichtTor>
               </div>
             </div>
 
@@ -206,6 +211,7 @@ export default function CoupleEchoPage() {
                   <h2 className="text-sm font-bold text-navy">Paar-Analyse-Bericht</h2>
                   <p className="text-xs text-brand-muted">Umfassende, allparteiliche Gesamtschau beider Perspektiven.</p>
                 </div>
+                <SchweigepflichtTor>
                 <div className="flex flex-wrap items-center gap-2">
                   <button onClick={() => createReport.mutate({ source: 'standard' })} disabled={createReport.isPending}
                     className="btn-primary !py-2 !text-sm disabled:opacity-60">
@@ -227,6 +233,7 @@ export default function CoupleEchoPage() {
                     </>
                   )}
                 </div>
+                </SchweigepflichtTor>
               </div>
               {createReport.isError && (
                 <p className="mt-2 text-xs text-red-600">Bericht konnte nicht erstellt werden. Bitte erneut versuchen.</p>

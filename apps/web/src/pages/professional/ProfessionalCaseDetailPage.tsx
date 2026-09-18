@@ -15,6 +15,7 @@ import AssignmentTypePanel from '@/components/professional/AssignmentTypePanel'
 import type { AssignmentType } from '@/api/collab'
 import AppointmentsPanel from '@/components/professional/AppointmentsPanel'
 import CaseHistoryPanel from '@/components/professional/CaseHistoryPanel'
+import SchweigepflichtTor, { SchweigepflichtZeile } from '@/components/professional/SchweigepflichtHinweis'
 import Avatar from '@/components/Avatar'
 import {
   IconBook, IconChart, IconChat, IconCheck, IconClipboard, IconDoc,
@@ -1114,17 +1115,24 @@ function ReportsPanel({ caseId }: { caseId: string }) {
           </>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 mt-5">
-          <button onClick={() => create.mutate()} disabled={create.isPending}
-            className="text-sm font-semibold px-4 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
-            {create.isPending ? 'Echo erstellt den Bericht …' : 'Bericht erstellen'}
-          </button>
-          <Link to="/professional/report-templates" className="text-sm text-brand-muted hover:text-accent">
-            Vorlagen verwalten →
-          </Link>
-          {create.isPending && (
-            <span className="text-[11px] text-brand-muted">Das kann bis zu einer Minute dauern.</span>
-          )}
+        {/* § 203 StGB: In den Bericht gehen auch die eigenen Sitzungsnotizen ein — das
+            steht einmal im Weg, bevor es zum ersten Mal passiert. */}
+        <div className="mt-5">
+          <SchweigepflichtTor>
+            <div className="flex flex-wrap items-center gap-3">
+              <button onClick={() => create.mutate()} disabled={create.isPending}
+                className="text-sm font-semibold px-4 py-1.5 rounded-brand bg-accent text-white hover:bg-accent/90 disabled:opacity-50">
+                {create.isPending ? 'Echo erstellt den Bericht …' : 'Bericht erstellen'}
+              </button>
+              <Link to="/professional/report-templates" className="text-sm text-brand-muted hover:text-accent">
+                Vorlagen verwalten →
+              </Link>
+              {create.isPending && (
+                <span className="text-[11px] text-brand-muted">Das kann bis zu einer Minute dauern.</span>
+              )}
+            </div>
+            <div className="mt-2"><SchweigepflichtZeile /></div>
+          </SchweigepflichtTor>
         </div>
         {create.isError && (
           <p className="text-xs text-red-600 mt-2">Bericht konnte nicht erstellt werden. Bitte erneut versuchen.</p>

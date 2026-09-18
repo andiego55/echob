@@ -13,7 +13,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.core import crypto
-from app.core.dependencies import get_current_professional, get_pool
+from app.core.dependencies import (
+    get_current_professional,
+    get_pool,
+    require_schweigepflicht_hinweis,
+)
 from app.schemas.professional import (
     PRO_REPORT_DISCLAIMER,
     CaseCoupleStatus,
@@ -122,7 +126,10 @@ async def case_couple_status(
 
 # ── Paar-Echo ────────────────────────────────────────────────────────────────
 
-@router.post("/couples/{couple_id}/echo/chat", response_model=CoupleEchoChatResponse)
+@router.post(
+    "/couples/{couple_id}/echo/chat", response_model=CoupleEchoChatResponse,
+    dependencies=[Depends(require_schweigepflicht_hinweis)],
+)
 async def couple_echo_chat(
     couple_id: UUID,
     body: CoupleEchoChatRequest,
@@ -308,7 +315,10 @@ def _couple_report_response(row) -> CoupleReport:
     )
 
 
-@router.post("/couples/{couple_id}/reports", response_model=CoupleReport, status_code=201)
+@router.post(
+    "/couples/{couple_id}/reports", response_model=CoupleReport, status_code=201,
+    dependencies=[Depends(require_schweigepflicht_hinweis)],
+)
 async def create_couple_report(
     couple_id: UUID,
     body: CoupleReportCreate,

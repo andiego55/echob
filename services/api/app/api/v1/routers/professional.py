@@ -231,7 +231,7 @@ async def get_me(
     """
     async with pool.acquire() as conn:
         await ensure_demo_for_professional(current["user_id"], conn)
-    return ProfessionalProfileResponse(**_mit_berufsgruppe(current["professional"]), **current["avv"])
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(current["professional"]), **current["zustimmungen"])
 
 
 @router.post("/register", response_model=ProfessionalProfileResponse)
@@ -276,7 +276,7 @@ async def set_berufsgruppe(
             "WHERE user_id = $1 RETURNING *",
             current["user_id"], gruppe,
         )
-    return ProfessionalProfileResponse(**_mit_berufsgruppe(dict(row)), **current["avv"])
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(dict(row)), **current["zustimmungen"])
 
 
 @router.get("/berufsgruppen")
@@ -302,28 +302,40 @@ async def accept_agreement(
     current: dict = Depends(get_current_professional),
     pool=Depends(get_pool),
 ) -> ProfessionalProfileResponse:
-    """Schließt den Auftragsverarbeitungsvertrag (AVV, Art. 28 DSGVO) ab.
+    """Hält eine Zustimmung fest — den AVV (Art. 28 DSGVO) oder den KI-Hinweis (§ 203 StGB).
 
-    Die Fachperson (Verantwortliche) akzeptiert die aktuell gültige Vertragsversion,
-    bevor sie freigegebene Klient-Daten mit EchoB (Auftragsverarbeiter) verarbeitet.
-    Append-only Nachweis (Version + Zeitpunkt). Erst danach hebt das Gate auf und der
-    Zugriff auf Falldaten ist serverseitig freigeschaltet (sharing_service).
+    **Zwei Arten, ein Endpunkt, und das ist kein Zusammenwerfen.** Beide sind derselbe
+    Vorgang: Die Fachperson erklärt zu einer bestimmten Fassung etwas, und das wird
+    append-only festgehalten. Inhaltlich sind sie verschieden — der AVV ist ein Vertrag,
+    den sie abschließt, der Hinweis eine Information, die sie zur Kenntnis nimmt —, und
+    deshalb tragen sie getrennte Kennungen, getrennte Fassungen und getrennte Nachweise.
+
+    Der AVV schaltet den Zugriff auf echte Fälle frei (sharing_service), der Hinweis die
+    KI-Aufrufe mit Fallkontext (``require_schweigepflicht_hinweis``).
     """
     from app.services import agreement_service
     xff = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
     ip = xff or (request.client.host if request.client else None)
+    schreiben = (
+        agreement_service.record_schweigepflicht_acceptance if body.kind == "schweigepflicht"
+        else agreement_service.record_avv_acceptance
+    )
     async with pool.acquire() as conn:
         try:
-            avv = await agreement_service.record_avv_acceptance(
+            await schreiben(
                 conn, current["user_id"], body.version,
                 user_agent=request.headers.get("user-agent"), ip_address=ip,
             )
         except ValueError:
             raise HTTPException(
                 status_code=400,
-                detail="Diese Vertragsversion ist nicht mehr aktuell. Bitte lade die Seite neu.",
+                detail="Diese Fassung ist nicht mehr aktuell. Bitte lade die Seite neu.",
             )
-    return ProfessionalProfileResponse(**_mit_berufsgruppe(current["professional"]), **avv)
+        # Immer den vollständigen Stand zurückgeben: Käme nur die eben geschriebene Art
+        # zurück, stünde die andere im Antwortmodell auf ihrem Vorgabewert — und das
+        # Frontend hielte einen erledigten Punkt für offen.
+        stand = await agreement_service.lade_zustimmungen(conn, current["user_id"])
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(current["professional"]), **stand)
 
 
 # ── Auffindbarkeit + Verbindungsanfragen (Opt-in) ─────────────────────────────
@@ -341,7 +353,7 @@ async def set_discoverable(
             "WHERE user_id = $2 RETURNING *",
             body.discoverable, current["user_id"],
         )
-    return ProfessionalProfileResponse(**_mit_berufsgruppe(dict(row)), **current["avv"])
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(dict(row)), **current["zustimmungen"])
 
 
 @router.get("/requests", response_model=list[IncomingRequest])

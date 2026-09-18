@@ -20,6 +20,7 @@ import { professionalRoomApi } from '@/api/professionalCoupleRoom'
 import { apiErrorMessage } from '@/api/errors'
 import EchoThinking from '@/components/couple/EchoThinking'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import SchweigepflichtTor, { SchweigepflichtZeile } from '@/components/professional/SchweigepflichtHinweis'
 
 /** Die Reihenfolge im Menü — vom Überblick zum Detail. */
 const BEREICHE: { key: string; label: string }[] = [
@@ -436,6 +437,8 @@ function EchoDialog({ coupleId }: { coupleId: string }) {
         </div>
       )}
 
+      {/* § 203 StGB: Auch hier geht freigegebenes Material an die KI. */}
+      <SchweigepflichtTor>
       <form
         onSubmit={e => { e.preventDefault(); if (text.trim()) fragen.mutate(text.trim()) }}
         className="mt-4"
@@ -457,7 +460,9 @@ function EchoDialog({ coupleId }: { coupleId: string }) {
             : 'Fragen'}
         </button>
         <Fehlermeldung error={fragen.error} />
+        <div className="mt-2"><SchweigepflichtZeile /></div>
       </form>
+      </SchweigepflichtTor>
     </div>
   )
 }

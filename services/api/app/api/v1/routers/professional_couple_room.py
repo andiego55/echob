@@ -20,7 +20,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from app.core.dependencies import get_current_user, get_pool
+from app.core.dependencies import get_current_user, get_pool, require_schweigepflicht_hinweis
 from app.schemas.couple_professional import (
     CoupleRoomEchoReply,
     CoupleRoomEchoRequest,
@@ -99,7 +99,10 @@ async def request_room(
 _ROOM_PROMPT = "echo_couple_room_prompt.md"
 
 
-@router.post("/paarraeume/{couple_id}/echo", response_model=CoupleRoomEchoReply)
+@router.post(
+    "/paarraeume/{couple_id}/echo", response_model=CoupleRoomEchoReply,
+    dependencies=[Depends(require_schweigepflicht_hinweis)],
+)
 async def room_echo(
     couple_id: UUID, body: CoupleRoomEchoRequest, request: Request,
     current=Depends(get_current_user), pool=Depends(get_pool),

@@ -20,7 +20,11 @@ from app.api.v1.routers.professional_notes import (
     load_session_notes_decrypted,
 )
 from app.core import crypto
-from app.core.dependencies import get_current_professional, get_pool
+from app.core.dependencies import (
+    get_current_professional,
+    get_pool,
+    require_schweigepflicht_hinweis,
+)
 from app.core.sse import ereignis
 from app.schemas.professional import (
     ProfessionalEchoChatRequest,
@@ -246,7 +250,10 @@ async def _antwort_speichern(
     )
 
 
-@router.post("/chat", response_model=ProfessionalEchoChatResponse)
+@router.post(
+    "/chat", response_model=ProfessionalEchoChatResponse,
+    dependencies=[Depends(require_schweigepflicht_hinweis)],
+)
 async def chat(
     case_id: UUID,
     body: ProfessionalEchoChatRequest,
@@ -271,7 +278,7 @@ async def chat(
         pool=pool, lage=lage, case_id=case_id, pid=pid, body=body, answer=answer)
 
 
-@router.post("/chat/stream")
+@router.post("/chat/stream", dependencies=[Depends(require_schweigepflicht_hinweis)])
 async def chat_stream(
     case_id: UUID,
     body: ProfessionalEchoChatRequest,
@@ -436,7 +443,7 @@ async def history(
     return [_msg_response(r) for r in rows]
 
 
-@router.post("/summary")
+@router.post("/summary", dependencies=[Depends(require_schweigepflicht_hinweis)])
 async def generate_summary(
     case_id: UUID,
     request: Request,

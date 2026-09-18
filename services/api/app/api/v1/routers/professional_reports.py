@@ -20,7 +20,11 @@ from app.api.v1.routers.professional_notes import (
 )
 from app.core import crypto
 from app.core.config import settings
-from app.core.dependencies import get_current_professional, get_pool
+from app.core.dependencies import (
+    get_current_professional,
+    get_pool,
+    require_schweigepflicht_hinweis,
+)
 from app.schemas.professional import (
     PRO_REPORT_DISCLAIMER,
     ProfessionalReport,
@@ -192,7 +196,7 @@ async def list_reports(
 
 @router.post(
     "/cases/{case_id}/reports", response_model=ProfessionalReport,
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_schweigepflicht_hinweis)],
 )
 async def create_report(
     case_id: UUID,

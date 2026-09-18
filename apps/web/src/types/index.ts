@@ -919,6 +919,11 @@ export interface ProfessionalProfile {
   avv_accepted?: boolean
   avv_accepted_version?: string | null
   avv_accepted_at?: string | null
+  // Hinweis zur Schweigepflicht (§ 203 StGB) — steuert das Tor vor den KI-Aufrufen
+  schweigepflicht_current_version?: string | null
+  schweigepflicht_accepted?: boolean
+  schweigepflicht_accepted_version?: string | null
+  schweigepflicht_accepted_at?: string | null
   // Opt-in: in der EchoB-Suche fuer Nutzer:innen auffindbar
   discoverable?: boolean
 }

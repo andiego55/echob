@@ -87,9 +87,23 @@ export default function ProfessionalRegisterPage() {
               </p>
             )}
 
-            <button type="submit" disabled={mutation.isPending || !displayName.trim()} className="btn-primary w-full">
+            {/* Die Berufsgruppe ist Pflicht, seit an ihr der Hinweis zur Schweigepflicht
+                haengt: Ohne Angabe bekaeme jede Fachperson die strengste Fassung zu lesen,
+                auch wer gar nicht unter § 203 StGB faellt. „Anderes" steht zur Wahl — die
+                Frage laesst sich beantworten, auch wenn man unsicher ist. */}
+            <button
+              type="submit"
+              disabled={mutation.isPending || !displayName.trim() || !gruppe}
+              className="btn-primary w-full"
+            >
               {mutation.isPending ? 'Wird angelegt …' : 'Fachpersonen-Profil anlegen'}
             </button>
+            {!gruppe && (
+              <p className="text-center text-xs text-brand-muted">
+                Bitte wählen Sie Ihre Berufsgruppe — daran hängt, welche Regeln zur
+                Schweigepflicht für Sie gelten.
+              </p>
+            )}
           </form>
         </div>
       </main>

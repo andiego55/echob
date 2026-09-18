@@ -23,6 +23,7 @@ import { mitlaufen } from '@/lib/mitlaufen'
 import type { ProfessionalEchoMessage } from '@/types'
 import type { EchoChatResult } from '@/api/professional'
 import KiHinweis from '@/components/KiHinweis'
+import SchweigepflichtTor, { SchweigepflichtZeile } from '@/components/professional/SchweigepflichtHinweis'
 
 const SUGGESTIONS = [
   'Welche Themen tauchen im freigegebenen Material auf?',
@@ -366,6 +367,9 @@ export default function ProfessionalEchoPage() {
 
               {/* Composer */}
               <div className="mt-4 border-t border-brand-border pt-3">
+                {/* § 203 StGB: Mit der Frage gehen der freigegebene Fall UND die eigenen
+                    Aufzeichnungen an den KI-Dienstleister. Einmal gelesen, dann weg. */}
+                <SchweigepflichtTor>
                 <div className="flex gap-2">
                   <textarea
                     value={input}
@@ -401,6 +405,7 @@ export default function ProfessionalEchoPage() {
                 </div>
                 {/* Art. 50 KI-VO: am Eingabefeld, nicht in einem Dokument. */}
                 <KiHinweis className="mt-2" />
+                <div className="mt-1"><SchweigepflichtZeile /></div>
                 {messages.length > 0 && (
                   <div className="mt-2 flex gap-3">
                     <button onClick={() => summaryGen.mutate()} disabled={summaryGen.isPending || !activeSession}
@@ -409,6 +414,7 @@ export default function ProfessionalEchoPage() {
                     </button>
                   </div>
                 )}
+                </SchweigepflichtTor>
               </div>
             </div>
 

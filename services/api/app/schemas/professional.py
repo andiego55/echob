@@ -41,6 +41,14 @@ class ProfessionalProfileResponse(BaseModel):
     avv_accepted_version: str | None = None
     avv_accepted_at: datetime | None = None
 
+    # Hinweis zur Schweigepflicht (§ 203 StGB): steuert das Tor vor den KI-Aufrufen mit
+    # Fallkontext. Getrennt vom AVV, weil es etwas anderes ist - eine Information, die zur
+    # Kenntnis genommen wird, kein Vertrag.
+    schweigepflicht_current_version: str | None = None
+    schweigepflicht_accepted: bool = False
+    schweigepflicht_accepted_version: str | None = None
+    schweigepflicht_accepted_at: datetime | None = None
+
     # Opt-in: in der EchoB-Suche fuer Nutzer:innen auffindbar.
     discoverable: bool = False
 
@@ -61,8 +69,13 @@ class BerufsgruppeUpdate(BaseModel):
 
 
 class AgreementAccept(BaseModel):
-    """Zustimmung der Fachperson zu einer Vertragsversion (AVV, Art. 28)."""
+    """Zustimmung der Fachperson zu einer Fassung — AVV (Art. 28) oder KI-Hinweis (§ 203).
+
+    ``kind`` hat eine Vorgabe, damit ein aelterer Client, der nur den AVV kennt, weiter
+    funktioniert. Neue Aufrufer nennen die Art ausdruecklich.
+    """
     version: str = Field(..., min_length=1, max_length=64)
+    kind: Literal["avv", "schweigepflicht"] = "avv"
 
 
 # ── Einladungen & Verbindungen (nutzerseitig) ─────────────────────────────────

@@ -74,11 +74,16 @@ def bauen(monkeypatch):
     """Baut eine App, in der nur der Strom echt ist."""
     gespeichert: dict = {}
 
-    def _bauen(echo: FakeEcho, *, lage_wirft: Exception | None = None):
+    def _bauen(
+        echo: FakeEcho, *, lage_wirft: Exception | None = None, hinweis_gelesen: bool = True,
+    ):
         app = create_app()
         app.dependency_overrides[get_pool] = lambda: _FakePool()
+        # `zustimmungen` gehoert zur angemeldeten Fachperson: Ohne bestaetigten Hinweis zur
+        # Schweigepflicht sperrt `require_schweigepflicht_hinweis` jeden KI-Aufruf (§ 203).
         app.dependency_overrides[get_current_professional] = lambda: {
             "user_id": FACHPERSON, "org_id": uuid.uuid4(),
+            "zustimmungen": {"schweigepflicht_accepted": hinweis_gelesen},
         }
         app.state.echo_service = echo
 
@@ -169,3 +174,23 @@ async def test_ein_fehler_vor_dem_strom_wird_ein_echter_http_fehler(bauen):
 
     assert antwort.status_code == 402
     assert "data:" not in antwort.text
+
+
+@pytest.mark.asyncio
+async def test_ohne_bestaetigten_hinweis_geht_nichts_hinaus(bauen):
+    """§ 203 StGB: Der Strom beginnt gar nicht erst, wenn der Hinweis offen ist.
+
+    Das Gegenstueck zum Struktur-Waechter: Der prueft, dass die Abhaengigkeit an der Route
+    haengt; dieser Test prueft, dass sie auch wirkt - und zwar bevor ein einziges Byte an
+    das Modell geht.
+    """
+    echo = FakeEcho(["nie"])
+    app, _ = bauen(echo, hinweis_gelesen=False)
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        antwort = await client.post(
+            f"/api/v1/professional/cases/{FALL}/echo/chat/stream", json={"message": "x"})
+
+    assert antwort.status_code == 403
+    assert "Schweigepflicht" in antwort.text
+    assert echo.kontext is None, "Der Fallkontext darf das Modell nie erreicht haben"

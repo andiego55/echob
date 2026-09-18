@@ -135,8 +135,10 @@ export const professionalApi = {
     apiClient.put<ProfessionalProfile>('/professional/berufsgruppe', { profession_group })
       .then(r => r.data),
 
-  acceptAgreement: (version: string) =>
-    apiClient.post<ProfessionalProfile>('/professional/agreements/accept', { version }).then(r => r.data),
+  /** `kind` bleibt optional: Der AVV ist die Vorgabe, der KI-Hinweis nennt sich selbst. */
+  acceptAgreement: (version: string, kind: 'avv' | 'schweigepflicht' = 'avv') =>
+    apiClient.post<ProfessionalProfile>('/professional/agreements/accept', { version, kind })
+      .then(r => r.data),
 
   // Auffindbarkeit (Opt-in) + eingehende Verbindungsanfragen
   setDiscoverable: (discoverable: boolean) =>
