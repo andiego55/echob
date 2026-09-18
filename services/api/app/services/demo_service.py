@@ -153,12 +153,14 @@ async def ensure_demo_for_professional(pid, conn) -> None:
         return
 
     # ── Lena-Fall: Freigabe + eigene Artefakte (Notizen/Bericht nur bei Erstanlage) ──
-    # faq_enabled: Die fiktive Klientin hat das Fragenpaket „ausgelöst" — so steht die
-    # Freigabe da wie eine echte, an der eine Fall-FAQ hängt.
+    # faq_enabled und notizen_erlaubt: Die fiktive Klientin hat beides angehakt — das
+    # Fragenpaket und die Mitverarbeitung der Aufzeichnungen der Fachperson. Die Spielwiese
+    # soll zeigen, was die Werkzeuge können; wie es ohne Einwilligung aussieht, erklärt der
+    # Hinweis am Eingabefeld. Es gibt hier keinen echten Menschen, dessen Notizen das wären.
     lena_share = await conn.fetchval(
         "INSERT INTO case_shares "
-        "(case_id, owner_user_id, professional_user_id, status, is_demo, faq_enabled, message) "
-        "VALUES ($1, $2, $3, 'active', true, true, $4) "
+        "(case_id, owner_user_id, professional_user_id, status, is_demo, faq_enabled, notizen_erlaubt, message) "
+        "VALUES ($1, $2, $3, 'active', true, true, true, $4) "
         "ON CONFLICT (case_id, professional_user_id) DO NOTHING RETURNING id",
         DEMO_CASE_ID, DEMO_CLIENT_USER_ID, pid, "Beispielfall zum Ausprobieren – fiktiv.",
     )
@@ -191,8 +193,8 @@ async def ensure_demo_for_professional(pid, conn) -> None:
     if await conn.fetchrow("SELECT 1 FROM cases WHERE id = $1", DEMO_PARTNER_CASE_ID):
         marco_share = await conn.fetchval(
             "INSERT INTO case_shares "
-            "(case_id, owner_user_id, professional_user_id, status, is_demo, faq_enabled, message) "
-            "VALUES ($1, $2, $3, 'active', true, true, $4) "
+            "(case_id, owner_user_id, professional_user_id, status, is_demo, faq_enabled, notizen_erlaubt, message) "
+            "VALUES ($1, $2, $3, 'active', true, true, true, $4) "
             "ON CONFLICT (case_id, professional_user_id) DO NOTHING RETURNING id",
             DEMO_PARTNER_CASE_ID, DEMO_PARTNER_USER_ID, pid,
             "Beispiel-Partnerfall (Paar-Analyse) – fiktiv.",

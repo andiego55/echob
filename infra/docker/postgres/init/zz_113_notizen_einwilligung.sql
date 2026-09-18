@@ -30,5 +30,11 @@
 ALTER TABLE case_shares
     ADD COLUMN IF NOT EXISTS notizen_erlaubt BOOLEAN NOT NULL DEFAULT FALSE;
 
+-- Ausnahme Spielwiese: Dort gibt es keinen Menschen, dessen Aufzeichnungen geschuetzt
+-- werden muessten - die Klientin ist erfunden, die Notizen der Fachperson gehoeren zum
+-- Beispielmaterial. Ohne diese Zeile zeigte der Beispielfall weniger als das Produkt kann,
+-- und zwar ohne erkennbaren Grund. demo_service legt neue Demo-Freigaben gleich so an.
+UPDATE case_shares SET notizen_erlaubt = true WHERE is_demo AND NOT notizen_erlaubt;
+
 COMMENT ON COLUMN case_shares.notizen_erlaubt IS
     'Freiwillige Einwilligung der Klient:in: Auch die eigenen Aufzeichnungen der Fachperson (Arbeitsmappe, Sitzungsnotizen, Erkenntnisse, Zusammenfassungen) duerfen fuer die KI-Funktionen verarbeitet werden. Der Wortlaut, dem sie zugestimmt hat, steht in consent_text.';

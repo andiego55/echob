@@ -103,13 +103,16 @@ async def test_die_spielwiese_bringt_die_fall_faq_mit(db):
         (DEMO_CASE_ID, demo_fall_faq.LENA), (DEMO_PARTNER_CASE_ID, demo_fall_faq.MARCO),
     ):
         laeufe = await db.fetch(
-            "SELECT r.status, r.fragen_beantwortet, s.faq_enabled FROM case_faq_runs r "
-            "JOIN case_shares s ON s.id = r.share_id "
+            "SELECT r.status, r.fragen_beantwortet, s.faq_enabled, s.notizen_erlaubt "
+            "FROM case_faq_runs r JOIN case_shares s ON s.id = r.share_id "
             "WHERE r.case_id = $1 AND r.professional_user_id = $2",
             case_id, pid,
         )
         assert len(laeufe) == 1, "genau ein Lauf je Fall, auch nach zwei Aufrufen"
         assert laeufe[0]["status"] == "fertig" and laeufe[0]["faq_enabled"] is True
+        # Die erfundene Klientin hat auch die Aufzeichnungen der Fachperson freigegeben -
+        # sonst zeigte die Spielwiese Echo und Berichte ohne die Beispiel-Sitzungsnotizen.
+        assert laeufe[0]["notizen_erlaubt"] is True
         assert laeufe[0]["fragen_beantwortet"] == len(faq.antworten)
 
         gelesen = await fall_faq_service.lade_fuer_fachperson(
