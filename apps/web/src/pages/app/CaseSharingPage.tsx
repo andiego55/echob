@@ -15,7 +15,7 @@ import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
-import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen } from '@/lib/einwilligung'
+import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen, notizenErklaerung } from '@/lib/einwilligung'
 
 /**
  * Die ankreuzbaren Inhalte — alle bis auf `scene`, das weiter unten einzeln steht.
@@ -300,6 +300,7 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   // Bewusst NICHT in `zustimmung`: Das Fragenpaket ist eine Wahl, keine Bedingung. Läge
   // es im selben Zustand, wäre es eine Zeile Code davon entfernt, die Freigabe zu sperren.
   const [fallFaq, setFallFaq] = useState(false)
+  const [notizen, setNotizen] = useState(false)
   const [done, setDone] = useState(false)
 
   // Bestehende Freigabe der gewählten Fachperson vorbefüllen (= Bearbeiten)
@@ -345,8 +346,9 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
         consent_version: EINWILLIGUNG_FASSUNG,
         // Beide Erklärungen im Wortlaut — genau, was oben stand. Der FAQ-Absatz kommt
         // nur mit, wenn das Häkchen wirklich gesetzt war.
-        consent_text: einwilligungsProtokoll(selProName, fallFaq),
+        consent_text: einwilligungsProtokoll(selProName, fallFaq, notizen),
         fall_faq: fallFaq,
+        notizen,
       })
     },
     onSuccess: () => {
@@ -469,22 +471,45 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
 
             {/* Optional, und deshalb abgesetzt: keine Umrandung in Akzentfarbe, kein
                 Platz in der Reihe der Pflicht-Erklärungen. Wer nur freigeben will, soll
-                hier nichts tun müssen. */}
-            <label className="mt-3 flex cursor-pointer gap-3 rounded-brand border border-dashed border-brand-border px-4 py-3 hover:bg-brand-bg/50">
-              <input
-                type="checkbox"
-                checked={fallFaq}
-                onChange={e => setFallFaq(e.target.checked)}
-                className="mt-0.5 shrink-0 accent-accent"
-              />
-              <span className="text-xs leading-relaxed text-brand-text">
-                <strong className="mb-1 block text-navy">
-                  {FALL_FAQ_ERKLAERUNG.titel}{' '}
-                  <span className="font-normal text-brand-muted">· optional</span>
-                </strong>
-                {FALL_FAQ_ERKLAERUNG.text}
-              </span>
-            </label>
+                hier nichts tun müssen. Getrennte Haken, weil es zwei verschiedene
+                Verarbeitungen sind — zusammengefasst wäre die Einwilligung nicht mehr
+                freiwillig (Art. 7 Abs. 4 DSGVO). */}
+            <p className="mt-4 px-1 text-[11px] font-semibold uppercase tracking-wide text-brand-muted">
+              Zusätzlich — freiwillig
+            </p>
+            <div className="mt-1.5 space-y-2">
+              <label className="flex cursor-pointer gap-3 rounded-brand border border-dashed border-brand-border px-4 py-3 hover:bg-brand-bg/50">
+                <input
+                  type="checkbox"
+                  checked={fallFaq}
+                  onChange={e => setFallFaq(e.target.checked)}
+                  className="mt-0.5 shrink-0 accent-accent"
+                />
+                <span className="text-xs leading-relaxed text-brand-text">
+                  <strong className="mb-1 block text-navy">
+                    {FALL_FAQ_ERKLAERUNG.titel}{' '}
+                    <span className="font-normal text-brand-muted">· optional</span>
+                  </strong>
+                  {FALL_FAQ_ERKLAERUNG.text}
+                </span>
+              </label>
+
+              <label className="flex cursor-pointer gap-3 rounded-brand border border-dashed border-brand-border px-4 py-3 hover:bg-brand-bg/50">
+                <input
+                  type="checkbox"
+                  checked={notizen}
+                  onChange={e => setNotizen(e.target.checked)}
+                  className="mt-0.5 shrink-0 accent-accent"
+                />
+                <span className="text-xs leading-relaxed text-brand-text">
+                  <strong className="mb-1 block text-navy">
+                    {notizenErklaerung(selProName).titel}{' '}
+                    <span className="font-normal text-brand-muted">· optional</span>
+                  </strong>
+                  {notizenErklaerung(selProName).text}
+                </span>
+              </label>
+            </div>
             </>
           )}
 

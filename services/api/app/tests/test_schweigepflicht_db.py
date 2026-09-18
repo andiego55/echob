@@ -103,3 +103,43 @@ async def test_die_juengste_fassung_zaehlt(db):
     assert await dienst.has_accepted_current_schweigepflicht(db, pid) is True
     assert await db.fetchval(
         "SELECT count(*) FROM professional_agreements WHERE professional_user_id = $1", pid) == 2
+
+
+# ── Die Einwilligung fuer die eigenen Aufzeichnungen ─────────────────────────
+
+async def test_das_haekchen_kommt_beim_freigabe_buendel_an(db):
+    """Vom Freigabe-Dialog bis zum Kontext ist es genau dieser Wert.
+
+    Ohne diesen Test koennte die Spalte gesetzt sein und der Kontextbau sie trotzdem nie
+    sehen - das Haekchen waere Dekoration, und niemandem fiele es auf.
+    """
+    from app.services import profi_material
+    from app.services.agreement_service import CURRENT_AVV_VERSION
+    from app.services.sharing_service import load_shared_bundle
+
+    owner, pro = uuid.uuid4(), uuid.uuid4()
+    case_id = await db.fetchval(
+        "INSERT INTO cases (user_id, relationship_type, relationship_status, contact_frequency) "
+        "VALUES ($1,'partner','together','daily') RETURNING id",
+        owner,
+    )
+    await db.execute(
+        "INSERT INTO professional_agreements (professional_user_id, kind, version) "
+        "VALUES ($1,'avv',$2)",
+        pro, CURRENT_AVV_VERSION,
+    )
+    share_id = await db.fetchval(
+        "INSERT INTO case_shares (case_id, owner_user_id, professional_user_id, status, notizen_erlaubt) "
+        "VALUES ($1,$2,$3,'active',false) RETURNING id",
+        case_id, owner, pro,
+    )
+    await db.execute(
+        "INSERT INTO case_share_elements (share_id, element_type) VALUES ($1,'all_scenes')",
+        share_id,
+    )
+    buendel = await load_shared_bundle(pro, case_id, db)
+    assert profi_material.erlaubt(buendel.share) is False
+
+    await db.execute("UPDATE case_shares SET notizen_erlaubt = true WHERE id = $1", share_id)
+    buendel = await load_shared_bundle(pro, case_id, db)
+    assert profi_material.erlaubt(buendel.share) is True

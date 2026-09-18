@@ -1044,6 +1044,12 @@ function ReportsPanel({ caseId }: { caseId: string }) {
     queryKey: ['case-couple', caseId],
     queryFn: () => professionalApi.caseCoupleStatus(caseId),
   })
+  // Steht schon im Zwischenspeicher (die Seite darüber lädt denselben Schlüssel) — hier
+  // nur, um sagen zu können, warum die eigenen Notizen im Bericht fehlen.
+  const { data: fall } = useQuery({
+    queryKey: ['prof-case', caseId],
+    queryFn: () => professionalApi.caseDetail(caseId),
+  })
 
   const create = useMutation({
     mutationFn: () => {
@@ -1131,7 +1137,7 @@ function ReportsPanel({ caseId }: { caseId: string }) {
                 <span className="text-[11px] text-brand-muted">Das kann bis zu einer Minute dauern.</span>
               )}
             </div>
-            <div className="mt-2"><SchweigepflichtZeile /></div>
+            <div className="mt-2"><SchweigepflichtZeile notizenErlaubt={fall?.notizen_erlaubt} /></div>
           </SchweigepflichtTor>
         </div>
         {create.isError && (

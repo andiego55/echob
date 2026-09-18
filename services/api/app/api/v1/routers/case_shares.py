@@ -88,6 +88,7 @@ async def _build_share_response(conn, share_row) -> CaseShareResponse:
         faq_enabled=share_row["faq_enabled"],
         faq_status=faq["status"] if faq else None,
         faq_erstellt_am=faq["angefordert_am"] if faq else None,
+        notizen_erlaubt=share_row["notizen_erlaubt"],
     )
 
 
@@ -150,17 +151,18 @@ async def create_share(
                 """
                 INSERT INTO case_shares
                   (case_id, owner_user_id, professional_user_id, status, message,
-                   consent_version, consent_text, consented_at, faq_enabled)
-                VALUES ($1, $2, $3, 'active', $4, $5, $6, NOW(), $7)
+                   consent_version, consent_text, consented_at, faq_enabled, notizen_erlaubt)
+                VALUES ($1, $2, $3, 'active', $4, $5, $6, NOW(), $7, $8)
                 ON CONFLICT (case_id, professional_user_id) DO UPDATE SET
                   status = 'active', message = EXCLUDED.message, updated_at = NOW(), revoked_at = NULL,
                   consent_version = EXCLUDED.consent_version,
                   consent_text = EXCLUDED.consent_text, consented_at = NOW(),
-                  faq_enabled = EXCLUDED.faq_enabled
+                  faq_enabled = EXCLUDED.faq_enabled,
+                  notizen_erlaubt = EXCLUDED.notizen_erlaubt
                 RETURNING *
                 """,
                 case_id, uid, body.professional_user_id, body.message,
-                body.consent_version, body.consent_text.strip(), body.fall_faq,
+                body.consent_version, body.consent_text.strip(), body.fall_faq, body.notizen,
             )
             await _set_elements(conn, share["id"], case_id, body.elements, body.scene_ids)
             # Das Fragenpaket wird HIER ausgeloest, in der Transaktion der Freigabe: Der

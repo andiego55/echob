@@ -972,6 +972,8 @@ export interface CaseShare {
   faq_status?: 'offen' | 'laeuft' | 'fertig' | 'fehler' | null
   /** Wann das Paket entstand. Macht den Tagesdeckel sichtbar - siehe FaqStand. */
   faq_erstellt_am?: string | null
+  /** Ob die eigenen Aufzeichnungen der Fachperson mitverarbeitet werden duerfen. */
+  notizen_erlaubt?: boolean
 }
 
 export interface ShareCreate {
@@ -985,6 +987,12 @@ export interface ShareCreate {
   consent_text?: string
   /** Fragenpaket ausloesen. Loest die Klient:in aus, nicht die Fachperson. */
   fall_faq?: boolean
+  /**
+   * Freiwillig: Duerfen auch die eigenen Aufzeichnungen der Fachperson (Arbeitsmappe,
+   * Sitzungsnotizen, Erkenntnisse, Zusammenfassungen) fuer die KI-Funktionen verarbeitet
+   * werden? Die Entbindung deckt nur die ausgewaehlten Inhalte.
+   */
+  notizen?: boolean
 }
 
 export interface InboxItem {
@@ -1203,6 +1211,13 @@ export interface SharedCaseBundle {
   case_avatar?: string | null
   case_title: string
   is_demo?: boolean
+  /**
+   * Hat die Klient:in zugestimmt, dass auch die eigenen Aufzeichnungen der Fachperson
+   * (Arbeitsmappe, Sitzungsnotizen, Erkenntnisse, Zusammenfassungen) fuer die
+   * KI-Funktionen verarbeitet werden duerfen? Ohne das bleiben sie aus jedem Modellaufruf
+   * heraus - die Oberflaeche sagt dann, warum.
+   */
+  notizen_erlaubt?: boolean
   activated?: boolean
   allowed: ShareElementType[]
   case: Case | null

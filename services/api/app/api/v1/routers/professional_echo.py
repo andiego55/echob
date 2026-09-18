@@ -15,10 +15,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 
-from app.api.v1.routers.professional_notes import (
-    build_session_notes_context,
-    load_session_notes_decrypted,
-)
+from app.api.v1.routers.professional_notes import load_session_notes_decrypted
 from app.core import crypto
 from app.core.dependencies import (
     get_current_professional,
@@ -36,8 +33,7 @@ from app.schemas.professional import (
     ProfessionalEchoSummaryResponse,
     ProfessionalEchoSummaryUpdate,
 )
-from app.services import collab_service, echo_modes, seat_service
-from app.services.professional_findings import build_findings_context
+from app.services import collab_service, echo_modes, profi_material, seat_service
 from app.services.sharing_service import (
     build_shared_case_context,
     load_shared_bundle,
@@ -68,29 +64,9 @@ def _msg_response(row) -> ProfessionalEchoMessageResponse:
     )
 
 
-_NOTE_FIELDS = (
-    "first_impressions", "key_scenes", "open_questions",
-    "conversation_prompts", "next_steps", "free_text",
-)
-_NOTE_LABELS = {
-    "first_impressions": "Erste Eindrücke",
-    "key_scenes": "Wichtige Szenen",
-    "open_questions": "Offene Fragen",
-    "conversation_prompts": "Gesprächsimpulse",
-    "next_steps": "Nächste Schritte",
-    "free_text": "Freitext",
-}
-
-
-def _build_notes_context(note: dict | None) -> str:
-    """Eigene Notizen der Fachperson für den Echo-Kontext (Echo soll sie kennen)."""
-    if not note:
-        return ""
-    parts = [
-        f"**{_NOTE_LABELS[k]}:** {(note.get(k) or '').strip()}"
-        for k in _NOTE_FIELDS if (note.get(k) or "").strip()
-    ]
-    return "## Deine Notizen zu diesem Fall\n" + "\n".join(parts) if parts else ""
+# Die Bausteine der eigenen Aufzeichnungen stehen in app/services/profi_material.py —
+# zusammen mit dem Schalter, ohne den sie nicht in einen Modellaufruf geraten duerfen.
+_NOTE_FIELDS = profi_material.NOTE_FIELDS
 
 
 @dataclass
@@ -175,16 +151,18 @@ async def _lage_beschaffen(
         if note_row else None
     )
     shared_context = build_shared_case_context(bundle)
+    # Zuweisungen und Termine entstehen gemeinsam mit der Klient:in — sie gehen immer mit.
+    # Die eigenen Aufzeichnungen der Fachperson nur, wenn die Klient:in beim Freigeben
+    # ausdruecklich zugestimmt hat (§ 203 StGB; profi_material erklaert, warum).
     extras = [
-        s for s in (
-            _build_notes_context(note),
-            build_session_notes_context(session_notes),
-            collab_service.build_collaboration_context(assignments, appointments),
-            build_findings_context([
-                crypto.decrypt_fields(dict(r), "body") for r in findings_rows
-            ]),
-        ) if s
+        s for s in (collab_service.build_collaboration_context(assignments, appointments),) if s
     ]
+    extras += profi_material.eigene_aufzeichnungen(
+        bundle.share,
+        note=note,
+        session_notes=session_notes,
+        findings=[crypto.decrypt_fields(dict(r), "body") for r in findings_rows],
+    )
     if extras:
         shared_context = shared_context + "\n\n" + "\n\n".join(extras)
 

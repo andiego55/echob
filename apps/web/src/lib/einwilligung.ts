@@ -51,7 +51,7 @@ import { BETREIBER_KURZ, BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreibe
  * und benennt die Beteiligten. Seit Migration 102 wird zusätzlich der Wortlaut selbst
  * gespeichert — die Kennung ordnet ein, der Text beweist.
  */
-export const EINWILLIGUNG_FASSUNG = 'share-2026-09e'
+export const EINWILLIGUNG_FASSUNG = 'share-2026-09f'
 
 /**
  * Was geschieht — die Information, bevor gefragt wird.
@@ -221,12 +221,53 @@ export const WIDERRUFSHINWEIS =
  * Genau dieser Text stand der Person auf dem Schirm. Er wird an der Freigabe abgelegt,
  * damit später nicht der Quellcode-Stand rekonstruiert werden muss.
  */
-export function einwilligungsProtokoll(fachperson: string, fallFaq = false): string {
+/**
+ * Die zweite freiwillige Entscheidung: die Aufzeichnungen der Fachperson.
+ *
+ * **Warum das nicht in die Entbindung oben gehört.** Die Entbindung deckt „die von mir
+ * ausgewählten Inhalte" — Szenen, Fragebögen, das eigene Profil. Die Notizen der
+ * Fachperson hat die Klient:in nie ausgewählt; sie kennt sie nicht einmal. Das ist eine
+ * andere Verarbeitung mit einer anderen Quelle, und nach Art. 7 Abs. 4 DSGVO (Erwägungs-
+ * grund 43) muss man dazu getrennt Ja oder Nein sagen können. Genau daran ist die
+ * ursprüngliche Sammel-Bestätigung schon einmal gescheitert.
+ *
+ * **Warum ein „Nein" etwas bewirkt.** Ohne diese Erklärung bleiben Arbeitsmappe,
+ * Sitzungsnotizen, Erkenntnisse und gespeicherte Zusammenfassungen aus jedem Modellaufruf
+ * heraus (``profi_material.eigene_aufzeichnungen``). Eine Einwilligung einzuholen, deren
+ * Verweigerung folgenlos bliebe, wäre schlechter als gar nicht zu fragen.
+ *
+ * **Warum der Name dreimal dasteht.** Eine Entbindung muss bestimmt sein, und das
+ * Geschlecht der Fachperson kennen wir nicht — ein Fürwort wäre hier eine Unterstellung.
+ */
+export function notizenErklaerung(fachperson: string): { titel: string; kurz: string; text: string } {
+  const wen = fachperson.trim() || 'die ausgewählte Fachperson'
+  return {
+    titel: 'Aufzeichnungen der Fachperson',
+    kurz: 'Auch die Notizen deiner Fachperson dürfen für die KI-Funktionen verarbeitet werden.',
+    text:
+      `${wen} hält in EchoB eigene Aufzeichnungen über unsere Gespräche: Notizen, `
+      + 'Zusammenfassungen und festgehaltene Erkenntnisse. Ich bin einverstanden, dass auch '
+      + `diese Aufzeichnungen für die KI-Funktionen an ${BETREIBER_VOLL} und den `
+      + `KI-Dienstleister ${KI_DIENSTLEISTER} übermittelt und dort verarbeitet werden, und `
+      + `entbinde ${wen} insoweit von der Schweigepflicht. Ohne diese Erklärung bleiben die `
+      + `Aufzeichnungen bei ${wen}; die KI-Funktionen arbeiten dann nur mit den Inhalten, die `
+      + 'ich oben ausgewählt habe. Die Aufzeichnungen selbst sehe ich in EchoB nicht; '
+      + 'Auskunft darüber bekomme ich auf Verlangen (Art. 15 DSGVO). Diese Erklärung ist '
+      + 'freiwillig und für die Freigabe nicht erforderlich.',
+  }
+}
+
+export function einwilligungsProtokoll(
+  fachperson: string, fallFaq = false, notizen = false,
+): string {
   const teile = erklaerungen(fachperson).map(e => `${e.titel}\n${e.text}`)
   // Nur wenn wirklich angehakt: Der Nachweis soll belegen, was die Person erklaert hat,
   // nicht was ihr angeboten wurde. Stuende der Absatz immer drin, belegte er bei jeder
   // Freigabe eine Uebermittlung, die meistens nicht stattgefunden hat.
   if (fallFaq) teile.push(`${FALL_FAQ_ERKLAERUNG.titel}\n${FALL_FAQ_ERKLAERUNG.text}`)
+  if (notizen) {
+    teile.push(`${notizenErklaerung(fachperson).titel}\n${notizenErklaerung(fachperson).text}`)
+  }
   return [...teile, WIDERRUFSHINWEIS].join('\n\n')
 }
 

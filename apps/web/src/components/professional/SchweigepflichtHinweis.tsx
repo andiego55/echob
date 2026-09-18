@@ -132,15 +132,35 @@ export default function SchweigepflichtTor({ children }: { children: React.React
  * Erscheint erst nach der Bestätigung — vorher steht der ganze Hinweis ohnehin da, und
  * zwei Fassungen desselben Texts übereinander liest niemand.
  */
-export function SchweigepflichtZeile() {
+export function SchweigepflichtZeile({ notizenErlaubt }: {
+  /**
+   * Stand der Freigabe: Hat die Klient:in der Mitverarbeitung eigener Aufzeichnungen
+   * zugestimmt? ``undefined`` = unbekannt (Bündel noch nicht geladen) — dann steht der
+   * allgemeine Satz, keine Behauptung in die eine oder andere Richtung.
+   */
+  notizenErlaubt?: boolean
+} = {}) {
   const { data } = useProfessional()
   if (data?.schweigepflicht_accepted !== true) return null
   const hinweis = schweigepflichtHinweis(data.unterliegt_203)
   return (
     <p className="flex items-center gap-1.5 text-[0.75rem] text-brand-muted">
-      <span>Mit dem Fall gehen auch Ihre Notizen an die KI.</span>
+      <span>
+        {notizenErlaubt === false
+          ? 'Ihre Notizen bleiben außen vor — dafür fehlt die Einwilligung der Klient:in.'
+          : 'Mit dem Fall gehen auch Ihre Notizen an die KI.'}
+      </span>
       <InfoPopover label="Hinweis zur Schweigepflicht" title={hinweis.titel}>
         <SchweigepflichtText hinweis={hinweis} kompakt />
+        {notizenErlaubt === false && (
+          <p className="mt-3 border-t border-brand-border pt-3 text-[0.8rem] leading-relaxed text-brand-muted">
+            Für diesen Fall hat die Klient:in der Mitverarbeitung Ihrer eigenen
+            Aufzeichnungen nicht zugestimmt. Arbeitsmappe, Sitzungsnotizen, Erkenntnisse und
+            gespeicherte Zusammenfassungen bleiben deshalb aus Echo und Berichten heraus.
+            Ändern kann das nur sie — beim Bearbeiten der Freigabe steht dort ein
+            freiwilliges Kästchen.
+          </p>
+        )}
       </InfoPopover>
     </p>
   )

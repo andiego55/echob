@@ -13,11 +13,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from app.api.v1.routers.professional_echo import _NOTE_FIELDS, _build_notes_context
-from app.api.v1.routers.professional_notes import (
-    build_session_notes_context,
-    load_session_notes_decrypted,
-)
+from app.api.v1.routers.professional_notes import load_session_notes_decrypted
 from app.core import crypto
 from app.core.config import settings
 from app.core.dependencies import (
@@ -37,7 +33,13 @@ from app.schemas.professional import (
     ProReportTemplateCreate,
     ProReportTemplateUpdate,
 )
-from app.services import collab_service, couple_service, demo_service, seat_service
+from app.services import (
+    collab_service,
+    couple_service,
+    demo_service,
+    profi_material,
+    seat_service,
+)
 from app.services.pro_report_templates import get_standard
 from app.services.sharing_service import (
     build_shared_case_context,
@@ -165,17 +167,6 @@ def _report_response(row) -> ProfessionalReport:
     )
 
 
-def _build_summaries_context(summaries: list[dict]) -> str:
-    items = [s for s in summaries if (s.get("summary_text") or "").strip()]
-    if not items:
-        return ""
-    lines = ["## Gespeicherte Echo-Zusammenfassungen (Fachperson)"]
-    for s in items:
-        title = (s.get("title") or "Zusammenfassung").strip()
-        lines.append(f"### {title}\n{s['summary_text'].strip()}")
-    return "\n".join(lines)
-
-
 @router.get("/cases/{case_id}/reports", response_model=list[ProfessionalReportListItem])
 async def list_reports(
     case_id: UUID,
@@ -293,19 +284,20 @@ async def create_report(
     # 3) Einzelfall-Kontext zusammenbauen (Paar-Kontext steht oben bereits)
     if not is_couple:
         note = (
-            crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
+            crypto.decrypt_fields({k: note_row[k] for k in profi_material.NOTE_FIELDS}, *profi_material.NOTE_FIELDS)
             if note_row else None
         )
         summaries = [crypto.decrypt_fields(dict(r), "summary_text") for r in summary_rows]
+        # Freigegebenes Material und gemeinsam entstandene Zuweisungen/Termine immer; die
+        # eigenen Aufzeichnungen der Fachperson nur mit Einwilligung (§ 203 StGB).
         parts = [
             s for s in (
                 build_shared_case_context(bundle),
-                _build_notes_context(note),
-                build_session_notes_context(session_notes),
-                _build_summaries_context(summaries),
                 collab_service.build_collaboration_context(assignments, appointments),
             ) if s
         ]
+        parts += profi_material.eigene_aufzeichnungen(
+            bundle.share, note=note, session_notes=session_notes, summaries=summaries)
         context = "\n\n---\n\n".join(parts)
 
     # 4) Generieren (synchron) + verschlüsselt speichern

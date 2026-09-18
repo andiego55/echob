@@ -148,6 +148,12 @@ class ShareCreate(BaseModel):
     # Berufsgeheimnistraeger:innen ist der Unterschied nicht akademisch - wer selbst
     # fragt, offenbart. Deshalb steht der Schalter hier und nicht im Fachpersonenbereich.
     fall_faq: bool = False
+    # Zweite freiwillige Entscheidung: Duerfen auch die eigenen Aufzeichnungen der
+    # Fachperson (Arbeitsmappe, Sitzungsnotizen, Erkenntnisse, Zusammenfassungen) fuer die
+    # KI-Funktionen verarbeitet werden? Die Entbindung oben deckt nur die ausgewaehlten
+    # Inhalte. Vorgabe false: Ein aelterer Client, der das Feld nicht kennt, darf keine
+    # Zustimmung behaupten.
+    notizen: bool = False
 
 
 class ShareUpdate(BaseModel):
@@ -175,6 +181,10 @@ class CaseShareResponse(BaseModel):
     # Antworten - genau das hat sie ausgeloest: eine Uebermittlung an die Fachperson.
     faq_enabled: bool = False
     faq_status: str | None = None
+    # Ob die eigenen Aufzeichnungen der Fachperson mitverarbeitet werden duerfen. Die
+    # Klient:in sieht hier ihre eigene Entscheidung, die Fachperson sieht an ihrem Fall,
+    # warum Notizen fehlen.
+    notizen_erlaubt: bool = False
     # Wann das Paket entstand. Ohne dieses Datum waere der Tagesdeckel unsichtbar: Wer
     # erneut speichert und keinen neuen Lauf bekommt, saehe dieselbe Zeile wie vorher und
     # wuesste nicht, ob etwas passiert ist.

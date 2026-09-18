@@ -405,7 +405,7 @@ export default function ProfessionalEchoPage() {
                 </div>
                 {/* Art. 50 KI-VO: am Eingabefeld, nicht in einem Dokument. */}
                 <KiHinweis className="mt-2" />
-                <div className="mt-1"><SchweigepflichtZeile /></div>
+                <div className="mt-1"><SchweigepflichtZeile notizenErlaubt={caseInfo?.notizen_erlaubt} /></div>
                 {messages.length > 0 && (
                   <div className="mt-2 flex gap-3">
                     <button onClick={() => summaryGen.mutate()} disabled={summaryGen.isPending || !activeSession}

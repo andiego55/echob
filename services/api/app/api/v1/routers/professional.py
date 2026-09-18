@@ -28,7 +28,13 @@ from app.schemas.professional import (
     ProfessionalProfileResponse,
     ProfessionalRegister,
 )
-from app.services import agreement_service, collab_service, seat_service, sharing_service
+from app.services import (
+    agreement_service,
+    collab_service,
+    profi_material,
+    seat_service,
+    sharing_service,
+)
 from app.services.demo_service import ensure_demo_for_professional
 from app.services.echo_service import _REL_TYPE_LABELS
 from app.services.professional_account import ensure_professional_account
@@ -889,6 +895,10 @@ async def case_detail(
         "case_avatar": case_avatar,
         "case_title": _case_title(bundle.case.get("relationship_type") if bundle.case else None),
         "is_demo": bool(bundle.share.get("is_demo")),
+        # Ob die Klient:in zugestimmt hat, dass auch die eigenen Aufzeichnungen der
+        # Fachperson durch die KI verarbeitet werden duerfen. Die Oberflaeche sagt damit,
+        # WARUM die Notizen in Echo und Bericht fehlen - sonst sieht es aus wie ein Fehler.
+        "notizen_erlaubt": profi_material.erlaubt(bundle.share),
         "activated": activated,
         "allowed": sorted(bundle.allowed),
         "case": _public_row(bundle.case),

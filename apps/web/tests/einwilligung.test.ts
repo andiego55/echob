@@ -20,6 +20,7 @@ import {
   alleErklaerungenBestaetigt,
   einwilligungsProtokoll,
   erklaerungen,
+  notizenErklaerung,
 } from '../src/lib/einwilligung'
 import { BETREIBER_VOLL, KI_DIENSTLEISTER } from '../src/lib/betreiber'
 
@@ -233,5 +234,49 @@ describe('Drei Ebenen, sauber getrennt', () => {
       expect(e.text).toContain(NAME)
       expect(e.text.length).toBeGreaterThan(200)
     }
+  })
+})
+
+describe('Die Aufzeichnungen der Fachperson', () => {
+  const erklaerung = notizenErklaerung(NAME)
+
+  it('ist eine eigene, freiwillige Erklärung — kein Teil der Pflichttexte', () => {
+    // Zusammengefasst waere die Einwilligung nicht mehr freiwillig (Art. 7 Abs. 4 DSGVO,
+    // Erwaegungsgrund 43). Genau daran ist die urspruengliche Sammel-Bestaetigung schon
+    // einmal gescheitert.
+    for (const pflicht of erklaerungen(NAME)) {
+      expect(pflicht.text).not.toContain('Aufzeichnungen')
+    }
+    expect(erklaerung.text).toContain('freiwillig')
+    expect(erklaerung.text).toContain('für die Freigabe nicht erforderlich')
+  })
+
+  it('nennt die Fachperson beim Namen statt mit einem Fürwort', () => {
+    // Eine Entbindung muss bestimmt sein, und das Geschlecht kennen wir nicht.
+    expect(erklaerung.text.split(NAME).length - 1).toBeGreaterThanOrEqual(3)
+  })
+
+  it('benennt, was gemeint ist und wohin es geht', () => {
+    for (const teil of ['Notizen', 'Zusammenfassungen', 'Erkenntnisse',
+      BETREIBER_VOLL, KI_DIENSTLEISTER, 'Schweigepflicht']) {
+      expect(erklaerung.text).toContain(teil)
+    }
+  })
+
+  it('sagt, was ohne sie geschieht — sonst wäre das Nein folgenlos', () => {
+    expect(erklaerung.text).toContain('Ohne diese Erklärung')
+    expect(erklaerung.text).toContain('nur mit den Inhalten, die ich oben ausgewählt habe')
+  })
+
+  it('steht nur im Protokoll, wenn sie angehakt war', () => {
+    expect(einwilligungsProtokoll(NAME)).not.toContain(erklaerung.titel)
+    expect(einwilligungsProtokoll(NAME, true, false)).not.toContain(erklaerung.titel)
+    const mit = einwilligungsProtokoll(NAME, false, true)
+    expect(mit).toContain(erklaerung.titel)
+    expect(mit).toContain(erklaerung.text)
+  })
+
+  it('faellt ohne Namen nicht auf eine leere Stelle zurueck', () => {
+    expect(notizenErklaerung('').text).toContain('die ausgewählte Fachperson')
   })
 })
