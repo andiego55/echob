@@ -130,6 +130,13 @@ async def _json_rows_by_email(conn, table: str, email: str) -> list:
 # Lösch-Reihenfolge: Kinder vor Eltern (FK-sicher). Die fall-referenzierenden
 # Tabellen vor `cases`; ON DELETE CASCADE auf cases(id) fängt etwaige Reste ab
 # (inkl. case_share_elements via case_shares und Profi-Notizen/Echo zu eigenen Fällen).
+#
+# ACHTUNG, die Falle dieser Liste: Eine Kaskade über ``cases`` räumt nur die Fälle DIESER
+# Person. Was eine Fachperson an den Fällen ANDERER Menschen angelegt hat — Berichte,
+# Erkenntnisse, Sitzungsnotizen, Fall-FAQ-Läufe — hängt an fremden Fällen und bleibt
+# stehen, bis es hier ausdrücklich steht. Genau das war bis zum 19.09.2026 der Fall.
+# ``test_loeschung_vollstaendig.py`` prüft beide Richtungen und meldet jede neue Tabelle
+# mit Personenbezug, die hier fehlt.
 _DELETE_STEPS = (
     ("echo_messages", "user_id = $1"),
     ("onboarding_answers", "user_id = $1"),
@@ -150,20 +157,77 @@ _DELETE_STEPS = (
     ("professional_assignments", "user_id = $1 OR professional_user_id = $1"),
     ("professional_appointments", "user_id = $1 OR professional_user_id = $1"),
     ("professional_templates", "professional_user_id = $1"),
+    # ── Arbeit der Fachperson an FREMDEN Fällen ──────────────────────────────
+    # Diese Zeilen hängen an den Fällen der Klient:innen. Löscht die Fachperson ihr
+    # Konto, bleibt der Fall (er gehört jemand anderem) — die eigene Arbeit daran darf
+    # trotzdem nicht bleiben.
+    ("professional_couple_echo_messages", "professional_user_id = $1"),
+    ("professional_couple_echo_sessions", "professional_user_id = $1"),
+    ("professional_couple_reports", "professional_user_id = $1"),
+    ("case_couples", "professional_user_id = $1"),
+    ("couple_professional_shares", "professional_user_id = $1"),
+    ("professional_session_notes", "professional_user_id = $1"),
+    ("professional_findings", "professional_user_id = $1"),
+    ("professional_reports", "professional_user_id = $1"),
+    ("case_faq_runs", "professional_user_id = $1"),
+    ("case_activations", "professional_user_id = $1"),
+    ("professional_note_templates", "professional_user_id = $1"),
+    ("professional_report_templates", "professional_user_id = $1"),
+    # Der AVV und der Schweigepflicht-Hinweis sind Erklärungen DIESER Person, mit IP und
+    # Browserkennung. Ohne das Konto, auf das sie sich beziehen, sind sie kein Nachweis
+    # mehr, sondern nur noch ein Datensatz über einen Menschen, der gegangen ist.
+    ("professional_agreements", "professional_user_id = $1"),
+    ("client_invites", "professional_user_id = $1 OR accepted_user_id = $1"),
+    ("client_notifications", "user_id = $1"),
     ("case_shares", "owner_user_id = $1 OR professional_user_id = $1"),
     ("cases", "user_id = $1"),
     ("professional_invites", "inviter_user_id = $1 OR professional_user_id = $1"),
     ("professional_profiles", "user_id = $1"),
     ("payments", "user_id = $1"),
     ("ai_usage_log", "user_id = $1"),
+    ("test_results", "user_id = $1"),
+    ("pseudonymous_accounts", "user_id = $1"),
     ("user_profiles", "user_id = $1"),
     ("user_consents", "user_id = $1"),
+    # ── Ausbildung ───────────────────────────────────────────────────────────
+    # Als Studierende:r: die eigene Zuordnung (Arbeitskopien und Einreichungen hängen
+    # daran). Als Institut: das Institut selbst — mitsamt allem, was es traegt. Das ist
+    # eine grosse Wirkung fuer eine einzelne Loeschung, aber die richtige: Ein Institut
+    # ohne Traeger waere ein Konto, das niemandem gehoert.
+    ("student_invites", "accepted_user_id = $1"),
+    ("students", "user_id = $1"),
+    ("training_institutes", "user_id = $1"),
+    # ── Organisation (B2B) ───────────────────────────────────────────────────
+    # organizations.owner_user_id ist NOT NULL — eine Organisation kann nicht ohne
+    # Inhaber:in weiterbestehen. Sie faellt deshalb mit. Wie viele Zeilen das waren,
+    # steht im Rueckgabewert; im Admin sieht man es nach dem Loeschen.
+    ("organization_members", "professional_user_id = $1"),
+    ("organization_invites", "invited_by_user_id = $1"),
+    ("organizations", "owner_user_id = $1"),
     # Paartherapie: Die couple_links-Zeile reicht — ON DELETE CASCADE räumt Sitzungen,
     # Nachrichten, Kontexte, private Dialoge, Zusammenfassungen, Abmachungen, Themen,
     # Perspektiven, Mediationen, Testläufe und Punkte ab. Der gemeinsame Raum fällt dabei
     # ganz: Sitzungsverläufe gehören zwei Menschen, der eigene Anteil lässt sich nicht
     # herausschneiden. Siehe couple_privacy_service.
     ("couple_links", "initiator_user_id = $1 OR partner_user_id = $1"),
+)
+
+
+# Zwei Stellen, an denen nicht gelöscht, sondern der Verweis gelöst wird — weil die Zeile
+# jemand anderem gehört:
+#
+# * Ein Verzeichnis-Eintrag ist unsere redaktionelle Arbeit (recherchierte Praxis), nicht
+#   die der Fachperson. Er darf nicht mit dem Konto verschwinden — aber er darf auch nicht
+#   veröffentlicht bleiben, wenn die Person ihn selbst gefüllt hat. Also: Anspruch lösen
+#   und offline nehmen. Wieder sichtbar macht ihn eine Entscheidung im Verzeichnis-Admin.
+# * Ein Zugangscode gehört dem Institut. Wer ihn eingelöst hatte, ist danach nicht mehr
+#   erkennbar; der Code selbst bleibt dem Institut erhalten.
+_FREIGABE_STEPS = (
+    ("directory_listings",
+     "UPDATE directory_listings SET claimed_by_user_id = NULL, published = FALSE, "
+     "updated_at = NOW() WHERE claimed_by_user_id = $1"),
+    ("institute_access_codes",
+     "UPDATE institute_access_codes SET used_by_user_id = NULL WHERE used_by_user_id = $1"),
 )
 
 
@@ -191,6 +255,8 @@ async def delete_user_data(
             """,
             user_id,
         )
+        for name, sql in _FREIGABE_STEPS:
+            counts[f"{name} (gelöst)"] = _affected(await conn.execute(sql, user_id))
         for table, where in _DELETE_STEPS:
             result = await conn.execute(f"DELETE FROM {table} WHERE {where}", user_id)
             counts[table] = _affected(result)

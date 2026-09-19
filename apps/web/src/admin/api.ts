@@ -148,6 +148,46 @@ export interface UserRow {
   hinweis_at: string | null
 }
 
+/** Was eine Löschung getan hat — oder warum sie nicht stattgefunden hat. */
+export interface LoeschErgebnis {
+  ok: boolean
+  grund: string | null
+  user_id: string | null
+  rollen: string[]
+  zeilen: number
+  /** geloescht | war_bereits_weg | fehlgeschlagen */
+  auth_konto: string | null
+  tabellen: Record<string, number>
+}
+
+/** Ein Konto, dessen Login es nicht mehr gibt: Daten ohne Zugang. */
+export interface VerwaistesKonto {
+  user_id: string
+  rolle: UserRow['rolle']
+  name: string | null
+  created_at: string | null
+  zuletzt_aktiv: string | null
+  spuren: number
+}
+
+/** Ein Login ohne eine einzige Zeile hier — meist eine Anmeldung, die nie ankam. */
+export interface LoginOhneProfil {
+  user_id: string
+  email: string | null
+  angelegt: string | null
+  letzter_login: string | null
+}
+
+export interface VerwaistReport {
+  geprueft_am: string
+  auth_konten: number
+  db_konten: number
+  /** Die Liste der Login-Konten war abgeschnitten — dann ist jeder Befund unzuverlässig. */
+  unvollstaendig: boolean
+  ohne_login: VerwaistesKonto[]
+  ohne_profil: LoginOhneProfil[]
+}
+
 export const adminApi = {
   listings: (status?: string) =>
     apiClient.get<ListingRow[]>('/admin/listings', { params: status ? { status } : {} })
@@ -189,4 +229,18 @@ export const adminApi = {
 
   users: (params?: { rolle?: string; q?: string }) =>
     apiClient.get<UserRow[]>('/admin/users', { params: params ?? {} }).then(r => r.data),
+
+  /** Vergleicht die Login-Konten bei Supabase mit den Konten hier. Fragt Supabase ab. */
+  verwaist: () =>
+    apiClient.get<VerwaistReport>('/admin/users/verwaist', { timeout: 60_000 })
+      .then(r => r.data),
+
+  /**
+   * Löscht Daten und Login-Konto — endgültig, ohne Papierkorb.
+   *
+   * Ein abgelehnter Versuch kommt als `ok: false` mit Grund zurück, nicht als Fehler:
+   * „Das ist das Admin-Konto" ist eine Antwort, die man lesen soll.
+   */
+  deleteUser: (userId: string) =>
+    apiClient.delete<LoeschErgebnis>(`/admin/users/${userId}`).then(r => r.data),
 }

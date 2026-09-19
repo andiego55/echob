@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 
-from app.admin import invites, listings, provisioning, users
+from app.admin import invites, konten, listings, provisioning, users
 from app.admin.schemas import (
     InviteDraft,
     InviteResult,
@@ -19,10 +19,12 @@ from app.admin.schemas import (
     ListingDetail,
     ListingRow,
     ListingUpdate,
+    LoeschErgebnis,
     PhotoResult,
     ProvisionRequest,
     ProvisionResult,
     UserRow,
+    VerwaistReport,
 )
 from app.core.dependencies import get_pool, get_supabase, require_admin
 from app.core.logging import get_logger
@@ -160,3 +162,31 @@ async def users_list(
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> list[UserRow]:
     return await users.liste(pool, rolle, q)
+
+
+@router.get("/users/verwaist", response_model=VerwaistReport)
+async def users_verwaist(
+    pool: asyncpg.Pool = Depends(get_pool),
+    supabase=Depends(get_supabase),
+) -> VerwaistReport:
+    """Wo laufen Anmeldung und Daten auseinander?
+
+    Steht **vor** der Route mit dem Platzhalter: Sonst schluckte ``/users/{user_id}`` das
+    Wort „verwaist" als Kennung.
+    """
+    return VerwaistReport(**await konten.verwaiste(pool, supabase))
+
+
+@router.delete("/users/{user_id}", response_model=LoeschErgebnis)
+async def user_delete(
+    user_id: str,
+    pool: asyncpg.Pool = Depends(get_pool),
+    supabase=Depends(get_supabase),
+) -> LoeschErgebnis:
+    """Löscht die Daten dieses Kontos und danach das Login — endgültig.
+
+    Ein abgelehnter Versuch ist **kein** Fehler, sondern eine Auskunft: ``ok: false`` mit
+    Grund. Ein 4xx würde in der Oberfläche als „hat nicht geklappt" ankommen, dabei ist
+    „das ist das Admin-Konto" eine Antwort, die man lesen soll.
+    """
+    return LoeschErgebnis(**await konten.loeschen(pool, supabase, user_id))

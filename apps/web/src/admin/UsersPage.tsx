@@ -21,9 +21,13 @@
  */
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiErrorMessage } from '@/api/errors'
+import { useAuth } from '@/contexts/AuthContext'
 import { adminApi, type UserRow } from './api'
+import KarteileichenPanel from './KarteileichenPanel'
+import LoeschDialog from './LoeschDialog'
+import { darfLoeschen } from './loeschen'
 import {
   ROLLEN_LABEL, aktivText, berufsgruppeText, eingeschlafen, hinweisZustand, tarifText,
   zahlenText,
@@ -121,11 +125,28 @@ function csvHerunterladen(zeilen: UserRow[]) {
   URL.revokeObjectURL(url)
 }
 
+/** Eine Zeile, zu der es hier keine gibt: ein Login ohne Daten. */
+function nurLogin(user_id: string, name: string | null): UserRow {
+  return {
+    user_id, rolle: 'client', name, email: null,
+    created_at: new Date().toISOString(),
+    avv_accepted: null, avv_version: null, avv_accepted_at: null, im_verzeichnis: false,
+    tarif: null, tarif_bis: null, zuletzt_aktiv: null,
+    faelle: null, szenen: null, verbindungen: null,
+    berufsgruppe: null, berufsgruppe_label: null, unterliegt_203: null,
+    hinweis_gelesen: null, hinweis_at: null,
+  }
+}
+
 export default function AdminUsersPage() {
   const [rolle, setRolle] = useState('')
   const [q, setQ] = useState('')
   // Ohne Klick gilt die Reihenfolge des Servers: zuletzt aktiv zuerst.
   const [sortierung, setSortierung] = useState<Sortierung | null>(null)
+  const [pruefen, setPruefen] = useState(false)
+  const [ziel, setZiel] = useState<{ row: UserRow; hinweis?: string } | null>(null)
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin-users', rolle, q],
     queryFn: () => adminApi.users({ rolle: rolle || undefined, q: q.trim() || undefined }),
@@ -144,6 +165,17 @@ export default function AdminUsersPage() {
     setSortierung(alt => (alt?.spalte === spalte
       ? { spalte, richtung: alt.richtung === 'auf' ? 'ab' : 'auf' }
       : { spalte, richtung: ersteRichtung(spalte) }))
+
+  /** Aus einem Fund der Karteileichen-Prüfung wird eine Zeile für den Löschdialog. */
+  function aufraeumen(userId: string, name: string | null, r: UserRow['rolle'] | null) {
+    const vorhanden = (data ?? []).find(x => x.user_id === userId)
+    if (r && vorhanden) return setZiel({ row: vorhanden })
+    if (r) return setZiel({ row: { ...nurLogin(userId, name), rolle: r } })
+    setZiel({
+      row: nurLogin(userId, name),
+      hinweis: 'Login ohne Daten in dieser Datenbank',
+    })
+  }
 
   const offen = zeilen.filter(r => avvZustand(r).ton === 'offen').length
   // Kleine Kopfzahlen: Wer die Seite oeffnet, will meist zuerst wissen, wie viele es
@@ -208,7 +240,25 @@ export default function AdminUsersPage() {
               >
                 CSV
               </button>
+              <button
+                type="button"
+                onClick={() => setPruefen(v => !v)}
+                title="Vergleicht die Login-Konten bei Supabase mit den Konten hier. Fragt beide Seiten ab und dauert einen Moment."
+                className={`rounded-brand border px-3.5 py-1.5 text-[0.82rem] font-medium transition-colors ${
+                  pruefen
+                    ? 'border-accent bg-accent text-white'
+                    : 'border-brand-border bg-white text-navy hover:border-accent/50'
+                }`}
+              >
+                Karteileichen
+              </button>
             </div>
+
+            {pruefen && (
+              <div className="mb-4">
+                <KarteileichenPanel onLoeschen={aufraeumen} />
+              </div>
+            )}
 
             {!isLoading && !error && zeilen.length > 0 && (
               <p className="mb-3 text-[0.8rem] text-brand-muted">
@@ -254,6 +304,7 @@ export default function AdminUsersPage() {
                           umschalten={umschalten}
                         />
                       ))}
+                      <th className="px-4 py-2.5" aria-label="Löschen" />
                     </tr>
                   </thead>
                   <tbody>
@@ -306,6 +357,18 @@ export default function AdminUsersPage() {
                             {aktivText(r.zuletzt_aktiv)}
                           </td>
                           <td className="px-4 py-2.5 text-brand-muted">{datum(r.created_at)}</td>
+                          <td className="px-4 py-2.5 text-right">
+                            {/* Dezent: Diese Handlung soll man finden, wenn man sie sucht -
+                                nicht danebenklicken, wenn man etwas anderes will. */}
+                            <button
+                              onClick={() => setZiel({ row: r })}
+                              disabled={!!darfLoeschen(r, user?.id)}
+                              title={darfLoeschen(r, user?.id) ?? 'Konto endgültig löschen'}
+                              className="rounded px-1.5 py-0.5 text-[0.78rem] text-brand-muted/70 transition-colors hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-brand-muted/70"
+                            >
+                              löschen
+                            </button>
+                          </td>
                         </tr>
                       )
                     })}
@@ -316,6 +379,20 @@ export default function AdminUsersPage() {
           </>
         )}
       </div>
+
+      {ziel && (
+        <LoeschDialog
+          row={ziel.row}
+          alle={data ?? []}
+          hinweis={ziel.hinweis}
+          onClose={() => setZiel(null)}
+          onFertig={() => {
+            // Beide Listen sind jetzt veraltet: die Tabelle und der Abgleich.
+            queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+            queryClient.invalidateQueries({ queryKey: ['admin-verwaist'] })
+          }}
+        />
+      )}
     </div>
   )
 }

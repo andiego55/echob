@@ -196,3 +196,52 @@ class UserRow(BaseModel):
     #: Nur Fachpersonen: Stand des Hinweises zur Schweigepflicht (aktuelle Fassung?).
     hinweis_gelesen: bool | None = None
     hinweis_at: datetime | None = None
+
+
+class LoeschErgebnis(BaseModel):
+    """Was eine Loeschung tatsaechlich getan hat.
+
+    Die Zaehler gehen bewusst mit zurueck: Eine Loeschung ohne Beleg ist eine Behauptung.
+    ``47 Zeilen in 12 Tabellen`` kann man pruefen, ``erledigt`` nicht.
+    """
+    ok: bool
+    #: Steht da, wenn nicht geloescht wurde - und sagt warum.
+    grund: str | None = None
+    user_id: str | None = None
+    rollen: list[str] = []
+    zeilen: int = 0
+    #: geloescht | war_bereits_weg | fehlgeschlagen
+    auth_konto: str | None = None
+    #: Nur Tabellen, in denen wirklich etwas weggefallen ist.
+    tabellen: dict[str, int] = {}
+
+
+class VerwaistesKonto(BaseModel):
+    """Daten ohne Login: Die Anmeldung wurde geloescht, die Daten blieben liegen."""
+    user_id: str
+    rolle: str
+    name: str | None = None
+    created_at: datetime | None = None
+    zuletzt_aktiv: datetime | None = None
+    #: Faelle plus Verbindungen - grob, aber es sagt, ob hier etwas Substanzielles liegt.
+    spuren: int = 0
+
+
+class LoginOhneProfil(BaseModel):
+    """Login ohne eine einzige Zeile hier: meist eine Anmeldung, die nie ankam."""
+    user_id: str
+    email: str | None = None
+    angelegt: datetime | None = None
+    letzter_login: datetime | None = None
+
+
+class VerwaistReport(BaseModel):
+    """Der Vergleich beider Datenbanken - in beide Richtungen."""
+    geprueft_am: datetime
+    auth_konten: int
+    db_konten: int
+    #: True, wenn die Liste der Login-Konten abgeschnitten wurde. Dann ist jede Aussage
+    #: ueber "verwaist" unzuverlaessig, und die Oberflaeche muss das sagen.
+    unvollstaendig: bool = False
+    ohne_login: list[VerwaistesKonto] = []
+    ohne_profil: list[LoginOhneProfil] = []
