@@ -94,7 +94,9 @@ describe('Zuletzt aktiv', () => {
     expect(aktivText('2026-09-19T08:00:00Z', JETZT)).toBe('heute')
     expect(aktivText('2026-09-18T08:00:00Z', JETZT)).toBe('gestern')
     expect(aktivText('2026-09-16T08:00:00Z', JETZT)).toBe('vor 3 Tagen')
-    expect(aktivText('2026-08-01T08:00:00Z', JETZT)).toBe('vor 1 Monaten')
+    // Einzahl ist Einzahl: "vor 1 Monaten" stand hier zuerst und fiel erst im Browser auf.
+    expect(aktivText('2026-08-01T08:00:00Z', JETZT)).toBe('vor 1 Monat')
+    expect(aktivText('2026-06-01T08:00:00Z', JETZT)).toBe('vor 3 Monaten')
     expect(aktivText('2024-05-01T08:00:00Z', JETZT)).toMatch(/2024/)
   })
 

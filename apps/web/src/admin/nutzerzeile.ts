@@ -83,7 +83,10 @@ export function aktivText(iso: string | null | undefined, jetzt: Date = new Date
   if (tage === 0) return 'heute'
   if (tage === 1) return 'gestern'
   if (tage < 31) return `vor ${tage} Tagen`
-  if (tage < 365) return `vor ${Math.floor(tage / 30)} Monaten`
+  if (tage < 365) {
+    const monate = Math.floor(tage / 30)
+    return `vor ${monate} ${monate === 1 ? 'Monat' : 'Monaten'}`
+  }
   return dann.toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' })
 }
 
