@@ -40,6 +40,14 @@ export default function ProfessionalEchoPage() {
 
   const [activeSession, setActiveSession] = useState<string | null>(null)
   const [messages, setMessages] = useState<ProfessionalEchoMessage[]>([])
+  /**
+   * Die eigene Frage, solange sie noch nicht gespeichert ist.
+   *
+   * Getrennt von `messages` statt als Platzhalter darin: Ohne erfundene Id kann sie auch
+   * nicht doppelt erscheinen. Sie verschwindet in demselben Zug, in dem die gespeicherte
+   * Nachricht dazukommt.
+   */
+  const [offeneFrage, setOffeneFrage] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [summary, setSummary] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -91,17 +99,20 @@ export default function ProfessionalEchoPage() {
     onFertig: (res) => {
       setGateError(false)
       setActiveSession(res.session_id)
+      // Die vorlaeufige Frage geht in demselben Zug, in dem die gespeicherte kommt.
+      setOffeneFrage(null)
       setMessages(prev => [...prev, res.user_message, res.assistant_message])
       qc.invalidateQueries({ queryKey: ['prof-echo-sessions', caseId] })
     },
     onFehler: (_anfrage, err) => {
+      setOffeneFrage(null)
       if (isAxiosError(err) && err.response?.status === 402) setGateError(true)
     },
   })
 
   useEffect(() => {
     mitlaufen(endRef.current, strom.beschaeftigt)
-  }, [messages, strom.takt.sichtbar])
+  }, [messages, offeneFrage, strom.takt.sichtbar, strom.beschaeftigt])
 
   // Glossar-Dialog automatisch starten
   useEffect(() => {
@@ -118,6 +129,9 @@ export default function ProfessionalEchoPage() {
   /** Ein Zug oder eine Nachricht — beides geht denselben Weg, samt Tiefe. */
   const senden = (msg: string) => {
     if (!msg.trim() || strom.beschaeftigt || locked) return
+    // Zuerst sichtbar, dann abgeschickt: Eine Frage, die erst mit der Antwort erscheint,
+    // laesst offen, ob der Klick ueberhaupt angekommen ist.
+    setOffeneFrage(msg.trim())
     strom.senden({ message: msg.trim(), ...(knapp ? { depth: 1 } : {}) })
   }
 
@@ -169,7 +183,7 @@ export default function ProfessionalEchoPage() {
     onSuccess: (_d, id) => {
       qc.invalidateQueries({ queryKey: ['prof-echo-sessions', caseId] })
       qc.removeQueries({ queryKey: ['prof-echo-history', caseId, id] })
-      if (id === activeSession) { setActiveSession(null); setMessages([]); setSummary(null) }
+      if (id === activeSession) { newChat() }
     },
   })
 
@@ -179,7 +193,7 @@ export default function ProfessionalEchoPage() {
     else setEditingId(null)
   }
 
-  const newChat = () => { setActiveSession(null); setMessages([]); setSummary(null); glossaryStarted.current = true }
+  const newChat = () => { strom.verwerfen(); setOffeneFrage(null); setActiveSession(null); setMessages([]); setSummary(null); glossaryStarted.current = true }
 
   return (
     <ProfessionalShell>
@@ -332,6 +346,14 @@ export default function ProfessionalEchoPage() {
                 {/* Die entstehende Antwort. Dieselbe Blase wie eine gespeicherte, nur mit
                     `ImFluss`: Unfertige Auszeichnung würde sonst 37- bis 60-mal pro Sekunde
                     hin und her kippen (siehe lib/imFluss). */}
+                {/* Die eigene Frage, noch nicht gespeichert — sieht aus wie jede andere. */}
+                {offeneFrage && (
+                  <div className="text-right">
+                    <div className="inline-block max-w-[85%] rounded-brand bg-accent/10 px-4 py-2.5 text-sm text-left text-brand-text">
+                      <span className="whitespace-pre-wrap">{offeneFrage}</span>
+                    </div>
+                  </div>
+                )}
                 {strom.takt.sichtbar && (
                   <div>
                     <div className="inline-block max-w-[85%] rounded-brand bg-brand-bg px-4 py-2.5 text-sm text-left text-brand-text">

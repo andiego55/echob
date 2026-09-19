@@ -11,8 +11,12 @@ import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import { ImFluss } from '@/components/app/ChatMessage'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
-import { professionalApi } from '@/api/professional'
+import { professionalApi, type EchoChatResult } from '@/api/professional'
+import { coupleAnalyseStreamen, type CoupleAnalyseAnfrage } from '@/api/coupleAnalyseStream'
+import { useAntwortStrom } from '@/lib/antwortStrom'
+import { mitlaufen } from '@/lib/mitlaufen'
 import type { CoupleReportListItem, ProfessionalEchoMessage } from '@/types'
 import KiHinweis from '@/components/KiHinweis'
 import SchweigepflichtTor, { SchweigepflichtZeile } from '@/components/professional/SchweigepflichtHinweis'
@@ -38,6 +42,15 @@ export default function CoupleEchoPage() {
   const [input, setInput] = useState('')
   const [tplId, setTplId] = useState('')
   const [gateError, setGateError] = useState(false)
+  /**
+   * Die eigene Frage, solange sie noch nicht gespeichert ist.
+   *
+   * Sie steht getrennt von `messages` statt als Platzhalter darin: Ohne erfundene Id kann
+   * sie auch nicht doppelt erscheinen. Verschwinden tut sie in demselben Zug, in dem die
+   * gespeicherte Nachricht dazukommt — React fasst beide Zustandsänderungen zu einem
+   * Bild zusammen.
+   */
+  const [offeneFrage, setOffeneFrage] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
 
   const { data: meta } = useQuery({ queryKey: ['couple-meta'], queryFn: professionalApi.coupleMeta })
@@ -49,31 +62,58 @@ export default function CoupleEchoPage() {
   })
   const reportTemplates = useQuery({ queryKey: ['prof-report-templates'], queryFn: professionalApi.reportTemplates })
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
-
-  const chat = useMutation({
-    mutationFn: (vars: { message: string; thread_type?: 'couple' | 'glossary'; glossary_slug?: string }) =>
-      professionalApi.coupleEchoChat(coupleId!, { ...vars, session_id: session ?? undefined }),
-    onSuccess: (res) => {
+  /**
+   * Die Antwort entsteht sichtbar, statt nach zwanzig Sekunden als Block dazustehen.
+   *
+   * Dieser Dialog liest zwei Fälle nebeneinander; seine Antworten sind die längsten im
+   * Fachpersonenbereich — und ausgerechnet er stand bis zuletzt stumm da. Der Rückfall
+   * auf `/chat` steckt im Baustein: Reicht ein Proxy den Strom nicht durch, kommt
+   * dieselbe Antwort am Stück.
+   */
+  const strom = useAntwortStrom<CoupleAnalyseAnfrage, EchoChatResult>({
+    streamen: (anfrage, onStueck, onEinstufung, signal) =>
+      coupleAnalyseStreamen(
+        coupleId!, { ...anfrage, session_id: session ?? undefined },
+        onStueck, onEinstufung, signal),
+    rueckfall: (anfrage) =>
+      professionalApi.coupleEchoChat(coupleId!, { ...anfrage, session_id: session ?? undefined }),
+    onFertig: (res) => {
       setGateError(false)
       const isNew = !session
       setSession(res.session_id)
+      // Die vorlaeufige Frage geht in demselben Zug, in dem die gespeicherte kommt.
+      setOffeneFrage(null)
       setMessages(prev => [...prev, res.user_message, res.assistant_message])
       if (isNew) qc.invalidateQueries({ queryKey: ['couple-sessions', coupleId] })
     },
-    onError: (err) => {
+    onFehler: (anfrage, err) => {
+      setOffeneFrage(null)
+      // Geschriebenes wird nicht weggeworfen - es geht zurueck ins Feld.
+      setInput(v => (v.trim() ? v : anfrage.message))
       if (isAxiosError(err) && err.response?.status === 402) setGateError(true)
     },
   })
+
+  useEffect(() => {
+    mitlaufen(endRef.current, strom.beschaeftigt)
+  }, [messages, offeneFrage, strom.takt.sichtbar, strom.beschaeftigt])
+
   const loadSession = useMutation({
     mutationFn: (sid: string) => professionalApi.coupleEchoHistory(coupleId!, sid),
-    onSuccess: (msgs, sid) => { setSession(sid); setMessages(msgs) },
+    // Ein laufender Strom gehoert zum verlassenen Dialog: Liefe er weiter, haengte seine
+    // Antwort am Ende unter dem falschen Gespraech.
+    onSuccess: (msgs, sid) => {
+      strom.verwerfen()
+      setOffeneFrage(null)
+      setSession(sid)
+      setMessages(msgs)
+    },
   })
   const delSession = useMutation({
     mutationFn: (sid: string) => professionalApi.deleteCoupleSession(coupleId!, sid),
     onSuccess: (_r, sid) => {
       qc.invalidateQueries({ queryKey: ['couple-sessions', coupleId] })
-      if (sid === session) { setSession(null); setMessages([]) }
+      if (sid === session) { newChat() }
     },
   })
   const createReport = useMutation({
@@ -87,11 +127,19 @@ export default function CoupleEchoPage() {
 
   const send = (text?: string) => {
     const msg = (text ?? input).trim()
-    if (!msg || chat.isPending) return
+    if (!msg || strom.beschaeftigt) return
     if (text === undefined) setInput('')
-    chat.mutate({ message: msg })
+    // Zuerst sichtbar, dann abgeschickt: Eine Frage, die erst mit der Antwort erscheint,
+    // laesst zwanzig Sekunden offen, ob der Klick ueberhaupt angekommen ist.
+    setOffeneFrage(msg)
+    strom.senden({ message: msg })
   }
-  const newChat = () => { setSession(null); setMessages([]) }
+  const newChat = () => {
+    strom.verwerfen()
+    setOffeneFrage(null)
+    setSession(null)
+    setMessages([])
+  }
 
   return (
     <ProfessionalShell>
@@ -154,7 +202,7 @@ export default function CoupleEchoPage() {
           <div className="min-w-0 flex-1 space-y-4">
             <div className="card min-h-[50vh] flex flex-col">
               <div className="flex-1 space-y-4 overflow-y-auto">
-                {messages.length === 0 && !chat.isPending && (
+                {messages.length === 0 && !strom.beschaeftigt && (
                   <div className="text-sm text-brand-muted">
                     <p className="mb-3">Fragen Sie Echo zu beiden Perspektiven. Zum Beispiel:</p>
                     <div className="flex flex-col gap-2">
@@ -178,7 +226,27 @@ export default function CoupleEchoPage() {
                     </div>
                   </div>
                 ))}
-                {chat.isPending && <p className="text-sm text-brand-muted">Echo denkt nach …</p>}
+                {/* Die eigene Frage, noch nicht gespeichert — sieht aus wie jede andere. */}
+                {offeneFrage && (
+                  <div className="text-right">
+                    <div className="inline-block max-w-[85%] rounded-brand bg-accent/10 px-4 py-2.5 text-left text-sm text-brand-text">
+                      <span className="whitespace-pre-wrap">{offeneFrage}</span>
+                    </div>
+                  </div>
+                )}
+                {/* Die entstehende Antwort. Dieselbe Blase wie eine gespeicherte, nur mit
+                    `ImFluss`: Unfertige Auszeichnung würde sonst 37- bis 60-mal pro
+                    Sekunde hin und her kippen (siehe lib/imFluss). */}
+                {strom.takt.sichtbar && (
+                  <div>
+                    <div className="inline-block max-w-[85%] rounded-brand bg-brand-bg px-4 py-2.5 text-left text-sm text-brand-text">
+                      <ImFluss text={strom.takt.sichtbar} />
+                    </div>
+                  </div>
+                )}
+                {strom.beschaeftigt && !strom.takt.sichtbar && (
+                  <p className="text-sm text-brand-muted">Echo denkt nach …</p>
+                )}
                 <div ref={endRef} />
               </div>
 
@@ -194,7 +262,7 @@ export default function CoupleEchoPage() {
                     placeholder="Frage zur Paardynamik …"
                     className="flex-1 rounded-brand border border-brand-border bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent resize-none"
                   />
-                  <button onClick={() => send()} disabled={chat.isPending || !input.trim()}
+                  <button onClick={() => send()} disabled={strom.beschaeftigt || !input.trim()}
                     className="btn-primary !px-5 !text-sm self-end">Senden</button>
                 </div>
                 {/* Art. 50 KI-VO: am Eingabefeld, nicht in einem Dokument. */}

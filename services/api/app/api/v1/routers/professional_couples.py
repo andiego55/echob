@@ -8,9 +8,12 @@ Paar-Echo-Daten liegen in eigenen professional_couple_echo_*-Tabellen.
 from __future__ import annotations
 
 import json
+import logging
+from dataclasses import dataclass
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 
 from app.core import crypto
 from app.core.dependencies import (
@@ -18,6 +21,7 @@ from app.core.dependencies import (
     get_pool,
     require_schweigepflicht_hinweis,
 )
+from app.core.sse import ereignis
 from app.schemas.professional import (
     PRO_REPORT_DISCLAIMER,
     CaseCoupleStatus,
@@ -38,6 +42,8 @@ from app.services import couple_service, echo_modes
 from app.services.pro_report_templates import get_standard
 from app.services.sharing_service import require_active_share
 from app.services.subscription_service import enforce_professional_echo_limit
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/professional", tags=["professional-couples"])
 
@@ -126,20 +132,27 @@ async def case_couple_status(
 
 # ── Paar-Echo ────────────────────────────────────────────────────────────────
 
-@router.post(
-    "/couples/{couple_id}/echo/chat", response_model=CoupleEchoChatResponse,
-    dependencies=[Depends(require_schweigepflicht_hinweis)],
-)
-async def couple_echo_chat(
-    couple_id: UUID,
-    body: CoupleEchoChatRequest,
-    request: Request,
-    current: dict = Depends(get_current_professional),
-    pool=Depends(get_pool),
-) -> CoupleEchoChatResponse:
-    pid = current["user_id"]
-    echo_svc = _get_echo_service(request)
+@dataclass
+class _Lage:
+    """Alles, was vor dem Modellaufruf feststehen muss.
 
+    Getrennt vom Aufruf, weil zwei Wege dieselbe Vorbereitung brauchen: ``/chat`` und
+    ``/chat/stream``. Und weil an dieser Vorbereitung der Zugriffsschutz hängt — beide
+    Fälle freigegeben, beide aktiviert, Kontingent frei. Zwei Kopien davon wären zwei
+    Stellen, an denen eine Prüfung fehlen kann.
+    """
+    session_id: UUID
+    combined_context: str
+    history: list[dict[str, str]]
+    mode_steering: str
+    glossary_term: str | None
+    glossary_definition: str | None
+
+
+async def _lage_beschaffen(
+    *, couple_id: UUID, body: CoupleEchoChatRequest, pid, pool, current: dict,
+) -> _Lage:
+    """Prüft, lädt, legt bei Bedarf eine Sitzung an — alles, bevor ein Byte hinausgeht."""
     async with pool.acquire() as conn:
         await enforce_professional_echo_limit(pid, conn)
         couple = await couple_service.require_couple(pid, couple_id, conn)
@@ -195,16 +208,20 @@ async def couple_echo_chat(
         if g:
             glossary_term, glossary_definition = g["term"], g["definition"]
 
-    answer = await echo_svc.professional_chat(
-        user_message=body.message,
-        shared_context=combined_context,
+    return _Lage(
+        session_id=session_id,
+        combined_context=combined_context,
         history=history,
+        mode_steering=pro_mode_steering,
         glossary_term=glossary_term,
         glossary_definition=glossary_definition,
-        mode_steering=pro_mode_steering,
-        prompt_file="echo_couple_prompt.md",
     )
 
+
+async def _antwort_speichern(
+    *, pool, lage: _Lage, couple_id: UUID, pid, body: CoupleEchoChatRequest, answer: str,
+) -> CoupleEchoChatResponse:
+    session_id = lage.session_id
     async with pool.acquire() as conn:
         user_msg = await conn.fetchrow(
             "INSERT INTO professional_couple_echo_messages "
@@ -230,6 +247,112 @@ async def couple_echo_chat(
         user_message=_msg_response(user_msg),
         assistant_message=_msg_response(assistant_msg),
         session_id=session_id,
+    )
+
+
+@router.post(
+    "/couples/{couple_id}/echo/chat", response_model=CoupleEchoChatResponse,
+    dependencies=[Depends(require_schweigepflicht_hinweis)],
+)
+async def couple_echo_chat(
+    couple_id: UUID,
+    body: CoupleEchoChatRequest,
+    request: Request,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> CoupleEchoChatResponse:
+    pid = current["user_id"]
+    echo_svc = _get_echo_service(request)
+    lage = await _lage_beschaffen(
+        couple_id=couple_id, body=body, pid=pid, pool=pool, current=current)
+
+    answer = await echo_svc.professional_chat(
+        user_message=body.message,
+        shared_context=lage.combined_context,
+        history=lage.history,
+        glossary_term=lage.glossary_term,
+        glossary_definition=lage.glossary_definition,
+        mode_steering=lage.mode_steering,
+        prompt_file="echo_couple_prompt.md",
+    )
+    return await _antwort_speichern(
+        pool=pool, lage=lage, couple_id=couple_id, pid=pid, body=body, answer=answer)
+
+
+@router.post(
+    "/couples/{couple_id}/echo/chat/stream",
+    dependencies=[Depends(require_schweigepflicht_hinweis)],
+)
+async def couple_echo_chat_stream(
+    couple_id: UUID,
+    body: CoupleEchoChatRequest,
+    request: Request,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+):
+    """Dieselbe Antwort wie ``/chat``, nur während sie entsteht.
+
+    **Warum gerade hier.** Die Paar-Analyse liest zwei Fälle nebeneinander — der Kontext
+    ist doppelt so groß wie im Einzelfall, und die Antworten sind die längsten im ganzen
+    Fachpersonenbereich. Genau dieser Dialog stand am längsten stumm da: erst zwanzig
+    Sekunden nichts, dann ein fertiger Block. Der Einzelfall-Dialog streamt längst; dass
+    ausgerechnet der langsamste es nicht tat, war eine Lücke, kein Entwurf.
+
+    **Keine Sicherheits-Triage**, wie im Einzelfall-Strom: Hier schreibt eine Fachperson
+    über einen Fall, nicht jemand über die eigene Not. Das ``beginn``-Ereignis geht ohne
+    Einstufung raus, damit die Oberfläche dieselbe Struktur liest wie sonst.
+
+    **Was schiefgehen kann, geht vor dem Strom schief.** Kontingent, Freigabe beider
+    Fälle, Aktivierung — alles in ``_lage_beschaffen`` und damit vor dem ersten Byte.
+    Danach sind die Kopfzeilen raus, und aus einem 402 würde ein 200 mit halbem Strom.
+    """
+    pid = current["user_id"]
+    echo_svc = _get_echo_service(request)
+    lage = await _lage_beschaffen(
+        couple_id=couple_id, body=body, pid=pid, pool=pool, current=current)
+
+    async def strom():
+        teile: list[str] = []
+        try:
+            yield ereignis("beginn", safety=None)
+
+            async for stueck in echo_svc.stream_professional_chat(
+                user_message=body.message,
+                shared_context=lage.combined_context,
+                history=lage.history,
+                glossary_term=lage.glossary_term,
+                glossary_definition=lage.glossary_definition,
+                mode_steering=lage.mode_steering,
+                prompt_file="echo_couple_prompt.md",
+            ):
+                teile.append(stueck)
+                yield ereignis("delta", text=stueck)
+
+            fertig = await _antwort_speichern(
+                pool=pool, lage=lage, couple_id=couple_id, pid=pid, body=body,
+                answer="".join(teile).strip(),
+            )
+            # Dasselbe Ergebnis wie bei /chat - mit echten Ids, damit die Oberflaeche den
+            # vorlaeufigen Text durch die gespeicherte Nachricht ersetzen kann.
+            yield ereignis("fertig", **json.loads(fertig.model_dump_json()))
+
+        except Exception:
+            # Ab hier ist kein HTTP-Fehler mehr moeglich - die Kopfzeilen sind raus.
+            logger.exception("Paar-Echo: Streaming fehlgeschlagen (Kopplung %s)", couple_id)
+            yield ereignis(
+                "fehler",
+                detail="Echo ist gerade nicht erreichbar. Bitte später noch einmal.",
+            )
+
+    return StreamingResponse(
+        strom(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            # Ohne das puffert der Reverse Proxy den Strom und liefert alles am Stueck.
+            "X-Accel-Buffering": "no",
+        },
     )
 
 
