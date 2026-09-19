@@ -14,9 +14,12 @@
  * Sicherheitsstatus. Die Zahlen sagen, ob jemand arbeitet; sie sagen nicht, woran.
  *
  * Die Entscheidungen hinter den Spalten (fehlt vs. null, „nie aktiv" vs. „heute") stehen
- * in `nutzerzeile.ts` und werden dort geprüft — im JSX sieht man ihnen nichts an.
+ * in `nutzerzeile.ts`, die Arbeit an der ganzen Liste (Sortieren, CSV) in
+ * `nutzerliste.ts` — beide werden dort geprüft, im JSX sieht man ihnen nichts an. Die
+ * Datei, die der CSV-Knopf erzeugt, enthält genau die Ansicht auf dem Schirm: dieselben
+ * Zeilen, dieselbe Grenze.
  */
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { apiErrorMessage } from '@/api/errors'
@@ -25,6 +28,9 @@ import {
   ROLLEN_LABEL, aktivText, berufsgruppeText, eingeschlafen, hinweisZustand, tarifText,
   zahlenText,
 } from './nutzerzeile'
+import {
+  alsCsv, csvDateiname, ersteRichtung, sortiere, type Richtung, type SortSpalte,
+} from './nutzerliste'
 
 const ROLLEN = [
   { key: '', label: 'Alle' },
@@ -68,9 +74,58 @@ const TON_KLASSE = {
   egal: 'text-brand-muted/60',
 } as const
 
+type Sortierung = { spalte: SortSpalte; richtung: Richtung }
+
+/**
+ * Ein anklickbarer Spaltenkopf.
+ *
+ * `aria-sort` steht nicht aus Pflichtgefühl da: Ohne das Attribut ist die Sortierung nur
+ * ein Pfeil — wer die Tabelle vorgelesen bekommt, hört eine sortierte Liste als
+ * unsortierte.
+ */
+function Kopf({ spalte, titel, sortierung, umschalten }: {
+  spalte: SortSpalte
+  titel: string
+  sortierung: Sortierung | null
+  umschalten: (spalte: SortSpalte) => void
+}) {
+  const aktiv = sortierung?.spalte === spalte
+  return (
+    <th
+      className="px-4 py-2.5 font-semibold"
+      aria-sort={aktiv ? (sortierung.richtung === 'auf' ? 'ascending' : 'descending') : 'none'}
+    >
+      <button
+        type="button"
+        onClick={() => umschalten(spalte)}
+        className={`group inline-flex items-center gap-1 uppercase tracking-wide ${
+          aktiv ? 'text-navy' : 'hover:text-navy'
+        }`}
+      >
+        {titel}
+        <span aria-hidden className={aktiv ? 'text-accent' : 'opacity-0 group-hover:opacity-40'}>
+          {aktiv && sortierung.richtung === 'ab' ? '↓' : '↑'}
+        </span>
+      </button>
+    </th>
+  )
+}
+
+/** Der Umweg, den ein Browser für „Datei speichern" verlangt. */
+function csvHerunterladen(zeilen: UserRow[]) {
+  const url = URL.createObjectURL(new Blob([alsCsv(zeilen)], { type: 'text/csv;charset=utf-8' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = csvDateiname()
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export default function AdminUsersPage() {
   const [rolle, setRolle] = useState('')
   const [q, setQ] = useState('')
+  // Ohne Klick gilt die Reihenfolge des Servers: zuletzt aktiv zuerst.
+  const [sortierung, setSortierung] = useState<Sortierung | null>(null)
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin-users', rolle, q],
     queryFn: () => adminApi.users({ rolle: rolle || undefined, q: q.trim() || undefined }),
@@ -78,7 +133,18 @@ export default function AdminUsersPage() {
   })
 
   const denied = (error as { response?: { status?: number } })?.response?.status === 403
-  const zeilen = data ?? []
+  // Sortiert wird hier, nicht im Server: Es sind hoechstens 500 geladene Zeilen, und ein
+  // zweiter Abruf je Klick wuerde die Liste zwischendurch veraendern.
+  const zeilen = useMemo(() => {
+    const roh = data ?? []
+    return sortierung ? sortiere(roh, sortierung.spalte, sortierung.richtung) : roh
+  }, [data, sortierung])
+
+  const umschalten = (spalte: SortSpalte) =>
+    setSortierung(alt => (alt?.spalte === spalte
+      ? { spalte, richtung: alt.richtung === 'auf' ? 'ab' : 'auf' }
+      : { spalte, richtung: ersteRichtung(spalte) }))
+
   const offen = zeilen.filter(r => avvZustand(r).ton === 'offen').length
   // Kleine Kopfzahlen: Wer die Seite oeffnet, will meist zuerst wissen, wie viele es
   // ueberhaupt sind und wie viele davon noch etwas tun.
@@ -133,6 +199,15 @@ export default function AdminUsersPage() {
                 placeholder="Name oder E-Mail …"
                 className="ml-auto w-56 rounded-brand border border-brand-border bg-white px-3 py-1.5 text-[0.82rem] outline-none focus:border-accent"
               />
+              <button
+                type="button"
+                onClick={() => csvHerunterladen(zeilen)}
+                disabled={zeilen.length === 0}
+                title="Speichert genau diese Ansicht als Datei — mit Namen, Adressen und Tarifen. Bitte nicht ungeschützt ablegen und nicht weitergeben."
+                className="rounded-brand border border-brand-border bg-white px-3.5 py-1.5 text-[0.82rem] font-medium text-navy transition-colors hover:border-accent/50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                CSV
+              </button>
             </div>
 
             {!isLoading && !error && zeilen.length > 0 && (
@@ -165,15 +240,20 @@ export default function AdminUsersPage() {
                 <table className="w-full min-w-[1040px] text-left text-[0.84rem]">
                   <thead className="border-b border-brand-border text-[0.7rem] uppercase tracking-wide text-brand-muted">
                     <tr>
-                      <th className="px-4 py-2.5 font-semibold">Konto</th>
-                      <th className="px-4 py-2.5 font-semibold">Rolle</th>
-                      <th className="px-4 py-2.5 font-semibold">E-Mail</th>
-                      <th className="px-4 py-2.5 font-semibold">Tarif</th>
-                      <th className="px-4 py-2.5 font-semibold">Zahlen</th>
-                      <th className="px-4 py-2.5 font-semibold">Vertrag</th>
-                      <th className="px-4 py-2.5 font-semibold">Hinweis</th>
-                      <th className="px-4 py-2.5 font-semibold">Zuletzt aktiv</th>
-                      <th className="px-4 py-2.5 font-semibold">Angelegt</th>
+                      {([
+                        ['name', 'Konto'], ['rolle', 'Rolle'], ['email', 'E-Mail'],
+                        ['tarif', 'Tarif'], ['menge', 'Zahlen'], ['avv', 'Vertrag'],
+                        ['hinweis', 'Hinweis'], ['zuletzt_aktiv', 'Zuletzt aktiv'],
+                        ['created_at', 'Angelegt'],
+                      ] as [SortSpalte, string][]).map(([spalte, titel]) => (
+                        <Kopf
+                          key={spalte}
+                          spalte={spalte}
+                          titel={titel}
+                          sortierung={sortierung}
+                          umschalten={umschalten}
+                        />
+                      ))}
                     </tr>
                   </thead>
                   <tbody>

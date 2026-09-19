@@ -13,6 +13,7 @@ import {
   ROLLEN_LABEL, aktivText, berufsgruppeText, eingeschlafen, hinweisZustand, tarifText,
   zahlenText,
 } from '../src/admin/nutzerzeile'
+import { alsCsv, csvDateiname, ersteRichtung, sortiere } from '../src/admin/nutzerliste'
 import type { UserRow } from '../src/admin/api'
 
 const LEER: UserRow = {
@@ -135,5 +136,137 @@ describe('Berufsgruppe', () => {
 
   it('steht bei anderen Rollen gar nicht', () => {
     expect(berufsgruppeText(zeile({ rolle: 'client' }))).toBe('—')
+  })
+})
+
+describe('Sortieren', () => {
+  const namen = (rows: UserRow[]) => rows.map(r => r.name)
+
+  it('stellt fehlende Angaben in beide Richtungen ans Ende', () => {
+    // Sonst steht beim ersten Klick oben, worueber man am wenigsten weiss - und ein Konto
+    // ohne jede Spur saehe aus wie das aelteste.
+    const liste = [
+      zeile({ name: 'Ohne', zuletzt_aktiv: null }),
+      zeile({ name: 'Alt', zuletzt_aktiv: '2026-01-01T00:00:00Z' }),
+      zeile({ name: 'Neu', zuletzt_aktiv: '2026-09-01T00:00:00Z' }),
+    ]
+    expect(namen(sortiere(liste, 'zuletzt_aktiv', 'ab'))).toEqual(['Neu', 'Alt', 'Ohne'])
+    expect(namen(sortiere(liste, 'zuletzt_aktiv', 'auf'))).toEqual(['Alt', 'Neu', 'Ohne'])
+  })
+
+  it('vergleicht Zahlen als Zahlen', () => {
+    // Als Text sortiert stuende "10" vor "9".
+    const liste = [zeile({ name: 'neun', faelle: 9 }), zeile({ name: 'zehn', faelle: 10 })]
+    expect(namen(sortiere(liste, 'menge', 'auf'))).toEqual(['neun', 'zehn'])
+  })
+
+  it('nimmt je Rolle die Zahl, die dort eine Menge ist', () => {
+    // Nach dem angezeigten Text zu sortieren hiesse, "12 Studierende" hinter
+    // "4 Klient:innen" zu stellen, weil "1" vor "4" steht.
+    const liste = [
+      zeile({ name: 'Fachperson', rolle: 'professional', verbindungen: 7 }),
+      zeile({ name: 'Klientin', faelle: 3 }),
+    ]
+    expect(namen(sortiere(liste, 'menge', 'ab'))).toEqual(['Fachperson', 'Klientin'])
+  })
+
+  it('sortiert Zustände nach Dringlichkeit, nicht nach dem Wort', () => {
+    // "offen" ist der einzige Grund, auf diese Spalte zu klicken. Alphabetisch stuende
+    // "gelesen" davor, und das Offene versteckte sich in der Mitte.
+    const liste = [
+      zeile({ name: 'gelesen', rolle: 'professional', hinweis_gelesen: true }),
+      zeile({ name: 'egal', rolle: 'client' }),
+      zeile({ name: 'offen', rolle: 'professional', hinweis_gelesen: false }),
+    ]
+    expect(namen(sortiere(liste, 'hinweis', 'auf'))).toEqual(['offen', 'gelesen', 'egal'])
+  })
+
+  it('lässt gleichwertige Zeilen in der Reihenfolge des Servers', () => {
+    // Sonst springen sie bei jedem Klick, und man sucht die Zeile neu, die man gerade las.
+    const liste = [zeile({ name: 'A', faelle: 1 }), zeile({ name: 'B', faelle: 1 })]
+    expect(namen(sortiere(liste, 'menge', 'auf'))).toEqual(['A', 'B'])
+    expect(namen(sortiere(liste, 'menge', 'ab'))).toEqual(['A', 'B'])
+  })
+
+  it('rührt die geladene Liste nicht an', () => {
+    const liste = [zeile({ name: 'B' }), zeile({ name: 'A' })]
+    sortiere(liste, 'name', 'auf')
+    expect(namen(liste)).toEqual(['B', 'A'])
+  })
+
+  it('nimmt beim ersten Klick die Richtung, die man meint', () => {
+    expect(ersteRichtung('zuletzt_aktiv')).toBe('ab')  // das Neueste zuerst
+    expect(ersteRichtung('created_at')).toBe('ab')
+    expect(ersteRichtung('menge')).toBe('ab')          // das Größte zuerst
+    expect(ersteRichtung('name')).toBe('auf')          // A–Z
+    expect(ersteRichtung('hinweis')).toBe('auf')       // das Offene zuerst
+  })
+})
+
+describe('CSV-Ausgabe', () => {
+  const ohneBom = (csv: string) => (csv.charCodeAt(0) === 0xfeff ? csv.slice(1) : csv)
+  const zeilen = (csv: string) => ohneBom(csv).split('\r\n')
+  /** Der Wert der ersten Datenzeile in der Spalte mit diesem Titel. */
+  const spalte = (csv: string, titel: string) => {
+    const [kopf, erste] = zeilen(csv)
+    const i = kopf.split(';').indexOf(titel)
+    expect(i, `Spalte „${titel}" fehlt`).toBeGreaterThanOrEqual(0)
+    return erste.split(';')[i]
+  }
+
+  it('ist eine Datei, die Excel auf Deutsch öffnet', () => {
+    // Ohne BOM raet Excel die Kodierung und macht aus "Fälle" "FÃ¤lle"; ohne Semikolon
+    // steht die ganze Zeile in einer Spalte. Beides faellt erst auf, wenn die Datei schon
+    // verschickt ist.
+    const csv = alsCsv([zeile({})])
+    expect(csv.charCodeAt(0)).toBe(0xfeff)
+    expect(zeilen(csv)[0].split(';').length).toBeGreaterThan(10)
+    expect(csv.endsWith('\r\n')).toBe(true)
+  })
+
+  it('maskiert, was die Spalten sprengen würde', () => {
+    // Ein Semikolon im Namen verschoebe sonst jede folgende Spalte dieser Zeile - still,
+    // und sichtbar erst in der Tabellenkalkulation.
+    const csv = alsCsv([zeile({ name: 'Praxis "Mitte"; Berlin' })])
+    expect(csv).toContain('"Praxis ""Mitte""; Berlin"')
+  })
+
+  it('lässt leer, was fehlt — und erfindet keine 0', () => {
+    // Derselbe Unterschied wie in der Tabelle, nur folgenreicher: Mit einer 0 rechnet in
+    // einer Tabellenkalkulation jemand weiter.
+    const csv = alsCsv([zeile({ faelle: null, szenen: 0 })])
+    expect(spalte(csv, 'Fälle')).toBe('')
+    expect(spalte(csv, 'Szenen')).toBe('0')
+  })
+
+  it('unterscheidet auch hier „nein" von „bedeutet hier nichts"', () => {
+    expect(spalte(alsCsv([zeile({ rolle: 'professional', hinweis_gelesen: false })]),
+      'Hinweis gelesen')).toBe('nein')
+    expect(spalte(alsCsv([zeile({ rolle: 'client' })]), 'Hinweis gelesen')).toBe('')
+  })
+
+  it('schreibt Datumsangaben so, dass man sie sortieren kann', () => {
+    expect(spalte(alsCsv([zeile({ created_at: '2026-01-05T12:00:00Z' })]), 'Angelegt'))
+      .toBe('2026-01-05')
+  })
+
+  it('nimmt von Klient:innen keine Adresse mit', () => {
+    // Was der Server nicht liefert, erfindet die Datei nicht - die Grenze der Tabelle muss
+    // die Grenze der Datei sein, sonst wandert sie beim Export aus dem Produkt heraus.
+    expect(spalte(alsCsv([zeile({ rolle: 'client', email: null })]), 'E-Mail')).toBe('')
+  })
+
+  it('hat einen festen Satz Spalten', () => {
+    // Waechst die Datei um eine Spalte, soll das hier auffallen und nicht beiher passieren:
+    // Was hier steht, verlaesst das Produkt.
+    expect(zeilen(alsCsv([]))[0].split(';')).toEqual([
+      'Kennung', 'Rolle', 'Name', 'E-Mail', 'Tarif', 'Zahlen', 'Fälle', 'Szenen',
+      'Verbindungen', 'Berufsgruppe', '§ 203', 'AVV', 'AVV-Fassung', 'AVV am',
+      'Hinweis gelesen', 'Hinweis am', 'Im Verzeichnis', 'Zuletzt aktiv', 'Angelegt',
+    ])
+  })
+
+  it('nennt die Datei nach dem Tag', () => {
+    expect(csvDateiname(new Date(2026, 8, 3))).toBe('echob-konten-2026-09-03.csv')
   })
 })
