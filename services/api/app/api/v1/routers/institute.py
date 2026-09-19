@@ -228,9 +228,12 @@ async def _clone_case(conn, source_case_id) -> str:
     sp = await conn.fetchrow(
         "SELECT display_name, modules, completed_modules, safety_status "
         "FROM user_profiles WHERE user_id = $1", src["user_id"])
+    # synthetisch: erfundene Fallperson, kein Konto — siehe user_profiles.synthetisch.
     await conn.execute(
-        "INSERT INTO user_profiles (user_id, display_name, modules, completed_modules, safety_status) "
-        "VALUES ($1, $2, COALESCE($3::jsonb, '{}'::jsonb), $4, $5) ON CONFLICT (user_id) DO NOTHING",
+        "INSERT INTO user_profiles "
+        "(user_id, display_name, modules, completed_modules, safety_status, synthetisch) "
+        "VALUES ($1, $2, COALESCE($3::jsonb, '{}'::jsonb), $4, $5, true) "
+        "ON CONFLICT (user_id) DO NOTHING",
         new_uid, sp["display_name"] if sp else None, sp["modules"] if sp else None,
         (list(sp["completed_modules"]) if sp and sp["completed_modules"] else []),
         sp["safety_status"] if sp else None,

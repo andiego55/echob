@@ -151,14 +151,21 @@ class InviteResult(BaseModel):
 # ── Rollenübersicht ──────────────────────────────────────────────────────────
 
 class UserRow(BaseModel):
-    """Ein Konto mit Rolle.
+    """Ein Konto: wer es ist, was es kostet, ob es lebt — und sonst nichts.
 
-    Klient:innen kommen hier bewusst nicht vor: Von ihnen kennt diese Datenbank weder
-    Namen noch Adresse — sie stehen nur in Supabase. Was fehlt, kann auch nicht
-    versehentlich in eine Liste geraten.
+    **Wo die Grenze verläuft.** Seit dem 19.09.2026 stehen auch Klient:innen in dieser
+    Liste; vorher fehlten sie mit der Begründung, was nicht dasteht, könne auch nicht
+    versehentlich geteilt werden. Für den Betrieb — Abrechnung, Support, Missbrauch, „lebt
+    dieses Konto noch?" — braucht es sie aber, und ein Konto, das man nicht sieht, kann man
+    auch nicht schützen.
+
+    Die Grenze liegt deshalb nicht mehr an der Rolle, sondern am Inhalt: Pseudonym statt
+    Klarname (mehr weiß diese Datenbank nicht), keine E-Mail von Klient:innen (die liegt in
+    Supabase und bleibt dort), und **kein einziger Inhalt** — keine Szene, kein Fall-Titel,
+    kein Sicherheitsstatus. Die Zahlen sagen, ob jemand arbeitet; sie sagen nicht, woran.
     """
     user_id: str
-    rolle: str                       # professional | institute | student
+    rolle: str                       # client | professional | institute | student
     name: str | None = None
     email: str | None = None
     created_at: datetime
@@ -168,3 +175,24 @@ class UserRow(BaseModel):
     avv_version: str | None = None
     avv_accepted_at: datetime | None = None
     im_verzeichnis: bool = False
+
+    # ── Betrieb ──────────────────────────────────────────────────────────────
+    #: Tarif der Klient:in (trial | early_bird | regular | annual); bei anderen Rollen leer.
+    tarif: str | None = None
+    tarif_bis: datetime | None = None
+    #: Letzte erkennbare Arbeit — nicht nur „Profil geändert". Was zählt, steht je Rolle in
+    #: der Sicht: Szenen und Echo bei Klient:innen, Echo und Berichte bei Fachpersonen.
+    zuletzt_aktiv: datetime | None = None
+    #: Zahlen statt Inhalte. Je Rolle gefüllt, sonst None — eine 0 wäre eine Aussage.
+    faelle: int | None = None
+    szenen: int | None = None
+    #: Klient:innen: aktive Freigaben. Fachpersonen: freigegebene Fälle ohne Spielwiese.
+    #: Institute: aktive Studierende.
+    verbindungen: int | None = None
+    #: Nur Fachpersonen: Berufsgruppe und ob sie der Schweigepflicht unterliegt (§ 203).
+    berufsgruppe: str | None = None
+    berufsgruppe_label: str | None = None
+    unterliegt_203: bool | None = None
+    #: Nur Fachpersonen: Stand des Hinweises zur Schweigepflicht (aktuelle Fassung?).
+    hinweis_gelesen: bool | None = None
+    hinweis_at: datetime | None = None

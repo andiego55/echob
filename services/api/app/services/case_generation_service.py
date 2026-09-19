@@ -352,9 +352,13 @@ async def _write_case(conn, *, inp, self_name: str, data: dict) -> str:
     distress = max(1, min(5, int(inp.distress_score)))
     safety_status = "heightened_attention" if distress >= 4 else "no_indication"
 
+    # synthetisch: Diese Zeile gehoert zu keinem Menschen mit Zugang, sondern zu einer
+    # erfundenen Fallperson. Ohne die Markierung stuende sie in der Admin-Nutzerliste wie
+    # eine Klient:in - eine Karteileiche, die man zaehlt und nie erreicht.
     await conn.execute(
-        "INSERT INTO user_profiles (user_id, display_name, modules, completed_modules, safety_status) "
-        "VALUES ($1, $2, $3::jsonb, $4, $5) ON CONFLICT (user_id) DO NOTHING",
+        "INSERT INTO user_profiles "
+        "(user_id, display_name, modules, completed_modules, safety_status, synthetisch) "
+        "VALUES ($1, $2, $3::jsonb, $4, $5, true) ON CONFLICT (user_id) DO NOTHING",
         person_uid, self_name, json.dumps(data["self_modules"]), _SELF_MODULE_IDS, safety_status,
     )
     main_concern = (_s(ob.get("main_concern")) or "")[:2000] or None

@@ -121,8 +121,9 @@ export interface InviteResult {
 
 export interface UserRow {
   user_id: string
-  rolle: 'professional' | 'institute' | 'student'
+  rolle: 'client' | 'professional' | 'institute' | 'student'
   name: string | null
+  /** Bei Klient:innen immer `null`: Ihre Adresse liegt in Supabase und bleibt dort. */
   email: string | null
   created_at: string
   /** Nur bei Fachpersonen gefüllt; `null` heißt „für diese Rolle ohne Bedeutung". */
@@ -130,6 +131,21 @@ export interface UserRow {
   avv_version: string | null
   avv_accepted_at: string | null
   im_verzeichnis: boolean
+  /** Nur Klient:innen: Tarif und Laufzeitende. */
+  tarif: string | null
+  tarif_bis: string | null
+  /** Letzte erkennbare Arbeit — `null` heißt „keine Spur", nicht „heute". */
+  zuletzt_aktiv: string | null
+  /** Zahlen statt Inhalte. Je Rolle gefüllt; `null` heißt „bedeutet hier nichts". */
+  faelle: number | null
+  szenen: number | null
+  verbindungen: number | null
+  /** Nur Fachpersonen. `unterliegt_203` hat drei Zustände — null heißt ungeklärt. */
+  berufsgruppe: string | null
+  berufsgruppe_label: string | null
+  unterliegt_203: boolean | null
+  hinweis_gelesen: boolean | null
+  hinweis_at: string | null
 }
 
 export const adminApi = {

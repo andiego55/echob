@@ -154,7 +154,8 @@ async def invite_send(
 
 @router.get("/users", response_model=list[UserRow])
 async def users_list(
-    rolle: str | None = Query(default=None, description="professional | institute | student"),
+    rolle: str | None = Query(
+        default=None, description="client | professional | institute | student"),
     q: str | None = Query(default=None, description="Suche in Name und E-Mail"),
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> list[UserRow]:
