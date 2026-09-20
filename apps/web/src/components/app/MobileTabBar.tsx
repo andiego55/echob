@@ -11,8 +11,13 @@
  * Daumenweg statt in der oberen Ecke, und das Postfach kann seine ungelesenen Nachrichten
  * zeigen, ohne dass man erst etwas aufklappen muss.
  *
- * **Vier Plätze, nicht sechs.** Mehr wird auf 375 px zu Text, den niemand liest. „Mehr"
- * sammelt ein, was man selten braucht.
+ * **Fünf Plätze, nicht acht.** Mehr wird auf 375 px zu Text, den niemand liest. „Mehr"
+ * sammelt ein, was man selten braucht — Schutz, Hilfe, Einstellungen. Den fünften Platz
+ * hat der Kompass bekommen, weil er als tägliche Geste gedacht ist; „Mein Profil" ist
+ * dafür aus der Liste verschwunden, denn es wohnt jetzt als „Wo ich stehe" im Kompass.
+ *
+ * Gemessen bei 375 px: fünf Zellen à 75 px, die breiteste Beschriftung („Kompass") 42 px.
+ * Ein sechster Platz ginge nicht mehr aus.
  */
 import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
@@ -39,11 +44,16 @@ const ZIELE: Ziel[] = [
     pfad: <><circle cx="9" cy="9" r="3.2" /><circle cx="16" cy="9" r="3.2" />
            <path d="M4 19c.8-2.6 2.7-4 5-4M19 19c-.8-2.6-2.7-4-5-4" /></>,
   },
+  {
+    // Der Kompass gehoert nach unten und nicht unter „Mehr": Er ist auf ein Antippen am
+    // Tag angelegt, und was man taeglich braucht, darf nicht zwei Zuege entfernt liegen.
+    to: '/app/kompass', label: 'Kompass',
+    pfad: <><circle cx="12" cy="12" r="9" /><path d="M15.4 8.6l-2.1 4.8-4.8 2.1 2.1-4.8z" /></>,
+  },
 ]
 
 /** Was seltener gebraucht wird — hinter einem Zug nach oben. */
 const MEHR = [
-  { to: '/app/profile',  label: 'Mein Profil' },
   { to: '/app/privacy',  label: 'Schutz & Daten' },
   { to: '/app/help',     label: 'Hilfe' },
   { to: '/app/settings', label: 'Einstellungen' },

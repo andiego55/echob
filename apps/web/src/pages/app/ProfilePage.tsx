@@ -1,5 +1,5 @@
 /**
- * /app/profile — Mein Beziehungsprofil
+ * /app/profile — Wo ich stehe (frueher „Mein Beziehungsprofil")
  * Selbstbeschreibung in 9 Modulen mit Scoring und Zusammenfassung.
  */
 import { useEffect, useState } from 'react'
@@ -146,10 +146,19 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         {/* Header */}
         <div className="mb-6">
-          <span className="label">Selbstbeschreibung</span>
-          <h1 className="page-title mt-1">Mein Beziehungsprofil</h1>
+          {/* Diese Seite ist einer der drei Eingänge des Kompasses. Der Rückweg steht
+              oben, damit sie nicht wie eine Sackgasse endet — der Pfad bleibt
+              /app/profile, weil ein Umzug jeden alten Verweis brechen würde. */}
+          <Link
+            to="/app/kompass"
+            className="text-[0.8rem] text-brand-muted no-underline transition-colors hover:text-navy"
+          >
+            ← Mein Kompass
+          </Link>
+          <h1 className="page-title mt-2">Wo ich stehe</h1>
           <p className="mt-2 text-sm text-brand-muted max-w-2xl">
-            Dein Beziehungsprofil hilft EchoB, deine Beziehungssituationen besser einzuordnen.
+            Eine Selbstbeschreibung über mehrere Bereiche. Sie hilft EchoB, deine
+            Beziehungssituationen besser einzuordnen.
             Es geht nicht darum, dich zu bewerten oder eine Diagnose zu stellen. Die Angaben helfen dabei,
             zwischen Beziehungsmustern, eigenen Reaktionsweisen, Belastung, Ressourcen und Sicherheitsaspekten zu unterscheiden.
           </p>
@@ -497,7 +506,7 @@ function SummaryView({
     <div className="mx-auto max-w-[780px] px-6 py-8">
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div>
-          <span className="label">Beziehungsprofil</span>
+          <span className="label">Wo ich stehe</span>
           <h1 className="page-title mt-1">Deine vorläufige Selbstbeschreibung</h1>
           <p className="text-xs text-brand-muted mt-1">
             Diese Einschätzung ist vorläufig und ersetzt keine professionelle Diagnostik.

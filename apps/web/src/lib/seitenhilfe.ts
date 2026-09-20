@@ -226,17 +226,37 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Zuweisungen öffnen und bearbeiten', 'Erledigtes abhaken'],
   },
 
+  // ── Mein Kompass ─────────────────────────────────────────────────────────
+  '/app/kompass': {
+    titel: 'Dein Kompass',
+    zweck: 'Dein eigener Raum — ohne Fall. Hier geht es um dich, nicht um jemanden, mit dem es schwierig ist.',
+    schritte: ['Einen Moment festhalten', 'Den Verlauf ansehen', 'Den Notfallplan schreiben'],
+    tipp: 'Ein Antippen genügt. Alles Weitere ist freiwillig — ein Verlauf aus kurzen Einträgen ist mehr wert als drei ausführliche.',
+  },
+  '/app/kompass/verlauf': {
+    titel: 'Dein Verlauf',
+    zweck: 'Alles, was du festgehalten hast — als Linie und als Liste.',
+    schritte: ['Zeitraum umschalten', 'Einen Punkt antippen', 'Einen Moment wegnehmen'],
+    tipp: 'Die Lücken sind auch eine Auskunft: Wochen ohne Eintrag sind oft die dichten.',
+  },
+  '/app/kompass/krisenplan': {
+    titel: 'Dein Notfallplan',
+    zweck: 'Was hilft, wenn es kippt — aufgeschrieben, solange es dir gut genug dafür geht.',
+    schritte: ['Warnzeichen benennen', 'Schritte der Reihe nach notieren', 'Menschen mit Nummer eintragen'],
+    tipp: 'Was in guten Momenten geholfen hat, steht hier als Vorschlag bereit. Deshalb fragt der Puls danach.',
+  },
+
   // ── Konto ────────────────────────────────────────────────────────────────
   '/app/profile': {
-    titel: 'Dein Beziehungsprofil',
-    zweck: 'Eine Selbstbeschreibung über mehrere Module — über dich, unabhängig von einem einzelnen Fall.',
-    schritte: ['Module nacheinander ausfüllen', 'Zusammenfassung lesen'],
-    tipp: 'Das Profil gehört dir, nicht einem Fall. Wenn sich Muster über Beziehungen hinweg wiederholen, zeigt es sich hier.',
+    titel: 'Wo du stehst',
+    zweck: 'Eine Selbstbeschreibung über mehrere Bereiche — über dich, unabhängig von einem einzelnen Fall.',
+    schritte: ['Bereiche nacheinander ausfüllen', 'Zusammenfassung lesen'],
+    tipp: 'Diese Seite gehört zu deinem Kompass, nicht zu einem Fall. Wenn sich Muster über Beziehungen hinweg wiederholen, zeigt es sich hier.',
   },
   '/app/profile/echo': {
-    titel: 'Gespräch zum Profil',
+    titel: 'Gespräch darüber, wo du stehst',
     zweck: 'Über deine Selbstbeschreibung sprechen.',
-    schritte: ['Einzelne Module vertiefen'],
+    schritte: ['Einzelne Bereiche vertiefen'],
   },
   '/app/settings': {
     titel: 'Einstellungen',

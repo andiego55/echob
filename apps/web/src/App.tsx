@@ -56,6 +56,9 @@ const HelpPage = lazy(() => import('@/pages/app/HelpPage'))
 const InboxPage = lazy(() => import('@/pages/app/InboxPage'))
 const ProfilePage = lazy(() => import('@/pages/app/ProfilePage'))
 const ProfileEchoPage = lazy(() => import('@/pages/app/ProfileEchoPage'))
+const KompassPage = lazy(() => import('@/pages/app/KompassPage'))
+const KompassVerlaufPage = lazy(() => import('@/pages/app/KompassVerlaufPage'))
+const KrisenplanPage = lazy(() => import('@/pages/app/KrisenplanPage'))
 const PersonProfilePage = lazy(() => import('@/pages/app/PersonProfilePage'))
 const PersonProfileEchoPage = lazy(() => import('@/pages/app/PersonProfileEchoPage'))
 const TopicDialogPage = lazy(() => import('@/pages/app/TopicDialogPage'))
@@ -258,6 +261,12 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/app/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
       <Route path="/app/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
       <Route path="/app/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
+      {/* Mein Kompass — der einzige Bereich der App ohne Fall. „Wo ich stehe" wohnt
+          weiterhin unter /app/profile: Die Seite hat nur einen neuen Namen und einen
+          neuen Eingang bekommen, und ein Umzug würde jeden alten Verweis brechen. */}
+      <Route path="/app/kompass" element={<ProtectedRoute><KompassPage /></ProtectedRoute>} />
+      <Route path="/app/kompass/verlauf" element={<ProtectedRoute><KompassVerlaufPage /></ProtectedRoute>} />
+      <Route path="/app/kompass/krisenplan" element={<ProtectedRoute><KrisenplanPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />
       <Route path="/app/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />

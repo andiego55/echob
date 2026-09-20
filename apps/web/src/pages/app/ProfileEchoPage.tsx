@@ -86,7 +86,7 @@ export default function ProfileEchoPage() {
         {/* Sub-Header */}
         <div className="border-b border-brand-border bg-white px-6 py-3 flex items-center justify-between">
           <div>
-            <span className="label text-xs">Beziehungsprofil</span>
+            <span className="label text-xs">Wo ich stehe</span>
             <p className="text-sm font-semibold text-navy">Mit Echo besprechen</p>
           </div>
           <Link to="/app/profile" className="text-xs text-brand-muted hover:text-navy transition-colors">
@@ -99,7 +99,7 @@ export default function ProfileEchoPage() {
           <div className="mx-auto max-w-[780px] px-6 py-6 space-y-4">
             {/* Kontext-Hinweis */}
             <div className="rounded-brand border border-brand-border bg-amber-50 px-4 py-3 text-sm text-brand-muted">
-              <p className="font-medium text-navy mb-1">Echo kennt dein Beziehungsprofil</p>
+              <p className="font-medium text-navy mb-1">Echo kennt deine Selbstbeschreibung</p>
               <p className="text-xs">
                 Echo hat Zugriff auf deine Selbstbeschreibung und stellt dir eine vorläufige Einschätzung vor.
                 Die Einschätzung ist nicht diagnostisch – sie ist eine Reflexionshilfe.

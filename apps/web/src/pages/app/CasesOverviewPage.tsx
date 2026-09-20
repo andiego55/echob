@@ -271,7 +271,7 @@ export default function CasesOverviewPage() {
                       {profilePercent}<span className="text-sm font-semibold"> %</span>
                     </p>
                     <p className="mt-1 text-xs text-brand-muted truncate group-hover:text-accent transition-colors">
-                      Beziehungsprofil
+                      Wo ich stehe
                     </p>
                     <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-brand-border/50">
                       <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${profilePercent}%` }} />
