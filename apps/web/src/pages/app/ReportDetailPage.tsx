@@ -11,6 +11,7 @@ import type { ReportType } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { scoreLevel } from '@/utils/profileScoring'
+import { SKALA_MAX, balkenBreite, skalenFarbe, skalenwert } from '@/lib/skalen'
 
 // ── Typ-Konfiguration ─────────────────────────────────────────────────────────
 
@@ -367,22 +368,6 @@ function ScaleBarsSection({ scales, title, subtitle, mode }: {
 }) {
   if (!scales || scales.length === 0) return null
 
-  const barColor = (score: number, m: typeof mode) => {
-    // Schwellen auf der 0–100-Skala. Vorher standen hier 4 / 3 / 2 – Werte aus der
-    // Zeit vor Migration 06. Seitdem war die oberste Stufe immer erfüllt und jede
-    // Skala rot, egal wie hoch sie wirklich lag.
-    if (m === 'personality') {
-      if (score >= 80) return 'bg-blue-600'
-      if (score >= 60) return 'bg-blue-500'
-      if (score >= 40) return 'bg-blue-400'
-      return 'bg-blue-300'
-    }
-    if (score >= 80) return 'bg-red-500'
-    if (score >= 60) return 'bg-amber-400'
-    if (score >= 40) return 'bg-yellow-300'
-    return 'bg-teal-300'
-  }
-
   const confidenceDot = (c: string) =>
     c === 'high' ? 'bg-emerald-500' : c === 'medium' ? 'bg-amber-400' : 'bg-gray-300'
 
@@ -405,13 +390,14 @@ function ScaleBarsSection({ scales, title, subtitle, mode }: {
                   <span className="text-xs font-medium text-navy">{s.label}</span>
                 </div>
                 <span className="text-xs font-bold text-brand-muted ml-3 flex-shrink-0 tabular-nums">
-                  {Math.round(s.score)}<span className="font-normal opacity-50">/100</span>
+                  {skalenwert(s.score)}
+                  <span className="font-normal opacity-50">/{SKALA_MAX}</span>
                 </span>
               </div>
               <div className="scale-track h-2.5 bg-brand-bg rounded-full overflow-hidden">
                 <div
-                  className={`h-full ${barColor(s.score, mode)} rounded-full`}
-                  style={{ width: `${Math.min(100, Math.max(0, s.score))}%` }}
+                  className={`h-full ${skalenFarbe(s.score, mode === 'personality' ? 'person' : 'dynamik')} rounded-full`}
+                  style={{ width: balkenBreite(s.score) }}
                 />
               </div>
             </div>

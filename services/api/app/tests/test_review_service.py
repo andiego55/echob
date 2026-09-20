@@ -43,10 +43,16 @@ def test_compute_trends_counts_and_buckets():
     assert [p["distress"] for p in t["distress_series"]] == [3.0, 4.0, 5.0]
 
 
-def test_scales_normalized_to_0_5():
+def test_skalen_behalten_die_skala_der_datenbank():
+    """Hier stand vorher eine Umrechnung auf 0–5 (80 → 4.0).
+
+    Dieselbe Dynamik hieß damit im Rückblick „4,0", auf der Fallübersicht „80" und im
+    Bericht wieder anders — und genau daraus wurde im Bericht das berüchtigte „5/100".
+    Eine Zahl, drei Bedeutungen: Wer sie vergleicht, vergleicht Unvergleichbares.
+    """
     scales = [{"scale_key": "boundary_violation", "score": 80, "confidence": "high"}]
     t = compute_trends([], scales)
-    assert t["scales"][0]["score"] == 4.0          # 80/20
+    assert t["scales"][0]["score"] == 80
     assert t["scales"][0]["scale_key"] == "boundary_violation"
 
 

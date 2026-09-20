@@ -14,6 +14,7 @@ import { SCALE_LABELS } from '@/types'
 import type { CaseTrends, DistressPoint, TrendMonth } from '@/types'
 import { CardSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import { SKALA_MAX } from '@/lib/skalen'
 
 export default function ReviewPage() {
   const bestaetigen = useBestaetigen()
@@ -102,8 +103,8 @@ export default function ReviewPage() {
                       key={s.scale_key}
                       label={SCALE_LABELS[s.scale_key] ?? s.scale_key}
                       value={s.score}
-                      max={5}
-                      suffix="/5"
+                      max={SKALA_MAX}
+                      suffix={`/${SKALA_MAX}`}
                     />
                   ))}
                 </div>

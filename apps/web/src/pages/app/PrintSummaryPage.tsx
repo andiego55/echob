@@ -20,6 +20,7 @@ import {
   RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS, CONTACT_FREQUENCY_LABELS, SCALE_LABELS,
 } from '@/types'
 import type { ScalesOverview } from '@/types'
+import { balkenBreite, skalenText } from '@/lib/skalen'
 
 export default function PrintSummaryPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -155,10 +156,10 @@ export default function PrintSummaryPage() {
                   <span className="mt-1 flex items-center gap-3 sm:mt-0 sm:flex-1 print:mt-0 print:flex-1">
                     <span className="h-2 flex-1 overflow-hidden rounded-full border border-brand-border">
                       <span className="block h-full bg-accent print:bg-navy"
-                            style={{ width: `${Math.min(100, Math.max(0, s.score))}%` }} />
+                            style={{ width: balkenBreite(s.score) }} />
                     </span>
                     <span className="flex-shrink-0 text-right text-brand-muted tabular-nums sm:w-24 print:w-24">
-                      {Math.round(s.score)}/100 ({confidenceLabel(s.confidence)})
+                      {skalenText(s.score)} ({confidenceLabel(s.confidence)})
                     </span>
                   </span>
                 </div>

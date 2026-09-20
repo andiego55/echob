@@ -83,12 +83,14 @@ def compute_trends(
         counter.update(_tags_of(s))
     top_tags = [{"tag": t, "count": c} for t, c in counter.most_common(8)]
 
-    # Skalen-Snapshot (DB speichert 0–100 → auf 0–5 normalisieren)
+    # Skalen-Snapshot auf der Skala, die auch überall sonst gilt: 0–100. Hier stand
+    # früher eine Umrechnung auf 0–5 — dieselbe Zahl bedeutete damit im Rückblick etwas
+    # anderes als auf der Fallübersicht und im Bericht.
     scales = sorted(
         [
             {
                 "scale_key": s.get("scale_key"),
-                "score": round(float(s.get("score") or 0) / 20, 2),
+                "score": round(float(s.get("score") or 0), 1),
                 "confidence": s.get("confidence", "low"),
             }
             for s in (scale_scores or []) if float(s.get("score") or 0) > 0

@@ -59,6 +59,50 @@ MAX_SCENE_DESC_CHARS = 1500
 MAX_SCENE_REACTION_CHARS = 800
 
 
+#: Die Beschriftung der Skalen - eine Stelle, damit Bericht und Rueckblick dieselbe
+#: Skala auch gleich benennen. Stand frueher in der Methode und war damit nur dort zu
+#: haben.
+_SCALE_LABELS: dict[str, str] = {
+    "boundary_violation":        "Grenzverletzungen",
+    "guilt_shifting":            "Schuldumkehr",
+    "control_isolation":         "Kontrolle & Isolation",
+    "proximity_distance":        "Nähe-Distanz-Wechsel",
+    "conflict_escalation":       "Konflikteskalation",
+    "perception_distortion":     "Wahrnehmungsverzerrung",
+    "safety_risk":               "Sicherheitsrisiko",
+    "responsibility_deflection": "Verantwortungsabwehr",
+    "cluster_b_traits":          "Cluster-B-Muster",
+    "empathy_deficit":           "Empathiedefizit",
+    "personality_openness":      "Offenheit",
+    "personality_conscientiousness": "Zuverlässigkeit",
+    "personality_extraversion":  "Dominanz & Präsenz",
+    "personality_agreeableness": "Kooperationsbereitschaft",
+    "personality_neuroticism":   "Emotionale Instabilität",
+}
+
+
+def skalenpunkt_fuer_bericht(s: dict[str, Any]) -> dict[str, Any]:
+    """Ein Skalenwert, wie er in den Bericht geht — auf der Skala, auf der er gemeint ist.
+
+    **Hier stand einmal ``round(raw / 20, 2)``** mit dem Kommentar „DB stores 0–100,
+    normalize to 0–5". Das stimmte vor Migration 06, danach nicht mehr: Die Spalte geht
+    seitdem von 0 bis 100. Die Anzeige im Bericht war weiter mit „/100" beschriftet und
+    bekam 0–5 geliefert — ein Höchstwert von 100 erschien als **„5/100"** mit einem 5 %
+    breiten Balken. Nicht bloß eine falsche Zahl, sondern die umgekehrte Aussage: Eine
+    maximal ausgeprägte Dynamik sah aus wie „kommt praktisch nicht vor".
+
+    Steht als eigene Funktion da, damit genau diese Umrechnung prüfbar ist. Als
+    verschachtelte Hilfsfunktion war sie es nicht — und genau darin ist sie verrottet.
+    """
+    key = s.get("scale_key", "")
+    return {
+        "key":        key,
+        "label":      _SCALE_LABELS.get(key, key.replace("_", " ").title()),
+        "score":      round(float(s.get("score") or 0), 1),
+        "confidence": s.get("confidence", "low"),
+    }
+
+
 def build_case_context(
     case: dict[str, Any],
     onboarding: dict[str, Any] | None,
@@ -67,11 +111,25 @@ def build_case_context(
     *,
     include_case_header: bool = True,
     include_scene_section: bool = True,
+    szenen_als: str = "nummer",
 ) -> str:
     """
     Erzeugt einen lesbaren Kontext-Block für den System-Prompt.
     Wird bei jedem Echo-Request vorangestellt.
     Format: Markdown-ähnlich, für LLMs optimiert.
+
+    ``szenen_als`` entscheidet, woran eine Szene im Prompt erkennbar ist:
+
+    * ``"nummer"`` — ``**Szene 12 – "Der Abend"**``. Richtig im Dialog: Dort wird aus
+      „Szene 12" ein anklickbarer Verweis mit Vorschau (siehe ``lib/belege.ts``), und der
+      Fall liegt beim Lesen ohnehin offen.
+    * ``"titel"`` — ``**„Der Abend"**``, ohne Nummer. Richtig in Berichten: Ein Bericht
+      wird ausgedruckt und weitergegeben; wer ihn dann liest, hat den Fall nicht vor sich.
+      „Szene 12" ist dort keine Auskunft, sondern toter Text.
+
+    Die Nummer wird für Berichte **weggelassen**, nicht bloß per Anweisung verboten: Ein
+    Modell benutzt jedes benennbare Material im Prompt auch als Sprache. Was es nie
+    gesehen hat, kann es nicht schreiben.
     """
     lines: list[str] = ["## Fallkontext\n"]
 
@@ -124,7 +182,12 @@ def build_case_context(
             date_str = f" ({scene['scene_date']})" if scene.get("scene_date") else ""
             distress = f", Belastung: {scene['distress_score']}/5" if scene.get("distress_score") else ""
             confirmed_mark = "✓" if scene.get("confirmed_by_user") else "○ unbestätigt"
-            lines.append(f"**Szene {nr} – \"{scene.get('title', 'Ohne Titel')}\"**{date_str}{distress} [{confirmed_mark}]")
+            titel = scene.get("title", "Ohne Titel")
+            kopf = (
+                f'**"{titel}"**' if szenen_als == "titel"
+                else f'**Szene {nr} – "{titel}"**'
+            )
+            lines.append(f"{kopf}{date_str}{distress} [{confirmed_mark}]")
 
             tags = scene.get("pattern_tags") or []
             if isinstance(tags, str):
@@ -159,11 +222,13 @@ def build_case_context(
     if scale_scores:
         relevant = [s for s in scale_scores if s.get("score", 0) > 0]
         if relevant:
-            lines.append("## Skalenwerte (vorläufig)\n")
+            # Die Spanne steht in der Ueberschrift, nicht nur am einzelnen Wert: Ein
+            # Modell, das nur "4" sieht, erfindet sich einen Nenner dazu.
+            lines.append("## Skalenwerte (vorläufig, Skala 0–100)\n")
             for s in sorted(relevant, key=lambda x: x.get("score", 0), reverse=True):
                 label = s.get("label") or s.get("scale_key", "")
                 lines.append(
-                    f"- {label}: {s['score']:.0f}/100 "
+                    f"- {label}: {float(s['score']):.0f}/100 "
                     f"(Konfidenz: {s.get('confidence', '–')}, {s.get('scene_count', 0)} Szenen)"
                 )
             lines.append("")
@@ -1294,6 +1359,9 @@ class EchoService:
             onboarding=onboarding,
             scenes=scenes,
             scale_scores=scale_scores,
+            # Ein Bericht wird ausgedruckt und weitergegeben - dann liegt der Fall nicht
+            # daneben. Szenen stehen hier deshalb mit Titel und Datum statt mit Nummer.
+            szenen_als="titel",
         ))
 
         if user_profile:
@@ -1414,38 +1482,13 @@ class EchoService:
         # ── Structured visualization data ─────────────────────────────────────
 
         # Scale labels (DB has no label column — map from scale_key)
-        _SCALE_LABELS: dict[str, str] = {
-            "boundary_violation":        "Grenzverletzungen",
-            "guilt_shifting":            "Schuldumkehr",
-            "control_isolation":         "Kontrolle & Isolation",
-            "proximity_distance":        "Nähe-Distanz-Wechsel",
-            "conflict_escalation":       "Konflikteskalation",
-            "perception_distortion":     "Wahrnehmungsverzerrung",
-            "safety_risk":               "Sicherheitsrisiko",
-            "responsibility_deflection": "Verantwortungsabwehr",
-            "cluster_b_traits":          "Cluster-B-Muster",
-            "empathy_deficit":           "Empathiedefizit",
-            "personality_openness":      "Offenheit",
-            "personality_conscientiousness": "Zuverlässigkeit",
-            "personality_extraversion":  "Dominanz & Präsenz",
-            "personality_agreeableness": "Kooperationsbereitschaft",
-            "personality_neuroticism":   "Emotionale Instabilität",
-        }
         _PERSONALITY_KEYS = {
             "personality_openness", "personality_conscientiousness",
             "personality_extraversion", "personality_agreeableness",
             "personality_neuroticism",
         }
 
-        def _scale_entry(s: dict) -> dict:
-            key = s.get("scale_key", "")
-            raw = float(s.get("score") or 0)
-            return {
-                "key":        key,
-                "label":      _SCALE_LABELS.get(key, key.replace("_", " ").title()),
-                "score":      round(raw / 20, 2),   # DB stores 0–100, normalize to 0–5
-                "confidence": s.get("confidence", "low"),
-            }
+        _scale_entry = skalenpunkt_fuer_bericht
 
         scales_dynamic = sorted(
             [_scale_entry(s) for s in scale_scores
