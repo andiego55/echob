@@ -89,11 +89,29 @@ class Satz(BaseModel):
     szene_id: UUID | None = None
     puls_id: UUID | None = None
     angeheftet: bool = False
+    #: Woran Echo den Vorschlag festmacht. Nur bei Vorschlägen gesetzt — wer einen Satz
+    #: selbst schreibt, muss sich nicht belegen.
+    grund: str | None = None
     created_at: datetime
     #: Wann zugestimmt wurde. Gehört sichtbar in die Oberfläche: Ein Satz von vor zwei
     #: Jahren ist etwas anderes als einer von gestern.
     bestaetigt_at: datetime | None = None
     updated_at: datetime
+
+
+class VorschlagsEntscheidung(BaseModel):
+    """Ja oder nein zu einem Vorschlag — mehr gibt es hier nicht zu sagen."""
+    annehmen: bool
+
+
+class VorschlagsLauf(BaseModel):
+    """Was ein Lauf ergeben hat.
+
+    ``hinweis`` ist der Satz an die Person, wenn nichts dabei war — „zu wenig Material",
+    „liegt noch etwas offen". Eine leere Liste ohne Erklärung sähe aus wie ein Fehler.
+    """
+    vorschlaege: list[Satz] = []
+    hinweis: str | None = None
 
 
 class KompassUebersicht(BaseModel):

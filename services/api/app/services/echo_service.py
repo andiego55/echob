@@ -786,6 +786,47 @@ class EchoService:
             logger.error("extract_artifacts: ungültige JSON-Antwort vom Modell.")
             return {"kandidaten": [], "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
 
+    async def kompass_saetze_vorschlagen(self, *, eingabe: str) -> dict[str, Any]:
+        """Destilliert aus Szenen und Pulsen hoechstens drei Saetze ueber die Person.
+
+        **Speichert nichts und behauptet nichts.** Was zurueckkommt, ist ein Vorschlag,
+        dem ein Mensch zustimmen muss - derselbe Ablauf wie bei den Artefakten.
+
+        ``eingabe`` ist bereits fertig gebaut (``kompass_vorschlag_service`` ->
+        ``als_prompt_eingabe``) und wird hier NICHT ergaenzt. Das ist Absicht: Ein Modell
+        benutzt jedes benennbare Material im Prompt auch als Sprache, und genau deshalb
+        gibt es fuer die Eingabe eine eigene, geprueft Funktion. Wer hier noch etwas
+        dazulegt, umgeht diesen Waechter.
+
+        Wie beim Destillieren der Artefakte das schnelle Modell bei niedriger Temperatur:
+        Der Aufruf wird nicht einzeln abgerechnet und soll wenig streuen.
+        """
+        if not self._use_openai:
+            return {
+                "vorschlaege": [],
+                "hinweis": "Echo laeuft im Demo-Modus - ohne OpenAI-Schluessel "
+                           "entstehen keine Vorschlaege.",
+            }
+
+        response = await self._chat(
+            model=self._model_fast,
+            messages=[
+                {"role": "system", "content": _load_prompt("kompass_satz_prompt.md")},
+                {"role": "user", "content": eingabe},
+            ],
+            max_tokens=900,
+            temperature=None if self._reasoning else 0.3,
+            response_format={"type": "json_object"},
+        )
+        import json as _aj
+        try:
+            roh = _aj.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("kompass_saetze_vorschlagen: ungueltige JSON-Antwort vom Modell.")
+            return {"vorschlaege": [],
+                    "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
+        return roh if isinstance(roh, dict) else {"vorschlaege": [], "hinweis": None}
+
     async def resonanz_nachfragen(
         self,
         *,

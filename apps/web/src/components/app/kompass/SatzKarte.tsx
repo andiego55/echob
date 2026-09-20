@@ -45,6 +45,9 @@ export default function SatzKarte({ satz: s, onAendern, onLoeschen, laeuft }: {
         {s.szene_id && (
           <span className="text-[0.72rem] text-brand-muted">· aus einer Szene</span>
         )}
+        {s.herkunft === 'echo' && (
+          <span className="text-[0.72rem] text-brand-muted">· von Echo vorgeschlagen</span>
+        )}
       </div>
 
       <p
@@ -57,6 +60,14 @@ export default function SatzKarte({ satz: s, onAendern, onLoeschen, laeuft }: {
       >
         {s.text}
       </p>
+
+      {/* Der Grund bleibt auch nach der Zustimmung stehen: Woran ein Satz festgemacht
+          wurde, ist ein Jahr später oft die interessantere Hälfte. */}
+      {s.grund && (
+        <p className="mt-1.5 text-[0.78rem] italic leading-relaxed text-brand-muted">
+          {s.grund}
+        </p>
+      )}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
         {entwurf && (

@@ -108,6 +108,13 @@ export interface Satz {
   szene_id: string | null
   puls_id: string | null
   angeheftet: boolean
+  /**
+   * Woran Echo den Vorschlag festmacht — „Das kam in drei Situationen vor".
+   *
+   * Nur bei Vorschlägen gesetzt. Er gehört sichtbar neben den Satz: Ohne Beleg ist
+   * Zustimmen ein Raten, und ein Vorschlag über die eigene Person will überlegt werden.
+   */
+  grund: string | null
   created_at: string
   bestaetigt_at: string | null
   updated_at: string
@@ -126,6 +133,12 @@ export interface SatzAenderung {
   art?: string
   stand?: 'entwurf' | 'bestaetigt' | 'ueberholt'
   angeheftet?: boolean
+}
+
+/** Was ein Lauf ergeben hat. `hinweis` erklärt eine leere Liste, statt sie zu lassen. */
+export interface VorschlagsLauf {
+  vorschlaege: Satz[]
+  hinweis: string | null
 }
 
 export interface KompassUebersicht {
@@ -175,4 +188,20 @@ export const kompassApi = {
 
   satzLoeschen: (satzId: string) =>
     apiClient.delete(`${basis}/saetze/${satzId}`).then(() => undefined),
+
+  /**
+   * Echo liest die letzten Szenen und Momente und schlägt Sätze vor.
+   *
+   * Dauert länger als die übrigen Aufrufe — hier spricht ein Modell. Die Vorschläge
+   * werden serverseitig als Entwürfe abgelegt; die Antwort ist nur die Abkürzung.
+   */
+  vorschlaegeHolen: () =>
+    apiClient
+      .post<VorschlagsLauf>(`${basis}/saetze/vorschlaege`, undefined, { timeout: 60_000 })
+      .then(r => r.data),
+
+  vorschlagEntscheiden: (satzId: string, annehmen: boolean) =>
+    apiClient
+      .post<Satz>(`${basis}/saetze/${satzId}/entscheidung`, { annehmen })
+      .then(r => r.data),
 }

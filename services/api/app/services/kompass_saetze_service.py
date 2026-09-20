@@ -38,6 +38,7 @@ def _aufbereiten(zeile: asyncpg.Record) -> dict[str, Any]:
     """Eine Zeile, wie die Oberfläche sie braucht — entschlüsselt und beschriftet."""
     d = dict(zeile)
     d["text"] = crypto.decrypt(d["text"]) if d.get("text") else ""
+    d["grund"] = crypto.decrypt(d["grund"]) if d.get("grund") else None
     d["art_label"] = katalog.satz_art_label(d.get("art"))
     return d
 
@@ -82,6 +83,7 @@ async def anlegen(
     szene_id: UUID | None = None,
     puls_id: UUID | None = None,
     stand: str = "entwurf",
+    grund: str | None = None,
 ) -> dict[str, Any]:
     """Legt einen Satz an.
 
@@ -93,6 +95,9 @@ async def anlegen(
     Art, Herkunft und Stand werden dagegen sehr wohl geprüft: Sie sind Wörter aus dem
     Katalog, und was nicht darin steht, würde erst an der Bedingung der Tabelle scheitern
     — also nach dem Schreiben und mit einer Fehlermeldung, die niemandem etwas sagt.
+
+    ``grund`` trägt, woran Echo einen Vorschlag festmacht. Bei selbst geschriebenen
+    Sätzen bleibt er leer: Wer ihn selbst schreibt, muss sich nicht belegen.
     """
     if art not in katalog.SATZ_ART_SCHLUESSEL:
         raise ValueError(f"Unbekannte Art: {art}")
@@ -108,12 +113,13 @@ async def anlegen(
     zeile = await conn.fetchrow(
         """
         INSERT INTO selbst_saetze
-            (user_id, art, text, herkunft, szene_id, puls_id, stand, bestaetigt_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            (user_id, art, text, herkunft, szene_id, puls_id, stand, bestaetigt_at, grund)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *
         """,
         user_id, art, crypto.encrypt(sauber), herkunft, szene_id, puls_id, stand,
         datetime.now(UTC) if stand == "bestaetigt" else None,
+        crypto.encrypt(grund.strip()) if grund and grund.strip() else None,
     )
     return _aufbereiten(zeile)
 

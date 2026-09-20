@@ -9,14 +9,15 @@ Die Kennung kommt aus dem Browser, also wird sie hier gegen die Eigentümerschaf
 bevor sie in die Datenbank geht — nicht im Dienst, sondern an der Naht, an der sie
 hereinkommt.
 
-**Kein KI-Weg in dieser Ausbaustufe.** Weder Kontingent noch Triage sind nötig, weil nichts
-an ein Modell geht. Das ändert sich mit den Sätzen; bis dahin ist dieser Router frei davon.
+**Genau ein KI-Weg.** Nur ``POST /saetze/vorschlaege`` spricht mit einem Modell, und der
+tut es ausschließlich, weil jemand den Knopf gedrückt hat — nichts läuft im Hintergrund.
+Dort hängt auch das Kontingent; alle anderen Endpunkte hier sind frei davon.
 """
 from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.kompass import (
@@ -28,9 +29,15 @@ from app.schemas.kompass import (
     Satz,
     SatzCreate,
     SatzUpdate,
+    VorschlagsEntscheidung,
+    VorschlagsLauf,
 )
 from app.services import kompass_katalog as katalog
-from app.services import kompass_saetze_service, kompass_service
+from app.services import (
+    kompass_saetze_service,
+    kompass_service,
+    kompass_vorschlag_service,
+)
 
 router = APIRouter(prefix="/me/kompass", tags=["kompass"])
 
@@ -243,7 +250,17 @@ async def satz_aendern(
 
     Ein Endpunkt für alles vier: Es ist jedes Mal dieselbe Sache — eine Spalte ändern —
     und vier Endpunkte wären vier Stellen, an denen die Eigentümerprüfung stehen muss.
+
+    **``verworfen`` kommt hier nicht durch.** Der Dienst kennt den Stand, weil das
+    Verwerfen eines Vorschlags ihn braucht — aber das hat seinen eigenen Endpunkt. Ohne
+    diese Zeile könnte jemand seinen EIGENEN Satz auf „verworfen" setzen; er verschwände
+    dann aus jeder Liste, ohne gelöscht zu sein, und wäre über die Oberfläche nicht mehr
+    erreichbar.
     """
+    sichtbar = {x["key"] for x in katalog.SATZ_STAENDE}
+    if body.stand is not None and body.stand not in sichtbar:
+        raise HTTPException(status_code=400, detail="Unbekannter Stand.")
+
     async with pool.acquire() as conn:
         try:
             satz = await kompass_saetze_service.aendern(
@@ -282,3 +299,61 @@ async def satz_loeschen(
         )
     if not weg:
         raise HTTPException(status_code=404, detail="Nicht gefunden.")
+
+
+# ── Echo schlägt vor ────────────────────────────────────────────────────────
+
+
+def _echo(request: Request):
+    svc = request.app.state.echo_service
+    if svc is None:
+        raise HTTPException(status_code=503, detail="Echo-Service nicht verfügbar.")
+    return svc
+
+
+@router.post("/saetze/vorschlaege", response_model=VorschlagsLauf)
+async def vorschlaege_holen(
+    request: Request,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> VorschlagsLauf:
+    """Echo liest die letzten Szenen und Momente und schlägt Sätze vor.
+
+    **Der einzige Weg, auf dem hier etwas an ein Modell geht — und er beginnt immer mit
+    einem Knopfdruck.** Kein Hintergrundlauf, keine Erinnerung, kein „schon mal
+    vorbereitet". Wer eine Woche nichts erfasst, findet den Raum unverändert vor.
+
+    Die Vorschläge werden als Entwürfe abgelegt und nicht nur zurückgegeben: Ein Vorschlag
+    über die eigene Person will überlegt werden, auch noch am nächsten Tag. Wäre er nur in
+    dieser Antwort, wäre er beim Neuladen weg — und die Entscheidung müsste sofort fallen.
+    """
+    async with pool.acquire() as conn:
+        ergebnis = await kompass_vorschlag_service.vorschlagen(
+            conn, _echo(request), user_id=current["user_id"]
+        )
+    return VorschlagsLauf(
+        vorschlaege=[Satz(**s) for s in ergebnis["vorschlaege"]],
+        hinweis=ergebnis.get("hinweis"),
+    )
+
+
+@router.post("/saetze/{satz_id}/entscheidung", response_model=Satz)
+async def vorschlag_entscheiden(
+    satz_id: UUID,
+    body: VorschlagsEntscheidung,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Satz:
+    """Einen Vorschlag annehmen oder verwerfen.
+
+    **Verwerfen löscht nicht.** Der Satz bleibt als ``verworfen`` stehen, damit derselbe
+    Vorschlag beim nächsten Lauf nicht wiederkommt: „Nein" einmal zu sagen muss genügen.
+    Sichtbar ist er danach nirgends mehr.
+    """
+    async with pool.acquire() as conn:
+        satz = await kompass_vorschlag_service.entscheiden(
+            conn, user_id=current["user_id"], satz_id=satz_id, annehmen=body.annehmen
+        )
+    if satz is None:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return Satz(**satz)

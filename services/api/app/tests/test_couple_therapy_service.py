@@ -1408,10 +1408,17 @@ async def test_checkin_altzeile_ohne_liste_bleibt_lesbar(db):
     Zusicherung faellt so eine Zeile still aus Anzeige und Rueckblick heraus.
     """
     user_a, _, _, _, couple_id = await _linked_pair(db)
+    # Die Woche kommt aus PYTHON, nicht aus `date_trunc('week', CURRENT_DATE)`.
+    #
+    # Beide liefern den Montag - aber aus verschiedenen Uhren: Postgres laeuft im
+    # Container auf UTC, der Testprozess auf Ortszeit. Montags zwischen 00:00 und 02:00
+    # (MESZ) ist es dort noch Sonntag, und die Zeile landete eine Woche vor der, die
+    # `load_week` liest. Der Test fiel dann fuer zwei Stunden pro Woche um - was hier
+    # geprueft wird, ist der Rueckfall von `mood` auf `moods` und keine Wochenarithmetik.
     await db.execute(
         "INSERT INTO couple_checkins (couple_id, user_id, week_start, mood) "
-        "VALUES ($1, $2, date_trunc('week', CURRENT_DATE)::date, 'wuetend')",
-        couple_id, user_a)
+        "VALUES ($1, $2, $3, 'wuetend')",
+        couple_id, user_a, cchk.week_start())
 
     woche = await cchk.load_week(db, couple_id, user_a)
     eigener = next(e for e in woche["entries"] if e["is_own"])
