@@ -27,6 +27,9 @@ _USER_TABLES = (
     "ai_usage_log", "user_consents", "professional_profiles",
     "professional_assignments", "professional_appointments",
     "scene_resonance", "feeling_snapshots",
+    "client_notifications", "test_results", "pseudonymous_accounts",
+    # Ausbildung: die eigene Zuordnung bzw. das eigene Institut.
+    "students", "training_institutes",
 )
 
 # Tabellen mit Daten in der Fachpersonen-Rolle (Spalte professional_user_id).
@@ -35,7 +38,42 @@ _PROFESSIONAL_TABLES = (
     "professional_notes", "professional_echo_sessions",
     "professional_echo_messages", "professional_echo_summaries",
     "professional_templates",
+    # Die eigene Arbeit an den Fällen anderer. Sie wird beim Löschen entfernt (siehe
+    # _DELETE_STEPS) — dann muss sie auch in der Auskunft stehen.
+    "professional_findings", "professional_session_notes", "professional_reports",
+    "professional_note_templates", "professional_report_templates",
+    "professional_agreements", "case_activations", "case_couples",
+    "couple_professional_shares",
+    "professional_couple_echo_sessions", "professional_couple_echo_messages",
+    "professional_couple_reports",
 )
+
+# Tabellen mit einer eigenen Bedingung — die Person steckt dort unter einem anderen
+# Spaltennamen oder in mehreren.
+_SONDERFAELLE = (
+    ("case_shares", "owner_user_id = $1 OR professional_user_id = $1"),
+    ("professional_invites", "inviter_user_id = $1 OR professional_user_id = $1"),
+    ("case_faq_runs", "professional_user_id = $1 OR owner_user_id = $1"),
+    ("client_invites", "professional_user_id = $1 OR accepted_user_id = $1"),
+    ("student_invites", "accepted_user_id = $1"),
+    ("organizations", "owner_user_id = $1"),
+    ("organization_members", "professional_user_id = $1"),
+    ("organization_invites", "invited_by_user_id = $1"),
+    ("directory_listings", "claimed_by_user_id = $1"),
+    ("institute_access_codes", "used_by_user_id = $1"),
+)
+
+#: Verschlüsselte Felder je Tabelle — sonst bekommt die Person Geheimtext statt Auskunft.
+#: ``json`` heißt: ein JSON-Feld, dessen Zeichenketten einzeln verschlüsselt sind.
+_ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
+    "professional_findings":         {"text": ("body",)},
+    "professional_report_templates": {"text": ("instruction",)},
+    "professional_session_notes":    {"json": ("content",)},
+    "professional_reports":          {"json": ("content",)},
+    "professional_couple_reports":   {"json": ("content",)},
+    "case_faq_runs":                 {"json": ("auswertung",)},
+    "professional_couple_echo_messages": {"text": ("content",)},
+}
 
 
 async def export_user_data(
@@ -49,15 +87,33 @@ async def export_user_data(
     for table in _PROFESSIONAL_TABLES:
         data[table] = await _json_rows(conn, table, "professional_user_id = $1", user_id)
 
-    data["case_shares"] = await _json_rows(
-        conn, "case_shares", "owner_user_id = $1 OR professional_user_id = $1", user_id
-    )
-    data["professional_invites"] = await _json_rows(
-        conn, "professional_invites",
-        "inviter_user_id = $1 OR professional_user_id = $1", user_id,
-    )
+    for table, where in _SONDERFAELLE:
+        data[table] = await _json_rows(conn, table, where, user_id)
+
     if email:
         data["waitlist"] = await _json_rows_by_email(conn, "waitlist", email)
+
+    # Verschlüsselte Felder der hinzugekommenen Tabellen. Steht vor den einzeln
+    # ausgeschriebenen Fällen unten, weil es dieselbe Arbeit für viele Tabellen tut.
+    for table, felder in _ENTSCHLUESSELN.items():
+        for row in data.get(table, []):
+            if not isinstance(row, dict):
+                continue
+            for feld in felder.get("text", ()):
+                if row.get(feld) is not None:
+                    row[feld] = crypto.decrypt(row[feld])
+            for feld in felder.get("json", ()):
+                if isinstance(row.get(feld), (dict, list)):
+                    row[feld] = crypto.decrypt_json_strings(row[feld])
+
+    # test_results legt das ganze Ergebnis als EINE verschlüsselte Zeichenkette ab.
+    for row in data.get("test_results", []):
+        if isinstance(row, dict) and row.get("result") is not None:
+            entschluesselt = crypto.decrypt(row["result"])
+            try:
+                row["result"] = json.loads(entschluesselt or "{}")
+            except (TypeError, ValueError):
+                row["result"] = entschluesselt
 
     # echo_messages-Inhalte sind ggf. feldverschlüsselt → für den Export entschlüsseln
     for msg in data.get("echo_messages", []):
