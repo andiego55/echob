@@ -19,13 +19,11 @@ import type { KompassZustand } from '@/api/kompass'
 import { ton } from '@/lib/kompass'
 
 export default function ZustandsReihe({
-  zustaende, gewaehlt, onWahl, klein = false,
+  zustaende, gewaehlt, onWahl,
 }: {
   zustaende: KompassZustand[]
   gewaehlt: number | null
   onWahl: (wert: number) => void
-  /** Für die Karte auf dem Fall-Überblick: dieselbe Reihe, weniger Platz. */
-  klein?: boolean
 }) {
   /** Der erste Punkt ist mit Tab erreichbar, solange nichts gewählt ist — so will es die
    *  Auswahlgruppe: EIN Halt im Tabulatorlauf, nicht fünf. */
@@ -57,7 +55,7 @@ export default function ZustandsReihe({
         {/* Die Linie liegt auf Höhe der Punktmitten und endet innerhalb der äußeren
             Zellen — sonst sähe sie aus wie ein Rahmen statt wie eine Achse. */}
         <div
-          className={`pointer-events-none absolute inset-x-[10%] ${klein ? 'top-[18px]' : 'top-[26px]'} h-px bg-brand-border`}
+          className="pointer-events-none absolute inset-x-[10%] top-[26px] h-px bg-brand-border"
           aria-hidden="true"
         />
 
@@ -73,19 +71,15 @@ export default function ZustandsReihe({
                 aria-checked={an}
                 tabIndex={z.wert === tabZiel ? 0 : -1}
                 onClick={() => onWahl(z.wert)}
-                className={`group flex flex-1 flex-col items-center gap-1.5 rounded-brand-sm ${
-                  klein ? 'py-1' : 'py-2'
-                } focus:outline-none focus-visible:ring-2 focus-visible:ring-accent`}
+                className="group flex flex-1 flex-col items-center gap-1.5 rounded-brand-sm py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                <span
-                  className={`grid place-items-center ${klein ? 'h-9 w-9' : 'h-[52px] w-[52px]'}`}
-                >
+                <span className="grid place-items-center h-[52px] w-[52px]">
                   <span
                     className={[
                       'rounded-full transition-all duration-300 ease-out motion-reduce:transition-none',
-                      klein ? 'h-4 w-4' : 'h-5 w-5',
+                      'h-5 w-5',
                       an
-                        ? klein ? 'scale-[1.7]' : 'scale-[1.9]'
+                        ? 'scale-[1.9]'
                         : 'scale-100 opacity-45 group-hover:scale-125 group-hover:opacity-80',
                     ].join(' ')}
                     style={{
@@ -99,7 +93,7 @@ export default function ZustandsReihe({
                 <span
                   className={[
                     'leading-none transition-colors',
-                    klein ? 'text-[0.62rem]' : 'text-[0.72rem] sm:text-[0.78rem]',
+                    'text-[0.72rem] sm:text-[0.78rem]',
                     an ? 'font-bold' : 'font-medium text-brand-muted group-hover:text-navy',
                   ].join(' ')}
                   style={an ? { color: ton(z.wert).schrift } : undefined}
@@ -114,14 +108,12 @@ export default function ZustandsReihe({
 
       {/* Der Beisatz bestätigt die Wahl mit anderen Worten („schwer, es drückt"). Die
           Höhe steht fest, damit die Knöpfe darunter nicht springen, sobald er erscheint. */}
-      {!klein && (
-        <p
-          className="mt-1 min-h-[1.25rem] text-center text-[0.82rem] italic text-brand-muted transition-opacity duration-300 motion-reduce:transition-none"
-          aria-live="polite"
-        >
-          {gewaehlterZustand?.hinweis ?? ''}
-        </p>
-      )}
+      <p
+        className="mt-1 min-h-[1.25rem] text-center text-[0.82rem] italic text-brand-muted transition-opacity duration-300 motion-reduce:transition-none"
+        aria-live="polite"
+      >
+        {gewaehlterZustand?.hinweis ?? ''}
+      </p>
     </div>
   )
 }

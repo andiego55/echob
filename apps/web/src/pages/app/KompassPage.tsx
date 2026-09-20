@@ -120,8 +120,25 @@ export default function KompassPage() {
           />
         </section>
 
-        {/* ── Ebene 2: die drei Eingänge ────────────────────────────────────── */}
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        {/* ── Ebene 2: die Eingänge ─────────────────────────────────────────
+            Vier, seit die Sätze dazugekommen sind. Die Regel des Bauplans lautete
+            „drei, nicht acht" — sie richtet sich gegen einen Werkzeugkasten, in dem
+            man suchen muss, nicht gegen die Zahl vier. Die Sätze sind eine eigene
+            Grundform und kein Werkzeug; sie gehören auf diese Ebene und nicht in eine
+            Unterseite. Ein fünfter Eingang wäre dagegen ein Zeichen, dass der Zuschnitt
+            nicht mehr stimmt. */}
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <Eingang
+            to="/app/kompass/saetze"
+            titel="Sätze über mich"
+            text="Was du über dich herausgefunden hast."
+            stand={
+              (stand?.saetze_bestaetigt ?? 0) === 0
+                ? 'Noch keiner bestätigt'
+                : `${stand?.saetze_bestaetigt} bestätigt`
+            }
+            fertig={(stand?.saetze_bestaetigt ?? 0) > 0}
+          />
           <Eingang
             to="/app/profile"
             titel="Wo ich stehe"

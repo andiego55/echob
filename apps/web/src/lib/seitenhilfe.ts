@@ -239,6 +239,12 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Zeitraum umschalten', 'Einen Punkt antippen', 'Einen Moment wegnehmen'],
     tipp: 'Die Lücken sind auch eine Auskunft: Wochen ohne Eintrag sind oft die dichten.',
   },
+  '/app/kompass/saetze': {
+    titel: 'Sätze über dich',
+    zweck: 'Was du über dich herausgefunden hast — in Sätzen, die du selbst bestätigt hast.',
+    schritte: ['Art wählen und Satz schreiben', 'Entwurf bestätigen', 'Überholtes stehen lassen'],
+    tipp: 'Bestätigt heißt nicht wahr, sondern: Das war deine Einschätzung an dem Tag. Deshalb steht das Alter daneben.',
+  },
   '/app/kompass/krisenplan': {
     titel: 'Dein Notfallplan',
     zweck: 'Was hilft, wenn es kippt — aufgeschrieben, solange es dir gut genug dafür geht.',

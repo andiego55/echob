@@ -138,6 +138,13 @@ VERTRAUT_DEM_AUFRUFER = {
         "Legt den Krisenplan an oder schreibt ihn fort. Wie puls_anlegen: Die user_id "
         "kommt aus get_current_user; der Koerper der Anfrage traegt nur den Inhalt, und "
         "aus dem filtert der Dienst alles heraus, was nicht im Katalog steht.",
+    "kompass_saetze_service.anlegen":
+        "Legt einen Satz ueber die eigene Person an. Ein INSERT kann sich nicht an eine "
+        "Eigentuemer-Spalte binden - die user_id IST die Spalte, die geschrieben wird. "
+        "Sie stammt im einzigen Aufrufer (routers/kompass.py: satz_anlegen) aus "
+        "get_current_user. Aus dem Browser kommen nur szene_id und puls_id, und beide "
+        "prueft der Router gegen scenes.user_id bzw. selbst_pulse.user_id, bevor er "
+        "herkommt; die Herkunft leitet er selbst ab, statt sie zu uebernehmen.",
 
     # ── Paarraum: der Router prüft, der Dienst schreibt ──────────────────────────────
     "couple_companion_service.add_message":

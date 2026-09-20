@@ -35,6 +35,20 @@ export interface KrisenplanTeil {
   beispiel: string
 }
 
+/** Eine der sechs Arten, mit Erklärung und Beispiel — beides kommt vom Server. */
+export interface SatzArt {
+  key: string
+  label: string
+  hinweis: string
+  beispiel: string
+}
+
+export interface SatzStand {
+  key: string
+  label: string
+  hinweis: string
+}
+
 export interface KompassKatalog {
   zustaende: KompassZustand[]
   /** Ab dieser Stufe fragt der Puls, was geholfen hat. */
@@ -43,6 +57,10 @@ export interface KompassKatalog {
   /** Dieselben Wortfamilien wie im Gefühlsbild — bewusst, nicht zufällig. */
   wortfamilien: GbWortFamilie[]
   krisenplan_teile: KrisenplanTeil[]
+  satz_arten: SatzArt[]
+  /** Nur die drei sichtbaren. „Verworfen" ist kein Stand, den jemand wählt. */
+  satz_staende: SatzStand[]
+  satz_max_zeichen: number
 }
 
 export interface Puls {
@@ -73,6 +91,43 @@ export interface Krisenplan {
   updated_at: string | null
 }
 
+/**
+ * Ein Satz über die eigene Person.
+ *
+ * **`bestaetigt_at` gehört sichtbar in die Oberfläche.** Ein bestätigter Satz ist eine
+ * Selbsteinschätzung von dem Tag, an dem jemand zugestimmt hat — kein Befund und keine
+ * Eigenschaft. Ohne das Datum liest er sich wie eine Tatsache über einen Menschen.
+ */
+export interface Satz {
+  id: string
+  art: string
+  art_label: string | null
+  text: string
+  stand: 'entwurf' | 'bestaetigt' | 'ueberholt'
+  herkunft: 'selbst' | 'szene' | 'puls' | 'echo'
+  szene_id: string | null
+  puls_id: string | null
+  angeheftet: boolean
+  created_at: string
+  bestaetigt_at: string | null
+  updated_at: string
+}
+
+/** Die Herkunft wird abgeleitet, nicht mitgeschickt — sie lässt sich nicht behaupten. */
+export interface SatzNeu {
+  art: string
+  text: string
+  szene_id?: string | null
+  puls_id?: string | null
+}
+
+export interface SatzAenderung {
+  text?: string
+  art?: string
+  stand?: 'entwurf' | 'bestaetigt' | 'ueberholt'
+  angeheftet?: boolean
+}
+
 export interface KompassUebersicht {
   letzter_puls: Puls | null
   verlauf: Puls[]
@@ -80,6 +135,7 @@ export interface KompassUebersicht {
   rhythmus: number
   verlauf_tage: number
   krisenplan_vorhanden: boolean
+  saetze_bestaetigt: number
 }
 
 const basis = '/me/kompass'
@@ -107,4 +163,16 @@ export const kompassApi = {
 
   krisenplanSpeichern: (inhalt: Record<string, string[]>) =>
     apiClient.put<Krisenplan>(`${basis}/krisenplan`, { inhalt }).then(r => r.data),
+
+  saetze: () =>
+    apiClient.get<Satz[]>(`${basis}/saetze`).then(r => r.data),
+
+  satzAnlegen: (satz: SatzNeu) =>
+    apiClient.post<Satz>(`${basis}/saetze`, satz).then(r => r.data),
+
+  satzAendern: (satzId: string, aenderung: SatzAenderung) =>
+    apiClient.patch<Satz>(`${basis}/saetze/${satzId}`, aenderung).then(r => r.data),
+
+  satzLoeschen: (satzId: string) =>
+    apiClient.delete(`${basis}/saetze/${satzId}`).then(() => undefined),
 }

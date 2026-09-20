@@ -74,6 +74,121 @@ KRISENPLAN_TEILE: tuple[dict[str, str], ...] = (
 #: Schlüssel, die im Inhalt eines Krisenplans vorkommen dürfen.
 KRISENPLAN_SCHLUESSEL: frozenset[str] = frozenset(t["key"] for t in KRISENPLAN_TEILE)
 
+# ── Die Sätze über mich ─────────────────────────────────────────────────────
+
+#: Wie lang ein Satz sein darf.
+#:
+#: Das ist keine technische Grenze, sondern die Form selbst: Ein Satz über sich, der nicht
+#: in eine Zeile passt, ist kein Satz, sondern ein Absatz — und ein Absatz lässt sich
+#: weder bestätigen noch später widerrufen. Wer mehr zu sagen hat, sagt es in zwei Sätzen.
+SATZ_MAX_ZEICHEN = 300
+
+#: Die sechs Arten.
+#:
+#: **Warum jede eine Erklärung trägt.** „Glaubenssatz" und „Wert" sind Fachworte, auch
+#: wenn sie nicht danach klingen. Wer sie zum ersten Mal liest, rät — und schreibt dann
+#: unter „Wert", was eigentlich ein Vorsatz ist. Die Erklärung steht deshalb nicht in
+#: einem Hilfetext, sondern neben der Art, und das Beispiel steht daneben, weil ein
+#: Beispiel schneller erklärt als zwei Sätze Definition.
+#:
+#: **Warum sechs und nicht drei.** Jede Art verlangt eine andere Haltung beim Lesen: Ein
+#: Glaubenssatz ist etwas, das man überprüfen will. Ein Wert ist etwas, an dem man sich
+#: ausrichtet. Beide in einen Topf zu werfen, nähme dem Raum seine Schärfe.
+SATZ_ARTEN: tuple[dict[str, str], ...] = (
+    {
+        "key": "glaubenssatz",
+        "label": "Glaubenssatz",
+        "hinweis": "Ein Satz, den du über dich für wahr hältst. Meist früh gelernt und "
+                   "selten überprüft — und er wirkt auch dann, wenn du ihn nie "
+                   "ausgesprochen hast.",
+        "beispiel": "Wenn ich Nein sage, bin ich egoistisch.",
+    },
+    {
+        "key": "wert",
+        "label": "Wert",
+        "hinweis": "Was dir wichtig ist, unabhängig davon, ob du gerade danach lebst. "
+                   "Werte sind kein Vorsatz; sie zeigen sich daran, was dich trifft, "
+                   "wenn jemand darüber hinweggeht.",
+        "beispiel": "Ehrlichkeit, auch wenn es unbequem wird.",
+    },
+    {
+        "key": "grenze",
+        "label": "Grenze",
+        "hinweis": "Wo für dich Schluss ist. Eine Grenze ist keine Forderung an andere, "
+                   "sondern eine Auskunft über dich — deshalb steht sie in der Ich-Form.",
+        "beispiel": "Angeschrien zu werden beendet für mich das Gespräch.",
+    },
+    {
+        "key": "ausloeser",
+        "label": "Auslöser",
+        "hinweis": "Was bei dir eine starke Reaktion auslöst, oft stärker, als die Lage "
+                   "allein erklärt. Einen Auslöser zu kennen heißt nicht, ihn "
+                   "abschaffen zu müssen.",
+        "beispiel": "Wenn ich stundenlang keine Antwort bekomme.",
+    },
+    {
+        "key": "staerke",
+        "label": "Stärke",
+        "hinweis": "Was du kannst. Am schwersten aufzuschreiben — und am wichtigsten an "
+                   "den Tagen, an denen dir nichts einfällt, das für dich spricht.",
+        "beispiel": "Ich halte einen Streit aus, ohne nachtragend zu werden.",
+    },
+    {
+        "key": "muster",
+        "label": "Muster",
+        "hinweis": "Etwas, das sich wiederholt. Kein Urteil, eine Beobachtung — und der "
+                   "erste Schritt, um es zu unterbrechen.",
+        "beispiel": "Ich werde still, sobald die Stimme lauter wird.",
+    },
+)
+
+SATZ_ART_SCHLUESSEL: frozenset[str] = frozenset(a["key"] for a in SATZ_ARTEN)
+
+#: Die Stände, die eine Person sieht und selbst setzen kann.
+#:
+#: **„Bestätigt" heißt nicht „wahr".** Ein bestätigter Satz ist eine Selbsteinschätzung
+#: von dem Tag, an dem jemand zugestimmt hat. Deshalb trägt er sein Datum, und deshalb
+#: gibt es „überholt" statt „löschen": Dass ein Satz nicht mehr stimmt, ist selbst eine
+#: Auskunft — oft die interessantere.
+SATZ_STAENDE: tuple[dict[str, str], ...] = (
+    {
+        "key": "entwurf",
+        "label": "Entwurf",
+        "hinweis": "Aufgeschrieben, noch nicht zugestimmt.",
+    },
+    {
+        "key": "bestaetigt",
+        "label": "Bestätigt",
+        "hinweis": "Deine Einschätzung von dem Tag, an dem du zugestimmt hast.",
+    },
+    {
+        "key": "ueberholt",
+        "label": "Überholt",
+        "hinweis": "Stimmt so nicht mehr. Bleibt stehen, weil die Bewegung etwas sagt.",
+    },
+)
+
+#: Alle Stände, die die Datenbank kennt.
+#:
+#: ``verworfen`` steht bewusst NICHT in ``SATZ_STAENDE``: Es ist kein Zustand, den jemand
+#: wählt, sondern die Erinnerung daran, dass ein Vorschlag von Echo abgelehnt wurde —
+#: damit derselbe Vorschlag nicht wiederkommt. Sichtbar ist er nirgends.
+SATZ_ALLE_STAENDE: frozenset[str] = frozenset(
+    {s["key"] for s in SATZ_STAENDE} | {"verworfen"}
+)
+
+#: Woraus ein Satz entstanden sein kann. ``selbst`` heißt: Die Person hat ihn geschrieben.
+SATZ_HERKUENFTE: frozenset[str] = frozenset({"selbst", "szene", "puls", "echo"})
+
+
+def satz_art_label(key: str | None) -> str | None:
+    """Die Beschriftung zu einer gespeicherten Art — oder None, wenn unbekannt."""
+    for art in SATZ_ARTEN:
+        if art["key"] == key:
+            return art["label"]
+    return None
+
+
 #: Die Wortfamilien des Gefühlsbilds, für den optionalen Schritt „ein Wort dazu".
 #: Wiederverwendet statt nachgebaut: Wer beides benutzt, soll nicht zwei Vokabulare lernen.
 WORTFAMILIEN = WORTFELD

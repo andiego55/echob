@@ -12,6 +12,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.services.kompass_katalog import SATZ_MAX_ZEICHEN
+
 
 class PulsCreate(BaseModel):
     """Ein Moment. Nur ``zustand`` ist Pflicht — das ist das Versprechen des Raums."""
@@ -51,6 +53,49 @@ class KrisenplanUpdate(BaseModel):
     inhalt: dict[str, Any] = Field(default_factory=dict)
 
 
+# ── Die Sätze über mich ─────────────────────────────────────────────────────
+#
+# **Warum ``art`` und ``stand`` hier schlichte Zeichenketten sind und keine Literale.**
+# Die erlaubten Wörter stehen im Katalog und in der Bedingung der Tabelle. Ein Literal
+# hier wäre eine DRITTE Stelle, die mitwandern muss — und genau diese Sorte Fehler hat in
+# dieser Codebasis schon dreimal zugeschlagen. Geprüft wird im Dienst gegen den Katalog,
+# abgeglichen wird vom Wächter gegen die Datenbank.
+
+
+class SatzCreate(BaseModel):
+    art: str
+    text: str = Field(min_length=1, max_length=SATZ_MAX_ZEICHEN)
+    #: Woher der Satz kommt. Die Herkunft wird daraus abgeleitet, nicht mitgeschickt —
+    #: sonst könnte jemand „von Echo vorgeschlagen" behaupten, was er selbst getippt hat.
+    szene_id: UUID | None = None
+    puls_id: UUID | None = None
+
+
+class SatzUpdate(BaseModel):
+    """Alles freiwillig — was fehlt, bleibt, wie es war."""
+    text: str | None = Field(default=None, max_length=SATZ_MAX_ZEICHEN)
+    art: str | None = None
+    stand: str | None = None
+    angeheftet: bool | None = None
+
+
+class Satz(BaseModel):
+    id: UUID
+    art: str
+    art_label: str | None = None
+    text: str
+    stand: str
+    herkunft: str
+    szene_id: UUID | None = None
+    puls_id: UUID | None = None
+    angeheftet: bool = False
+    created_at: datetime
+    #: Wann zugestimmt wurde. Gehört sichtbar in die Oberfläche: Ein Satz von vor zwei
+    #: Jahren ist etwas anderes als einer von gestern.
+    bestaetigt_at: datetime | None = None
+    updated_at: datetime
+
+
 class KompassUebersicht(BaseModel):
     """Was die Startseite braucht, in einem Zug."""
     letzter_puls: Puls | None = None
@@ -59,3 +104,5 @@ class KompassUebersicht(BaseModel):
     rhythmus: int = 0
     verlauf_tage: int = 28
     krisenplan_vorhanden: bool = False
+    #: Wie viele bestätigte Sätze — für die Karte „Sätze über mich".
+    saetze_bestaetigt: int = 0

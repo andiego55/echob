@@ -208,6 +208,31 @@ export function nachTagen(pulse: Puls[], jetzt: number = Date.now()): Tagesgrupp
     })
 }
 
+/**
+ * Wie alt etwas ist, grob — „vor 3 Wochen", „vor 8 Monaten".
+ *
+ * **Wofür.** Ein bestätigter Satz über sich selbst ist eine Einschätzung von dem Tag, an
+ * dem jemand zugestimmt hat, und kein Befund. Ohne sichtbares Alter liest er sich wie
+ * eine Eigenschaft. „14. Februar" sagt dabei weniger als „vor sieben Monaten": Das eine
+ * muss man ausrechnen, das andere trifft sofort.
+ *
+ * Grob ist Absicht. Auf den Tag genau wäre hier eine Genauigkeit, die es nicht gibt.
+ */
+export function altersWort(iso: string | null | undefined, jetzt: number = Date.now()): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+
+  const tage = Math.round((tagesBeginn(new Date(jetzt)) - tagesBeginn(d)) / TAG_MS)
+  if (tage <= 0) return 'heute'
+  if (tage === 1) return 'gestern'
+  if (tage < 14) return `vor ${tage} Tagen`
+  if (tage < 56) return `vor ${Math.round(tage / 7)} Wochen`
+  if (tage < 365) return `vor ${Math.round(tage / 30.4)} Monaten`
+  const jahre = Math.floor(tage / 365)
+  return jahre === 1 ? 'vor einem Jahr' : `vor ${jahre} Jahren`
+}
+
 /** Wie viele Momente in welchem Zeitraum — ohne Lob und ohne Mahnung. */
 export function rhythmusSatz(anzahl: number, tage: number): string {
   const zeitraum = tage % 7 === 0 ? `${tage / 7} Wochen` : `${tage} Tagen`

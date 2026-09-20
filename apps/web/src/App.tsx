@@ -58,6 +58,7 @@ const ProfilePage = lazy(() => import('@/pages/app/ProfilePage'))
 const ProfileEchoPage = lazy(() => import('@/pages/app/ProfileEchoPage'))
 const KompassPage = lazy(() => import('@/pages/app/KompassPage'))
 const KompassVerlaufPage = lazy(() => import('@/pages/app/KompassVerlaufPage'))
+const KompassSaetzePage = lazy(() => import('@/pages/app/KompassSaetzePage'))
 const KrisenplanPage = lazy(() => import('@/pages/app/KrisenplanPage'))
 const PersonProfilePage = lazy(() => import('@/pages/app/PersonProfilePage'))
 const PersonProfileEchoPage = lazy(() => import('@/pages/app/PersonProfileEchoPage'))
@@ -266,6 +267,7 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
           neuen Eingang bekommen, und ein Umzug würde jeden alten Verweis brechen. */}
       <Route path="/app/kompass" element={<ProtectedRoute><KompassPage /></ProtectedRoute>} />
       <Route path="/app/kompass/verlauf" element={<ProtectedRoute><KompassVerlaufPage /></ProtectedRoute>} />
+      <Route path="/app/kompass/saetze" element={<ProtectedRoute><KompassSaetzePage /></ProtectedRoute>} />
       <Route path="/app/kompass/krisenplan" element={<ProtectedRoute><KrisenplanPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />

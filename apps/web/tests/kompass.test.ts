@@ -14,6 +14,7 @@ import { describe, expect, it } from 'vitest'
 import type { Puls } from '@/api/kompass'
 import {
   ZUSTANDS_TON,
+  altersWort,
   bewegung,
   kurve,
   nachTagen,
@@ -155,6 +156,30 @@ describe('zeitWort', () => {
 
   it('gibt bei unlesbarem Datum nichts aus statt „Invalid Date"', () => {
     expect(zeitWort('gar kein Datum', JETZT)).toBe('')
+  })
+})
+
+describe('altersWort', () => {
+  it('nennt grobe Abstaende statt eines Datums', () => {
+    // Ein bestaetigter Satz ueber sich selbst ist eine Einschaetzung von einem Tag.
+    // „14. Februar" muss man ausrechnen; „vor sieben Monaten" trifft sofort.
+    expect(altersWort('2026-09-20T08:00:00', JETZT)).toBe('heute')
+    expect(altersWort('2026-09-19T08:00:00', JETZT)).toBe('gestern')
+    expect(altersWort(vorTagen(5), JETZT)).toBe('vor 5 Tagen')
+    expect(altersWort(vorTagen(21), JETZT)).toBe('vor 3 Wochen')
+    expect(altersWort(vorTagen(200), JETZT)).toBe('vor 7 Monaten')
+  })
+
+  it('sagt bei einem Jahr „einem" und nicht „1"', () => {
+    expect(altersWort(vorTagen(400), JETZT)).toBe('vor einem Jahr')
+    expect(altersWort(vorTagen(800), JETZT)).toBe('vor 2 Jahren')
+  })
+
+  it('gibt bei fehlendem oder kaputtem Datum nichts aus', () => {
+    // Ein unbestaetigter Satz hat kein Datum - dort darf kein „vor 57 Jahren" stehen.
+    expect(altersWort(null, JETZT)).toBe('')
+    expect(altersWort(undefined, JETZT)).toBe('')
+    expect(altersWort('kein Datum', JETZT)).toBe('')
   })
 })
 
