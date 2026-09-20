@@ -114,6 +114,11 @@ def _fall_abschnitt(fall: dict) -> str:
     teile: list[str] = []
     name = _t(fall.get("client_display_name") or "Ohne Namen")
     teile.append(f"<h2>{name}</h2>")
+    # Die Beziehungsart unter den Namen: Hat dieselbe Person zwei Faelle, stuenden hier
+    # sonst zwei gleich benannte Abschnitte untereinander, und die Akte waere nicht mehr
+    # zuzuordnen. Mehr als die Art steht nicht da - einen Titel hat ein Fall nicht.
+    if fall.get("case_title"):
+        teile.append(f'<p class="meta">{_t(fall["case_title"])}</p>')
 
     teile.append(
         '<dl class="paar kopf" style="margin-bottom:1rem">'

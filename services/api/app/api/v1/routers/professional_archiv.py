@@ -37,7 +37,7 @@ from pydantic import BaseModel
 
 from app.core import crypto
 from app.core.dependencies import get_current_professional, get_pool
-from app.services import dokumentation_export
+from app.services import dokumentation_export, fall_titel
 from app.services.sharing_service import require_dokumentation
 
 router = APIRouter(prefix="/professional/archiv", tags=["professional-archiv"])
@@ -99,7 +99,7 @@ async def liste(
         rows = await conn.fetch(
             """
             SELECT s.case_id, s.created_at AS freigegeben_am, s.revoked_at AS beendet_am,
-                   c.title AS case_title,
+                   c.relationship_type,
                    up.display_name AS client_display_name,
                    (SELECT count(*) FROM professional_session_notes n
                      WHERE n.case_id = s.case_id AND n.professional_user_id = $1) AS sitzungsnotizen,
@@ -119,7 +119,7 @@ async def liste(
         ArchivFall(
             case_id=r["case_id"],
             client_display_name=r["client_display_name"],
-            case_title=r["case_title"],
+            case_title=fall_titel.titel(r["relationship_type"]),
             freigegeben_am=r["freigegeben_am"],
             beendet_am=r["beendet_am"],
             sitzungsnotizen=r["sitzungsnotizen"],
@@ -205,7 +205,7 @@ async def _lade_fall(conn, *, pid, case_id) -> dict:
     share = await require_dokumentation(pid, case_id, conn)
 
     kopf = await conn.fetchrow(
-        "SELECT c.title AS case_title, up.display_name AS client_display_name "
+        "SELECT c.relationship_type, up.display_name AS client_display_name "
         "FROM case_shares s LEFT JOIN cases c ON c.id = s.case_id "
         "LEFT JOIN user_profiles up ON up.user_id = s.owner_user_id "
         "WHERE s.id = $1",
@@ -244,7 +244,7 @@ async def _lade_fall(conn, *, pid, case_id) -> dict:
     return {
         "case_id": case_id,
         "client_display_name": kopf["client_display_name"] if kopf else None,
-        "case_title": kopf["case_title"] if kopf else None,
+        "case_title": fall_titel.titel(kopf["relationship_type"]) if kopf else None,
         "freigegeben_am": share["created_at"],
         "beendet_am": share["revoked_at"],
         "beendet": share["status"] != "active",

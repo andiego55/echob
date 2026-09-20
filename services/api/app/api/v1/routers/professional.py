@@ -32,12 +32,12 @@ from app.schemas.professional import (
 from app.services import (
     agreement_service,
     collab_service,
+    fall_titel,
     profi_material,
     seat_service,
     sharing_service,
 )
 from app.services.demo_service import ensure_demo_for_professional
-from app.services.echo_service import _REL_TYPE_LABELS
 from app.services.professional_account import ensure_professional_account
 from app.services.sharing_service import load_shared_bundle, require_active_share
 
@@ -49,8 +49,8 @@ _NOTE_FIELDS = (
 )
 
 
-def _case_title(relationship_type: str | None) -> str:
-    return _REL_TYPE_LABELS.get(relationship_type or "", "Fall")
+#: Der Falltitel kommt aus `services.fall_titel` - dasselbe Wort auch im Archiv.
+_case_title = fall_titel.titel
 
 
 _TITLE_BY_KIND = {

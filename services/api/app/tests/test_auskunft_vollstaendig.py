@@ -130,7 +130,8 @@ async def test_die_auskunft_einer_fachperson_enthaelt_ihre_arbeit_im_klartext(db
         "INSERT INTO professional_session_notes (case_id, professional_user_id, title, content) "
         "VALUES ($1,$2,'Sitzung 3',$3::jsonb)",
         case_id, pro,
-        json.dumps(crypto.encrypt_json_strings({"sections": ["Ruhiger als beim letzten Mal."]})),
+        json.dumps(crypto.encrypt_json_strings(
+            {"sections": [{"heading": "Verlauf", "text": "Ruhiger als beim letzten Mal."}]})),
     )
     await db.execute(
         "INSERT INTO professional_reports (case_id, professional_user_id, source, title, content) "
@@ -148,8 +149,8 @@ async def test_die_auskunft_einer_fachperson_enthaelt_ihre_arbeit_im_klartext(db
     assert len(daten["professional_findings"]) == 1
     assert daten["professional_findings"][0]["body"] == "Sie weicht beim Thema Geld aus.", \
         "entschluesselt, nicht als Geheimtext"
-    assert daten["professional_session_notes"][0]["content"]["sections"] == [
-        "Ruhiger als beim letzten Mal."]
+    notiz = daten["professional_session_notes"][0]["content"]["sections"][0]
+    assert notiz["text"] == "Ruhiger als beim letzten Mal."
     assert daten["professional_reports"][0]["content"]["sections"][0]["text"] == \
         "Der Verlauf zeigt."
     assert len(daten["professional_agreements"]) == 1, "der unterschriebene AVV gehört dazu"
