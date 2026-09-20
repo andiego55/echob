@@ -21,7 +21,12 @@ from app.schemas.echo import (
     EchoChatSessionUpdate,
     EchoMessageResponse,
 )
-from app.services import gefuehlsbild_service, resonanz_service, resonanz_uebungen
+from app.services import (
+    gefuehlsbild_service,
+    kompass_auswahl,
+    resonanz_service,
+    resonanz_uebungen,
+)
 from app.services.case_artifacts import build_artifact_context
 from app.services.case_documents import build_document_context
 from app.services.echo_kontext import ALLE_TEILE, LABELS, normalisieren
@@ -311,6 +316,21 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
             gb_ctx = gefuehlsbild_service.kontext_block(bild)
             if gb_ctx:
                 context_parts.append(gb_ctx)
+
+        # Die bestaetigten Saetze aus dem Kompass. Nach dem Gefuehlsbild, weil beide
+        # von der Person selbst stammen - das eine sagt, wie es ihr gerade geht, das
+        # andere, was sich ueber die Zeit als wahr herausgestellt hat.
+        #
+        # Der einzige Kontextteil, der NICHT aus diesem Fall kommt: Er gilt ueber alle
+        # Beziehungen hinweg. Die Auswahl (hoechstens sieben, angeheftete immer, nie
+        # ueberholte) trifft `kompass_auswahl` - hier wird sie nur eingehaengt.
+        if "saetze" not in ohne:
+            async with pool.acquire() as conn:
+                kompass_saetze = await kompass_auswahl.fuer_fall(
+                    conn, user_id=user_id, case_id=case_id)
+            satz_ctx = kompass_auswahl.kontext_block(kompass_saetze)
+            if satz_ctx:
+                context_parts.append(satz_ctx)
 
         # Themendialog-Zusammenfassungen
         if topic_summaries and "themen" not in ohne:
@@ -1000,6 +1020,15 @@ async def get_context_overview(
                 "SELECT COUNT(*) FROM scene_resonance "
                 "WHERE user_id = $1 AND (case_id = $2 OR case_id IS NULL) "
                 "AND reaction <> 'nicht_meins'", user_id, case_id),
+            # LEAST(..., 7) und nicht COUNT(*): Von vierzig bestaetigten Saetzen gehen
+            # hoechstens sieben in den Prompt. Stuende hier die volle Zahl, zeigte das
+            # Band etwas an, das im Kontext nirgends auftaucht - genau der Fehler, gegen
+            # den dieses Band gebaut ist. Die Grenze kommt aus dem Dienst, damit beide
+            # Seiten nicht auseinanderlaufen koennen.
+            "saetze": await conn.fetchval(
+                "SELECT LEAST(COUNT(*), $2) FROM selbst_saetze "
+                "WHERE user_id = $1 AND stand = 'bestaetigt'",
+                user_id, kompass_auswahl.MAX_JE_AUFRUF),
         }
 
     return KontextAntwort(parts=[

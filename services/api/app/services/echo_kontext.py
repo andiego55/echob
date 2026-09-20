@@ -30,11 +30,13 @@ KontextTeil = Literal[
     "dokumente",
     "resonanz",
     "gefuehlsbild",
+    "saetze",
 ]
 
 ALLE_TEILE: tuple[str, ...] = (
     "szenen", "muster", "selbstauskunft", "fallprofil",
     "themen", "hypothesen", "erkenntnisse", "dokumente", "resonanz", "gefuehlsbild",
+    "saetze",
 )
 
 #: Wort und Erklaerung je Teil — genau so, wie sie im Band stehen.
@@ -82,6 +84,13 @@ LABELS: dict[str, dict[str, str]] = {
     "gefuehlsbild": {
         "label": "Gefühlsbild",
         "hinweis": "Wie es dir zuletzt ging — von dir selbst festgehalten.",
+    },
+    # Der einzige Teil, der NICHT aus diesem Fall stammt: Er kommt aus dem Kompass und
+    # gilt ueber alle Beziehungen hinweg. Deshalb steht das im Hinweis - sonst wundert
+    # man sich, woher Echo etwas weiss, das man hier nie geschrieben hat.
+    "saetze": {
+        "label": "Sätze über dich",
+        "hinweis": "Was du in deinem Kompass über dich bestätigt hast — unabhängig von diesem Fall.",
     },
 }
 

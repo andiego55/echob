@@ -246,7 +246,7 @@ export default function KompassSaetzePage() {
         {stapel.bestaetigt.length > 0 && (
           <Stapel
             titel="Das gilt"
-            hinweis="Deine Einschätzung von dem Tag, an dem du zugestimmt hast — kein Befund."
+            hinweis="Deine Einschätzung von dem Tag, an dem du zugestimmt hast — kein Befund. Echo kann sich in deinen Fällen darauf beziehen; im Kontextband jedes Gesprächs lässt sich das abschalten."
           >
             {stapel.bestaetigt.map(s => (
               <SatzKarte
