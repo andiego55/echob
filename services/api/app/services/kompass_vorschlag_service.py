@@ -18,6 +18,12 @@ Satz über sich, den ein Katalog erfunden hat. Dagegen hilft keine Anweisung, so
 dass das Material nicht ankommt. Deshalb ist ``als_prompt_eingabe`` eine eigene Funktion
 mit einem eigenen Wächter: Der liest, was sie ausgibt.
 
+**Was hineingeht, muss ENTSCHLUESSELT hineingehen.** Szenentexte liegen feldverschluesselt
+in der Datenbank. Wer sie roh weiterreicht, schickt "enc:v1:gAAAAA…" an das Modell — und
+bekommt keine Fehlermeldung, sondern eine hoefliche Antwort, dass sich daraus nichts
+ableiten lasse. Ein Waechter liest die Ausgabe von ``als_prompt_eingabe`` auf diesen
+Praefix; er greift auch fuer jedes Feld, das hier spaeter dazukommt.
+
 **Was mitgeht und was nicht.** Bestätigte und selbst geschriebene Sätze gehen mit („steht
 schon da") — sie sind die eigenen Worte der Person, und ohne sie schlüge jeder Lauf
 dasselbe vor. Die VERWORFENEN gehen NICHT mit: Das wären Echos eigene abgelehnte
@@ -32,6 +38,7 @@ from uuid import UUID
 
 import asyncpg
 
+from app.core import crypto
 from app.core.logging import get_logger
 from app.services import kompass_katalog as katalog
 from app.services import kompass_saetze_service, kompass_service, subscription_service
@@ -126,14 +133,21 @@ async def material(conn: asyncpg.Connection, *, user_id: UUID | str) -> dict[str
     Die Szenenabfrage bindet ``user_id`` selbst, obwohl Szenen über den Fall zur Person
     gehören. Sonst stünde die Eigentümerschaft auf einem Verweis statt auf einer Bedingung.
     """
-    szenen = await conn.fetch(
+    zeilen = await conn.fetch(
         "SELECT title, description, user_reaction, scene_date, created_at "
         "FROM scenes WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2",
         user_id, MAX_SZENEN,
     )
+    # ENTSCHLUESSELN, und zwar hier. `description` und `user_reaction` liegen
+    # feldverschluesselt; der Titel nicht. Ohne diese Zeile ging genau das an das Modell:
+    # lesbare Titel und daneben "enc:v1:gAAAAA...". Echo hat das im ersten echten Lauf
+    # selbst gemeldet ("Die eigentlichen Notizen sind verschluesselt") - kein Absturz,
+    # kein roter Test, nur drei Wochen Material, aus denen nichts zu holen war.
+    szenen = [crypto.decrypt_fields(dict(z), "description", "user_reaction")
+              for z in zeilen]
     pulse = await kompass_service.verlauf(conn, user_id=user_id, tage=PULS_TAGE)
     return {
-        "szenen": [dict(z) for z in szenen],
+        "szenen": szenen,
         # Die jüngsten, aber in Leserichtung: ältester zuerst, damit eine Entwicklung
         # als Entwicklung lesbar ist und nicht rückwärts.
         "pulse": pulse[-MAX_PULSE:],
@@ -228,7 +242,6 @@ async def _alle_texte(conn: asyncpg.Connection, *, user_id: UUID | str) -> list[
     zeilen = await conn.fetch(
         "SELECT text FROM selbst_saetze WHERE user_id = $1", user_id
     )
-    from app.core import crypto
     return [crypto.decrypt(z["text"]) for z in zeilen if z["text"]]
 
 

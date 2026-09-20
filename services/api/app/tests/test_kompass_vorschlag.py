@@ -30,6 +30,7 @@ import pytest
 from fastapi import HTTPException
 from httpx import ASGITransport, AsyncClient
 
+from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.main import create_app
 from app.services import kompass_katalog as katalog
@@ -194,6 +195,54 @@ async def _material_anlegen(conn, uid, *, anzahl: int = 6) -> None:
     for i in range(anzahl):
         await kompass_service.puls_anlegen(
             conn, user_id=uid, zustand=(i % 5) + 1, notiz=f"Notiz {i}")
+
+
+@pytest.mark.asyncio
+async def test_kein_geheimtext_erreicht_das_modell(db):
+    """Der Fehler, den erst der erste echte Lauf gezeigt hat.
+
+    Szenentexte liegen feldverschluesselt. Ohne Entschluesselung ging an das Modell:
+    lesbare Titel und daneben "enc:v1:gAAAAA...". Es gab keinen Absturz und keinen roten
+    Test - nur eine hoefliche Antwort, dass sich aus den sichtbaren Titeln allein nichts
+    ableiten lasse. Drei Wochen Material, aus denen nichts zu holen war.
+
+    Geprueft wird ueber den PRAEFIX, nicht ueber ein bestimmtes Feld: So greift der
+    Waechter auch fuer jede Spalte, die hier spaeter dazukommt.
+    """
+    uid = await _person(db)
+    case_id = await db.fetchval(
+        "INSERT INTO cases (user_id, relationship_type, relationship_status, "
+        "contact_frequency) VALUES ($1,'partner','together','daily') RETURNING id", uid)
+    geheim = "Es wurde laut, und ich habe aufgehoert zu reden."
+    reaktion = "Ich war wie eingefroren."
+    await db.execute(
+        "INSERT INTO scenes (case_id, user_id, title, description, user_reaction) "
+        "VALUES ($1,$2,'Beim Abendessen',$3,$4)",
+        case_id, uid, crypto.encrypt(geheim), crypto.encrypt(reaktion))
+
+    stoff = await dienst.material(db, user_id=uid)
+    eingabe = dienst.als_prompt_eingabe(stoff, [])
+
+    # Erst die Gegenprobe: Ohne sie waere der Test auch dann gruen, wenn die Szene
+    # ueberhaupt nicht im Prompt landet.
+    assert geheim in eingabe
+    assert reaktion in eingabe
+    assert crypto._PREFIX not in eingabe, "Geheimtext im Prompt"
+
+
+@pytest.mark.asyncio
+async def test_auch_die_notiz_eines_pulses_kommt_lesbar_an(db):
+    """Die Gegenprobe fuer den anderen Zweig - Pulse gehen durch `verlauf` und sind
+    dort entschluesselt. Faellt das einmal weg, faellt es hier auf."""
+    uid = await _person(db)
+    await kompass_service.puls_anlegen(
+        db, user_id=uid, zustand=2, notiz="Den ganzen Tag angespannt gewesen.")
+
+    stoff = await dienst.material(db, user_id=uid)
+    eingabe = dienst.als_prompt_eingabe(stoff, [])
+
+    assert "Den ganzen Tag angespannt gewesen." in eingabe
+    assert crypto._PREFIX not in eingabe
 
 
 @pytest.mark.asyncio
