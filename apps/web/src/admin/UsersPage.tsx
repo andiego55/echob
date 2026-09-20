@@ -115,6 +115,71 @@ function Kopf({ spalte, titel, sortierung, umschalten }: {
   )
 }
 
+/**
+ * Der Name einer Zeile — anklickbar, weil er sich manchmal ändern muss.
+ *
+ * **Warum hier und nicht in einem Formular.** Es ist ein Support-Handgriff: Jemand
+ * schreibt „bitte ändert meinen Namen", und der Weg dafür war bis zum 20.09.2026 ein
+ * Zugriff auf die Produktivdatenbank. Fachpersonen können es seitdem selbst (Profil →
+ * „Anzeigename in Echo"); das hier bleibt für alle, die es nicht können oder nicht wollen.
+ *
+ * Leer speichern geht nicht: Ein Konto ohne Namen steht bei der Gegenseite als „—".
+ */
+function NameZelle({ row, onFertig }: { row: UserRow; onFertig: () => void }) {
+  const [offen, setOffen] = useState(false)
+  const [wert, setWert] = useState(row.name ?? '')
+  const [fehler, setFehler] = useState<string | null>(null)
+  const [laeuft, setLaeuft] = useState(false)
+
+  async function speichern() {
+    const neu = wert.trim()
+    if (!neu || neu === (row.name ?? '')) return setOffen(false)
+    setLaeuft(true)
+    try {
+      const e = await adminApi.renameUser(row.user_id, neu)
+      if (!e.ok) return setFehler(e.grund ?? 'Nicht geändert.')
+      setOffen(false)
+      setFehler(null)
+      onFertig()
+    } catch (err) {
+      setFehler(apiErrorMessage(err, 'Unbekannter Grund.'))
+    } finally {
+      setLaeuft(false)
+    }
+  }
+
+  if (!offen) {
+    return (
+      <button
+        onClick={() => { setWert(row.name ?? ''); setOffen(true) }}
+        title="Namen ändern"
+        className="group text-left font-medium text-navy hover:text-accent"
+      >
+        {row.name || '—'}
+        <span aria-hidden className="ml-1 text-[0.7rem] opacity-0 transition-opacity group-hover:opacity-60">✎</span>
+      </button>
+    )
+  }
+  return (
+    <span className="block">
+      <input
+        autoFocus
+        value={wert}
+        maxLength={160}
+        onChange={e => setWert(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') speichern()
+          if (e.key === 'Escape') { setOffen(false); setFehler(null) }
+        }}
+        onBlur={speichern}
+        disabled={laeuft}
+        className="w-44 rounded border border-accent px-1.5 py-0.5 text-sm outline-none"
+      />
+      {fehler && <span className="mt-0.5 block text-[0.68rem] text-red-600">{fehler}</span>}
+    </span>
+  )
+}
+
 /** Der Umweg, den ein Browser für „Datei speichern" verlangt. */
 function csvHerunterladen(zeilen: UserRow[]) {
   const url = URL.createObjectURL(new Blob([alsCsv(zeilen)], { type: 'text/csv;charset=utf-8' }))
@@ -315,7 +380,9 @@ export default function AdminUsersPage() {
                       return (
                         <tr key={r.user_id} className="border-b border-brand-border/60 last:border-0">
                           <td className="px-4 py-2.5">
-                            <span className="font-medium text-navy">{r.name || '—'}</span>
+                            <NameZelle row={r} onFertig={() => {
+                              queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+                            }} />
                             {r.im_verzeichnis && (
                               <span className="ml-2 rounded-full bg-accent/10 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-accent">
                                 Verzeichnis

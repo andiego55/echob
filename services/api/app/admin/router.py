@@ -20,9 +20,11 @@ from app.admin.schemas import (
     ListingRow,
     ListingUpdate,
     LoeschErgebnis,
+    NameUpdate,
     PhotoResult,
     ProvisionRequest,
     ProvisionResult,
+    UmbenennErgebnis,
     UserRow,
     VerwaistReport,
 )
@@ -175,6 +177,20 @@ async def users_verwaist(
     Wort „verwaist" als Kennung.
     """
     return VerwaistReport(**await konten.verwaiste(pool, supabase))
+
+
+@router.patch("/users/{user_id}/name", response_model=UmbenennErgebnis)
+async def user_rename(
+    user_id: str,
+    payload: NameUpdate,
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> UmbenennErgebnis:
+    """Ändert den angezeigten Namen — der Support-Fall „bitte ändert das für mich".
+
+    Fachpersonen können ihn seit dem 20.09.2026 selbst ändern (``PUT /professional/
+    anzeigename``); das hier ist der Weg für alle, die es nicht können oder nicht wollen.
+    """
+    return UmbenennErgebnis(**await konten.umbenennen(pool, user_id, payload.display_name))
 
 
 @router.delete("/users/{user_id}", response_model=LoeschErgebnis)

@@ -140,6 +140,17 @@ export const professionalApi = {
     apiClient.post<ProfessionalProfile>('/professional/agreements/accept', { version, kind })
       .then(r => r.data),
 
+  /**
+   * Der Name, unter dem Klient:innen diese Fachperson sehen.
+   *
+   * Nicht zu verwechseln mit dem Namen im Verzeichnis-Eintrag (öffentlich) und dem der
+   * Praxis-Organisation (für Kolleg:innen). Dieser hier steht in der Freigabe, in
+   * Benachrichtigungen und im Archiv der Klient:in.
+   */
+  setAnzeigename: (display_name: string) =>
+    apiClient.put<ProfessionalProfile>('/professional/anzeigename', { display_name })
+      .then(r => r.data),
+
   // Auffindbarkeit (Opt-in) + eingehende Verbindungsanfragen
   setDiscoverable: (discoverable: boolean) =>
     apiClient.put<ProfessionalProfile>('/professional/discoverable', { discoverable }).then(r => r.data),

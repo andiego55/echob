@@ -64,6 +64,11 @@ class ProfessionalRegister(BaseModel):
     profession_group: str | None = Field(None, max_length=40)
 
 
+class AnzeigenameUpdate(BaseModel):
+    """Der Name, unter dem Klient:innen die Fachperson sehen."""
+    display_name: str = Field(min_length=1, max_length=160)
+
+
 class BerufsgruppeUpdate(BaseModel):
     profession_group: str | None = Field(None, max_length=40)
 

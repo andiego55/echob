@@ -17,6 +17,7 @@ from app.core import berufsgruppen, crypto
 from app.core.dependencies import get_current_professional, get_current_user, get_pool
 from app.schemas.professional import (
     AgreementAccept,
+    AnzeigenameUpdate,
     BerufsgruppeUpdate,
     DiscoverableUpdate,
     GlossaryTerm,
@@ -259,6 +260,36 @@ async def register(
             profession_group=body.profession_group,
         )
     return ProfessionalProfileResponse(**_mit_berufsgruppe(row))
+
+
+@router.put("/anzeigename", response_model=ProfessionalProfileResponse)
+async def set_anzeigename(
+    body: AnzeigenameUpdate,
+    current: dict = Depends(get_current_professional),
+    pool=Depends(get_pool),
+) -> ProfessionalProfileResponse:
+    """Der Name, unter dem Klient:innen diese Fachperson sehen.
+
+    **Warum es das braucht.** Dieser Name stand bis zum 20.09.2026 an genau einer Stelle
+    im Code: beim Anlegen des Kontos. Danach war er nicht mehr zu ändern — obwohl er
+    derjenige ist, den die Klient:innen zu sehen bekommen: in der Freigabe, in
+    Benachrichtigungen, im Archiv. Die beiden Namen, die sich ändern ließen, waren der
+    öffentliche Verzeichnis-Eintrag und der Praxisname der Organisation. Wer „Theodor"
+    ins erste Feld getippt hatte, blieb Theodor.
+
+    **Leer ist keine Option.** Ohne Namen stünde bei der Klient:in „Freigegeben an —".
+    Ein Konto ohne Namen ist für die Gegenseite schlechter als ein unpassender Name.
+    """
+    name = body.display_name.strip()
+    if not name:
+        raise HTTPException(status_code=422, detail="Bitte einen Namen angeben.")
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "UPDATE professional_profiles SET display_name = $2, updated_at = NOW() "
+            "WHERE user_id = $1 RETURNING *",
+            current["user_id"], name[:160],
+        )
+    return ProfessionalProfileResponse(**_mit_berufsgruppe(dict(row)), **current["zustimmungen"])
 
 
 @router.put("/berufsgruppe", response_model=ProfessionalProfileResponse)

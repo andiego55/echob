@@ -245,3 +245,17 @@ class VerwaistReport(BaseModel):
     unvollstaendig: bool = False
     ohne_login: list[VerwaistesKonto] = []
     ohne_profil: list[LoginOhneProfil] = []
+
+
+class NameUpdate(BaseModel):
+    """Der neue angezeigte Name eines Kontos."""
+    display_name: str = Field(min_length=1, max_length=160)
+
+
+class UmbenennErgebnis(BaseModel):
+    ok: bool
+    grund: str | None = None
+    user_id: str | None = None
+    rolle: str | None = None
+    name: str | None = None
+

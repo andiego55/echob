@@ -63,6 +63,9 @@ export default function ProfessionalProfilePage() {
   const [form, setForm] = useState<FormState | null>(null)
   const [dirty, setDirty] = useState(false)
   const [saved, setSaved] = useState(false)
+  /** Der Kontoname — kommt aus einer anderen Quelle als das Formular (siehe `save`). */
+  const [kontoname, setKontoname] = useState('')
+  const [kontonameGeladen, setKontonameGeladen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { if (data && !form) setForm(toForm(data)) }, [data, form])
@@ -74,7 +77,21 @@ export default function ProfessionalProfilePage() {
   }
 
   const save = useMutation({
-    mutationFn: (published: boolean) => directoryProfileApi.save(toPayload(form!, published)),
+    /**
+     * Ein Knopf, zwei Ziele.
+     *
+     * „Name / Praxis" gehört zum Verzeichnis-Eintrag, „Anzeigename in Echo" zum Konto —
+     * zwei Tabellen, zwei Endpunkte. Wer das Formular ausfüllt, soll davon nichts merken:
+     * Zwei Speichern-Knöpfe nebeneinander wären genau die Verwirrung, die dieses Feld
+     * beseitigen soll.
+     */
+    mutationFn: async (published: boolean) => {
+      const gewuenscht = kontoname.trim()
+      if (gewuenscht && gewuenscht !== (meProf.data?.display_name ?? '')) {
+        qc.setQueryData(['professional-me'], await professionalApi.setAnzeigename(gewuenscht))
+      }
+      return directoryProfileApi.save(toPayload(form!, published))
+    },
     onSuccess: (me) => {
       setForm(toForm(me))
       setDirty(false)
@@ -90,6 +107,13 @@ export default function ProfessionalProfilePage() {
   })
 
   const meProf = useQuery({ queryKey: ['professional-me'], queryFn: professionalApi.me })
+  // Einmal beim Laden setzen, danach gehört das Feld der tippenden Person.
+  useEffect(() => {
+    if (meProf.data && !kontonameGeladen) {
+      setKontoname(meProf.data.display_name ?? '')
+      setKontonameGeladen(true)
+    }
+  }, [meProf.data, kontonameGeladen])
   const discoverable = !!meProf.data?.discoverable
   const setDiscoverable = useMutation({
     mutationFn: (v: boolean) => professionalApi.setDiscoverable(v),
@@ -148,6 +172,37 @@ export default function ProfessionalProfilePage() {
                   <Field label="Name / Praxis" required value={form.display_name} onChange={(v) => set({ display_name: v })} />
                   <Field label="Berufsbezeichnung" value={form.title ?? ''} onChange={(v) => set({ title: v })}
                     placeholder="z. B. Psychologische Psychotherapeutin, Paartherapeutin" />
+                  {/* Der dritte Name auf dieser Seite - und der einzige, den die eigenen
+                      Klient:innen zu sehen bekommen. Deshalb steht unter dem Feld, WO er
+                      erscheint: Bei drei Namensfeldern sagt eine Beschriftung allein nicht,
+                      welches gemeint ist. */}
+                  <div>
+                    <Field
+                      label="Anzeigename in Echo"
+                      value={kontoname}
+                      onChange={(v) => { setKontoname(v); setDirty(true); setSaved(false) }}
+                      maxLength={160}
+                      placeholder={form.display_name || 'z. B. Praxis am Hang'}
+                    />
+                    {/* Nicht „So erscheinst du …": Genau so beginnt weiter oben der Satz
+                        ueber den Verzeichnis-Eintrag. Zwei fast gleiche Saetze auf einer
+                        Seite mit drei Namensfeldern waeren die Verwirrung, die dieses Feld
+                        gerade aufloesen soll. */}
+                    <p className="mt-1 text-[0.7rem] leading-snug text-brand-muted">
+                      Unter diesem Namen sehen dich deine <strong>Klient:innen</strong> in der
+                      App — in der Freigabe, in Benachrichtigungen und im Archiv. Er steht
+                      nicht im öffentlichen Verzeichnis.{' '}
+                      {form.display_name.trim() && kontoname.trim() !== form.display_name.trim() && (
+                        <button
+                          type="button"
+                          onClick={() => { setKontoname(form.display_name.trim()); setDirty(true); setSaved(false) }}
+                          className="ml-1 text-accent underline-offset-2 hover:underline"
+                        >
+                          Aus „Name / Praxis" übernehmen
+                        </button>
+                      )}
+                    </p>
+                  </div>
                   <div>
                     <span className="mb-1.5 block text-[0.8rem] font-medium text-navy">
                       Fachrichtung(en) <span className="text-accent">*</span>{' '}

@@ -145,6 +145,58 @@ async def loeschen(pool: asyncpg.Pool, supabase, user_id: str) -> dict:
     }
 
 
+# ── Umbenennen ───────────────────────────────────────────────────────────────
+
+#: Wo der angezeigte Name je Rolle wirklich steht. Vier Rollen, vier Tabellen, und in
+#: einer heißt die Spalte anders — ohne diese Zuordnung müsste die Oberfläche raten.
+_NAMENSORT = {
+    "client":       ("user_profiles", "display_name", "user_id"),
+    "professional": ("professional_profiles", "display_name", "user_id"),
+    "institute":    ("training_institutes", "name", "user_id"),
+    "student":      ("students", "display_name", "user_id"),
+}
+
+
+async def umbenennen(pool: asyncpg.Pool, user_id: str, name: str) -> dict:
+    """Ändert den angezeigten Namen eines Kontos — der Support-Fall.
+
+    **Warum das Admin das können muss.** Der Name einer Fachperson ist der, den ihre
+    Klient:innen sehen. Er war bis zum 20.09.2026 überhaupt nicht änderbar; wer sich beim
+    Anlegen vertippt hat, blieb dabei. Seitdem kann die Fachperson ihn selbst ändern — für
+    alle anderen Fälle („bitte ändert das für mich") ist der Weg über die Datenbank zu
+    umständlich und zu riskant.
+
+    Geändert wird genau ein Feld. Wer hier mehr können soll, braucht einen eigenen Weg mit
+    eigener Begründung.
+    """
+    sauber = name.strip()[:160]
+    if not sauber:
+        return {"ok": False, "grund": "Ein Konto ohne Namen ist für die Gegenseite schlechter."}
+
+    async with pool.acquire() as conn:
+        rollen = await _rollen(conn, user_id)
+        if not rollen:
+            return {"ok": False, "grund": "Zu dieser Kennung steht hier kein Konto."}
+        # Bei mehreren Rollen entscheidet die erste, die einen Namensort kennt - in der
+        # Reihenfolge, in der sie auch in der Liste stehen.
+        for rolle in rollen:
+            ort = _NAMENSORT.get(rolle)
+            if not ort:
+                continue
+            tabelle, spalte, schluessel = ort
+            ergebnis = await conn.execute(
+                f"UPDATE {tabelle} SET {spalte} = $2 WHERE {schluessel} = $1::uuid",
+                user_id, sauber,
+            )
+            if ergebnis.endswith("1"):
+                logger.info(
+                    "Konto umbenannt (user_id=%s, rolle=%s, tabelle=%s)",
+                    user_id, rolle, tabelle,
+                )
+                return {"ok": True, "user_id": user_id, "rolle": rolle, "name": sauber}
+    return {"ok": False, "grund": "Der Name konnte nicht geändert werden."}
+
+
 # ── Karteileichen ────────────────────────────────────────────────────────────
 
 async def _auth_konten(supabase) -> tuple[dict[str, dict], bool]:

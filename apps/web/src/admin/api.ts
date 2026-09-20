@@ -236,6 +236,16 @@ export const adminApi = {
       .then(r => r.data),
 
   /**
+   * Ändert den angezeigten Namen eines Kontos — der Support-Fall.
+   *
+   * Fachpersonen können ihn selbst ändern (Profil → „Anzeigename in Echo"); das hier ist
+   * der Weg für alle, die es nicht können oder nicht wollen.
+   */
+  renameUser: (userId: string, display_name: string) =>
+    apiClient.patch<{ ok: boolean; grund: string | null; name: string | null }>(
+      `/admin/users/${userId}/name`, { display_name }).then(r => r.data),
+
+  /**
    * Löscht Daten und Login-Konto — endgültig, ohne Papierkorb.
    *
    * Ein abgelehnter Versuch kommt als `ok: false` mit Grund zurück, nicht als Fehler:
