@@ -28,6 +28,8 @@ _USER_TABLES = (
     "professional_assignments", "professional_appointments",
     "scene_resonance", "feeling_snapshots",
     "client_notifications", "test_results", "pseudonymous_accounts",
+    # Mein Kompass - gehoert der Person, nicht einem Fall.
+    "selbst_pulse", "selbst_vorhaben",
     # Ausbildung: die eigene Zuordnung bzw. das eigene Institut.
     "students", "training_institutes",
 )
@@ -73,6 +75,8 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     "professional_couple_reports":   {"json": ("content",)},
     "case_faq_runs":                 {"json": ("auswertung",)},
     "professional_couple_echo_messages": {"text": ("content",)},
+    "selbst_pulse":                  {"text": ("notiz", "geholfen")},
+    "selbst_vorhaben":               {"json": ("inhalt",)},
 }
 
 
@@ -242,6 +246,8 @@ _DELETE_STEPS = (
     ("payments", "user_id = $1"),
     ("ai_usage_log", "user_id = $1"),
     ("test_results", "user_id = $1"),
+    ("selbst_pulse", "user_id = $1"),
+    ("selbst_vorhaben", "user_id = $1"),
     ("pseudonymous_accounts", "user_id = $1"),
     ("user_profiles", "user_id = $1"),
     ("user_consents", "user_id = $1"),

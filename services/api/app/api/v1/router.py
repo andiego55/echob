@@ -36,6 +36,7 @@ from app.api.v1.routers import (
     hypotheses,
     inbox,
     institute,
+    kompass,
     notifications,
     onboarding,
     org_billing,
@@ -144,5 +145,6 @@ v1_router.include_router(couple_shares.router)
 v1_router.include_router(paar_szenen.router)     # Beziehungsszenen im Paarraum
 
 # ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
+v1_router.include_router(kompass.router)     # Mein Kompass - der Raum ohne Fall
 v1_router.include_router(institute.router)
 v1_router.include_router(student.router)

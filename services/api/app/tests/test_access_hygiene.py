@@ -126,6 +126,19 @@ VERTRAUT_DEM_AUFRUFER = {
         "Wie grant_plan. Einziger Aufrufer ist billing_service.fulfill_checkout_session, "
         "erreichbar nur aus handle_event und verify_and_fulfill_session.",
 
+    # ── Mein Kompass: ein INSERT hat kein WHERE ─────────────────────────────────────
+    "kompass_service.puls_anlegen":
+        "Legt einen Puls an. Ein INSERT kann sich nicht an eine Eigentuemer-Spalte binden "
+        "- die user_id IST die Spalte, die geschrieben wird. Sie stammt in beiden "
+        "Aufrufern (routers/kompass.py: puls_anlegen und uebersicht) aus "
+        "get_current_user, also aus dem geprueften Token; aus dem Koerper der Anfrage "
+        "kommt sie nie. Der einzige Wert aus dem Browser ist die optionale case_id, und "
+        "die prueft der Router gegen cases.user_id, bevor er herkommt.",
+    "kompass_service.krisenplan_speichern":
+        "Legt den Krisenplan an oder schreibt ihn fort. Wie puls_anlegen: Die user_id "
+        "kommt aus get_current_user; der Koerper der Anfrage traegt nur den Inhalt, und "
+        "aus dem filtert der Dienst alles heraus, was nicht im Katalog steht.",
+
     # ── Paarraum: der Router prüft, der Dienst schreibt ──────────────────────────────
     "couple_companion_service.add_message":
         "Schreibt eine Zeile des privaten Begleiter-Dialogs. Alle drei Aufrufer in couple.py "
