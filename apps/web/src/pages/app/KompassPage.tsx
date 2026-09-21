@@ -119,6 +119,22 @@ export default function KompassPage() {
             faelle={offeneFaelle}
             onSpeichern={puls => anlegen.mutateAsync(puls)}
           />
+
+          {/* Kein sechster Eingang, sondern ein zweiter Weg zu DERSELBEN Frage.
+              Der Puls beantwortet sie in fünf Sekunden; das Gefühlsbild nimmt sich
+              Zeit, geht über Szenen, ein Feld und Wörter — und endet mit einem Text.
+              Es gehört deshalb hierher unter den Puls und nicht in die Kartenreihe:
+              Dort stehen Grundformen und Räume, keine Werkzeuge. */}
+          <p className="mt-5 border-t border-brand-border/60 pt-3 text-center text-[0.8rem] text-brand-muted">
+            Mehr Zeit? Dann geh über{' '}
+            <Link
+              to="/app/kompass/gefuehlsbild"
+              className="font-semibold text-accent no-underline hover:underline"
+            >
+              ein Gefühlsbild
+            </Link>{' '}
+            — dieselbe Frage, mit Szenen, einem Feld und Wörtern.
+          </p>
         </section>
 
         {/* ── Ebene 2: die Eingänge ─────────────────────────────────────────

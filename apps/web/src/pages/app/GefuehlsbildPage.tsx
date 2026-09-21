@@ -1,5 +1,13 @@
 /**
- * /app/cases/:caseId/gefuehlsbild — wie es dir in dieser Beziehung gerade geht.
+ * Das Gefühlsbild — auf zwei Ebenen, mit einer Seite.
+ *
+ * `/app/cases/:caseId/gefuehlsbild` fragt: Wie geht es mir mit dieser Person?
+ * `/app/kompass/gefuehlsbild` fragt: Wie geht es mir überhaupt?
+ *
+ * **Warum EINE Seite und nicht zwei.** Die Kataloge, die drei Zugänge, der Ablauf bis
+ * zum bestätigten Text — alles identisch. Zwei Seiten hießen: beim nächsten Wort im
+ * Wortfeld zwei Stellen, von denen man eine vergisst. Was sich unterscheidet, ist ein
+ * fehlender Fall — und das sind die paar Zeilen unten, nicht die Seite.
  *
  * **Das Problem.** Wer belastet ist, kann oft nicht sagen, wie es ihm geht. Nicht aus
  * Unwilligkeit — die Worte sind nicht da, oder das einzige, das kommt, ist „schlecht". Jedes
@@ -316,7 +324,11 @@ function VerlaufsKarte({ bild }: { bild: Gefuehlsbild }) {
 
 // ── Die Seite ───────────────────────────────────────────────────────────────
 export default function GefuehlsbildPage() {
-  const { caseId = '' } = useParams<{ caseId: string }>()
+  // Kein caseId in der Route heißt: die eigene Ebene. `null` und nicht `''`, weil der
+  // API-Baustein genau daran die beiden Ebenen auseinanderhält.
+  const { caseId } = useParams<{ caseId: string }>()
+  const fallId = caseId ?? null
+  const eigenesBild = fallId === null
   const qc = useQueryClient()
   const [schritt, setSchritt] = useState<Schritt>('szenen')
   const [eigenes, setEigenes] = useState<string | null>(null)
@@ -326,9 +338,8 @@ export default function GefuehlsbildPage() {
   const [fehler, setFehler] = useState<string | null>(null)
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['gefuehlsbild', caseId],
-    queryFn: () => gefuehlsbildApi.stand(caseId),
-    enabled: !!caseId,
+    queryKey: ['gefuehlsbild', fallId ?? 'ich'],
+    queryFn: () => gefuehlsbildApi.stand(fallId),
   })
 
   const entwurf = data?.entwurf
@@ -336,16 +347,16 @@ export default function GefuehlsbildPage() {
     const d = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
     setFehler(d ?? 'Das hat gerade nicht geklappt.')
   }
-  const frisch = () => qc.invalidateQueries({ queryKey: ['gefuehlsbild', caseId] })
+  const frisch = () => qc.invalidateQueries({ queryKey: ['gefuehlsbild', fallId ?? 'ich'] })
 
   const sichern = useMutation({
     mutationFn: (teil: Parameters<typeof gefuehlsbildApi.sichern>[1]) =>
-      gefuehlsbildApi.sichern(caseId, teil),
+      gefuehlsbildApi.sichern(fallId, teil),
     onSuccess: () => { frisch(); setFehler(null) },
     onError: melden,
   })
   const schreiben = useMutation({
-    mutationFn: () => gefuehlsbildApi.schreiben(caseId),
+    mutationFn: () => gefuehlsbildApi.schreiben(fallId),
     onSuccess: (v) => {
       setText(v.bericht)
       setEchoHinweis(v.hinweis)
@@ -355,7 +366,7 @@ export default function GefuehlsbildPage() {
     onError: melden,
   })
   const bestaetigen = useMutation({
-    mutationFn: () => gefuehlsbildApi.bestaetigen(caseId),
+    mutationFn: () => gefuehlsbildApi.bestaetigen(fallId),
     onSuccess: () => {
       setBestaetigt(true)
       setText(null)
@@ -381,14 +392,28 @@ export default function GefuehlsbildPage() {
 
   return (
     <AppShell>
-      <CaseNav caseId={caseId} />
+      {!eigenesBild && <CaseNav caseId={caseId!} />}
 
       <div className="mx-auto max-w-[820px] px-6 py-8">
-        <h1 className="page-title">Gefühlsbild</h1>
+        {eigenesBild && (
+          <Link
+            to="/app/kompass"
+            className="text-[0.8rem] text-brand-muted no-underline transition-colors hover:text-navy"
+          >
+            ← Mein Kompass
+          </Link>
+        )}
+        <h1 className={`page-title ${eigenesBild ? 'mt-2' : ''}`}>Gefühlsbild</h1>
+
+        {/* Der Unterschied steht ÜBER dem Werkzeug, nicht in einem Hilfetext. Dieselbe
+            Oberfläche zweimal, ohne diesen Satz, wäre Verwirrung statt Tiefe: Man sieht
+            nicht, wo das Bild landet und wer es je zu sehen bekommt. */}
         <p className="mt-1 max-w-[64ch] text-sm leading-relaxed text-brand-muted">
-          Wie es dir in dieser Beziehung gerade geht — ohne dass du es aufschreiben musst.
-          Drei Wege dorthin, keiner davon Pflicht. Am Ende schreibt Echo daraus einen Text,
-          den du änderst, bis er stimmt.
+          {eigenesBild
+            ? 'Wie es dir überhaupt geht — dieses Bild gehört zu dir, nicht zu einem Fall.'
+            : 'Wie es dir in dieser Beziehung gerade geht'}
+          {' '}— ohne dass du es aufschreiben musst. Drei Wege dorthin, keiner davon
+          Pflicht. Am Ende schreibt Echo daraus einen Text, den du änderst, bis er stimmt.
         </p>
 
         {isLoading && <ListSkeleton rows={3} label="Wird geladen" />}
@@ -396,12 +421,21 @@ export default function GefuehlsbildPage() {
 
         {bestaetigt && (
           <p className="mt-5 rounded-brand bg-green-50 px-5 py-4 text-[0.9rem] leading-relaxed text-green-900">
-            Bestätigt. Dein Gefühlsbild steht jetzt im Verlauf, Echo bezieht sich in
-            Gesprächen darauf, und du kannst es unter{' '}
-            <Link to={`/app/cases/${caseId}/share`} className="font-semibold underline">
-              Freigaben
-            </Link>{' '}
-            für deine Fachperson sichtbar machen.
+            {eigenesBild ? (
+              <>
+                Bestätigt. Dein Gefühlsbild steht jetzt in deinem Verlauf. Es gehört dir
+                und geht mit keinem Fall mit — auch nicht mit einem freigegebenen.
+              </>
+            ) : (
+              <>
+                Bestätigt. Dein Gefühlsbild steht jetzt im Verlauf, Echo bezieht sich in
+                Gesprächen darauf, und du kannst es unter{' '}
+                <Link to={`/app/cases/${caseId}/share`} className="font-semibold underline">
+                  Freigaben
+                </Link>{' '}
+                für deine Fachperson sichtbar machen.
+              </>
+            )}
           </p>
         )}
 

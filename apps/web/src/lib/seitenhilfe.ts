@@ -245,6 +245,12 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Art wählen und Satz schreiben', 'Echo schauen lassen, was sich wiederholt', 'Entwurf bestätigen', 'Überholtes stehen lassen'],
     tipp: 'Bestätigt heißt nicht wahr, sondern: Das war deine Einschätzung an dem Tag. Deshalb steht das Alter daneben.',
   },
+  '/app/kompass/gefuehlsbild': {
+    titel: 'Dein Gefühlsbild',
+    zweck: 'Wie es dir überhaupt geht — unabhängig von einem Fall.',
+    schritte: ['Über Szenen, ein Wortfeld oder freie Wörter hineingehen', 'Den Text lesen, den Echo daraus schreibt', 'Bestätigen'],
+    tipp: 'Dasselbe Werkzeug gibt es auch im Fall. Dieses Bild gehört zu dir und geht mit keiner Freigabe mit.',
+  },
   '/app/kompass/vorhaben': {
     titel: 'Was du dir vornimmst',
     zweck: 'Ein Vorhaben ist kein Vorsatz: Es hat Schritte und einen Abstand, in dem du zurückschaust.',

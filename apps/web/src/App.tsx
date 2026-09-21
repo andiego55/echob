@@ -270,6 +270,8 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/app/kompass/verlauf" element={<ProtectedRoute><KompassVerlaufPage /></ProtectedRoute>} />
       <Route path="/app/kompass/saetze" element={<ProtectedRoute><KompassSaetzePage /></ProtectedRoute>} />
       <Route path="/app/kompass/vorhaben" element={<ProtectedRoute><KompassVorhabenPage /></ProtectedRoute>} />
+      {/* Dieselbe Seite wie am Fall - der fehlende caseId IST der Unterschied. */}
+      <Route path="/app/kompass/gefuehlsbild" element={<ProtectedRoute><GefuehlsbildPage /></ProtectedRoute>} />
       <Route path="/app/kompass/krisenplan" element={<ProtectedRoute><KrisenplanPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />

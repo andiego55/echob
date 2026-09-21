@@ -77,25 +77,33 @@ export interface GefuehlsbildTeil {
   bericht?: string | null
 }
 
-const basis = (caseId: string) => `/cases/${caseId}/gefuehlsbild`
+/**
+ * Zwei Ebenen, ein Werkzeug.
+ *
+ * `null` heißt: Das Bild gehört DIR, nicht einem Fall — „Wie geht es mir überhaupt?"
+ * statt „Wie geht es mir mit dieser Person?". Dieselben Kataloge, derselbe Ablauf; der
+ * Server hält beide Ebenen in derselben Tabelle auseinander (`case_id IS NULL`).
+ */
+const basis = (caseId: string | null) =>
+  caseId ? `/cases/${caseId}/gefuehlsbild` : '/me/kompass/gefuehlsbild'
 
 export const gefuehlsbildApi = {
-  stand: (caseId: string) =>
+  stand: (caseId: string | null) =>
     apiClient.get<GefuehlsbildStand>(basis(caseId)).then(r => r.data),
 
-  ueberblick: (caseId: string) =>
+  ueberblick: (caseId: string | null) =>
     apiClient
       .get<GefuehlsbildUeberblick>(`${basis(caseId)}/ueberblick`)
       .then(r => r.data),
 
-  sichern: (caseId: string, teil: GefuehlsbildTeil) =>
+  sichern: (caseId: string | null, teil: GefuehlsbildTeil) =>
     apiClient.put<Gefuehlsbild>(basis(caseId), teil).then(r => r.data),
 
-  schreiben: (caseId: string) =>
+  schreiben: (caseId: string | null) =>
     apiClient
       .post<GefuehlsbildVorschlag>(`${basis(caseId)}/schreiben`)
       .then(r => r.data),
 
-  bestaetigen: (caseId: string) =>
+  bestaetigen: (caseId: string | null) =>
     apiClient.post<Gefuehlsbild>(`${basis(caseId)}/bestaetigen`).then(r => r.data),
 }

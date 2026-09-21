@@ -8,6 +8,16 @@ taucht in keiner Auswertung auf. Wer noch am Zusammenstellen ist, hat noch nicht
 nachträglich umschreiben könnte, hätte keine Reihe von Momentaufnahmen, sondern eine
 einzige, die immer schon so war. Der Verlauf ist aber der eigentliche Wert — dass sich
 etwas verändert hat, sieht man nur, wenn das Alte stehen bleibt.
+
+**Zwei Ebenen, ein Werkzeug.** ``case_id`` darf NULL sein — dann gehört das Bild der
+PERSON und nicht einem Fall („Wie geht es mir überhaupt?" statt „Wie geht es mir mit
+dieser Person?"). Dieselben Kataloge, derselbe Ablauf, dieselbe Tabelle.
+
+**Warum das von selbst dicht ist.** Jede Abfrage hier filtert über
+``case_id IS NOT DISTINCT FROM $1``. Für einen echten Fall trifft das genau diesen Fall;
+für NULL genau die persönliche Ebene. Wer — wie die Fachperson über ``load_shared_bundle``
+— mit einer Fallkennung kommt, bekommt die persönlichen Bilder also nie zu sehen, und
+zwar nicht aus Sorgfalt, sondern weil eine Kennung nicht gleichzeitig NULL sein kann.
 """
 from __future__ import annotations
 
@@ -59,12 +69,12 @@ _SPALTEN = (
 
 
 async def entwurf_holen_oder_anlegen(
-    conn: asyncpg.Connection, case_id: UUID, user_id: UUID
+    conn: asyncpg.Connection, case_id: UUID | None, user_id: UUID
 ) -> dict[str, Any]:
     """Der eine offene Entwurf dieses Falls — oder ein frischer."""
     zeile = await conn.fetchrow(
         f"SELECT {_SPALTEN} FROM feeling_snapshots "
-        "WHERE case_id = $1 AND user_id = $2 AND status = 'entwurf'", case_id, user_id,
+        "WHERE case_id IS NOT DISTINCT FROM $1 AND user_id = $2 AND status = 'entwurf'", case_id, user_id,
     )
     if zeile is None:
         zeile = await conn.fetchrow(
@@ -76,7 +86,7 @@ async def entwurf_holen_oder_anlegen(
 
 async def entwurf_sichern(
     conn: asyncpg.Connection,
-    case_id: UUID,
+    case_id: UUID | None,
     user_id: UUID,
     *,
     szenen: object = None,
@@ -121,7 +131,7 @@ async def entwurf_sichern(
         UPDATE feeling_snapshots
            SET szenen = $3::jsonb, feld = $4::jsonb, woerter = $5::jsonb,
                eigenes = $6, bericht = $7, updated_at = NOW()
-         WHERE id = $1 AND case_id = $2 AND user_id = $8
+         WHERE id = $1 AND case_id IS NOT DISTINCT FROM $2 AND user_id = $8
         RETURNING {_SPALTEN}
         """,
         aktuell["id"], case_id,
@@ -145,7 +155,7 @@ def ist_leer(bild: dict[str, Any]) -> bool:
 
 
 async def bestaetigen(
-    conn: asyncpg.Connection, case_id: UUID, user_id: UUID
+    conn: asyncpg.Connection, case_id: UUID | None, user_id: UUID
 ) -> dict[str, Any]:
     """Der Entwurf wird zur Momentaufnahme. Danach unveränderlich."""
     bild = await entwurf_holen_oder_anlegen(conn, case_id, user_id)
@@ -169,7 +179,7 @@ async def bestaetigen(
 
 
 async def verlauf(
-    conn: asyncpg.Connection, case_id: UUID, user_id: UUID, grenze: int = 12
+    conn: asyncpg.Connection, case_id: UUID | None, user_id: UUID, grenze: int = 12
 ) -> list[dict[str, Any]]:
     """Die bestätigten Momentaufnahmen, neueste zuerst.
 
@@ -185,7 +195,7 @@ async def verlauf(
     """
     zeilen = await conn.fetch(
         f"SELECT {_SPALTEN} FROM feeling_snapshots "
-        "WHERE case_id = $1 AND user_id = $2 AND status = 'bestaetigt' "
+        "WHERE case_id IS NOT DISTINCT FROM $1 AND user_id = $2 AND status = 'bestaetigt' "
         "ORDER BY bestaetigt_at DESC LIMIT $3",
         case_id, user_id, grenze,
     )
@@ -193,7 +203,7 @@ async def verlauf(
 
 
 async def aktuelles(
-    conn: asyncpg.Connection, case_id: UUID, user_id: UUID
+    conn: asyncpg.Connection, case_id: UUID | None, user_id: UUID
 ) -> dict[str, Any] | None:
     """Das jüngste bestätigte — das, was gilt."""
     zeilen = await verlauf(conn, case_id, user_id, grenze=1)
@@ -201,7 +211,7 @@ async def aktuelles(
 
 
 async def ueberblick(
-    conn: asyncpg.Connection, case_id: UUID, user_id: UUID
+    conn: asyncpg.Connection, case_id: UUID | None, user_id: UUID
 ) -> dict[str, Any]:
     """Was der Fall-Überblick über das Gefühlsbild wissen muss — **ohne etwas anzulegen**.
 
@@ -213,12 +223,12 @@ async def ueberblick(
     letztes = await aktuelles(conn, case_id, user_id)
     entwurf = await conn.fetchrow(
         f"SELECT {_SPALTEN} FROM feeling_snapshots "
-        "WHERE case_id = $1 AND user_id = $2 AND status = 'entwurf'", case_id, user_id,
+        "WHERE case_id IS NOT DISTINCT FROM $1 AND user_id = $2 AND status = 'entwurf'", case_id, user_id,
     )
     begonnen = bool(entwurf) and not ist_leer(_aufbereiten(dict(entwurf)))
     anzahl = await conn.fetchval(
         "SELECT COUNT(*) FROM feeling_snapshots "
-        "WHERE case_id = $1 AND user_id = $2 AND status = 'bestaetigt'", case_id, user_id,
+        "WHERE case_id IS NOT DISTINCT FROM $1 AND user_id = $2 AND status = 'bestaetigt'", case_id, user_id,
     )
     return {"aktuell": letztes, "entwurf_begonnen": begonnen, "anzahl": anzahl or 0}
 
