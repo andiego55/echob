@@ -69,7 +69,7 @@ def auswaehlen(
     entschieden, und das lässt sich ohne Datenbank prüfen.
 
     Der Stand wird hier NOCH EINMAL geprüft, obwohl die Abfrage ihn schon filtert. Diese
-    Funktion ist die Stelle, an der die Regel „nur bestätigte" steht; sie darf nicht davon
+    Funktion ist die Stelle, an der die Regel „nur bestätigte“ steht; sie darf nicht davon
     abhängen, dass ein Aufrufer an anderer Stelle daran gedacht hat.
     """
     bestaetigt = [s for s in saetze if s.get("stand") == "bestaetigt"]
@@ -137,7 +137,7 @@ async def vorhaben_fuer_fall(
     hieße, sie daran zu messen.
 
     Ohne Fallbezug, anders als bei den Sätzen: Ein Vorhaben gilt für die Person und nicht
-    für eine Beziehung — „im Streit nicht sofort einlenken" ist in jedem Fall dasselbe.
+    für eine Beziehung — „im Streit nicht sofort einlenken“ ist in jedem Fall dasselbe.
     """
     laufende = await kompass_vorhaben_service.liste(
         conn, user_id=user_id, staende=("laufend",)
@@ -187,7 +187,7 @@ def kontext_block(saetze: list[dict[str, Any]]) -> str:
     """Der Abschnitt für den System-Prompt — oder ein leerer Text.
 
     **Die Rahmung ist wichtiger als die Liste.** Ohne sie liest ein Modell diese Zeilen
-    als Eigenschaften und redet die Person darauf fest: „Du bist jemand, der …". Ein
+    als Eigenschaften und redet die Person darauf fest: „Du bist jemand, der …“. Ein
     bestätigter Satz ist aber eine Selbsteinschätzung von einem bestimmten Tag, und
     deshalb steht das Datum an jedem einzelnen.
 

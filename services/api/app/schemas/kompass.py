@@ -172,6 +172,45 @@ class Vorhaben(BaseModel):
     updated_at: datetime
 
 
+# ── Die geführten Übungen ───────────────────────────────────────────────────
+
+
+class UebungsSchritt(BaseModel):
+    frage: str
+    #: Für den Menschen. Geht NICHT in den Prompt — er enthält Beispiele.
+    hinweis: str
+    platzhalter: str
+
+
+class Uebung(BaseModel):
+    key: str
+    label: str
+    hinweis: str
+    dauer: str
+    #: ``satz`` oder ``vorhaben`` — was am Ende herauskommt.
+    ergibt: str
+    schritte: list[UebungsSchritt]
+
+
+class UebungAbschluss(BaseModel):
+    """Die Antworten, in der Reihenfolge der Fragen.
+
+    Die Position IST die Zuordnung. Eine Antwort darf leer sein; unter
+    ``MINDEST_ANTWORTEN`` gibt es kein Ergebnis.
+    """
+    antworten: list[str] = Field(default_factory=list, max_length=12)
+
+
+class UebungsErgebnis(BaseModel):
+    """Genau eines von beiden — oder keins, dann sagt ``hinweis`` warum.
+
+    Das Ergebnis ist ein ENTWURF. Es gilt erst, wenn die Person zustimmt.
+    """
+    satz: Satz | None = None
+    vorhaben: Vorhaben | None = None
+    hinweis: str | None = None
+
+
 class KompassUebersicht(BaseModel):
     """Was die Startseite braucht, in einem Zug."""
     letzter_puls: Puls | None = None

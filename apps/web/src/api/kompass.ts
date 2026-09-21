@@ -196,6 +196,35 @@ export interface VorhabenAenderung {
   zurueckgeschaut?: boolean
 }
 
+/** Eine Frage einer geführten Übung. Der Hinweis ist für dich, nicht für Echo. */
+export interface UebungsSchritt {
+  frage: string
+  hinweis: string
+  platzhalter: string
+}
+
+export interface Uebung {
+  key: string
+  label: string
+  hinweis: string
+  dauer: string
+  /** Was am Ende herauskommt: `satz` oder `vorhaben`. */
+  ergibt: 'satz' | 'vorhaben'
+  schritte: UebungsSchritt[]
+}
+
+/**
+ * Was eine Übung ergeben hat — genau eines von beiden, oder keins.
+ *
+ * Das Ergebnis ist ein ENTWURF: Es liegt schon im Kompass, gilt aber erst mit deiner
+ * Zustimmung. Deshalb muss man es nicht sofort entscheiden.
+ */
+export interface UebungsErgebnis {
+  satz: Satz | null
+  vorhaben: Vorhaben | null
+  hinweis: string | null
+}
+
 export interface KompassUebersicht {
   letzter_puls: Puls | null
   verlauf: Puls[]
@@ -267,6 +296,19 @@ export const kompassApi = {
 
   vorhabenLoeschen: (id: string) =>
     apiClient.delete(`${basis}/vorhaben/${id}`).then(() => undefined),
+
+  uebungen: () =>
+    apiClient.get<Uebung[]>(`${basis}/uebungen`).then(r => r.data),
+
+  /** Dauert länger als die übrigen Aufrufe — hier spricht ein Modell. */
+  uebungAbschliessen: (schluessel: string, antworten: string[]) =>
+    apiClient
+      .post<UebungsErgebnis>(
+        `${basis}/uebungen/${schluessel}/abschliessen`,
+        { antworten },
+        { timeout: 60_000 },
+      )
+      .then(r => r.data),
 
   vorschlagEntscheiden: (satzId: string, annehmen: boolean) =>
     apiClient

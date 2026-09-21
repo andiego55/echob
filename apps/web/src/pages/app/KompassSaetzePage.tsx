@@ -201,9 +201,23 @@ export default function KompassSaetzePage() {
           <Fehlermeldung error={holen.error} className="mt-2 text-center" />
         </section>
 
+        {/* Der Einstieg in die Übungen steht DORT, wo man sie braucht: auf der Seite,
+            auf der man vor einem leeren Feld sitzt. Eine eigene Karte auf der
+            Startseite wäre ein Werkzeugkasten, in dem man erst suchen muss. */}
+        <p className="mt-4 max-w-[62ch] text-[0.86rem] leading-relaxed text-brand-muted">
+          Kommst du nicht drauf?{' '}
+          <Link
+            to="/app/kompass/uebungen?u=grenze"
+            className="font-semibold text-accent no-underline hover:underline"
+          >
+            Eine Übung
+          </Link>{' '}
+          stellt dir ein paar Fragen und formuliert am Ende einen Satz daraus.
+        </p>
+
         {nochNichts && (
-          <p className="mt-4 max-w-[62ch] text-[0.88rem] leading-relaxed text-brand-muted">
-            Noch steht hier nichts. Das ist der normale Anfang — solche Sätze fallen
+          <p className="mt-3 max-w-[62ch] text-[0.88rem] leading-relaxed text-brand-muted">
+            Sonst steht hier noch nichts. Das ist der normale Anfang — solche Sätze fallen
             einem selten auf Kommando ein. Oft kommen sie nach einer Szene oder an einem
             Tag, an dem etwas deutlich wurde.
           </p>

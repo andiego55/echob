@@ -49,10 +49,19 @@ def _bedingung(spalte: str) -> set[str]:
 
     Gelesen wird die LETZTE Datei, die die Bedingung setzt — Postgres arbeitet die
     Skripte alphabetisch ab, und es gilt, was zuletzt gesetzt wurde.
+
+    **BEIDE Schreibweisen zählen**, und das ist hier keine Kleinigkeit: Angelegt wird eine
+    Bedingung inline (``spalte TEXT NOT NULL CHECK (…)``), geweitet wird sie später per
+    ``ALTER TABLE … ADD CONSTRAINT``. Kennte dieses Muster nur die erste Form, läse der
+    Wächter für immer die Fassung von der Geburt der Tabelle — und meldete entweder einen
+    Fehler, den es nicht gibt, oder schlimmer: Er bliebe grün, während Code und Datenbank
+    auseinanderlaufen. Genau das ist beim Nachtragen von ``uebung`` passiert.
     """
     muster = re.compile(
         rf"{spalte}\s+TEXT\s+NOT\s+NULL(?:\s+DEFAULT\s+'[a-z_]+')?\s+CHECK\s*\("
-        rf"{spalte}\s+IN\s*\((?P<werte>[^)]*)\)",
+        rf"{spalte}\s+IN\s*\((?P<werte>[^)]*)\)"
+        rf"|ADD\s+CONSTRAINT\s+selbst_saetze_{spalte}_check\s+"
+        rf"CHECK\s*\({spalte}\s+IN\s*\((?P<werte2>[^)]*)\)",
         re.IGNORECASE | re.DOTALL,
     )
     letzte: set[str] | None = None
@@ -61,7 +70,8 @@ def _bedingung(spalte: str) -> set[str]:
         if "selbst_saetze" not in text:
             continue
         for treffer in muster.finditer(text):
-            letzte = set(re.findall(r"'([a-z_]+)'", treffer.group("werte")))
+            roh = treffer.group("werte") or treffer.group("werte2") or ""
+            letzte = set(re.findall(r"'([a-z_]+)'", roh))
     assert letzte is not None, f"Keine Bedingung fuer {spalte} in selbst_saetze gefunden"
     return letzte
 
@@ -73,7 +83,7 @@ def test_es_gibt_ueberhaupt_etwas_zu_pruefen():
     """
     assert len(_bedingung("art")) == 6
     assert len(_bedingung("stand")) == 4
-    assert len(_bedingung("herkunft")) == 4
+    assert len(_bedingung("herkunft")) == 5
 
 
 def test_die_arten_stehen_im_katalog_und_in_der_datenbank():

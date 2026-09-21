@@ -827,6 +827,43 @@ class EchoService:
                     "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
         return roh if isinstance(roh, dict) else {"vorschlaege": [], "hinweis": None}
 
+    async def kompass_uebung_auswerten(self, *, eingabe: str) -> dict[str, Any]:
+        """Macht aus den Antworten einer gefuehrten Uebung EIN Ergebnis.
+
+        **Formuliert, deutet nicht.** Was in den Antworten nicht vorkommt, kommt auch im
+        Ergebnis nicht vor - und wenn es nicht reicht, ist `null` die richtige Antwort.
+        Ein erfundenes Ergebnis waere schlimmer als keins: Die Person wuerde ihm
+        zustimmen, und dann stuende etwas ueber sie da, das sie nie gesagt hat.
+
+        ``eingabe`` ist fertig gebaut (``kompass_uebung_service.als_prompt_eingabe``) und
+        wird hier NICHT ergaenzt: Die Hinweise und Platzhalter des Katalogs enthalten
+        Beispielsaetze, und die kaemen als Ergebnis zurueck. Wer hier etwas dazulegt,
+        umgeht den Waechter, der genau das prueft.
+        """
+        if not self._use_openai:
+            return {"ergebnis": None,
+                    "hinweis": "Echo laeuft im Demo-Modus - ohne OpenAI-Schluessel "
+                               "entsteht hier kein Ergebnis."}
+
+        response = await self._chat(
+            model=self._model_fast,
+            messages=[
+                {"role": "system", "content": _load_prompt("kompass_uebung_prompt.md")},
+                {"role": "user", "content": eingabe},
+            ],
+            max_tokens=700,
+            temperature=None if self._reasoning else 0.3,
+            response_format={"type": "json_object"},
+        )
+        import json as _aj
+        try:
+            roh = _aj.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("kompass_uebung_auswerten: ungueltige JSON-Antwort vom Modell.")
+            return {"ergebnis": None,
+                    "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
+        return roh if isinstance(roh, dict) else {"ergebnis": None, "hinweis": None}
+
     async def resonanz_nachfragen(
         self,
         *,

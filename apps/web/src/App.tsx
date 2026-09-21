@@ -60,6 +60,7 @@ const KompassPage = lazy(() => import('@/pages/app/KompassPage'))
 const KompassVerlaufPage = lazy(() => import('@/pages/app/KompassVerlaufPage'))
 const KompassSaetzePage = lazy(() => import('@/pages/app/KompassSaetzePage'))
 const KompassVorhabenPage = lazy(() => import('@/pages/app/KompassVorhabenPage'))
+const KompassUebungenPage = lazy(() => import('@/pages/app/KompassUebungenPage'))
 const KrisenplanPage = lazy(() => import('@/pages/app/KrisenplanPage'))
 const PersonProfilePage = lazy(() => import('@/pages/app/PersonProfilePage'))
 const PersonProfileEchoPage = lazy(() => import('@/pages/app/PersonProfileEchoPage'))
@@ -272,6 +273,7 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/app/kompass/vorhaben" element={<ProtectedRoute><KompassVorhabenPage /></ProtectedRoute>} />
       {/* Dieselbe Seite wie am Fall - der fehlende caseId IST der Unterschied. */}
       <Route path="/app/kompass/gefuehlsbild" element={<ProtectedRoute><GefuehlsbildPage /></ProtectedRoute>} />
+      <Route path="/app/kompass/uebungen" element={<ProtectedRoute><KompassUebungenPage /></ProtectedRoute>} />
       <Route path="/app/kompass/krisenplan" element={<ProtectedRoute><KrisenplanPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />

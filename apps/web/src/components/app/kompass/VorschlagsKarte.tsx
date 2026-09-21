@@ -44,7 +44,7 @@ export default function VorschlagsKarte({ satz: s, onEntscheiden, laeuft }: {
         )}
 
         <p className="mt-2 text-[1.05rem] font-medium leading-relaxed text-navy">
-          „{s.text}"
+          „{s.text}“
         </p>
 
         <p className="mt-1.5 text-[0.8rem] text-brand-muted">

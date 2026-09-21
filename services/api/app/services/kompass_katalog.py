@@ -234,8 +234,11 @@ SATZ_ALLE_STAENDE: frozenset[str] = frozenset(
     {s["key"] for s in SATZ_STAENDE} | {"verworfen"}
 )
 
-#: Woraus ein Satz entstanden sein kann. ``selbst`` heißt: Die Person hat ihn geschrieben.
-SATZ_HERKUENFTE: frozenset[str] = frozenset({"selbst", "szene", "puls", "echo"})
+#: Woraus ein Satz entstanden sein kann. ``selbst`` heißt: Die Person hat ihn geschrieben,
+#: ``uebung`` heißt: Er ist am Ende einer geführten Übung entstanden.
+SATZ_HERKUENFTE: frozenset[str] = frozenset(
+    {"selbst", "szene", "puls", "echo", "uebung"}
+)
 
 
 def satz_art_label(key: str | None) -> str | None:

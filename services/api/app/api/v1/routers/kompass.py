@@ -29,6 +29,9 @@ from app.schemas.kompass import (
     Satz,
     SatzCreate,
     SatzUpdate,
+    Uebung,
+    UebungAbschluss,
+    UebungsErgebnis,
     Vorhaben,
     VorhabenCreate,
     VorhabenUpdate,
@@ -39,6 +42,8 @@ from app.services import kompass_katalog as katalog
 from app.services import (
     kompass_saetze_service,
     kompass_service,
+    kompass_uebung_service,
+    kompass_uebungen,
     kompass_vorhaben_service,
     kompass_vorschlag_service,
 )
@@ -465,3 +470,51 @@ async def vorhaben_loeschen(
         )
     if not weg:
         raise HTTPException(status_code=404, detail="Nicht gefunden.")
+
+
+# ── Die geführten Übungen ───────────────────────────────────────────────────
+
+
+@router.get("/uebungen", response_model=list[Uebung])
+async def uebungen_lesen(_current: dict = Depends(get_current_user)) -> list[Uebung]:
+    """Die Übungen mit ihren Fragen.
+
+    Eigener Endpunkt statt im Katalog: Die Fragen samt Hinweisen sind um ein Vielfaches
+    länger als der Rest des Vokabulars, und sie werden nur auf einer Seite gebraucht.
+    """
+    return [Uebung(**u) for u in kompass_uebungen.fuer_die_oberflaeche()]
+
+
+@router.post("/uebungen/{schluessel}/abschliessen", response_model=UebungsErgebnis)
+async def uebung_abschliessen(
+    schluessel: str,
+    body: UebungAbschluss,
+    request: Request,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> UebungsErgebnis:
+    """Aus den Antworten wird ein Satz oder ein Vorhaben — als Entwurf.
+
+    **Der zweite und letzte KI-Weg im Kompass**, und wie der erste einer, den jemand
+    selbst auslöst. Echo kommt genau einmal, ganz am Ende: Die Übung ist benannt und
+    endet mit einem Ergebnis, nicht mit einem offenen Chat.
+
+    Das Ergebnis wird abgelegt und nicht nur zurückgegeben. Wer sich zehn Minuten Zeit
+    genommen hat, soll die Entscheidung darüber nicht sofort treffen müssen — und sie
+    nicht verlieren, wenn er das Fenster schließt.
+    """
+    echo = _echo(request)
+    async with pool.acquire() as conn:
+        try:
+            ergebnis = await kompass_uebung_service.abschliessen(
+                conn, echo, user_id=current["user_id"],
+                schluessel=schluessel, antworten=body.antworten,
+            )
+        except ValueError as fehler:
+            raise HTTPException(status_code=404, detail=str(fehler)) from fehler
+
+    return UebungsErgebnis(
+        satz=Satz(**ergebnis["satz"]) if ergebnis.get("satz") else None,
+        vorhaben=Vorhaben(**ergebnis["vorhaben"]) if ergebnis.get("vorhaben") else None,
+        hinweis=ergebnis.get("hinweis"),
+    )

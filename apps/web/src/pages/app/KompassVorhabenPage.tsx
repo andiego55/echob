@@ -141,6 +141,17 @@ export default function KompassVorhabenPage() {
           )}
         </section>
 
+        <p className="mt-4 max-w-[62ch] text-[0.86rem] leading-relaxed text-brand-muted">
+          Geht es um ein Gespräch?{' '}
+          <Link
+            to="/app/kompass/uebungen?u=gespraech"
+            className="font-semibold text-accent no-underline hover:underline"
+          >
+            Eine Übung
+          </Link>{' '}
+          macht daraus ein Vorhaben mit Schritten.
+        </p>
+
         {nochNichts && (
           <p className="mt-4 max-w-[62ch] text-[0.88rem] leading-relaxed text-brand-muted">
             Noch nichts. Gute Vorhaben entstehen selten am Schreibtisch — eher nach einer
