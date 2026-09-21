@@ -16,8 +16,14 @@ import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType } from '@/types'
 import { CATEGORY_ELEMENTS } from '@/pages/app/CaseSharingPage'
 
-/** Einzelne Szenen stehen in der Oberfläche in einer eigenen Liste, nicht im Raster. */
-const EIGENE_LISTE: ShareElementType[] = ['scene']
+/**
+ * Was in der Oberfläche in einer EIGENEN Liste steht statt im Kästchen-Raster.
+ *
+ * Beides sind Inhalte, die man Stück für Stück auswählt statt als Kategorie: einzelne
+ * Szenen und einzelne Sätze über sich. Ein Kästchen „Sätze über dich" gäbe es nicht —
+ * es hieße, das ganze Selbstbild zu öffnen, und genau das soll es nicht sein.
+ */
+const EIGENE_LISTE: ShareElementType[] = ['scene', 'satz']
 
 describe('Freigabe – die ankreuzbaren Inhalte', () => {
   it('bietet jeden Inhalt zum Ankreuzen an, den es überhaupt gibt', () => {

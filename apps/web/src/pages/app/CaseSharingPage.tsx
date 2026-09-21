@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { scenesApi } from '@/api/scenes'
+import { kompassApi } from '@/api/kompass'
 import { sharesApi, professionalsApi } from '@/api/shares'
 import { subscriptionApi } from '@/api/subscription'
 import { SHARE_ELEMENT_LABELS } from '@/types'
@@ -290,9 +291,21 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   scenes: { id: string; title: string }[]
 }) {
   const qc = useQueryClient()
+  // Die Saetze gehoeren der Person, nicht dem Fall - deshalb ohne caseId. Gezeigt wird
+  // nur Bestaetigtes: Ein Entwurf ist keine Aussage, ein offener Vorschlag ist Echos
+  // Formulierung. Der Server weist beides ohnehin ab; hier gar nicht erst anzubieten
+  // erspart die Frage, warum ein Haken nichts bewirkt hat.
+  const { data: alleSaetze = [] } = useQuery({
+    queryKey: ['kompass-saetze'],
+    queryFn: kompassApi.saetze,
+    staleTime: 60_000,
+  })
+  const saetze = alleSaetze.filter(s => s.stand === 'bestaetigt')
+
   const [proId, setProId] = useState('')
   const [elements, setElements] = useState<ShareElementType[]>([])
   const [sceneIds, setSceneIds] = useState<string[]>([])
+  const [satzIds, setSatzIds] = useState<string[]>([])
   const [message, setMessage] = useState('')
   // Zwei rechtlich verschiedene Erklaerungen - deshalb zwei Haken. Frueher stand beides
   // in einer Bestaetigung; wer nur einer zustimmen wollte, konnte das nicht.
@@ -329,6 +342,12 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
     setElements(prev => prev.includes(el) ? prev.filter(e => e !== el) : [...prev, el])
   const toggleScene = (id: string) =>
     setSceneIds(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
+  const toggleSatz = (id: string) =>
+    setSatzIds(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
+
+  // „Ganzen Fall freigeben" laesst die Saetze bewusst AUS. Sie gehoeren nicht zum Fall,
+  // sondern zur Person, und ein Knopf, der alles anhakt, wuerde sie mitnehmen, ohne
+  // dass jemand sie ausgewaehlt hat - das Gegenteil dessen, wofuer sie da sind.
   const selectWholeCase = () => { setElements([...CATEGORY_ELEMENTS]); setSceneIds([]) }
 
   const allScenes = elements.includes('all_scenes')
@@ -337,10 +356,12 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
     mutationFn: () => {
       const els = [...elements]
       if (sceneIds.length > 0 && !allScenes && !els.includes('scene')) els.push('scene')
+      if (satzIds.length > 0 && !els.includes('satz')) els.push('satz')
       return sharesApi.create(caseId, {
         professional_user_id: proId,
         elements: els,
         scene_ids: allScenes ? [] : sceneIds,
+        satz_ids: satzIds,
         message: message.trim() || null,
         consent: true,
         consent_version: EINWILLIGUNG_FASSUNG,
@@ -358,6 +379,7 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   })
 
   const nothingSelected = elements.length === 0 && sceneIds.length === 0
+    && satzIds.length === 0
 
   if (accepted.length === 0) {
     return (
@@ -401,6 +423,38 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
               </label>
             ))}
           </div>
+
+          {/* Einzelne Sätze über die eigene Person.
+              Bewusst ohne Kästchen im Raster darüber: „Alle Sätze" gäbe es nicht. Was
+              hier steht, gehört nicht zum Fall, sondern zur Person — und wird Stück für
+              Stück ausgewählt oder gar nicht. */}
+          {saetze.length > 0 && (
+            <div className="mt-3 rounded-brand border border-brand-border bg-brand-bg px-3 py-2">
+              <p className="mb-1 text-xs font-medium text-brand-text">
+                Einzelne Sätze über dich
+              </p>
+              <p className="mb-2 text-[0.7rem] leading-snug text-brand-muted">
+                Aus deinem Kompass. Sie gehören dir und nicht diesem Fall — deshalb geht
+                hier nur mit, was du einzeln auswählst.
+              </p>
+              <div className="max-h-40 space-y-1 overflow-y-auto">
+                {saetze.map(sa => (
+                  <label key={sa.id} className="flex cursor-pointer items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={satzIds.includes(sa.id)}
+                      onChange={() => toggleSatz(sa.id)}
+                      className="mt-1 accent-accent"
+                    />
+                    <span>
+                      <span className="text-brand-muted">{sa.art_label ?? sa.art}: </span>
+                      {sa.text}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Einzelne Szenen */}
           {scenes.length > 0 && (

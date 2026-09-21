@@ -34,10 +34,15 @@ async def _require_owned_case(conn, case_id, user_id) -> None:
         raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
 
 
-async def _set_elements(conn, share_id, case_id, elements, scene_ids) -> None:
-    """Setzt die freigegebenen Elemente neu (delete + insert)."""
+async def _set_elements(conn, share_id, case_id, owner_user_id, elements, scene_ids,
+                       satz_ids) -> None:
+    """Setzt die freigegebenen Elemente neu (delete + insert).
+
+    ``scene`` und ``satz`` tragen eine eigene Kennung und werden deshalb je Stueck
+    geschrieben - alles andere ist eine Kategorie und bekommt eine Zeile.
+    """
     await conn.execute("DELETE FROM case_share_elements WHERE share_id = $1", share_id)
-    for et in {e for e in elements if e != "scene"}:
+    for et in {e for e in elements if e not in ("scene", "satz")}:
         await conn.execute(
             "INSERT INTO case_share_elements (share_id, element_type) VALUES ($1, $2)",
             share_id, et,
@@ -54,11 +59,33 @@ async def _set_elements(conn, share_id, case_id, elements, scene_ids) -> None:
                 "VALUES ($1, 'scene', $2)",
                 share_id, r["id"],
             )
+    if "satz" in elements and satz_ids:
+        # ZWEI Bedingungen, und beide sind wichtig.
+        #
+        # `user_id` — die Saetze gehoeren der Person, nicht dem Fall. Ohne diese Zeile
+        # koennte eine fremde Satz-Kennung in die eigene Freigabe wandern und waere
+        # danach fuer die Fachperson lesbar.
+        #
+        # `stand = 'bestaetigt'` — ein Entwurf ist keine Aussage, und ein offener
+        # Vorschlag ist Echos Formulierung. Beides weiterzugeben hiesse, etwas ueber
+        # sich preiszugeben, dem man nie zugestimmt hat.
+        valid = await conn.fetch(
+            "SELECT id FROM selbst_saetze "
+            "WHERE user_id = $1 AND id = ANY($2::uuid[]) AND stand = 'bestaetigt'",
+            owner_user_id, satz_ids,
+        )
+        for r in valid:
+            await conn.execute(
+                "INSERT INTO case_share_elements (share_id, element_type, satz_id) "
+                "VALUES ($1, 'satz', $2)",
+                share_id, r["id"],
+            )
 
 
 async def _build_share_response(conn, share_row) -> CaseShareResponse:
     elem_rows = await conn.fetch(
-        "SELECT element_type, scene_id FROM case_share_elements WHERE share_id = $1",
+        "SELECT element_type, scene_id, satz_id FROM case_share_elements "
+        "WHERE share_id = $1",
         share_row["id"],
     )
     pro = await conn.fetchrow(
@@ -80,7 +107,8 @@ async def _build_share_response(conn, share_row) -> CaseShareResponse:
         status=share_row["status"],
         message=share_row["message"],
         elements=[
-            ShareElementResponse(element_type=e["element_type"], scene_id=e["scene_id"])
+            ShareElementResponse(element_type=e["element_type"], scene_id=e["scene_id"],
+                                 satz_id=e["satz_id"])
             for e in elem_rows
         ],
         created_at=share_row["created_at"],
@@ -164,7 +192,8 @@ async def create_share(
                 case_id, uid, body.professional_user_id, body.message,
                 body.consent_version, body.consent_text.strip(), body.fall_faq, body.notizen,
             )
-            await _set_elements(conn, share["id"], case_id, body.elements, body.scene_ids)
+            await _set_elements(conn, share["id"], case_id, uid,
+                                body.elements, body.scene_ids, body.satz_ids)
             # Das Fragenpaket wird HIER ausgeloest, in der Transaktion der Freigabe: Der
             # Lauf und die Einwilligung, auf der er beruht, entstehen gemeinsam oder keins
             # von beidem. Ohne Haken wird ein frueher erzeugter Lauf abgeraeumt: Sonst blieben
@@ -207,7 +236,8 @@ async def update_share(
                 "updated_at = NOW(), revoked_at = NULL WHERE id = $1",
                 share_id, body.message,
             )
-            await _set_elements(conn, share_id, case_id, body.elements, body.scene_ids)
+            await _set_elements(conn, share_id, case_id, uid,
+                                body.elements, body.scene_ids, body.satz_ids)
             # Die Auswahl hat sich geaendert - ein vorhandener Fall-FAQ-Lauf passt nicht
             # mehr dazu. Er zitiert woertlich aus Szenen, die jetzt womoeglich nicht mehr
             # freigegeben sind. Der Freigabe-Status bleibt dabei 'active', der Lesepfad

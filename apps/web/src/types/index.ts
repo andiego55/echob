@@ -887,6 +887,9 @@ export type ShareElementType =
   | 'scales' | 'gefuehlsbild' | 'reports' | 'topic_summaries' | 'person_profile' | 'self_profile'
   | 'hypotheses' | 'test_results'
   | 'documents' | 'artifacts'
+  // Je Satz, nicht als Kategorie — siehe SHARE_ELEMENT_LABELS und die eigene Liste
+  // in CaseSharingPage. „Alle Sätze über dich" gibt es bewusst nicht.
+  | 'satz'
 
 export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   case_info:       'Fallinformationen',
@@ -903,6 +906,7 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   test_results:    'Selbsttest-Ergebnisse',
   documents:       'Beigelegte Dokumente',
   artifacts:       'Festgehaltene Erkenntnisse',
+  satz:            'Einzelne Sätze über dich',
 }
 
 export interface ProfessionalProfile {
@@ -980,6 +984,8 @@ export interface ShareCreate {
   professional_user_id: string
   elements: ShareElementType[]
   scene_ids?: string[]
+  /** Einzeln ausgewaehlte Saetze aus dem Kompass. Nur bestaetigte werden angenommen. */
+  satz_ids?: string[]
   message?: string | null
   consent?: boolean
   consent_version?: string

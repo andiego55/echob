@@ -44,6 +44,10 @@ class SharedBundle:
     #: Das juengste BESTAETIGTE Gefuehlsbild. Ein Entwurf ist keine Aussage
     #: und wird nie freigegeben.
     gefuehlsbild: dict[str, Any] | None = None
+    #: Einzeln freigegebene Saetze aus dem Kompass. NIE als Ganzes: Alle Saetze ueber
+    #: sich herzugeben waere ein geoeffnetes Selbstbild; hier steht nur, was Stueck fuer
+    #: Stueck ausgewaehlt wurde - und nur Bestaetigtes.
+    saetze: list[dict[str, Any]] = field(default_factory=list)
     #: Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon —
     #: dass jemand eigene Einschaetzungen revidiert hat, sagt etwas ueber den Fall.
     artifacts_ueberholt: int = 0
@@ -182,20 +186,52 @@ async def require_dokumentation(professional_user_id, case_id, conn) -> dict[str
 
 
 async def load_share_elements(share_id, conn) -> tuple[set[str], list]:
-    """Erlaubte Element-Typen + freigegebene Einzelszenen-IDs einer Freigabe."""
+    """Erlaubte Element-Typen + freigegebene Einzelszenen und Einzelsaetze."""
     rows = await conn.fetch(
-        "SELECT element_type, scene_id FROM case_share_elements WHERE share_id = $1",
+        "SELECT element_type, scene_id, satz_id FROM case_share_elements "
+        "WHERE share_id = $1",
         share_id,
     )
     allowed = {r["element_type"] for r in rows}
     scene_ids = [r["scene_id"] for r in rows if r["element_type"] == "scene" and r["scene_id"]]
-    return allowed, scene_ids
+    satz_ids = [r["satz_id"] for r in rows if r["element_type"] == "satz" and r["satz_id"]]
+    return allowed, scene_ids, satz_ids
+
+
+def build_satz_context(saetze: list[dict[str, Any]]) -> str:
+    """Die einzeln freigegebenen Sätze über die eigene Person, für die Fachperson.
+
+    **Eine andere Rahmung als im eigenen Gespräch.** Dort spricht Echo mit der Person
+    über sie selbst. Hier liest eine dritte Person mit, und deshalb steht dabei, wie
+    diese Sätze zustande gekommen sind: nicht erhoben, nicht abgeleitet, sondern selbst
+    geschrieben oder einem Vorschlag zugestimmt — und Stück für Stück ausgewählt.
+
+    **Der Auswahlcharakter gehört dazu.** Was hier steht, ist nicht „ihr Selbstbild",
+    sondern das, was sie zeigen wollte. Ohne diesen Satz liest eine Fachperson eine
+    Auswahl als Gesamtbild und schließt aus dem, was fehlt.
+    """
+    zeilen = [
+        "## Was sie über sich sagt — von ihr freigegeben",
+        "",
+        "_Diese Sätze stammen aus ihrem eigenen Bereich. Sie hat jeden davon selbst "
+        "bestätigt und jeden EINZELN für dich freigegeben — es ist also eine Auswahl "
+        "und kein Gesamtbild. Was nicht dabei ist, ist kein Hinweis. Selbsteinschätzung "
+        "von einem bestimmten Tag, kein Befund._",
+        "",
+    ]
+    for satz in saetze:
+        art = satz.get("art_label") or satz.get("art") or "Satz"
+        wann = satz.get("bestaetigt_at")
+        datum = wann.strftime("%d.%m.%Y") if hasattr(wann, "strftime") else "?"
+        zeilen.append(f"- **{art}** (bestätigt am {datum}): {satz.get('text', '')}")
+    zeilen.append("")
+    return "\n".join(zeilen)
 
 
 async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundle:
     """Lädt AUSSCHLIESSLICH die freigegebenen Daten dieses Falls für diese Fachperson."""
     share = await require_active_share(professional_user_id, case_id, conn)
-    allowed, scene_ids = await load_share_elements(share["id"], conn)
+    allowed, scene_ids, satz_ids = await load_share_elements(share["id"], conn)
 
     bundle = SharedBundle(share=share, allowed=allowed)
 
@@ -285,6 +321,30 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
             conn, case_id, share["owner_user_id"]
         )
 
+    # Einzeln freigegebene Saetze aus dem Kompass.
+    #
+    # DREI Bedingungen in einer Abfrage, und jede traegt etwas anderes:
+    #   * `id = ANY(...)` - nur was Stueck fuer Stueck ausgewaehlt wurde.
+    #   * `user_id = owner_user_id` - gebunden an die EIGENTUEMERIN aus der geprueften
+    #     Freigabe. Die Kennungen stehen in einer Tabelle, die der Fachperson gehoert;
+    #     ohne diese Zeile stuende dort eine Kennung, und hier kaeme ein fremder Satz.
+    #   * `stand = 'bestaetigt'` - wer einen freigegebenen Satz spaeter als ueberholt
+    #     markiert, hat ihn zurueckgenommen. Er verschwindet damit aus dem Buendel, ohne
+    #     dass jemand die Freigabe anfassen muss.
+    if "satz" in allowed and satz_ids:
+        rows = await conn.fetch(
+            "SELECT id, art, text, bestaetigt_at, created_at FROM selbst_saetze "
+            "WHERE id = ANY($1::uuid[]) AND user_id = $2 AND stand = 'bestaetigt' "
+            "ORDER BY bestaetigt_at DESC NULLS LAST",
+            satz_ids, share["owner_user_id"],
+        )
+        from app.services import kompass_katalog
+        bundle.saetze = [
+            {**crypto.decrypt_fields(dict(r), "text"),
+             "art_label": kompass_katalog.satz_art_label(r["art"])}
+            for r in rows
+        ]
+
     # Festgehaltene Erkenntnisse. Überholte fließen inhaltlich NICHT mit (siehe
     # build_artifact_context) — nur ihre Zahl.
     if "artifacts" in allowed:
@@ -364,6 +424,9 @@ def build_shared_case_context(bundle: SharedBundle) -> str:
         gb = gefuehlsbild_service.kontext_block(bundle.gefuehlsbild)
         if gb:
             parts.append(gb)
+
+    if bundle.saetze:
+        parts.append(build_satz_context(bundle.saetze))
 
     if bundle.artifacts or bundle.artifacts_ueberholt:
         ctx = build_artifact_context(bundle.artifacts, ueberholt_anzahl=bundle.artifacts_ueberholt)

@@ -18,6 +18,10 @@ ShareElementType = Literal[
     "hypotheses", "test_results",
     "documents", "artifacts",
     "gefuehlsbild",
+    # Je Satz, nicht als Ganzes: Alle Saetze ueber sich freizugeben waere ein
+    # geoeffnetes Selbstbild. Deshalb traegt diese Art - wie 'scene' - eine eigene
+    # Kennung, und in ShareCreate steht daneben `satz_ids`.
+    "satz",
 ]
 
 
@@ -142,6 +146,7 @@ class ShareCreate(BaseModel):
     professional_user_id: UUID
     elements: list[ShareElementType] = Field(default_factory=list)
     scene_ids: list[UUID] = Field(default_factory=list)   # nur relevant bei element 'scene'
+    satz_ids: list[UUID] = Field(default_factory=list)    # nur relevant bei element 'satz'
     message: str | None = Field(None, max_length=2000)
     consent: bool = False                                  # ausdrueckliche Einwilligung (Pflicht)
     consent_version: str | None = Field(None, max_length=64)
@@ -170,6 +175,7 @@ class ShareUpdate(BaseModel):
 class ShareElementResponse(BaseModel):
     element_type: ShareElementType
     scene_id: UUID | None = None
+    satz_id: UUID | None = None
 
 
 class CaseShareResponse(BaseModel):
