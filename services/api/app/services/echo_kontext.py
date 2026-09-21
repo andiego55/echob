@@ -31,12 +31,13 @@ KontextTeil = Literal[
     "resonanz",
     "gefuehlsbild",
     "saetze",
+    "vorhaben",
 ]
 
 ALLE_TEILE: tuple[str, ...] = (
     "szenen", "muster", "selbstauskunft", "fallprofil",
     "themen", "hypothesen", "erkenntnisse", "dokumente", "resonanz", "gefuehlsbild",
-    "saetze",
+    "saetze", "vorhaben",
 )
 
 #: Wort und Erklaerung je Teil — genau so, wie sie im Band stehen.
@@ -91,6 +92,13 @@ LABELS: dict[str, dict[str, str]] = {
     "saetze": {
         "label": "Sätze über dich",
         "hinweis": "Was du in deinem Kompass über dich bestätigt hast — unabhängig von diesem Fall.",
+    },
+    # Wie die Saetze aus dem Kompass und damit fallunabhaengig. Der Hinweis sagt, was
+    # Echo damit NICHT tut: Ohne das erwartet man Nachfragen zum Stand - und schaltet
+    # den Teil ab, weil man sie nicht will.
+    "vorhaben": {
+        "label": "Deine Vorhaben",
+        "hinweis": "Woran du gerade arbeitest. Echo fragt nie nach, wie weit du bist.",
     },
 }
 

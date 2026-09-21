@@ -281,6 +281,94 @@ async def test_die_zahl_im_band_ist_die_zahl_im_prompt(db):
     assert im_band == len(im_prompt) == auswahl.MAX_JE_AUFRUF
 
 
+# ── Die Vorhaben ─────────────────────────────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_nur_offene_vorhaben_gehen_ins_gespraech(db):
+    """Ein erreichtes Vorhaben ist eine Erinnerung, kein Vorhaben. Ein ruhendes hat die
+    Person bewusst zur Seite gelegt. Beides mitzutragen hiesse, sie daran zu messen."""
+    from app.services import kompass_vorhaben_service as vorhaben_dienst
+    uid = await _person(db)
+    await vorhaben_dienst.anlegen(db, user_id=uid, titel="Laeuft noch.")
+    fertig = await vorhaben_dienst.anlegen(db, user_id=uid, titel="Schon geschafft.")
+    ruht = await vorhaben_dienst.anlegen(db, user_id=uid, titel="Gerade nicht dran.")
+    await vorhaben_dienst.aendern(
+        db, user_id=uid, vorhaben_id=fertig["id"], stand="erreicht")
+    await vorhaben_dienst.aendern(db, user_id=uid, vorhaben_id=ruht["id"], stand="ruht")
+
+    offene = await auswahl.vorhaben_fuer_fall(db, user_id=uid)
+    assert [v["titel"] for v in offene] == ["Laeuft noch."]
+
+
+@pytest.mark.asyncio
+async def test_hoechstens_fuenf_vorhaben(db):
+    from app.services import kompass_vorhaben_service as vorhaben_dienst
+    uid = await _person(db)
+    for i in range(9):
+        await vorhaben_dienst.anlegen(db, user_id=uid, titel=f"Vorhaben {i}")
+
+    offene = await auswahl.vorhaben_fuer_fall(db, user_id=uid)
+    assert len(offene) == auswahl.MAX_VORHABEN_JE_AUFRUF == 5
+
+
+@pytest.mark.asyncio
+async def test_fremde_vorhaben_kommen_nie_mit(db):
+    from app.services import kompass_vorhaben_service as vorhaben_dienst
+    ich = await _person(db)
+    jemand_anders = await _person(db)
+    await vorhaben_dienst.anlegen(db, user_id=jemand_anders, titel="Nicht deines.")
+
+    assert await auswahl.vorhaben_fuer_fall(db, user_id=ich) == []
+
+
+@pytest.mark.asyncio
+async def test_der_titel_kommt_lesbar_in_den_block(db):
+    """Titel und Grund liegen verschluesselt. Ginge das roh in den Prompt, saehe Echo
+    "enc:v1:gAAAAA..." - derselbe Fehler wie bei den Szenen."""
+    from app.services import kompass_vorhaben_service as vorhaben_dienst
+    uid = await _person(db)
+    await vorhaben_dienst.anlegen(
+        db, user_id=uid, titel="Im Streit nicht sofort einlenken.",
+        warum="Weil ich mich danach jedes Mal aergere.")
+
+    block = auswahl.vorhaben_block(await auswahl.vorhaben_fuer_fall(db, user_id=uid))
+
+    assert "Im Streit nicht sofort einlenken." in block
+    assert "Weil ich mich danach jedes Mal aergere." in block
+    assert "enc:" not in block
+
+
+def test_ohne_vorhaben_entsteht_kein_abschnitt():
+    assert auswahl.vorhaben_block([]) == ""
+
+
+def test_der_block_verbietet_das_nachfragen():
+    """Die wichtigste Zeile ist ein Verbot. Ein Modell, das weiss, dass jemand sich
+    etwas vorgenommen hat, fragt sonst beim naechsten Mal, wie weit er ist - und aus
+    einem Begleiter wird eine App, die etwas von einem will."""
+    block = auswahl.vorhaben_block([
+        {"titel": "Etwas.", "schritte": [], "schritte_erledigt": 0, "warum": None}])
+    assert "nie nach dem Stand" in block
+    assert "erinnere nie daran" in block
+
+
+def test_die_einzelnen_schritte_gehen_nicht_mit():
+    """Nur ihre Zahl. Ein Arbeitsplan im Prompt wird vom Modell als Sprache benutzt -
+    dann redet es in den Handgriffen der Person statt ueber ihre Lage."""
+    block = auswahl.vorhaben_block([{
+        "titel": "Etwas.",
+        "warum": None,
+        "schritte": [
+            {"id": "1", "text": "Erst tief durchatmen.", "erledigt_at": "x"},
+            {"id": "2", "text": "Dann sagen, was ist.", "erledigt_at": None},
+        ],
+        "schritte_erledigt": 1,
+    }])
+    assert "1 von 2 Schritten" in block
+    assert "Erst tief durchatmen." not in block
+    assert "Dann sagen, was ist." not in block
+
+
 # ── Der Isolationswächter ────────────────────────────────────────────────────
 
 _APP = Path(__file__).resolve().parents[1]

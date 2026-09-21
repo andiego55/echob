@@ -38,11 +38,15 @@ from uuid import UUID
 
 import asyncpg
 
-from app.services import kompass_saetze_service
+from app.services import kompass_saetze_service, kompass_vorhaben_service
 
 #: Höchstens so viele Sätze je Aufruf. Sieben ist die Grenze aus dem Bauplan: genug, um
 #: ein wiederkehrendes Thema zu treffen, wenig genug, um das Gespräch nicht zu färben.
 MAX_JE_AUFRUF = 7
+
+#: Höchstens so viele Vorhaben. Weniger als bei den Sätzen, weil ein Vorhaben mehr Raum
+#: einnimmt — und wer an acht Dingen gleichzeitig arbeitet, arbeitet an keinem.
+MAX_VORHABEN_JE_AUFRUF = 5
 
 _URZEIT = datetime.min
 
@@ -118,6 +122,65 @@ async def fuer_fall(
             satz.get("szene_id") is not None and str(satz["szene_id"]) in eigene_szenen
         )
     return auswaehlen(alle, grenze=grenze)
+
+
+async def vorhaben_fuer_fall(
+    conn: asyncpg.Connection,
+    *,
+    user_id: UUID | str,
+    grenze: int = MAX_VORHABEN_JE_AUFRUF,
+) -> list[dict[str, Any]]:
+    """Die OFFENEN Vorhaben — eines der drei Dinge, die Echo laut Bauplan liest.
+
+    Nur ``laufend``: Ein erreichtes Vorhaben ist eine Erinnerung, kein Vorhaben, und ein
+    ruhendes hat die Person bewusst zur Seite gelegt. Beides in ein Gespräch zu tragen
+    hieße, sie daran zu messen.
+
+    Ohne Fallbezug, anders als bei den Sätzen: Ein Vorhaben gilt für die Person und nicht
+    für eine Beziehung — „im Streit nicht sofort einlenken" ist in jedem Fall dasselbe.
+    """
+    laufende = await kompass_vorhaben_service.liste(
+        conn, user_id=user_id, staende=("laufend",)
+    )
+    return laufende[: max(0, grenze)]
+
+
+def vorhaben_block(vorhaben: list[dict[str, Any]]) -> str:
+    """Der Abschnitt für den System-Prompt — oder ein leerer Text.
+
+    **Die wichtigste Zeile ist ein Verbot.** Ein Modell, das weiß, dass jemand sich etwas
+    vorgenommen hat, fragt beim nächsten Mal, wie weit er ist. Genau das soll hier nicht
+    passieren: Wer sich etwas vornimmt, hat schon genug Mahner, und aus einem Begleiter
+    würde eine App, die etwas von einem will. Der Bauplan sagt es kurz — wer eine Woche
+    nichts erfasst, wird nicht erinnert.
+
+    **Die einzelnen Schritte gehen NICHT mit**, nur ihre Zahl. Was Echo braucht, ist die
+    Richtung; die Schritte sind der Arbeitsplan, und ein Arbeitsplan im Prompt wird vom
+    Modell als Sprache benutzt — dann redet es in den Handgriffen der Person statt über
+    ihre Lage.
+    """
+    if not vorhaben:
+        return ""
+
+    zeilen = [
+        "## Was sie sich vorgenommen hat",
+        "",
+        "_Ihre eigenen, offenen Vorhaben. Sie stehen hier, damit du weißt, woran sie "
+        "arbeitet — **nicht**, damit du nachfragst, wie weit sie ist. Frag nie nach dem "
+        "Stand, erinnere nie daran und rechne ihr nichts vor. Beziehe dich darauf, wenn "
+        "die Lage von selbst dorthin führt._",
+        "",
+    ]
+    for v in vorhaben:
+        teile = [f"- **{v.get('titel', '')}**"]
+        schritte = v.get("schritte") or []
+        if schritte:
+            teile.append(f" ({v.get('schritte_erledigt', 0)} von {len(schritte)} Schritten)")
+        if v.get("warum"):
+            teile.append(f" — {v['warum']}")
+        zeilen.append("".join(teile))
+    zeilen.append("")
+    return "\n".join(zeilen)
 
 
 def kontext_block(saetze: list[dict[str, Any]]) -> str:

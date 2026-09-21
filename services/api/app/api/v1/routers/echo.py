@@ -332,6 +332,16 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
             if satz_ctx:
                 context_parts.append(satz_ctx)
 
+        # Die offenen Vorhaben - das dritte der drei Dinge, die Echo laut Bauplan
+        # liest. Direkt nach den Saetzen: Das eine sagt, was sich als wahr
+        # herausgestellt hat, das andere, was daraus werden soll.
+        if "vorhaben" not in ohne:
+            async with pool.acquire() as conn:
+                offene = await kompass_auswahl.vorhaben_fuer_fall(conn, user_id=user_id)
+            vorhaben_ctx = kompass_auswahl.vorhaben_block(offene)
+            if vorhaben_ctx:
+                context_parts.append(vorhaben_ctx)
+
         # Themendialog-Zusammenfassungen
         if topic_summaries and "themen" not in ohne:
             topic_ctx = build_topic_context(topic_summaries)
@@ -1029,6 +1039,12 @@ async def get_context_overview(
                 "SELECT LEAST(COUNT(*), $2) FROM selbst_saetze "
                 "WHERE user_id = $1 AND stand = 'bestaetigt'",
                 user_id, kompass_auswahl.MAX_JE_AUFRUF),
+            # Wie bei den Saetzen die Zahl, die WIRKLICH mitgeht - und nur laufende:
+            # Erreichtes und Ruhendes traegt Echo nicht ins Gespraech.
+            "vorhaben": await conn.fetchval(
+                "SELECT LEAST(COUNT(*), $2) FROM selbst_vorhaben "
+                "WHERE user_id = $1 AND art = 'ziel' AND stand = 'laufend'",
+                user_id, kompass_auswahl.MAX_VORHABEN_JE_AUFRUF),
         }
 
     return KontextAntwort(parts=[
