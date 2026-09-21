@@ -49,6 +49,17 @@ export interface SatzStand {
   hinweis: string
 }
 
+export interface VorhabenStand {
+  key: string
+  label: string
+  hinweis: string
+}
+
+export interface RueckschauRhythmus {
+  tage: number
+  label: string
+}
+
 export interface KompassKatalog {
   zustaende: KompassZustand[]
   /** Ab dieser Stufe fragt der Puls, was geholfen hat. */
@@ -61,6 +72,11 @@ export interface KompassKatalog {
   /** Nur die drei sichtbaren. „Verworfen" ist kein Stand, den jemand wählt. */
   satz_staende: SatzStand[]
   satz_max_zeichen: number
+  vorhaben_staende: VorhabenStand[]
+  rueckschau_rhythmen: RueckschauRhythmus[]
+  vorhaben_max_titel: number
+  schritt_max_zeichen: number
+  max_schritte: number
 }
 
 export interface Puls {
@@ -141,6 +157,45 @@ export interface VorschlagsLauf {
   hinweis: string | null
 }
 
+/** Ein Schritt eines Vorhabens. `id` fehlt nur, solange er noch nicht gespeichert ist. */
+export interface Schritt {
+  id?: string | null
+  text: string
+  erledigt_at?: string | null
+}
+
+export interface Vorhaben {
+  id: string
+  titel: string
+  warum: string | null
+  schritte: Schritt[]
+  schritte_erledigt: number
+  rhythmus_tage: number
+  /** Wann zuletzt zurückgeschaut wurde. Ob daraus „fällig" folgt, rechnet `lib/kompass`. */
+  rueckschau_am: string | null
+  stand: 'laufend' | 'erreicht' | 'ruht'
+  stand_label: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface VorhabenNeu {
+  titel: string
+  warum?: string | null
+  schritte?: Schritt[]
+  rhythmus_tage?: number
+}
+
+export interface VorhabenAenderung {
+  titel?: string
+  warum?: string | null
+  schritte?: Schritt[]
+  rhythmus_tage?: number
+  stand?: 'laufend' | 'erreicht' | 'ruht'
+  /** Nur setzen, wenn wirklich zurückgeschaut wurde — sonst ist der Rhythmus wertlos. */
+  zurueckgeschaut?: boolean
+}
+
 export interface KompassUebersicht {
   letzter_puls: Puls | null
   verlauf: Puls[]
@@ -149,6 +204,7 @@ export interface KompassUebersicht {
   verlauf_tage: number
   krisenplan_vorhanden: boolean
   saetze_bestaetigt: number
+  vorhaben_laufend: number
 }
 
 const basis = '/me/kompass'
@@ -199,6 +255,18 @@ export const kompassApi = {
     apiClient
       .post<VorschlagsLauf>(`${basis}/saetze/vorschlaege`, undefined, { timeout: 60_000 })
       .then(r => r.data),
+
+  vorhaben: () =>
+    apiClient.get<Vorhaben[]>(`${basis}/vorhaben`).then(r => r.data),
+
+  vorhabenAnlegen: (v: VorhabenNeu) =>
+    apiClient.post<Vorhaben>(`${basis}/vorhaben`, v).then(r => r.data),
+
+  vorhabenAendern: (id: string, aenderung: VorhabenAenderung) =>
+    apiClient.patch<Vorhaben>(`${basis}/vorhaben/${id}`, aenderung).then(r => r.data),
+
+  vorhabenLoeschen: (id: string) =>
+    apiClient.delete(`${basis}/vorhaben/${id}`).then(() => undefined),
 
   vorschlagEntscheiden: (satzId: string, annehmen: boolean) =>
     apiClient

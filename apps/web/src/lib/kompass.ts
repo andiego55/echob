@@ -276,6 +276,31 @@ export function bewegung(pulse: Puls[]): { richtung: Richtung; satz: string } | 
   return { richtung: 'gleich', satz: 'Die letzten Einträge liegen etwa wie die davor.' }
 }
 
+// ── Die Rückschau ───────────────────────────────────────────────────────────
+
+/**
+ * Ist eine Rückschau auf dieses Vorhaben fällig?
+ *
+ * **Warum das hier steht und nicht im Dienst.** Die Rechnung braucht eine Uhr, und der
+ * Dienst hat bewusst keine: Was eine Uhr im Verborgenen hat, ist nur mit Mühe prüfbar.
+ * Hier kommt sie als Argument herein, und ein Test kann jeden Grenzfall stellen.
+ *
+ * **Ohne festen Rhythmus wird nie etwas fällig.** Wer „ohne festen Rhythmus" wählt, hat
+ * sich gegen Erinnerungen entschieden — das ist eine Antwort und keine fehlende Angabe.
+ *
+ * Gerechnet wird ab der letzten Rückschau, und wenn es keine gab, ab dem Anlegen.
+ */
+export function rueckschauFaellig(
+  vorhaben: { rueckschau_am: string | null; rhythmus_tage: number; created_at: string },
+  jetzt: number = Date.now(),
+): boolean {
+  if (!vorhaben.rhythmus_tage || vorhaben.rhythmus_tage <= 0) return false
+  const basis = new Date(vorhaben.rueckschau_am || vorhaben.created_at)
+  if (Number.isNaN(basis.getTime())) return false
+  const vergangen = (tagesBeginn(new Date(jetzt)) - tagesBeginn(basis)) / TAG_MS
+  return vergangen >= vorhaben.rhythmus_tage
+}
+
 // ── Der Krisenplan ──────────────────────────────────────────────────────────
 
 /**

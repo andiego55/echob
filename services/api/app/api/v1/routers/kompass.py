@@ -29,6 +29,9 @@ from app.schemas.kompass import (
     Satz,
     SatzCreate,
     SatzUpdate,
+    Vorhaben,
+    VorhabenCreate,
+    VorhabenUpdate,
     VorschlagsEntscheidung,
     VorschlagsLauf,
 )
@@ -36,6 +39,7 @@ from app.services import kompass_katalog as katalog
 from app.services import (
     kompass_saetze_service,
     kompass_service,
+    kompass_vorhaben_service,
     kompass_vorschlag_service,
 )
 
@@ -59,6 +63,11 @@ async def katalog_lesen(_current: dict = Depends(get_current_user)) -> dict:
         "satz_arten": list(katalog.SATZ_ARTEN),
         "satz_staende": list(katalog.SATZ_STAENDE),
         "satz_max_zeichen": katalog.SATZ_MAX_ZEICHEN,
+        "vorhaben_staende": list(katalog.VORHABEN_STAENDE),
+        "rueckschau_rhythmen": list(katalog.RUECKSCHAU_RHYTHMEN),
+        "vorhaben_max_titel": katalog.VORHABEN_MAX_TITEL,
+        "schritt_max_zeichen": katalog.SCHRITT_MAX_ZEICHEN,
+        "max_schritte": katalog.MAX_SCHRITTE,
     }
 
 
@@ -72,6 +81,9 @@ async def uebersicht(
         user_id = current["user_id"]
         daten = await kompass_service.uebersicht(conn, user_id=user_id)
         daten["saetze_bestaetigt"] = await kompass_saetze_service.anzahl_bestaetigt(
+            conn, user_id=user_id
+        )
+        daten["vorhaben_laufend"] = await kompass_vorhaben_service.anzahl_laufend(
             conn, user_id=user_id
         )
     return KompassUebersicht(**daten)
@@ -357,3 +369,99 @@ async def vorschlag_entscheiden(
     if satz is None:
         raise HTTPException(status_code=404, detail="Nicht gefunden.")
     return Satz(**satz)
+
+
+# ── Die Vorhaben ────────────────────────────────────────────────────────────
+
+
+@router.get("/vorhaben", response_model=list[Vorhaben])
+async def vorhaben_lesen(
+    stand: list[str] | None = Query(default=None),
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[Vorhaben]:
+    """Die eigenen Vorhaben, neueste zuerst.
+
+    Ohne Filter kommt alles — auch Erreichtes und Ruhendes. Was einmal ging, soll
+    sichtbar bleiben; eine Liste, die nur das Offene zeigt, liest sich nach einem halben
+    Jahr wie eine Mahnung.
+    """
+    async with pool.acquire() as conn:
+        zeilen = await kompass_vorhaben_service.liste(
+            conn, user_id=current["user_id"], staende=tuple(stand) if stand else None
+        )
+    return [Vorhaben(**v) for v in zeilen]
+
+
+@router.post("/vorhaben", response_model=Vorhaben, status_code=status.HTTP_201_CREATED)
+async def vorhaben_anlegen(
+    body: VorhabenCreate,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Vorhaben:
+    """Sich etwas vornehmen. Nur der Titel ist Pflicht."""
+    async with pool.acquire() as conn:
+        try:
+            v = await kompass_vorhaben_service.anlegen(
+                conn,
+                user_id=current["user_id"],
+                titel=body.titel,
+                warum=body.warum,
+                schritte=[s.model_dump() for s in body.schritte],
+                rhythmus_tage=body.rhythmus_tage,
+            )
+        except ValueError as fehler:
+            raise HTTPException(status_code=400, detail=str(fehler)) from fehler
+    return Vorhaben(**v)
+
+
+@router.patch("/vorhaben/{vorhaben_id}", response_model=Vorhaben)
+async def vorhaben_aendern(
+    vorhaben_id: UUID,
+    body: VorhabenUpdate,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Vorhaben:
+    """Umschreiben, Schritte abhaken, den Stand setzen oder eine Rückschau festhalten.
+
+    Ein Endpunkt für alles: Schritte abhaken, umsortieren und umschreiben sind dieselbe
+    Bewegung, und mehrere Endpunkte wären mehrere Stellen mit Eigentümerprüfung.
+    """
+    async with pool.acquire() as conn:
+        try:
+            v = await kompass_vorhaben_service.aendern(
+                conn,
+                user_id=current["user_id"],
+                vorhaben_id=vorhaben_id,
+                titel=body.titel,
+                warum=body.warum,
+                schritte=(
+                    [s.model_dump() for s in body.schritte]
+                    if body.schritte is not None else None
+                ),
+                rhythmus_tage=body.rhythmus_tage,
+                stand=body.stand,
+                zurueckgeschaut=body.zurueckgeschaut,
+            )
+        except ValueError as fehler:
+            raise HTTPException(status_code=400, detail=str(fehler)) from fehler
+    if v is None:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return Vorhaben(**v)
+
+
+@router.delete(
+    "/vorhaben/{vorhaben_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None
+)
+async def vorhaben_loeschen(
+    vorhaben_id: UUID,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> None:
+    """Ein Vorhaben ganz wegnehmen — neben „ruht", nicht statt dessen."""
+    async with pool.acquire() as conn:
+        weg = await kompass_vorhaben_service.loeschen(
+            conn, user_id=current["user_id"], vorhaben_id=vorhaben_id
+        )
+    if not weg:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")

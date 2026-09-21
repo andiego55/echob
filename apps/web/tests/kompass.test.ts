@@ -23,6 +23,7 @@ import {
   planZeilen,
   planZumSpeichern,
   rhythmusSatz,
+  rueckschauFaellig,
   ton,
   zeitWort,
 } from '@/lib/kompass'
@@ -240,6 +241,47 @@ describe('nachTagen', () => {
 
   it('wirft unlesbare Zeitangaben weg, statt eine Gruppe daraus zu machen', () => {
     expect(nachTagen([puls(3, 'kaputt')], JETZT)).toEqual([])
+  })
+})
+
+describe('rueckschauFaellig', () => {
+  const vorhaben = (rest: Partial<{
+    rueckschau_am: string | null; rhythmus_tage: number; created_at: string
+  }> = {}) => ({
+    rueckschau_am: null,
+    rhythmus_tage: 7,
+    created_at: vorTagen(10),
+    ...rest,
+  })
+
+  it('wird faellig, wenn der selbst gewaehlte Abstand um ist', () => {
+    expect(rueckschauFaellig(vorhaben({ created_at: vorTagen(10) }), JETZT)).toBe(true)
+    expect(rueckschauFaellig(vorhaben({ created_at: vorTagen(3) }), JETZT)).toBe(false)
+  })
+
+  it('rechnet ab der letzten Rueckschau, nicht ab dem Anlegen', () => {
+    // Sonst bliebe ein altes Vorhaben fuer immer faellig, auch direkt nachdem jemand
+    // hingeschaut hat.
+    const alt = vorhaben({ created_at: vorTagen(300), rueckschau_am: vorTagen(2) })
+    expect(rueckschauFaellig(alt, JETZT)).toBe(false)
+  })
+
+  it('wird ohne festen Rhythmus nie faellig', () => {
+    // Wer das waehlt, hat sich gegen Erinnerungen entschieden. Das ist eine Antwort
+    // und keine fehlende Angabe.
+    expect(rueckschauFaellig(vorhaben({ rhythmus_tage: 0, created_at: vorTagen(900) }),
+      JETZT)).toBe(false)
+  })
+
+  it('wird am Stichtag selbst faellig und nicht erst danach', () => {
+    expect(rueckschauFaellig(vorhaben({ rhythmus_tage: 14, created_at: vorTagen(14) }),
+      JETZT)).toBe(true)
+    expect(rueckschauFaellig(vorhaben({ rhythmus_tage: 14, created_at: vorTagen(13) }),
+      JETZT)).toBe(false)
+  })
+
+  it('haelt bei unlesbarem Datum lieber nichts fuer faellig', () => {
+    expect(rueckschauFaellig(vorhaben({ created_at: 'kaputt' }), JETZT)).toBe(false)
   })
 })
 

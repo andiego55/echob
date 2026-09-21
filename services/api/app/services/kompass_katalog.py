@@ -74,6 +74,63 @@ KRISENPLAN_TEILE: tuple[dict[str, str], ...] = (
 #: Schlüssel, die im Inhalt eines Krisenplans vorkommen dürfen.
 KRISENPLAN_SCHLUESSEL: frozenset[str] = frozenset(t["key"] for t in KRISENPLAN_TEILE)
 
+# ── Die Vorhaben ────────────────────────────────────────────────────────────
+
+#: Wie lang ein Vorhaben und ein Schritt sein dürfen.
+VORHABEN_MAX_TITEL = 200
+SCHRITT_MAX_ZEICHEN = 200
+#: Mehr Schritte sind keine Schritte mehr, sondern eine Liste, vor der man kapituliert.
+MAX_SCHRITTE = 12
+
+#: Die Stände eines Vorhabens.
+#:
+#: **Es gibt kein „aufgegeben".** Ein Vorhaben, das gerade nicht dran ist, ruht — das ist
+#: kein Scheitern, sondern eine Lage. Wer sein eigenes Wort dafür liest, nimmt sich beim
+#: nächsten Mal nichts mehr vor.
+VORHABEN_STAENDE: tuple[dict[str, str], ...] = (
+    {
+        "key": "laufend",
+        "label": "Läuft",
+        "hinweis": "Daran arbeitest du gerade.",
+    },
+    {
+        "key": "erreicht",
+        "label": "Erreicht",
+        "hinweis": "Geschafft. Bleibt stehen — man vergisst sonst, was schon ging.",
+    },
+    {
+        "key": "ruht",
+        "label": "Ruht",
+        "hinweis": "Gerade nicht dran. Kein Scheitern, eine Lage.",
+    },
+)
+
+VORHABEN_STAND_SCHLUESSEL: frozenset[str] = frozenset(
+    s["key"] for s in VORHABEN_STAENDE
+)
+
+#: In welchem Abstand man auf ein Vorhaben zurückschaut.
+#:
+#: **Warum das überhaupt gefragt wird.** Ein Vorhaben ohne Rückschau ist ein Vorsatz: Man
+#: nimmt es sich vor, und niemand kommt je darauf zurück. Der Abstand ist dabei
+#: absichtlich lang — wer sich täglich fragt, ob er schon weiter ist, arbeitet gegen sich.
+RUECKSCHAU_RHYTHMEN: tuple[dict[str, Any], ...] = (
+    {"tage": 7, "label": "Jede Woche"},
+    {"tage": 14, "label": "Alle zwei Wochen"},
+    {"tage": 30, "label": "Einmal im Monat"},
+    {"tage": 0, "label": "Ohne festen Rhythmus"},
+)
+
+RUECKSCHAU_TAGE: frozenset[int] = frozenset(r["tage"] for r in RUECKSCHAU_RHYTHMEN)
+
+
+def vorhaben_stand_label(key: str | None) -> str | None:
+    for stand in VORHABEN_STAENDE:
+        if stand["key"] == key:
+            return stand["label"]
+    return None
+
+
 # ── Die Sätze über mich ─────────────────────────────────────────────────────
 
 #: Wie lang ein Satz sein darf.

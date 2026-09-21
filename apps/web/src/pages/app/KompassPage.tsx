@@ -10,8 +10,9 @@
  *
  *   1. *Der Puls.* Ganz oben, ohne Umweg, in fünf Sekunden erledigt. Wer die Seite öffnet,
  *      soll etwas TUN können, bevor er etwas liest.
- *   2. *Die drei Eingänge.* Wo ich stehe, mein Verlauf, mein Notfallplan. Drei, nicht acht
- *      — ein Werkzeugkasten, in dem man suchen muss, wird nicht benutzt.
+ *   2. *Die Eingänge.* Ein Eingang ist eine Grundform oder ein Raum, nie ein Werkzeug —
+ *      danach sind es fünf, und die Liste ist geschlossen. Ein Werkzeugkasten, in dem man
+ *      suchen muss, wird nicht benutzt.
  *   3. *Der Verlauf, leise.* Unten, ohne Aufforderung. Er ist das Ergebnis der oberen
  *      Ebene und darf sich Zeit lassen, bis er etwas zu sagen hat.
  *
@@ -121,12 +122,23 @@ export default function KompassPage() {
         </section>
 
         {/* ── Ebene 2: die Eingänge ─────────────────────────────────────────
-            Vier, seit die Sätze dazugekommen sind. Die Regel des Bauplans lautete
-            „drei, nicht acht" — sie richtet sich gegen einen Werkzeugkasten, in dem
-            man suchen muss, nicht gegen die Zahl vier. Die Sätze sind eine eigene
-            Grundform und kein Werkzeug; sie gehören auf diese Ebene und nicht in eine
-            Unterseite. Ein fünfter Eingang wäre dagegen ein Zeichen, dass der Zuschnitt
-            nicht mehr stimmt. */}
+            Fünf. Bei vieren stand hier noch, ein fünfter wäre ein Zeichen, dass der
+            Zuschnitt nicht mehr stimmt — das war die falsche Regel. Die richtige lautet:
+            Ein Eingang ist eine GRUNDFORM oder ein RAUM, nie ein Werkzeug. Danach sind
+            es genau fünf, und die Liste ist geschlossen:
+
+              Sätze, Vorhaben  — zwei der drei Grundformen (die dritte, der Puls, steht
+                                 oben als Handlung statt als Karte)
+              Verlauf          — die Sicht auf den Puls
+              Wo ich stehe     — der Profilraum
+              Notfallplan      — technisch eine Art von Vorhaben, hier trotzdem eigen:
+                                 Er ist das Einzige, das in einem Zustand gebraucht wird,
+                                 in dem ein zusätzlicher Tipp zu viel ist. Eine Ordnung,
+                                 die in einer Krise einen Handgriff kostet, ist die
+                                 falsche Ordnung.
+
+            Ein SECHSTER wäre ein Werkzeug — und Werkzeuge sind Eingänge zu einer der
+            Formen, keine eigene Karte. */}
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <Eingang
             to="/app/kompass/saetze"
@@ -156,6 +168,17 @@ export default function KompassPage() {
             text="Jeder Moment, den du festgehalten hast."
             stand={rhythmusSatz(stand?.rhythmus ?? 0, stand?.verlauf_tage ?? 28)}
             fertig={(stand?.rhythmus ?? 0) > 0}
+          />
+          <Eingang
+            to="/app/kompass/vorhaben"
+            titel="Was ich mir vornehme"
+            text="Vorhaben mit Schritten — und einer Rückschau."
+            stand={
+              (stand?.vorhaben_laufend ?? 0) === 0
+                ? 'Noch nichts vorgenommen'
+                : `${stand?.vorhaben_laufend} läuft gerade`
+            }
+            fertig={(stand?.vorhaben_laufend ?? 0) > 0}
           />
           <Eingang
             to="/app/kompass/krisenplan"

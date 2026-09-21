@@ -245,6 +245,12 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Art wählen und Satz schreiben', 'Echo schauen lassen, was sich wiederholt', 'Entwurf bestätigen', 'Überholtes stehen lassen'],
     tipp: 'Bestätigt heißt nicht wahr, sondern: Das war deine Einschätzung an dem Tag. Deshalb steht das Alter daneben.',
   },
+  '/app/kompass/vorhaben': {
+    titel: 'Was du dir vornimmst',
+    zweck: 'Ein Vorhaben ist kein Vorsatz: Es hat Schritte und einen Abstand, in dem du zurückschaust.',
+    schritte: ['Etwas vornehmen', 'Schritte abhaken', 'Zurückschauen, wenn der Abstand um ist'],
+    tipp: 'Es gibt kein „aufgegeben". Was gerade nicht dran ist, ruht — und bleibt da, ohne zu drängen.',
+  },
   '/app/kompass/krisenplan': {
     titel: 'Dein Notfallplan',
     zweck: 'Was hilft, wenn es kippt — aufgeschrieben, solange es dir gut genug dafür geht.',

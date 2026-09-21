@@ -138,6 +138,12 @@ VERTRAUT_DEM_AUFRUFER = {
         "Legt den Krisenplan an oder schreibt ihn fort. Wie puls_anlegen: Die user_id "
         "kommt aus get_current_user; der Koerper der Anfrage traegt nur den Inhalt, und "
         "aus dem filtert der Dienst alles heraus, was nicht im Katalog steht.",
+    "kompass_vorhaben_service.anlegen":
+        "Legt ein Vorhaben an. Ein INSERT kann sich nicht an eine Eigentuemer-Spalte "
+        "binden - die user_id IST die Spalte, die geschrieben wird. Sie stammt im "
+        "einzigen Aufrufer (routers/kompass.py: vorhaben_anlegen) aus get_current_user. "
+        "Aus dem Browser kommen nur Titel, Grund, Schritte und der Rhythmus; der Dienst "
+        "prueft Rhythmus und Stand gegen den Katalog und schneidet den Rest auf Laenge.",
     "kompass_saetze_service.anlegen":
         "Legt einen Satz ueber die eigene Person an. Ein INSERT kann sich nicht an eine "
         "Eigentuemer-Spalte binden - die user_id IST die Spalte, die geschrieben wird. "

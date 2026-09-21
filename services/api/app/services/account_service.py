@@ -76,7 +76,7 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     "case_faq_runs":                 {"json": ("auswertung",)},
     "professional_couple_echo_messages": {"text": ("content",)},
     "selbst_pulse":                  {"text": ("notiz", "geholfen")},
-    "selbst_vorhaben":               {"json": ("inhalt",)},
+    "selbst_vorhaben":               {"text": ("titel",), "json": ("inhalt",)},
     "selbst_saetze":                 {"text": ("text", "grund")},
 }
 

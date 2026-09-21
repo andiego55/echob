@@ -12,7 +12,11 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.services.kompass_katalog import SATZ_MAX_ZEICHEN
+from app.services.kompass_katalog import (
+    SATZ_MAX_ZEICHEN,
+    SCHRITT_MAX_ZEICHEN,
+    VORHABEN_MAX_TITEL,
+)
 
 
 class PulsCreate(BaseModel):
@@ -114,6 +118,60 @@ class VorschlagsLauf(BaseModel):
     hinweis: str | None = None
 
 
+# ── Die Vorhaben ────────────────────────────────────────────────────────────
+
+
+class Schritt(BaseModel):
+    """Ein Schritt eines Vorhabens.
+
+    ``id`` darf beim Anlegen fehlen — der Dienst vergibt dann eine. Ohne Kennung ließe
+    sich ein Schritt nur über seine Position ansprechen, und beim Umsortieren hakte man
+    den falschen ab.
+    """
+    id: str | None = None
+    text: str = Field(min_length=1, max_length=SCHRITT_MAX_ZEICHEN)
+    #: ISO-Zeitstempel oder None. Kommt vom Client zurück, wie er ihn bekommen hat.
+    erledigt_at: str | None = None
+
+
+class VorhabenCreate(BaseModel):
+    """Nur der Titel ist Pflicht. Wer sich etwas vornimmt, weiß oft noch nicht, wie."""
+    titel: str = Field(min_length=1, max_length=VORHABEN_MAX_TITEL)
+    warum: str | None = Field(default=None, max_length=1000)
+    schritte: list[Schritt] = Field(default_factory=list)
+    rhythmus_tage: int = 0
+
+
+class VorhabenUpdate(BaseModel):
+    """Alles freiwillig — was fehlt, bleibt, wie es war."""
+    titel: str | None = Field(default=None, max_length=VORHABEN_MAX_TITEL)
+    warum: str | None = Field(default=None, max_length=1000)
+    schritte: list[Schritt] | None = None
+    rhythmus_tage: int | None = None
+    stand: str | None = None
+    #: Nur wenn jemand wirklich zurückgeschaut hat. Bei jeder Änderung mitzuschreiben
+    #: hieße: Wer einen Tippfehler korrigiert, hat Rückschau gehalten.
+    zurueckgeschaut: bool = False
+
+
+class Vorhaben(BaseModel):
+    id: UUID
+    titel: str
+    warum: str | None = None
+    schritte: list[Schritt] = []
+    #: Wie viele davon erledigt sind — gerechnet im Dienst, damit „2 von 5" überall
+    #: dieselbe Auskunft ist.
+    schritte_erledigt: int = 0
+    rhythmus_tage: int = 0
+    #: Wann zuletzt zurückgeschaut wurde. Ob daraus „fällig" folgt, entscheidet die
+    #: Oberfläche — dieser Dienst hat bewusst keine Uhr.
+    rueckschau_am: str | None = None
+    stand: str
+    stand_label: str | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
 class KompassUebersicht(BaseModel):
     """Was die Startseite braucht, in einem Zug."""
     letzter_puls: Puls | None = None
@@ -124,3 +182,5 @@ class KompassUebersicht(BaseModel):
     krisenplan_vorhanden: bool = False
     #: Wie viele bestätigte Sätze — für die Karte „Sätze über mich".
     saetze_bestaetigt: int = 0
+    #: Wie viele Vorhaben gerade laufen.
+    vorhaben_laufend: int = 0
