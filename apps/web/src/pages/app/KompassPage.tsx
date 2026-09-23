@@ -160,12 +160,16 @@ export default function KompassPage() {
             to="/app/kompass/saetze"
             titel="Sätze über mich"
             text="Was du über dich herausgefunden hast."
+            // Die wartende Frage verdrängt die Zahl. „Ein Satz wartet auf dich" ist der
+            // Grund hinzugehen; „12 bestätigt" ist eine Auskunft, die nicht wegläuft.
             stand={
-              (stand?.saetze_bestaetigt ?? 0) === 0
-                ? 'Noch keiner bestätigt'
-                : `${stand?.saetze_bestaetigt} bestätigt`
+              stand?.frage_wartet
+                ? 'Ein Satz wartet auf dich'
+                : (stand?.saetze_bestaetigt ?? 0) === 0
+                  ? 'Noch keiner bestätigt'
+                  : `${stand?.saetze_bestaetigt} bestätigt`
             }
-            fertig={(stand?.saetze_bestaetigt ?? 0) > 0}
+            fertig={!!stand?.frage_wartet || (stand?.saetze_bestaetigt ?? 0) > 0}
           />
           <Eingang
             to="/app/profile"

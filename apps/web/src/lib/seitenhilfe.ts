@@ -242,8 +242,8 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
   '/app/kompass/saetze': {
     titel: 'Sätze über dich',
     zweck: 'Was du über dich herausgefunden hast — in Sätzen, die du selbst bestätigt hast.',
-    schritte: ['Art wählen und Satz schreiben', 'Echo schauen lassen, was sich wiederholt', 'Entwurf bestätigen', 'Überholtes stehen lassen'],
-    tipp: 'Bestätigt heißt nicht wahr, sondern: Das war deine Einschätzung an dem Tag. Deshalb steht das Alter daneben.',
+    schritte: ['Art wählen und Satz schreiben', 'Echo schauen lassen, was sich wiederholt', 'Entwurf bestätigen', '„Stimmt das noch?" beantworten'],
+    tipp: 'Bestätigt heißt nicht wahr, sondern: Das war deine Einschätzung an dem Tag. Deshalb steht das Alter daneben — und deshalb fragt der Raum nach einem halben Jahr noch einmal nach.',
   },
   '/app/kompass/uebungen': {
     titel: 'Geführte Übungen',

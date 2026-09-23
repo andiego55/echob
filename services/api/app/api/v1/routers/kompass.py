@@ -34,6 +34,9 @@ from app.schemas.kompass import (
     PortraitSichern,
     PortraitStand,
     PortraitVorschlag,
+    Pruefung,
+    PruefungsAntwort,
+    PruefungsErgebnis,
     Puls,
     PulsCreate,
     Satz,
@@ -52,6 +55,7 @@ from app.schemas.kompass import (
 from app.services import kompass_katalog as katalog
 from app.services import (
     kompass_portrait_service,
+    kompass_pruefung_service,
     kompass_saetze_service,
     kompass_service,
     kompass_spur_service,
@@ -110,6 +114,9 @@ async def uebersicht(
         )
         daten["portrait_bereit"] = portrait["bereit"]
         daten["portraits_anzahl"] = portrait["anzahl"]
+        daten["frage_wartet"] = await kompass_pruefung_service.gibt_es_eine_frage(
+            conn, user_id=user_id
+        )
     return KompassUebersicht(**daten)
 
 
@@ -723,3 +730,55 @@ async def saetze_zu_szene(
         saetze = await kompass_saetze_service.zu_szene(
             conn, user_id=current["user_id"], szene_id=szene_id)
     return [Satz(**s) for s in saetze]
+
+
+# ── „Stimmt das noch?" ──────────────────────────────────────────────────────
+
+
+@router.get("/pruefung", response_model=Pruefung)
+async def pruefung_lesen(
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Pruefung:
+    """Der alte Satz, der jetzt wieder vorgelegt wird — meistens keiner.
+
+    Läuft auf der Seite der Sätze mit und ist deshalb billig gehalten: eine Abfrage über
+    einen Teil-Index, kein Modell, keine Entschlüsselung außer der einen Zeile.
+    """
+    async with pool.acquire() as conn:
+        satz = await kompass_pruefung_service.faelliger_satz(
+            conn, user_id=current["user_id"])
+    return Pruefung(satz=Satz(**satz) if satz else None)
+
+
+@router.post("/pruefung/{satz_id}", response_model=PruefungsErgebnis)
+async def pruefung_beantworten(
+    satz_id: UUID,
+    body: PruefungsAntwort,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> PruefungsErgebnis:
+    """Stimmt · hat sich verändert · stimmt nicht mehr.
+
+    Bei „hat sich verändert" stehen danach beide Sätze da, verbunden — und genau dieses
+    Nebeneinander ist der Punkt: Es zeigt eine Entwicklung, die eine überschriebene Zeile
+    verschluckt hätte.
+    """
+    async with pool.acquire() as conn:
+        try:
+            ergebnis = await kompass_pruefung_service.antworten(
+                conn,
+                user_id=current["user_id"],
+                satz_id=satz_id,
+                antwort=body.antwort,
+                neuer_text=body.neuer_text,
+            )
+        except LookupError as fehler:
+            raise HTTPException(status_code=404, detail=str(fehler)) from fehler
+        except ValueError as fehler:
+            raise HTTPException(status_code=400, detail=str(fehler)) from fehler
+
+    return PruefungsErgebnis(
+        alt=Satz(**ergebnis["alt"]),
+        neu=Satz(**ergebnis["neu"]) if ergebnis.get("neu") else None,
+    )

@@ -34,7 +34,15 @@ from app.services import kompass_katalog as katalog
 MAX_SAETZE = 300
 
 
-def _aufbereiten(zeile: asyncpg.Record) -> dict[str, Any]:
+def aufbereiten(zeile: asyncpg.Record) -> dict[str, Any]:
+    """Eine Zeile dieser Tabelle in die Form, die nach außen geht — entschlüsselt.
+
+    Öffentlich, weil ein Nachbardienst sie braucht: ``kompass_pruefung_service`` liest
+    eigene Abfragen auf ``selbst_saetze`` und muss dieselbe Aufbereitung bekommen. Über
+    einen unterstrichenen Namen hinweg zuzugreifen wäre dieselbe Kopplung, nur ohne es
+    zuzugeben — und eine zweite Aufbereitung daneben wäre die Stelle, an der ein Satz
+    irgendwann unentschlüsselt herauskommt.
+    """
     """Eine Zeile, wie die Oberfläche sie braucht — entschlüsselt und beschriftet."""
     d = dict(zeile)
     d["text"] = crypto.decrypt(d["text"]) if d.get("text") else ""
@@ -70,7 +78,7 @@ async def liste(
         "ORDER BY angeheftet DESC, created_at DESC LIMIT $3",
         user_id, list(erlaubt), MAX_SAETZE,
     )
-    return [_aufbereiten(z) for z in zeilen]
+    return [aufbereiten(z) for z in zeilen]
 
 
 async def anlegen(
@@ -121,7 +129,7 @@ async def anlegen(
         datetime.now(UTC) if stand == "bestaetigt" else None,
         crypto.encrypt(grund.strip()) if grund and grund.strip() else None,
     )
-    return _aufbereiten(zeile)
+    return aufbereiten(zeile)
 
 
 async def aendern(
@@ -179,14 +187,14 @@ async def aendern(
         zeile = await conn.fetchrow(
             "SELECT * FROM selbst_saetze WHERE id = $1 AND user_id = $2", satz_id, user_id
         )
-        return _aufbereiten(zeile) if zeile else None
+        return aufbereiten(zeile) if zeile else None
 
     zeile = await conn.fetchrow(
         f"UPDATE selbst_saetze SET {', '.join(setzungen)}, updated_at = NOW() "  # noqa: S608
         "WHERE id = $1 AND user_id = $2 RETURNING *",
         satz_id, user_id, *werte,
     )
-    return _aufbereiten(zeile) if zeile else None
+    return aufbereiten(zeile) if zeile else None
 
 
 async def loeschen(
@@ -227,7 +235,7 @@ async def zu_szene(
         "ORDER BY bestaetigt_at DESC",
         user_id, szene_id,
     )
-    return [_aufbereiten(z) for z in zeilen]
+    return [aufbereiten(z) for z in zeilen]
 
 
 async def anzahl_bestaetigt(

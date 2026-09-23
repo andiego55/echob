@@ -28,6 +28,7 @@ import { PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import SatzKarte from '@/components/app/kompass/SatzKarte'
 import SatzSchreiben from '@/components/app/kompass/SatzSchreiben'
+import StimmtDasNoch from '@/components/app/kompass/StimmtDasNoch'
 import VorschlagsKarte from '@/components/app/kompass/VorschlagsKarte'
 import { kompassApi, type Satz, type SatzAenderung, type SatzNeu } from '@/api/kompass'
 
@@ -54,7 +55,17 @@ export default function KompassSaetzePage() {
   const frisch = () => {
     qc.invalidateQueries({ queryKey: ['kompass-saetze'] })
     qc.invalidateQueries({ queryKey: ['kompass'] })
+    qc.invalidateQueries({ queryKey: ['kompass-pruefung'] })
   }
+
+  // „Stimmt das noch?" — der Raum legt von sich aus einen alten Satz wieder vor. Er
+  // laedt still mit: Scheitert der Abruf, fehlt die Frage, und die Seite ist trotzdem
+  // vollstaendig. Eine Fehlermeldung fuer ein Angebot waere zu viel.
+  const { data: pruefung } = useQuery({
+    queryKey: ['kompass-pruefung'],
+    queryFn: kompassApi.pruefung,
+    retry: false,
+  })
 
   const anlegen = useMutation({
     mutationFn: (satz: SatzNeu) => kompassApi.satzAnlegen(satz),
@@ -72,6 +83,12 @@ export default function KompassSaetzePage() {
   const holen = useMutation({
     mutationFn: () => kompassApi.vorschlaegeHolen(),
     onSuccess: (lauf) => { frisch(); setHinweis(lauf.hinweis) },
+  })
+  const beantworten = useMutation({
+    mutationFn: ({ id, antwort, neuerText }:
+      { id: string; antwort: string; neuerText?: string }) =>
+      kompassApi.pruefungBeantworten(id, antwort, neuerText),
+    onSuccess: frisch,
   })
   const entscheiden = useMutation({
     mutationFn: ({ id, annehmen }: { id: string; annehmen: boolean }) =>
@@ -138,6 +155,22 @@ export default function KompassSaetzePage() {
             hast. Der Puls hält fest, wie es gerade ist. Hier steht, was bleibt.
           </p>
         </header>
+
+        {/* ── „Stimmt das noch?" ─────────────────────────────────────────
+            Ganz oben, vor allem anderen: Es ist das Einzige auf dieser Seite, das auf
+            eine Antwort wartet. Weiter unten waere es eine Zeile unter vierzig Saetzen,
+            und dann koennte man sich das Nachfragen auch sparen. */}
+        {pruefung?.satz && (
+          <div className="mb-3">
+            <StimmtDasNoch
+              key={pruefung.satz.id}
+              satz={pruefung.satz}
+              maxZeichen={katalog.satz_max_zeichen}
+              onAntworten={(antwort, neuerText) =>
+                beantworten.mutateAsync({ id: pruefung.satz!.id, antwort, neuerText })}
+            />
+          </div>
+        )}
 
         {/* ── Selbst schreiben ───────────────────────────────────────────── */}
         <section className="card card-hero card-static">

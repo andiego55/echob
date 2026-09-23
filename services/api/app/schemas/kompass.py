@@ -101,6 +101,13 @@ class Satz(BaseModel):
     #: Wann zugestimmt wurde. Gehört sichtbar in die Oberfläche: Ein Satz von vor zwei
     #: Jahren ist etwas anderes als einer von gestern.
     bestaetigt_at: datetime | None = None
+    #: Wann zuletzt „Stimmt das noch?" beantwortet wurde. Ausdrücklich NICHT dasselbe wie
+    #: ``bestaetigt_at``: Wer beim Nachfragen das Zustimmungsdatum hochzählt, macht aus
+    #: jedem alten Satz einen frischen und löscht genau die Auskunft, um die es geht.
+    geprueft_at: datetime | None = None
+    #: Der Satz, aus dem dieser geworden ist. Das Nebeneinander von altem und neuem Satz
+    #: ist die eigentliche Entwicklungsanzeige.
+    vorgaenger_id: UUID | None = None
     updated_at: datetime
 
 
@@ -117,6 +124,39 @@ class VorschlagsLauf(BaseModel):
     """
     vorschlaege: list[Satz] = []
     hinweis: str | None = None
+
+
+# ── „Stimmt das noch?" ──────────────────────────────────────────────────────
+
+
+class Pruefung(BaseModel):
+    """Der Satz, der gerade wieder vorgelegt wird — oder keiner.
+
+    Ein Feld und kein nackter Satz, damit „gerade nichts" eine Antwort ist und kein
+    leerer Körper, den die Oberfläche raten muss.
+    """
+    satz: Satz | None = None
+
+
+class PruefungsAntwort(BaseModel):
+    """``stimmt`` · ``veraendert`` · ``stimmt_nicht_mehr``.
+
+    Schlichte Zeichenkette, kein Literal: Die Liste steht im Dienst. Ein zweites
+    Verzeichnis hier wäre die nächste Stelle, die mitwandern muss.
+    """
+    antwort: str
+    #: Nur bei ``veraendert`` — und dann Pflicht. Der Dienst weist Leeres ab.
+    neuer_text: str | None = Field(default=None, max_length=SATZ_MAX_ZEICHEN)
+
+
+class PruefungsErgebnis(BaseModel):
+    """Beide Sätze nebeneinander — das ist der eigentliche Zweck.
+
+    ``neu`` steht nur bei „hat sich verändert". Der alte kommt immer zurück, damit die
+    Oberfläche zeigen kann, woraus der neue geworden ist.
+    """
+    alt: Satz
+    neu: Satz | None = None
 
 
 # ── Die Vorhaben ────────────────────────────────────────────────────────────
@@ -290,6 +330,9 @@ class KompassUebersicht(BaseModel):
     vorhaben_laufend: int = 0
     #: Ob gerade ein Selbstporträt entstehen darf — der Knopf auf der Startseite.
     portrait_bereit: bool = False
+    #: Ob ein alter Satz auf „Stimmt das noch?" wartet. Eine Marke am Eingang zu den
+    #: Sätzen — nicht mehr: Der Raum soll etwas fuer einen haben, nicht etwas wollen.
+    frage_wartet: bool = False
     #: Wie viele es schon gibt. Ohne diese Zahl liesse sich „noch keines, und noch nicht
     #: soweit" nicht von „eines da, gerade nicht fällig" unterscheiden — und die
     #: Startseite lüde zu einer Seite ein, die nur „jetzt nicht" sagt.

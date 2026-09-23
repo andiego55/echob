@@ -133,6 +133,16 @@ export interface Satz {
   grund: string | null
   created_at: string
   bestaetigt_at: string | null
+  /**
+   * Wann zuletzt „Stimmt das noch?" beantwortet wurde.
+   *
+   * Ausdrücklich NICHT dasselbe wie `bestaetigt_at`: Wer beim Nachfragen das
+   * Zustimmungsdatum hochzählt, macht aus jedem alten Satz einen frischen und löscht
+   * genau die Auskunft, um die es geht.
+   */
+  geprueft_at: string | null
+  /** Der Satz, aus dem dieser geworden ist — „hat sich verändert". */
+  vorgaenger_id: string | null
   updated_at: string
 }
 
@@ -279,6 +289,17 @@ export interface Belege {
   ereignisse: SpurEreignis[]
 }
 
+/** Der alte Satz, der gerade wieder vorgelegt wird — meistens keiner. */
+export interface Pruefung {
+  satz: Satz | null
+}
+
+/** Beide Sätze nebeneinander. `neu` steht nur bei „hat sich verändert". */
+export interface PruefungsErgebnis {
+  alt: Satz
+  neu: Satz | null
+}
+
 export interface KompassUebersicht {
   letzter_puls: Puls | null
   verlauf: Puls[]
@@ -286,6 +307,8 @@ export interface KompassUebersicht {
   rhythmus: number
   verlauf_tage: number
   krisenplan_vorhanden: boolean
+  /** Ob ein alter Satz auf „Stimmt das noch?" wartet. */
+  frage_wartet: boolean
   saetze_bestaetigt: number
   vorhaben_laufend: number
   portrait_bereit: boolean
@@ -384,6 +407,15 @@ export const kompassApi = {
    * `szenen` ist aus, bis jemand es einschaltet: Szenen gehören zu Fällen, und der
    * Kompass ist der Raum ohne Fall.
    */
+  pruefung: () =>
+    apiClient.get<Pruefung>(`${basis}/pruefung`).then(r => r.data),
+
+  pruefungBeantworten: (satzId: string, antwort: string, neuerText?: string) =>
+    apiClient
+      .post<PruefungsErgebnis>(`${basis}/pruefung/${satzId}`,
+        { antwort, neuer_text: neuerText ?? null })
+      .then(r => r.data),
+
   spur: (tage: number, szenen: boolean) =>
     apiClient
       .get<SpurEreignis[]>(`${basis}/spur`, { params: { tage, szenen } })
