@@ -33,6 +33,14 @@ export interface KrisenplanTeil {
   label: string
   hinweis: string
   beispiel: string
+  /**
+   * Ob die Reihenfolge in diesem Abschnitt eine Aussage ist.
+   *
+   * Nur dann gibt es Pfeile zum Umsortieren. Bei Warnzeichen oder Menschen wären sie
+   * Werkzeug ohne Zweck — und ein Bildschirm voller Knöpfe ist das Letzte, was auf
+   * dieser Seite jemand gebrauchen kann.
+   */
+  geordnet?: boolean
 }
 
 /** Eine der sechs Arten, mit Erklärung und Beispiel — beides kommt vom Server. */

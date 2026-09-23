@@ -317,3 +317,28 @@ async def test_ohne_alles_geht_der_puls_trotzdem(db):
     assert antwort.status_code == 201
     assert antwort.json()["zustand_label"] == "belastet"
     assert uebersicht.json()["rhythmus"] == 1
+
+
+# ── Wahl und Reihung ─────────────────────────────────────────────────────────
+
+def test_genau_ein_krisenplan_teil_ist_geordnet():
+    """Die Reihung ist ein ABSCHLUSS, kein Werkzeug an jeder Zeile.
+
+    „Was ich dann tue — der Reihe nach" heißt so, seit es die Seite gibt; bis zur
+    Reihung gab es nur keinen Weg, sie herzustellen, außer alles neu zu tippen. Bei
+    Warnzeichen oder Menschen wären Pfeile an jeder Zeile Werkzeug ohne Zweck — und ein
+    Bildschirm voller Knöpfe ist das Letzte, was auf dieser Seite jemand gebrauchen kann.
+    """
+    geordnet = [t["key"] for t in katalog.KRISENPLAN_TEILE if t.get("geordnet")]
+    assert geordnet == ["schritte"], geordnet
+
+
+def test_der_geordnete_teil_sagt_es_auch_in_seinen_worten():
+    """Die Nummern neben den Zeilen müssen zu dem passen, was darüber steht.
+
+    Stünde „geordnet" an einem Abschnitt, dessen Text nichts von Reihenfolge sagt, wäre
+    die Nummerierung eine Rangfolge, die niemand gemeint hat.
+    """
+    teil = next(t for t in katalog.KRISENPLAN_TEILE if t.get("geordnet"))
+    worte = (teil["label"] + " " + teil["hinweis"]).lower()
+    assert "reihe" in worte or "reihenfolge" in worte, worte

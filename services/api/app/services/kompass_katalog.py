@@ -54,6 +54,14 @@ KRISENPLAN_TEILE: tuple[dict[str, str], ...] = (
     {
         "key": "schritte",
         "label": "Was ich dann tue — der Reihe nach",
+        #: Die Reihenfolge ist hier die Aussage, nicht die Sortierung einer Liste. „Der
+        #: Reihe nach" steht seit jeher in der Ueberschrift; bis zur Reihung gab es nur
+        #: keinen Weg, sie herzustellen, ausser alles neu zu tippen.
+        #:
+        #: Ein Abschnitt fuer sich: Bei Warnzeichen oder Menschen waeren Pfeile an jeder
+        #: Zeile Werkzeug ohne Zweck - und ein Bildschirm voller Knoepfe ist genau das,
+        #: was auf dieser Seite niemand gebrauchen kann.
+        "geordnet": True,
         "hinweis": "In der Reihenfolge, in der du es versuchst. Das Erste soll leicht sein.",
         "beispiel": "Aus dem Zimmer gehen · eine Runde laufen · X anrufen",
     },

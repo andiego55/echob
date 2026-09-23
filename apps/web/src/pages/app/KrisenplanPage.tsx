@@ -117,6 +117,28 @@ export default function KrisenplanPage() {
     setEntwurf(e => (e ? { ...e, [key]: [...(e[key] ?? []), wert] } : e))
   }
 
+  /**
+   * Eine Zeile um eine Stelle verschieben — die REIHUNG.
+   *
+   * Der Bauplan zählt sie zu den Eingabeformen: „Aus Karten wählen, die wichtigsten nach
+   * vorn." Die Wahl gibt es hier schon (die Vorschläge aus guten Momenten); dies ist die
+   * zweite Hälfte — und ausdrücklich nur als ABSCHLUSS. Niemand fängt damit an, zehn
+   * Dinge zu sortieren; man sortiert, was schon dasteht.
+   *
+   * Pfeile und kein Ziehen: Ziehen ist am Telefon ungenau und mit der Tastatur gar nicht
+   * bedienbar. Auf ausgerechnet dieser Seite ist das keine Feinheit.
+   */
+  function zeileSchieben(key: string, index: number, richtung: -1 | 1) {
+    const ziel = index + richtung
+    setEntwurf(e => {
+      if (!e) return e
+      const zeilen = [...(e[key] ?? [])]
+      if (ziel < 0 || ziel >= zeilen.length) return e
+      ;[zeilen[index], zeilen[ziel]] = [zeilen[ziel], zeilen[index]]
+      return { ...e, [key]: zeilen }
+    })
+  }
+
   // Der Fehler VOR dem Ladezustand — und hier wiegt das schwerer als anderswo. Der
   // Entwurf entsteht erst, wenn beide Abfragen da sind; scheitert eine, bliebe diese
   // Seite dauerhaft im Skelett. Ausgerechnet der Notfallplan darf nicht wortlos
@@ -177,6 +199,7 @@ export default function KrisenplanPage() {
               onZeile={setzeZeile}
               onWeg={zeileWeg}
               onDazu={zeileDazu}
+              onSchieben={zeileSchieben}
             />
           )}
 
@@ -291,7 +314,7 @@ function Leseansicht({ teile, inhalt }: {
 // ── Die Bearbeitung ──────────────────────────────────────────────────────────
 
 function Bearbeitung({
-  teile, entwurf, vorschlaege, vorschlagZiel, onZeile, onWeg, onDazu,
+  teile, entwurf, vorschlaege, vorschlagZiel, onZeile, onWeg, onDazu, onSchieben,
 }: {
   teile: KrisenplanTeil[]
   entwurf: Record<string, string[]>
@@ -300,6 +323,7 @@ function Bearbeitung({
   onZeile: (key: string, index: number, wert: string) => void
   onWeg: (key: string, index: number) => void
   onDazu: (key: string, wert?: string) => void
+  onSchieben: (key: string, index: number, richtung: -1 | 1) => void
 }) {
   return (
     <div className="space-y-4">
@@ -336,6 +360,16 @@ function Bearbeitung({
             <div className="mt-3 space-y-2">
               {zeilen.map((z, i) => (
                 <div key={i} className="flex items-center gap-2">
+                  {/* Die Nummer steht nur, wo die Reihenfolge etwas bedeutet. Sonst
+                      waere sie eine Rangfolge, die niemand gemeint hat. */}
+                  {t.geordnet && (
+                    <span
+                      className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/10 text-[0.7rem] font-bold text-accent"
+                      aria-hidden="true"
+                    >
+                      {i + 1}
+                    </span>
+                  )}
                   <input
                     type="text"
                     value={z}
@@ -345,6 +379,22 @@ function Bearbeitung({
                     aria-label={`${t.label}, Zeile ${i + 1}`}
                     className="input"
                   />
+                  {t.geordnet && zeilen.length > 1 && (
+                    <div className="flex shrink-0 flex-col">
+                      <Pfeil
+                        richtung="hoch"
+                        aus={i === 0}
+                        label={`Zeile ${i + 1} nach oben`}
+                        onKlick={() => onSchieben(t.key, i, -1)}
+                      />
+                      <Pfeil
+                        richtung="runter"
+                        aus={i === zeilen.length - 1}
+                        label={`Zeile ${i + 1} nach unten`}
+                        onKlick={() => onSchieben(t.key, i, 1)}
+                      />
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => onWeg(t.key, i)}
@@ -360,6 +410,13 @@ function Bearbeitung({
                   </button>
                 </div>
               ))}
+
+              {t.geordnet && zeilen.length > 1 && (
+                <p className="!mt-2 text-[0.76rem] leading-relaxed text-brand-muted">
+                  Die Reihenfolge zählt: Das Erste soll das Leichteste sein — das, was
+                  auch dann noch geht, wenn fast nichts mehr geht.
+                </p>
+              )}
             </div>
 
             <button
@@ -407,5 +464,35 @@ function Anlaufstellen() {
         ))}
       </ul>
     </section>
+  )
+}
+
+// ── Eine Stelle nach oben oder unten ─────────────────────────────────────────
+// Klein und ohne Farbe: Es ist kein Vorgang, sondern eine Korrektur. Ausgeschaltet am
+// Rand, statt zu verschwinden — sonst springen die übrigen Pfeile beim Sortieren hin und
+// her, und man trifft den falschen.
+
+function Pfeil({ richtung, aus, label, onKlick }: {
+  richtung: 'hoch' | 'runter'
+  aus: boolean
+  label: string
+  onKlick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onKlick}
+      disabled={aus}
+      aria-label={label}
+      className="rounded-brand-sm px-1.5 py-0.5 text-brand-muted transition-colors hover:bg-brand-bg hover:text-navy disabled:opacity-25 disabled:hover:bg-transparent"
+    >
+      <svg
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+        strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"
+        aria-hidden="true"
+      >
+        <path d={richtung === 'hoch' ? 'M18 15l-6-6-6 6' : 'M6 9l6 6 6-6'} />
+      </svg>
+    </button>
   )
 }
