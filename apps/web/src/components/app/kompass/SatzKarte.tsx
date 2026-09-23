@@ -10,16 +10,26 @@
  *
  * **Warum „Löschen" rechts aussen steht.** Es ist der einzige Knopf ohne Rückweg. Zwischen
  * ihm und den anderen liegt deshalb Platz, nicht nur eine andere Farbe.
+ *
+ * **„Besprechen" nur an bestätigten Sätzen.** Ein Entwurf ist noch keine Aussage über
+ * einen Menschen, und ein überholter hat seine Antwort schon — beides gehört nicht auf
+ * eine Tagesordnung.
  */
 import Chip from '@/components/Chip'
-import type { Satz, SatzAenderung } from '@/api/kompass'
+import BesprechenKnopf from './BesprechenKnopf'
+import type { AgendaArt, Satz, SatzAenderung } from '@/api/kompass'
 import { altersWort } from '@/lib/kompass'
 
-export default function SatzKarte({ satz: s, onAendern, onLoeschen, laeuft }: {
+export default function SatzKarte({
+  satz: s, onAendern, onLoeschen, laeuft, aufDerListe, onBesprechen,
+}: {
   satz: Satz
   onAendern: (a: SatzAenderung) => void
   onLoeschen: () => void
   laeuft: boolean
+  /** Ob der Satz auf der Tagesordnung steht. Fehlt, wo es die Liste nicht gibt. */
+  aufDerListe?: boolean
+  onBesprechen?: (art: AgendaArt, zielId: string, drauf: boolean) => Promise<unknown>
 }) {
   const entwurf = s.stand === 'entwurf'
   const ueberholt = s.stand === 'ueberholt'
@@ -111,6 +121,15 @@ export default function SatzKarte({ satz: s, onAendern, onLoeschen, laeuft }: {
           >
             Gilt doch wieder
           </button>
+        )}
+
+        {s.stand === 'bestaetigt' && onBesprechen && (
+          <BesprechenKnopf
+            art="satz"
+            zielId={s.id}
+            markiert={!!aufDerListe}
+            onUmschalten={onBesprechen}
+          />
         )}
 
         <button

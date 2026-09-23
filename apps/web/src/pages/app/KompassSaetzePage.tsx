@@ -29,6 +29,7 @@ import { useBestaetigen } from '@/components/Bestaetigung'
 import SatzKarte from '@/components/app/kompass/SatzKarte'
 import SatzSchreiben from '@/components/app/kompass/SatzSchreiben'
 import StimmtDasNoch from '@/components/app/kompass/StimmtDasNoch'
+import { useAgenda } from '@/hooks/useAgenda'
 import VorschlagsKarte from '@/components/app/kompass/VorschlagsKarte'
 import { kompassApi, type Satz, type SatzAenderung, type SatzNeu } from '@/api/kompass'
 
@@ -38,6 +39,7 @@ const MAX_OFFENE = 3
 export default function KompassSaetzePage() {
   const qc = useQueryClient()
   const bestaetigen = useBestaetigen()
+  const agenda = useAgenda()
   const [schreibt, setSchreibt] = useState(false)
   const [ueberholteOffen, setUeberholteOffen] = useState(false)
   const [hinweis, setHinweis] = useState<string | null>(null)
@@ -284,6 +286,8 @@ export default function KompassSaetzePage() {
                 key={s.id} satz={s} laeuft={aendern.isPending}
                 onAendern={a => aendern.mutate({ id: s.id, ...a })}
                 onLoeschen={() => wegwerfen(s)}
+                aufDerListe={agenda.istDrauf('satz', s.id)}
+                onBesprechen={agenda.umschalten}
               />
             ))}
           </Stapel>
@@ -300,6 +304,8 @@ export default function KompassSaetzePage() {
                 key={s.id} satz={s} laeuft={aendern.isPending}
                 onAendern={a => aendern.mutate({ id: s.id, ...a })}
                 onLoeschen={() => wegwerfen(s)}
+                aufDerListe={agenda.istDrauf('satz', s.id)}
+                onBesprechen={agenda.umschalten}
               />
             ))}
           </Stapel>
@@ -337,6 +343,8 @@ export default function KompassSaetzePage() {
                     key={s.id} satz={s} laeuft={aendern.isPending}
                     onAendern={a => aendern.mutate({ id: s.id, ...a })}
                     onLoeschen={() => wegwerfen(s)}
+                    aufDerListe={agenda.istDrauf('satz', s.id)}
+                    onBesprechen={agenda.umschalten}
                   />
                 ))}
               </div>

@@ -39,7 +39,9 @@ import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import VerlaufsKurve from '@/components/app/kompass/VerlaufsKurve'
-import { kompassApi, type Puls, type SpurEreignis } from '@/api/kompass'
+import BesprechenKnopf from '@/components/app/kompass/BesprechenKnopf'
+import { useAgenda } from '@/hooks/useAgenda'
+import { kompassApi, type AgendaArt, type Puls, type SpurEreignis } from '@/api/kompass'
 import { casesApi } from '@/api/cases'
 import { bewegung, rhythmusSatz, spurNachTagen, ton, zeitWort } from '@/lib/kompass'
 
@@ -52,6 +54,7 @@ const ZEITRAEUME = [
 export default function KompassVerlaufPage() {
   const qc = useQueryClient()
   const bestaetigen = useBestaetigen()
+  const agenda = useAgenda()
   const [tage, setTage] = useState(28)
   const [offen, setOffen] = useState<string | null>(null)
   const [mitSzenen, setMitSzenen] = useState(false)
@@ -226,6 +229,8 @@ export default function KompassVerlaufPage() {
                           fallName={fallName}
                           onWegnehmen={() => wegnehmen(p)}
                           laeuft={loeschen.isPending && loeschen.variables === p.id}
+                          aufDerListe={agenda.istDrauf('puls', p.id)}
+                          onBesprechen={agenda.umschalten}
                         />
                       ))}
                       {g.ereignisse.map((e, i) => (
@@ -250,13 +255,18 @@ export default function KompassVerlaufPage() {
 
 // ── Ein Moment in der Liste ──────────────────────────────────────────────────
 
-function MomentZeile({ puls: p, hervorgehoben, wortLabel, fallName, onWegnehmen, laeuft }: {
+function MomentZeile({
+  puls: p, hervorgehoben, wortLabel, fallName, onWegnehmen, laeuft,
+  aufDerListe, onBesprechen,
+}: {
   puls: Puls
   hervorgehoben: boolean
   wortLabel: Map<string, string>
   fallName: Map<string, string>
   onWegnehmen: () => void
   laeuft: boolean
+  aufDerListe: boolean
+  onBesprechen: (art: AgendaArt, zielId: string, drauf: boolean) => Promise<unknown>
 }) {
   const farbe = ton(p.zustand).hex
   return (
@@ -312,6 +322,17 @@ function MomentZeile({ puls: p, hervorgehoben, wortLabel, fallName, onWegnehmen,
               Mit {fallName.get(p.case_id)}
             </p>
           )}
+
+          {/* Erst nach dem Inhalt: Der Knopf ist ein Nachgedanke zu dem, was dasteht,
+              und keine Aufforderung beim Lesen. */}
+          <div className="mt-2 -ml-2.5">
+            <BesprechenKnopf
+              art="puls"
+              zielId={p.id}
+              markiert={aufDerListe}
+              onUmschalten={onBesprechen}
+            />
+          </div>
         </div>
 
         <button

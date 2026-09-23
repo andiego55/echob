@@ -30,14 +30,17 @@ import AppShell from '@/components/app/AppShell'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
-import { kompassApi, type Portrait } from '@/api/kompass'
+import { kompassApi, type AgendaArt, type Portrait } from '@/api/kompass'
 import { altersWort } from '@/lib/kompass'
+import BesprechenKnopf from '@/components/app/kompass/BesprechenKnopf'
+import { useAgenda } from '@/hooks/useAgenda'
 
 const MAX_ZEICHEN = 4000
 
 export default function KompassPortraitPage() {
   const qc = useQueryClient()
   const nachfragen = useBestaetigen()
+  const agenda = useAgenda()
   const [text, setText] = useState('')
   // Woher der Text im Feld stammt: aus dem gespeicherten Entwurf oder gerade eben von
   // Echo. Ungespeicherte Fassungen duerfen beim Neuladen der Abfrage nicht verschwinden.
@@ -312,7 +315,14 @@ export default function KompassPortraitPage() {
                 : 'Jedes bleibt so stehen, wie du es bestätigt hast. Nebeneinander gelesen zeigen sie, was sich bewegt hat.'}
             </p>
             <div className="mt-4 space-y-4">
-              {stand.verlauf.map(p => <Fassung key={p.id} portrait={p} />)}
+              {stand.verlauf.map(p => (
+                <Fassung
+                  key={p.id}
+                  portrait={p}
+                  aufDerListe={agenda.istDrauf('portrait', p.id)}
+                  onBesprechen={agenda.umschalten}
+                />
+              ))}
             </div>
           </section>
         )}
@@ -326,7 +336,11 @@ export default function KompassPortraitPage() {
 // Aufgeklappt, nicht als Liste von Titeln: Ein Porträt hat keinen Titel, und „Fassung vom
 // 3. März" aufklappen zu müssen, um den eigenen Text zu lesen, ist eine Hürde ohne Zweck.
 // Ältere sind eingeklappt, weil die Seite sonst nicht mehr endet.
-function Fassung({ portrait }: { portrait: Portrait }) {
+function Fassung({ portrait, aufDerListe, onBesprechen }: {
+  portrait: Portrait
+  aufDerListe: boolean
+  onBesprechen: (art: AgendaArt, zielId: string, drauf: boolean) => Promise<unknown>
+}) {
   const [offen, setOffen] = useState(false)
   const datum = portrait.bestaetigt_at
     ? new Date(portrait.bestaetigt_at).toLocaleDateString('de-DE',
@@ -351,15 +365,25 @@ function Fassung({ portrait }: { portrait: Portrait }) {
       >
         {portrait.text}
       </div>
-      {lang && (
-        <button
-          type="button"
-          onClick={() => setOffen(o => !o)}
-          className="mt-2 text-[0.8rem] font-medium text-accent transition-colors hover:underline"
-        >
-          {offen ? 'Weniger' : 'Ganz lesen'}
-        </button>
-      )}
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        {lang && (
+          <button
+            type="button"
+            onClick={() => setOffen(o => !o)}
+            className="text-[0.8rem] font-medium text-accent transition-colors hover:underline"
+          >
+            {offen ? 'Weniger' : 'Ganz lesen'}
+          </button>
+        )}
+        <div className="-ml-2.5">
+          <BesprechenKnopf
+            art="portrait"
+            zielId={portrait.id}
+            markiert={aufDerListe}
+            onUmschalten={onBesprechen}
+          />
+        </div>
+      </div>
     </article>
   )
 }

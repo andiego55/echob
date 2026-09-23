@@ -63,6 +63,7 @@ const KompassVorhabenPage = lazy(() => import('@/pages/app/KompassVorhabenPage')
 const KompassUebungenPage = lazy(() => import('@/pages/app/KompassUebungenPage'))
 const KompassPortraitPage = lazy(() => import('@/pages/app/KompassPortraitPage'))
 const KompassBriefPage = lazy(() => import('@/pages/app/KompassBriefPage'))
+const KompassAgendaPage = lazy(() => import('@/pages/app/KompassAgendaPage'))
 const KrisenplanPage = lazy(() => import('@/pages/app/KrisenplanPage'))
 const PersonProfilePage = lazy(() => import('@/pages/app/PersonProfilePage'))
 const PersonProfileEchoPage = lazy(() => import('@/pages/app/PersonProfileEchoPage'))
@@ -278,6 +279,7 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/app/kompass/uebungen" element={<ProtectedRoute><KompassUebungenPage /></ProtectedRoute>} />
       <Route path="/app/kompass/portrait" element={<ProtectedRoute><KompassPortraitPage /></ProtectedRoute>} />
       <Route path="/app/kompass/brief" element={<ProtectedRoute><KompassBriefPage /></ProtectedRoute>} />
+      <Route path="/app/kompass/agenda" element={<ProtectedRoute><KompassAgendaPage /></ProtectedRoute>} />
       <Route path="/app/kompass/krisenplan" element={<ProtectedRoute><KrisenplanPage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />

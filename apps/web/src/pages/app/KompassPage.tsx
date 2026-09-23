@@ -226,6 +226,25 @@ export default function KompassPage() {
           />
         </div>
 
+        {/* Kein Band und kein sechster Eingang: Die Tagesordnung WARTET nicht auf
+            einen, sie liegt bereit, wenn man sie braucht. Eine leise Zeile ist genau
+            das — und sie steht nur da, wenn etwas drauf ist; der Weg dorthin sind die
+            Knöpfe an den Sätzen selbst. */}
+        {(stand?.agenda_anzahl ?? 0) > 0 && (
+          <p className="mt-4 text-center text-[0.82rem] text-brand-muted">
+            Für den nächsten Termin hast du{' '}
+            <Link
+              to="/app/kompass/agenda"
+              className="font-semibold text-accent no-underline hover:underline"
+            >
+              {stand?.agenda_anzahl === 1
+                ? 'einen Punkt vorgemerkt'
+                : `${stand?.agenda_anzahl} Punkte vorgemerkt`}
+            </Link>
+            .
+          </p>
+        )}
+
         <Fehlermeldung error={anlegen.error} className="mt-4" />
 
         {/* ── Was hier für dich liegt ───────────────────────────────────────

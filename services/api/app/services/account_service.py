@@ -30,7 +30,7 @@ _USER_TABLES = (
     "client_notifications", "test_results", "pseudonymous_accounts",
     # Mein Kompass - gehoert der Person, nicht einem Fall.
     "selbst_pulse", "selbst_vorhaben", "selbst_saetze", "selbst_portraits",
-    "selbst_briefe",
+    "selbst_briefe", "selbst_agenda",
     # Ausbildung: die eigene Zuordnung bzw. das eigene Institut.
     "students", "training_institutes",
 )
@@ -84,6 +84,7 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     # kein Widerspruch zu "liegt zu bis zum Datum": Die Sperre ist eine Verabredung mit
     # sich selbst im Raum, kein Recht des Betreibers, jemandem seinen Text vorzuenthalten.
     "selbst_briefe":                 {"text": ("text",)},
+    "selbst_agenda":                 {"text": ("notiz",)},
 }
 
 
@@ -253,6 +254,11 @@ _DELETE_STEPS = (
     ("payments", "user_id = $1"),
     ("ai_usage_log", "user_id = $1"),
     ("test_results", "user_id = $1"),
+    # Die Tagesordnung zuerst: Sie verweist auf Saetze, Pulse und Portraets. Die
+    # Fremdschluessel raeumen zwar per CASCADE auf, aber die Reihenfolge dieser Liste IST
+    # die Reihenfolge des Loeschens - sie soll nicht davon abhaengen, dass jemand die
+    # Regeln der Datenbank im Kopf hat.
+    ("selbst_agenda", "user_id = $1"),
     ("selbst_pulse", "user_id = $1"),
     ("selbst_vorhaben", "user_id = $1"),
     ("selbst_saetze", "user_id = $1"),

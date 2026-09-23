@@ -269,6 +269,12 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Etwas vornehmen', 'Schritte abhaken', 'Zurückschauen, wenn der Abstand um ist'],
     tipp: 'Es gibt kein „aufgegeben". Was gerade nicht dran ist, ruht — und bleibt da, ohne zu drängen.',
   },
+  '/app/kompass/agenda': {
+    titel: 'Das möchtest du besprechen',
+    zweck: 'Was du dir für den nächsten Termin vorgemerkt hast — eine Liste zum Mitnehmen.',
+    schritte: ['An Sätzen, Momenten und Porträts auf „Besprechen" tippen', 'Vor dem Termin durchgehen', 'Danach herunternehmen'],
+    tipp: 'Die Liste bleibt bei dir. Sie wird nicht weitergegeben — einzelne Sätze kannst du weiterhin einzeln freigeben.',
+  },
   '/app/kompass/brief': {
     titel: 'Ein Brief an dich selbst',
     zweck: 'Ein paar Zeilen an dich in ein paar Monaten — für einen Tag, an dem es schwerer ist.',

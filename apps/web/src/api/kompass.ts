@@ -312,6 +312,29 @@ export interface Brief {
   created_at: string
 }
 
+/** Die Arten, die auf die Tagesordnung können. Dieselben wie im Dienst. */
+export type AgendaArt = 'satz' | 'puls' | 'portrait'
+
+/**
+ * Ein Punkt der Tagesordnung, fertig zum Vorlesen.
+ *
+ * `titel` und `unterzeile` bildet der Server — sonst gäbe es drei Stellen, an denen ein
+ * Puls beschrieben wird, und sie liefen auseinander.
+ */
+export interface AgendaPunkt {
+  id: string
+  art: AgendaArt
+  ziel_id: string
+  titel: string
+  unterzeile: string | null
+  notiz: string | null
+  wann: string | null
+  created_at: string
+}
+
+/** Welche Kennungen je Art schon auf der Liste stehen. */
+export type AgendaMarkierungen = Record<AgendaArt, string[]>
+
 /** Der alte Satz, der gerade wieder vorgelegt wird — meistens keiner. */
 export interface Pruefung {
   satz: Satz | null
@@ -330,6 +353,8 @@ export interface KompassUebersicht {
   rhythmus: number
   verlauf_tage: number
   krisenplan_vorhanden: boolean
+  /** Wie viele Punkte auf der Tagesordnung stehen. */
+  agenda_anzahl: number
   /** Ob ein Brief an dich selbst heute aufgeht und noch nicht gelesen ist. */
   brief_wartet: boolean
   /** Ob ein alter Satz auf „Stimmt das noch?" wartet. */
@@ -432,6 +457,22 @@ export const kompassApi = {
    * `szenen` ist aus, bis jemand es einschaltet: Szenen gehören zu Fällen, und der
    * Kompass ist der Raum ohne Fall.
    */
+  agenda: () =>
+    apiClient.get<AgendaPunkt[]>(`${basis}/agenda`).then(r => r.data),
+
+  /** Eine Abfrage für alle Karten — und ohne einen Text zu entschlüsseln. */
+  agendaMarkierungen: () =>
+    apiClient.get<AgendaMarkierungen>(`${basis}/agenda/markierungen`).then(r => r.data),
+
+  agendaDazu: (art: AgendaArt, zielId: string, notiz?: string) =>
+    apiClient
+      .post<AgendaPunkt>(`${basis}/agenda`,
+        { art, ziel_id: zielId, notiz: notiz ?? null })
+      .then(r => r.data),
+
+  agendaWeg: (eintragId: string) =>
+    apiClient.delete(`${basis}/agenda/${eintragId}`).then(() => undefined),
+
   briefe: () =>
     apiClient.get<Brief[]>(`${basis}/briefe`).then(r => r.data),
 

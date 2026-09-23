@@ -26,6 +26,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.kompass import (
+    AgendaNeu,
+    AgendaPunkt,
     Belege,
     Brief,
     BriefNeu,
@@ -55,6 +57,7 @@ from app.schemas.kompass import (
     VorschlagsLauf,
 )
 from app.services import (
+    kompass_agenda_service,
     kompass_brief_service,
     kompass_portrait_service,
     kompass_pruefung_service,
@@ -124,6 +127,9 @@ async def uebersicht(
         )
         daten["brief_wartet"] = bool(
             await kompass_brief_service.wartet(conn, user_id=user_id)
+        )
+        daten["agenda_anzahl"] = await kompass_agenda_service.anzahl(
+            conn, user_id=user_id
         )
     return KompassUebersicht(**daten)
 
@@ -862,5 +868,82 @@ async def brief_zuruecknehmen(
     async with pool.acquire() as conn:
         weg = await kompass_brief_service.zuruecknehmen(
             conn, user_id=current["user_id"], brief_id=brief_id)
+    if not weg:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+
+
+# ── „Das möchte ich besprechen" ─────────────────────────────────────────────
+
+
+@router.get("/agenda", response_model=list[AgendaPunkt])
+async def agenda_lesen(
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[AgendaPunkt]:
+    """Die Tagesordnung fuer den naechsten Termin, aelteste zuerst.
+
+    Privat. Sie wird nicht freigegeben — auf ihr duerfen Pulse stehen, und die sind
+    ausdruecklich nie freigebbar. Wer einzelne Saetze uebergeben will, gibt sie einzeln
+    frei; dafuer gibt es den Weg schon.
+    """
+    async with pool.acquire() as conn:
+        punkte = await kompass_agenda_service.liste(conn, user_id=current["user_id"])
+    return [AgendaPunkt(**p) for p in punkte]
+
+
+@router.post("/agenda", response_model=AgendaPunkt, status_code=status.HTTP_201_CREATED)
+async def agenda_dazu(
+    body: AgendaNeu,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> AgendaPunkt:
+    """Setzt ein Stueck auf die Tagesordnung.
+
+    Die Eigentuemerschaft der Kennung prueft der Dienst — hier gibt es anders als beim
+    Puls keine Naht, an der sie schon einmal geprueft worden waere, und sie stuende sonst
+    an zwei Stellen halb.
+    """
+    async with pool.acquire() as conn:
+        try:
+            punkt = await kompass_agenda_service.dazu(
+                conn, user_id=current["user_id"], art=body.art,
+                ziel_id=body.ziel_id, notiz=body.notiz)
+        except LookupError as fehler:
+            raise HTTPException(status_code=404, detail=str(fehler)) from fehler
+        except ValueError as fehler:
+            raise HTTPException(status_code=400, detail=str(fehler)) from fehler
+
+    return AgendaPunkt(**punkt)
+
+
+@router.get("/agenda/markierungen")
+async def agenda_markierungen(
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict[str, list[str]]:
+    """Welche Stuecke schon auf der Liste stehen, je Art.
+
+    Damit jede Karte zeigen kann, ob sie drauf ist — mit EINER Abfrage und ohne einen
+    Text zu entschluesseln. Die Liste selbst waere der bequeme Weg und der falsche: Sie
+    holt zu jedem Eintrag sein Ziel und schluesselt es auf, fuer eine Frage, die ja oder
+    nein lautet.
+    """
+    async with pool.acquire() as conn:
+        return await kompass_agenda_service.markierungen(
+            conn, user_id=current["user_id"])
+
+
+@router.delete(
+    "/agenda/{eintrag_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None
+)
+async def agenda_weg(
+    eintrag_id: UUID,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> None:
+    """Nimmt einen Punkt herunter. Das Stueck selbst bleibt, wo es ist."""
+    async with pool.acquire() as conn:
+        weg = await kompass_agenda_service.weg(
+            conn, user_id=current["user_id"], eintrag_id=eintrag_id)
     if not weg:
         raise HTTPException(status_code=404, detail="Nicht gefunden.")

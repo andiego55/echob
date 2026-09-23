@@ -12,6 +12,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.services.kompass_agenda_service import NOTIZ_MAX_ZEICHEN as AGENDA_NOTIZ_MAX
 from app.services.kompass_brief_service import MAX_TAGE as BRIEF_MAX_TAGE
 from app.services.kompass_brief_service import MAX_ZEICHEN as BRIEF_MAX_ZEICHEN
 from app.services.kompass_brief_service import MIN_TAGE as BRIEF_MIN_TAGE
@@ -319,6 +320,33 @@ class Belege(BaseModel):
     ereignisse: list[SpurEreignis] = []
 
 
+# ── „Das möchte ich besprechen" ─────────────────────────────────────────────
+
+
+class AgendaPunkt(BaseModel):
+    """Ein Punkt der Tagesordnung, fertig zum Vorlesen.
+
+    ``titel`` und ``unterzeile`` bildet der Dienst, nicht die Oberfläche: Sonst gäbe es
+    drei Stellen, an denen ein Puls beschrieben wird, und sie liefen auseinander.
+    """
+    id: UUID
+    art: str
+    ziel_id: UUID
+    titel: str
+    unterzeile: str | None = None
+    #: Warum jemand das ansprechen will. Freiwillig.
+    notiz: str | None = None
+    #: Von wann das Stück ist — nicht, wann es auf die Liste kam.
+    wann: datetime | None = None
+    created_at: datetime
+
+
+class AgendaNeu(BaseModel):
+    art: str
+    ziel_id: UUID
+    notiz: str | None = Field(default=None, max_length=AGENDA_NOTIZ_MAX)
+
+
 # ── Ein Brief an dich selbst ────────────────────────────────────────────────
 
 
@@ -357,6 +385,9 @@ class KompassUebersicht(BaseModel):
     vorhaben_laufend: int = 0
     #: Ob gerade ein Selbstporträt entstehen darf — der Knopf auf der Startseite.
     portrait_bereit: bool = False
+    #: Wie viele Punkte auf der Tagesordnung stehen. Eine Zahl am Eingang, kein Band:
+    #: Die Liste wartet nicht auf einen — sie liegt bereit, wenn man sie braucht.
+    agenda_anzahl: int = 0
     #: Ob ein Brief an sich selbst heute aufgeht und noch nicht gelesen ist. Der
     #: freundlichste Grund zurueckzukommen, den der Raum hat — deshalb steht er vor
     #: allem anderen, was auf der Startseite warten koennte.
