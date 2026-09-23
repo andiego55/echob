@@ -11,6 +11,21 @@
  * Gesellschaft, und beide Texte müssen das gleichzeitig nachvollziehen.
  */
 
+/**
+ * Nur die Marke — für die INFORMATION nach Art. 13.
+ *
+ * Eine Information sagt, wer verarbeitet; wer das genau ist, steht einen Klick entfernt
+ * in der Datenschutzerklärung und im Impressum, und in beiden vollständig. Der bürgerliche
+ * Name des Betreibers im laufenden Text einer Hinweisbox leistet dafür nichts — er ist
+ * dort nur eine Privatanschrift, die eine Klient:in nicht wissen muss, um zu verstehen,
+ * was mit ihren Texten geschieht.
+ *
+ * **Nicht für Erklärungen.** Eine Einwilligung und eine Schweigepflichtentbindung müssen
+ * BESTIMMT sein: Sie werden gegenüber jemandem abgegeben, und der muss benannt sein.
+ * Dort steht weiterhin ``BETREIBER_VOLL``.
+ */
+export const BETREIBER_MARKE = 'EchoB'
+
 /** Kurzform für laufenden Text. */
 export const BETREIBER_KURZ = 'EchoB (Andreas Wygrabek)'
 

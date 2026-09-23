@@ -41,7 +41,8 @@ export const echoApi = {
 
   topicSummary: (caseId: string, thread_type: string) =>
     apiClient
-      .post<{ summary: string }>(`/cases/${caseId}/echo/topic-summary`, { thread_type })
+      .post<{ summary: string | null; hinweis: string | null }>(
+        `/cases/${caseId}/echo/topic-summary`, { thread_type })
       .then(r => r.data),
 
   resetTopicHistory: (caseId: string, thread_type: string) =>

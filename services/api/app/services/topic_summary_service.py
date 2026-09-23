@@ -36,7 +36,26 @@ def build_topic_context(topic_summaries: list[dict[str, Any]]) -> str:
     # Wissens-Dialoge (content_<slug>): dynamische Themen, nach den Kern-Themen.
     for topic, text in by_topic.items():
         if topic.startswith("content_") and text:
-            label = topic.removeprefix("content_").replace("-", " ").capitalize()
-            lines.append(f"### Wissens-Dialog: {label}\n{text}\n")
+            lines.append(f"### {etikett(topic)}\n{text}\n")
 
     return "\n".join(lines)
+
+
+def etikett(topic: str) -> str:
+    """Die Überschrift eines Themas — **nie der technische Schlüssel**.
+
+    Eine Fachperson bekam „content_beziehungsgesundheit" als Überschrift einer
+    Zusammenfassung zu lesen. Das ist keine Schönheitsfrage: Was in einer Akte steht,
+    liest jemand, der den Schlüssel nicht kennt und auch nicht kennen soll.
+
+    Der Titel des Wissensbeitrags steht im Frontend-Manifest und ist von hier aus nicht
+    erreichbar. Aus dem Schlüssel lässt sich aber ein lesbarer Name bilden — allemal
+    besser als ein Bezeichner mit Unterstrich. Sollte der echte Titel je gebraucht
+    werden, ist dies die eine Stelle, an der er einzusetzen wäre.
+    """
+    if topic in _TOPIC_LABELS:
+        return _TOPIC_LABELS[topic]
+    if topic.startswith("content_"):
+        wort = topic.removeprefix("content_").replace("-", " ").replace("_", " ").strip()
+        return f"Wissens-Dialog: {wort[:1].upper()}{wort[1:]}" if wort else "Wissens-Dialog"
+    return topic

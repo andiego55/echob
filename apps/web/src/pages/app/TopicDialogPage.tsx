@@ -121,6 +121,11 @@ export default function TopicDialogPage() {
   const [input, setInput] = useState('')
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const [summary, setSummary] = useState<string | null>(null)
+  // „Noch zu kurz" ist keine Zusammenfassung, sondern die Auskunft, dass es keine gibt.
+  // Frueher kam sie als Text zurueck, liess sich speichern und stand am Ende in einer
+  // Akte — gerichtet an eine Fachperson, die ihr nicht folgen kann. Jetzt sagt der
+  // Server es getrennt, und hier landet es auch getrennt.
+  const [summaryHinweis, setSummaryHinweis] = useState<string | null>(null)
   const [savedSummary, setSavedSummary] = useState(false)
   const sessionId = topicId ?? ''
 
@@ -186,7 +191,7 @@ export default function TopicDialogPage() {
 
   const summaryMutation = useMutation({
     mutationFn: () => echoApi.topicSummary(caseId!, topicId!),
-    onSuccess: (data) => { setSummary(data.summary); setSavedSummary(false) },
+    onSuccess: (data) => { setSummary(data.summary); setSavedSummary(false); setSummaryHinweis(data.hinweis) },
   })
 
   const saveSummaryMutation = useMutation({
@@ -362,6 +367,12 @@ export default function TopicDialogPage() {
                       </button>
                     )}
                   </div>
+                </div>
+              )}
+
+              {summaryHinweis && !summary && (
+                <div className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3 text-xs leading-relaxed text-brand-muted">
+                  {summaryHinweis}
                 </div>
               )}
 

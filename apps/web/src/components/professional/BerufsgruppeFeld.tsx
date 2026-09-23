@@ -2,8 +2,8 @@
  * Die Berufsgruppe der Fachperson — und was rechtlich daran hängt.
  *
  * **Warum das keine Beschriftung ist.** An der Berufsgruppe entscheidet sich, ob § 203 StGB
- * gilt: Psychotherapeut:innen und Berufspsycholog:innen unterliegen der strafbewehrten
- * Schweigepflicht, Coaches und Berater:innen nicht. Daran hängen unterschiedliche
+ * gilt: Psychotherapeut:innen und Berufspsycholog:innen unterliegen der Schweigepflicht
+ * nach dieser Vorschrift, Coaches und Berater:innen nicht. Daran hängen unterschiedliche
  * Vertragsbausteine — deshalb kommt die Liste vom Server und steht nicht im Formular.
  *
  * **Drei Zustände, nicht zwei.** `unterliegt_203` kann `true`, `false` oder `null` sein.
@@ -11,6 +11,12 @@
  * Psychotherapie, die eine staatliche Erlaubnis brauchen, aber keine staatlich geregelte
  * Ausbildung. Eine offene Frage als beantwortet darzustellen wäre schlimmer als sie offen
  * zu zeigen, deshalb bekommt sie hier eine eigene Farbe und einen eigenen Satz.
+ *
+ * **Ein leeres Feld schaltet sich nicht wortlos ab.** Genau das tat es: Der Katalog kam
+ * vom Server, der Aufruf scheiterte auf der Registrierungsseite (dort ist man noch keine
+ * Fachperson), die Liste blieb leer — und ein `disabled`-Auswahlfeld stand vor einem
+ * Pflichtfeld. Registrieren war unmöglich, ohne dass irgendwo stand, warum. Ein
+ * gescheiterter Abruf sagt jetzt, dass er gescheitert ist.
  *
  * **Warum die Angabe freiwillig bleibt.** Bestandskonten haben sie nicht, und wer ein Konto
  * bereitstellt, kennt sie nicht. Eine erfundene Voreinstellung wäre eine Behauptung über
@@ -24,7 +30,7 @@ export default function BerufsgruppeFeld({ wert, onAendern, disabled }: {
   onAendern: (gruppe: string | null) => void
   disabled?: boolean
 }) {
-  const { data: gruppen = [] } = useQuery({
+  const { data: gruppen = [], isLoading, error } = useQuery({
     queryKey: ['berufsgruppen'],
     queryFn: professionalApi.berufsgruppen,
     staleTime: Infinity,
@@ -41,7 +47,7 @@ export default function BerufsgruppeFeld({ wert, onAendern, disabled }: {
       <select
         id="berufsgruppe"
         value={wert ?? ''}
-        disabled={disabled || gruppen.length === 0}
+        disabled={disabled || isLoading || gruppen.length === 0}
         onChange={e => onAendern(e.target.value || null)}
         className="w-full rounded-brand border border-brand-border bg-white px-4 py-2.5 text-sm outline-none transition focus:border-accent focus:ring-1 focus:ring-accent disabled:opacity-50"
       >
@@ -49,7 +55,12 @@ export default function BerufsgruppeFeld({ wert, onAendern, disabled }: {
         {gruppen.map(g => <option key={g.id} value={g.id}>{g.label}</option>)}
       </select>
 
-      {gewaehlt ? (
+      {error ? (
+        <p className="mt-2 text-xs leading-relaxed text-red-700">
+          Die Liste der Berufsgruppen ließ sich nicht laden. Bitte lade die Seite neu —
+          ohne sie lässt sich das Formular nicht abschicken.
+        </p>
+      ) : gewaehlt ? (
         <p className={`mt-2 text-xs leading-relaxed ${
           gewaehlt.unterliegt_203 === true ? 'text-amber-800'
             : gewaehlt.unterliegt_203 === null ? 'text-brand-muted'
@@ -66,7 +77,7 @@ export default function BerufsgruppeFeld({ wert, onAendern, disabled }: {
       ) : (
         <p className="mt-2 text-xs leading-relaxed text-brand-muted">
           An der Berufsgruppe hängt, welche Vereinbarungen für die Zusammenarbeit nötig sind —
-          insbesondere, ob die strafbewehrte Schweigepflicht nach § 203 StGB gilt.
+          insbesondere, ob die Schweigepflicht nach § 203 StGB gilt.
         </p>
       )}
     </div>

@@ -293,7 +293,18 @@ export default function ResonanzPage() {
 
       <div className="mx-auto max-w-[980px] px-6 py-8">
         <div className="mb-6">
-          <h1 className="page-title">Wiedererkanntes</h1>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h1 className="page-title">Wiedererkanntes</h1>
+            {/* Der Weg zurueck zur Quelle. Diese Seite zeigt, was jemand wiedererkannt
+                hat - und es gibt 178 Szenen, von denen er die meisten nie gesehen hat.
+                Ohne diesen Link endet die Seite bei dem, was schon da ist. */}
+            <Link
+              to="/szenen"
+              className="shrink-0 text-[0.84rem] font-semibold text-accent no-underline hover:underline"
+            >
+              Weitere Beziehungsszenen ansehen →
+            </Link>
+          </div>
           <p className="mt-1 max-w-[62ch] text-sm leading-relaxed text-brand-muted">
             Erfundene Szenen, die dir bekannt vorkamen. Einzeln sagt das wenig — zusammen
             zeigt es oft eine Richtung. Es ist kein Test und kein Ergebnis: nichts davon

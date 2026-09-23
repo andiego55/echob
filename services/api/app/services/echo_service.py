@@ -20,6 +20,7 @@ PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 _REL_TYPE_LABELS = {
     "partner": "Partner:in", "ex_partner": "Ex-Partner:in", "family": "Elternteil / Familie",
+    "child": "Sohn / Tochter",
     "friendship": "Freundschaft", "work": "Arbeitsbeziehung", "co_parenting": "Co-Parenting",
     "other": "Andere Beziehung", "own_patterns": "Eigene Beziehungsmuster",
 }

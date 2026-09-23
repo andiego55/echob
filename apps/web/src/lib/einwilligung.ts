@@ -41,7 +41,7 @@
  * Freiwilligkeit der Einwilligung eine offene Frage (Art. 7 Abs. 4 DSGVO), und ein
  * Versprechen an dieser Stelle würde sie verdecken statt lösen.
  */
-import { BETREIBER_KURZ, BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreiber'
+import { BETREIBER_MARKE, BETREIBER_VOLL, KI_DIENSTLEISTER } from '@/lib/betreiber'
 
 /**
  * Fassung der Erklärungen.
@@ -84,7 +84,10 @@ export const DATENSCHUTZHINWEISE: { was: string; text: string }[] = [
   },
   {
     was: 'Wer sie verarbeitet',
-    text: `Die Fachperson, ${BETREIBER_KURZ} in ihrem Auftrag und für die KI-Funktionen `
+    // Marke statt Name: Das hier ist eine Information (Art. 13), keine Erklaerung. Wer
+    // genau dahintersteht, sagt die Datenschutzerklaerung einen Klick weiter - und dort
+    // gehoert es auch hin.
+    text: `Die Fachperson, ${BETREIBER_MARKE} in ihrem Auftrag und für die KI-Funktionen `
       + `${KI_DIENSTLEISTER} samt der im Auftragsverarbeitungsvertrag offengelegten `
       + 'Unterauftragnehmer. Dabei kann eine Verarbeitung in den USA stattfinden.',
   },
@@ -103,7 +106,7 @@ export const DATENSCHUTZHINWEISE: { was: string; text: string }[] = [
   {
     was: 'Was nicht passiert',
     text: 'Deine Inhalte werden nicht zum Training von KI-Modellen verwendet — weder von '
-      + `${BETREIBER_KURZ} noch von ${KI_DIENSTLEISTER}. Eine kurzzeitige Speicherung dort `
+      + `${BETREIBER_MARKE} noch von ${KI_DIENSTLEISTER}. Eine kurzzeitige Speicherung dort `
       + 'zur Missbrauchserkennung ist derzeit nicht ausgeschlossen; daran arbeiten wir.',
   },
   {

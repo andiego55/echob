@@ -318,12 +318,22 @@ async def set_berufsgruppe(
 
 @router.get("/berufsgruppen")
 async def list_berufsgruppen(
-    _current: dict = Depends(get_current_professional),
+    _current: dict = Depends(get_current_user),
 ) -> list[dict]:
     """Die auswählbaren Berufsgruppen samt Folge für die Schweigepflicht.
 
     Kommt vom Server, damit die Liste nicht im Formular mitwandert: Die Zuordnung ist
     eine rechtliche Aussage, keine Beschriftung.
+
+    **``get_current_user`` und nicht ``get_current_professional`` — sonst ist die
+    Registrierung unmöglich.** Wer dieses Formular ausfüllt, IST noch keine Fachperson;
+    die Abfrage scheiterte, die Liste blieb leer, das Auswahlfeld schaltete sich selbst
+    ab, und die Berufsgruppe ist Pflicht. Ein Formular, das sich nicht absenden lässt,
+    ohne zu sagen warum.
+
+    Angemeldet sein muss man trotzdem: Hierher kommt man über einen Einladungslink nach
+    dem Login. Ein Katalog rechtlicher Zuordnungen ist nichts Geheimes, aber er ist auch
+    nichts, was ohne Anlass öffentlich stehen muss.
     """
     return [
         {"id": kennung, "label": beschriftung,

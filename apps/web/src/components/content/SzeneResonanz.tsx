@@ -380,9 +380,23 @@ export default function SzeneResonanz({ slug, titel }: { slug: string; titel: st
             </p>
           ) : (
             <p className="rounded-brand bg-navy/[0.03] px-5 py-3 text-[0.86rem] leading-relaxed text-brand-muted">
-              Unter <span className="font-medium text-navy">Wiedererkanntes</span> in deinem
-              Fall kannst du das in Ruhe ausarbeiten — mit ein paar Fragen, die helfen,
-              dein Erlebnis von dieser Geschichte zu trennen. Erst daraus wird eine Szene.
+              {/* Der Verweis ist jetzt ein Weg. Das Ziel haengt davon ab, ob der Eintrag
+                  schon einem Fall zugeordnet ist: Mit Fall geht es direkt dorthin, ohne
+                  in die Fallliste - und dort steht die Zuordnung ohnehin an. Ein Link
+                  auf eine Seite, die nach einer Auswahl verlangt, ist besser als ein
+                  fett gesetztes Wort, das keine ist. */}
+              Unter{' '}
+              <Link
+                to={eigener?.case_id
+                  ? `/app/cases/${eigener.case_id}/resonanz`
+                  : '/app/cases'}
+                className="font-semibold text-accent no-underline hover:underline"
+              >
+                Wiedererkanntes
+              </Link>{' '}
+              in deinem Fall kannst du das in Ruhe ausarbeiten — mit ein paar Fragen, die
+              helfen, dein Erlebnis von dieser Geschichte zu trennen. Erst daraus wird
+              eine Szene.
             </p>
           )}
 

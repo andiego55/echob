@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 # ── Enums als Literal-Typen ───────────────────────────────────────────────────
 
 RelationshipType = Literal[
-    "partner", "ex_partner", "family", "friendship",
+    "partner", "ex_partner", "family", "child", "friendship",
     "work", "co_parenting", "other", "own_patterns"
 ]
 

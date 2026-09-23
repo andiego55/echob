@@ -122,7 +122,7 @@ function BerufsgruppeSection() {
       <h2 className="text-lg font-semibold text-navy">Berufsgruppe</h2>
       <p className="mt-1 mb-4 text-sm text-brand-muted">
         Sie entscheidet, welche Vereinbarungen für die Zusammenarbeit gelten — insbesondere,
-        ob die strafbewehrte Schweigepflicht nach § 203 StGB greift. Jederzeit änderbar.
+        ob die Schweigepflicht nach § 203 StGB greift. Jederzeit änderbar.
       </p>
       <div className="max-w-md">
         <BerufsgruppeFeld

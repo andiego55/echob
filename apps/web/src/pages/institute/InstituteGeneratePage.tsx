@@ -12,6 +12,7 @@ import type { GenerationInput, GenerationStatus } from '@/types'
 
 const REL_TYPES: [string, string][] = [
   ['partner', 'Partnerschaft'], ['ex_partner', 'Ex-Partnerschaft'], ['family', 'Familie'],
+  ['child', 'Sohn / Tochter'],
   ['friendship', 'Freundschaft'], ['work', 'Berufliche Beziehung'], ['co_parenting', 'Gemeinsame Elternschaft'],
   ['other', 'Andere'], ['own_patterns', 'Eigene Muster'],
 ]

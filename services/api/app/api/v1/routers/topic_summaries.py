@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
+from app.services import topic_summary_gate, topic_summary_service
 
 router = APIRouter(prefix="/cases/{case_id}/topic-summaries", tags=["topic-summaries"])
 
@@ -63,6 +64,11 @@ async def upsert_summary(
 ) -> TopicSummaryResponse:
     if body.topic not in TOPIC_LABELS and not body.topic.startswith("content_"):
         raise HTTPException(status_code=400, detail="Ungültiges Thema.")
+    # Die zweite Haelfte der Bremse. Die erste steht beim Erzeugen; nur dort waere sie
+    # eine Bitte an den Browser - und der Browser schickt, was er will. Hier ist ein
+    # Platzhalter nicht speicherbar, egal woher er kommt.
+    if topic_summary_gate.ist_platzhalter(body.summary_text):
+        raise HTTPException(status_code=400, detail=topic_summary_gate.ZU_KURZ)
     async with pool.acquire() as conn:
         await _assert_owner(case_id, current_user["user_id"], conn)
         row = await conn.fetchrow(
@@ -115,6 +121,10 @@ async def _assert_owner(case_id, user_id, conn):
 
 def _to_response(row) -> TopicSummaryResponse:
     d = dict(row)
-    d["topic_label"] = TOPIC_LABELS.get(d["topic"], d["topic"])
+    # Nie der rohe Schluessel: Er stand schon einmal als Ueberschrift in einer Akte.
+    # Die Ableitung teilt sich diese Stelle mit dem Fallkontext - zwei Ableitungen waeren
+    # zwei Namen fuer dasselbe Thema, je nachdem, wo man hinschaut.
+    d["topic_label"] = TOPIC_LABELS.get(d["topic"]) or topic_summary_service.etikett(
+        d["topic"])
     crypto.decrypt_fields(d, "summary_text")
     return TopicSummaryResponse(**d)

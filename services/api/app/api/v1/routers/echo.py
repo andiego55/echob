@@ -26,6 +26,7 @@ from app.services import (
     kompass_auswahl,
     resonanz_service,
     resonanz_uebungen,
+    topic_summary_gate,
 )
 from app.services.case_artifacts import build_artifact_context
 from app.services.case_documents import build_document_context
@@ -882,8 +883,12 @@ async def summarize_assignment_dialog(
     payload = dlg.get("payload") or {}
     topic = (payload.get("topic") or payload.get("intention")
              or dlg.get("title") or "Zugewiesener Dialog")
+    # Die Bremse VOR dem Modell: Ob genug da ist, ist eine Zahl - und ein Lauf, der
+    # ohnehin nichts ergeben darf, soll nichts kosten.
+    if not topic_summary_gate.reicht_aus(history):
+        return {"summary": None, "hinweis": topic_summary_gate.ZU_KURZ}
     summary = await echo_svc.generate_topic_summary(topic=topic, history=history)
-    return {"summary": summary}
+    return {"summary": summary, "hinweis": None}
 
 
 class FinalizeSceneRequest(BaseModel):
@@ -1188,8 +1193,10 @@ async def topic_summary(
             case_id, body.thread_type,
         )
     history = [{"role": r["role"], "content": crypto.decrypt(r["content"])} for r in rows]
+    if not topic_summary_gate.reicht_aus(history):
+        return {"summary": None, "hinweis": topic_summary_gate.ZU_KURZ}
     summary = await echo_svc.generate_topic_summary(topic=body.thread_type, history=history)
-    return {"summary": summary}
+    return {"summary": summary, "hinweis": None}
 
 
 @router.delete("/topic-history")

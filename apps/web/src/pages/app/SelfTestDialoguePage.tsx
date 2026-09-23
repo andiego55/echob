@@ -97,6 +97,11 @@ function Dialogue({
   const [mobileView, setMobileView] = useState<'chat' | 'overview'>('chat')
   const [delta, setDelta] = useState<ResultDelta | null>(null)
   const [summary, setSummary] = useState<string | null>(null)
+  // „Noch zu kurz" ist keine Zusammenfassung, sondern die Auskunft, dass es keine gibt.
+  // Frueher kam sie als Text zurueck, liess sich speichern und stand am Ende in einer
+  // Akte — gerichtet an eine Fachperson, die ihr nicht folgen kann. Jetzt sagt der
+  // Server es getrennt, und hier landet es auch getrennt.
+  const [summaryHinweis, setSummaryHinweis] = useState<string | null>(null)
   const [savedSummary, setSavedSummary] = useState(false)
 
   const dirty = useMemo(
@@ -154,7 +159,7 @@ function Dialogue({
 
   const summaryMutation = useMutation({
     mutationFn: () => echoApi.topicSummary(caseId, threadType),
-    onSuccess: (d) => { setSummary(d.summary); setSavedSummary(false); setMobileView('chat') },
+    onSuccess: (d) => { setSummary(d.summary); setSavedSummary(false); setSummaryHinweis(d.hinweis); setMobileView('chat') },
   })
   const saveSummaryMutation = useMutation({
     mutationFn: () => topicSummariesApi.save(caseId, threadType, summary!),
@@ -331,6 +336,11 @@ function Dialogue({
                           {saveSummaryMutation.isPending ? 'Speichert …' : 'Als Notiz zum Fall speichern'}
                         </button>
                       )}
+                    </div>
+                  )}
+                  {summaryHinweis && !summary && (
+                    <div className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3 text-xs leading-relaxed text-brand-muted">
+                      {summaryHinweis}
                     </div>
                   )}
                   {summaryMutation.isError && (

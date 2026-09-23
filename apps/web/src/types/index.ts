@@ -3,7 +3,7 @@
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
 export type RelationshipType =
-  | 'partner' | 'ex_partner' | 'family' | 'friendship'
+  | 'partner' | 'ex_partner' | 'family' | 'child' | 'friendship'
   | 'work' | 'co_parenting' | 'other' | 'own_patterns'
 
 export type RelationshipStatus =
@@ -51,6 +51,7 @@ export const RELATIONSHIP_TYPE_LABELS: Record<RelationshipType, string> = {
   partner:       'Partner:in',
   ex_partner:    'Ex-Partner:in',
   family:        'Elternteil / Familie',
+  child:         'Sohn / Tochter',
   friendship:    'Freundschaft',
   work:          'Arbeitsbeziehung',
   co_parenting:  'Co-Parenting',

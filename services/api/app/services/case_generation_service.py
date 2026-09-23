@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 _REL_TYPE_DE = {
     "partner": "Partnerschaft", "ex_partner": "Ex-Partnerschaft", "family": "Familie",
+    "child": "Beziehung zum eigenen Kind",
     "friendship": "Freundschaft", "work": "berufliche Beziehung",
     "co_parenting": "gemeinsame Elternschaft", "other": "Beziehung", "own_patterns": "eigene Muster",
 }

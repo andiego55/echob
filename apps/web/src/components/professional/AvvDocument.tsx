@@ -156,8 +156,9 @@ export default function AvvDocument({ version = AVV_DOC_VERSION }: { version?: s
 
       <H>5. Berufsgeheimnis und Schweigepflicht (§ 203 StGB)</H>
       <P>
-        Dieser Abschnitt gilt, soweit die Verantwortliche einer strafbewehrten Schweigepflicht
-        unterliegt — etwa als Psychotherapeutin oder Psychotherapeut, als Berufspsychologin
+        Dieser Abschnitt gilt, soweit die Verantwortliche einer Schweigepflicht unterliegt,
+        deren Verletzung nach § 203 StGB strafbar ist — etwa als Psychotherapeutin oder
+        Psychotherapeut, als Berufspsychologin
         oder Berufspsychologe mit staatlich anerkannter wissenschaftlicher Abschlussprüfung
         oder als Angehörige eines anderen Heilberufs im Sinne des § 203 Abs. 1 StGB. Für
         beratende und coachende Tätigkeiten ohne solche Pflicht ist er gegenstandslos.
