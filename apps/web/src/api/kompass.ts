@@ -225,6 +225,36 @@ export interface UebungsErgebnis {
   hinweis: string | null
 }
 
+/**
+ * Ein Selbstporträt — ein Entwurf oder eine datierte Momentaufnahme.
+ *
+ * Ein bestätigtes Porträt ist unveränderlich. Bearbeitet wird der Entwurf; das vom März
+ * neben dem vom September zu lesen, ist die Entwicklungsanzeige.
+ */
+export interface Portrait {
+  id: string
+  status: 'entwurf' | 'bestaetigt'
+  text: string
+  created_at: string
+  updated_at: string
+  bestaetigt_at: string | null
+}
+
+export interface PortraitStand {
+  entwurf: Portrait | null
+  verlauf: Portrait[]
+  /** Ob gerade ein neues entstehen darf. */
+  bereit: boolean
+  /** Warum nicht — steht nur da, wenn `bereit` falsch ist. */
+  grund: string | null
+}
+
+/** Echos Fassung. Gespeichert ist damit noch nichts. */
+export interface PortraitVorschlag {
+  text: string
+  hinweis: string | null
+}
+
 export interface KompassUebersicht {
   letzter_puls: Puls | null
   verlauf: Puls[]
@@ -234,6 +264,15 @@ export interface KompassUebersicht {
   krisenplan_vorhanden: boolean
   saetze_bestaetigt: number
   vorhaben_laufend: number
+  portrait_bereit: boolean
+  /**
+   * Wie viele es schon gibt.
+   *
+   * Ohne diese Zahl liesse sich „noch keines, und noch nicht soweit" nicht von „eines da,
+   * gerade nicht fällig" unterscheiden — und die Startseite lüde zu einer Seite ein, die
+   * nur „jetzt nicht" sagt.
+   */
+  portraits_anzahl: number
 }
 
 const basis = '/me/kompass'
@@ -314,4 +353,29 @@ export const kompassApi = {
     apiClient
       .post<Satz>(`${basis}/saetze/${satzId}/entscheidung`, { annehmen })
       .then(r => r.data),
+
+  portrait: () =>
+    apiClient.get<PortraitStand>(`${basis}/portrait`).then(r => r.data),
+
+  /**
+   * Echo schreibt einen Vorschlag — **speichert nichts**.
+   *
+   * Der längste Aufruf im Kompass: Es geht mehr Material hin und mehrere Absätze zurück.
+   * Ist gerade kein neues Porträt fällig, kommt ein leerer Text mit `hinweis` zurück —
+   * kein Fehler, sondern die Antwort auf die Frage.
+   */
+  portraitSchreiben: () =>
+    apiClient
+      .post<PortraitVorschlag>(`${basis}/portrait/schreiben`, undefined,
+        { timeout: 120_000 })
+      .then(r => r.data),
+
+  portraitSichern: (text: string) =>
+    apiClient.put<Portrait>(`${basis}/portrait`, { text }).then(r => r.data),
+
+  portraitBestaetigen: () =>
+    apiClient.post<Portrait>(`${basis}/portrait/bestaetigen`).then(r => r.data),
+
+  portraitEntwurfVerwerfen: () =>
+    apiClient.delete(`${basis}/portrait/entwurf`).then(() => undefined),
 }

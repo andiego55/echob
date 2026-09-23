@@ -377,7 +377,13 @@ _APP = Path(__file__).resolve().parents[1]
 #: Fall gibt ihn NICHT mit her. Kommt hier ein Fachpersonen- oder Paar-Pfad dazu, ist das
 #: kein Umbau, sondern eine Entscheidung ueber fremde Einsicht - und muss eine sein.
 _ERLAUBTE_AUFRUFER = {
+    # Das Gespraech der Person mit Echo ueber einen ihrer Faelle.
     "api/v1/routers/echo.py",
+    # Das Selbstportraet. Es liest dasselbe Material fuer DIESELBE Person und schreibt
+    # einen Text, den nur sie zu sehen bekommt - der Kompass verlaesst sich dabei nicht.
+    # Genau deshalb steht es hier und nicht einfach so da: Ein neuer Aufrufer ist eine
+    # Entscheidung ueber fremde Einsicht und muss eine sein.
+    "services/kompass_portrait_service.py",
 }
 
 

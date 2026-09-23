@@ -864,6 +864,44 @@ class EchoService:
                     "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
         return roh if isinstance(roh, dict) else {"ergebnis": None, "hinweis": None}
 
+    async def kompass_portrait_schreiben(self, *, eingabe: str) -> dict[str, Any]:
+        """Schreibt aus Saetzen, Pulsen und Vorhaben ein zusammenhaengendes Selbstportraet.
+
+        **Speichert nichts.** Was zurueckkommt, ist ein Vorschlag, den die Person
+        bearbeitet und erst dann ablegt - derselbe Ablauf wie bei den Artefakten und dem
+        Gefuehlsbild.
+
+        Anders als die uebrigen Kompass-Aufrufe nimmt dieser das SMARTE Modell (dasselbe
+        wie Berichte und Skalen): Hier geht es nicht ums Destillieren eines Satzes,
+        sondern um einen Text, der Zusammenhaenge herstellt und trotzdem nichts
+        hinzuerfindet. Das ist die schwierigere Aufgabe, und das Ergebnis liest ein
+        Mensch ueber sich selbst. Entsprechend selten darf er entstehen - die Bremse
+        dafuer steht in kompass_portrait_service.bereitschaft.
+        """
+        if not self._use_openai:
+            return {"text": "",
+                    "hinweis": "Echo laeuft im Demo-Modus - ohne OpenAI-Schluessel "
+                               "entsteht hier kein Portraet."}
+
+        response = await self._chat(
+            model=self._model_smart,
+            messages=[
+                {"role": "system", "content": _load_prompt("kompass_portrait_prompt.md")},
+                {"role": "user", "content": eingabe},
+            ],
+            max_tokens=1400,
+            temperature=None if self._reasoning else 0.5,
+            response_format={"type": "json_object"},
+        )
+        import json as _aj
+        try:
+            roh = _aj.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("kompass_portrait_schreiben: ungueltige JSON-Antwort.")
+            return {"text": "",
+                    "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
+        return roh if isinstance(roh, dict) else {"text": "", "hinweis": None}
+
     async def resonanz_nachfragen(
         self,
         *,

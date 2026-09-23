@@ -111,6 +111,8 @@ _AI_USAGE_LIMITS = {
     "fall_faq":   ("fall_faq_limit", "FAQ_LIMIT_REACHED", "Fall-FAQ"),
     "satz_vorschlag": ("satz_vorschlag_limit", "SATZ_VORSCHLAG_LIMIT_REACHED",
                        "Satz-Vorschläge"),
+    "selbstportrait": ("selbstportrait_limit", "PORTRAIT_LIMIT_REACHED",
+                       "Selbstporträts"),
 }
 
 

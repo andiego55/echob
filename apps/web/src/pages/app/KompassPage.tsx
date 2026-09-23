@@ -207,6 +207,45 @@ export default function KompassPage() {
 
         <Fehlermeldung error={anlegen.error} className="mt-4" />
 
+        {/* ── Das Ergebnis ──────────────────────────────────────────────────
+            KEIN sechster Eingang, und das ist der Grund: Ein Eingang ist eine Grundform
+            oder ein Raum. Das Porträt ist weder — es ist, was aus ihnen entsteht. Als
+            Karte in der Reihe stünde das Ergebnis neben seinen eigenen Bestandteilen.
+
+            Steht nur da, wenn es etwas zu holen gibt: Ein Band, das zu einer Seite
+            einlädt, auf der „jetzt nicht" steht, ist eine Sackgasse. Die Einladung dazu
+            kommt aus den Sätzen, wo sie hingehört. */}
+        {(stand?.portrait_bereit || (stand?.portraits_anzahl ?? 0) > 0) && (
+          <Link
+            to="/app/kompass/portrait"
+            className={`group mt-6 flex flex-wrap items-center justify-between gap-3 rounded-brand border p-5 no-underline shadow-brand-sm transition-all hover:-translate-y-0.5 hover:shadow-brand motion-reduce:hover:translate-y-0 ${
+              stand?.portrait_bereit
+                ? 'border-accent/50 bg-accent/5 hover:border-accent'
+                : 'border-brand-border bg-brand-card hover:border-accent/40'
+            }`}
+          >
+            <span className="min-w-0">
+              <span className="card-title-lg block transition-colors group-hover:text-accent">
+                Mein Selbstporträt
+              </span>
+              <span className="mt-1 block max-w-[52ch] text-[0.84rem] leading-snug text-brand-muted">
+                {stand?.portrait_bereit
+                  ? ((stand?.portraits_anzahl ?? 0) === 0
+                      ? 'Aus deinen Sätzen, Momenten und Vorhaben kann jetzt ein zusammenhängender Text werden — einer, den du jemandem zeigen kannst.'
+                      : 'Seit dem letzten hat sich einiges getan. Ein neues kann entstehen.')
+                  : `${stand?.portraits_anzahl === 1 ? 'Eines' : stand?.portraits_anzahl} bestätigt — nebeneinander gelesen zeigen sie, was sich bewegt hat.`}
+              </span>
+            </span>
+            <span
+              className={`shrink-0 text-[0.78rem] font-semibold ${
+                stand?.portrait_bereit ? 'text-accent' : 'text-brand-muted'
+              }`}
+            >
+              {stand?.portrait_bereit ? 'Kann entstehen' : 'Ansehen'}
+            </span>
+          </Link>
+        )}
+
         {/* ── Ebene 3: der Verlauf, leise ───────────────────────────────────── */}
         <section className="card card-static mt-6">
           <div className="flex items-baseline justify-between gap-3">

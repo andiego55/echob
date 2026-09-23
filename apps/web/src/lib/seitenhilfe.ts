@@ -257,6 +257,12 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Über Szenen, ein Wortfeld oder freie Wörter hineingehen', 'Den Text lesen, den Echo daraus schreibt', 'Bestätigen'],
     tipp: 'Dasselbe Werkzeug gibt es auch im Fall. Dieses Bild gehört zu dir und geht mit keiner Freigabe mit.',
   },
+  '/app/kompass/portrait': {
+    titel: 'Dein Selbstporträt',
+    zweck: 'Ein zusammenhängender Text darüber, wie du dich gerade siehst — aus allem, was du festgehalten hast.',
+    schritte: ['Echo schreiben lassen', 'Ändern, was nicht stimmt', 'Bestätigen — danach bleibt es stehen'],
+    tipp: 'Es kommt nicht auf Knopfdruck, sondern wenn genug dazugekommen ist. Das vom März neben dem vom September zu lesen, ist der eigentliche Zweck.',
+  },
   '/app/kompass/vorhaben': {
     titel: 'Was du dir vornimmst',
     zweck: 'Ein Vorhaben ist kein Vorsatz: Es hat Schritte und einen Abstand, in dem du zurückschaust.',

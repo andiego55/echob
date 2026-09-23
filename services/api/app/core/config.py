@@ -81,6 +81,11 @@ class Settings(BaseSettings):
     # Gebrauch (ein Lauf je Fachperson, gelegentlich erneuert) mehrfach ab.
     fall_faq_limit: int = 10       # max. Fall-FAQ-Laeufe pro Nutzer/Monat
     satz_vorschlag_limit: int = 10  # max. Laeufe "Echo schlaegt Saetze vor"/Nutzer/Monat
+    # Ein Selbstportraet schickt Saetze, Pulse und Vorhaben zusammen hin und laesst
+    # mehrere Absaetze zurueckschreiben - der teuerste Knopf im Kompass. Entstehen darf
+    # es ohnehin nur alle paar Wochen; die Grenze faengt das Gegenteil ab, naemlich
+    # fuenfzehnmal "nochmal schreiben", weil die erste Fassung nicht traf.
+    selbstportrait_limit: int = 5  # max. Portraet-Laeufe pro Nutzer/Monat
     # Harter Deckel der kostenlosen Spielwiese (Demo-Fälle), pro Fachperson:
     demo_echo_limit: int = 30      # max. Echo-Nachrichten auf Demo-Fällen (gesamt)
     demo_report_limit: int = 6     # max. Berichte pro Demo-Fall (inkl. Beispielbericht)

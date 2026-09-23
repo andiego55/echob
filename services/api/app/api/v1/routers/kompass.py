@@ -9,9 +9,14 @@ Die Kennung kommt aus dem Browser, also wird sie hier gegen die Eigentümerschaf
 bevor sie in die Datenbank geht — nicht im Dienst, sondern an der Naht, an der sie
 hereinkommt.
 
-**Genau ein KI-Weg.** Nur ``POST /saetze/vorschlaege`` spricht mit einem Modell, und der
-tut es ausschließlich, weil jemand den Knopf gedrückt hat — nichts läuft im Hintergrund.
-Dort hängt auch das Kontingent; alle anderen Endpunkte hier sind frei davon.
+**Drei KI-Wege, und jeder beginnt mit einem Knopfdruck.** ``POST /saetze/vorschlaege``,
+``POST /uebungen/{…}/abschliessen`` und ``POST /portrait/schreiben`` sprechen mit einem
+Modell — sonst keiner, und nichts davon läuft im Hintergrund. Nur an diesen dreien hängt
+ein Kontingent; alle anderen Endpunkte hier sind frei davon.
+
+Die ersten beiden teilen sich eine Grenze, weil sie dasselbe tun: einen Satz schreiben.
+Das Porträt hat eine eigene — ein Monat voller Übungen soll den Jahresrückblick nicht
+verhindern.
 """
 from __future__ import annotations
 
@@ -24,6 +29,10 @@ from app.schemas.kompass import (
     KompassUebersicht,
     Krisenplan,
     KrisenplanUpdate,
+    Portrait,
+    PortraitSichern,
+    PortraitStand,
+    PortraitVorschlag,
     Puls,
     PulsCreate,
     Satz,
@@ -40,12 +49,14 @@ from app.schemas.kompass import (
 )
 from app.services import kompass_katalog as katalog
 from app.services import (
+    kompass_portrait_service,
     kompass_saetze_service,
     kompass_service,
     kompass_uebung_service,
     kompass_uebungen,
     kompass_vorhaben_service,
     kompass_vorschlag_service,
+    subscription_service,
 )
 
 router = APIRouter(prefix="/me/kompass", tags=["kompass"])
@@ -91,6 +102,11 @@ async def uebersicht(
         daten["vorhaben_laufend"] = await kompass_vorhaben_service.anzahl_laufend(
             conn, user_id=user_id
         )
+        portrait = await kompass_portrait_service.fuer_die_uebersicht(
+            conn, user_id=user_id
+        )
+        daten["portrait_bereit"] = portrait["bereit"]
+        daten["portraits_anzahl"] = portrait["anzahl"]
     return KompassUebersicht(**daten)
 
 
@@ -518,3 +534,118 @@ async def uebung_abschliessen(
         vorhaben=Vorhaben(**ergebnis["vorhaben"]) if ergebnis.get("vorhaben") else None,
         hinweis=ergebnis.get("hinweis"),
     )
+
+
+# ── Das Selbstporträt ───────────────────────────────────────────────────────
+
+
+@router.get("/portrait", response_model=PortraitStand)
+async def portrait_stand(
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> PortraitStand:
+    """Entwurf, Verlauf — und ob jetzt ein neues entstehen darf."""
+    async with pool.acquire() as conn:
+        daten = await kompass_portrait_service.stand(conn, user_id=current["user_id"])
+    return PortraitStand(
+        entwurf=Portrait(**daten["entwurf"]) if daten["entwurf"] else None,
+        verlauf=[Portrait(**p) for p in daten["verlauf"]],
+        bereit=daten["bereit"],
+        grund=daten["grund"],
+    )
+
+
+@router.post("/portrait/schreiben", response_model=PortraitVorschlag)
+async def portrait_schreiben(
+    request: Request,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> PortraitVorschlag:
+    """Echo schreibt einen Vorschlag — **speichert nichts**.
+
+    **Zwei Bremsen, und beide werden gebraucht.** Die Bereitschaft entscheidet, ob ein
+    NEUES Porträt entstehen darf: Wer es jeden Tag erzeugen kann, erzeugt es nie wieder.
+    Was sie nicht abfängt, ist „nochmal schreiben" — solange nichts bestätigt ist, bleibt
+    sie bestehen. Dafür ist das Kontingent da.
+
+    Beide stehen VOR dem Modell. Ein Lauf, der ohnehin nichts ergäbe, darf nichts kosten.
+
+    **Die Verbindung wird vor dem Modellaufruf zurückgegeben.** Sie eine Minute lang zu
+    halten, während OpenAI schreibt, ist die bekannte Engstelle dieser API; verbucht wird
+    danach in einem zweiten, kurzen Zugriff.
+    """
+    echo = _echo(request)
+    user_id = current["user_id"]
+    art = kompass_portrait_service.KONTINGENT_ART
+    async with pool.acquire() as conn:
+        daten = await kompass_portrait_service.stand(conn, user_id=user_id)
+        if not daten["bereit"]:
+            return PortraitVorschlag(text="", hinweis=daten["grund"])
+
+        await subscription_service.enforce_ai_usage_limit(str(user_id), conn, art)
+        eingabe = await kompass_portrait_service.als_prompt_eingabe(
+            conn, user_id=user_id)
+
+    roh = await echo.kompass_portrait_schreiben(eingabe=eingabe)
+
+    async with pool.acquire() as conn:
+        await subscription_service.log_ai_usage(str(user_id), conn, art)
+
+    return PortraitVorschlag(
+        text=(roh.get("text") or "")[: kompass_portrait_service.MAX_ZEICHEN],
+        hinweis=roh.get("hinweis"),
+    )
+
+
+@router.put("/portrait", response_model=Portrait)
+async def portrait_sichern(
+    body: PortraitSichern,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Portrait:
+    """Den bearbeiteten Text als Entwurf ablegen."""
+    async with pool.acquire() as conn:
+        try:
+            p = await kompass_portrait_service.entwurf_sichern(
+                conn, user_id=current["user_id"], text=body.text)
+        except ValueError as fehler:
+            raise HTTPException(status_code=400, detail=str(fehler)) from fehler
+    return Portrait(**p)
+
+
+@router.post("/portrait/bestaetigen", response_model=Portrait)
+async def portrait_bestaetigen(
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Portrait:
+    """Aus dem Entwurf wird eine datierte Momentaufnahme. Danach unveränderlich.
+
+    Wer sein Porträt von vor sechs Monaten umschreiben könnte, hätte keine Reihe von
+    Momentaufnahmen, sondern eine einzige, die immer schon so war — und damit wäre die
+    Entwicklungsanzeige wertlos.
+    """
+    async with pool.acquire() as conn:
+        p = await kompass_portrait_service.bestaetigen(
+            conn, user_id=current["user_id"])
+    if p is None:
+        raise HTTPException(status_code=404, detail="Kein Entwurf da.")
+    return Portrait(**p)
+
+
+@router.delete(
+    "/portrait/entwurf", status_code=status.HTTP_204_NO_CONTENT, response_model=None
+)
+async def portrait_entwurf_verwerfen(
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> None:
+    """Den Entwurf wegwerfen.
+
+    Ein Porträt, in dem sich jemand nicht wiedererkennt, soll nicht als halbfertiger
+    Text herumliegen und beim nächsten Öffnen wieder da sein.
+    """
+    async with pool.acquire() as conn:
+        weg = await kompass_portrait_service.entwurf_verwerfen(
+            conn, user_id=current["user_id"])
+    if not weg:
+        raise HTTPException(status_code=404, detail="Kein Entwurf da.")

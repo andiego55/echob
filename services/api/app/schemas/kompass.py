@@ -17,6 +17,7 @@ from app.services.kompass_katalog import (
     SCHRITT_MAX_ZEICHEN,
     VORHABEN_MAX_TITEL,
 )
+from app.services.kompass_portrait_service import MAX_ZEICHEN as PORTRAIT_MAX_ZEICHEN
 
 
 class PulsCreate(BaseModel):
@@ -211,6 +212,39 @@ class UebungsErgebnis(BaseModel):
     hinweis: str | None = None
 
 
+# ── Das Selbstporträt ───────────────────────────────────────────────────────
+
+
+class Portrait(BaseModel):
+    id: UUID
+    status: str
+    text: str = ""
+    created_at: datetime
+    updated_at: datetime
+    #: Wann es bestätigt wurde. Sichtbar — zwei Porträts nebeneinander sind nur dann
+    #: eine Entwicklungsanzeige, wenn man weiß, aus welchen Monaten sie stammen.
+    bestaetigt_at: datetime | None = None
+
+
+class PortraitStand(BaseModel):
+    """Was die Seite braucht — samt der Frage, ob ein neues entstehen darf."""
+    entwurf: Portrait | None = None
+    verlauf: list[Portrait] = []
+    bereit: bool = False
+    #: Warum nicht. Steht nur da, wenn ``bereit`` falsch ist.
+    grund: str | None = None
+
+
+class PortraitSichern(BaseModel):
+    text: str = Field(min_length=1, max_length=PORTRAIT_MAX_ZEICHEN)
+
+
+class PortraitVorschlag(BaseModel):
+    """Echos Fassung — gespeichert ist damit noch nichts."""
+    text: str = ""
+    hinweis: str | None = None
+
+
 class KompassUebersicht(BaseModel):
     """Was die Startseite braucht, in einem Zug."""
     letzter_puls: Puls | None = None
@@ -223,3 +257,9 @@ class KompassUebersicht(BaseModel):
     saetze_bestaetigt: int = 0
     #: Wie viele Vorhaben gerade laufen.
     vorhaben_laufend: int = 0
+    #: Ob gerade ein Selbstporträt entstehen darf — der Knopf auf der Startseite.
+    portrait_bereit: bool = False
+    #: Wie viele es schon gibt. Ohne diese Zahl liesse sich „noch keines, und noch nicht
+    #: soweit" nicht von „eines da, gerade nicht fällig" unterscheiden — und die
+    #: Startseite lüde zu einer Seite ein, die nur „jetzt nicht" sagt.
+    portraits_anzahl: int = 0
