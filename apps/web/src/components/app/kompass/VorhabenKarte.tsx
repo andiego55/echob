@@ -6,9 +6,10 @@
  * offen auf der Karte und nicht hinter einem Aufklapper — was man nicht sieht, hakt man
  * nicht ab.
  *
- * **Der Balken zeigt Fortschritt, nicht Rückstand.** Er füllt sich von links und bleibt
- * unauffällig, wenn nichts erledigt ist. Ein roter Rest oder ein Prozentwert machte aus
- * einem Vorhaben eine Leistungsanzeige — und aus drei offenen Schritten ein Versäumnis.
+ * **Kein Fortschrittsbalken, und das ist eine Korrektur.** Hier stand einer; der Bauplan
+ * lehnt ihn ab („Ein Vorhaben hat keinen Prozentwert"), und der Einwand trifft auch einen
+ * Balken ohne Zahl: Er misst abgehakte Schritte und sieht aus wie Fortschritt am Ziel.
+ * Geblieben ist „2 von 5 Schritten" — nachprüfbar und ohne Versprechen.
  *
  * **Die Rückschau ist eine Einladung, keine Mahnung.** Sie erscheint, wenn der selbst
  * gewählte Abstand vorbei ist, und sie lässt sich mit einem Klick erledigen. Es gibt
@@ -27,7 +28,6 @@ export default function VorhabenKarte({ vorhaben: v, onAendern, onLoeschen, laeu
   const laeuftNoch = v.stand === 'laufend'
   const erreicht = v.stand === 'erreicht'
   const faellig = laeuftNoch && rueckschauFaellig(v)
-  const anteil = v.schritte.length > 0 ? v.schritte_erledigt / v.schritte.length : 0
 
   const schrittUmschalten = (s: Schritt) => {
     const neu: Schritt[] = v.schritte.map(x =>
@@ -74,15 +74,15 @@ export default function VorhabenKarte({ vorhaben: v, onAendern, onLoeschen, laeu
 
       {v.schritte.length > 0 && (
         <>
-          {/* Füllt sich von links, ohne Zahl. Ein Prozentwert machte aus einem Vorhaben
-              eine Leistungsanzeige. */}
-          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-brand-border/60">
-            <div
-              className="h-full rounded-full bg-accent transition-all duration-500 motion-reduce:transition-none"
-              style={{ width: `${anteil * 100}%` }}
-            />
-          </div>
-
+          {/* HIER STAND EIN BALKEN, und er war falsch.
+              Der Bauplan sagt: „Ein Vorhaben hat keinen Prozentwert. Was es hat, sind
+              Spuren. Ein Balken bei 40 % wäre erfunden." Der Einwand trifft auch einen
+              Balken ohne Zahl: Er misst abgehakte Schritte und SIEHT AUS wie Fortschritt
+              am Ziel. Wer drei von fünf Schritten getan hat, ist nicht zu 60 % weniger
+              streitsüchtig — und die Anzeige behauptet genau das.
+              Was bleibt, ist die Zahl oben („2 von 5 Schritten"): nachprüfbar und ohne
+              Versprechen. Die eigentlichen Belege — Pulse und Szenen seit dem Vorhaben —
+              sind ein eigenes Stück und stehen noch aus. */}
           <ul className="mt-3 space-y-1.5">
             {v.schritte.map(s => (
               <li key={s.id ?? s.text}>
