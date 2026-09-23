@@ -220,11 +220,28 @@ class Vorhaben(BaseModel):
 # ── Die geführten Übungen ───────────────────────────────────────────────────
 
 
+class Pol(BaseModel):
+    """Eine Seite eines Gegensatzpaares."""
+    key: str
+    label: str
+
+
+class Gegensatzpaar(BaseModel):
+    key: str
+    links: Pol
+    rechts: Pol
+
+
 class UebungsSchritt(BaseModel):
     frage: str
     #: Für den Menschen. Geht NICHT in den Prompt — er enthält Beispiele.
     hinweis: str
     platzhalter: str
+    #: ``text`` oder ``paare``. Schlichte Zeichenkette, kein Literal: Die Liste der
+    #: Formen steht im Katalog, und eine zweite hier müsste mitwandern.
+    form: str = "text"
+    #: Nur bei ``form == "paare"``. Die Antwort sind die Schlüssel der angetippten Pole.
+    paare: list[Gegensatzpaar] = []
 
 
 class Uebung(BaseModel):
@@ -234,6 +251,9 @@ class Uebung(BaseModel):
     dauer: str
     #: ``satz`` oder ``vorhaben`` — was am Ende herauskommt.
     ergibt: str
+    #: Wie viele Schritte beantwortet sein müssen. Meist zwei; eine Übung aus einer
+    #: einzigen Form braucht nur einen.
+    mindestens: int = 2
     schritte: list[UebungsSchritt]
 
 

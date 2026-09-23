@@ -215,10 +215,32 @@ export interface VorhabenAenderung {
 }
 
 /** Eine Frage einer geführten Übung. Der Hinweis ist für dich, nicht für Echo. */
+/** Eine Seite eines Gegensatzpaares. */
+export interface Pol {
+  key: string
+  label: string
+}
+
+export interface Gegensatzpaar {
+  key: string
+  links: Pol
+  rechts: Pol
+}
+
+/**
+ * Ein Schritt einer Übung — und seine Eingabeform.
+ *
+ * Die zweite Grammatik des Kompasses: `text` ist ein Feld zum Schreiben, `paare` sind
+ * Gegensätze zum Antippen. Der Grund steht im Gefühlsbild-Katalog und gilt überall: Wer
+ * belastet ist, hat die Worte oft nicht.
+ */
 export interface UebungsSchritt {
   frage: string
   hinweis: string
   platzhalter: string
+  form: 'text' | 'paare'
+  /** Nur bei `paare`. Die Antwort sind die Schlüssel der angetippten Pole. */
+  paare: Gegensatzpaar[]
 }
 
 export interface Uebung {
@@ -228,6 +250,8 @@ export interface Uebung {
   dauer: string
   /** Was am Ende herauskommt: `satz` oder `vorhaben`. */
   ergibt: 'satz' | 'vorhaben'
+  /** Wie viele Schritte beantwortet sein müssen. Meist zwei. */
+  mindestens: number
   schritte: UebungsSchritt[]
 }
 

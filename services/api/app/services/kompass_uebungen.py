@@ -13,6 +13,14 @@ kein Schema. Scham-Arbeit ergänzen heißt: einen Katalogeintrag und einen gefü
 schreiben, der am Ende einen Satz oder ein Vorhaben erzeugt. Keine Tabelle, keine
 Migration." Genau das ist diese Datei. Eine vierte Übung kostet einen Eintrag hier.
 
+**Eine Übung ist aus Formen zusammengesetzt, nicht aus Textfeldern.** Der Bauplan nennt
+das die zweite Grammatik: „eine Handvoll Eingabeformen, aus denen jedes Werkzeug
+zusammengesetzt wird". Ein Schritt trägt deshalb ein ``form``: ``text`` ist ein Feld zum
+Schreiben, ``paare`` sind Gegensätze zum Antippen. Der Grund steht im Gefühlsbild-Katalog
+und gilt hier genauso: *Wer belastet ist, hat die Worte oft nicht.* Eine Übung, die man
+ohne einen Tastendruck zu Ende bringen kann, erreicht Menschen, die vor einem leeren Feld
+aufhören.
+
 **Die Fragen sind das Produkt.** Nicht die Technik drumherum. Eine schlechte Frage
 („Was fühlst du?“) führt zu nichts; eine gute („Was genau ging zu weit — das Verhalten,
 nicht die Person?") tut die Arbeit, bevor ein Modell überhaupt etwas sieht. Die Hinweise
@@ -32,6 +40,15 @@ MINDEST_ANTWORTEN = 2
 
 #: Länge einer Antwort. Großzügiger als ein Satz: Hier wird erzählt, nicht formuliert.
 ANTWORT_MAX_ZEICHEN = 1500
+
+#: Die Eingabeformen, die ein Schritt haben kann.
+#:
+#: ``text``  — ein Feld zum Schreiben. Die Voreinstellung; ohne Angabe gilt sie.
+#: ``paare`` — Gegensätze, von denen einer heute schwerer wiegt. Antippen, nicht tippen.
+#:
+#: Eine dritte Form später (Lückensatz, Kette, Wahl und Reihung) ist ein Wort hier, ein
+#: Zweig im Ablauf und ein Stück Oberfläche — keine Tabelle und keine Migration.
+FORMEN: tuple[str, ...] = ("text", "paare")
 
 
 UEBUNGEN: tuple[dict[str, Any], ...] = (
@@ -104,6 +121,76 @@ UEBUNGEN: tuple[dict[str, Any], ...] = (
         ),
     },
     {
+        "key": "werte",
+        "label": "Was mir wichtig ist",
+        "hinweis": "Acht Paare, je zwei Dinge, die beide gut sind. Antippen, was heute "
+                   "schwerer wiegt — und am Ende steht ein Satz über deine Werte.",
+        "dauer": "3 Minuten",
+        "ergibt": "satz",
+        "satz_arten": ("wert",),
+        #: Eins genuegt: Die Paare SIND die Uebung, das freie Feld danach ist ein Angebot.
+        #: Zwei zu verlangen hiesse, das Tippen doch noch zur Bedingung zu machen.
+        "mindestens": 1,
+        "schritte": (
+            {
+                "form": "paare",
+                "frage": "Was wiegt heute schwerer?",
+                "hinweis": "Beides ist gut, und beides gilt — es geht nur um HEUTE. Wo "
+                           "du dich nicht entscheiden kannst oder willst, lass das Paar "
+                           "aus; auch das ist eine Antwort.",
+                "platzhalter": "",
+                "paare": (
+            {
+                "key": "verlaesslich",
+                "links":  {"key": "verlaesslichkeit", "label": "Verlässlichkeit"},
+                "rechts": {"key": "spontaneitaet", "label": "Spontaneität"},
+            },
+            {
+                "key": "naehe",
+                "links":  {"key": "naehe", "label": "Nähe"},
+                "rechts": {"key": "eigener_raum", "label": "Eigener Raum"},
+            },
+            {
+                "key": "harmonie",
+                "links":  {"key": "harmonie", "label": "Harmonie"},
+                "rechts": {"key": "ehrlichkeit", "label": "Ehrlichkeit"},
+            },
+            {
+                "key": "sicherheit",
+                "links":  {"key": "sicherheit", "label": "Sicherheit"},
+                "rechts": {"key": "freiheit", "label": "Freiheit"},
+            },
+            {
+                "key": "fuer_andere",
+                "links":  {"key": "fuer_andere_da", "label": "Für andere da sein"},
+                "rechts": {"key": "auf_mich_achten", "label": "Auf mich achten"},
+            },
+            {
+                "key": "verstanden",
+                "links":  {"key": "verstanden_werden", "label": "Verstanden werden"},
+                "rechts": {"key": "recht_haben", "label": "Recht behalten"},
+            },
+            {
+                "key": "ruhe",
+                "links":  {"key": "ruhe", "label": "Ruhe"},
+                "rechts": {"key": "lebendigkeit", "label": "Lebendigkeit"},
+            },
+            {
+                "key": "loyalitaet",
+                "links":  {"key": "loyalitaet", "label": "Loyalität"},
+                "rechts": {"key": "grenzen_ziehen", "label": "Grenzen ziehen"},
+            },
+                ),
+            },
+            {
+                "frage": "Fehlt etwas, das dir wichtig ist?",
+                "hinweis": "Freiwillig. Wenn die Paare es schon getroffen haben, geh "
+                           "einfach weiter.",
+                "platzhalter": "",
+            },
+        ),
+    },
+    {
         "key": "gespraech",
         "label": "Ein Gespräch vorbereiten",
         "hinweis": "Von „Ich muss mal mit ihr reden“ zu etwas, das du wirklich tun kannst.",
@@ -141,6 +228,33 @@ UEBUNGEN: tuple[dict[str, Any], ...] = (
 UEBUNGS_SCHLUESSEL: frozenset[str] = frozenset(u["key"] for u in UEBUNGEN)
 
 
+def mindestens(uebung: dict[str, Any]) -> int:
+    """Wie viele Schritte diese Übung mindestens beantwortet haben muss.
+
+    Meist zwei. Eine Übung, die aus einer einzigen Form besteht — acht Paare auf einem
+    Schirm —, braucht aber nur einen: Sonst hinge ihr Ergebnis an einem freien Feld, das
+    ausdrücklich freiwillig ist. Genau das wäre die Regel „Tippen ist immer möglich, nie
+    nötig" andersherum.
+    """
+    return int(uebung.get("mindestens") or MINDEST_ANTWORTEN)
+
+
+def paar_labels(schritt: dict[str, Any]) -> dict[str, tuple[str, str]]:
+    """Pol-Schlüssel → (gewählt, Gegenstück). Für die Übersetzung der Antwort.
+
+    Die Antwort einer ``paare``-Form ist eine Liste von Pol-Schlüsseln, sonst nichts. Erst
+    hier werden daraus Wörter — und zwar auf dem Server. Würde die Oberfläche den Satz
+    bauen, stünde die Sprache der Übung im Browser, und der Prompt bekäme, was ein Client
+    ihm schickt.
+    """
+    karte: dict[str, tuple[str, str]] = {}
+    for paar in schritt.get("paare") or ():
+        links, rechts = paar["links"], paar["rechts"]
+        karte[links["key"]] = (links["label"], rechts["label"])
+        karte[rechts["key"]] = (rechts["label"], links["label"])
+    return karte
+
+
 def uebung(key: str | None) -> dict[str, Any] | None:
     """Die Übung zu einem Schlüssel — oder None, wenn es sie nicht gibt."""
     for u in UEBUNGEN:
@@ -158,7 +272,21 @@ def fuer_die_oberflaeche() -> list[dict[str, Any]]:
             "hinweis": u["hinweis"],
             "dauer": u["dauer"],
             "ergibt": u["ergibt"],
-            "schritte": [dict(s) for s in u["schritte"]],
+            "mindestens": mindestens(u),
+            "schritte": [
+                {
+                    "frage": s["frage"],
+                    "hinweis": s["hinweis"],
+                    "platzhalter": s.get("platzhalter", ""),
+                    "form": s.get("form", "text"),
+                    "paare": [
+                        {"key": p["key"], "links": dict(p["links"]),
+                         "rechts": dict(p["rechts"])}
+                        for p in (s.get("paare") or ())
+                    ],
+                }
+                for s in u["schritte"]
+            ],
         }
         for u in UEBUNGEN
     ]

@@ -14,6 +14,18 @@
  * stehen — und auch dann, wenn am Ende nichts herauskommt: Zehn Minuten Arbeit dürfen
  * nicht an einer Modellantwort hängen.
  *
+ * **Ein Schritt ist eine FORM, kein Textfeld.** Der Bauplan nennt das die zweite
+ * Grammatik: „eine Handvoll Eingabeformen, aus denen jedes Werkzeug zusammengesetzt
+ * wird". Diese Komponente führt durch die Schritte und rendert je nach `form` — ein Feld
+ * zum Schreiben oder Gegensätze zum Antippen. Eine dritte Form später ist ein Zweig hier
+ * und ein eigenes Stück, kein Umbau.
+ *
+ * **Und deshalb heißt der Knopf nicht mehr „Fertig, wenn zwei Fragen beantwortet sind".**
+ * Wie viele es braucht, sagt die Übung — eine, die aus einer einzigen Form besteht,
+ * verlangt einen Schritt. Stünde hier eine feste Zwei, hinge das Ergebnis einer
+ * Antipp-Übung an dem freien Feld dahinter, und „Tippen ist immer möglich, nie nötig"
+ * wäre genau umgedreht.
+ *
  * **Das Ergebnis ist ein Entwurf.** Es liegt danach schon im Kompass und gilt trotzdem
  * erst mit der Zustimmung. Wer unsicher ist, geht weg und entscheidet morgen.
  */
@@ -21,6 +33,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import Chip from '@/components/Chip'
+import EntwederOder from './EntwederOder'
 import type { Uebung, UebungsErgebnis } from '@/api/kompass'
 
 export default function UebungsLauf({ uebung, onAbschliessen, onZurueck }: {
@@ -39,6 +52,11 @@ export default function UebungsLauf({ uebung, onAbschliessen, onZurueck }: {
   const letzter = schritt === uebung.schritte.length - 1
   const beantwortet = antworten.filter(a => a.trim()).length
   const aktuell = uebung.schritte[schritt]
+  const paarForm = aktuell.form === 'paare'
+  // Die Antwort einer Paar-Form ist die Liste der angetippten Pol-Schluessel, als eine
+  // Zeichenkette. Sie bleibt damit im selben Kanal wie jede andere Antwort - und was
+  // daraus ein deutscher Satz wird, entscheidet der Server.
+  const pole = antworten[schritt] ? antworten[schritt].split(',').filter(Boolean) : []
 
   async function fertig() {
     if (laeuft) return
@@ -169,26 +187,47 @@ export default function UebungsLauf({ uebung, onAbschliessen, onZurueck }: {
         </p>
       ) : (
         <div className="mt-5">
-          <label
-            htmlFor="uebung-antwort"
-            className="block text-[1.02rem] font-semibold leading-snug text-navy"
-          >
-            {aktuell.frage}
-          </label>
+          {/* Bei Paaren kein <label>: Es gibt kein einzelnes Feld, auf das es zeigen
+              koennte, und ein Label ohne Ziel ist fuer einen Screenreader schlimmer als
+              keins. Die Frage traegt dort die Gruppe. */}
+          {paarForm ? (
+            <p className="text-[1.02rem] font-semibold leading-snug text-navy">
+              {aktuell.frage}
+            </p>
+          ) : (
+            <label
+              htmlFor="uebung-antwort"
+              className="block text-[1.02rem] font-semibold leading-snug text-navy"
+            >
+              {aktuell.frage}
+            </label>
+          )}
           <p className="mt-1.5 max-w-[60ch] text-[0.84rem] leading-relaxed text-brand-muted">
             {aktuell.hinweis}
           </p>
-          <textarea
-            id="uebung-antwort"
-            key={schritt}
-            value={antworten[schritt]}
-            onChange={e => setAntworten(alt =>
-              alt.map((a, i) => (i === schritt ? e.target.value.slice(0, 1500) : a)))}
-            rows={4}
-            autoFocus
-            placeholder={aktuell.platzhalter}
-            className="input mt-3 resize-y text-[0.98rem] leading-relaxed"
-          />
+
+          {paarForm ? (
+            <div role="group" aria-label={aktuell.frage}>
+              <EntwederOder
+                paare={aktuell.paare}
+                gewaehlt={pole}
+                onWahl={schluessel => setAntworten(alt =>
+                  alt.map((a, i) => (i === schritt ? schluessel.join(',') : a)))}
+              />
+            </div>
+          ) : (
+            <textarea
+              id="uebung-antwort"
+              key={schritt}
+              value={antworten[schritt]}
+              onChange={e => setAntworten(alt =>
+                alt.map((a, i) => (i === schritt ? e.target.value.slice(0, 1500) : a)))}
+              rows={4}
+              autoFocus
+              placeholder={aktuell.platzhalter}
+              className="input mt-3 resize-y text-[0.98rem] leading-relaxed"
+            />
+          )}
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {schritt > 0 && (
@@ -207,22 +246,26 @@ export default function UebungsLauf({ uebung, onAbschliessen, onZurueck }: {
                 onClick={() => setSchritt(s => s + 1)}
                 className="btn-primary !px-5 !py-2 !text-sm"
               >
-                {antworten[schritt].trim() ? 'Weiter' : 'Überspringen'}
+                {antworten[schritt].trim()
+                  ? 'Weiter'
+                  : paarForm ? 'Ohne Auswahl weiter' : 'Überspringen'}
               </button>
             ) : (
               <button
                 type="button"
                 onClick={fertig}
-                disabled={beantwortet < 2}
+                disabled={beantwortet < uebung.mindestens}
                 className="btn-primary !px-5 !py-2 !text-sm disabled:opacity-50"
               >
                 Fertig
               </button>
             )}
 
-            {letzter && beantwortet < 2 && (
+            {letzter && beantwortet < uebung.mindestens && (
               <span className="text-[0.78rem] text-brand-muted">
-                Zwei beantwortete Fragen genügen — welche, ist egal.
+                {uebung.mindestens > 1
+                  ? 'Zwei beantwortete Fragen genügen — welche, ist egal.'
+                  : 'Tipp wenigstens ein paar Paare an.'}
               </span>
             )}
           </div>

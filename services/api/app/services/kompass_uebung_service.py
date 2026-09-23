@@ -15,6 +15,12 @@ zehn Minuten Zeit genommen. Das Ergebnis darf nicht mit dem Schließen des Fenst
 sein — und die Entscheidung darüber soll nicht unter dem Druck stehen, sie jetzt sofort
 treffen zu müssen.
 
+**Zwei Formen, ein Weg.** Ein Schritt ist entweder ein Feld zum Schreiben oder eine Reihe
+von Gegensätzen zum Antippen. Beides kommt als Zeichenkette herein; was aus den
+angetippten Polen ein deutscher Satz wird, entscheidet **dieser Dienst** und nicht der
+Browser. Sonst stünde die Sprache der Übung im Frontend, und der Prompt bekäme, was ein
+Client ihm schickt — statt dessen, was im Katalog steht.
+
 **Was NICHT in den Prompt geht:** die Hinweise und Platzhalter aus dem Katalog. Sie sind
 für den Menschen geschrieben und enthalten Beispiele — und ein Modell benutzt jedes
 Beispiel als Sprache. Es bekommt die Fragen und die Antworten, sonst nichts. Ein Wächter
@@ -43,6 +49,33 @@ logger = get_logger(__name__)
 KONTINGENT_ART = "satz_vorschlag"
 
 
+def _paare_lesen(schritt: dict[str, Any], roh: str) -> str:
+    """Angetippte Pole zu Sätzen — „Nähe wiegt heute schwerer als Eigener Raum".
+
+    Die Antwort kommt als Liste von Pol-Schlüsseln, durch Komma getrennt. **Unbekannte
+    Schlüssel fallen weg**, und das ist kein Formalismus: Sonst schriebe ein Client sich
+    seine eigenen Werte in den Prompt, und die Übung redete über etwas, das nicht im
+    Katalog steht.
+
+    Höchstens einer je Paar — wer beide Pole schickt, hat sich nicht entschieden, und ein
+    „A wiegt schwerer als B und B schwerer als A" wäre Unsinn im Prompt.
+    """
+    labels = kompass_uebungen.paar_labels(schritt)
+    gesehen: set[str] = set()
+    zeilen: list[str] = []
+    for schluessel in roh.split(","):
+        eintrag = labels.get(schluessel.strip())
+        if eintrag is None:
+            continue
+        gewaehlt, gegenstueck = eintrag
+        paar_key = tuple(sorted((gewaehlt, gegenstueck)))
+        if paar_key in gesehen:
+            continue
+        gesehen.add(paar_key)
+        zeilen.append(f"{gewaehlt} wiegt heute schwerer als {gegenstueck}.")
+    return chr(10).join(zeilen)
+
+
 def _antworten_ordnen(
     uebung: dict[str, Any], roh: list[str] | None
 ) -> list[tuple[str, str]]:
@@ -54,7 +87,11 @@ def _antworten_ordnen(
     """
     paare: list[tuple[str, str]] = []
     for schritt, antwort in zip(uebung["schritte"], roh or [], strict=False):
-        text = (antwort or "").strip()[: kompass_uebungen.ANTWORT_MAX_ZEICHEN]
+        roh_text = (antwort or "").strip()
+        if schritt.get("form") == "paare":
+            text = _paare_lesen(schritt, roh_text)
+        else:
+            text = roh_text[: kompass_uebungen.ANTWORT_MAX_ZEICHEN]
         if text:
             paare.append((schritt["frage"], text))
     return paare
@@ -138,12 +175,14 @@ async def abschliessen(
         raise ValueError(f"Unbekannte Übung: {schluessel}")
 
     paare = _antworten_ordnen(uebung, antworten)
-    if len(paare) < kompass_uebungen.MINDEST_ANTWORTEN:
+    noetig = kompass_uebungen.mindestens(uebung)
+    if len(paare) < noetig:
         return {
             "satz": None,
             "vorhaben": None,
-            "hinweis": "Dafür ist noch zu wenig da. Beantworte mindestens zwei Fragen — "
-                       "welche, ist egal.",
+            "hinweis": ("Dafür ist noch zu wenig da. Beantworte mindestens zwei Fragen — "
+                        "welche, ist egal.") if noetig > 1 else
+                       "Dafür ist noch zu wenig da. Tipp wenigstens ein paar Paare an.",
         }
 
     await subscription_service.enforce_ai_usage_limit(str(user_id), conn, KONTINGENT_ART)

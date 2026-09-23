@@ -110,7 +110,13 @@ export default function KompassUebungenPage() {
                       {u.label}
                     </span>
                     <span className="text-[0.74rem] text-brand-muted">
-                      {u.schritte.length} Fragen · {u.dauer}
+                      {/* „2 Fragen" waere bei einer Paar-Uebung zwar wahr und trotzdem
+                          irrefuehrend: Dahinter stehen acht Paare und ein freiwilliges
+                          Feld. Was hier zaehlt, ist das, weswegen jemand ueberhaupt
+                          anfaengt — dass er nichts schreiben muss. */}
+                      {u.schritte.some(s => s.form === 'paare')
+                        ? <>Antippen statt tippen · {u.dauer}</>
+                        : <>{u.schritte.length} Fragen · {u.dauer}</>}
                     </span>
                   </div>
                   <p className="mt-1 text-[0.86rem] leading-relaxed text-brand-muted">
