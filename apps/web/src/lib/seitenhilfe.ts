@@ -269,6 +269,12 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Etwas vornehmen', 'Schritte abhaken', 'Zurückschauen, wenn der Abstand um ist'],
     tipp: 'Es gibt kein „aufgegeben". Was gerade nicht dran ist, ruht — und bleibt da, ohne zu drängen.',
   },
+  '/app/kompass/brief': {
+    titel: 'Ein Brief an dich selbst',
+    zweck: 'Ein paar Zeilen an dich in ein paar Monaten — für einen Tag, an dem es schwerer ist.',
+    schritte: ['Schreiben, solange es dir gut genug geht', 'Abstand wählen', 'Zukleben — und vergessen'],
+    tipp: 'Du kannst ihn jederzeit wegnehmen, aber nicht vorher lesen. Genau das macht ihn aus.',
+  },
   '/app/kompass/krisenplan': {
     titel: 'Dein Notfallplan',
     zweck: 'Was hilft, wenn es kippt — aufgeschrieben, solange es dir gut genug dafür geht.',

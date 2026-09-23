@@ -27,6 +27,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.kompass import (
     Belege,
+    Brief,
+    BriefNeu,
     KompassUebersicht,
     Krisenplan,
     KrisenplanUpdate,
@@ -52,8 +54,8 @@ from app.schemas.kompass import (
     VorschlagsEntscheidung,
     VorschlagsLauf,
 )
-from app.services import kompass_katalog as katalog
 from app.services import (
+    kompass_brief_service,
     kompass_portrait_service,
     kompass_pruefung_service,
     kompass_saetze_service,
@@ -65,6 +67,7 @@ from app.services import (
     kompass_vorschlag_service,
     subscription_service,
 )
+from app.services import kompass_katalog as katalog
 
 router = APIRouter(prefix="/me/kompass", tags=["kompass"])
 
@@ -91,6 +94,8 @@ async def katalog_lesen(_current: dict = Depends(get_current_user)) -> dict:
         "vorhaben_max_titel": katalog.VORHABEN_MAX_TITEL,
         "schritt_max_zeichen": katalog.SCHRITT_MAX_ZEICHEN,
         "max_schritte": katalog.MAX_SCHRITTE,
+        "brief_abstaende": list(kompass_brief_service.ABSTAENDE),
+        "brief_max_zeichen": kompass_brief_service.MAX_ZEICHEN,
     }
 
 
@@ -116,6 +121,9 @@ async def uebersicht(
         daten["portraits_anzahl"] = portrait["anzahl"]
         daten["frage_wartet"] = await kompass_pruefung_service.gibt_es_eine_frage(
             conn, user_id=user_id
+        )
+        daten["brief_wartet"] = bool(
+            await kompass_brief_service.wartet(conn, user_id=user_id)
         )
     return KompassUebersicht(**daten)
 
@@ -782,3 +790,77 @@ async def pruefung_beantworten(
         alt=Satz(**ergebnis["alt"]),
         neu=Satz(**ergebnis["neu"]) if ergebnis.get("neu") else None,
     )
+
+
+# ── Ein Brief an dich selbst ────────────────────────────────────────────────
+
+
+@router.get("/briefe", response_model=list[Brief])
+async def briefe_lesen(
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[Brief]:
+    """Alle Briefe — **verschlossene ohne ihren Text**.
+
+    Die Entscheidung faellt im Dienst, nicht in dieser Vorlage: Ein Feld, das nur deshalb
+    nicht auf dem Schirm landet, weil ein Schema es auslaesst, steht trotzdem in der
+    Antwort — und die kann jeder lesen, der die Anfrage stellt.
+    """
+    async with pool.acquire() as conn:
+        briefe = await kompass_brief_service.liste(conn, user_id=current["user_id"])
+    return [Brief(**b) for b in briefe]
+
+
+@router.post("/briefe", response_model=Brief, status_code=status.HTTP_201_CREATED)
+async def brief_schreiben(
+    body: BriefNeu,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Brief:
+    """Legt einen Brief ab. Ab jetzt ist er zu, bis sein Tag kommt."""
+    async with pool.acquire() as conn:
+        try:
+            brief = await kompass_brief_service.schreiben(
+                conn, user_id=current["user_id"], text=body.text, tage=body.tage)
+        except ValueError as fehler:
+            raise HTTPException(status_code=400, detail=str(fehler)) from fehler
+    return Brief(**brief)
+
+
+@router.post("/briefe/{brief_id}/oeffnen", response_model=Brief)
+async def brief_oeffnen(
+    brief_id: UUID,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Brief:
+    """Öffnet den Brief — wenn sein Tag gekommen ist.
+
+    Vorher 404, und zwar ohne Unterschied zu „gibt es nicht". Ein eigener Fehler fuer
+    „noch zu" waere eine Einladung, ihn zu umgehen.
+    """
+    async with pool.acquire() as conn:
+        brief = await kompass_brief_service.lesen(
+            conn, user_id=current["user_id"], brief_id=brief_id)
+    if brief is None:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return Brief(**brief)
+
+
+@router.delete(
+    "/briefe/{brief_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None
+)
+async def brief_zuruecknehmen(
+    brief_id: UUID,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> None:
+    """Nimmt den Brief weg — auch einen verschlossenen.
+
+    Die Gegenseite dazu, dass man ihn nicht vorab lesen kann: Ohne diesen Weg waere der
+    Brief etwas, das einem passiert.
+    """
+    async with pool.acquire() as conn:
+        weg = await kompass_brief_service.zuruecknehmen(
+            conn, user_id=current["user_id"], brief_id=brief_id)
+    if not weg:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")

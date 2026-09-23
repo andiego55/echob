@@ -60,6 +60,11 @@ export interface RueckschauRhythmus {
   label: string
 }
 
+export interface BriefAbstand {
+  tage: number
+  label: string
+}
+
 export interface KompassKatalog {
   zustaende: KompassZustand[]
   /** Ab dieser Stufe fragt der Puls, was geholfen hat. */
@@ -77,6 +82,9 @@ export interface KompassKatalog {
   vorhaben_max_titel: number
   schritt_max_zeichen: number
   max_schritte: number
+  /** Drei benannte Abstände, keine dreißig Zahlen. */
+  brief_abstaende: BriefAbstand[]
+  brief_max_zeichen: number
 }
 
 export interface Puls {
@@ -289,6 +297,21 @@ export interface Belege {
   ereignisse: SpurEreignis[]
 }
 
+/**
+ * Ein Brief an das eigene Ich.
+ *
+ * `text` fehlt, solange der Brief zu ist — und das entscheidet der Server. Hier steht
+ * `string | null`, damit niemand auf die Idee kommt, sich darauf zu verlassen.
+ */
+export interface Brief {
+  id: string
+  oeffnet_am: string
+  offen: boolean
+  text: string | null
+  gelesen_at: string | null
+  created_at: string
+}
+
 /** Der alte Satz, der gerade wieder vorgelegt wird — meistens keiner. */
 export interface Pruefung {
   satz: Satz | null
@@ -307,6 +330,8 @@ export interface KompassUebersicht {
   rhythmus: number
   verlauf_tage: number
   krisenplan_vorhanden: boolean
+  /** Ob ein Brief an dich selbst heute aufgeht und noch nicht gelesen ist. */
+  brief_wartet: boolean
   /** Ob ein alter Satz auf „Stimmt das noch?" wartet. */
   frage_wartet: boolean
   saetze_bestaetigt: number
@@ -407,6 +432,19 @@ export const kompassApi = {
    * `szenen` ist aus, bis jemand es einschaltet: Szenen gehören zu Fällen, und der
    * Kompass ist der Raum ohne Fall.
    */
+  briefe: () =>
+    apiClient.get<Brief[]>(`${basis}/briefe`).then(r => r.data),
+
+  briefSchreiben: (text: string, tage: number) =>
+    apiClient.post<Brief>(`${basis}/briefe`, { text, tage }).then(r => r.data),
+
+  /** Öffnet ihn — wenn sein Tag gekommen ist. Vorher 404, wie „gibt es nicht". */
+  briefOeffnen: (id: string) =>
+    apiClient.post<Brief>(`${basis}/briefe/${id}/oeffnen`).then(r => r.data),
+
+  briefZuruecknehmen: (id: string) =>
+    apiClient.delete(`${basis}/briefe/${id}`).then(() => undefined),
+
   pruefung: () =>
     apiClient.get<Pruefung>(`${basis}/pruefung`).then(r => r.data),
 

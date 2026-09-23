@@ -147,10 +147,23 @@ VERTRAUT_DEM_AUFRUFER = {
     "kompass_saetze_service.anlegen":
         "Legt einen Satz ueber die eigene Person an. Ein INSERT kann sich nicht an eine "
         "Eigentuemer-Spalte binden - die user_id IST die Spalte, die geschrieben wird. "
-        "Sie stammt im einzigen Aufrufer (routers/kompass.py: satz_anlegen) aus "
-        "get_current_user. Aus dem Browser kommen nur szene_id und puls_id, und beide "
-        "prueft der Router gegen scenes.user_id bzw. selbst_pulse.user_id, bevor er "
-        "herkommt; die Herkunft leitet er selbst ab, statt sie zu uebernehmen.",
+        "Vier Aufrufer, und bei allen vieren stammt sie aus get_current_user: der Router "
+        "(satz_anlegen) sowie kompass_vorschlag_service, kompass_uebung_service und "
+        "kompass_pruefung_service - die drei reichen die user_id durch, die sie selbst "
+        "vom Router bekommen haben, und holen sie nirgends aus einem Anfragekoerper. "
+        "Aus dem Browser kommen nur szene_id und puls_id, und beide prueft der Router "
+        "gegen scenes.user_id bzw. selbst_pulse.user_id, bevor er herkommt; die Herkunft "
+        "leitet er selbst ab, statt sie zu uebernehmen. "
+        "(Stand 23.09.2026 nachgezaehlt - hier stand vorher 'im einzigen Aufrufer', und "
+        "das war seit den Vorschlaegen nicht mehr wahr. Eine Begruendung, die niemand "
+        "nachzieht, ist schlimmer als keine: Sie sieht geprueft aus.)",
+    "kompass_brief_service.schreiben":
+        "Legt einen Brief an das eigene Ich ab. Ein INSERT kann sich nicht an eine "
+        "Eigentuemer-Spalte binden - die user_id IST die Spalte, die geschrieben wird. "
+        "Sie stammt im einzigen Aufrufer (routers/kompass.py: brief_schreiben) aus "
+        "get_current_user. Aus dem Browser kommen nur der Text und eine Anzahl Tage; das "
+        "Oeffnungsdatum rechnet der Dienst daraus selbst, damit es sich nicht auf gestern "
+        "setzen laesst.",
 
     # ── Paarraum: der Router prüft, der Dienst schreibt ──────────────────────────────
     "couple_companion_service.add_message":

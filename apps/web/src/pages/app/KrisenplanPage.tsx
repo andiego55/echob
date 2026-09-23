@@ -182,6 +182,22 @@ export default function KrisenplanPage() {
 
         <Anlaufstellen />
 
+        {/* Dieselbe Mechanik, anderes Format — und deshalb steht der Verweis hier und
+            nicht als eigener Eingang: Beides ist die starke Version deiner selbst, die
+            fuer die schwaechere schreibt. Der Plan sagt, was zu tun ist; der Brief sagt,
+            wie es war. */}
+        <p className="mt-6 max-w-[54ch] text-[0.84rem] leading-relaxed text-brand-muted">
+          Dieselbe Idee in anderer Form:{' '}
+          <Link
+            to="/app/kompass/brief"
+            className="font-semibold text-accent no-underline hover:underline"
+          >
+            ein Brief an dich selbst
+          </Link>
+          . Ein paar Zeilen von heute, die in ein paar Monaten aufgehen — für einen Tag,
+          an dem es schwerer ist.
+        </p>
+
         {/* Die Speicherleiste klebt unten — bei vier Abschnitten ist das Ende der Seite
             weit weg, und ein Knopf, den man erst suchen muss, wird nicht gedrückt. */}
         {bearbeiten || !vorhanden ? (

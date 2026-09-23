@@ -6,12 +6,15 @@ merken, statt es zu erben.
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.services.kompass_brief_service import MAX_TAGE as BRIEF_MAX_TAGE
+from app.services.kompass_brief_service import MAX_ZEICHEN as BRIEF_MAX_ZEICHEN
+from app.services.kompass_brief_service import MIN_TAGE as BRIEF_MIN_TAGE
 from app.services.kompass_katalog import (
     SATZ_MAX_ZEICHEN,
     SCHRITT_MAX_ZEICHEN,
@@ -316,6 +319,30 @@ class Belege(BaseModel):
     ereignisse: list[SpurEreignis] = []
 
 
+# ── Ein Brief an dich selbst ────────────────────────────────────────────────
+
+
+class Brief(BaseModel):
+    """Ein Brief an das eigene Ich.
+
+    ``text`` fehlt, solange der Brief zu ist — und das entscheidet der Dienst, nicht
+    diese Vorlage. Ein Feld, das nur deshalb nicht auf dem Schirm steht, weil eine
+    Vorlage es auslässt, steht trotzdem in der Antwort.
+    """
+    id: UUID
+    oeffnet_am: date
+    offen: bool = False
+    text: str | None = None
+    gelesen_at: datetime | None = None
+    created_at: datetime
+
+
+class BriefNeu(BaseModel):
+    text: str = Field(min_length=1, max_length=BRIEF_MAX_ZEICHEN)
+    #: Abstand in Tagen, nicht Datum: Ein Datum ließe sich auf gestern setzen.
+    tage: int = Field(ge=BRIEF_MIN_TAGE, le=BRIEF_MAX_TAGE)
+
+
 class KompassUebersicht(BaseModel):
     """Was die Startseite braucht, in einem Zug."""
     letzter_puls: Puls | None = None
@@ -330,6 +357,10 @@ class KompassUebersicht(BaseModel):
     vorhaben_laufend: int = 0
     #: Ob gerade ein Selbstporträt entstehen darf — der Knopf auf der Startseite.
     portrait_bereit: bool = False
+    #: Ob ein Brief an sich selbst heute aufgeht und noch nicht gelesen ist. Der
+    #: freundlichste Grund zurueckzukommen, den der Raum hat — deshalb steht er vor
+    #: allem anderen, was auf der Startseite warten koennte.
+    brief_wartet: bool = False
     #: Ob ein alter Satz auf „Stimmt das noch?" wartet. Eine Marke am Eingang zu den
     #: Sätzen — nicht mehr: Der Raum soll etwas fuer einen haben, nicht etwas wollen.
     frage_wartet: bool = False

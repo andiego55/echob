@@ -30,6 +30,7 @@ _USER_TABLES = (
     "client_notifications", "test_results", "pseudonymous_accounts",
     # Mein Kompass - gehoert der Person, nicht einem Fall.
     "selbst_pulse", "selbst_vorhaben", "selbst_saetze", "selbst_portraits",
+    "selbst_briefe",
     # Ausbildung: die eigene Zuordnung bzw. das eigene Institut.
     "students", "training_institutes",
 )
@@ -79,6 +80,10 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     "selbst_vorhaben":               {"text": ("titel",), "json": ("inhalt",)},
     "selbst_saetze":                 {"text": ("text", "grund")},
     "selbst_portraits":              {"text": ("text",)},
+    # Die Auskunft ueber das eigene Konto enthaelt auch verschlossene Briefe. Das ist
+    # kein Widerspruch zu "liegt zu bis zum Datum": Die Sperre ist eine Verabredung mit
+    # sich selbst im Raum, kein Recht des Betreibers, jemandem seinen Text vorzuenthalten.
+    "selbst_briefe":                 {"text": ("text",)},
 }
 
 
@@ -252,6 +257,7 @@ _DELETE_STEPS = (
     ("selbst_vorhaben", "user_id = $1"),
     ("selbst_saetze", "user_id = $1"),
     ("selbst_portraits", "user_id = $1"),
+    ("selbst_briefe", "user_id = $1"),
     ("pseudonymous_accounts", "user_id = $1"),
     ("user_profiles", "user_id = $1"),
     ("user_consents", "user_id = $1"),

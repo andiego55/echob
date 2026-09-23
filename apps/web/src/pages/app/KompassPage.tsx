@@ -125,6 +125,23 @@ export default function KompassPage() {
               Zeit, geht über Szenen, ein Feld und Wörter — und endet mit einem Text.
               Es gehört deshalb hierher unter den Puls und nicht in die Kartenreihe:
               Dort stehen Grundformen und Räume, keine Werkzeuge. */}
+          {/* An einem guten Tag schreibt man anders als an einem schlechten — der Raum
+              nutzt das. Die Einladung steht deshalb GENAU DANN da und nicht immer: An
+              einem schweren Tag ist sie eine Zumutung, an einem guten ein Angebot.
+              Dieselbe Idee wie die Frage „Was hat heute geholfen?" im Puls. */}
+          {letzter && letzter.zustand >= katalog.guter_zustand_ab && (
+            <p className="mt-5 border-t border-brand-border/60 pt-3 text-center text-[0.8rem] text-brand-muted">
+              Guter Moment? Dann schreib{' '}
+              <Link
+                to="/app/kompass/brief"
+                className="font-semibold text-accent no-underline hover:underline"
+              >
+                einen Brief an dich selbst
+              </Link>{' '}
+              — er geht in ein paar Monaten auf.
+            </p>
+          )}
+
           <p className="mt-5 border-t border-brand-border/60 pt-3 text-center text-[0.8rem] text-brand-muted">
             Mehr Zeit? Dann geh über{' '}
             <Link
@@ -211,44 +228,46 @@ export default function KompassPage() {
 
         <Fehlermeldung error={anlegen.error} className="mt-4" />
 
-        {/* ── Das Ergebnis ──────────────────────────────────────────────────
-            KEIN sechster Eingang, und das ist der Grund: Ein Eingang ist eine Grundform
-            oder ein Raum. Das Porträt ist weder — es ist, was aus ihnen entsteht. Als
-            Karte in der Reihe stünde das Ergebnis neben seinen eigenen Bestandteilen.
+        {/* ── Was hier für dich liegt ───────────────────────────────────────
+            EIN Band, nicht zwei — und das ist eine Entscheidung über den Charakter des
+            Raums. Wir haben Benachrichtigungen ausgeschlossen; der Grund
+            zurückzukommen muss also hier liegen. Aber „etwas liegt für dich da" trägt
+            nur, solange es EINE Sache ist. Ein Stapel aus drei Angeboten ist eine
+            Aufgabenliste, und die will etwas VON einem.
 
-            Steht nur da, wenn es etwas zu holen gibt: Ein Band, das zu einer Seite
-            einlädt, auf der „jetzt nicht" steht, ist eine Sackgasse. Die Einladung dazu
-            kommt aus den Sätzen, wo sie hingehört. */}
-        {(stand?.portrait_bereit || (stand?.portraits_anzahl ?? 0) > 0) && (
-          <Link
+            Deshalb ein Vorrang statt einer Reihe: der Brief (er ist auf den heutigen
+            Tag geschrieben und wartet wirklich), dann das Porträt. Und es steht nur da,
+            wenn es etwas zu holen gibt — ein Band, das auf eine Seite führt, die „jetzt
+            nicht" sagt, ist eine Sackgasse.
+
+            KEIN sechster Eingang: Ein Eingang ist eine Grundform oder ein Raum. Das
+            hier ist keins von beidem. */}
+        {stand?.brief_wartet ? (
+          <Band
+            to="/app/kompass/brief"
+            titel="Ein Brief von dir liegt bereit"
+            text="Du hast ihn vor einiger Zeit an dich geschrieben — für heute."
+            marke="Aufmachen"
+            betont
+          />
+        ) : stand?.portrait_bereit ? (
+          <Band
             to="/app/kompass/portrait"
-            className={`group mt-6 flex flex-wrap items-center justify-between gap-3 rounded-brand border p-5 no-underline shadow-brand-sm transition-all hover:-translate-y-0.5 hover:shadow-brand motion-reduce:hover:translate-y-0 ${
-              stand?.portrait_bereit
-                ? 'border-accent/50 bg-accent/5 hover:border-accent'
-                : 'border-brand-border bg-brand-card hover:border-accent/40'
-            }`}
-          >
-            <span className="min-w-0">
-              <span className="card-title-lg block transition-colors group-hover:text-accent">
-                Mein Selbstporträt
-              </span>
-              <span className="mt-1 block max-w-[52ch] text-[0.84rem] leading-snug text-brand-muted">
-                {stand?.portrait_bereit
-                  ? ((stand?.portraits_anzahl ?? 0) === 0
-                      ? 'Aus deinen Sätzen, Momenten und Vorhaben kann jetzt ein zusammenhängender Text werden — einer, den du jemandem zeigen kannst.'
-                      : 'Seit dem letzten hat sich einiges getan. Ein neues kann entstehen.')
-                  : `${stand?.portraits_anzahl === 1 ? 'Eines' : stand?.portraits_anzahl} bestätigt — nebeneinander gelesen zeigen sie, was sich bewegt hat.`}
-              </span>
-            </span>
-            <span
-              className={`shrink-0 text-[0.78rem] font-semibold ${
-                stand?.portrait_bereit ? 'text-accent' : 'text-brand-muted'
-              }`}
-            >
-              {stand?.portrait_bereit ? 'Kann entstehen' : 'Ansehen'}
-            </span>
-          </Link>
-        )}
+            titel="Mein Selbstporträt"
+            text={(stand?.portraits_anzahl ?? 0) === 0
+              ? 'Aus deinen Sätzen, Momenten und Vorhaben kann jetzt ein zusammenhängender Text werden — einer, den du jemandem zeigen kannst.'
+              : 'Seit dem letzten hat sich einiges getan. Ein neues kann entstehen.'}
+            marke="Kann entstehen"
+            betont
+          />
+        ) : (stand?.portraits_anzahl ?? 0) > 0 ? (
+          <Band
+            to="/app/kompass/portrait"
+            titel="Mein Selbstporträt"
+            text={`${stand?.portraits_anzahl === 1 ? 'Eines' : stand?.portraits_anzahl} bestätigt — nebeneinander gelesen zeigen sie, was sich bewegt hat.`}
+            marke="Ansehen"
+          />
+        ) : null}
 
         {/* ── Ebene 3: der Verlauf, leise ───────────────────────────────────── */}
         <section className="card card-static mt-6">
@@ -310,6 +329,45 @@ function Eingang({ to, titel, text, stand, fertig }: {
         className={`mt-3 text-[0.74rem] font-semibold ${fertig ? 'text-accent' : 'text-brand-muted'}`}
       >
         {stand}
+      </span>
+    </Link>
+  )
+}
+
+// ── Was hier für dich liegt ──────────────────────────────────────────────────
+// Eine Form für alles, was warten kann. Nicht aus Sparsamkeit: Sie sehen gleich aus,
+// weil sie dasselbe sind — etwas, das der Raum für einen hat.
+
+function Band({ to, titel, text, marke, betont = false }: {
+  to: string
+  titel: string
+  text: string
+  marke: string
+  betont?: boolean
+}) {
+  return (
+    <Link
+      to={to}
+      className={`group mt-6 flex flex-wrap items-center justify-between gap-3 rounded-brand border p-5 no-underline shadow-brand-sm transition-all hover:-translate-y-0.5 hover:shadow-brand motion-reduce:hover:translate-y-0 ${
+        betont
+          ? 'border-accent/50 bg-accent/5 hover:border-accent'
+          : 'border-brand-border bg-brand-card hover:border-accent/40'
+      }`}
+    >
+      <span className="min-w-0">
+        <span className="card-title-lg block transition-colors group-hover:text-accent">
+          {titel}
+        </span>
+        <span className="mt-1 block max-w-[52ch] text-[0.84rem] leading-snug text-brand-muted">
+          {text}
+        </span>
+      </span>
+      <span
+        className={`shrink-0 text-[0.78rem] font-semibold ${
+          betont ? 'text-accent' : 'text-brand-muted'
+        }`}
+      >
+        {marke}
       </span>
     </Link>
   )
