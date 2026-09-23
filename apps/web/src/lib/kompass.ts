@@ -11,7 +11,7 @@
  * Zeit gebraucht wird, kommt sie als Argument — sonst hängt der Test von der Tageszeit ab,
  * zu der er läuft.
  */
-import type { Puls } from '@/api/kompass'
+import type { Puls, SpurEreignis } from '@/api/kompass'
 
 // ── Die Farben der fünf Zustände ────────────────────────────────────────────
 
@@ -203,6 +203,72 @@ export function nachTagen(pulse: Puls[], jetzt: number = Date.now()): Tagesgrupp
         label,
         pulse: [...eintraege].sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        ),
+      }
+    })
+}
+
+export interface SpurTag {
+  tag: string
+  label: string
+  pulse: Puls[]
+  /** Alles andere desselben Tages: Sätze, Vorhaben, Schritte, Porträts, Szenen. */
+  ereignisse: SpurEreignis[]
+}
+
+/**
+ * Pulse und alles Übrige auf eine Achse, nach Kalendertagen.
+ *
+ * **Warum die Pulse getrennt bleiben und nicht als Ereignis mitlaufen.** Ein Moment
+ * trägt Wörter, eine Notiz, „hat gutgetan", den Fall — und einen Knopf zum Wegnehmen.
+ * Als schmale Zeile auf der Achse wäre das alles weg, und die Seite hätte weniger, als
+ * sie vorher hatte. Deshalb kommt der Puls aus seiner eigenen, vollen Abfrage; die Achse
+ * liefert nur, was sonst noch an dem Tag war.
+ *
+ * Ortszeit wie bei {@link nachTagen}, und aus demselben Grund: Ein Moment um 00:30
+ * gehört zu der Nacht, in der er passiert ist.
+ */
+export function spurNachTagen(
+  pulse: Puls[],
+  ereignisse: SpurEreignis[],
+  jetzt: number = Date.now(),
+): SpurTag[] {
+  const tage = new Map<string, { pulse: Puls[]; ereignisse: SpurEreignis[] }>()
+
+  const fach = (iso: string) => {
+    const d = new Date(iso)
+    if (Number.isNaN(d.getTime())) return null
+    const tag = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      + `-${String(d.getDate()).padStart(2, '0')}`
+    let eintrag = tage.get(tag)
+    if (!eintrag) { eintrag = { pulse: [], ereignisse: [] }; tage.set(tag, eintrag) }
+    return eintrag
+  }
+
+  for (const p of pulse) fach(p.created_at)?.pulse.push(p)
+  // Pulse kommen aus der vollen Abfrage - kaemen sie hier ein zweites Mal, stuende
+  // jeder Moment doppelt auf der Achse.
+  for (const e of ereignisse) if (e.art !== 'puls') fach(e.am)?.ereignisse.push(e)
+
+  const n = new Date(jetzt)
+  return [...tage.entries()]
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .map(([tag, inhalt]) => {
+      const [j, m, d] = tag.split('-').map(Number)
+      const datum = new Date(j, m - 1, d)
+      const abstand = Math.round((tagesBeginn(n) - tagesBeginn(datum)) / TAG_MS)
+      return {
+        tag,
+        label: abstand === 0
+          ? 'Heute'
+          : abstand === 1
+            ? 'Gestern'
+            : `${WOCHENTAGE[datum.getDay()]}, ${datum.getDate()}. ${MONATE[datum.getMonth()]}`,
+        pulse: [...inhalt.pulse].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        ),
+        ereignisse: [...inhalt.ereignisse].sort(
+          (a, b) => new Date(b.am).getTime() - new Date(a.am).getTime(),
         ),
       }
     })

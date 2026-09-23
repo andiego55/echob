@@ -1,5 +1,22 @@
 /**
- * /app/kompass/verlauf — jeder Moment, den jemand festgehalten hat.
+ * /app/kompass/verlauf — deine Spur: alles Festgehaltene auf einer Achse.
+ *
+ * **Warum das keine sechste Karte auf der Startseite ist.** Der Bauplan nennt es „Deine
+ * Spur" und beschreibt „eine einzige scrollbare Zeitachse, auf der alles liegt". Genau
+ * das war diese Seite schon — nur für eine Form. Sie wächst, statt daneben ein zweites
+ * Mal zu entstehen; eine Seite mit den Momenten und daneben eine mit allem hätte zwei
+ * Wahrheiten über denselben Tag.
+ *
+ * **Warum die Momente reich bleiben und der Rest schmal.** Ein Puls trägt Wörter, eine
+ * Notiz, „hat gutgetan", den Fall — und den Knopf zum Wegnehmen. Als schmale Zeile auf
+ * der Achse wäre das alles weg, und die Seite hätte weniger, als sie vorher hatte. Also
+ * kommen die Momente weiter aus ihrer eigenen, vollen Abfrage; die Achse liefert nur,
+ * was sonst noch an dem Tag war.
+ *
+ * **Warum die Szenen ausgeschaltet beginnen.** Sie gehören zu Fällen, und dies ist der
+ * Raum ohne Fall. Wer nur auf sich schauen will, soll nicht an eine Beziehung erinnert
+ * werden — wer beides sehen will, schaltet sie ein. Dann ist dies der Ort, an dem die
+ * beiden Hälften des Produkts auf derselben Linie liegen.
  *
  * **Warum es diese Seite neben der Kurve auf dem Dashboard gibt.** Die Kurve zeigt eine
  * Bewegung, aber keine Gründe. Wer sieht, dass die letzte Woche tiefer lag, will als
@@ -22,9 +39,9 @@ import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import VerlaufsKurve from '@/components/app/kompass/VerlaufsKurve'
-import { kompassApi, type Puls } from '@/api/kompass'
+import { kompassApi, type Puls, type SpurEreignis } from '@/api/kompass'
 import { casesApi } from '@/api/cases'
-import { bewegung, nachTagen, rhythmusSatz, ton, zeitWort } from '@/lib/kompass'
+import { bewegung, rhythmusSatz, spurNachTagen, ton, zeitWort } from '@/lib/kompass'
 
 const ZEITRAEUME = [
   { tage: 28, label: '4 Wochen' },
@@ -37,6 +54,7 @@ export default function KompassVerlaufPage() {
   const bestaetigen = useBestaetigen()
   const [tage, setTage] = useState(28)
   const [offen, setOffen] = useState<string | null>(null)
+  const [mitSzenen, setMitSzenen] = useState(false)
 
   const { data: katalog } = useQuery({
     queryKey: ['kompass-katalog'],
@@ -46,6 +64,10 @@ export default function KompassVerlaufPage() {
   const { data: pulse, isLoading, error: verlaufFehler } = useQuery({
     queryKey: ['kompass-verlauf', tage],
     queryFn: () => kompassApi.verlauf(tage),
+  })
+  const { data: spur } = useQuery({
+    queryKey: ['kompass-spur', tage, mitSzenen],
+    queryFn: () => kompassApi.spur(tage, mitSzenen),
   })
   const { data: faelle } = useQuery({
     queryKey: ['cases'],
@@ -57,12 +79,14 @@ export default function KompassVerlaufPage() {
     mutationFn: (id: string) => kompassApi.pulsLoeschen(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['kompass-verlauf'] })
+      qc.invalidateQueries({ queryKey: ['kompass-spur'] })
       qc.invalidateQueries({ queryKey: ['kompass'] })
     },
   })
 
   const liste = useMemo(() => pulse ?? [], [pulse])
-  const gruppen = useMemo(() => nachTagen(liste), [liste])
+  const gruppen = useMemo(
+    () => spurNachTagen(liste, spur ?? []), [liste, spur])
   const richtung = useMemo(() => bewegung(liste), [liste])
 
   /** Wort-Schlüssel → Beschriftung. Ohne das stünde in der Liste `erschoepft_stumpf`. */
@@ -101,10 +125,11 @@ export default function KompassVerlaufPage() {
         </Link>
 
         <header className="mb-6 mt-3">
-          <h1 className="page-title">Mein Verlauf</h1>
+          <h1 className="page-title">Meine Spur</h1>
           <p className="mt-1 max-w-[62ch] text-sm text-brand-muted">
-            Was du festgehalten hast — als Linie und als Liste. Die Linie zeigt die
-            Bewegung, die Liste die Gründe.
+            Alles, was du festgehalten hast, auf einer Achse — Momente, Sätze, Vorhaben
+            und Porträts. Die Linie oben zeigt die Bewegung, die Achse darunter die
+            Gründe.
           </p>
         </header>
 
@@ -171,11 +196,26 @@ export default function KompassVerlaufPage() {
 
             <Fehlermeldung error={loeschen.error} className="mt-4" />
 
-            {gruppen.length > 0 && (
-              <section className="mt-6 space-y-5">
+            <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="section-label !mb-0">Die Achse</h2>
+              {/* Ein Schalter, kein Filter-Menue: Es gibt genau eine Entscheidung, und
+                  sie ist aus, bis jemand sie trifft. */}
+              <label className="flex cursor-pointer items-center gap-2 text-[0.78rem] text-brand-muted transition-colors hover:text-navy">
+                <input
+                  type="checkbox"
+                  checked={mitSzenen}
+                  onChange={e => setMitSzenen(e.target.checked)}
+                  className="h-3.5 w-3.5 rounded border-brand-border accent-accent"
+                />
+                Szenen aus meinen Fällen einblenden
+              </label>
+            </div>
+
+            {gruppen.length > 0 ? (
+              <section className="mt-3 space-y-5">
                 {gruppen.map(g => (
                   <div key={g.tag}>
-                    <h2 className="section-label">{g.label}</h2>
+                    <h3 className="section-label">{g.label}</h3>
                     <div className="mt-2 space-y-2">
                       {g.pulse.map(p => (
                         <MomentZeile
@@ -188,10 +228,18 @@ export default function KompassVerlaufPage() {
                           laeuft={loeschen.isPending && loeschen.variables === p.id}
                         />
                       ))}
+                      {g.ereignisse.map((e, i) => (
+                        <SpurZeile key={`${e.art}-${e.am}-${i}`} ereignis={e} />
+                      ))}
                     </div>
                   </div>
                 ))}
               </section>
+            ) : (
+              <p className="mt-3 text-[0.88rem] leading-relaxed text-brand-muted">
+                In diesem Zeitraum liegt noch nichts. Was du festhältst, sammelt sich
+                hier von selbst.
+              </p>
             )}
           </>
         )}
@@ -284,4 +332,47 @@ function MomentZeile({ puls: p, hervorgehoben, wortLabel, fallName, onWegnehmen,
       </div>
     </article>
   )
+}
+
+// ── Alles, was kein Moment ist ───────────────────────────────────────────────
+// Schmal mit Absicht. Ein bestätigter Satz hat seine eigene Seite, eine Szene auch —
+// hier steht, DASS an dem Tag etwas war, und ein Klick führt dorthin. Stünde hier
+// jeweils der ganze Text, wäre die Achse nach zwei Monaten unlesbar.
+
+const ETIKETT: Record<SpurEreignis['art'], { farbe: string; wort: string }> = {
+  puls:     { farbe: 'bg-brand-muted', wort: 'Moment' },
+  satz:     { farbe: 'bg-accent', wort: 'Satz' },
+  vorhaben: { farbe: 'bg-navy', wort: 'Vorhaben' },
+  schritt:  { farbe: 'bg-accent/60', wort: 'Schritt' },
+  portrait: { farbe: 'bg-navy', wort: 'Porträt' },
+  szene:    { farbe: 'bg-brand-border', wort: 'Szene' },
+}
+
+function SpurZeile({ ereignis: e }: { ereignis: SpurEreignis }) {
+  const etikett = ETIKETT[e.art] ?? ETIKETT.puls
+  const inhalt = (
+    <>
+      <span
+        className={`mt-[0.45rem] h-2 w-2 shrink-0 rounded-full ${etikett.farbe}`}
+        aria-hidden="true"
+      />
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-baseline gap-x-2">
+          <span className="text-[0.84rem] font-semibold text-navy">{e.titel}</span>
+          <span className="text-[0.72rem] text-brand-muted">{zeitWort(e.am)}</span>
+        </span>
+        {e.detail && (
+          <span className="mt-0.5 block text-[0.84rem] leading-snug text-brand-text">
+            {e.art === 'satz' ? `„${e.detail}“` : e.detail}
+          </span>
+        )}
+      </span>
+    </>
+  )
+
+  const klassen = 'flex items-start gap-3 rounded-brand border border-brand-border/70 bg-brand-card px-4 py-2.5 no-underline transition-colors'
+
+  return e.ziel
+    ? <Link to={e.ziel} className={`${klassen} hover:border-accent/40`}>{inhalt}</Link>
+    : <div className={klassen}>{inhalt}</div>
 }

@@ -1,8 +1,13 @@
 /**
  * /app/cases/:caseId/scenes/:sceneId — Szene ansehen & bearbeiten
+ *
+ * **Der Rückverweis in den Kompass.** Ein Satz über sich selbst zeigt schon, aus welcher
+ * Szene er gewachsen ist; die Szene wusste bisher nichts davon. Hier steht das
+ * Gegenstück: „Hierauf beruht ein Satz von dir." Drei Worte Aufwand — und der Kreislauf
+ * zwischen Beziehungsarbeit und Arbeit an sich selbst wird fühlbar statt behauptet.
  */
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
@@ -10,6 +15,8 @@ import { scenesApi } from '@/api/scenes'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
+import { kompassApi } from '@/api/kompass'
+import { altersWort } from '@/lib/kompass'
 
 const SAFETY_BADGE: Record<string, { label: string; cls: string }> = {
   none:     { label: 'Kein Sicherheitsrisiko',    cls: 'bg-green-100 text-green-800' },
@@ -34,6 +41,15 @@ export default function SceneDetailPage() {
     queryKey: ['scene', caseId, sceneId],
     queryFn: () => scenesApi.get(caseId!, sceneId!),
     enabled: !!caseId && !!sceneId,
+  })
+
+  // Der Rueckverweis. Scheitert er, bleibt die Szene vollstaendig - eine Marke, die
+  // fehlt, ist kein Grund, die Seite mit einer Fehlermeldung zu stoeren.
+  const { data: saetze } = useQuery({
+    queryKey: ['kompass-saetze-szene', sceneId],
+    queryFn: () => kompassApi.saetzeZuSzene(sceneId!),
+    enabled: !!sceneId,
+    retry: false,
   })
 
   const [editMode, setEditMode] = useState(false)
@@ -273,6 +289,35 @@ export default function SceneDetailPage() {
             <p className="text-xs text-brand-muted">Keine Muster-Tags markiert. Über „Bearbeiten" ergänzen.</p>
           )}
         </div>
+
+        {/* ── Der Rueckverweis ──────────────────────────────────────────────
+            Steht nur da, wenn wirklich ein bestaetigter Satz daraus gewachsen ist.
+            Eine Marke, die immer da ist und meistens leer, waere Moebel. */}
+        {saetze && saetze.length > 0 && (
+          <div className="mb-6 rounded-brand border border-accent/40 bg-accent/[0.05] p-4">
+            <p className="text-sm font-semibold text-navy">
+              {saetze.length === 1
+                ? 'Hierauf beruht ein Satz von dir.'
+                : `Hierauf beruhen ${saetze.length} Sätze von dir.`}
+            </p>
+            <ul className="mt-2 space-y-1.5">
+              {saetze.map(s => (
+                <li key={s.id} className="text-[0.9rem] leading-relaxed text-brand-text">
+                  „{s.text}"
+                  <span className="ml-2 text-[0.74rem] text-brand-muted">
+                    {s.art_label ?? s.art} · bestätigt {altersWort(s.bestaetigt_at)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/app/kompass/saetze"
+              className="mt-2 inline-block text-[0.8rem] font-semibold text-accent no-underline hover:underline"
+            >
+              Zu meinen Sätzen
+            </Link>
+          </div>
+        )}
 
         {/* Aktionen */}
         <div className="flex gap-3 flex-wrap">

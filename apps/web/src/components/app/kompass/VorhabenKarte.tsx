@@ -11,11 +11,17 @@
  * Balken ohne Zahl: Er misst abgehakte Schritte und sieht aus wie Fortschritt am Ziel.
  * Geblieben ist „2 von 5 Schritten" — nachprüfbar und ohne Versprechen.
  *
+ * **An seiner Stelle stehen Belege.** „Was war seitdem?" führt zu dem, was seit dem
+ * Anfang festgehalten wurde: Momente, Sätze, Szenen. Vier Pulse und eine Szene sind
+ * wahr, ein Balken bei 40 % wäre erfunden — und Belege überzeugen mehr, weil man sie
+ * nachlesen kann.
+ *
  * **Die Rückschau ist eine Einladung, keine Mahnung.** Sie erscheint, wenn der selbst
  * gewählte Abstand vorbei ist, und sie lässt sich mit einem Klick erledigen. Es gibt
  * keine Zählung verpasster Rückschauen und keine Farbe dafür.
  */
 import Chip from '@/components/Chip'
+import VorhabenBelege from './VorhabenBelege'
 import type { Schritt, Vorhaben, VorhabenAenderung } from '@/api/kompass'
 import { altersWort, rueckschauFaellig } from '@/lib/kompass'
 
@@ -81,8 +87,7 @@ export default function VorhabenKarte({ vorhaben: v, onAendern, onLoeschen, laeu
               am Ziel. Wer drei von fünf Schritten getan hat, ist nicht zu 60 % weniger
               streitsüchtig — und die Anzeige behauptet genau das.
               Was bleibt, ist die Zahl oben („2 von 5 Schritten"): nachprüfbar und ohne
-              Versprechen. Die eigentlichen Belege — Pulse und Szenen seit dem Vorhaben —
-              sind ein eigenes Stück und stehen noch aus. */}
+              Versprechen. Die eigentlichen Belege stehen unten unter „Was war seitdem?" */}
           <ul className="mt-3 space-y-1.5">
             {v.schritte.map(s => (
               <li key={s.id ?? s.text}>
@@ -123,6 +128,10 @@ export default function VorhabenKarte({ vorhaben: v, onAendern, onLoeschen, laeu
           </button>
         </div>
       )}
+
+      {/* Nicht bei erreichten Vorhaben: Was seit dem Anfang war, ist dort keine offene
+          Frage mehr, sondern Vergangenheit — und die Karte soll dann ruhig sein. */}
+      {laeuftNoch && <VorhabenBelege vorhabenId={v.id} />}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
         {laeuftNoch && (

@@ -234,9 +234,9 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     tipp: 'Ein Antippen genügt. Alles Weitere ist freiwillig — ein Verlauf aus kurzen Einträgen ist mehr wert als drei ausführliche.',
   },
   '/app/kompass/verlauf': {
-    titel: 'Dein Verlauf',
-    zweck: 'Alles, was du festgehalten hast — als Linie und als Liste.',
-    schritte: ['Zeitraum umschalten', 'Einen Punkt antippen', 'Einen Moment wegnehmen'],
+    titel: 'Deine Spur',
+    zweck: 'Alles, was du festgehalten hast, auf einer Achse — Momente, Sätze, Vorhaben, Porträts.',
+    schritte: ['Zeitraum umschalten', 'Szenen einblenden', 'Einen Punkt antippen', 'Einen Moment wegnehmen'],
     tipp: 'Die Lücken sind auch eine Auskunft: Wochen ohne Eintrag sind oft die dichten.',
   },
   '/app/kompass/saetze': {

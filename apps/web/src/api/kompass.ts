@@ -255,6 +255,30 @@ export interface PortraitVorschlag {
   hinweis: string | null
 }
 
+/** Ein Punkt auf der Zeitachse. */
+export interface SpurEreignis {
+  art: 'puls' | 'satz' | 'vorhaben' | 'schritt' | 'portrait' | 'szene'
+  am: string
+  titel: string
+  /** Ein kurzer Ausschnitt, nie der ganze Text. */
+  detail: string | null
+  /** Nur bei Pulsen — färbt den Punkt. */
+  zustand: number | null
+  ziel: string | null
+}
+
+/**
+ * Was seit dem Anfang eines Vorhabens dazugekommen ist.
+ *
+ * Ausdrücklich KEIN Prozentwert: `zaehlung` sagt, wie viel seitdem da ist, nicht wie
+ * weit jemand ist. Ob es zusammengehört, liest die Person selbst.
+ */
+export interface Belege {
+  seit: string
+  zaehlung: Partial<Record<SpurEreignis['art'], number>>
+  ereignisse: SpurEreignis[]
+}
+
 export interface KompassUebersicht {
   letzter_puls: Puls | null
   verlauf: Puls[]
@@ -353,6 +377,29 @@ export const kompassApi = {
     apiClient
       .post<Satz>(`${basis}/saetze/${satzId}/entscheidung`, { annehmen })
       .then(r => r.data),
+
+  /**
+   * Alles Festgehaltene auf einer Achse, neueste zuerst.
+   *
+   * `szenen` ist aus, bis jemand es einschaltet: Szenen gehören zu Fällen, und der
+   * Kompass ist der Raum ohne Fall.
+   */
+  spur: (tage: number, szenen: boolean) =>
+    apiClient
+      .get<SpurEreignis[]>(`${basis}/spur`, { params: { tage, szenen } })
+      .then(r => r.data),
+
+  /**
+   * Die bestätigten Sätze, die aus dieser Szene gewachsen sind — der Rückverweis.
+   *
+   * Unter `/me/kompass` und nicht unter dem Fall: Was herauskommt, sind Sätze über die
+   * Person, und die gehören in den Raum, der ihr gehört.
+   */
+  saetzeZuSzene: (szeneId: string) =>
+    apiClient.get<Satz[]>(`${basis}/szenen/${szeneId}/saetze`).then(r => r.data),
+
+  vorhabenBelege: (id: string) =>
+    apiClient.get<Belege>(`${basis}/vorhaben/${id}/belege`).then(r => r.data),
 
   portrait: () =>
     apiClient.get<PortraitStand>(`${basis}/portrait`).then(r => r.data),

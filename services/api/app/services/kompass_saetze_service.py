@@ -204,6 +204,32 @@ async def loeschen(
     return not ergebnis.endswith("0")
 
 
+async def zu_szene(
+    conn: asyncpg.Connection, *, user_id: UUID | str, szene_id: UUID | str
+) -> list[dict[str, Any]]:
+    """Die bestätigten Sätze, die aus DIESER Szene gewachsen sind — der Rückverweis.
+
+    **Die Verbindung geht bisher nur in eine Richtung.** Ein Satz zeigt, woher er kommt;
+    die Szene weiß nichts davon. Der Bauplan nennt das Gegenstück beim Namen: in der
+    Szene eine kleine Marke, „Hierauf beruht ein Satz von dir". Erst damit wird der
+    Kreislauf fühlbar statt behauptet.
+
+    **Nur Bestätigtes.** Ein Entwurf oder ein verworfener Vorschlag ist keine Aussage
+    über einen Menschen — in einer Szene, die man Monate später wieder aufschlägt, sähe
+    er trotzdem aus wie eine.
+
+    ``user_id`` steht in der Bedingung, obwohl die Szene ihrer Person gehört: Sonst
+    hinge die Eigentümerschaft an einem Verweis statt an einer Abfrage.
+    """
+    zeilen = await conn.fetch(
+        "SELECT * FROM selbst_saetze "
+        "WHERE user_id = $1 AND szene_id = $2 AND stand = 'bestaetigt' "
+        "ORDER BY bestaetigt_at DESC",
+        user_id, szene_id,
+    )
+    return [_aufbereiten(z) for z in zeilen]
+
+
 async def anzahl_bestaetigt(
     conn: asyncpg.Connection, *, user_id: UUID | str
 ) -> int:

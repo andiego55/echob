@@ -145,7 +145,7 @@ export default function KompassPage() {
 
               Sätze, Vorhaben  — zwei der drei Grundformen (die dritte, der Puls, steht
                                  oben als Handlung statt als Karte)
-              Verlauf          — die Sicht auf den Puls
+              Spur             — die Sicht auf alles Festgehaltene, Puls zuerst
               Wo ich stehe     — der Profilraum
               Notfallplan      — technisch eine Art von Vorhaben, hier trotzdem eigen:
                                  Er ist das Einzige, das in einem Zustand gebraucht wird,
@@ -180,8 +180,8 @@ export default function KompassPage() {
           />
           <Eingang
             to="/app/kompass/verlauf"
-            titel="Mein Verlauf"
-            text="Jeder Moment, den du festgehalten hast."
+            titel="Meine Spur"
+            text="Alles Festgehaltene auf einer Achse."
             stand={rhythmusSatz(stand?.rhythmus ?? 0, stand?.verlauf_tage ?? 28)}
             fertig={(stand?.rhythmus ?? 0) > 0}
           />

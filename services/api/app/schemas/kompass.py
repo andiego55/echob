@@ -245,6 +245,37 @@ class PortraitVorschlag(BaseModel):
     hinweis: str | None = None
 
 
+# ── Deine Spur ──────────────────────────────────────────────────────────────
+
+
+class SpurEreignis(BaseModel):
+    """Ein Punkt auf der Zeitachse.
+
+    ``art`` ist eine schlichte Zeichenkette und kein Literal: Die Liste steht im Dienst,
+    und eine zweite hier waere die naechste Stelle, die mitwandern muss.
+    """
+    art: str
+    am: datetime
+    titel: str
+    #: Ein kurzer Ausschnitt, nie der ganze Text. Die Achse ist eine Uebersicht.
+    detail: str | None = None
+    #: Nur bei Pulsen — faerbt den Punkt.
+    zustand: int | None = None
+    #: Wohin ein Klick fuehrt.
+    ziel: str | None = None
+
+
+class Belege(BaseModel):
+    """Was seit dem Anfang eines Vorhabens dazugekommen ist.
+
+    Ausdruecklich KEIN Prozentwert: ``zaehlung`` sagt, wie viel seitdem da ist, nicht
+    wie weit jemand ist. Die Zuordnung liest die Person selbst.
+    """
+    seit: datetime
+    zaehlung: dict[str, int] = Field(default_factory=dict)
+    ereignisse: list[SpurEreignis] = []
+
+
 class KompassUebersicht(BaseModel):
     """Was die Startseite braucht, in einem Zug."""
     letzter_puls: Puls | None = None

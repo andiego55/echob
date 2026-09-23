@@ -26,6 +26,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.kompass import (
+    Belege,
     KompassUebersicht,
     Krisenplan,
     KrisenplanUpdate,
@@ -38,6 +39,7 @@ from app.schemas.kompass import (
     Satz,
     SatzCreate,
     SatzUpdate,
+    SpurEreignis,
     Uebung,
     UebungAbschluss,
     UebungsErgebnis,
@@ -52,6 +54,7 @@ from app.services import (
     kompass_portrait_service,
     kompass_saetze_service,
     kompass_service,
+    kompass_spur_service,
     kompass_uebung_service,
     kompass_uebungen,
     kompass_vorhaben_service,
@@ -649,3 +652,74 @@ async def portrait_entwurf_verwerfen(
             conn, user_id=current["user_id"])
     if not weg:
         raise HTTPException(status_code=404, detail="Kein Entwurf da.")
+
+
+# ── Deine Spur ──────────────────────────────────────────────────────────────
+
+
+@router.get("/spur", response_model=list[SpurEreignis])
+async def spur(
+    tage: int = Query(default=kompass_spur_service.SPUR_TAGE, ge=1, le=1095),
+    szenen: bool = Query(default=False),
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[SpurEreignis]:
+    """Alles Festgehaltene auf einer Achse, neueste zuerst.
+
+    ``szenen`` ist aus, bis jemand es einschaltet. Szenen gehoeren zu Faellen, und dies
+    ist der Raum ohne Fall — wer nur auf sich schauen will, soll nicht an eine Beziehung
+    erinnert werden.
+    """
+    async with pool.acquire() as conn:
+        punkte = await kompass_spur_service.ereignisse(
+            conn, user_id=current["user_id"], tage=tage, mit_szenen=szenen)
+    return [SpurEreignis(**e) for e in punkte]
+
+
+@router.get("/vorhaben/{vorhaben_id}/belege", response_model=Belege)
+async def vorhaben_belege(
+    vorhaben_id: UUID,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> Belege:
+    """Was seit dem Anfang dieses Vorhabens dazugekommen ist — Spuren, kein Prozentwert.
+
+    Auf Abruf und nicht in der Liste: Fuer jedes Vorhaben mitzuliefern hiesse fuenf
+    Abfragen je Karte, und gelesen wird es fuer eines nach dem anderen.
+    """
+    async with pool.acquire() as conn:
+        daten = await kompass_spur_service.belege_fuer_vorhaben(
+            conn, user_id=current["user_id"], vorhaben_id=vorhaben_id)
+    if daten is None:
+        raise HTTPException(status_code=404, detail="Nicht gefunden.")
+    return Belege(
+        seit=daten["seit"],
+        zaehlung=daten["zaehlung"],
+        ereignisse=[SpurEreignis(**e) for e in daten["ereignisse"]],
+    )
+
+
+# ── Der Rückverweis ─────────────────────────────────────────────────────────
+
+
+@router.get("/szenen/{szene_id}/saetze", response_model=list[Satz])
+async def saetze_zu_szene(
+    szene_id: UUID,
+    current: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> list[Satz]:
+    """Die bestätigten Sätze, die aus dieser Szene gewachsen sind.
+
+    **Unter ``/me/kompass`` und nicht unter ``/cases/…/scenes/…``**, obwohl die Szene
+    dort liegt. Was hier herauskommt, sind Sätze über die Person — und die gehören in
+    den Raum, der ihr gehört. Unter dem Fall wären sie ein Endpunkt, den eine Freigabe
+    eines Tages mitnehmen könnte, ohne dass es jemandem auffällt.
+
+    Keine 404 bei einer fremden Szene, sondern eine leere Liste: Die Abfrage bindet die
+    Nutzer-Kennung, also ist „gibt es nicht" und „gehört dir nicht" hier dasselbe — und
+    ein Unterschied zwischen beiden verriete, welche Kennungen existieren.
+    """
+    async with pool.acquire() as conn:
+        saetze = await kompass_saetze_service.zu_szene(
+            conn, user_id=current["user_id"], szene_id=szene_id)
+    return [Satz(**s) for s in saetze]
