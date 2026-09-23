@@ -317,19 +317,29 @@ async def bestaetigen(
 ) -> dict[str, Any] | None:
     """Aus dem Entwurf wird eine datierte Momentaufnahme. Danach unveränderlich.
 
-    ``clock_timestamp()`` statt ``NOW()``, aus demselben Grund wie beim Puls: ``NOW()``
-    liefert den Beginn der TRANSAKTION, nicht den Augenblick. Zwei Bestätigungen in
-    einer Transaktion trügen dieselbe Zeit — und ihre Reihenfolge wäre damit weg.
+    **Die Zeit kommt aus Python, und das ist keine Geschmacksfrage.** Sie wird später mit
+    ``selbst_saetze.bestaetigt_at`` verglichen — „wie viele Sätze kamen seit dem letzten
+    Porträt dazu?" —, und die stammt aus ``datetime.now(UTC)``, also von der Uhr des
+    App-Servers. Käme diese hier aus der Datenbank (``clock_timestamp()``), stünden auf
+    den beiden Seiten des Vergleichs zwei verschiedene Uhren: Die Datenbank läuft in
+    einem eigenen Container, und schon ein Vorsprung von Millisekunden lässt Sätze, die
+    kurz nach einem Porträt bestätigt wurden, älter aussehen als es. Sie zählten dann
+    nicht mit, und das nächste Porträt käme erst nach sechs Wochen statt nach fünf
+    Sätzen — ohne Fehler, ohne Spur, nur als Ausbleiben.
+
+    ``NOW()`` wäre aus einem zweiten Grund falsch: Es liefert den Beginn der TRANSAKTION.
+    Zwei Bestätigungen in einer trügen dieselbe Zeit, und ihre Reihenfolge wäre weg.
+    Python löst beides.
     """
     offen = await entwurf(conn, user_id=user_id)
     if offen is None or not (offen.get("text") or "").strip():
         return None
+    jetzt = datetime.now(UTC)
     zeile = await conn.fetchrow(
         "UPDATE selbst_portraits "
-        "SET status = 'bestaetigt', bestaetigt_at = clock_timestamp(), "
-        "    updated_at = clock_timestamp() "
+        "SET status = 'bestaetigt', bestaetigt_at = $3, updated_at = $3 "
         "WHERE id = $1 AND user_id = $2 RETURNING *",
-        offen["id"], user_id,
+        offen["id"], user_id, jetzt,
     )
     logger.info("Selbstportraet bestaetigt.")
     return _aufbereiten(zeile)

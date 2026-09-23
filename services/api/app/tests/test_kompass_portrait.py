@@ -318,19 +318,33 @@ async def test_der_stand_zaehlt_nur_saetze_seit_dem_letzten_portrait(db):
 
     Würden sie mitgezählt, wäre die Bedingung „fünf neue" beim zweiten Porträt sofort
     erfüllt — und der Bremse bliebe nur noch die Zeit.
+
+    **Die neuen Sätze werden ausdrücklich datiert**, statt sich auf die Uhr zu verlassen.
+    Unter Windows tickt ``datetime.now()` grob (rund 15 ms); fünf Sätze in einer Schleife
+    landen dann teilweise auf demselben Tick wie das Porträt, und ``bestaetigt_at >``
+    zählt sie nicht. Der Test war dadurch launisch — in etwa jedem achten Lauf rot, ohne
+    dass sich etwas geändert hätte.
+
+    Das ist kein Mangel des Codes: Zwischen einem Porträt und den Sätzen danach liegen in
+    Wirklichkeit Tage. Ein Test, der auf einer Tick-Grenze balanciert, prüft die Uhr statt
+    die Regel. Dass Uhr und Uhr dieselbe sein müssen, prüft
+    ``test_ein_satz_kurz_nach_einem_portrait_zaehlt_als_neu`` — und zwar dort allein.
     """
     uid = await _person(db)
     for i in range(4):
         await _bestaetigter_satz(db, uid, "wert", f"Alter Satz {i}.")
 
     await dienst.entwurf_sichern(db, user_id=uid, text="Fassung eins.")
-    await dienst.bestaetigen(db, user_id=uid)
+    portrait = await dienst.bestaetigen(db, user_id=uid)
 
     zustand = await dienst.stand(db, user_id=uid)
     assert zustand["bereit"] is False, "vier alte Saetze sind keine neuen"
 
     for i in range(dienst.NEUE_SAETZE_FUER_WEITERES):
-        await _bestaetigter_satz(db, uid, "muster", f"Neuer Satz {i}.")
+        satz = await _bestaetigter_satz(db, uid, "muster", f"Neuer Satz {i}.")
+        await db.execute(
+            "UPDATE selbst_saetze SET bestaetigt_at = $2 WHERE id = $1",
+            satz["id"], portrait["bestaetigt_at"] + timedelta(days=i + 1))
 
     assert (await dienst.stand(db, user_id=uid))["bereit"] is True
 
@@ -469,3 +483,44 @@ async def test_ohne_material_bleibt_der_prompt_ehrlich_leer(db):
     assert "Was sie über sich bestätigt hat" not in eingabe
     assert "Woran sie arbeitet" not in eingabe
     assert eingabe.strip(), "ganz leer waere auch falsch - die Anweisung bleibt"
+
+
+@pytest.mark.asyncio
+async def test_ein_satz_kurz_nach_einem_portrait_zaehlt_als_neu(db):
+    """**Zwei Uhren, und der Vergleich zwischen ihnen.**
+
+    ``selbst_saetze.bestaetigt_at`` kommt aus ``datetime.now(UTC)`` — der Uhr des
+    App-Servers. Käme die des Porträts aus der Datenbank (``clock_timestamp()``),
+    stünden auf den beiden Seiten von „seit dem letzten Porträt" verschiedene Uhren; die
+    Datenbank läuft in einem eigenen Container, und ein Vorsprung von Millisekunden
+    genügt, damit ein Satz von danach älter aussieht.
+
+    Was dann passierte, sähe nach nichts aus: Das nächste Porträt käme erst nach sechs
+    Wochen statt nach fünf Sätzen. Kein Fehler, keine Spur — nur ein Ausbleiben.
+
+    Genau so ist es passiert, und nur dieser Abstand von Millisekunden hat es gezeigt.
+    """
+    uid = await _person(db)
+    for i in range(dienst.ERSTES_PORTRAIT_AB):
+        await _bestaetigter_satz(db, uid, "wert", f"Vorher {i}.")
+    await dienst.entwurf_sichern(db, user_id=uid, text="Die erste Fassung.")
+    letztes = await dienst.bestaetigen(db, user_id=uid)
+
+    # Unmittelbar danach - genau der Abstand, bei dem ein Uhrenversatz durchschlaegt.
+    neuer = await _bestaetigter_satz(db, uid, "muster", "Danach.")
+
+    # GLEICH ist erlaubt, FRUEHER nicht. Unter Windows tickt datetime.now() grob genug,
+    # dass beide auf denselben Wert fallen - das ist die Aufloesung der Uhr und kein
+    # Fehler. Frueher zu sein ginge dagegen nur mit einer zweiten Uhr.
+    abstand = (neuer["bestaetigt_at"] - letztes["bestaetigt_at"]).total_seconds()
+    assert abstand >= 0, (
+        "Ein Satz, der NACH dem Portraet bestaetigt wurde, traegt eine fruehere Zeit - "
+        "die beiden Zeitstempel kommen von verschiedenen Uhren."
+    )
+    # Und die Gegenrichtung, die ein blosses >= nicht faenge: Laeuft die zweite Uhr
+    # NACH, saehe der Satz viel spaeter aus - und Saetze von vor dem Portraet zaehlten
+    # als neu. Dieselbe Uhr, Millisekunden auseinander, bleibt weit unter einer Sekunde.
+    assert abstand < 1.0, (
+        f"{abstand:.3f}s zwischen zwei unmittelbar aufeinanderfolgenden Zeitstempeln - "
+        "das ist kein Ablauf, das ist ein Uhrenversatz."
+    )
