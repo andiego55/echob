@@ -8,6 +8,7 @@ dort später versehentlich mehr preisgibt.
 from __future__ import annotations
 
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -259,3 +260,33 @@ class UmbenennErgebnis(BaseModel):
     rolle: str | None = None
     name: str | None = None
 
+
+
+class PlaetzeRow(BaseModel):
+    """Eine Organisation mit Tarif, Plaetzen und laufendem Verbrauch.
+
+    ``included_tarif`` und ``zusatz_faelle`` stehen GETRENNT, nicht nur als Summe: Eine
+    blosse 9 waere eine Zahl, die niemand erklaeren koennte - und nach einem Tarifwechsel
+    merkte niemand, dass sie sich geaendert hat.
+    """
+    id: UUID
+    name: str | None = None
+    plan: str | None = None
+    subscription_status: str | None = None
+    included_tarif: int = 0
+    zusatz_faelle: int = 0
+    included: int = 0
+    verbraucht: int = 0
+    zusatz_grund: str | None = None
+    zusatz_gesetzt_am: datetime | None = None
+
+
+class PlaetzeUpdate(BaseModel):
+    """Der Gesamtbetrag des Geschenks, nicht ein Zuwachs.
+
+    Zweimal „+2" zu klicken soll nicht heimlich 4 ergeben.
+    """
+    zusatz_faelle: int = Field(ge=0, le=500)
+    #: Pflicht. Ein Geschenk ohne Grund ist in einem halben Jahr nicht mehr erklaerbar -
+    #: und wird deshalb nie zurueckgenommen.
+    grund: str = Field(min_length=5, max_length=500)

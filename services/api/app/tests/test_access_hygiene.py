@@ -165,6 +165,20 @@ VERTRAUT_DEM_AUFRUFER = {
         "Oeffnungsdatum rechnet der Dienst daraus selbst, damit es sich nicht auf gestern "
         "setzen laesst.",
 
+    # ── Admin: der Router traegt require_admin ──────────────────────────────────────
+    "plaetze.uebersicht":
+        "Listet ALLE Organisationen samt Tarif und Verbrauch - das ist der Zweck. Eine "
+        "Bindung an eine Nutzer-Id waere hier sinnlos: Der Ueberblick ueber die eigenen "
+        "Organisationen ist keine Admin-Aufgabe. Garantiert wird der Zugriff von "
+        "require_admin, und zwar am ROUTER (app/admin/router.py), nicht an der einzelnen "
+        "Funktion - deshalb kann dort auch kein neuer Endpunkt ungeschuetzt entstehen. "
+        "test_admin_gate.py prueft das fuer jede einzelne Route.",
+    "plaetze.setzen":
+        "Setzt die Zusatzplaetze einer Organisation. Wie uebersicht: Der Zugriff haengt "
+        "an require_admin am Router. Die org_id kommt aus dem Pfad und wird nicht gegen "
+        "eine Nutzer-Id geprueft, weil ein Admin gerade fremde Organisationen bearbeiten "
+        "koennen soll; wer es getan hat, steht danach in zusatz_gesetzt_von.",
+
     # ── Paarraum: der Router prüft, der Dienst schreibt ──────────────────────────────
     "couple_companion_service.add_message":
         "Schreibt eine Zeile des privaten Begleiter-Dialogs. Alle drei Aufrufer in couple.py "

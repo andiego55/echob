@@ -61,20 +61,33 @@ async def count_currently_active(org_id, conn, period=None) -> int:
 async def get_org_billing(org_id, conn) -> dict:
     """Abrechnungs-Status der Org: plan, Abo-Status, verbrauchte/inkludierte Einheiten."""
     row = await conn.fetchrow(
-        "SELECT plan, subscription_status, subscription_ends_at, current_period_start, stripe_customer_id "
+        "SELECT plan, subscription_status, subscription_ends_at, current_period_start, "
+        "       stripe_customer_id, zusatz_faelle, zusatz_grund "
         "FROM organizations WHERE id = $1",
         org_id,
     )
     plan = row["plan"] if row else "free"
     status = row["subscription_status"] if row else None
     period = (row["current_period_start"] if row else None) or _month_start()
+    # Zusatzplaetze kommen OBENDRAUF, nicht anstelle des Tarifs. Der Unterschied ist kein
+    # Detail: Ein Wert, der den Tarif ersetzt, haelt eine Person beim Upgrade auf ihrem
+    # alten Stand fest - aus einem Geschenk wird eine Bremse. Additiv ueberlebt es jeden
+    # Tarifwechsel, und was es ist, bleibt erkennbar.
+    aus_dem_tarif = included_cases(plan)
+    zusatz = (row["zusatz_faelle"] if row else 0) or 0
     return {
         "plan": plan,
         "status": status,
         "subscription_active": status in _ACTIVE_SUB,
         "active_cases": await count_consumed_this_period(org_id, conn, period),   # verbrauchte Einheiten
         "currently_active": await count_currently_active(org_id, conn, period),
-        "included": included_cases(plan),
+        "included": aus_dem_tarif + zusatz,
+        # Getrennt ausgewiesen, damit die Oberflaeche „1 aus dem Tarif, 4 zusaetzlich"
+        # sagen kann. Eine blosse 5 waere eine Zahl, die niemand erklaeren koennte - und
+        # bei der nach einem Tarifwechsel niemand merkt, dass sie sich geaendert hat.
+        "included_tarif": aus_dem_tarif,
+        "zusatz_faelle": zusatz,
+        "zusatz_grund": (row["zusatz_grund"] if row else None),
         "period_start": period,
         "stripe_customer_id": row["stripe_customer_id"] if row else None,
         "subscription_ends_at": row["subscription_ends_at"] if row else None,

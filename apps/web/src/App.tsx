@@ -139,6 +139,7 @@ const ProfessionalProfilePage = lazy(() => import('@/pages/professional/Professi
 // es gehoert nie ins Buendel, das eine nutzende Person herunterlaedt.
 const AdminListingsPage = lazy(() => import('@/admin/ListingsPage'))
 const AdminUsersPage = lazy(() => import('@/admin/UsersPage'))
+const AdminPlaetzePage = lazy(() => import('@/admin/PlaetzePage'))
 const RegionalPage = lazy(() => import('@/pages/RegionalPage'))
 import { REGION_PROFESSIONS }    from '@/directory/regions'
 const ProfessionalReportTemplatesPage = lazy(() => import('@/pages/professional/ProfessionalReportTemplatesPage'))
@@ -345,6 +346,7 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/professional/profil" element={<ProfessionalRoute><ProfessionalProfilePage /></ProfessionalRoute>} />
       <Route path="/admin/verzeichnis" element={<ProtectedRoute><AdminListingsPage /></ProtectedRoute>} />
       <Route path="/admin/nutzer" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
+      <Route path="/admin/plaetze" element={<ProtectedRoute><AdminPlaetzePage /></ProtectedRoute>} />
       <Route path="/professional/report-templates" element={<ProfessionalRoute><ProfessionalReportTemplatesPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId" element={<ProfessionalRoute><ProfessionalCaseDetailPage /></ProfessionalRoute>} />
       <Route path="/professional/cases/:caseId/echo" element={<ProfessionalRoute><ProfessionalEchoPage /></ProfessionalRoute>} />

@@ -188,7 +188,36 @@ export interface VerwaistReport {
   ohne_profil: LoginOhneProfil[]
 }
 
+/**
+ * Eine Organisation mit Tarif, Plaetzen und laufendem Verbrauch.
+ *
+ * `included_tarif` und `zusatz_faelle` stehen getrennt, nicht nur als Summe: Eine blosse
+ * 9 waere eine Zahl, die niemand erklaeren koennte - und nach einem Tarifwechsel merkte
+ * niemand, welcher Teil sich geaendert hat.
+ */
+export interface PlaetzeRow {
+  id: string
+  name: string | null
+  plan: string | null
+  subscription_status: string | null
+  included_tarif: number
+  zusatz_faelle: number
+  included: number
+  verbraucht: number
+  zusatz_grund: string | null
+  zusatz_gesetzt_am: string | null
+}
+
 export const adminApi = {
+  plaetze: (suche?: string) =>
+    apiClient.get<PlaetzeRow[]>('/admin/plaetze', { params: suche ? { suche } : {} })
+      .then(r => r.data),
+
+  /** Setzt den GESAMTBETRAG des Geschenks, nicht einen Zuwachs. */
+  plaetzeSetzen: (orgId: string, zusatz: number, grund: string) =>
+    apiClient.put<PlaetzeRow>(`/admin/plaetze/${orgId}`,
+      { zusatz_faelle: zusatz, grund }).then(r => r.data),
+
   listings: (status?: string) =>
     apiClient.get<ListingRow[]>('/admin/listings', { params: status ? { status } : {} })
       .then(r => r.data),

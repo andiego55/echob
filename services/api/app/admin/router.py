@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 
-from app.admin import invites, konten, listings, provisioning, users
+from app.admin import invites, konten, listings, plaetze, provisioning, users
 from app.admin.schemas import (
     InviteDraft,
     InviteResult,
@@ -22,6 +22,8 @@ from app.admin.schemas import (
     LoeschErgebnis,
     NameUpdate,
     PhotoResult,
+    PlaetzeRow,
+    PlaetzeUpdate,
     ProvisionRequest,
     ProvisionResult,
     UmbenennErgebnis,
@@ -206,3 +208,37 @@ async def user_delete(
     „das ist das Admin-Konto" eine Antwort, die man lesen soll.
     """
     return LoeschErgebnis(**await konten.loeschen(pool, supabase, user_id))
+
+
+# ── Plätze ───────────────────────────────────────────────────────────────────
+#
+# Das Werkzeug für die Anfangszeit: mehr Fälle, als ein Tarif hergibt, ohne dafür den
+# Tarif hochzustufen. Es ist ausdrücklich KEIN individueller Tarif — der Preis bleibt der
+# des Tarifs; was hier vergeben wird, sind Plätze.
+
+@router.get("/plaetze", response_model=list[PlaetzeRow])
+async def plaetze_liste(
+    suche: str | None = Query(default=None, max_length=120),
+    pool=Depends(get_pool),
+) -> list[PlaetzeRow]:
+    """Alle Organisationen mit Tarif, Plätzen und laufendem Verbrauch."""
+    return [PlaetzeRow(**z) for z in await plaetze.uebersicht(pool, suche=suche)]
+
+
+@router.put("/plaetze/{org_id}", response_model=PlaetzeRow)
+async def plaetze_setzen(
+    org_id: str,
+    body: PlaetzeUpdate,
+    pool=Depends(get_pool),
+    admin: dict = Depends(require_admin),
+) -> PlaetzeRow:
+    """Zusätzliche Plätze vergeben oder zurücknehmen — mit Grund.
+
+    ``require_admin`` hängt schon am Router; hier steht es ein zweites Mal, weil die
+    Kennung der handelnden Person gebraucht wird. Wer etwas verschenkt, soll darin
+    auftauchen.
+    """
+    return PlaetzeRow(**await plaetze.setzen(
+        pool, org_id=org_id, zusatz=body.zusatz_faelle, grund=body.grund,
+        admin_user_id=str(admin.get("user_id") or ""),
+    ))

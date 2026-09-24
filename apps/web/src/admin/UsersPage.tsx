@@ -252,6 +252,7 @@ export default function AdminUsersPage() {
       <header className="bg-navy px-6">
         <div className="mx-auto flex h-14 max-w-[1240px] items-center justify-between">
           <span className="font-bold text-white">Echo<span className="text-accent">B</span> · Konten</span>
+          <Link to="/admin/plaetze" className="text-[0.82rem] text-white/60 no-underline hover:text-white">Plätze ↗</Link>
           <Link to="/admin/verzeichnis" className="text-[0.82rem] text-white/60 no-underline hover:text-white">
             Zum Verzeichnis-Admin ↗
           </Link>

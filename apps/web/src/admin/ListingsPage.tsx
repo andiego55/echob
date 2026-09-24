@@ -62,6 +62,7 @@ export default function AdminListingsPage() {
         <div className="mx-auto flex h-14 max-w-[1080px] items-center justify-between">
           <span className="font-bold text-white">Echo<span className="text-accent">B</span> · Verzeichnis</span>
           <div className="flex items-center gap-4">
+            <Link to="/admin/plaetze" className="text-[0.82rem] text-white/60 no-underline hover:text-white">Plätze ↗</Link>
             <Link to="/admin/nutzer" className="text-[0.82rem] text-white/60 no-underline hover:text-white">Konten ↗</Link>
             <Link to="/fachpersonen" className="text-[0.82rem] text-white/60 no-underline hover:text-white">Öffentlich ↗</Link>
           </div>
