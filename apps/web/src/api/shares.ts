@@ -14,6 +14,20 @@ export const sharesApi = {
   /** Fragenpaket neu erstellen — ohne die Freigabe erneut zu erklaeren. */
   faqAktualisieren: (caseId: string, shareId: string) =>
     apiClient.post<CaseShare>(`/cases/${caseId}/shares/${shareId}/faq`).then(r => r.data),
+
+  /**
+   * Das Fragenpaket nachträglich hinzufügen — mit eigener Erklärung für diesen Absatz.
+   *
+   * Der gespeicherte Einwilligungstext einer Freigabe ohne Fragenpaket enthält ihn
+   * nicht; ihn ohne Erklärung einzuschalten wäre eine Übermittlung ohne Nachweis. Der
+   * Text wird an den bestehenden angehängt, nicht an seine Stelle gesetzt.
+   */
+  faqAktivieren: (caseId: string, shareId: string, consentText: string, version: string) =>
+    apiClient
+      .post<CaseShare>(`/cases/${caseId}/shares/${shareId}/faq/aktivieren`, {
+        consent: true, consent_version: version, consent_text: consentText,
+      })
+      .then(r => r.data),
 }
 
 /** Nutzerseitige Fachpersonen-Verbindungen. */

@@ -14,6 +14,7 @@ import { subscriptionApi } from '@/api/subscription'
 import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import FreigabeStand from '@/components/app/FreigabeStand'
 import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen, notizenErklaerung } from '@/lib/einwilligung'
@@ -85,6 +86,9 @@ export default function CaseSharingPage() {
                             ))}
                       </div>
                       {s.faq_enabled && <FaqStand caseId={caseId!} share={s} />}
+                      {/* Was erklaert wurde, wie Neues ankommt, und der Weg zum
+                          Fragenpaket fuer Freigaben, die es noch nicht haben. */}
+                      <FreigabeStand caseId={caseId!} share={s} />
                     </div>
                     {s.status === 'active' && <RevokeButton caseId={caseId!} share={s} />}
                   </div>

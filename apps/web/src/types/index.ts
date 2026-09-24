@@ -977,6 +977,14 @@ export interface CaseShare {
   faq_status?: 'offen' | 'laeuft' | 'fertig' | 'fehler' | null
   /** Wann das Paket entstand. Macht den Tagesdeckel sichtbar - siehe FaqStand. */
   faq_erstellt_am?: string | null
+  /**
+   * Wann die Erklärungen abgegeben wurden.
+   *
+   * Steht an der Freigabe, damit die Person sieht, DASS eine Einwilligung und eine
+   * Entbindung vorliegen und von wann — das ist ihr Nachweis, nicht nur unserer.
+   */
+  consented_at?: string | null
+  consent_version?: string | null
   /** Ob die eigenen Aufzeichnungen der Fachperson mitverarbeitet werden duerfen. */
   notizen_erlaubt?: boolean
 }

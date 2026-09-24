@@ -5,6 +5,7 @@ Freigaben sind nur an verbundene (accepted) Fachpersonen möglich.
 """
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -12,6 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.professional import (
     CaseShareResponse,
+    FaqAktivierung,
     ShareCreate,
     ShareElementResponse,
     ShareUpdate,
@@ -117,6 +119,8 @@ async def _build_share_response(conn, share_row) -> CaseShareResponse:
         faq_status=faq["status"] if faq else None,
         faq_erstellt_am=faq["angefordert_am"] if faq else None,
         notizen_erlaubt=share_row["notizen_erlaubt"],
+        consented_at=share_row["consented_at"],
+        consent_version=share_row["consent_version"],
     )
 
 
@@ -249,6 +253,98 @@ async def update_share(
             await conn.execute(
                 "UPDATE case_shares SET faq_enabled = FALSE WHERE id = $1", share_id)
             share = await conn.fetchrow("SELECT * FROM case_shares WHERE id = $1", share_id)
+        return await _build_share_response(conn, share)
+
+
+@router.post("/{share_id}/faq/aktivieren", response_model=CaseShareResponse)
+async def faq_aktivieren(
+    case_id: UUID,
+    share_id: UUID,
+    body: FaqAktivierung,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> CaseShareResponse:
+    """Das Fragenpaket nachträglich zu einer bestehenden Freigabe hinzufügen.
+
+    **Warum es das braucht.** Wer beim Freigeben das Häkchen nicht gesetzt hat, kam später
+    gar nicht mehr heran: Der Auffrisch-Endpunkt verlangt ``faq_enabled``, und der einzige
+    Weg dorthin war, die ganze Freigabe neu zu erklären — also beide Rechtserklärungen ein
+    zweites Mal zu bestätigen. Wer eine Einwilligung so oft abfragt, dass sie zur Formalie
+    wird, beschädigt sie.
+
+    **Warum trotzdem eine Erklärung.** Der gespeicherte Text dieser Freigabe enthält den
+    FAQ-Absatz nicht, und das ist richtig so: Er belegt, was die Person erklärt hat, nicht
+    was ihr angeboten wurde. Hier wird deshalb genau dieser eine Absatz erklärt — und
+    **an den bestehenden Text angehängt**, nicht an seine Stelle gesetzt. Ersetzen würde
+    den Nachweis der ersten Einwilligung löschen; was nachträglich dazukam, muss als
+    solches erkennbar bleiben (Art. 7 Abs. 1 DSGVO).
+
+    **Wer auslöst, bleibt gleich:** die Klient:in. Für Berufsgeheimnisträger:innen ist der
+    Unterschied nicht akademisch — wer selbst fragt, offenbart.
+    """
+    uid = current_user["user_id"]
+    if not body.consent or not body.consent_version:
+        raise HTTPException(
+            status_code=400,
+            detail="Für das Fragenpaket ist deine ausdrückliche Einwilligung erforderlich.",
+        )
+    if not (body.consent_text or "").strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Der Wortlaut der Einwilligung fehlt. Bitte lade die Seite neu.",
+        )
+
+    async with pool.acquire() as conn:
+        share = await conn.fetchrow(
+            "SELECT * FROM case_shares WHERE id = $1 AND case_id = $2 AND owner_user_id = $3",
+            share_id, case_id, uid,
+        )
+        if not share:
+            raise HTTPException(status_code=404, detail="Freigabe nicht gefunden.")
+        if share["status"] != "active":
+            raise HTTPException(
+                status_code=422,
+                detail="Diese Freigabe ist widerrufen. Gib den Fall neu frei, wenn du "
+                       "wieder mit dieser Fachperson arbeiten möchtest.",
+            )
+        if share["faq_enabled"]:
+            raise HTTPException(
+                status_code=422,
+                detail="Für diese Freigabe läuft bereits ein Fragenpaket. Es lässt sich "
+                       "an der Freigabe aktualisieren.",
+            )
+        if not await subscription_service.has_ai_usage_left(uid, conn, "fall_faq"):
+            raise HTTPException(
+                status_code=422,
+                detail="Dein monatliches Kontingent für Fragenpakete ist aufgebraucht. "
+                       "Am Monatsersten geht es weiter.",
+            )
+
+        # Angehaengt, nicht ersetzt. Die erste Einwilligung bleibt im Wortlaut stehen, und
+        # der Zusatz traegt sein eigenes Datum - sonst saehe es spaeter so aus, als waere
+        # von Anfang an alles zusammen erklaert worden.
+        heute = datetime.now(UTC).strftime("%d.%m.%Y")
+        alter_text = (share["consent_text"] or "").strip()
+        trenner = f"--- Nachträglich erklärt am {heute} ---"
+        neuer_text = "\n\n".join(
+            teil for teil in (alter_text, trenner, body.consent_text.strip()) if teil
+        )
+
+        async with conn.transaction():
+            await conn.execute(
+                "UPDATE case_shares SET faq_enabled = TRUE, consent_text = $2, "
+                "consent_version = $3, updated_at = NOW() "
+                "WHERE id = $1 AND owner_user_id = $4",
+                share_id, neuer_text[:8000], body.consent_version, uid,
+            )
+            aktuell = await conn.fetchrow(
+                "SELECT * FROM case_shares WHERE id = $1", share_id)
+            run_id = await fall_faq_service.sicher_anlegen(
+                conn, share=dict(aktuell), gewuenscht=True)
+        if run_id:
+            fall_faq_service.spawn(request.app, run_id)
+        share = await conn.fetchrow("SELECT * FROM case_shares WHERE id = $1", share_id)
         return await _build_share_response(conn, share)
 
 

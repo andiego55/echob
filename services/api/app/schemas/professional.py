@@ -166,6 +166,22 @@ class ShareCreate(BaseModel):
     notizen: bool = False
 
 
+class FaqAktivierung(BaseModel):
+    """Das Fragenpaket nachtraeglich zu einer bestehenden Freigabe hinzufuegen.
+
+    **Warum das eine eigene Erklaerung braucht.** Der gespeicherte Einwilligungstext
+    einer Freigabe ohne Fragenpaket enthaelt den FAQ-Absatz nicht - aus gutem Grund: Er
+    belegt, was die Person erklaert hat, nicht was ihr angeboten wurde. Das Paket ohne
+    eine Erklaerung dazu einzuschalten waere eine Uebermittlung ohne Nachweis.
+
+    Deshalb dieselben zwei Felder wie beim Anlegen einer Freigabe - nur fuer diesen
+    einen Absatz.
+    """
+    consent: bool = False
+    consent_version: str | None = Field(None, max_length=64)
+    consent_text: str | None = Field(None, max_length=4000)
+
+
 class ShareUpdate(BaseModel):
     elements: list[ShareElementType] = Field(default_factory=list)
     scene_ids: list[UUID] = Field(default_factory=list)
@@ -200,6 +216,12 @@ class CaseShareResponse(BaseModel):
     # erneut speichert und keinen neuen Lauf bekommt, saehe dieselbe Zeile wie vorher und
     # wuesste nicht, ob etwas passiert ist.
     faq_erstellt_am: datetime | None = None
+    # Wann die Erklaerungen abgegeben wurden. Die Klient:in soll an ihrer Freigabe sehen
+    # koennen, DASS eine Einwilligung und eine Entbindung vorliegen und von wann - das ist
+    # ihr Nachweis, nicht nur unserer. Der Wortlaut steht bewusst NICHT hier: Er ist lang,
+    # und eine Liste ist nicht der Ort, an dem man ihn liest.
+    consented_at: datetime | None = None
+    consent_version: str | None = None
 
 
 # ── Postfach / Fallübersicht (Fachperson) ─────────────────────────────────────

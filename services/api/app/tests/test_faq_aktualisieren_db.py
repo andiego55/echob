@@ -176,3 +176,149 @@ async def test_ein_laufendes_paket_wird_nicht_doppelt_gestartet(welt):
             owner)
     # Der abgewiesene zweite Klick darf nichts kosten.
     assert gebucht == 1
+
+
+# ── Nachträglich hinzufügen ──────────────────────────────────────────────────
+#
+# Die Lücke, die der Endpunkt oben offen lässt — mit Absicht: Wer das Häkchen nie gesetzt
+# hat, kam gar nicht mehr heran. Der einzige Weg war, die ganze Freigabe neu zu erklären,
+# also beide Rechtserklärungen ein zweites Mal zu bestätigen.
+#
+# Der Weg dafür ist ein eigener Endpunkt mit einer eigenen Erklärung — für genau diesen
+# einen Absatz. Umgangen wird damit nichts.
+
+_FAQ_TEXT = (
+    "Zusätzlich kann EchoB einmalig 40 fachlich vorbereitete Fragen zu den freigegebenen "
+    "Inhalten beantworten, damit die Fachperson sich einlesen kann."
+)
+
+
+def _aktivieren_pfad(case_id, share_id):
+    return f"/api/v1/cases/{case_id}/shares/{share_id}/faq/aktivieren"
+
+
+async def _ohne_faq(pool, share_id, text="Erste Erklärung vom Anfang."):
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE case_shares SET faq_enabled = FALSE, consent_text = $2, "
+            "consent_version = 'share-alt' WHERE id = $1",
+            share_id, text)
+
+
+async def test_nachtraeglich_hinzufuegen_startet_einen_lauf(welt):
+    pool, owner, case_id, share_id = welt
+    await _ohne_faq(pool, share_id)
+
+    with _client(owner) as c:
+        antwort = c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": True, "consent_version": "share-neu", "consent_text": _FAQ_TEXT,
+        })
+
+    assert antwort.status_code == 200, antwort.text
+    assert antwort.json()["faq_enabled"] is True
+    async with pool.acquire() as conn:
+        assert await conn.fetchval(
+            "SELECT count(*) FROM case_faq_runs WHERE share_id = $1", share_id) == 1
+
+
+async def test_der_alte_einwilligungstext_bleibt_stehen(welt):
+    """**Der wichtigste Test hier.**
+
+    Ersetzen wäre der bequeme Weg — und er löschte den Nachweis der ersten Einwilligung.
+    Art. 7 Abs. 1 DSGVO verlangt, dass belegbar ist, WOZU eingewilligt wurde; was
+    nachträglich dazukam, muss als solches erkennbar bleiben.
+    """
+    pool, owner, case_id, share_id = welt
+    await _ohne_faq(pool, share_id, "Die ursprüngliche Erklärung im Wortlaut.")
+
+    with _client(owner) as c:
+        c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": True, "consent_version": "share-neu", "consent_text": _FAQ_TEXT,
+        })
+
+    async with pool.acquire() as conn:
+        text = await conn.fetchval(
+            "SELECT consent_text FROM case_shares WHERE id = $1", share_id)
+    assert "Die ursprüngliche Erklärung im Wortlaut." in text
+    assert _FAQ_TEXT in text
+    assert "Nachträglich erklärt am" in text, "der Zusatz traegt kein eigenes Datum"
+
+
+async def test_ohne_erklaerung_passiert_nichts(welt):
+    """Der ganze Grund, warum es diesen Endpunkt überhaupt gibt, wäre sonst verfehlt.
+
+    Er existiert, damit die Erklärung NICHT umgangen wird — nicht, damit es schneller
+    geht.
+    """
+    pool, owner, case_id, share_id = welt
+    await _ohne_faq(pool, share_id)
+
+    with _client(owner) as c:
+        ohne_haken = c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": False, "consent_version": "share-neu", "consent_text": _FAQ_TEXT,
+        })
+        ohne_text = c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": True, "consent_version": "share-neu", "consent_text": "  ",
+        })
+
+    assert ohne_haken.status_code == 400
+    assert ohne_text.status_code == 400
+    async with pool.acquire() as conn:
+        assert await conn.fetchval(
+            "SELECT faq_enabled FROM case_shares WHERE id = $1", share_id) is False
+        assert await conn.fetchval(
+            "SELECT count(*) FROM case_faq_runs WHERE share_id = $1", share_id) == 0
+
+
+async def test_zweimal_hinzufuegen_geht_nicht(welt):
+    """Beim zweiten Mal ist „aktualisieren" der richtige Weg — und der ist billiger.
+
+    Ohne diese Sperre liefe jeder Klick durch das Kontingent und legte einen zweiten
+    Lauf an, für den es nur eine Zeile gibt.
+    """
+    pool, owner, case_id, share_id = welt
+    await _ohne_faq(pool, share_id)
+
+    with _client(owner) as c:
+        erst = c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": True, "consent_version": "share-neu", "consent_text": _FAQ_TEXT,
+        })
+        nochmal = c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": True, "consent_version": "share-neu", "consent_text": _FAQ_TEXT,
+        })
+
+    assert erst.status_code == 200
+    assert nochmal.status_code == 422
+
+
+async def test_nach_dem_widerruf_laesst_sich_nichts_hinzufuegen(welt):
+    pool, owner, case_id, share_id = welt
+    await _ohne_faq(pool, share_id)
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE case_shares SET status = 'revoked' WHERE id = $1", share_id)
+
+    with _client(owner) as c:
+        antwort = c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": True, "consent_version": "share-neu", "consent_text": _FAQ_TEXT,
+        })
+
+    assert antwort.status_code == 422
+    async with pool.acquire() as conn:
+        assert await conn.fetchval(
+            "SELECT count(*) FROM case_faq_runs WHERE share_id = $1", share_id) == 0
+
+
+async def test_eine_fremde_freigabe_bleibt_fremd(welt):
+    pool, owner, case_id, share_id = welt
+    await _ohne_faq(pool, share_id)
+
+    with _client(uuid.uuid4()) as c:
+        antwort = c.post(_aktivieren_pfad(case_id, share_id), json={
+            "consent": True, "consent_version": "share-neu", "consent_text": _FAQ_TEXT,
+        })
+
+    assert antwort.status_code == 404
+    async with pool.acquire() as conn:
+        assert await conn.fetchval(
+            "SELECT faq_enabled FROM case_shares WHERE id = $1", share_id) is False
