@@ -9,6 +9,7 @@ from fastapi import APIRouter
 from app.admin import router as admin_router
 from app.api.v1.routers import (
     account,
+    bindung,
     case_artifacts,
     case_documents,
     case_shares,
@@ -102,6 +103,7 @@ v1_router.include_router(profile.router)
 v1_router.include_router(account.router)
 v1_router.include_router(person_profile.router)
 v1_router.include_router(topic_summaries.router)
+v1_router.include_router(bindung.router)
 v1_router.include_router(test_results.router)
 v1_router.include_router(hypotheses.router)
 v1_router.include_router(onboarding.router)

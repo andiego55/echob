@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
+import BindungAusBeschreibung from '@/components/content/BindungAusBeschreibung'
 import {
   ATTACH_ORDER, TYPES, RATING_LABEL, ratingFor,
   type AttachType, type Rating, type TypeProfile,
@@ -65,6 +66,14 @@ export default function KompatibilitaetPage() {
             <Selector title="Du bist …" value={me} onSelect={setMe} />
             <Selector title="Dein Gegenüber ist …" value={partner} onSelect={setPartner} />
           </div>
+
+          {/* Direkt unter den Auswahlfeldern, nicht weiter unten: Genau hier steht
+              jemand, der die vier Muster nicht kennt — und acht Kacheln vor sich hat,
+              die ihm nichts sagen. Weiter unten fände er es nie, weil er vorher
+              aufhört. */}
+          <BindungAusBeschreibung
+            onUebernehmen={(a, b) => { setMe(a); setPartner(b) }}
+          />
 
           {/* Matrix */}
           <div className="mt-10">

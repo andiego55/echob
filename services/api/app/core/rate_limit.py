@@ -62,6 +62,10 @@ REGELN: tuple[Regel, ...] = (
           "Oeffentliches Verzeichnis: Blaettern ja, systematischer Abgriff nein."),
     Regel("/api/v1/szenen", 40, 60,
           "Oeffentliche Szenen-Reaktionen: Ein Mensch tippt beim Lesen, kein Skript."),
+    Regel("/api/v1/bindung", 5, 300,
+          "Oeffentlicher Modellaufruf ohne Anmeldung. Fuenf in fuenf Minuten reichen "
+          "einem Menschen, der eine Beschreibung tippt und das Ergebnis liest - und sie "
+          "sind wenig genug, dass ein Skript daran nichts verdient."),
     Regel("", 300, 60,
           "Auffangnetz gegen Schleifen im Frontend. Von Hand nicht erreichbar."),
 )

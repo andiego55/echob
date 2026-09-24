@@ -903,6 +903,45 @@ class EchoService:
                     "hinweis": "Die Antwort war unbrauchbar. Versuch es noch einmal."}
         return roh if isinstance(roh, dict) else {"text": "", "hinweis": None}
 
+    async def bindungsmuster_vorschlagen(self, *, beschreibung: str) -> dict[str, Any]:
+        """Aus einer Beschreibung Bindungsmuster **vorschlagen** — nie feststellen.
+
+        Fuer die Kompatibilitaets-Matrix: Wer die vier Muster nicht kennt, kann die
+        beiden Kacheln nicht waehlen. Hier beschreibt jemand in eigenen Worten, wie es
+        zwischen ihm und einer anderen Person zugeht.
+
+        **Das schnelle Modell.** Es geht um eine Zuordnung zu vier bekannten Mustern mit
+        Begruendung, nicht um einen Text ueber einen Menschen. Und die Seite ist
+        oeffentlich - was oft laeuft, darf nicht teuer sein.
+
+        **Speichert nichts.** Weder die Beschreibung noch das Ergebnis. Was jemand hier
+        ueber eine Beziehung schreibt, ist das Empfindlichste, was es gibt; fuer eine
+        Auskunft, die man sofort liest, gibt es keinen Grund, sie aufzubewahren.
+        """
+        if not self._use_openai:
+            return {"du": [], "gegenueber": [],
+                    "hinweis": "Echo laeuft im Demo-Modus - ohne OpenAI-Schluessel "
+                               "entsteht hier kein Vorschlag."}
+
+        response = await self._chat(
+            model=self._model_fast,
+            messages=[
+                {"role": "system",
+                 "content": _load_prompt("bindungs_einschaetzung_prompt.md")},
+                {"role": "user", "content": beschreibung},
+            ],
+            max_tokens=900,
+            temperature=None if self._reasoning else 0.4,
+            response_format={"type": "json_object"},
+        )
+        import json as _aj
+        try:
+            roh = _aj.loads(response.choices[0].message.content or "{}")
+        except (ValueError, TypeError):
+            logger.error("bindungsmuster_vorschlagen: ungueltige JSON-Antwort.")
+            return {"du": [], "gegenueber": [], "hinweis": None}
+        return roh if isinstance(roh, dict) else {"du": [], "gegenueber": [], "hinweis": None}
+
     async def resonanz_nachfragen(
         self,
         *,
