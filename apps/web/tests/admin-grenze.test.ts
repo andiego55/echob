@@ -53,11 +53,19 @@ describe('Grenze des Admin-Werkzeugs', () => {
     expect(verstoesse, 'Gebrauchtes gehoert nach src/components oder src/lib, nicht nach src/admin').toEqual([])
   })
 
-  it('haelt die Naht bei genau zwei nachgeladenen Seiten', () => {
+  it('haelt die Naht bei genau drei nachgeladenen Seiten', () => {
     // Waechst die Zahl der Beruehrpunkte, verliert die Grenze ihren Sinn - dann soll
-    // jemand bewusst entscheiden, nicht nebenbei.
+    // jemand bewusst entscheiden, nicht nebenbei. Genau das ist hier passiert:
+    //
+    //   2 -> 3 am 24.09.2026, PlaetzePage. Eine eigene Seite, weil es eine eigene
+    //   Aufgabe ist (Plaetze verschenken) mit einer eigenen Gefahr - ein Tippfehler
+    //   verschenkt Kontingent. Sie in die Nutzerliste zu haengen haette sie neben
+    //   Loeschen und Umbenennen gestellt, wo man schnell klickt.
+    //
+    // Vier waeren ein Anlass, ueber die Grenze selbst nachzudenken, nicht ueber diese
+    // Zahl.
     const ausApp = importe(NAHT).filter(zeigtAufAdmin)
-    expect(ausApp).toHaveLength(2)
+    expect(ausApp).toHaveLength(3)
   })
 
   it('laedt den Admin-Code nur nach, nie fest', () => {

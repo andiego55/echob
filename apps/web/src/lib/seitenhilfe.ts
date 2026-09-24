@@ -227,6 +227,12 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
   },
 
   // ── Mein Kompass ─────────────────────────────────────────────────────────
+  '/app/paar/:coupleId/rhythmus': {
+    titel: 'Euer Rhythmus',
+    zweck: 'Was wiederkehrt: der Wochen-Check, Wertschätzung und kleine Übungen für die Zeit, in der gerade nichts brennt.',
+    schritte: ['Den Wochen-Check ausfüllen', 'Etwas benennen, das gutgetan hat', 'Einen Impuls ausprobieren'],
+    tipp: 'Fünf Minuten in einer ruhigen Woche sind mehr wert als eine Stunde in einer schwierigen.',
+  },
   '/app/kompass': {
     titel: 'Dein Kompass',
     zweck: 'Dein eigener Raum — ohne Fall. Hier geht es um dich, nicht um jemanden, mit dem es schwierig ist.',
