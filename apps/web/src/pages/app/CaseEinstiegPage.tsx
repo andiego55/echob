@@ -22,6 +22,12 @@
  * muss, wird zu etwas, das man wegdrückt, und irgendwann drückt man auch das weg, was
  * wichtig ist. Wer mehr will, findet den Weg unter *Wiedererkanntes*.
  *
+ * **Eine Begrüßung steht davor.** Wer gerade ein Konto und einen Fall angelegt hat und
+ * dann ohne ein Wort fünf erfundene Geschichten vorgesetzt bekommt, weiß nicht, was das
+ * soll — und erfundene Geschichten in einem Werkzeug, in dem es um das eigene Leben geht,
+ * sind erklärungsbedürftig. Der Text sagt in vier Sätzen, worauf er sich eingelassen hat,
+ * was gleich kommt und wo es später steht. Ein Knopf weiter, kein Formular.
+ *
  * **Abbrechen geht überall und kostet nichts.** Auch nach der zweiten Szene. Was bis dahin
  * getippt wurde, bleibt.
  */
@@ -42,7 +48,10 @@ const SZENEN = new Map(
 export default function CaseEinstiegPage() {
   const { caseId = '' } = useParams<{ caseId: string }>()
   const navigate = useNavigate()
-  const [schritt, setSchritt] = useState(0)
+  // -1 ist die Begruessung, 0 die erste Szene. Ein eigener Zustand daneben waere ein
+  // zweiter Schalter fuer dieselbe Frage („wo bin ich gerade?") - und zwei Schalter
+  // geraten irgendwann in Widerspruch.
+  const [schritt, setSchritt] = useState(-1)
   const [gesetzt, setGesetzt] = useState<Record<string, Reaktion>>({})
 
   const { data: slugs, isLoading } = useQuery({
@@ -64,6 +73,7 @@ export default function CaseEinstiegPage() {
     [slugs],
   ) as { slug: string; title: string; description: string; perspective?: string; pull_quote?: string }[]
 
+  const willkommen = schritt < 0
   const fertig = liste.length > 0 && schritt >= liste.length
   const erkannt = Object.values(gesetzt).filter(istWiedererkannt).length
 
@@ -78,7 +88,62 @@ export default function CaseEinstiegPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-[680px] px-6 py-10">
-        {isLoading && <ListSkeleton rows={3} label="Wird geladen" />}
+        {isLoading && !willkommen && <ListSkeleton rows={3} label="Wird geladen" />}
+
+        {/* ── Die Begrüßung ────────────────────────────────────────────── */}
+        {willkommen && (
+          <>
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.1em] text-accent">
+              Willkommen
+            </p>
+            <h1 className="mt-3 text-[1.7rem] font-bold leading-tight text-navy">
+              Schön, dass du da bist.
+            </h1>
+
+            <div className="mt-5 space-y-4 text-[0.97rem] leading-relaxed text-brand-text">
+              <p>
+                EchoB ist kein Ratgeber und kein Test. Es ist ein Ort, an dem du
+                festhalten kannst, was in einer Beziehung passiert — und mit der Zeit
+                siehst du, was sich wiederholt. Nicht, weil dir jemand sagt, was du fühlen
+                sollst, sondern weil es dann schwarz auf weiß dasteht.
+              </p>
+              <p>
+                Bevor es losgeht, zeigen wir dir{' '}
+                <strong className="text-navy">fünf erfundene Szenen</strong> — kurze
+                Situationen aus anderen Beziehungen. Du sagst nur, ob dir etwas davon
+                bekannt vorkommt. Das ist als Einstimmung gedacht: Oft fällt einem an einer
+                fremden Geschichte auf, was man an der eigenen übersieht.
+              </p>
+              <p>
+                Zwei Minuten, ein Tipp je Szene. Du musst nichts schreiben und nichts
+                erklären, und du kannst jederzeit aufhören. Später findest du die Szenen
+                jederzeit wieder unter{' '}
+                <strong className="text-navy">Wiedererkanntes</strong>.
+              </p>
+            </div>
+
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <button
+                type="button"
+                onClick={() => setSchritt(0)}
+                className="btn-primary !px-6 !py-3"
+              >
+                Los geht's
+              </button>
+              <Link
+                to="/app"
+                className="text-[0.9rem] font-medium text-brand-muted hover:text-navy hover:underline"
+              >
+                Überspringen
+              </Link>
+            </div>
+
+            <p className="mt-8 border-t border-brand-border pt-5 text-[0.84rem] leading-relaxed text-brand-muted">
+              Was du hier schreibst, sieht niemand außer dir — solange du es nicht selbst
+              freigibst.
+            </p>
+          </>
+        )}
 
         {/* ── Der Durchgang ────────────────────────────────────────────── */}
         {!fertig && liste[schritt] && (
@@ -202,8 +267,11 @@ export default function CaseEinstiegPage() {
               >
                 Erste eigene Szene schreiben
               </Link>
+              {/* Ins Dashboard, nicht in die leere Szenenliste: Dort steht, was es sonst
+                  noch gibt, samt „Wie fange ich an?". Die leere Liste ist genau die
+                  Aufforderung, vor der dieser ganze Durchgang jemanden bewahren soll. */}
               <Link
-                to={`/app/cases/${caseId}/scenes`}
+                to="/app"
                 className="text-[0.9rem] font-medium text-brand-muted hover:text-navy hover:underline"
               >
                 Später — erst umsehen

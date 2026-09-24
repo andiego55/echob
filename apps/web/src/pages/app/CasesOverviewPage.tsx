@@ -15,6 +15,7 @@ import { subscriptionApi } from '@/api/subscription'
 import { PROFILE_MODULES } from '@/utils/profileModules'
 import { RELATIONSHIP_TYPE_LABELS, RELATIONSHIP_STATUS_LABELS } from '@/types'
 import type { Case } from '@/types'
+import ErsteSchritte from '@/components/app/ErsteSchritte'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { ListSkeleton } from '@/components/Skeleton'
 
@@ -314,6 +315,12 @@ export default function CasesOverviewPage() {
             </Link>
           </div>
         )}
+
+        {/* ── Wie fange ich an? ──────────────────────────────────────────
+            Unten, nicht oben: Die Frage kommt beim zweiten oder dritten Besuch. Zuerst
+            schaut man sich um, und erst wenn man nichts gefunden hat, sucht man eine
+            Erklaerung — oben stuende sie im Weg von allem, was man tun koennte. */}
+        <ErsteSchritte />
 
         {/* Vertrauens-Zeile */}
         <p className="mt-10 text-center text-xs text-brand-muted/70">

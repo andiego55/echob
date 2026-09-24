@@ -18,12 +18,13 @@
  * 2. „nicht beurteilbar" wie einen Fehler aussehen lassen — es ist ein Ergebnis,
  * 3. eine Hypothese wie einen Befund setzen.
  */
-import { useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fallFaqApi } from '@/api/fallFaq'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { BELEGDICHTE_TEXT, auffaelligkeit, belegdichteStufe } from '@/lib/fallFaq'
-import type { FaqAchse, FaqBeleg, FaqClusterAnteil, FaqFrage, FaqKategorie, SharedCaseBundle } from '@/types'
+import SzeneFenster from '@/components/professional/SzeneFenster'
+import type { FaqAchse, FaqBeleg, FaqClusterAnteil, FaqFrage, FaqKategorie, Scene, SharedCaseBundle } from '@/types'
 
 /**
  * Kategorie-Marke → Zeichen. Rein dekorativ, deshalb aria-hidden am Einsatzort.
@@ -45,10 +46,21 @@ const MARKEN: Record<string, string> = {
   netz: 'M12 5a2 2 0 100 4 2 2 0 000-4M5 17a2 2 0 100 4 2 2 0 000-4M19 17a2 2 0 100 4 2 2 0 000-4M10.5 8.5L6.5 15M13.5 8.5l4 6.5M7 19h10',
 }
 
+/**
+ * Die Szene hinter einer Belegkarte aufschlagen.
+ *
+ * Ein Kontext und keine Eigenschaft: Zwischen dem Panel und der Belegkarte liegen acht
+ * Bauteile, die mit Szenen nichts zu tun haben. Sie alle eine Funktion durchreichen zu
+ * lassen, hiesse, acht Signaturen fuer etwas zu aendern, das nur am Ende gebraucht wird
+ * — und beim naechsten Bauteil dazwischen noch einmal.
+ */
+const SzeneOeffnen = createContext<((szeneNr: number) => void) | null>(null)
+
 export default function FallFaqPanel({ caseId, bundle }: {
   caseId: string
   bundle: SharedCaseBundle | undefined
 }) {
+  const [offeneSzene, setOffeneSzene] = useState<Scene | null>(null)
   const { data, isLoading, error } = useQuery({
     queryKey: ['fall-faq', caseId],
     queryFn: () => fallFaqApi.get(caseId),
@@ -67,6 +79,18 @@ export default function FallFaqPanel({ caseId, bundle }: {
     return m
   }, [bundle])
 
+  /** Dieselbe Quelle, aber die ganze Szene — fürs Aufschlagen. */
+  const szenenVoll = useMemo(() => {
+    const m = new Map<number, Scene>()
+    for (const s of bundle?.scenes ?? []) if (s.scene_no) m.set(s.scene_no, s)
+    return m
+  }, [bundle])
+
+  const oeffnen = useCallback(
+    (nr: number) => setOffeneSzene(szenenVoll.get(nr) ?? null),
+    [szenenVoll],
+  )
+
   if (isLoading) return <div className="card"><div className="h-40 animate-pulse rounded-brand bg-brand-bg" /></div>
   if (error) return <div className="card"><Fehlermeldung error={error} /></div>
   if (!data) return null
@@ -80,7 +104,9 @@ export default function FallFaqPanel({ caseId, bundle }: {
   const beantwortet = data.kategorien.reduce((n, k) => n + k.beantwortet, 0)
 
   return (
+    <SzeneOeffnen.Provider value={oeffnen}>
     <div className="space-y-5">
+      <SzeneFenster szene={offeneSzene} onSchliessen={() => setOffeneSzene(null)} />
       <Kopf faq={data} />
       {/* Null Antworten ist kein Fehler, sondern eine Auskunft über die Freigabe — aber
           eine, die man nicht aus vierzig grauen Zeilen herauslesen können muss. */}
@@ -88,6 +114,7 @@ export default function FallFaqPanel({ caseId, bundle }: {
       {data.auswertung && <Merkmalsbild auswertung={data.auswertung} szenen={szenen} />}
       <Fragenteil kategorien={data.kategorien} szenen={szenen} />
     </div>
+    </SzeneOeffnen.Provider>
   )
 }
 
@@ -604,6 +631,7 @@ function Belegblock({ belege, gegenbelege, szenen }: {
 function BelegSpalte({ titel, belege, szenen, leerText }: {
   titel: string; belege: FaqBeleg[]; szenen: Map<number, string>; leerText?: string
 }) {
+  const oeffnen = useContext(SzeneOeffnen)
   return (
     <div>
       <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-muted">{titel}</p>
@@ -614,10 +642,24 @@ function BelegSpalte({ titel, belege, szenen, leerText }: {
             {belege.map((b, i) => (
               <li key={`${b.szene_nr}-${i}`}
                 className="rounded-brand-sm border border-brand-border bg-white px-3 py-2">
-                <a href={`#szene-${b.szene_nr}`}
-                  className="text-[10px] font-semibold uppercase tracking-wide text-accent no-underline hover:underline">
-                  Szene {b.szene_nr}
-                </a>
+                {/* Aufschlagen statt springen: Wer den Beleg prueft, soll danach an
+                    derselben Stelle weiterlesen. Ein Beleg, dessen Pruefung den
+                    Zusammenhang kostet, wird nicht geprueft. Der Anker bleibt als
+                    Rueckfallweg, falls die Szene nicht im Buendel liegt. */}
+                {oeffnen ? (
+                  <button
+                    type="button"
+                    onClick={() => oeffnen(b.szene_nr)}
+                    className="text-[10px] font-semibold uppercase tracking-wide text-accent hover:underline"
+                  >
+                    Szene {b.szene_nr}
+                  </button>
+                ) : (
+                  <a href={`#szene-${b.szene_nr}`}
+                    className="text-[10px] font-semibold uppercase tracking-wide text-accent no-underline hover:underline">
+                    Szene {b.szene_nr}
+                  </a>
+                )}
                 {szenen.get(b.szene_nr) && (
                   <span className="ml-1.5 text-[10px] text-brand-muted">{szenen.get(b.szene_nr)}</span>
                 )}
