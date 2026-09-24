@@ -17,18 +17,21 @@
  * darüber, welcher Moment gerade offen ist.
  */
 import { useId } from 'react'
-import type { Puls } from '@/api/kompass'
-import { kurve, ton } from '@/lib/kompass'
+import { kurve, ton, type PulsPunkt } from '@/lib/kompass'
 
-export default function VerlaufsKurve({
+/**
+ * Nimmt alles, was Zeit und Zustand trägt — auch die beschnittenen Punkte, die eine
+ * Fachperson sieht. `onWahl` gibt denselben Typ zurück, den die Seite hineingegeben hat.
+ */
+export default function VerlaufsKurve<T extends PulsPunkt>({
   pulse, tage, hoehe = 150, gewaehlt, onWahl, jetzt,
 }: {
-  pulse: Puls[]
+  pulse: T[]
   tage: number
   /** In der Koordinatenwelt der SVG. Die Breite ist immer 600 und skaliert mit. */
   hoehe?: number
   gewaehlt?: string | null
-  onWahl?: (puls: Puls) => void
+  onWahl?: (puls: T) => void
   /** Nur für Tests und Geschichten — sonst die echte Uhr. */
   jetzt?: number
 }) {

@@ -34,6 +34,9 @@ import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
 import ArbeitsmappePanel from '@/components/professional/ArbeitsmappePanel'
 import FallFaqPanel from '@/components/professional/FallFaqPanel'
 import Absprachen from '@/components/app/Absprachen'
+import {
+  KrisenplanKarte, SaetzeKarte, VorhabenKarte, VerlaufKarte,
+} from '@/components/professional/KompassPanel'
 
 const TOPIC_LABELS: Record<string, string> = {
   topic_self: 'Über mich', topic_person: 'Über die Fallperson',
@@ -671,6 +674,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         ))}
       </div>
 
+      {has('krisenplan') && <KrisenplanKarte plan={bundle.krisenplan} />}
+
       <CouplePanel caseId={bundle.case_id} />
 
       <div className="grid items-start gap-4 lg:grid-cols-2">
@@ -733,6 +738,10 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
             <GefuehlsbildPanel bild={bundle.gefuehlsbild} />
           </Section>
         )}
+
+        {has('satz') && <SaetzeKarte saetze={bundle.saetze} />}
+        {has('vorhaben') && <VorhabenKarte vorhaben={bundle.vorhaben} />}
+        {has('verlauf') && <VerlaufKarte verlauf={bundle.verlauf} />}
 
         {has('topic_summaries') && bundle.topic_summaries.length > 0 && (
           <Section title="Themendialog-Zusammenfassungen" icon={<IconChat />}>

@@ -22,6 +22,11 @@ ShareElementType = Literal[
     # geoeffnetes Selbstbild. Deshalb traegt diese Art - wie 'scene' - eine eigene
     # Kennung, und in ShareCreate steht daneben `satz_ids`.
     "satz",
+    # Die uebrigen drei Kompass-Inhalte. Drei Woerter und kein Sammelwort "kompass":
+    # Der Krisenplan ist das, was viele zuerst teilen wollen, der Verlauf das, was
+    # manche nie teilen wollen. Bei einem Sammelwort muesste man alles geben - und
+    # gaebe dann gar nichts.
+    "verlauf", "vorhaben", "krisenplan",
 ]
 
 

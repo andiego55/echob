@@ -255,3 +255,43 @@ async def loeschen(
         vorhaben_id, user_id, ART,
     )
     return not ergebnis.endswith("0")
+
+# ── Fuer den Kontext einer Fachperson ────────────────────────────────────────
+
+def kontext_block(vorhaben: list[dict[str, Any]]) -> str:
+    """Woran die Person arbeitet - fuer den System-Prompt der Fachperson.
+
+    **Mit Stand, und der Stand ist die halbe Aussage.** Ein Vorhaben, das ruht, ist etwas
+    anderes als eines, das laeuft, und beide sind etwas anderes als ein erreichtes. Ohne
+    das Wort dazu liest ein Modell drei offene Baustellen, wo zwei davon Geschichte sind -
+    und spricht die Person auf etwas an, das sie hinter sich hat.
+
+    Die Schritte selbst bleiben draussen. Sie sind das Kleingedruckte ihres eigenen Plans;
+    im Gespraech zaehlt, WAS sie sich vorgenommen hat und wie weit sie ist.
+    """
+    zeilen = [z for z in (_kontext_zeile(v) for v in vorhaben) if z]
+    if not zeilen:
+        return ""
+    return "\n".join([
+        "## Woran sie gerade arbeitet",
+        "",
+        "_Vorhaben aus ihrem eigenen Bereich, von ihr selbst formuliert und fuer dich "
+        "freigegeben. Der Stand steht dabei: Ruhen ist in dieser App ausdruecklich kein "
+        "Scheitern, sondern eine Lage. Nichts davon ist eine Aufgabe, die du abfragen "
+        "sollst._",
+        "",
+        *zeilen,
+        "",
+    ])
+
+
+def _kontext_zeile(v: dict[str, Any]) -> str:
+    titel = (v.get("titel") or "").strip()
+    if not titel:
+        return ""
+    stand = v.get("stand_label") or katalog.vorhaben_stand_label(v.get("stand")) or ""
+    gesamt = len(v.get("schritte") or [])
+    fortschritt = (
+        f", {v.get('schritte_erledigt', 0)} von {gesamt} Schritten" if gesamt else ""
+    )
+    return f"- {titel} (**{stand}**{fortschritt})"

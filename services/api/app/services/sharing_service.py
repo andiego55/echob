@@ -48,6 +48,10 @@ class SharedBundle:
     #: sich herzugeben waere ein geoeffnetes Selbstbild; hier steht nur, was Stueck fuer
     #: Stueck ausgewaehlt wurde - und nur Bestaetigtes.
     saetze: list[dict[str, Any]] = field(default_factory=list)
+    #: Nur Zahlen — Zustand, Anspannung, Zeitpunkt. KEIN Freitext.
+    verlauf: list[dict[str, Any]] = field(default_factory=list)
+    vorhaben: list[dict[str, Any]] = field(default_factory=list)
+    krisenplan: dict[str, Any] | None = None
     #: Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon —
     #: dass jemand eigene Einschaetzungen revidiert hat, sagt etwas ueber den Fall.
     artifacts_ueberholt: int = 0
@@ -345,6 +349,41 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
             for r in rows
         ]
 
+    # ── Der Verlauf: Kurven, KEINE Tagebuchtexte ─────────────────────────────
+    #
+    # Der Bauplan sagt beides in einem Atemzug: „Mein Verlauf — Kurven, keine
+    # Tagebuchtexte" und „Ausdruecklich nie freigebbar: die rohen Pulse mit Freitext".
+    # Ein Puls traegt BEIDES; freigegeben wird nur die Zahl.
+    #
+    # Deshalb steht hier eine Spaltenliste und kein SELECT *. Ein Stern holte notiz und
+    # geholfen mit, beide feldverschluesselt - und wer sie spaeter irgendwo
+    # entschluesselt, hat den Tagebuchtext einer Klient:in in einer Akte, ohne dass es
+    # jemandem auffiele. Die Auswahl gehoert an die Abfrage, nicht an die Anzeige.
+    #
+    # Auch die case_id bleibt draussen. Der Kompass ist fallfrei: Ein Moment kann an einem
+    # ANDEREN Fall haengen, und dessen Kennung verriete dieser Fachperson, dass es ihn
+    # gibt. Fuer eine Kurve aus Zeit und Zustand braucht es sie nicht.
+    if "verlauf" in allowed:
+        rows = await conn.fetch(
+            "SELECT id, zustand, anspannung, created_at FROM selbst_pulse "
+            "WHERE user_id = $1 AND created_at >= NOW() - INTERVAL '365 days' "
+            "ORDER BY created_at ASC",
+            share["owner_user_id"],
+        )
+        bundle.verlauf = [dict(r) for r in rows]
+
+    # ── Vorhaben: Ziele und Schritte mit Stand ───────────────────────────────
+    if "vorhaben" in allowed:
+        from app.services import kompass_vorhaben_service
+        bundle.vorhaben = await kompass_vorhaben_service.liste(
+            conn, user_id=share["owner_user_id"])
+
+    # ── Der Krisenplan ───────────────────────────────────────────────────────
+    if "krisenplan" in allowed:
+        from app.services import kompass_service
+        bundle.krisenplan = await kompass_service.krisenplan(
+            conn, user_id=share["owner_user_id"])
+
     # Festgehaltene Erkenntnisse. Überholte fließen inhaltlich NICHT mit (siehe
     # build_artifact_context) — nur ihre Zahl.
     if "artifacts" in allowed:
@@ -427,6 +466,24 @@ def build_shared_case_context(bundle: SharedBundle) -> str:
 
     if bundle.saetze:
         parts.append(build_satz_context(bundle.saetze))
+
+    # Vorhaben und Krisenplan gehen mit in den Kontext - der Verlauf NICHT.
+    #
+    # Er besteht aus Zahlen ohne Worte. Ein Modell, das "Zustand 2, Anspannung 7, 14.03."
+    # liest, erzaehlt daraus eine Geschichte, die niemand geschrieben hat; die Kurve ist
+    # etwas zum Ansehen und Besprechen, nicht zum Deuten. Sie steht deshalb in der Akte
+    # und nicht im Prompt.
+    if bundle.vorhaben:
+        from app.services import kompass_vorhaben_service
+        ctx = kompass_vorhaben_service.kontext_block(bundle.vorhaben)
+        if ctx:
+            parts.append(ctx)
+
+    if bundle.krisenplan:
+        from app.services import kompass_service
+        ctx = kompass_service.krisenplan_kontext_block(bundle.krisenplan)
+        if ctx:
+            parts.append(ctx)
 
     if bundle.artifacts or bundle.artifacts_ueberholt:
         ctx = build_artifact_context(bundle.artifacts, ueberholt_anzahl=bundle.artifacts_ueberholt)

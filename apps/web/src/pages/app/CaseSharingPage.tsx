@@ -21,6 +21,17 @@ import { useBestaetigen } from '@/components/Bestaetigung'
 import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen, notizenErklaerung } from '@/lib/einwilligung'
 
 /**
+ * Inhalte aus dem eigenen Bereich — ankreuzbar, aber NICHT Teil des Falls.
+ *
+ * **Der Kompass gehört der Person, nicht diesem Fall.** Der Verlauf umfasst alle Momente,
+ * die sie festgehalten hat, auch die zu ganz anderem; den Notfallplan gibt es genau einmal.
+ * Deshalb stehen sie unten in einem eigenen Block — und deshalb greift „Gesamter Fall“
+ * nicht danach. Ein Knopf, der Arbeit sparen soll, darf nicht nebenbei den eigenen
+ * Notfallplan mitgeben.
+ */
+export const KOMPASS_ELEMENTE: ShareElementType[] = ['verlauf', 'vorhaben', 'krisenplan']
+
+/**
  * Die ankreuzbaren Inhalte — alle bis auf `scene`, das weiter unten einzeln steht.
  *
  * **Exportiert, weil hier etwas lautlos schiefgehen kann.** Ein neuer freigebbarer Inhalt
@@ -33,6 +44,9 @@ export const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales', 'gefuehlsbild',
   'reports', 'topic_summaries', 'person_profile', 'self_profile', 'hypotheses', 'test_results',
   'documents', 'artifacts',
+  // Aus dem Kompass. „satz“ fehlt hier mit Absicht — Sätze wählt man einzeln aus,
+  // siehe die eigene Liste weiter unten.
+  ...KOMPASS_ELEMENTE,
 ]
 
 export default function CaseSharingPage() {
@@ -356,10 +370,14 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
   const toggleSatz = (id: string) =>
     setSatzIds(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
 
-  // „Ganzen Fall freigeben" laesst die Saetze bewusst AUS. Sie gehoeren nicht zum Fall,
-  // sondern zur Person, und ein Knopf, der alles anhakt, wuerde sie mitnehmen, ohne
-  // dass jemand sie ausgewaehlt hat - das Gegenteil dessen, wofuer sie da sind.
-  const selectWholeCase = () => { setElements([...CATEGORY_ELEMENTS]); setSceneIds([]) }
+  // „Gesamter Fall" ist woertlich gemeint: alles zu DIESEM Fall - und sonst nichts.
+  //
+  // Der Kompass bleibt aussen vor: die Saetze, der Verlauf, die Vorhaben, der Notfallplan.
+  // Sie gehoeren nicht zum Fall, sondern zur Person, und ein Knopf, der Arbeit sparen
+  // soll, wuerde sie mitnehmen, ohne dass jemand sie ausgewaehlt hat - das Gegenteil
+  // dessen, wofuer sie da sind.
+  const FALL_ELEMENTE = CATEGORY_ELEMENTS.filter(el => !KOMPASS_ELEMENTE.includes(el))
+  const selectWholeCase = () => { setElements([...FALL_ELEMENTE]); setSceneIds([]) }
 
   const allScenes = elements.includes('all_scenes')
 
@@ -427,12 +445,31 @@ function NewShareCard({ caseId, accepted, shares, scenes }: {
             <button onClick={selectWholeCase} className="text-xs text-accent hover:underline">Gesamter Fall</button>
           </div>
           <div className="mt-2 grid sm:grid-cols-2 gap-2">
-            {CATEGORY_ELEMENTS.map(el => (
+            {FALL_ELEMENTE.map(el => (
               <label key={el} className="flex items-center gap-2 text-sm text-brand-text cursor-pointer">
                 <input type="checkbox" checked={elements.includes(el)} onChange={() => toggle(el)} className="accent-accent" />
                 {SHARE_ELEMENT_LABELS[el]}
               </label>
             ))}
+          </div>
+
+          {/* Der Rest des Kompasses — im selben Ton wie die Sätze darunter: Was hier
+              steht, gehört der Person und nicht dem Fall. */}
+          <div className="mt-3 rounded-brand border border-brand-border bg-brand-bg px-3 py-2">
+            <p className="mb-1 text-xs font-medium text-brand-text">Aus deinem Kompass</p>
+            <p className="mb-2 text-[0.7rem] leading-snug text-brand-muted">
+              Gehört dir und nicht diesem Fall — dein Verlauf umfasst alle Momente, die du
+              festgehalten hast, auch die zu ganz anderem. „Gesamter Fall“ kreuzt hier
+              nichts an.
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {KOMPASS_ELEMENTE.map(el => (
+                <label key={el} className="flex items-start gap-2 text-sm text-brand-text cursor-pointer">
+                  <input type="checkbox" checked={elements.includes(el)} onChange={() => toggle(el)} className="mt-1 accent-accent" />
+                  {SHARE_ELEMENT_LABELS[el]}
+                </label>
+              ))}
+            </div>
           </div>
 
           {/* Einzelne Sätze über die eigene Person.

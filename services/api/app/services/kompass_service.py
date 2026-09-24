@@ -183,3 +183,68 @@ async def uebersicht(
         "verlauf_tage": VERLAUF_TAGE,
         "krisenplan_vorhanden": bool(plan and any(plan["inhalt"].values())),
     }
+
+# ── Fuer die Fachperson ──────────────────────────────────────────────────────
+
+def krisenplan_abschnitte(plan: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """Der Plan als geordnete Abschnitte mit Etikett - leere fliegen raus.
+
+    **Die Reihenfolge ist die des Katalogs, nicht die des gespeicherten Objekts.**
+    Warnzeichen zuerst, weil der Plan greifen soll, BEVOR es soweit ist; ein Plan, der mit
+    "wen ich anrufe" beginnt, liest sich wie eine Liste fuer den Moment, in dem es schon
+    passiert ist.
+
+    Diese Form geht an zwei Stellen: in den System-Prompt (krisenplan_kontext_block) und
+    als fertige Abschnitte an die Oberflaeche der Fachperson. Die Etiketten stehen damit
+    nur an einer Stelle - im Katalog.
+    """
+    inhalt = (plan or {}).get("inhalt") or {}
+    abschnitte = []
+    for teil in katalog.KRISENPLAN_TEILE:
+        zeilen = [
+            z.strip() for z in (inhalt.get(teil["key"]) or [])
+            if isinstance(z, str) and z.strip()
+        ]
+        if zeilen:
+            abschnitte.append({
+                "key": teil["key"],
+                "label": teil["label"],
+                # Nur bei den Schritten wahr. Die Reihenfolge ist dort die Aussage
+                # ("der Reihe nach") - ohne dieses Wort wuerde die Oberflaeche der
+                # Fachperson den Schluessel "schritte" selbst kennen muessen.
+                "geordnet": bool(teil.get("geordnet")),
+                "zeilen": zeilen,
+            })
+    return abschnitte
+
+
+def krisenplan_kontext_block(plan: dict[str, Any] | None) -> str:
+    """Der eigene Notfallplan - fuer den System-Prompt der Fachperson.
+
+    **Der Rahmen ist hier wichtiger als der Inhalt.** Ein Notfallplan liest sich wie ein
+    Verbesserungsvorschlag, sobald ein Modell ihn kommentiert: zu wenig Schritte, die
+    falsche Reihenfolge, warum steht da niemand zum Anrufen. Genau das darf nicht
+    passieren. Was in dem Plan steht, hat die Person fuer den schlimmsten Moment
+    geschrieben, den sie kennt, und im Ernstfall haelt sie sich daran und nicht an einer
+    besseren Fassung.
+
+    Die Reihenfolge ist die des Katalogs und nicht die des gespeicherten Objekts:
+    Warnzeichen zuerst, weil der Plan greifen soll, BEVOR es soweit ist.
+    """
+    abschnitte = [
+        f"**{a['label']}:** " + " - ".join(a["zeilen"])
+        for a in krisenplan_abschnitte(plan)
+    ]
+    if not abschnitte:
+        return ""
+    return "\n".join([
+        "## Ihr eigener Notfallplan",
+        "",
+        "_Von ihr selbst geschrieben, fuer den Fall, dass es kippt, und fuer dich "
+        "freigegeben. **Nicht kommentieren, nicht ergaenzen, nicht verbessern** - im "
+        "Ernstfall ist das, was hier steht, das, woran sie sich haelt. Wenn die Fachperson "
+        "danach fragt, gib ihn wieder; von selbst ist er Hintergrund._",
+        "",
+        *abschnitte,
+        "",
+    ])

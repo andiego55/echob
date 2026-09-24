@@ -891,6 +891,10 @@ export type ShareElementType =
   // Je Satz, nicht als Kategorie — siehe SHARE_ELEMENT_LABELS und die eigene Liste
   // in CaseSharingPage. „Alle Sätze über dich" gibt es bewusst nicht.
   | 'satz'
+  // Die übrigen drei Kompass-Inhalte. Drei Wörter statt eines Sammelworts „kompass":
+  // Der Krisenplan ist das, was viele zuerst teilen wollen, der Verlauf das, was manche
+  // nie teilen wollen.
+  | 'verlauf' | 'vorhaben' | 'krisenplan'
 
 export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   case_info:       'Fallinformationen',
@@ -906,6 +910,11 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   hypotheses:      'Hypothesen (tastend)',
   test_results:    'Selbsttest-Ergebnisse',
   documents:       'Beigelegte Dokumente',
+  // „Nur die Kurve" steht im Etikett, weil es der Punkt ist: Die Notizen aus den
+  // Momenten gehen NICHT mit, und das soll man beim Ankreuzen lesen, nicht erst danach.
+  verlauf:         'Mein Verlauf (nur die Kurve, keine Notizen)',
+  vorhaben:        'Meine Vorhaben',
+  krisenplan:      'Mein Notfallplan',
   artifacts:       'Festgehaltene Erkenntnisse',
   satz:            'Einzelne Sätze über dich',
 }
@@ -1219,6 +1228,44 @@ export interface SharedGefuehlsbild {
   szenen: { title: string; wirkungen: string[] }[]
 }
 
+/** Ein einzeln freigegebener Satz über die eigene Person. */
+export interface SharedSatz {
+  id: string
+  art: string
+  art_label: string | null
+  text: string
+  /** Gehört sichtbar dazu: eine Selbsteinschätzung von einem Tag, kein Befund. */
+  bestaetigt_at: string | null
+}
+
+/** Ein freigegebenes Vorhaben. Die Schritte selbst bleiben im eigenen Bereich. */
+export interface SharedVorhaben {
+  id: string
+  titel: string
+  stand: string
+  stand_label: string | null
+  schritte: { text: string; erledigt_at?: string | null }[]
+  schritte_erledigt: number
+}
+
+/**
+ * Der eigene Notfallplan, schon geordnet.
+ *
+ * Reihenfolge und Etiketten kommen vom Server aus dem Katalog — Warnzeichen zuerst, weil
+ * der Plan greifen soll, BEVOR es soweit ist. Stünden sie hier, gäbe es zwei Listen, die
+ * übereinstimmen müssen.
+ */
+export interface SharedKrisenplan {
+  abschnitte: {
+    key: string
+    label: string
+    /** Nur bei den Schritten wahr: Dort ist die Reihenfolge die Aussage. */
+    geordnet: boolean
+    zeilen: string[]
+  }[]
+  updated_at: string | null
+}
+
 export interface SharedCaseBundle {
   case_id: string
   client_display_name: string
@@ -1253,6 +1300,17 @@ export interface SharedCaseBundle {
   artifacts_ueberholt?: number
   /** Das jüngste **bestätigte** Gefühlsbild. Entwürfe gehen nie mit. */
   gefuehlsbild?: SharedGefuehlsbild | null
+  /**
+   * Aus ihrem eigenen Bereich, dem Kompass — vier Inhalte, jeder einzeln freigebbar.
+   *
+   * **Der Verlauf trägt nur Zahlen.** Kein `notiz`, kein `geholfen`: Die Notizen aus den
+   * einzelnen Momenten sind die Kladde und gehen nie mit. Das steht nicht nur im
+   * Kommentar — der Typ kennt die Felder gar nicht erst (siehe `PulsPunkt`).
+   */
+  saetze?: SharedSatz[]
+  verlauf?: import('@/lib/kompass').PulsPunkt[]
+  vorhaben?: SharedVorhaben[]
+  krisenplan?: SharedKrisenplan | null
   notes: ProfessionalNote | null
   echo_summaries: ProfessionalEchoSummary[]
 }

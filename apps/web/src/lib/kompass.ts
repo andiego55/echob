@@ -50,18 +50,34 @@ export function ton(wert: number | null | undefined) {
 
 // ── Die Kurve ───────────────────────────────────────────────────────────────
 
-export interface KurvenPunkt {
+/**
+ * Was die Geometrie WIRKLICH braucht: wann, wie, und eine Kennung für den Punkt.
+ *
+ * **Kein Freitext.** Die Kurve kommt ohne Notiz und ohne „was geholfen hat" aus — und
+ * genau so wird sie auch freigegeben: Eine Fachperson sieht die Punkte, nie das
+ * Tagebuch dahinter. Stünde hier `Puls`, müsste der Aufrufer dort `notiz: null`
+ * erfinden, und die Zusicherung stünde nur noch im Kommentar.
+ */
+export type PulsPunkt =
+  Pick<Puls, 'id' | 'zustand' | 'anspannung' | 'created_at'>
+  /**
+   * Nur fuer die Vorlesebeschreibung eines anklickbaren Punktes — und die gibt es nur
+   * dort, wo man einen Moment oeffnen kann. Freigegebene Punkte tragen das Wort nicht.
+   */
+  & { zustand_label?: string | null }
+
+export interface KurvenPunkt<T extends PulsPunkt = PulsPunkt> {
   x: number
   y: number
-  puls: Puls
+  puls: T
 }
 
-export interface Kurve {
+export interface Kurve<T extends PulsPunkt = PulsPunkt> {
   /** Der Pfad der Linie. Leer, solange es weniger als zwei Punkte gibt. */
   linie: string
   /** Derselbe Pfad, unten geschlossen — für die Fläche darunter. */
   flaeche: string
-  punkte: KurvenPunkt[]
+  punkte: KurvenPunkt<T>[]
 }
 
 const TAG_MS = 86_400_000
@@ -79,10 +95,10 @@ const TAG_MS = 86_400_000
  * Eine gewöhnliche Spline schießt über — und ein Punkt unterhalb von „belastet" behauptet
  * einen Zustand, den die Skala nicht kennt.
  */
-export function kurve(
-  pulse: Puls[],
+export function kurve<T extends PulsPunkt>(
+  pulse: T[],
   opt: { breite: number; hoehe: number; tage: number; rand?: number; jetzt?: number },
-): Kurve {
+): Kurve<T> {
   const { breite, hoehe, tage } = opt
   const rand = opt.rand ?? 10
   const jetzt = opt.jetzt ?? Date.now()
@@ -94,7 +110,7 @@ export function kurve(
   const innenB = Math.max(1, breite - rand * 2)
   const innenH = Math.max(1, hoehe - rand * 2)
 
-  const punkte: KurvenPunkt[] = pulse.map(p => {
+  const punkte: KurvenPunkt<T>[] = pulse.map(p => {
     const t = new Date(p.created_at).getTime()
     const anteil = Math.min(1, Math.max(0, (t - von) / spanne))
     // 1 = unten, 5 = oben. Der Bildschirm läuft nach unten, die Stimmung nach oben.

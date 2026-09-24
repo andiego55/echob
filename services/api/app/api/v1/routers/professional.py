@@ -33,6 +33,7 @@ from app.services import (
     agreement_service,
     collab_service,
     fall_titel,
+    kompass_service,
     profi_material,
     seat_service,
     sharing_service,
@@ -122,6 +123,24 @@ def _public_row(row, fields: tuple[str, ...] = ()):
             except (ValueError, TypeError):
                 pass
     return d
+
+
+def _krisenplan_fuer_fachperson(plan):
+    """Der Notfallplan als geordnete Abschnitte - oder None.
+
+    **Nicht die rohe Zeile.** Die truege die user_id mit und ueberliesse der Oberflaeche
+    die Frage, welche Schluessel es gibt und in welcher Reihenfolge sie gehoeren. Die
+    Reihenfolge ist hier aber eine Aussage (Warnzeichen zuerst), und sie steht im Katalog.
+
+    Leer heisst None und nicht ein Plan mit null Abschnitten: Freigegeben, aber noch nichts
+    geschrieben, ist etwas anderes als ein Plan, und die Oberflaeche soll das sagen koennen.
+    """
+    if not plan:
+        return None
+    abschnitte = kompass_service.krisenplan_abschnitte(plan)
+    if not abschnitte:
+        return None
+    return {"abschnitte": abschnitte, "updated_at": plan.get("updated_at")}
 
 
 def _gefuehlsbild_fuer_fachperson(bild):
@@ -959,6 +978,23 @@ async def case_detail(
         "artifacts_ueberholt": bundle.artifacts_ueberholt,
         # Wie es der Person zuletzt ging - von ihr selbst zusammengestellt und bestaetigt.
         "gefuehlsbild": _gefuehlsbild_fuer_fachperson(bundle.gefuehlsbild),
+        # ── Aus ihrem eigenen Bereich, dem Kompass ───────────────────────────
+        #
+        # Vier Inhalte, jeder einzeln freigebbar. Was NICHT freigegeben ist, ist hier
+        # leer - das Buendel laedt es gar nicht erst, also muss hier nichts geprueft
+        # werden.
+        #
+        # Der Verlauf traegt AUSDRUECKLICH nur Zahlen: Zustand, Anspannung, Zeitpunkt.
+        # Die Auswahl passiert im sharing_service an der Abfrage; hier wird nichts
+        # nachgefiltert, damit es nicht zwei Stellen gibt, an denen es richtig sein muss.
+        #
+        # _public_row streicht die user_id: Die Vorhaben kommen aus einem SELECT *, und
+        # die Auth-Kennung der Klient:in geht die Fachperson nichts an. Der Notfallplan
+        # geht denselben Weg, nur ausfuehrlicher - er wird zu geordneten Abschnitten.
+        "saetze": bundle.saetze,
+        "verlauf": [_public_row(p) for p in bundle.verlauf],
+        "vorhaben": [_public_row(v) for v in bundle.vorhaben],
+        "krisenplan": _krisenplan_fuer_fachperson(bundle.krisenplan),
         "notes": (
             crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
             if note_row else None
