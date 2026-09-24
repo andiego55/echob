@@ -62,9 +62,28 @@ function chipCls(active: boolean): string {
   }`
 }
 
+/**
+ * Wie viele Beiträge je Thema stehen, solange kein Thema gewählt ist.
+ *
+ * Die Seite zeigte bisher ALLES: jedes Thema mit jedem Beitrag, untereinander. Das war
+ * kein Index mehr, sondern eine Liste, die man scrollt, bis man aufhört. Vier je Thema
+ * reichen, um zu sehen, worum es geht — der Rest ist einen Klick entfernt.
+ */
+const VORSCHAU_JE_THEMA = 4
+
 export default function WissenPage() {
   const [activeType, setActiveType] = useState<ContentType | null>(null)
-  const items = activeType ? ALL_ITEMS.filter((i) => i.type === activeType) : ALL_ITEMS
+  // Die Themen sind KEIN neues Vokabular. Es sind dieselben Ueberschriften, unter denen
+  // die Beitraege ohnehin standen - sie filtern jetzt, statt nur zu beschriften. Ein
+  // zweites Schlagwort-System danebenzustellen hiesse, dieselbe Einteilung zweimal zu
+  // pflegen, und die zweite waere nach einem halben Jahr die falsche.
+  const [activeCluster, setActiveCluster] = useState<Cluster | null>(null)
+
+  const items = ALL_ITEMS.filter(
+    (i) => (!activeType || i.type === activeType)
+      && (!activeCluster || i.cluster === activeCluster),
+  )
+  const sichtbareCluster = CLUSTERS.filter((cl) => items.some((i) => i.cluster === cl))
 
   return (
     <PageLayout>
@@ -111,10 +130,36 @@ export default function WissenPage() {
         </div>
       </section>
 
-      {/* Nach Format – Filter */}
+      {/* Filter: erst das Thema, dann das Format ─────────────────────────────
+          Das Thema steht oben, weil danach gesucht wird. Niemand kommt hierher und
+          denkt „ich haette gern einen Vergleich" — man kommt mit „Gaslighting". */}
       <section className="border-t border-brand-border px-6 pt-10 pb-1">
         <div className="mx-auto max-w-[960px]">
-          <p className="mb-3 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brand-muted">Nach Format</p>
+          <p className="mb-3 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brand-muted">
+            Nach Thema
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => setActiveCluster(null)}
+              className={chipCls(activeCluster === null)}>
+              Alle Themen
+            </button>
+            {CLUSTERS.map((cl) => {
+              const anzahl = ALL_ITEMS.filter(
+                (i) => i.cluster === cl && (!activeType || i.type === activeType)).length
+              if (anzahl === 0) return null
+              return (
+                <button key={cl} type="button" onClick={() => setActiveCluster(cl)}
+                  className={chipCls(activeCluster === cl)}>
+                  {CLUSTER_LABELS[cl]}
+                  <span className="ml-1.5 text-[0.72rem] opacity-60">{anzahl}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <p className="mb-3 mt-6 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-brand-muted">
+            Nach Format
+          </p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => setActiveType(null)} className={chipCls(activeType === null)}>
               Alle
@@ -125,20 +170,32 @@ export default function WissenPage() {
               </button>
             ))}
           </div>
+
+          {(activeCluster || activeType) && (
+            <p className="mt-4 text-[0.84rem] text-brand-muted">
+              {items.length === 1 ? 'Ein Beitrag' : `${items.length} Beiträge`}
+              {activeCluster && <> zu <span className="font-semibold text-navy">{CLUSTER_LABELS[activeCluster]}</span></>}
+              {items.length === 0 && ' — probier eine andere Kombination.'}
+            </p>
+          )}
         </div>
       </section>
 
       {/* Master-Index nach Thema */}
       <section className="px-6 py-[56px]">
         <div className="mx-auto max-w-[960px]">
-          {CLUSTERS.map((cl) => {
+          {sichtbareCluster.map((cl) => {
             const clItems = items.filter((i) => i.cluster === cl)
             if (clItems.length === 0) return null
+            // Ohne gewaehltes Thema nur eine Vorschau je Thema. Mit gewaehltem alles -
+            // dann ist es ja das, was jemand sehen wollte.
+            const gezeigt = activeCluster ? clItems : clItems.slice(0, VORSCHAU_JE_THEMA)
+            const rest = clItems.length - gezeigt.length
             return (
               <div key={cl} className="mb-12 last:mb-0">
                 <h2 className="mb-5 text-[clamp(1.2rem,2vw,1.5rem)] font-bold text-navy">{CLUSTER_LABELS[cl]}</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {clItems.map((it) => {
+                  {gezeigt.map((it) => {
                     const c = TYPE_BADGE[it.type]
                     return (
                       <Link key={it.url} to={it.url} className="group card no-underline hover:border-accent/50">
@@ -154,9 +211,28 @@ export default function WissenPage() {
                     )
                   })}
                 </div>
+                {rest > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveCluster(cl)}
+                    className="mt-4 text-[0.86rem] font-semibold text-accent hover:underline"
+                  >
+                    Alle {clItems.length} Beiträge zu {CLUSTER_LABELS[cl]} →
+                  </button>
+                )}
               </div>
             )
           })}
+
+          {items.length === 0 && (
+            <p className="text-[0.92rem] text-brand-muted">
+              Zu dieser Kombination gibt es noch nichts.{' '}
+              <button type="button" onClick={() => { setActiveCluster(null); setActiveType(null) }}
+                className="font-semibold text-accent hover:underline">
+                Filter zurücksetzen
+              </button>
+            </p>
+          )}
         </div>
       </section>
 

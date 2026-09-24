@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import TagInput from '@/components/directory/TagInput'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ProfessionalShell from '@/components/professional/ProfessionalShell'
@@ -172,6 +173,37 @@ export default function ProfessionalProfilePage() {
                   <Field label="Name / Praxis" required value={form.display_name} onChange={(v) => set({ display_name: v })} />
                   <Field label="Berufsbezeichnung" value={form.title ?? ''} onChange={(v) => set({ title: v })}
                     placeholder="z. B. Psychologische Psychotherapeutin, Paartherapeutin" />
+                  {/* Die Berufsgruppe, schreibgeschuetzt.
+                      Sie gehoert NICHT hierher zum Bearbeiten: An ihr haengt, ob § 203
+                      StGB gilt und welche Vertragsbausteine noetig sind. In einem
+                      Formular fuer Claim, Ort und Buchungslink stuende eine rechtliche
+                      Festlegung zwischen Marketing-Feldern.
+                      Sie gehoert aber sehr wohl SICHTBAR hierher: Direkt darueber steht
+                      ein freies Feld "Berufsbezeichnung", und zwei benachbarte Angaben,
+                      von denen eine rechtlich traegt und die andere nicht, verwechselt
+                      man - und traegt dann in das falsche ein. */}
+                  {meProf.data?.profession_group_label && (
+                    <div>
+                      <p className="mb-1.5 block text-sm font-medium text-brand-text">
+                        Berufsgruppe
+                      </p>
+                      <p className="rounded-brand border border-brand-border bg-brand-bg px-4 py-2.5 text-sm text-brand-muted">
+                        {meProf.data.profession_group_label}
+                      </p>
+                      <p className="mt-1 text-[0.72rem] leading-relaxed text-brand-muted">
+                        Daran hängt, welche Vereinbarungen für die Zusammenarbeit gelten.
+                        Änderbar unter{' '}
+                        <Link
+                          to="/professional/settings"
+                          className="font-medium text-accent no-underline hover:underline"
+                        >
+                          Einstellungen
+                        </Link>
+                        {' '}— die Berufsbezeichnung darüber ist frei und nur für deinen
+                        Eintrag.
+                      </p>
+                    </div>
+                  )}
                   {/* Der dritte Name auf dieser Seite - und der einzige, den die eigenen
                       Klient:innen zu sehen bekommen. Deshalb steht unter dem Feld, WO er
                       erscheint: Bei drei Namensfeldern sagt eine Beschriftung allein nicht,
