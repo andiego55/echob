@@ -82,7 +82,7 @@ const CoupleMediationPage = lazy(() => import('@/pages/couple/CoupleMediationPag
 const CoupleTestPage = lazy(() => import('@/pages/couple/CoupleTestPage'))
 import {
   CoupleSessionsPage, CoupleTopicsPage, CoupleAgreementsPage,
-  CoupleTestsPage, CoupleProgressPage,
+  CoupleTestsPage, CoupleProgressPage, CoupleRhythmPage,
   CoupleRetrospectPage, CoupleQuestionsPage, CoupleImpulsePage,
   CoupleSharesPage, CoupleSettingsPage,
 } from '@/pages/couple/CoupleTabPages'
@@ -328,6 +328,7 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/app/paar/:coupleId/tests" element={<ProtectedRoute><CoupleTestsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/fragen" element={<ProtectedRoute><CoupleQuestionsPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/impulse" element={<ProtectedRoute><CoupleImpulsePage /></ProtectedRoute>} />
+      <Route path="/app/paar/:coupleId/rhythmus" element={<ProtectedRoute><CoupleRhythmPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/rueckblick" element={<ProtectedRoute><CoupleRetrospectPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/freigaben" element={<ProtectedRoute><CoupleSharesPage /></ProtectedRoute>} />
       <Route path="/app/paar/:coupleId/fortschritt" element={<ProtectedRoute><CoupleProgressPage /></ProtectedRoute>} />

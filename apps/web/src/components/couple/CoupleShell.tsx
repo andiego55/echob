@@ -75,6 +75,7 @@ export const GRUPPEN: Gruppe[] = [
   {
     label: 'Wir',
     kinder: [
+      { path: '/rhythmus', label: 'Rhythmus' },
       { path: '/rueckblick', label: 'Rückblick' },
       { path: '/fortschritt', label: 'Fortschritt' },
       { path: '/freigaben', label: 'Freigaben' },

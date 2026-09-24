@@ -7,17 +7,26 @@
  * Leerzustände erklären, was der Bereich kann, statt „nichts vorhanden" zu melden. Wer
  * zum ersten Mal hier ist, soll wissen, was ihn erwartet.
  *
- * **Drei benannte Abschnitte statt eines Stapels.** Die Seite war mit jedem Feature
- * gewachsen und stapelte zuletzt gut zwanzig gleich aussehende Blöcke — wer sie öffnete,
- * sah keine Antwort auf „was ist heute dran", sondern eine Wand. Jetzt: **Jetzt** (was
- * Aufmerksamkeit braucht), **Euer Rhythmus** (was wiederkehrt), **Weitermachen** (wo es
- * weitergeht). Was nur zum Nachschlagen da ist, liegt zugeklappt darunter.
+ * **Eine Frage, nicht vier.** Diese Seite ist mit jedem Feature gewachsen und zeigte
+ * zuletzt vierzehn Blöcke. Ein früherer Versuch hat sie in drei Abschnitte geteilt und
+ * einen Aufklapper darunter gelegt; sie ist trotzdem wieder vollgelaufen — weil die
+ * Ursache eine andere war.
  *
- * **Vor den drei Abschnitten steht die Landkarte** (`Einstiege`). Die Abschnitte zeigen
- * *Zustand* — wie es steht, was wartet. Sie beantworten aber nicht, wo jemand hinsoll, der
- * mit einem Anliegen hereinkommt: Der Raum hat sechs Wege, etwas zu sagen, und in der
- * Reiterleiste heißen sie alle ungefähr „reden". Deshalb zuerst die Absicht, dann der
- * Zustand.
+ * **Die Ursache: zwei Landkarten und zwei Statusysteme.** Es gab `Einstiege` (sechs Wege,
+ * etwas zu sagen) UND vier „Weitermachen"-Kacheln, die auf dieselben Ziele zeigten. Und es
+ * gab die Abschnitte für den Zustand UND einen Aufklapper mit Zahlen, laufenden
+ * Gesprächen, eigenen Zusammenfassungen und dem Archiv — von denen jedes einzelne hinter
+ * einem Reiter längst ein Zuhause hat.
+ *
+ * **Jetzt beantwortet die Seite genau eine Frage: was ist gerade dran.** Wer hier ist, wo
+ * es hingeht (eine Landkarte), wie es steht, was offen ist — auf beiden Seiten —, und was
+ * heute fällig ist. Alles Wiederkehrende liegt unter *Rhythmus*, alles Laufende unter
+ * *Gespräche*, alle Zahlen unter *Fortschritt*, die eigenen Zusammenfassungen bei *Echo*.
+ *
+ * **Warum „wartet auf dich" und „wartet auf sie" jetzt zusammenstehen.** Es ist dieselbe
+ * Frage aus zwei Richtungen, und getrennt durch den halben Bildschirm liest man nur die
+ * erste. Zusammen sieht man in einem Blick, ob der Ball bei einem liegt — und das ist die
+ * Auskunft, um die es geht.
  */
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -25,15 +34,12 @@ import Avatar from '@/components/Avatar'
 import { coupleApi } from '@/api/couple'
 import type { CoupleDashboardItem } from '@/api/couple'
 import { apiErrorMessage } from '@/api/errors'
-import AppreciationCard from './AppreciationCard'
 import BarometerCard from './BarometerCard'
 import CoupleNotices from './CoupleNotices'
 import SinceLastVisit from './SinceLastVisit'
 import { DashboardSkeleton } from '@/components/Skeleton'
 import DueAgreementsCard from './DueAgreementsCard'
 import Einstiege from './Einstiege'
-import WeeklyCheckinCard from './WeeklyCheckinCard'
-import ImpulseTeaser from './ImpulseTeaser'
 import HonestTeaser from './HonestTeaser'
 
 export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
@@ -54,13 +60,10 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
     )
   }
 
-  const {
-    attention, waiting_for_partner: waiting, sessions, topics, agreements, progress,
-    echo_summaries: summaries,
-  } = data
-  const laufend = sessions.filter(s => s.status !== 'closed')
-  const archiv = sessions.filter(s => s.status === 'closed' || s.has_summary)
-  const offeneThemen = topics.filter(t => t.status !== 'resolved')
+  // Nur noch, was auf DIESER Seite steht. Sitzungen, Themen, Zahlen und die eigenen
+  // Zusammenfassungen kommen weiter in der Antwort des Servers — sie werden hier aber
+  // nicht mehr gezeigt, sondern auf ihren Reitern.
+  const { attention, waiting_for_partner: waiting, progress } = data
   const partner = data.partner_name || 'deine Partnerperson'
 
   return (
@@ -91,260 +94,111 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
 
       <Einstiege coupleId={coupleId} />
 
-      <Abschnitt titel="Jetzt" />
-
       <BarometerCard
         coupleId={coupleId}
         ownAvatar={data.own_avatar}
         partnerAvatar={data.partner_avatar}
       />
 
-      {/* ── Ball bei dir ──────────────────────────────────────────── */}
-      {attention.length > 0 ? (
-        <div className="card border-l-4 border-l-accent">
-          <h2 className="card-title">
-            Das wartet auf dich
-            <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-[0.65rem] text-white">
-              {attention.length}
-            </span>
-          </h2>
-          <div className="mt-3 space-y-2">
-            {attention.map((item, i) => <ItemRow key={i} item={item} highlight />)}
-          </div>
-        </div>
-      ) : (
+      {/* ── Offen, auf beiden Seiten ──────────────────────────────────
+          Eine Karte statt zweier, die durch den halben Bildschirm getrennt waren. Es ist
+          dieselbe Frage aus zwei Richtungen; getrennt liest man nur die erste. */}
+      {attention.length === 0 && waiting.length === 0 ? (
         <div className="card">
           <h2 className="card-title">Nichts offen</h2>
           <p className="mt-1.5 text-sm text-brand-muted">
-            {waiting.length > 0
-              ? `Bei dir ist gerade nichts zu tun – der Ball liegt bei ${partner}.`
-              : 'Ihr seid auf dem Laufenden. Ein guter Moment für ein neues Thema.'}
+            Ihr seid auf dem Laufenden. Ein guter Moment für ein neues Thema.
           </p>
+        </div>
+      ) : (
+        <div className={`card ${attention.length > 0 ? 'border-l-4 border-l-accent' : ''}`}>
+          {attention.length > 0 ? (
+            <>
+              <h2 className="card-title">
+                Das wartet auf dich
+                <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-[0.65rem] text-white">
+                  {attention.length}
+                </span>
+              </h2>
+              <div className="mt-3 space-y-2">
+                {attention.map((item, i) => <ItemRow key={i} item={item} highlight />)}
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-brand-muted">
+              Bei dir ist gerade nichts zu tun – der Ball liegt bei {partner}.
+            </p>
+          )}
+
+          {waiting.length > 0 && (
+            <div className={attention.length > 0
+              ? 'mt-4 border-t border-brand-border/60 pt-3' : 'mt-3'}>
+              <p className="section-label">Wartet auf {partner}</p>
+              <div className="mt-2 space-y-2">
+                {waiting.map((item, i) => <ItemRow key={i} item={item} />)}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       <DueAgreementsCard coupleId={coupleId} />
 
+      {/* „Gerade gestritten" stand hier ein zweites Mal. Der Knopf sitzt im Kopf der
+          Seite und ist damit immer sichtbar — eine Karte weiter unten, die dasselbe sagt,
+          ist kein zweiter Weg, sondern eine zweite Gelegenheit, ihn zu übersehen. */}
+
+      {/* Die Übung, auf die alles andere hinausläuft — und das Einzige aus dem Rhythmus,
+          das hier bleibt: Sie meldet sich nur, wenn sie etwas zu sagen hat. */}
+      <HonestTeaser teaser={data.honest_teaser} />
+
+      {/* Der Rhythmus als EINE Zeile. Vorher standen hier vier Karten (Wochen-Check,
+          Impulse, Wertschätzung, ehrlich mitteilen) — jede für sich gut, zusammen der
+          Grund, warum die Seite nicht endete. Sie haben jetzt einen eigenen Reiter. */}
       <Link
-        to={`/app/paar/${coupleId}/streit`}
+        to={`/app/paar/${coupleId}/rhythmus`}
         className="flex items-center justify-between gap-3 rounded-brand-lg border border-brand-border bg-white px-4 py-3 no-underline shadow-brand-sm transition hover:border-accent/50"
       >
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-navy">Gerade gestritten?</p>
+          <p className="text-sm font-semibold text-navy">Euer Rhythmus</p>
           <p className="mt-0.5 text-[0.72rem] leading-snug text-brand-muted">
-            Erst runterkommen, dann sortieren. Nur für dich – es muss nichts daraus werden.
+            Wochen-Check, Wertschätzung und kleine Übungen — fünf Minuten, die über Wochen
+            tragen.
           </p>
         </div>
-        <span className="shrink-0 text-xs text-accent">Hier entlang →</span>
+        <span className="shrink-0 text-xs text-accent">Ansehen →</span>
       </Link>
 
-      <Abschnitt titel="Euer Rhythmus" hinweis="Fünf Minuten, die über Wochen tragen." />
+      {/* ── Was hier NICHT mehr steht, und warum ──────────────────────
+          Hier lag ein Aufklapper „Mehr aus eurem Raum" mit Zahlen, laufenden Gespraechen,
+          den eigenen Echo-Zusammenfassungen und dem Archiv. Zugeklappt kostete er wenig —
+          aber er war der Ort, an dem die Seite immer weiter wuchs, weil jedes neue Stueck
+          dort noch hineinpasste.
 
-      <WeeklyCheckinCard
-        coupleId={coupleId}
-        ownAvatar={data.own_avatar}
-        partnerAvatar={data.partner_avatar}
-      />
+          Jedes dieser Dinge hat einen Reiter, und zwar seit es sie gibt:
+            Zahlen und Stufe          → Wir · Fortschritt
+            Laufende Gespraeche und
+            das Archiv                → Reden · Gespraeche
+            offene Mediationen        → Klaeren · Mediation
+            eigene Zusammenfassungen  → Reden · Echo
 
-      <ImpulseTeaser coupleId={coupleId} />
-
-      <AppreciationCard coupleId={coupleId} />
-
-      {/* Ans Ende des Rhythmus: die Übung, auf die alles andere hinausläuft. */}
-      <HonestTeaser teaser={data.honest_teaser} />
-
-      {waiting.length > 0 && (
-        <div className="card">
-          <h2 className="card-title">Wartet auf {partner}</h2>
-          <div className="mt-3 space-y-2">
-            {waiting.map((item, i) => <ItemRow key={i} item={item} />)}
-          </div>
-        </div>
-      )}
-
-      <Abschnitt titel="Weitermachen" />
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <QuickAction
-          to={`/app/paar/${coupleId}/fragen`}
-          title="Etwas fragen"
-          text="Eine Frage dalassen – sie wartet, bis die andere Person Zeit hat."
-        />
-        <QuickAction
-          to={`/app/paar/${coupleId}/echo`}
-          title="Mit Echo sprechen"
-          text="Nur für dich – findet das nächste Thema und die richtigen Worte."
-        />
-        <QuickAction
-          to={`/app/paar/${coupleId}/gespraeche`}
-          title="Gespräch beginnen"
-          text="Ein Thema, ein Ziel, moderiert von Echo."
-        />
-        <QuickAction
-          to={`/app/paar/${coupleId}/mediation`}
-          title="Thema klären"
-          text="Für alles, bei dem ihr feststeckt."
-        />
-      </div>
-
-      {/* ── Zum Nachschlagen ──────────────────────────────────────
-          Zahlen, eigene Zusammenfassungen und das Archiv sind selten das, weshalb
-          jemand die Seite öffnet. Sichtbar kosten sie Aufmerksamkeit, zugeklappt
-          nicht — verfügbar bleiben sie trotzdem. */}
-      <details className="group">
-        <summary className="cursor-pointer list-none py-2">
-          <span className="section-label transition-colors group-open:text-accent">
-            Mehr aus eurem Raum
-          </span>
-          <span className="ml-1.5 text-[0.68rem] text-brand-muted transition-transform group-open:rotate-90 inline-block">
-            ▸
-          </span>
-        </summary>
-
-        <div className="mt-3 space-y-5">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Tile label="Stufe" value={progress.level.name} />
-        <Tile label="Punkte" value={String(progress.total_points)} hint="gemeinsam" />
-        <Tile
-          label="Serie"
-          value={progress.streak_weeks > 0 ? `${progress.streak_weeks} Wo.` : '–'}
-          hint={progress.streak_weeks > 0 ? 'in Folge' : 'noch keine'}
-        />
-        <Tile
-          label="Abmachungen"
-          value={String(agreements.active + agreements.kept)}
-          hint={agreements.kept > 0 ? `${agreements.kept} gehalten` : 'gelten'}
-        />
-      </div>
-
-      {/* ── Läuft gerade ──────────────────────────────────────────── */}
-      {laufend.length > 0 || offeneThemen.length > 0 ? (
-        <div className="card">
-          <h2 className="card-title">Läuft gerade</h2>
-          <div className="mt-3 space-y-2">
-            {laufend.map(s => (
-              <RowLink key={s.id} to={`/app/paar/sitzung/${s.id}`} title={s.title}
-                detail={
-                  `Gespräch · ${s.message_count} Beiträge`
-                  + (s.from_topic ? ' · aus einer Mediation' : '')
-                  + (s.scheduled_for ? ` · ${new Date(s.scheduled_for).toLocaleString('de-DE')}` : '')
-                } />
-            ))}
-            {offeneThemen.map(t => (
-              <RowLink key={t.id} to={`/app/paar/thema/${t.id}`} title={t.title}
-                detail={
-                  'Mediation'
-                  + (t.open_bridges > 0 ? ` · ${t.open_bridges} offene Vorschläge` : '')
-                  + (t.message_count > 0 ? ` · ${t.message_count} Beiträge` : '')
-                  + (!t.has_mediation ? ' · noch kein Vorschlag' : '')
-                } />
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="card">
-          <h2 className="card-title">Noch nichts begonnen</h2>
-          <p className="mt-1.5 text-sm text-brand-muted">
-            Ein <strong className="text-navy">Gespräch</strong> ist gut für ein Thema, das ihr
-            besprechen wollt. Eine <strong className="text-navy">Mediation</strong> ist für
-            das, bei dem ihr schon festhängt – dort schreibt ihr erst getrennt, bevor Echo
-            Vorschläge macht.
-          </p>
-        </div>
-      )}
-
-      {/* ── Was du für dich festgehalten hast ─────────────────────── */}
-      <div className="card card-quiet">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="card-title-sm">Was du für dich festgehalten hast</h2>
-            <p className="mt-1 text-xs text-brand-muted">
-              Zusammenfassungen deiner Gespräche mit Echo. {partner} sieht sie nicht.
-            </p>
-          </div>
-          <Link to={`/app/paar/${coupleId}/echo`} className="shrink-0 text-xs text-accent hover:underline">
-            Zum Begleiter →
-          </Link>
-        </div>
-
-        {summaries.length === 0 ? (
-          <p className="mt-3 text-sm text-brand-muted">
-            Noch keine. Sprich mit Echo über das, was dich beschäftigt, und lass das Gespräch
-            danach zusammenfassen – so wie du es aus deinen Themendialogen kennst.
-          </p>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {summaries.map(s => (
-              <details key={s.id} className="rounded-brand border border-brand-border px-3.5 py-2.5">
-                <summary className="cursor-pointer text-sm font-semibold text-navy">
-                  {s.title || 'Gespräch'}
-                  <span className="ml-2 text-[0.65rem] font-normal text-brand-muted">
-                    {new Date(s.created_at).toLocaleDateString('de-DE')}
-                  </span>
-                </summary>
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-brand-muted">
-                  {s.summary_text}
-                </p>
-              </details>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ── Gespeicherte Gespräche ────────────────────────────────── */}
-      {archiv.length > 0 && (
-        <div className="card card-quiet">
-          <h2 className="card-title-sm">Was ihr besprochen habt</h2>
-          <p className="mt-1 text-xs text-brand-muted">
-            Zum Nachlesen, wenn die Erinnerung auseinandergeht.
-          </p>
-          <div className="mt-3 space-y-2">
-            {archiv.slice(0, 8).map(s => (
-              <Link
-                key={s.id}
-                to={`/app/paar/sitzung/${s.id}`}
-                className="flex items-center justify-between gap-3 rounded-brand px-3.5 py-2 no-underline transition hover:bg-brand-bg"
-              >
-                <p className="min-w-0 truncate text-sm text-brand-text">{s.title}</p>
-                <span className="shrink-0 text-[0.65rem] text-brand-muted">
-                  {s.has_summary ? 'mit Zusammenfassung' : 'ohne Zusammenfassung'}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-        </div>
-      </details>
-    </div>
-  )
-}
-
-/** Abschnittsmarke zwischen Karten — gibt dem Auge Halt, ohne Platz zu kosten. */
-function Abschnitt({ titel, hinweis }: { titel: string; hinweis?: string }) {
-  return (
-    <div className="flex flex-wrap items-baseline gap-x-3 pt-2">
-      <h2 className="section-label">{titel}</h2>
-      {hinweis && <p className="text-[0.72rem] text-brand-muted/80">{hinweis}</p>}
+          Sie hier ein zweites Mal zu zeigen half niemandem: Wer sie sucht, geht auf den
+          Reiter; wer sie nicht sucht, scrollt daran vorbei. */}
+      <p className="pt-1 text-center text-[0.74rem] text-brand-muted">
+        Zahlen und Stufe stehen unter{" "}
+        <Link to={`/app/paar/${coupleId}/fortschritt`}
+          className="font-medium text-accent no-underline hover:underline">Fortschritt</Link>
+        {", "}laufende und vergangene Gespräche unter{" "}
+        <Link to={`/app/paar/${coupleId}/gespraeche`}
+          className="font-medium text-accent no-underline hover:underline">Gespräche</Link>
+        {"."}
+      </p>
     </div>
   )
 }
 
 
-function RowLink({ to, title, detail }: { to: string; title: string; detail: string }) {
-  return (
-    <Link
-      to={to}
-      className="flex items-center justify-between gap-3 rounded-brand border border-brand-border px-3.5 py-2.5 no-underline transition hover:border-accent/50"
-    >
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-navy">{title}</p>
-        <p className="mt-0.5 text-xs text-brand-muted">{detail}</p>
-      </div>
-      <span className="shrink-0 text-xs text-accent">Öffnen →</span>
-    </Link>
-  )
-}
+
 
 function ItemRow({ item, highlight = false }: { item: CoupleDashboardItem; highlight?: boolean }) {
   const inner = (
@@ -364,27 +218,4 @@ function ItemRow({ item, highlight = false }: { item: CoupleDashboardItem; highl
     : <div className={cls}>{inner}</div>
 }
 
-function QuickAction({ to, title, text }: { to: string; title: string; text: string }) {
-  return (
-    <Link
-      to={to}
-      className="group rounded-brand-lg border border-brand-border bg-white p-4 no-underline shadow-brand-sm transition-all hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-brand"
-    >
-      <p className="card-title">{title}</p>
-      <p className="mt-1 text-[0.72rem] leading-snug text-brand-muted">{text}</p>
-      <span className="mt-2 inline-flex items-center gap-1 text-[0.72rem] font-semibold text-accent">
-        Öffnen<span className="transition-transform group-hover:translate-x-0.5">→</span>
-      </span>
-    </Link>
-  )
-}
 
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-brand border border-brand-border bg-white px-3.5 py-3">
-      <p className="text-[0.62rem] font-bold uppercase tracking-wide text-brand-muted">{label}</p>
-      <p className="mt-1 truncate card-title-lg">{value}</p>
-      {hint && <p className="text-[0.65rem] text-brand-muted">{hint}</p>}
-    </div>
-  )
-}

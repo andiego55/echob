@@ -18,6 +18,9 @@ import SharesCard from '@/components/couple/SharesCard'
 import RetrospectCard from '@/components/couple/RetrospectCard'
 import QuestionsBoard from '@/components/couple/QuestionsBoard'
 import ImpulseBoard from '@/components/couple/ImpulseBoard'
+import WeeklyCheckinCard from '@/components/couple/WeeklyCheckinCard'
+import AppreciationCard from '@/components/couple/AppreciationCard'
+import ImpulseTeaser from '@/components/couple/ImpulseTeaser'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
 import EndRoomPanel from '@/components/couple/EndRoomPanel'
@@ -100,6 +103,20 @@ export function CoupleTestsPage() {
   return (
     <CoupleShell subtitle="Beide ausfüllen, dann nebeneinanderlegen.">
       <TestsCard coupleId={coupleId} />
+    </CoupleShell>
+  )
+}
+
+export function CoupleRhythmPage() {
+  const coupleId = useCoupleId()
+  return (
+    <CoupleShell subtitle="Fünf Minuten, die über Wochen tragen.">
+      <div className="space-y-5">
+        <WeeklyCheckinCard coupleId={coupleId} />
+        <AppreciationCard coupleId={coupleId} />
+        <ImpulseTeaser coupleId={coupleId} />
+      </div>
+      <CoupleSafetyNote />
     </CoupleShell>
   )
 }
