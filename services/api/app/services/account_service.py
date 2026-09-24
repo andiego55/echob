@@ -31,6 +31,11 @@ _USER_TABLES = (
     # Mein Kompass - gehoert der Person, nicht einem Fall.
     "selbst_pulse", "selbst_vorhaben", "selbst_saetze", "selbst_portraits",
     "selbst_briefe", "selbst_agenda",
+    # absprachen steht NICHT hier: Die Tabelle hat keine user_id-Spalte, sondern
+    # owner_user_id und professional_user_id. Hier eingetragen erzeugte sie ein
+    # "DELETE FROM absprachen WHERE user_id = $1" - und das faellt erst beim Loeschen
+    # eines Kontos um, also an der unangenehmsten Stelle. Sie steht in _SONDERFAELLE
+    # (Auskunft) und in _DELETE_STEPS (Loeschen), jeweils mit eigener Bedingung.
     # Ausbildung: die eigene Zuordnung bzw. das eigene Institut.
     "students", "training_institutes",
 )
@@ -57,6 +62,14 @@ _SONDERFAELLE = (
     ("case_shares", "owner_user_id = $1 OR professional_user_id = $1"),
     ("professional_invites", "inviter_user_id = $1 OR professional_user_id = $1"),
     ("case_faq_runs", "professional_user_id = $1 OR owner_user_id = $1"),
+    # Eine Absprache gehoert BEIDEN. Loescht eine Seite ihr Konto, hat sie keine
+    # Gegenseite mehr - und ohne Gegenseite ist eine gegenseitige Verabredung kein
+    # Text mehr, sondern ein Fragment. Deshalb faellt sie mit jeder der beiden.
+    #
+    # Ueber case_id wuerde sie bei der Klient:in ohnehin kaskadieren; hier steht sie
+    # trotzdem, damit die Liste die Wahrheit sagt und nicht auf eine Regel der
+    # Datenbank verweist, die niemand beim Lesen im Kopf hat.
+    ("absprachen", "owner_user_id = $1 OR professional_user_id = $1"),
     ("client_invites", "professional_user_id = $1 OR accepted_user_id = $1"),
     ("student_invites", "accepted_user_id = $1"),
     ("organizations", "owner_user_id = $1"),
@@ -75,6 +88,7 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     "professional_reports":          {"json": ("content",)},
     "professional_couple_reports":   {"json": ("content",)},
     "case_faq_runs":                 {"json": ("auswertung",)},
+    "absprachen":                    {"text": ("text",)},
     "professional_couple_echo_messages": {"text": ("content",)},
     "selbst_pulse":                  {"text": ("notiz", "geholfen")},
     "selbst_vorhaben":               {"text": ("titel",), "json": ("inhalt",)},
@@ -248,6 +262,14 @@ _DELETE_STEPS = (
     ("client_invites", "professional_user_id = $1 OR accepted_user_id = $1"),
     ("client_notifications", "user_id = $1"),
     ("case_shares", "owner_user_id = $1 OR professional_user_id = $1"),
+    # Eine Absprache gehoert BEIDEN. Loescht eine Seite ihr Konto, hat sie keine
+    # Gegenseite mehr - und eine gegenseitige Verabredung ohne Gegenseite ist kein Text
+    # mehr, sondern ein Fragment. Deshalb faellt sie mit jeder der beiden.
+    #
+    # Vor cases, obwohl der Fremdschluessel ohnehin kaskadieren wuerde: Die Reihenfolge
+    # dieser Liste IST die Reihenfolge des Loeschens, und sie soll nicht davon abhaengen,
+    # dass jemand die Regeln der Datenbank im Kopf hat.
+    ("absprachen", "owner_user_id = $1 OR professional_user_id = $1"),
     ("cases", "user_id = $1"),
     ("professional_invites", "inviter_user_id = $1 OR professional_user_id = $1"),
     ("professional_profiles", "user_id = $1"),

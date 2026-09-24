@@ -33,6 +33,7 @@ import { PROFILE_MODULES } from '@/utils/profileModules'
 import { PERSON_PROFILE_MODULES } from '@/utils/personProfileModules'
 import ArbeitsmappePanel from '@/components/professional/ArbeitsmappePanel'
 import FallFaqPanel from '@/components/professional/FallFaqPanel'
+import Absprachen from '@/components/app/Absprachen'
 
 const TOPIC_LABELS: Record<string, string> = {
   topic_self: 'Über mich', topic_person: 'Über die Fallperson',
@@ -478,7 +479,15 @@ export default function ProfessionalCaseDetailPage() {
 
         {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
         {tab === 'faq' && <FallFaqPanel caseId={caseId!} bundle={bundle} />}
-        {tab === 'collab' && <CollabPanel caseId={caseId!} initialType={collabSub} />}
+        {tab === 'collab' && (
+          <div className="space-y-5">
+            <CollabPanel caseId={caseId!} initialType={collabSub} />
+            {/* Unter „Zusammenarbeit" und nicht in einem eigenen Reiter: Eine Absprache
+                IST Zusammenarbeit, und ein eigener Reiter fuer im Schnitt eine Zeile
+                waere ein Ort, an den niemand geht. */}
+            <Absprachen caseId={caseId!} seite="fachperson" />
+          </div>
+        )}
         {tab === 'echo' && (
           <EchoPanel
             caseId={caseId!}

@@ -15,6 +15,7 @@ import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType, CaseShare } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import FreigabeStand from '@/components/app/FreigabeStand'
+import Absprachen from '@/components/app/Absprachen'
 import Chip from '@/components/Chip'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRUFSHINWEIS, alleErklaerungenBestaetigt, einwilligungsProtokoll, erklaerungen, notizenErklaerung } from '@/lib/einwilligung'
@@ -60,6 +61,12 @@ export default function CaseSharingPage() {
         <ConnectionsCard />
 
         <NewShareCard caseId={caseId!} accepted={accepted} shares={shares} scenes={scenes} />
+
+        {/* Die Absprachen stehen HIER und nicht auf dem Fall-Ueberblick: Es ist die
+            einzige Seite, auf der es um das Verhaeltnis zu der Fachperson geht. Auf dem
+            Ueberblick stuenden sie zwischen lauter Dingen, die einem allein gehoeren -
+            und das hier gehoert keinem allein. */}
+        <Absprachen caseId={caseId!} seite="klient" />
 
         {/* Aktive Freigaben */}
         <div className="card">
