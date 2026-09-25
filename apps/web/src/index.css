@@ -245,6 +245,21 @@
     .kompass-punkt { animation: none; opacity: 1; }
   }
 
+  /* ── Die Reihung: was sich gerade bewegt hat ─────────────────── */
+  /* Beim Umsortieren bleiben die React-Schluessel gleich, die Zeile wird also nicht neu
+     gebaut - eine Animation auf dem Element feuert nie von allein. Die Klasse setzt die
+     Komponente auf den zuletzt bewegten Eintrag; sie zeigt, WO er gelandet ist. Kurz und
+     ohne Farbwechsel: Es ist eine Korrektur, kein Ereignis. */
+  .kompass-bewegt { animation: kompass-bewegt 420ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+  @keyframes kompass-bewegt {
+    0%   { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(47, 111, 143, 0.28); }
+    45%  { transform: scale(1.015); box-shadow: 0 0 0 5px rgba(47, 111, 143, 0.12); }
+    100% { transform: none; box-shadow: 0 0 0 0 rgba(47, 111, 143, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kompass-bewegt { animation: none; }
+  }
+
   /* ── Safety Notice ───────────────────────────────────────────── */
   .safety-notice {
     @apply bg-[#eef5fb] border border-[#c0d8ed] border-l-4 border-l-[#3b6a9a]

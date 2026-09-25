@@ -23,6 +23,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
+import { Pfeil, verschoben } from '@/components/app/kompass/Reihung'
 import { kompassApi, type KrisenplanTeil } from '@/api/kompass'
 import { ANLAUFSTELLEN } from '@/lib/anlaufstellen'
 import { nummerAus, planGefuellt, planZeilen, planZumSpeichern } from '@/lib/kompass'
@@ -127,16 +128,14 @@ export default function KrisenplanPage() {
    *
    * Pfeile und kein Ziehen: Ziehen ist am Telefon ungenau und mit der Tastatur gar nicht
    * bedienbar. Auf ausgerechnet dieser Seite ist das keine Feinheit.
+   *
+   * Das Pfeilpaar und das Umstellen selbst liegen in `components/app/kompass/Reihung`.
+   * Die ganze Form dort passt hier NICHT: Ihre Zeilen sind feste Bezeichnungen, diese
+   * hier sind Eingabefelder, die man noch tippt. Geteilt wird deshalb, was wirklich
+   * dasselbe ist — und nicht eine Komponente mit einem Schalter für zwei Bauarten.
    */
-  function zeileSchieben(key: string, index: number, richtung: -1 | 1) {
-    const ziel = index + richtung
-    setEntwurf(e => {
-      if (!e) return e
-      const zeilen = [...(e[key] ?? [])]
-      if (ziel < 0 || ziel >= zeilen.length) return e
-      ;[zeilen[index], zeilen[ziel]] = [zeilen[ziel], zeilen[index]]
-      return { ...e, [key]: zeilen }
-    })
+  function zeileSchieben(key: string, index: number, richtung: 'hoch' | 'runter') {
+    setEntwurf(e => (e ? { ...e, [key]: verschoben(e[key] ?? [], index, richtung) } : e))
   }
 
   // Der Fehler VOR dem Ladezustand — und hier wiegt das schwerer als anderswo. Der
@@ -323,7 +322,7 @@ function Bearbeitung({
   onZeile: (key: string, index: number, wert: string) => void
   onWeg: (key: string, index: number) => void
   onDazu: (key: string, wert?: string) => void
-  onSchieben: (key: string, index: number, richtung: -1 | 1) => void
+  onSchieben: (key: string, index: number, richtung: 'hoch' | 'runter') => void
 }) {
   return (
     <div className="space-y-4">
@@ -385,13 +384,13 @@ function Bearbeitung({
                         richtung="hoch"
                         aus={i === 0}
                         label={`Zeile ${i + 1} nach oben`}
-                        onKlick={() => onSchieben(t.key, i, -1)}
+                        onKlick={() => onSchieben(t.key, i, 'hoch')}
                       />
                       <Pfeil
                         richtung="runter"
                         aus={i === zeilen.length - 1}
                         label={`Zeile ${i + 1} nach unten`}
-                        onKlick={() => onSchieben(t.key, i, 1)}
+                        onKlick={() => onSchieben(t.key, i, 'runter')}
                       />
                     </div>
                   )}
@@ -464,35 +463,5 @@ function Anlaufstellen() {
         ))}
       </ul>
     </section>
-  )
-}
-
-// ── Eine Stelle nach oben oder unten ─────────────────────────────────────────
-// Klein und ohne Farbe: Es ist kein Vorgang, sondern eine Korrektur. Ausgeschaltet am
-// Rand, statt zu verschwinden — sonst springen die übrigen Pfeile beim Sortieren hin und
-// her, und man trifft den falschen.
-
-function Pfeil({ richtung, aus, label, onKlick }: {
-  richtung: 'hoch' | 'runter'
-  aus: boolean
-  label: string
-  onKlick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onKlick}
-      disabled={aus}
-      aria-label={label}
-      className="rounded-brand-sm px-1.5 py-0.5 text-brand-muted transition-colors hover:bg-brand-bg hover:text-navy disabled:opacity-25 disabled:hover:bg-transparent"
-    >
-      <svg
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
-        strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"
-        aria-hidden="true"
-      >
-        <path d={richtung === 'hoch' ? 'M18 15l-6-6-6 6' : 'M6 9l6 6 6-6'} />
-      </svg>
-    </button>
   )
 }

@@ -10,9 +10,11 @@
  *
  *   1. *Der Puls.* Ganz oben, ohne Umweg, in fünf Sekunden erledigt. Wer die Seite öffnet,
  *      soll etwas TUN können, bevor er etwas liest.
- *   2. *Die Eingänge.* Ein Eingang ist eine Grundform oder ein Raum, nie ein Werkzeug —
- *      danach sind es fünf, und die Liste ist geschlossen. Ein Werkzeugkasten, in dem man
- *      suchen muss, wird nicht benutzt.
+ *   2. *Die Eingänge.* Ein Eingang ist eine Grundform oder ein Raum, nie ein Werkzeug. Ein
+ *      Werkzeugkasten, in dem man suchen muss, wird nicht benutzt. Hier stand einmal
+ *      „danach sind es fünf, und die Liste ist geschlossen" — das war eine Zählung, die
+ *      sich als Regel ausgab. Die Regel ist der erste Satz. Wie viele Eingänge daraus
+ *      folgen, entscheidet er, und nicht wir vorab.
  *   3. *Der Verlauf, leise.* Unten, ohne Aufforderung. Er ist das Ergebnis der oberen
  *      Ebene und darf sich Zeit lassen, bis er etwas zu sagen hat.
  *
@@ -29,6 +31,7 @@ import { PageSkeleton } from '@/components/Skeleton'
 import PulsErfassen from '@/components/app/kompass/PulsErfassen'
 import VerlaufsKurve from '@/components/app/kompass/VerlaufsKurve'
 import { kompassApi, type PulsNeu } from '@/api/kompass'
+import { idealApi } from '@/api/kompassIdeal'
 import { casesApi } from '@/api/cases'
 import { profileApi } from '@/api/profile'
 import { PROFILE_MODULES } from '@/utils/profileModules'
@@ -57,6 +60,18 @@ export default function KompassPage() {
     queryFn: profileApi.get,
     staleTime: 60_000,
   })
+  // Eine eigene Abfrage statt einer Zahl in der Kompass-Übersicht.
+  //
+  // Die Zahl dort wäre ein Feld weniger im Netz — aber sie hieße: Dienst, Antwortmodell und
+  // TS-Typ des Kompass anfassen, damit ein FREMDES Modul eine Kachel füllen kann. Dann ist
+  // die Traumbeziehung nicht mehr herausnehmbar, und ihr Hinausnehmen ließe hier eine Lücke
+  // in einer Antwort, die nichts mit ihr zu tun hat. Eine zusätzliche Anfrage ist der
+  // ehrlichere Preis; sie fällt ohne Fehler aus, wenn das Modul fehlt.
+  const { data: idealeDaten } = useQuery({
+    queryKey: ['ideale'],
+    queryFn: idealApi.liste,
+    staleTime: 60_000,
+  })
 
   const anlegen = useMutation({
     mutationFn: (puls: PulsNeu) => kompassApi.pulsAnlegen(puls),
@@ -67,6 +82,7 @@ export default function KompassPage() {
   const richtung = useMemo(() => bewegung(verlauf), [verlauf])
 
   const offeneFaelle = (faelle?.cases ?? []).filter(f => !f.archived_at)
+  const ideale = idealeDaten ?? []
   const fertigeModule = profil?.completed_modules?.length ?? 0
 
   // Der Fehler VOR dem Ladezustand. Ohne diesen Zweig bliebe die Seite bei einem
@@ -155,13 +171,12 @@ export default function KompassPage() {
         </section>
 
         {/* ── Ebene 2: die Eingänge ─────────────────────────────────────────
-            Fünf. Bei vieren stand hier noch, ein fünfter wäre ein Zeichen, dass der
-            Zuschnitt nicht mehr stimmt — das war die falsche Regel. Die richtige lautet:
-            Ein Eingang ist eine GRUNDFORM oder ein RAUM, nie ein Werkzeug. Danach sind
-            es genau fünf, und die Liste ist geschlossen:
+            Die Regel: Ein Eingang ist eine GRUNDFORM oder ein RAUM, nie ein Werkzeug.
+            Werkzeuge sind Zugänge zu einer der Formen und bekommen keine eigene Karte.
 
-              Sätze, Vorhaben  — zwei der drei Grundformen (die dritte, der Puls, steht
-                                 oben als Handlung statt als Karte)
+              Sätze, Vorhaben  — zwei der Grundformen (der Puls, die dritte, steht oben
+                                 als Handlung statt als Karte)
+              Traumbeziehung   — die vierte Grundform, siehe unten
               Spur             — die Sicht auf alles Festgehaltene, Puls zuerst
               Wo ich stehe     — der Profilraum
               Notfallplan      — technisch eine Art von Vorhaben, hier trotzdem eigen:
@@ -170,8 +185,23 @@ export default function KompassPage() {
                                  die in einer Krise einen Handgriff kostet, ist die
                                  falsche Ordnung.
 
-            Ein SECHSTER wäre ein Werkzeug — und Werkzeuge sind Eingänge zu einer der
-            Formen, keine eigene Karte. */}
+            **Hier stand, ein sechster wäre ein Werkzeug, und die Liste sei geschlossen.**
+            Das war zweimal dieselbe Verwechslung: erst bei vier („ein fünfter wäre ein
+            Zeichen, dass der Zuschnitt nicht stimmt"), dann bei fünf. Eine Zählung ist
+            keine Regel. Die Regel hat gehalten — hinzugekommen ist eine Grundform.
+
+            **Warum die Traumbeziehung eine Grundform ist und kein Werkzeug.** Die drei
+            bisherigen sind: wie es mir gerade geht (Puls), was über mich stimmt (Satz),
+            was ich vorhabe (Vorhaben). Keine davon nimmt auf, WAS ICH WILL. Ein Wunsch
+            ist kein Zustand, keine Feststellung und kein Plan — er ist ein Maßstab, und
+            er hält still, während sich alles andere bewegt. Daran hängt auch die zweite
+            Regel dieses Raums: Nur eine Grundform bekommt eine eigene Tabelle. Die
+            Traumbeziehung hat eine (`selbst_ideale`), weil sie eine ist — nicht
+            umgekehrt.
+
+            **Und sie steht hinten, nicht in der Mitte.** Die fünf davor behalten ihren
+            Platz. Wer gelernt hat, wo sein Notfallplan liegt, soll ihn nicht suchen
+            müssen, weil etwas Neues dazugekommen ist. */}
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <Eingang
             to="/app/kompass/saetze"
@@ -223,6 +253,19 @@ export default function KompassPage() {
             text="Was hilft, wenn es kippt — vorher aufgeschrieben."
             stand={stand?.krisenplan_vorhanden ? 'Angelegt' : 'Noch leer'}
             fertig={!!stand?.krisenplan_vorhanden}
+          />
+          <Eingang
+            to="/app/kompass/traumbeziehung"
+            titel="Meine Traumbeziehung"
+            text="Wie du es dir wünschst — je Beziehungsart eine Skizze."
+            stand={
+              ideale.length === 0
+                ? 'Noch nichts skizziert'
+                : ideale.length === 1
+                  ? 'Eine Skizze'
+                  : `${ideale.length} Skizzen`
+            }
+            fertig={ideale.length > 0}
           />
         </div>
 

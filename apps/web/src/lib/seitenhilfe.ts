@@ -287,6 +287,18 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     schritte: ['Schreiben, solange es dir gut genug geht', 'Abstand wählen', 'Zukleben — und vergessen'],
     tipp: 'Du kannst ihn jederzeit wegnehmen, aber nicht vorher lesen. Genau das macht ihn aus.',
   },
+  '/app/kompass/traumbeziehung': {
+    titel: 'Meine Traumbeziehung',
+    zweck: 'Nicht wie es ist — wie du es dir wünschst. Je Beziehungsart eine eigene Skizze.',
+    schritte: ['Beziehungsart wählen', 'Skizzieren, in vier Schritten', 'Später neben einen Fall legen'],
+    tipp: 'Eine Skizze lässt sich nur an einen Fall DERSELBEN Art halten. Ein Wunschbild einer Partnerschaft sagt über das Verhältnis zu deinen Eltern nichts.',
+  },
+  '/app/kompass/traumbeziehung/:art': {
+    titel: 'Deine Skizze',
+    zweck: 'Was da sein müsste, damit es dir gut geht — angetippt, abgewogen und geordnet.',
+    schritte: ['Was zählt', 'Wie viel davon', 'Die Abwägung', 'Die Reihenfolge'],
+    tipp: 'Es wird laufend gespeichert, du musst nichts abschicken. Die Schritte sind ein Angebot — du kannst jeden einzeln anspringen und jederzeit aufhören.',
+  },
   '/app/kompass/krisenplan': {
     titel: 'Dein Notfallplan',
     zweck: 'Was hilft, wenn es kippt — aufgeschrieben, solange es dir gut genug dafür geht.',

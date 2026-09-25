@@ -65,6 +65,8 @@ const KompassPortraitPage = lazy(() => import('@/pages/app/KompassPortraitPage')
 const KompassBriefPage = lazy(() => import('@/pages/app/KompassBriefPage'))
 const KompassAgendaPage = lazy(() => import('@/pages/app/KompassAgendaPage'))
 const KrisenplanPage = lazy(() => import('@/pages/app/KrisenplanPage'))
+const TraumbeziehungPage = lazy(() => import('@/pages/app/TraumbeziehungPage'))
+const TraumbeziehungSkizzePage = lazy(() => import('@/pages/app/TraumbeziehungSkizzePage'))
 const PersonProfilePage = lazy(() => import('@/pages/app/PersonProfilePage'))
 const PersonProfileEchoPage = lazy(() => import('@/pages/app/PersonProfileEchoPage'))
 const TopicDialogPage = lazy(() => import('@/pages/app/TopicDialogPage'))
@@ -282,6 +284,8 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/app/kompass/brief" element={<ProtectedRoute><KompassBriefPage /></ProtectedRoute>} />
       <Route path="/app/kompass/agenda" element={<ProtectedRoute><KompassAgendaPage /></ProtectedRoute>} />
       <Route path="/app/kompass/krisenplan" element={<ProtectedRoute><KrisenplanPage /></ProtectedRoute>} />
+      <Route path="/app/kompass/traumbeziehung" element={<ProtectedRoute><TraumbeziehungPage /></ProtectedRoute>} />
+      <Route path="/app/kompass/traumbeziehung/:art" element={<ProtectedRoute><TraumbeziehungSkizzePage /></ProtectedRoute>} />
       <Route path="/app/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/app/privacy" element={<ProtectedRoute><PrivacySettingsPage /></ProtectedRoute>} />
       <Route path="/app/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
