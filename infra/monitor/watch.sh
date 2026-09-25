@@ -179,6 +179,39 @@ Ein Backup, das nie zurueckgespielt wurde, ist eine Vermutung. Auf deinem Rechne
   infra/backup/restore-pruefen.sh <backup.sql.gz.age> <schluesseldatei>"
 fi
 
+# ── Wartet ein Neustart? ─────────────────────────────────────────────────────
+#
+# WARUM DAS HIER STEHEN MUSS. "0 Sicherheitsupdates ausstehend" heisst nicht sicher - es
+# heisst, sie sind installiert. Ob sie WIRKEN, sagt allein /var/run/reboot-required.
+# unattended-upgrades legt Kernel und libc brav ab und schweigt danach.
+#
+# Diese Luecke kostete zweieinhalb Monate: -134, -136 und -138 lagen auf der Platte, aktiv
+# war -124. Aufgefallen ist es zufaellig beim Aufraeumen.
+#
+# UND WARUM ES BEI DIESEM SERVER BESONDERS ZAEHLT. Ein Neustart ist hier nicht kostenlos -
+# die Datenplatte ist mit LUKS verschluesselt und muss von Hand entsperrt werden, sonst
+# bleibt die Anwendung unten. Genau deshalb wird er aufgeschoben, und genau deshalb braucht
+# es eine Erinnerung, die nicht vom Vorsatz abhaengt. Warnung, nicht kritisch: Es ist kein
+# Ausfall, es ist eine faellige Verabredung.
+if [ -f /var/run/reboot-required ]; then
+  pakete="$(tr '\n' ' ' < /var/run/reboot-required.pkgs 2>/dev/null)"
+  notiz "Neustart: AUSSTEHEND${pakete:+ ($pakete)}"
+  pruefe neustart warn \
+    "Ein Neustart steht aus${pakete:+ - betroffen: $pakete}.
+
+Installierte Sicherheitsupdates wirken erst danach. Der Server laeuft bis dahin auf dem
+alten Kernel, auch wenn 'apt' nichts mehr zu tun meldet.
+
+Drei Minuten, vier Zeilen - die Datenplatte muss danach von Hand entsperrt werden:
+  apt-get dist-upgrade -y && reboot
+  # nach dem Hochfahren:
+  /root/echob-unlock.sh
+  curl -fsS ${API_URL} && echo"
+else
+  notiz "Neustart: nicht erforderlich"
+  pruefe neustart ok "Kein Neustart ausstehend."
+fi
+
 # ── API: laeuft sie noch, oder laeuft sie nur? ───────────────────────────────
 code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$API_URL" 2>/dev/null)"
 notiz "API:      HTTP ${code:-keine Antwort}"
