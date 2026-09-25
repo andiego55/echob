@@ -27,6 +27,7 @@ const TYPE_CONFIG: Record<ReportType, {
   therapy_prep:  { color: 'text-indigo-700', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', printAccent: '#3730a3' },
   progress:      { color: 'text-amber-700',  bgColor: 'bg-amber-50',  borderColor: 'border-amber-200',  printAccent: '#b45309' },
   partner:       { color: 'text-rose-700',   bgColor: 'bg-rose-50',   borderColor: 'border-rose-200',   printAccent: '#be123c' },
+  ideal_delta:   { color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', printAccent: '#047857' },
 }
 const DEFAULT_CONFIG = TYPE_CONFIG.pattern
 

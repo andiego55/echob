@@ -19,7 +19,7 @@ from cryptography.fernet import Fernet
 
 from app.api.v1.routers.person_profile import _row_to_response as _person_row_to_response
 from app.api.v1.routers.profile import _row_to_response as _profile_row_to_response
-from app.api.v1.routers.reports import _row_to_report
+from app.api.v1.routers.reports import row_to_report
 from app.core import crypto
 from app.core.config import settings
 from app.services.account_service import export_user_data
@@ -200,9 +200,9 @@ async def test_reports_content_jsonb_encrypted(db):
     assert "enc:v1:" in raw
     assert secret_heading not in raw and secret_text not in raw
 
-    # Lese-Helfer (_row_to_report) stellt den Klartext wieder her
+    # Lese-Helfer (row_to_report) stellt den Klartext wieder her
     row = await db.fetchrow("SELECT * FROM reports WHERE id=$1", report_id)
-    rep = _row_to_report(row)
+    rep = row_to_report(row)
     assert rep.content["sections"][0]["heading"] == secret_heading
     assert rep.content["sections"][0]["text"] == secret_text
 

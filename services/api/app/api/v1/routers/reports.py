@@ -35,7 +35,7 @@ async def list_reports(
             "SELECT * FROM reports WHERE case_id = $1 ORDER BY created_at DESC",
             case_id,
         )
-    reports = [_row_to_report(r) for r in rows]
+    reports = [row_to_report(r) for r in rows]
     return ReportListResponse(reports=reports, total=len(reports))
 
 
@@ -133,7 +133,7 @@ async def create_report(
         await log_ai_usage(user_id, conn, "report")
 
     logger.info("Bericht erstellt: report_id=%s case_id=%s type=%s", row["id"], case_id, body.report_type)
-    return _row_to_report(row)
+    return row_to_report(row)
 
 
 @router.get("/{report_id}", response_model=ReportResponse)
@@ -151,7 +151,7 @@ async def get_report(
         )
     if not row:
         raise HTTPException(status_code=404, detail="Bericht nicht gefunden.")
-    return _row_to_report(row)
+    return row_to_report(row)
 
 
 class ReportSectionUpdate(BaseModel):
@@ -188,7 +188,7 @@ async def update_report(
             "WHERE id = $2 AND case_id = $3 RETURNING *",
             json.dumps(crypto.encrypt_json_strings(content)), report_id, case_id,
         )
-    return _row_to_report(updated)
+    return row_to_report(updated)
 
 
 @router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
@@ -220,7 +220,14 @@ async def _assert_case_owner(case_id, user_id, conn, *, return_row: bool = False
     return row if return_row else None
 
 
-def _row_to_report(row) -> ReportResponse:
+def row_to_report(row) -> ReportResponse:
+    """Eine Berichtszeile in die Antwort - Inhalt entschluesselt, Etikett gesetzt.
+
+    Oeffentlich, weil der Traumbeziehungs-Vergleich (``kompass_ideale``) Berichte in
+    dieselbe Tabelle schreibt und dieselbe Antwort zurueckgibt. Eine zweite Kopie
+    dieser Umwandlung liefe beim naechsten verschluesselten Feld auseinander, und der
+    Unterschied waere nicht zu sehen: Ein Router zeigte Klartext, der andere nicht.
+    """
     import json
     d = dict(row)
     content = d.get("content")

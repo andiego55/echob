@@ -20,6 +20,7 @@ const TYPE_META: Record<ReportType, { color: string; bg: string; border: string 
   therapy_prep: { color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200' },
   progress:     { color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200' },
   partner:      { color: 'text-rose-700',   bg: 'bg-rose-50',   border: 'border-rose-200' },
+  ideal_delta:  { color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200' },
 }
 
 export default function ReportsPage() {

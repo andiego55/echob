@@ -33,6 +33,7 @@ import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
 import Reihung from '@/components/app/kompass/Reihung'
 import Waage from '@/components/app/kompass/Waage'
+import SkizzeVergleichen from '@/components/app/kompass/SkizzeVergleichen'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import {
   idealApi,
@@ -294,6 +295,12 @@ export default function TraumbeziehungSkizzePage() {
         </section>
 
         <Fehlermeldung error={sichern.error ?? entfernen.error} className="mt-3" />
+
+        {/* Ganz unten, und das ist eine Entscheidung über die Reihenfolge: Erst denkt
+            jemand darüber nach, was er sich wünscht. Erst danach steht die Frage da, wie
+            es tatsächlich ist. Umgekehrt wäre die Skizze von Anfang an eine Antwort auf
+            einen Fall — und damit kein Wunsch mehr, sondern eine Beschwerde. */}
+        <SkizzeVergleichen art={art} artLabel={artLabel} leer={!hatEtwas} />
 
         {hatEtwas && (
           <button

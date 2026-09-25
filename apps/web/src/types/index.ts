@@ -24,7 +24,13 @@ export type ThreadType =
   | 'blog_professionelle_hilfe' | 'blog_krisentelefone'
   | `content_${string}`
   | 'hyp_dynamics' | 'hyp_clusterb' | 'hyp_attachment' | 'hyp_trauma' | 'hyp_own_role'
-export type ReportType = 'short' | 'pattern' | 'coaching_prep' | 'therapy_prep' | 'progress' | 'partner'
+export type ReportType =
+  | 'short' | 'pattern' | 'coaching_prep' | 'therapy_prep' | 'progress' | 'partner'
+  // Wunsch und Wirklichkeit: entsteht NICHT auf der Berichtsseite, sondern aus einer
+  // Traumbeziehungs-Skizze heraus. Steht hier trotzdem, weil die Antwort der API
+  // diesen Wert traegt - eine Vereinigung, die ihn nicht kennt, luegt ueber das, was
+  // ankommen kann.
+  | 'ideal_delta'
 export type ReportStatus = 'draft' | 'ready' | 'archived'
 export type Confidence = 'low' | 'medium' | 'high'
 
@@ -104,6 +110,7 @@ export const REPORT_TYPE_LABELS: Record<ReportType, string> = {
   therapy_prep:  'Therapie-/Beratungsvorbereitung',
   progress:      'Verlaufsbericht',
   partner:       'Nachricht für das Gegenüber',
+  ideal_delta:   'Wunsch und Wirklichkeit',
 }
 
 // ── Datenmodelle ──────────────────────────────────────────────────────────────

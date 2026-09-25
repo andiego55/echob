@@ -1927,6 +1927,108 @@ class EchoService:
             "_mock": True,
         }
 
+    # ── Wunsch und Wirklichkeit ───────────────────────────────────────────────
+
+    async def generate_ideal_delta(
+        self,
+        *,
+        ideal_text: str,
+        case_context: dict[str, Any],
+        scenes: list[dict[str, Any]],
+        scale_scores: list[dict[str, Any]],
+        onboarding: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Die Traumbeziehungs-Skizze neben einen Fall gelegt — Wunsch und Wirklichkeit.
+
+        **Eine eigene Methode und kein weiterer Zweig in ``_openai_report``.** Das Ergebnis
+        wird in ``reports`` gespeichert wie jeder Bericht, denn genau das ist es. Die
+        Erzeugung ist aber eine andere Aufgabe: Sie braucht eine ZWEITE Eingabe, die kein
+        anderer Bericht hat, und sie hat ihre eigenen vier Abschnitte. Beides in die
+        gemeinsame Pipeline zu falten hieße, ihr einen Parameter zu geben, den ein einziger
+        Typ benutzt — und ein Schalter mitten in einer Form ist der Anfang von zwei Formen
+        in einer Funktion.
+
+        **Was NICHT mitgeht:** Personenprofil, Themen-Analysen, Hypothesen. Nicht aus
+        Sparsamkeit, sondern weil die Frage eine andere ist. Verglichen wird ein Wunsch mit
+        dem, was tatsächlich passiert — und was passiert, steht in Szenen, Skalen und den
+        Einstiegsantworten. Eine Deutung daneben zu legen erzeugte einen Text, der den
+        Wunsch an einer Analyse misst statt an einem Leben.
+        """
+        if not self._use_openai:
+            return self._mock_report("ideal_delta", case_context)
+
+        import json
+
+        from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS
+
+        system_prompt = _load_prompt("kompass_ideal_delta_prompt.md")
+
+        fall_kontext = build_case_context(
+            case=case_context,
+            onboarding=onboarding,
+            scenes=scenes,
+            scale_scores=scale_scores,
+            # Wie in Berichten: mit Titel statt Nummer. Wer das hier später liest — sie
+            # selbst in einem halben Jahr, oder eine Fachperson — hat den Fall nicht offen.
+            szenen_als="titel",
+        )
+
+        # Die Skizze VOR dem Fall. Sie ist der Maßstab; steht sie hinten, liest das Modell
+        # sie als Anhang zu einer Fallanalyse und schreibt genau die Fallanalyse, die hier
+        # nicht gefragt ist.
+        full_context = (
+            "=== IHRE SKIZZE: WIE SIE ES SICH WÜNSCHT ===\n\n" + ideal_text
+            + "\n\n---\n\n=== DER FALL: WIE ES IST ===\n\n" + fall_kontext
+        )
+
+        response = await self._chat(  # type: ignore[union-attr]
+            model=self._model_smart,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": full_context},
+                {"role": "user", "content": (
+                    "Lege die Skizze neben den Fall. Genau die vier Abschnitte in der "
+                    "vorgegebenen Reihenfolge. Keine Prozente, keine Punktzahl, kein Rat "
+                    "zu bleiben oder zu gehen.\n\n"
+                    "Antworte ausschließlich als gültiges JSON-Objekt."
+                )},
+            ],
+            max_tokens=3000,
+            # Niedriger als bei den meisten Berichten. Ein Delta soll belegen, nicht
+            # formulieren — und je freier das Modell schreibt, desto eher ergänzt es einen
+            # Wunsch, der nie dastand.
+            temperature=0.32,
+            response_format={"type": "json_object"},
+        )
+        parsed = json.loads(response.choices[0].message.content or "{}")
+
+        abschnitte = [
+            {"heading": str(a.get("heading", "")), "text": str(a.get("text", ""))}
+            for a in (parsed.get("sections") or [])
+            if isinstance(a, dict) and str(a.get("text", "")).strip()
+        ]
+        if not abschnitte:
+            # Lieber ein ehrlicher Satz als ein leerer Bericht, der aussieht wie ein Fehler
+            # in der Anzeige.
+            abschnitte = [{
+                "heading": "Kein Vergleich entstanden",
+                "text": (
+                    "Zu dieser Skizze und diesem Fall ist kein Text zustande gekommen. "
+                    "Versuch es noch einmal — und wenn es wieder nicht geht, liegt das "
+                    "nicht an dir."
+                ),
+            }]
+
+        ergebnis: dict[str, Any] = {
+            "type": "ideal_delta",
+            "type_label": REPORT_TYPE_LABELS.get("ideal_delta", "Wunsch und Wirklichkeit"),
+            "sections": abschnitte,
+            "disclaimer": REPORT_DISCLAIMER,
+        }
+        if str(parsed.get("hinweis") or "").strip():
+            ergebnis["hinweis"] = str(parsed["hinweis"]).strip()
+        return ergebnis
+
     def _mock_report(self, report_type: str, case_context: dict) -> dict:
         from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS
         return {

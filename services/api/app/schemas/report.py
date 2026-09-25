@@ -7,7 +7,10 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-ReportType = Literal["short", "pattern", "coaching_prep", "therapy_prep", "progress", "partner"]
+ReportType = Literal[
+    "short", "pattern", "coaching_prep", "therapy_prep", "progress", "partner",
+    "ideal_delta",
+]
 ReportStatus = Literal["draft", "ready", "archived"]
 
 REPORT_TYPE_LABELS: dict[str, str] = {
@@ -17,6 +20,7 @@ REPORT_TYPE_LABELS: dict[str, str] = {
     "therapy_prep":  "Therapie-/Beratungsvorbereitung",
     "progress":      "Verlaufsbericht",
     "partner":       "Nachricht für das Gegenüber",
+    "ideal_delta":   "Wunsch und Wirklichkeit",
 }
 
 REPORT_DISCLAIMER = (

@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import type { Report } from '@/types'
 
 /**
  * Meine Traumbeziehung — die Skizze einer gewünschten Beziehung, je Beziehungsart eine.
@@ -119,4 +120,19 @@ export const idealApi = {
    */
   vergleichbar: (art: string, caseId: string) =>
     apiClient.get<Vergleichbar>(`${basis}/${art}/vergleichbar/${caseId}`).then(r => r.data),
+
+  /**
+   * Der Vergleich selbst. Antwort ist ein **Bericht** — kein neues Ding.
+   *
+   * Ein Delta ist ein erzeugter Text über einen Fall, und genau das sind Berichte. Es
+   * liegt danach am Fall, lässt sich freigeben, drucken, exportieren und löschen wie
+   * jeder andere — ohne dass dafür eine einzige dieser Fähigkeiten ein zweites Mal
+   * gebaut werden musste.
+   *
+   * Dauert bis zu einer Minute: Das Modell liest zwei Dinge und schreibt vier Abschnitte.
+   */
+  vergleich: (art: string, caseId: string) =>
+    apiClient
+      .post<Report>(`${basis}/${art}/vergleich/${caseId}`)
+      .then(r => r.data),
 }
