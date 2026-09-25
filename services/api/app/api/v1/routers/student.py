@@ -151,12 +151,27 @@ async def _copy_or_404(conn, copy_id, student_id):
     return copy
 
 
-async def _load_case_echo_context(conn, case_id):
+async def _load_case_echo_context(conn, kopie):
     """Fall + Onboarding + Szenen + extra_context (Selbstbild/Fremdeinschätzung/Hypothesen).
 
     Gemeinsam genutzt von freiem Echo und Hypothesen-Dialogen; gespeicherte
     Hypothesen fließen als Kontext in jedes Gespräch ein (wie im Nutzer-Echo).
+
+    **Warum hier eine ZEILE steht und keine ``case_id``.** Diese Funktion liest alles über
+    einen Übungsfall: Onboarding, Szenen, Fremdeinschätzung, Selbstbild, Hypothesen. Mit
+    einer nackten ``case_id`` als Parameter war die Berechtigung eine Annahme über die
+    Aufrufer — richtig, aber unausgesprochen und von außen nicht erkennbar.
+
+    ``kopie`` ist die Zeile, die ``_copy_or_404`` zurückgibt, und die gibt es nur mit
+    geprüfter Zugehörigkeit. Die Berechtigung steht damit in der Signatur.
+
+    **Warum nicht einfach eine ``user_id`` verlangen und binden.** Weil das hier das Falsche
+    prüfen würde: Ein Übungsfall gehört keinem Konto. ``case_generation_service._write_case``
+    erzeugt seine ``user_id`` als ``uuid.uuid4()``; sie existiert nur innerhalb dieses Falls.
+    Der Anspruch der Studierenden läuft über ``student_case_copies``, nicht über ``cases`` —
+    eine Bindung an ``cases.user_id`` träfe niemals zu.
     """
+    case_id = kopie["case_id"]
     case_row = await conn.fetchrow("SELECT * FROM cases WHERE id = $1", case_id)
     if not case_row:
         raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
@@ -189,13 +204,17 @@ async def _load_case_echo_context(conn, case_id):
     return case_row, onboarding, scenes, "\n\n---\n\n".join(parts)
 
 
-async def _echo_turn(pool, echo_svc, *, case_id, user_id, message, thread_type):
+async def _echo_turn(pool, echo_svc, *, kopie, user_id, message, thread_type):
     """Ein Echo-Gesprächszug (freier Chat oder Hypothesen-Dialog) mit Krisen-Triage.
 
     Steuertoken (__…__, z. B. der Dialog-Start-Trigger) überspringen die Triage.
+
+    Nimmt die geprüfte Arbeitskopie und nicht ihre ``case_id`` — siehe
+    ``_load_case_echo_context``.
     """
+    case_id = kopie["case_id"]
     async with pool.acquire() as conn:
-        case_row, onboarding, scenes, extra_context = await _load_case_echo_context(conn, case_id)
+        case_row, onboarding, scenes, extra_context = await _load_case_echo_context(conn, kopie)
         history_rows = await conn.fetch(
             "SELECT role, content FROM echo_messages WHERE case_id = $1 AND thread_type = $2 "
             "ORDER BY created_at DESC LIMIT 20", case_id, thread_type)
@@ -337,7 +356,7 @@ async def echo_chat(
             g = await conn.fetchrow("SELECT term FROM glossary_terms WHERE slug = $1", body.glossary_slug)
             if g:
                 glossary_term = g["term"]
-        case_row, onboarding, scenes, extra_context = await _load_case_echo_context(conn, case_id)
+        case_row, onboarding, scenes, extra_context = await _load_case_echo_context(conn, copy)
         history_rows = await conn.fetch(
             "SELECT role, content FROM echo_messages WHERE session_id = $1 "
             "ORDER BY created_at DESC LIMIT 20", session_id)
@@ -827,7 +846,7 @@ async def hyp_chat(
     async with pool.acquire() as conn:
         copy = await _copy_or_404(conn, copy_id, current["student"]["id"])
     return await _echo_turn(
-        pool, echo_svc, case_id=copy["case_id"], user_id=current["user_id"],
+        pool, echo_svc, kopie=copy, user_id=current["user_id"],
         message=body.message, thread_type=hyp_type)
 
 
