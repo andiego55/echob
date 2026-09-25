@@ -24,6 +24,8 @@ import AppShell from '@/components/app/AppShell'
 import { coupleApi } from '@/api/couple'
 import CoupleOnboarding from './CoupleOnboarding'
 import InfoPopover from '@/components/InfoPopover'
+import Verbindungshinweis from '@/components/Verbindungshinweis'
+import { apiErrorMessage, istEndgueltigWeg } from '@/api/errors'
 
 interface Reiter { path: string; label: string }
 interface Gruppe { label: string; kinder: Reiter[] }
@@ -124,7 +126,7 @@ export default function CoupleShell({
   const base = `/app/paar/${coupleId}`
   const rest = pathname.startsWith(base) ? pathname.slice(base.length) : ''
 
-  const { data: room, isLoading, isError } = useQuery({
+  const { data: room, isLoading, error } = useQuery({
     queryKey: ['couple-link', coupleId],
     queryFn: () => coupleApi.get(coupleId),
     enabled: !!coupleId,
@@ -145,14 +147,20 @@ export default function CoupleShell({
     )
   }
 
-  if (isError || !room) {
+  // Nur ein echtes „weg" (404/410) rechtfertigt diesen Satz. Alles andere ist ein
+  // „gerade nicht", und dann bleibt der Raum stehen - siehe Verbindungshinweis.
+  if (!room) {
     return (
       <AppShell>
         <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
-            <h1 className="page-title card-title">Paarraum nicht gefunden</h1>
+            <h1 className="page-title card-title">
+              {istEndgueltigWeg(error) ? 'Paarraum nicht gefunden' : 'Paarraum gerade nicht erreichbar'}
+            </h1>
             <p className="mt-2 text-sm text-brand-muted">
-              Dieser Raum existiert nicht oder wurde beendet.
+              {istEndgueltigWeg(error)
+                ? 'Dieser Raum existiert nicht oder wurde beendet.'
+                : apiErrorMessage(error)}
             </p>
             <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">
               Zur Übersicht
@@ -270,7 +278,10 @@ export default function CoupleShell({
         </div>
       )}
 
-      <div className="mx-auto max-w-[1100px] px-6 py-8">{children}</div>
+      <div className="mx-auto max-w-[1100px] px-6 py-8">
+        <Verbindungshinweis error={error} />
+        {children}
+      </div>
     </AppShell>
   )
 }

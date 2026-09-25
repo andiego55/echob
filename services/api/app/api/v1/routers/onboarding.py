@@ -95,6 +95,52 @@ async def save_onboarding(
     return _row_to_response(row)
 
 
+class AvatarNur(BaseModel):
+    avatar: str | None = None
+
+
+@router.patch("/avatar", response_model=OnboardingResponse)
+async def save_avatar(
+    case_id: UUID,
+    body: AvatarNur,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+):
+    """Nur das Bild der Fallperson — und ausdruecklich NICHT durch die PUT-Tuer.
+
+    **Warum das eine eigene Route braucht.** Das PUT oben ersetzt den ganzen Antwortsatz
+    und setzt dabei jedes Mal ``completed_at = NOW()``. Beides ist dort richtig und hier
+    falsch:
+
+    * Ein ``{"avatar": "..."}`` allein loeschte den ganzen Fragebogen.
+    * Und ``completed_at`` ist kein Zeitstempel, sondern eine Aussage: Solange es leer ist,
+      gilt der Fall als benannt, aber nicht eingerichtet, und die eigentlichen Fragen
+      (Was belastet dich? Welche Szenen wiederholen sich?) stehen noch aus. Wer ein
+      passenderes Tier auswaehlt, hat das Onboarding nicht durchlaufen — es aus diesem
+      Anlass als erledigt zu markieren, kostete dem Fall seine Fragen.
+      ``test_case_create_naming.py`` haelt genau diese Grenze schon beim Anlegen.
+
+    Deshalb: eine Spalte, kein ``completed_at``, und beim ersten Mal entsteht die Zeile mit
+    leerem ``completed_at``.
+    """
+    user_id = current_user["user_id"]
+    async with pool.acquire() as conn:
+        await _assert_case_owner(case_id, user_id, conn)
+        row = await conn.fetchrow(
+            """
+            INSERT INTO onboarding_answers (case_id, user_id, avatar)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (case_id) DO UPDATE SET
+              avatar     = EXCLUDED.avatar,
+              updated_at = NOW()
+            WHERE onboarding_answers.case_id = $1
+            RETURNING *
+            """,
+            case_id, user_id, (body.avatar or "").strip()[:16] or None,
+        )
+    return _row_to_response(row)
+
+
 async def _assert_case_owner(case_id, user_id, conn):
     row = await conn.fetchrow(
         "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",

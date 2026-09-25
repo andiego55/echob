@@ -62,6 +62,20 @@ export interface CoupleContext {
   moods: Record<string, string>
 }
 
+/**
+ * Was der Ich-Botschaften-Coach zurückgibt.
+ *
+ * `text` ist der Satz allein — das, was sich ins Feld übernehmen lässt. Er ist **leer**,
+ * wenn das Modell nicht umgeformt hat: Bei Gewalt oder Drohungen nennt es Hilfenummern
+ * statt einer besseren Formulierung, und die darf kein „übernehmen" bekommen.
+ */
+export interface CoupleRephrase {
+  /** Die ganze Antwort, so wie sie dasteht. */
+  suggestion: string
+  text: string
+  geaendert: string | null
+}
+
 export const coupleSessionsApi = {
   list: (coupleId: string) =>
     apiClient.get<CoupleSession[]>(`/couple/links/${coupleId}/sessions`).then(r => r.data),
@@ -92,10 +106,18 @@ export const coupleSessionsApi = {
     },
   ) => apiClient.put<CoupleContext>(`/couple/sessions/${sessionId}/context`, body).then(r => r.data),
 
+  /**
+   * Den eigenen freigegebenen Beitrag zurückziehen — zurück in den Entwurf.
+   *
+   * Nur den eigenen. Was Echo schon geantwortet hat, steht weiter im Verlauf.
+   */
+  withdrawContext: (sessionId: string) =>
+    apiClient.delete<CoupleContext>(`/couple/sessions/${sessionId}/context`).then(r => r.data),
+
   /** Ich-Botschaften-Coach – nur für dich, wird nicht gespeichert. */
   rephrase: (sessionId: string, text: string) =>
-    apiClient.post<{ suggestion: string }>(`/couple/sessions/${sessionId}/rephrase`, { text })
-      .then(r => r.data.suggestion),
+    apiClient.post<CoupleRephrase>(`/couple/sessions/${sessionId}/rephrase`, { text })
+      .then(r => r.data),
 
   propose: (sessionId: string) =>
     apiClient.post<CoupleSession>(`/couple/sessions/${sessionId}/propose`).then(r => r.data),

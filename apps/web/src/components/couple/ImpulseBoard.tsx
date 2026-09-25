@@ -28,7 +28,7 @@ import Fehlermeldung from '@/components/Fehlermeldung'
 export default function ImpulseBoard({ coupleId }: { coupleId: string }) {
   const [gewaehlt, setGewaehlt] = useState<string | null>(null)
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['couple-impulses', coupleId],
     queryFn: () => coupleImpulsesApi.list(coupleId),
     enabled: !!coupleId,
@@ -36,7 +36,7 @@ export default function ImpulseBoard({ coupleId }: { coupleId: string }) {
   })
 
   if (isLoading) return <CardSkeleton label="Impulse werden geladen" />
-  if (isError || !data) {
+  if (!data) {
     return (
       <div className="card border-l-4 border-l-red-400">
         <p className="text-sm text-brand-muted">{apiErrorMessage(error)}</p>

@@ -24,7 +24,7 @@ import Weiterfuehren from './Weiterfuehren'
 import Fehlermeldung from '@/components/Fehlermeldung'
 
 export default function QuestionsBoard({ coupleId }: { coupleId: string }) {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['couple-questions', coupleId],
     queryFn: () => coupleQuestionsApi.list(coupleId),
     enabled: !!coupleId,
@@ -32,7 +32,7 @@ export default function QuestionsBoard({ coupleId }: { coupleId: string }) {
   })
 
   if (isLoading) return <CardSkeleton />
-  if (isError || !data) {
+  if (!data) {
     return (
       <div className="card border-l-4 border-l-red-400">
         <p className="text-sm text-brand-muted">{apiErrorMessage(error)}</p>

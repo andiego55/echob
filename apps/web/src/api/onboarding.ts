@@ -24,4 +24,15 @@ export const onboardingApi = {
 
   save: (caseId: string, data: OnboardingAnswers) =>
     apiClient.put<OnboardingResponse>(`/cases/${caseId}/onboarding`, data).then(r => r.data),
+
+  /**
+   * Nur das Bild — eigene Tür, mit Absicht.
+   *
+   * `save` ersetzt den ganzen Antwortsatz und markiert das Onboarding als durchlaufen.
+   * Für einen Avatar wäre beides falsch: Der Fragebogen wäre leer, und die eigentlichen
+   * Fragen kämen nie mehr.
+   */
+  saveAvatar: (caseId: string, avatar: string) =>
+    apiClient.patch<OnboardingResponse>(`/cases/${caseId}/onboarding/avatar`, { avatar })
+      .then(r => r.data),
 }

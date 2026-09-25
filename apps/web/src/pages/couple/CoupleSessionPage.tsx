@@ -13,15 +13,16 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { useAuth } from '@/contexts/AuthContext'
 import Avatar from '@/components/Avatar'
 import { coupleSessionsApi } from '@/api/coupleSessions'
-import { apiErrorMessage } from '@/api/errors'
+import { apiErrorMessage, istEndgueltigWeg } from '@/api/errors'
+import Verbindungshinweis from '@/components/Verbindungshinweis'
 import type { CoupleSessionDetail } from '@/api/coupleSessions'
 import ContextComposer from '@/components/couple/ContextComposer'
+import WasEchoWeiss from '@/components/couple/WasEchoWeiss'
 import PreparationWizard from '@/components/couple/PreparationWizard'
 import PrivateEchoPanel from '@/components/couple/PrivateEchoPanel'
 import ProposalBar from '@/components/couple/ProposalBar'
 import EchoThinking from '@/components/couple/EchoThinking'
 import { SessionSkeleton } from '@/components/Skeleton'
-import { MOOD_EMOJI } from '@/components/couple/moods'
 import AgreementsCard from '@/components/couple/AgreementsCard'
 import Verlaufseintrag from '@/components/couple/Verlaufseintrag'
 import Weiterfuehren from '@/components/couple/Weiterfuehren'
@@ -41,13 +42,22 @@ export default function CoupleSessionPage() {
   const [prepMode, setPrepMode] = useState<'wizard' | 'manual'>('wizard')
   const endRef = useRef<HTMLDivElement>(null)
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['couple-session', sessionId],
     queryFn: () => coupleSessionsApi.get(sessionId),
     enabled: !!sessionId,
     retry: false,
     // Die andere Person schreibt in denselben Verlauf – regelmäßig nachladen.
     refetchInterval: 8000,
+  })
+
+  // Derselbe Schluessel, den Vorbereitung und Composer benutzen — react-query holt ihn
+  // nur einmal. Gebraucht wird daraus hier die Liste der Stimmungs-Beschriftungen: Sie
+  // kommt vom Server, damit Vorbereitung, Check-in und Echo dieselbe Sprache sprechen.
+  const { data: eigenerBeitrag } = useQuery({
+    queryKey: ['couple-context', sessionId],
+    queryFn: () => coupleSessionsApi.getContext(sessionId),
+    enabled: !!sessionId,
   })
 
   const apply = (d: CoupleSessionDetail) => qc.setQueryData(['couple-session', sessionId], d)
@@ -113,12 +123,15 @@ export default function CoupleSessionPage() {
       </AppShell>
     )
   }
-  if (isError || !data) {
+  // Wie beim Thema: Der Verlauf und das halb geschriebene Feld gehen sonst mit.
+  if (!data) {
     return (
       <AppShell>
         <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
-            <h1 className="page-title">Gespräch lässt sich nicht öffnen</h1>
+            <h1 className="page-title">
+              {istEndgueltigWeg(error) ? 'Gespräch nicht gefunden' : 'Gespräch gerade nicht erreichbar'}
+            </h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
             <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
@@ -141,6 +154,8 @@ export default function CoupleSessionPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-[1100px] px-6 py-8">
+        <Verbindungshinweis error={error} />
+
         <div className="mb-5">
           <Link to={`/app/paar/${session.couple_id}`} className="text-xs text-brand-muted hover:text-navy">← Paarraum</Link>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -368,33 +383,13 @@ export default function CoupleSessionPage() {
               ? <PreparationWizard sessionId={sessionId} />
               : <ContextComposer sessionId={sessionId} disabled={closed} />}
 
-            <div className="card">
-              <h2 className="card-title">Was Echo weiß</h2>
-              {contexts.length === 0 ? (
-                <p className="mt-2 text-sm text-brand-muted">
-                  Noch nichts. Echo kennt nur, was ihr hier ausdrücklich freigebt.
-                </p>
-              ) : (
-                <div className="mt-3 space-y-3">
-                  {contexts.map(c => (
-                    <div key={c.user_id} className="rounded-brand border border-brand-border px-3.5 py-3">
-                      <p className="text-xs font-semibold text-navy">Von {c.name}</p>
-                      {c.mood && (
-                        <p className="mt-0.5 text-[0.7rem] text-brand-muted">
-                          Kommt {MOOD_EMOJI[c.mood] ?? ''} {c.mood} herein
-                        </p>
-                      )}
-                      <p className="mt-1 whitespace-pre-wrap text-sm text-brand-muted">{c.text}</p>
-                      {c.appreciation && (
-                        <p className="mt-2 rounded-brand bg-accent/[0.06] px-2.5 py-1.5 text-xs text-brand-text">
-                          <span className="font-medium text-navy">Schätzt an dir:</span> {c.appreciation}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <WasEchoWeiss
+              sessionId={sessionId}
+              contexts={contexts}
+              ownUserId={user?.id}
+              moods={eigenerBeitrag?.moods ?? {}}
+              echoHatGeantwortet={messages.length > 0}
+            />
             </>}
           </div>
         </div>

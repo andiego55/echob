@@ -12,7 +12,8 @@ import AppShell from '@/components/app/AppShell'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { useAuth } from '@/contexts/AuthContext'
 import { coupleMediationApi } from '@/api/coupleMediation'
-import { apiErrorMessage } from '@/api/errors'
+import { apiErrorMessage, istEndgueltigWeg } from '@/api/errors'
+import Verbindungshinweis from '@/components/Verbindungshinweis'
 import EchoThinking from '@/components/couple/EchoThinking'
 import MediationFollowUp from '@/components/couple/MediationFollowUp'
 import BridgeBoard from '@/components/couple/BridgeBoard'
@@ -33,7 +34,7 @@ export default function CoupleMediationPage() {
   const [priv, setPriv] = useState('')
   const [touched, setTouched] = useState(false)
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['couple-topic', topicId],
     queryFn: () => coupleMediationApi.get(topicId),
     enabled: !!topicId,
@@ -63,9 +64,20 @@ export default function CoupleMediationPage() {
 
   const apply = (d: CoupleTopicDetail) => qc.setQueryData(['couple-topic', topicId], d)
 
+  /**
+   * **Leer ist eine Aussage, kein fehlendes Feld.**
+   *
+   * Der Server behandelt `null` als „schicke ich nicht mit" und behaelt dann den alten
+   * Text (COALESCE). Wer seine Sicht loeschte, schickte bis hierher genau das: `null`.
+   * Gespeichert wurde nichts, der alte Text kam mit der Antwort zurueck, und weil danach
+   * `touched` auf false springt, schrieb der Effekt ihn wieder ins Feld. Von aussen sah
+   * das aus, als tue der Knopf nichts.
+   *
+   * Deshalb geht der leere String hinueber und nicht `null`: Er heisst „jetzt leer".
+   */
   const save = useMutation({
     mutationFn: () => coupleMediationApi.savePerspective(topicId, {
-      open_text: open.trim() || null, private_text: priv.trim() || null,
+      open_text: open.trim(), private_text: priv.trim(),
     }),
     onSuccess: d => { apply(d); setTouched(false); entwurf.loeschen() },
   })
@@ -92,12 +104,16 @@ export default function CoupleMediationPage() {
   if (isLoading) {
     return <AppShell><div className="mx-auto max-w-[1100px] px-6 py-8 text-sm text-brand-muted">Lade …</div></AppShell>
   }
-  if (isError || !data) {
+  // Ein gescheitertes Nachfragen darf das Thema nicht loeschen: Wer hier schreibt, hat
+  // das Schwerste im Modul im Eingabefeld stehen.
+  if (!data) {
     return (
       <AppShell>
         <div className="mx-auto max-w-[1100px] px-6 py-8">
           <div className="card">
-            <h1 className="page-title">Thema lässt sich nicht öffnen</h1>
+            <h1 className="page-title">
+              {istEndgueltigWeg(error) ? 'Thema nicht gefunden' : 'Thema gerade nicht erreichbar'}
+            </h1>
             <p className="mt-1.5 text-sm text-brand-muted">{apiErrorMessage(error)}</p>
             <Link to="/app/paar" className="btn-quiet !py-2 !px-4 !text-sm mt-4 inline-block">Zur Übersicht</Link>
           </div>
@@ -107,6 +123,11 @@ export default function CoupleMediationPage() {
   }
 
   const { topic, mediations, both_sides_ready } = data
+  // Speichern darf man, sobald es etwas zu speichern GIBT - und das Leeren gehoert dazu.
+  // Die alte Bedingung (beide Felder leer = Knopf aus) sperrte genau den Fall, in dem
+  // jemand loeschen wollte.
+  const gespeichert = { open: (own?.open_text ?? '').trim(), priv: (own?.private_text ?? '').trim() }
+  const geaendert = open.trim() !== gespeichert.open || priv.trim() !== gespeichert.priv
   // Eigenes Thema, keine fremde Sicht (`other`), keine Vermittlung - dieselbe Grenze wie
   // im Dienst, damit der Knopf nur da steht, wo er auch funktioniert.
   const loeschbar = user?.id === topic.created_by && !other && mediations.length === 0
@@ -114,6 +135,8 @@ export default function CoupleMediationPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-[1100px] px-6 py-8">
+        <Verbindungshinweis error={error} />
+
         <div className="mb-5">
           <Link to={`/app/paar/${topic.couple_id}`} className="text-xs text-brand-muted hover:text-navy">← Paarraum</Link>
           <span className="label mt-2 block">Mediation</span>
@@ -179,10 +202,10 @@ export default function CoupleMediationPage() {
 
             <button
               onClick={() => save.mutate()}
-              disabled={save.isPending || (!open.trim() && !priv.trim())}
+              disabled={save.isPending || !geaendert}
               className="btn-primary !py-2 !px-5 !text-sm mt-4 disabled:opacity-50"
             >
-              {save.isPending ? 'Speichere …' : 'Speichern'}
+              {save.isPending ? 'Speichere …' : geaendert ? 'Speichern' : 'Gespeichert'}
             </button>
             <Fehlermeldung error={save.error} className="mt-3" />
           </div>

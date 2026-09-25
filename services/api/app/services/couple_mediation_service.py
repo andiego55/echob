@@ -106,7 +106,24 @@ async def set_topic_status(conn, topic_id, user_id, status: str) -> dict:
 # ── Perspektiven ─────────────────────────────────────────────────────────────
 
 async def save_perspective(conn, topic_id, user_id, *, open_text=None, private_text=None) -> dict:
-    """Speichert den EIGENEN Beitrag. Niemand kann für eine andere Person schreiben."""
+    """Speichert den EIGENEN Beitrag. Niemand kann für eine andere Person schreiben.
+
+    **Drei Zustaende, nicht zwei — und der Unterschied hat einen Fehler gekostet.**
+
+        ``None``  dieses Feld schicke ich nicht mit  -> der alte Text bleibt stehen
+        ``""``    dieses Feld ist jetzt leer         -> der alte Text ist weg
+        Text      so steht es jetzt da
+
+    Das ``COALESCE`` unten ist genau die erste Zeile. Der Client schickte aber fuer ein
+    geleertes Feld ``None`` — also „nicht mitgeschickt" —, und damit liess sich ein Beitrag
+    ueberhaupt nicht zuruecknehmen: Gespeichert wurde nichts, der alte Text kam in der
+    Antwort zurueck und stand gleich wieder im Eingabefeld. Kein Fehler, keine Meldung, nur
+    ein Knopf, der scheinbar nichts tut.
+
+    Der leere String faellt hier durch: ``crypto.encrypt("")`` gibt ``""`` zurueck, und
+    ``COALESCE("", alt)`` ist ``""``. Genau so soll es sein, aber es ist zu leise, um es
+    nicht hinzuschreiben.
+    """
     await require_topic(conn, topic_id, user_id)
     for value in (open_text, private_text):
         if value is not None and len(value) > MAX_TEXT_CHARS:

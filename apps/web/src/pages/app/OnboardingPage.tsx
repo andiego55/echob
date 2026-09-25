@@ -161,12 +161,26 @@ export default function OnboardingPage() {
     }
   }
 
+  /**
+   * Was hier gespeichert wird, steht auch woanders — und das wusste bisher niemand.
+   *
+   * Pseudonym und Avatar der Fallperson leben in den Onboarding-Antworten, angezeigt werden
+   * sie aber in der Fall-Navigation, auf der Fall-Seite und in der Fall-Liste. Die holen
+   * ihre Daten unter ``['case', id]`` und ``['cases']``, und beide blieben unberuehrt:
+   * Wer den Avatar aenderte, sah ueberall weiter den alten — bis er die Seite neu laedt.
+   */
+  const fallErneuern = () => {
+    qc.invalidateQueries({ queryKey: ['case', caseId] })
+    qc.invalidateQueries({ queryKey: ['cases'] })
+  }
+
   const handleFinish = async () => {
     setSaving(true)
     setSaveError(false)
     try {
       const saved = await onboardingApi.save(caseId!, answers)
       qc.setQueryData(['onboarding', caseId], saved)
+      fallErneuern()
       navigate(`/app/cases/${caseId}/scenes`)
     } catch {
       setSaveError(true)
@@ -181,6 +195,7 @@ export default function OnboardingPage() {
     try {
       const saved = await onboardingApi.save(caseId!, answers)
       qc.setQueryData(['onboarding', caseId], saved)
+      fallErneuern()
       setSavedOk(true)
       setTimeout(() => setSavedOk(false), 2000)
     } catch {

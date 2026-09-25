@@ -44,6 +44,23 @@ const GENERIC_DETAILS = new Set([
   'Unauthorized', 'Forbidden', 'Unprocessable Entity', 'Bad Request',
 ])
 
+/**
+ * Ist das ein „gibt es nicht" — oder nur ein „gerade nicht"?
+ *
+ * **Warum die Unterscheidung ein eigener Baustein ist.** Eine ganze Reihe Seiten prueft
+ * `isError || !data` und zeigt dann einen Leerzustand: „Paarraum nicht gefunden",
+ * „Thema laesst sich nicht oeffnen". Das ist bei 404 richtig und bei allem anderen eine
+ * Behauptung. Ein abgelaufener Token, ein Neustart des Servers, ein Funkloch im Zug — alle
+ * drei erzeugten bisher den Satz, der Raum sei beendet. Wer das liest, glaubt es.
+ *
+ * Nur 404 und 410 heissen wirklich „weg". Alles andere heisst „nicht jetzt", und dann
+ * gehoert ein Hinweis auf die Seite und nicht an ihre Stelle.
+ */
+export function istEndgueltigWeg(err: unknown): boolean {
+  const status = (err as AxiosError | undefined)?.response?.status
+  return status === 404 || status === 410
+}
+
 export function apiErrorMessage(err: unknown, fallback = 'Das hat leider nicht geklappt.'): string {
   const ax = err as AxiosError<{ detail?: string }> | undefined
 

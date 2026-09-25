@@ -7,7 +7,7 @@
  */
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { coupleSessionsApi } from '@/api/coupleSessions'
+import { coupleSessionsApi, type CoupleRephrase } from '@/api/coupleSessions'
 import { MOOD_EMOJI } from './moods'
 import Fehlermeldung from '@/components/Fehlermeldung'
 
@@ -22,7 +22,7 @@ export default function PreparationWizard({
   const [appreciation, setAppreciation] = useState('')
   const [concern, setConcern] = useState('')
   const [request, setRequest] = useState('')
-  const [coached, setCoached] = useState<string | null>(null)
+  const [coached, setCoached] = useState<CoupleRephrase | null>(null)
 
   const { data: ctx } = useQuery({
     queryKey: ['couple-context', sessionId],
@@ -39,7 +39,7 @@ export default function PreparationWizard({
     mutationFn: () => coupleSessionsApi.saveContext(sessionId, {
       confirmed_text: buildText(),
       mood: mood || null,
-      appreciation: appreciation.trim() || null,
+      appreciation: appreciation.trim(),
     }),
     onSuccess: d => {
       qc.setQueryData(['couple-context', sessionId], d)
@@ -48,9 +48,21 @@ export default function PreparationWizard({
     },
   })
 
+  /**
+   * Was ins Gespräch geht — **immer die Worte im Feld.**
+   *
+   * Vorher stand hier der Vorschlag, sobald es einen gab: Die eigenen Worte waren damit
+   * unerreichbar, obwohl daneben stand, man könne bei ihnen bleiben. Wer den Vorschlag
+   * will, übernimmt ihn jetzt mit einem Klick ins Feld und kann ihn dort noch ändern —
+   * „Echo füllt vor, der Mensch korrigiert".
+   *
+   * Der schlimmere Fall war ein anderer: Beschreibt der Satz Gewalt oder Drohungen, formt
+   * das Modell ihn ausdrücklich NICHT um, sondern nennt Hilfenummern. Die wären so als
+   * eigenes Anliegen im gemeinsamen Gespräch gelandet.
+   */
   function buildText(): string {
     const parts: string[] = []
-    if (concern.trim()) parts.push(coached?.split('\nGeändert:')[0].trim() || concern.trim())
+    if (concern.trim()) parts.push(concern.trim())
     if (request.trim()) parts.push(`Meine Bitte: ${request.trim()}`)
     return parts.join('\n\n')
   }
@@ -142,11 +154,45 @@ export default function PreparationWizard({
 
             {coached && (
               <div className="mt-3 rounded-brand border border-accent/40 bg-accent/[0.05] px-3.5 py-3">
-                <p className="text-[0.65rem] font-bold uppercase tracking-wide text-accent">Vorschlag</p>
-                <p className="mt-1 whitespace-pre-wrap text-sm text-brand-text">{coached}</p>
-                <p className="mt-2 text-[0.68rem] text-brand-muted">
-                  Nur für dich. Du kannst ihn übernehmen oder bei deinen Worten bleiben.
+                <p className="text-[0.65rem] font-bold uppercase tracking-wide text-accent">
+                  {coached.text ? 'Vorschlag' : 'Echos Antwort'}
                 </p>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-brand-text">
+                  {coached.text || coached.suggestion}
+                </p>
+                {coached.geaendert && (
+                  <p className="mt-2 text-[0.7rem] italic leading-snug text-brand-muted">
+                    Geändert: {coached.geaendert}
+                  </p>
+                )}
+
+                {/* Der Knopf ist der ganze Punkt. Uebernommen landet der Satz IM Feld —
+                    dort steht er in eigener Hand und laesst sich weiter aendern. */}
+                {coached.text ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={() => { setConcern(coached.text); setCoached(null) }}
+                      className="btn-primary !py-1.5 !px-3.5 !text-xs"
+                    >
+                      Vorschlag übernehmen
+                    </button>
+                    <button
+                      onClick={() => setCoached(null)}
+                      className="text-xs text-brand-muted hover:text-navy"
+                    >
+                      Bei meinen Worten bleiben
+                    </button>
+                  </div>
+                ) : (
+                  // Keine Umformung, sondern eine Sicherheitsantwort: Der Prompt nennt bei
+                  // Gewalt und Drohungen Hilfenummern statt einer besseren Formulierung.
+                  // Hier gibt es nichts zu uebernehmen, und einen Knopf dafuer darf es
+                  // nicht geben.
+                  <p className="mt-2 text-[0.68rem] leading-snug text-brand-muted">
+                    Dafür braucht es keine bessere Formulierung. Was du geschrieben hast,
+                    bleibt unverändert stehen.
+                  </p>
+                )}
               </div>
             )}
           </div>

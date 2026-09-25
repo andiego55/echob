@@ -301,6 +301,42 @@ async def save_context(
     return _decrypt_context(dict(row))
 
 
+async def withdraw_context(conn, session_id, user_id) -> dict | None:
+    """Den eigenen freigegebenen Beitrag zurückziehen — zurück in den Entwurf.
+
+    **Was fehlte.** Unter „Was Echo weiß" stand, was beide mitgeteilt haben, und es gab
+    keinen Weg zurück. Wer sich verschrieben hatte, zu viel gesagt hatte oder es sich
+    anders überlegte, konnte den eigenen Beitrag nicht mehr anfassen — ``save_context``
+    arbeitet mit ``COALESCE``, und ``None`` heißt dort „nicht mitgeschickt".
+
+    **Nicht in den Papierkorb, sondern in den Entwurf** — genauso wie ``withdraw`` es mit
+    einem Vorschlag macht. Zurückziehen heißt „das soll gerade nicht gelten", nicht „das
+    war nichts": Der Text bleibt in eigener Hand und lässt sich erneut freigeben. Der
+    Entwurf wird nur befüllt, wenn dort nichts steht — ein angefangener neuer Text ist die
+    frischere Absicht und darf nicht überschrieben werden.
+
+    Stimmung und Wertschätzung bleiben in der Zeile stehen, verschwinden aber mit ihr aus
+    dem Raum: ``load_confirmed_contexts`` nimmt nur Zeilen mit ``confirmed_text``.
+
+    **Was es nicht kann:** Gesagtes ungesagt machen. Hat Echo schon geantwortet, steht das
+    im Verlauf — das sagt die Oberfläche auch so.
+    """
+    await require_session(conn, session_id, user_id)
+    row = await conn.fetchrow(
+        """
+        UPDATE couple_session_contexts SET
+          draft_text     = COALESCE(draft_text, confirmed_text),
+          confirmed_text = NULL,
+          confirmed_at   = NULL,
+          updated_at     = NOW()
+        WHERE session_id = $1 AND user_id = $2
+        RETURNING *
+        """,
+        session_id, user_id,
+    )
+    return _decrypt_context(dict(row)) if row else None
+
+
 async def load_confirmed_contexts(conn, session_id) -> list[dict]:
     """Alle BESTÄTIGTEN Beiträge — die einzige Kontextquelle der Moderation."""
     rows = await conn.fetch(

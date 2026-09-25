@@ -43,7 +43,7 @@ import Einstiege from './Einstiege'
 import HonestTeaser from './HonestTeaser'
 
 export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['couple-dashboard', coupleId],
     queryFn: () => coupleApi.dashboard(coupleId),
     enabled: !!coupleId,
@@ -52,7 +52,7 @@ export default function CoupleDashboard({ coupleId }: { coupleId: string }) {
   })
 
   if (isLoading) return <DashboardSkeleton />
-  if (isError || !data) {
+  if (!data) {
     return (
       <div className="card border-l-4 border-l-red-400">
         <p className="text-sm text-brand-muted">{apiErrorMessage(error)}</p>

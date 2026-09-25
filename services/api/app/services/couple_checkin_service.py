@@ -83,8 +83,12 @@ async def save(conn, couple_id, user_id, *, moods=None, highlight=None, wish=Non
         "  wish = COALESCE(EXCLUDED.wish, couple_checkins.wish) "
         "RETURNING *",
         couple_id, user_id, woche, liste, (liste[0] if liste else None),
-        crypto.encrypt((highlight or "").strip()[:MAX_CHARS]) if highlight else None,
-        crypto.encrypt((wish or "").strip()[:MAX_CHARS]) if wish else None,
+        # `is not None` statt einer Wahrheitspruefung: Ein leerer Text ist eine Angabe
+        # (weg damit) und faellt durch das COALESCE oben durch. Mit `if highlight` wurde
+        # daraus wieder None, und ein einmal geschriebener Hoehepunkt blieb fuer immer
+        # stehen - derselbe Fehler wie in der Mediation.
+        crypto.encrypt((highlight or "").strip()[:MAX_CHARS]) if highlight is not None else None,
+        crypto.encrypt((wish or "").strip()[:MAX_CHARS]) if wish is not None else None,
     )
     return _decrypt(row)
 

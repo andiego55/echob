@@ -50,7 +50,9 @@ export default function ContextComposer({ sessionId, disabled = false }: Props) 
 
   const confirm = useMutation({
     mutationFn: () => coupleSessionsApi.saveContext(sessionId, {
-      confirmed_text: text.trim(), instruction: instruction.trim() || null,
+      // Leer heisst leer, nicht „nicht mitgeschickt“: Mit `null` liesse sich ein
+      // einmal gegebener Hinweis an Echo nie wieder zuruecknehmen.
+      confirmed_text: text.trim(), instruction: instruction.trim(),
     }),
     onSuccess: d => {
       qc.setQueryData(['couple-context', sessionId], d)

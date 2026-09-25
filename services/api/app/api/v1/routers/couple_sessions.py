@@ -15,6 +15,7 @@ Fall-Inhalte. Der KI-Entwurf liest nur den EIGENEN Fall und ist bis zum Bestäti
 """
 from __future__ import annotations
 
+import re
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -68,6 +69,28 @@ async def _members(conn, link) -> list[dict]:
         {"user_id": uid, "name": p["name"], "avatar": p["avatar"]}
         for uid, p in profile.items()
     ]
+
+
+def _mein_beitrag(ctx: dict | None) -> CoupleContextResponse:
+    """Mein eigener Beitrag — mit Entwurf, den nur ich sehe.
+
+    Vier Endpunkte geben genau das zurueck: lesen, Entwurf erzeugen, freigeben,
+    zurueckziehen. Stand es viermal da, brauchte ein neues Feld vier Aenderungen, und die
+    vergessene lieferte still `null`.
+    """
+    c = ctx or {}
+    return CoupleContextResponse(
+        draft_text=c.get("draft_text"),
+        confirmed_text=c.get("confirmed_text"),
+        instruction=c.get("instruction"),
+        source_elements=list(c.get("source_elements") or []),
+        confirmed_at=c.get("confirmed_at"),
+        available_elements=ccs.ELEMENT_LABELS,
+        max_chars=css.MAX_CONTEXT_CHARS,
+        mood=c.get("mood"),
+        appreciation=c.get("appreciation"),
+        moods=css.MOOD_LABELS,
+    )
 
 
 def _context_out(c: dict, names: dict[str, str]) -> dict:
@@ -168,18 +191,7 @@ async def get_context(
 ) -> CoupleContextResponse:
     async with pool.acquire() as conn:
         ctx = await css.get_own_context(conn, session_id, current["user_id"])
-    return CoupleContextResponse(
-        draft_text=(ctx or {}).get("draft_text"),
-        confirmed_text=(ctx or {}).get("confirmed_text"),
-        instruction=(ctx or {}).get("instruction"),
-        source_elements=list((ctx or {}).get("source_elements") or []),
-        confirmed_at=(ctx or {}).get("confirmed_at"),
-        available_elements=ccs.ELEMENT_LABELS,
-        max_chars=css.MAX_CONTEXT_CHARS,
-        mood=(ctx or {}).get("mood"),
-        appreciation=(ctx or {}).get("appreciation"),
-        moods=css.MOOD_LABELS,
-    )
+    return _mein_beitrag(ctx)
 
 
 @router.post("/sessions/{session_id}/context/draft", response_model=CoupleContextResponse)
@@ -214,14 +226,7 @@ async def draft_context(
             conn, session_id, user_id,
             draft_text=draft, source_elements=body.elements,
         )
-    return CoupleContextResponse(
-        draft_text=ctx.get("draft_text"), confirmed_text=ctx.get("confirmed_text"),
-        instruction=ctx.get("instruction"),
-        source_elements=list(ctx.get("source_elements") or []),
-        confirmed_at=ctx.get("confirmed_at"),
-        available_elements=ccs.ELEMENT_LABELS, max_chars=css.MAX_CONTEXT_CHARS,
-        mood=ctx.get("mood"), appreciation=ctx.get("appreciation"), moods=css.MOOD_LABELS,
-    )
+    return _mein_beitrag(ctx)
 
 
 @router.put("/sessions/{session_id}/context", response_model=CoupleContextResponse)
@@ -240,14 +245,20 @@ async def save_context(
             session, _ = await css.require_session(conn, session_id, user_id)
             await progress.award(conn, session["couple_id"], user_id,
                                  "context_shared", session_id)
-    return CoupleContextResponse(
-        draft_text=ctx.get("draft_text"), confirmed_text=ctx.get("confirmed_text"),
-        instruction=ctx.get("instruction"),
-        source_elements=list(ctx.get("source_elements") or []),
-        confirmed_at=ctx.get("confirmed_at"),
-        available_elements=ccs.ELEMENT_LABELS, max_chars=css.MAX_CONTEXT_CHARS,
-        mood=ctx.get("mood"), appreciation=ctx.get("appreciation"), moods=css.MOOD_LABELS,
-    )
+    return _mein_beitrag(ctx)
+
+
+@router.delete("/sessions/{session_id}/context", response_model=CoupleContextResponse)
+async def withdraw_context(
+    session_id: UUID,
+    current=Depends(get_current_user), pool=Depends(get_pool),
+) -> CoupleContextResponse:
+    """Den eigenen freigegebenen Beitrag zurückziehen. Nur den eigenen — nie den fremden."""
+    async with pool.acquire() as conn:
+        ctx = await css.withdraw_context(conn, session_id, current["user_id"])
+    if ctx is None:
+        raise HTTPException(status_code=404, detail="Du hast hier noch nichts freigegeben.")
+    return _mein_beitrag(ctx)
 
 
 @router.post("/sessions/{session_id}/rephrase", response_model=CoupleRephraseResponse)
@@ -271,7 +282,36 @@ async def rephrase(
         prompt_file=_REPHRASE_PROMPT,
     )
 
-    return CoupleRephraseResponse(suggestion=suggestion)
+    return _rephrase_out(suggestion)
+
+
+#: Woran eine Umformung zu erkennen ist — der Prompt haengt diese Zeile an jede an.
+#:
+#: Als eigene ZEILE und ohne Ruecksicht auf Gross-/Kleinschreibung: Modelle sind bei der
+#: Form solcher Anhaengsel nicht zuverlaessig, und ein verpasster Treffer kostet hier den
+#: Knopf „Vorschlag uebernehmen" — also genau die Funktion.
+_GEAENDERT = re.compile(r"^\s*ge(?:ä|ae|a)ndert\s*:", re.IGNORECASE | re.MULTILINE)
+
+
+def _rephrase_out(antwort: str) -> CoupleRephraseResponse:
+    """Satz und Begruendung trennen — und Sicherheitsantworten erkennbar lassen.
+
+    Eine Umformung endet auf einer Zeile „Geaendert: ...". Fehlt sie, hat das Modell nicht
+    umgeformt: Bei Gewalt, Drohungen oder Angst um die eigene Sicherheit nennt der Prompt
+    ausdruecklich Hilfenummern statt einer besseren Formulierung. Dann bleibt ``text`` leer,
+    und die Oberflaeche bietet kein „uebernehmen" an — die Nummer der Telefonseelsorge als
+    eigenes Anliegen im gemeinsamen Gespraech waere der schlimmste denkbare Ausgang dieser
+    Funktion.
+    """
+    treffer = list(_GEAENDERT.finditer(antwort))
+    if not treffer:
+        return CoupleRephraseResponse(suggestion=antwort)
+    letzter = treffer[-1]
+    return CoupleRephraseResponse(
+        suggestion=antwort,
+        text=antwort[:letzter.start()].strip(),
+        geaendert=antwort[letzter.end():].strip() or None,
+    )
 
 
 # ── Vorschlag, Annahme, Verabredung ──────────────────────────────────────────

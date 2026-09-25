@@ -24,6 +24,7 @@ import ImpulseTeaser from '@/components/couple/ImpulseTeaser'
 import IsolationNotice from '@/components/couple/IsolationNotice'
 import CoupleSafetyNote from '@/components/couple/CoupleSafetyNote'
 import EndRoomPanel from '@/components/couple/EndRoomPanel'
+import AnkerFall from '@/components/couple/AnkerFall'
 import { coupleApi } from '@/api/couple'
 import { useQuery } from '@tanstack/react-query'
 
@@ -146,6 +147,28 @@ export function CoupleSettingsPage() {
     <CoupleShell subtitle="Was privat bleibt, was gilt – und wie ihr wieder auseinandergeht.">
       <div className="space-y-5">
         <IsolationNotice />
+
+        {/* Wohin die Szenen aus diesem Raum gehen. Gefragt wird danach beim Beitreten und
+            beim ersten „Szene erstellen" — nachsehen oder ändern konnte man es bisher
+            nirgends, obwohl bei der Wahl „änderbar bleibt das jederzeit" steht. */}
+        <div className="card">
+          <h2 className="card-title">Wohin die Szenen gehen</h2>
+          <p className="mt-1.5 text-xs leading-relaxed text-brand-muted">
+            Was du hier aus einem Gespräch als Szene festhältst, wird in einem deiner
+            eigenen Fälle gespeichert. Die Zuordnung gibt deiner Partnerperson keinen
+            Zugriff darauf, und sie erfährt auch nicht, welcher Fall es ist.
+          </p>
+          <div className="mt-3">
+            {room && (
+              <AnkerFall
+                coupleId={coupleId}
+                caseId={room.case_id}
+                titel="Zugeordneter Fall"
+              />
+            )}
+          </div>
+        </div>
+
         <ReminderCard coupleId={coupleId} />
         {room && <EndRoomPanel coupleId={coupleId} since={room.accepted_at ?? room.created_at} />}
         <CoupleSafetyNote />

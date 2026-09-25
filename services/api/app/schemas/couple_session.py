@@ -43,8 +43,25 @@ class CoupleRephraseRequest(BaseModel):
 
 
 class CoupleRephraseResponse(BaseModel):
-    """Nur für die anfragende Person — wird nicht gespeichert."""
+    """Nur für die anfragende Person — wird nicht gespeichert.
+
+    **Drei Felder statt einem, und das hat einen Grund.** Die Oberflaeche muss den
+    Vorschlag uebernehmbar machen — und dafuer wissen, WAS der Satz ist und was die
+    Erklaerung dazu. Zerlegte das der Client selbst, staende die Kenntnis der Prompt-Form
+    ("Geaendert: ") im Frontend, und niemand wuesste, dass sie beim Aendern des Prompts
+    mitgeht.
+
+    **Und der wichtigere Fall:** Beschreibt der Satz Gewalt oder Drohungen, formt der
+    Prompt ihn ausdruecklich NICHT um, sondern nennt Hilfenummern. Das ist kein Vorschlag
+    und darf auf keinen Knopf „uebernehmen" treffen — sonst stuende die Telefonnummer der
+    Telefonseelsorge als eigenes Anliegen im gemeinsamen Gespraech. Daran erkennt man es:
+    Eine Umformung traegt immer die Zeile „Geaendert: ", eine Sicherheitsantwort nie.
+    """
     suggestion: str
+    #: Der Satz allein — was ins Feld uebernommen wird. Leer, wenn es keine Umformung gab.
+    text: str = ""
+    #: Die eine Zeile „was ich veraendert habe", ohne ihr Praefix.
+    geaendert: str | None = None
 
 
 class CoupleSessionResponse(BaseModel):

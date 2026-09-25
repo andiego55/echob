@@ -55,7 +55,9 @@ export default function WeeklyCheckinCard({
 
   const save = useMutation({
     mutationFn: () => coupleRhythmApi.saveCheckin(coupleId, {
-      moods, highlight: highlight.trim() || null, wish: wish.trim() || null,
+      // Wie ueberall hier: der leere String heisst „geloescht“, `null` hiesse
+      // „unveraendert lassen“ (COALESCE im Upsert).
+      moods, highlight: highlight.trim(), wish: wish.trim(),
     }),
     onSuccess: (d: CoupleCheckinWeek) => {
       qc.setQueryData(['couple-checkin', coupleId], d)
@@ -70,7 +72,20 @@ export default function WeeklyCheckinCard({
   const fragen = data.questions
   const eigen = data.entries.find(e => e.is_own)
   const fremd = data.entries.find(e => !e.is_own)
-  const kannSpeichern = moods.length > 0 || !!highlight.trim() || !!wish.trim()
+  // Gespeichert werden darf, sobald sich etwas GEAENDERT hat — und das Leeren gehoert
+  // dazu. Mit der alten Bedingung (irgendetwas muss ausgefuellt sein) war der Knopf genau
+  // dann tot, wenn jemand seine Angaben der Woche wieder wegnehmen wollte; derselbe Fehler
+  // wie in der Mediation, nur eine Ebene hoeher.
+  const gespeichert = {
+    moods: (eigen?.moods ?? []).join('|'),
+    highlight: (eigen?.highlight ?? '').trim(),
+    wish: (eigen?.wish ?? '').trim(),
+  }
+  const etwasDa = moods.length > 0 || !!highlight.trim() || !!wish.trim()
+  const kannSpeichern = etwasDa
+    || moods.join('|') !== gespeichert.moods
+    || highlight.trim() !== gespeichert.highlight
+    || wish.trim() !== gespeichert.wish
   const formularZeigen = !data.own_done || offen
 
   return (

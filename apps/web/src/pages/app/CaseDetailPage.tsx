@@ -28,6 +28,7 @@ import {
   CONTACT_FREQUENCY_LABELS,
 } from '@/types'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import FallAvatar from '@/components/app/FallAvatar'
 import { ListSkeleton, PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
 
@@ -83,7 +84,7 @@ export default function CaseDetailPage() {
         <div className="card card-hero card-static mb-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-3.5 min-w-0">
-              <Avatar value={c.avatar} size="lg" />
+              <FallAvatar caseId={caseId!} avatar={c.avatar} />
               <div>
                 <span className="label mb-2">{RELATIONSHIP_TYPE_LABELS[c.relationship_type]}</span>
                 {/* Der Name steht jetzt auch im Band ueber den Reitern. Zweimal in
