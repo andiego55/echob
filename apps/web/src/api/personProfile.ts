@@ -12,7 +12,7 @@ export const personProfileApi = {
     apiClient.put<PersonProfile>(`/cases/${caseId}/person-profile/summary-text`, { summary_text }).then(r => r.data),
 
   generateSummary: (caseId: string) =>
-    apiClient.post<{ summary_text: string }>(`/cases/${caseId}/person-profile/generate-summary`).then(r => r.data),
+    apiClient.post<{ summary_text: string }>(`/cases/${caseId}/person-profile/generate-summary`, undefined, { timeout: 120_000 }).then(r => r.data),
 
   echoChat: (caseId: string, data: { message: string; session_id: string }) =>
     apiClient.post(`/cases/${caseId}/person-profile/echo/chat`, data).then(r => r.data),

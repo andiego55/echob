@@ -235,13 +235,14 @@ export const professionalApi = {
     /** Tiefe nur für diese eine Antwort (1..5) — überschreibt das Profil, ohne es zu ändern. */
     depth?: number
   }) =>
-    apiClient.post<EchoChatResult>(`/professional/cases/${caseId}/echo/chat`, data).then(r => r.data),
+    apiClient.post<EchoChatResult>(`/professional/cases/${caseId}/echo/chat`, data, { timeout: 120_000 }).then(r => r.data),
   echoSummaryGenerate: (caseId: string, sessionId: string) =>
     apiClient.post<{ summary: string }>(
-      `/professional/cases/${caseId}/echo/summary`, null, { params: { session_id: sessionId } },
+      `/professional/cases/${caseId}/echo/summary`, null,
+      { params: { session_id: sessionId }, timeout: 120_000 },
     ).then(r => r.data),
   echoSummarySave: (caseId: string, data: { session_id?: string; title?: string; summary_text: string }) =>
-    apiClient.post<ProfessionalEchoSummary>(`/professional/cases/${caseId}/echo/summaries`, data).then(r => r.data),
+    apiClient.post<ProfessionalEchoSummary>(`/professional/cases/${caseId}/echo/summaries`, data, { timeout: 120_000 }).then(r => r.data),
   echoSessionRename: (caseId: string, sessionId: string, title: string) =>
     apiClient
       .patch<ProfessionalEchoSession>(`/professional/cases/${caseId}/echo/sessions/${sessionId}`, { title })

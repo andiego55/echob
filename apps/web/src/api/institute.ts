@@ -71,7 +71,7 @@ export const instituteApi = {
   // Beispielfälle (KI-Generierung) — asynchron: start liefert eine generation_id,
   // Status wird gepollt (die Generierung läuft im Hintergrund weiter).
   generateExample: (input: GenerationInput) =>
-    apiClient.post<GenerationStart>('/institute/examples/generate', input).then(r => r.data),
+    apiClient.post<GenerationStart>('/institute/examples/generate', input, { timeout: 120_000 }).then(r => r.data),
   getGeneration: (id: string) =>
     apiClient.get<GenerationStatus>(`/institute/examples/generations/${id}`).then(r => r.data),
   listExamples: () =>

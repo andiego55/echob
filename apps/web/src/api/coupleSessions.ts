@@ -96,7 +96,7 @@ export const coupleSessionsApi = {
     apiClient.get<CoupleContext>(`/couple/sessions/${sessionId}/context`).then(r => r.data),
 
   draftContext: (sessionId: string, body: { case_id: string; elements: string[]; focus?: string | null }) =>
-    apiClient.post<CoupleContext>(`/couple/sessions/${sessionId}/context/draft`, body).then(r => r.data),
+    apiClient.post<CoupleContext>(`/couple/sessions/${sessionId}/context/draft`, body, { timeout: 60_000 }).then(r => r.data),
 
   saveContext: (
     sessionId: string,
@@ -116,7 +116,7 @@ export const coupleSessionsApi = {
 
   /** Ich-Botschaften-Coach – nur für dich, wird nicht gespeichert. */
   rephrase: (sessionId: string, text: string) =>
-    apiClient.post<CoupleRephrase>(`/couple/sessions/${sessionId}/rephrase`, { text })
+    apiClient.post<CoupleRephrase>(`/couple/sessions/${sessionId}/rephrase`, { text }, { timeout: 60_000 })
       .then(r => r.data),
 
   propose: (sessionId: string) =>

@@ -129,10 +129,16 @@ export const idealApi = {
    * jeder andere — ohne dass dafür eine einzige dieser Fähigkeiten ein zweites Mal
    * gebaut werden musste.
    *
+   * **Die Frist muss dabeistehen.** Der Client wartet sonst 15 Sekunden — das ist die
+   * Vorgabe für gewöhnliche Anfragen und für einen Modellaufruf viel zu kurz. Ohne sie
+   * bricht der Browser ab, während der Server weiterschreibt: Der Bericht entsteht, das
+   * Kontingent wird verbraucht, und die nutzende Person sieht einen Netzwerkfehler. Das
+   * ist schlimmer als ein Fehlschlag, weil nichts davon aussieht wie das, was passiert ist.
+   *
    * Dauert bis zu einer Minute: Das Modell liest zwei Dinge und schreibt vier Abschnitte.
    */
   vergleich: (art: string, caseId: string) =>
     apiClient
-      .post<Report>(`${basis}/${art}/vergleich/${caseId}`)
+      .post<Report>(`${basis}/${art}/vergleich/${caseId}`, undefined, { timeout: 120_000 })
       .then(r => r.data),
 }

@@ -3,7 +3,7 @@ import type { EchoChatRequest, EchoChatResponse, EchoChatSession, EchoMessage } 
 
 export const echoApi = {
   chat: (caseId: string, data: EchoChatRequest) =>
-    apiClient.post<EchoChatResponse>(`/cases/${caseId}/echo/chat`, data).then(r => r.data),
+    apiClient.post<EchoChatResponse>(`/cases/${caseId}/echo/chat`, data, { timeout: 120_000 }).then(r => r.data),
 
   history: (caseId: string, threadType = 'topic', sessionId?: string, limit = 50, chatSessionId?: string) =>
     apiClient

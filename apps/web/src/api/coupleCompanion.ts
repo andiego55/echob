@@ -62,7 +62,7 @@ export const coupleCompanionApi = {
   /** Fasst zusammen, schließt das Gespräch ab und behält die Zusammenfassung. */
   summarize: (coupleId: string, kind: CoupleThreadKind = 'chat') =>
     apiClient.post<CoupleEchoSummary>(`/couple/links/${coupleId}/echo/summary`, null,
-      { params: { kind } }).then(r => r.data),
+      { params: { kind }, timeout: 120_000 }).then(r => r.data),
 
   threads: (coupleId: string, kind?: CoupleThreadKind) =>
     apiClient.get<CoupleEchoThread[]>(`/couple/links/${coupleId}/echo/threads`,

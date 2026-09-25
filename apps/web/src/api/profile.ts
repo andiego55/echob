@@ -24,7 +24,7 @@ export const profileApi = {
     apiClient.put<UserProfile>('/profile/module', { module_id, data } satisfies ProfileModuleUpdate).then(r => r.data),
 
   echoChat: (data: EchoChatRequest & { session_id: string }) =>
-    apiClient.post<EchoChatResponse>('/profile/echo/chat', data).then(r => r.data),
+    apiClient.post<EchoChatResponse>('/profile/echo/chat', data, { timeout: 120_000 }).then(r => r.data),
 
   echoHistory: (session_id: string) =>
     apiClient.get<EchoMessage[]>('/profile/echo/history', { params: { session_id } }).then(r => r.data),

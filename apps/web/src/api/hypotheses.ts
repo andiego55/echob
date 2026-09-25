@@ -90,7 +90,7 @@ export const hypothesesApi = {
 
   /** Erzeugt (ohne zu speichern) eine Arbeitshypothese aus dem Dialogverlauf. */
   generate: (caseId: string, hypothesis_type: string) =>
-    apiClient.post<{ summary: string }>(`/cases/${caseId}/hypotheses/generate`, { hypothesis_type }).then(r => r.data),
+    apiClient.post<{ summary: string }>(`/cases/${caseId}/hypotheses/generate`, { hypothesis_type }, { timeout: 120_000 }).then(r => r.data),
 
   remove: (caseId: string, hypothesis_type: string) =>
     apiClient.delete(`/cases/${caseId}/hypotheses/${hypothesis_type}`).then(r => r.data),

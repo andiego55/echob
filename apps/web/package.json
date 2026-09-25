@@ -9,7 +9,7 @@
     "build": "node scripts/build-content.mjs && tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview",
     "lint": "eslint . --report-unused-disable-directives",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b --force",
     "test": "vitest run",
     "test:watch": "vitest"
   },
