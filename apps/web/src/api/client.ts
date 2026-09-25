@@ -1,5 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { supabase } from '@/lib/supabase'
+import { darfNachfassen, einmalGleichzeitig } from './nachfassen'
 
 /**
  * Zentrale Axios-Instanz für alle /api/v1/* Aufrufe.
@@ -43,26 +44,21 @@ apiClient.interceptors.request.use(async (config) => {
 // einer Schleife — ist die Sitzung wirklich abgelaufen, muss der 401 durchkommen, sonst
 // dreht jede Anfrage doppelt und niemand landet je auf der Anmeldung.
 
-/** Läuft gerade ein Erneuerungsversuch? Dann warten alle auf denselben. */
-let erneuerung: Promise<string | null> | null = null
-
 /**
  * Den Token erneuern — höchstens einmal gleichzeitig.
  *
- * **Warum geteilt.** Eine Seite mit sechs Abfragen bekommt sechs 401 im selben Moment.
- * Sechs Erneuerungen wären nicht nur verschwendet: Ein Refresh-Token ist genau einmal
- * gültig, die späteren würden abgewiesen, und am Ende wäre die Sitzung kaputt — durch den
- * Rettungsversuch.
+ * Das „höchstens einmal" macht `einmalGleichzeitig`; warum es nötig ist, steht dort (ein
+ * Refresh-Token ist genau einmal gültig, sechs parallele Versuche zerstören die Sitzung).
+ * Ein Fehlschlag wird zu `null`: Dann kommt der 401 durch, und der Aufrufer entscheidet.
  */
-function tokenErneuern(): Promise<string | null> {
-  if (!erneuerung) {
-    erneuerung = supabase.auth.refreshSession()
-      .then(({ data }) => data.session?.access_token ?? null)
-      .catch(() => null)
-      .finally(() => { erneuerung = null })
+const tokenErneuern = einmalGleichzeitig(async (): Promise<string | null> => {
+  try {
+    const { data } = await supabase.auth.refreshSession()
+    return data.session?.access_token ?? null
+  } catch {
+    return null
   }
-  return erneuerung
-}
+})
 
 /** Dieselbe Anfrage wurde schon einmal mit frischem Token versucht. */
 type Versucht = InternalAxiosRequestConfig & { _tokenErneuert?: boolean }
@@ -72,7 +68,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const config = error.config as Versucht | undefined
-    if (error.response?.status === 401 && config && !config._tokenErneuert) {
+    if (config && darfNachfassen(error.response?.status, !!config._tokenErneuert)) {
       config._tokenErneuert = true
       const token = await tokenErneuern()
       if (token) {

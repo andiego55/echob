@@ -1,17 +1,13 @@
-import { Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
+import RollenTor, { Spinner } from '@/components/auth/RollenTor'
 import { instituteApi } from '@/api/institute'
 
-export function Spinner() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-brand-bg">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-border border-t-accent" />
-    </div>
-  )
-}
 
-/** Rolle der eingeloggten Person: 200 = Ausbildungsinstitut, 404 → isError. */
+/**
+ * Rolle der eingeloggten Person: 200 = Ausbildungsinstitut, sonst 403. Was aus
+ * welcher Antwort folgt, entscheidet <RollenTor>.
+ */
 export function useInstitute() {
   const { session } = useAuth()
   return useQuery({
@@ -25,11 +21,13 @@ export function useInstitute() {
 
 /** Guard für /institute/* — nur für registrierte Ausbildungsinstitute. */
 export default function InstituteRoute({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useAuth()
-  const { data, isLoading, isError } = useInstitute()
+  const { data, isLoading, error } = useInstitute()
 
-  if (loading || (session && isLoading)) return <Spinner />
-  if (!session) return <Navigate to="/auth" replace />
-  if (isError || !data) return <Navigate to="/app" replace />
-  return <>{children}</>
+  return (
+    <RollenTor rolle="der Institutsbereich" data={data} isLoading={isLoading} error={error}>
+      {children}
+    </RollenTor>
+  )
 }
+
+export { Spinner }

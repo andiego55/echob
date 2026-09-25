@@ -1,17 +1,13 @@
-import { Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
+import RollenTor, { Spinner } from '@/components/auth/RollenTor'
 import { studentApi } from '@/api/student'
 
-export function Spinner() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-brand-bg">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-border border-t-accent" />
-    </div>
-  )
-}
 
-/** Rolle der eingeloggten Person: 200 = Student:in, 404 → isError. */
+/**
+ * Rolle der eingeloggten Person: 200 = Student:in, sonst 403. Was aus welcher
+ * Antwort folgt, entscheidet <RollenTor>.
+ */
 export function useStudent() {
   const { session } = useAuth()
   return useQuery({
@@ -25,11 +21,13 @@ export function useStudent() {
 
 /** Guard für /student/* — nur für registrierte Studierende. */
 export default function StudentRoute({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useAuth()
-  const { data, isLoading, isError } = useStudent()
+  const { data, isLoading, error } = useStudent()
 
-  if (loading || (session && isLoading)) return <Spinner />
-  if (!session) return <Navigate to="/auth" replace />
-  if (isError || !data) return <Navigate to="/app" replace />
-  return <>{children}</>
+  return (
+    <RollenTor rolle="der Studierendenbereich" data={data} isLoading={isLoading} error={error}>
+      {children}
+    </RollenTor>
+  )
 }
+
+export { Spinner }
