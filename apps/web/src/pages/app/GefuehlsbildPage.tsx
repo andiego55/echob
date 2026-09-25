@@ -14,8 +14,9 @@
  * Textfeld, das nach Gefühlen fragt, läuft bei genau diesen Menschen leer, und das sind die,
  * um die es geht.
  *
- * **Drei Zugänge, weil das nicht eine Ursache hat.** Szenen (du brauchst keine Worte),
- * das Feld (zwei Achsen zum Ziehen), die Wörter (du hast ein grobes und suchst das genaue).
+ * **Drei Zugänge, weil das nicht eine Ursache hat.** Die Wörter (du hast ein grobes und
+ * suchst das genaue), das Feld (zwei Achsen zum Ziehen), die Szenen (du brauchst gar keine
+ * Worte).
  * Keiner ist Pflicht, jeder allein genügt. Wer nur drei Wörter antippt, hat ein gültiges
  * Gefühlsbild.
  *
@@ -47,10 +48,26 @@ const SZENEN = CONTENT_MANIFEST.filter(m => m.type === 'scene')
 
 type Schritt = 'szenen' | 'feld' | 'woerter' | 'eigenes' | 'text'
 
+/**
+ * Die Reihenfolge — und warum die Wörter vorne stehen.
+ *
+ * **Vorher kamen die Szenen zuerst**, und das war der Zugang mit der höchsten Schwelle:
+ * Man liest kurze erfundene Geschichten und entscheidet bei jeder, ob sie sich anfühlt wie
+ * man selbst. Das kostet Lesen, Einlassen und ein Urteil — bei jemandem, der gerade nicht
+ * sagen kann, wie es ihm geht, ist das viel verlangt für den ersten Schritt.
+ *
+ * Die Wörter sind das Gegenteil: ein Wort antippen, ein genaueres dahinter, fertig. Wer nur drei Wörter
+ * antippt, hat ein gültiges Gefühlsbild — das stand immer schon da, nur an dritter Stelle.
+ *
+ * Die Szenen bleiben, sie stehen jetzt hinten: Wer nach den Wörtern noch etwas sucht,
+ * findet dort das, wofür er keine Worte hat. Kein Schritt ist Pflicht, jeder ist
+ * anspringbar, also kostet die Reihenfolge niemanden etwas — sie sagt nur, womit man
+ * anfängt, wenn man nichts entscheidet.
+ */
 const SCHRITTE: { key: Schritt; label: string; frage: string }[] = [
-  { key: 'szenen', label: 'Szenen', frage: 'Was fühlt sich an wie du gerade?' },
-  { key: 'feld', label: 'Das Feld', frage: 'Wo bist du gerade?' },
   { key: 'woerter', label: 'Wörter', frage: 'Wenn du es benennen müsstest?' },
+  { key: 'feld', label: 'Das Feld', frage: 'Wo bist du gerade?' },
+  { key: 'szenen', label: 'Szenen', frage: 'Was fühlt sich an wie du gerade?' },
   { key: 'eigenes', label: 'In eigenen Worten', frage: 'Willst du selbst etwas schreiben?' },
   { key: 'text', label: 'Dein Gefühlsbild', frage: 'Was daraus geworden ist' },
 ]
@@ -65,7 +82,7 @@ function gemischt<T>(liste: T[]): T[] {
   return kopie
 }
 
-// ── Schritt 1: Szenen ───────────────────────────────────────────────────────
+// ── Die Szenen ──────────────────────────────────────────────────────────────
 function SzenenStapel({ gewaehlt, max, onWahl }: {
   gewaehlt: string[]
   max: number
@@ -158,7 +175,7 @@ function SzenenStapel({ gewaehlt, max, onWahl }: {
   )
 }
 
-// ── Schritt 3: Wörter ───────────────────────────────────────────────────────
+// ── Die Wörter ──────────────────────────────────────────────────────────────
 function Wortfeld({ familien, gewaehlt, max, onWahl }: {
   familien: GbWortFamilie[]
   gewaehlt: string[]
@@ -330,7 +347,7 @@ export default function GefuehlsbildPage() {
   const fallId = caseId ?? null
   const eigenesBild = fallId === null
   const qc = useQueryClient()
-  const [schritt, setSchritt] = useState<Schritt>('szenen')
+  const [schritt, setSchritt] = useState<Schritt>(SCHRITTE[0].key)
   const [eigenes, setEigenes] = useState<string | null>(null)
   const [text, setText] = useState<string | null>(null)
   const [echoHinweis, setEchoHinweis] = useState<string | null>(null)
@@ -371,7 +388,7 @@ export default function GefuehlsbildPage() {
       setBestaetigt(true)
       setText(null)
       setEigenes(null)
-      setSchritt('szenen')
+      setSchritt(SCHRITTE[0].key)
       frisch()
     },
     onError: melden,

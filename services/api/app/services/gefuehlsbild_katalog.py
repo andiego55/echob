@@ -22,10 +22,33 @@ from typing import Any
 # ── Das Wortfeld ─────────────────────────────────────────────────────────────
 #
 # Die Auswahl ist nicht aus einem Lehrbuch, sondern aus dem Material: Sie deckt die
-# haeufigsten `scene_tags` der 178 Szenen ab und die acht Wirkungen aus `resonanz_katalog`.
+# haeufigsten `scene_tags` der Szenen ab und die neun Wirkungen aus `resonanz_katalog`.
 # Woerter, die in diesem Zusammenhang niemand benutzt ("euphorisch", "angewidert"), fehlen
 # bewusst - eine lange Liste, in der das Eigene nicht vorkommt, ist schlimmer als eine
 # kurze, in der es vorkommt.
+#
+# ── Die Erweiterung auf dreizehn Familien ────────────────────────────────────
+#
+# Sieben Familien deckten ein Gefuehlsspektrum nicht ab. Welche fehlten, ist nicht geraten,
+# sondern an denselben Schlagwoertern abgelesen, aus denen die ersten sieben kamen - hier
+# jeweils mit der Zahl der Szenen, die es tragen:
+#
+#   sehnsucht (12), verlustangst (10), naehe-distanz (12)   -> Sehnsuechtig
+#   entwertung (16), anerkennung (10), verachtung (9)       -> Gekraenkt
+#   kontrolle (14), grenze (14), anpassung (12)             -> Eingeengt
+#   koerpererinnerung (8), ohnmacht (6), selbstverlust (7)  -> Erstarrt
+#   rueckzug (13), stonewalling (7)                         -> Abgewandt
+#   klarheit (11), veraenderung (11), selbstfuersorge (14)  -> Entschlossen
+#
+# **Die letzte ist die wichtigste und am leichtesten zu uebersehen.** "Zugewandt" traegt das
+# Aufatmen - erleichtert, ruhig, dankbar. Es traegt nicht die Handlungsfaehigkeit. Wer sich
+# gerade entschieden hat zu gehen, fuehlt weder "traurig" noch "ruhig", sondern entschlossen,
+# und fand dafuer bisher kein Wort. Dieselbe Ueberlegung, aus der es die neunte Wirkung
+# "Wieder zu mir kommen" gibt.
+#
+# **Warum Familien und nicht mehr Woerter je Familie.** Die erste Ebene ist das, was man
+# sieht; die zweite sieht nur, wer schon weiss, wo er suchen soll. Ein Gefuehl, dessen
+# Familie fehlt, ist unauffindbar - eines, das nur ein Wort tiefer liegt, findet sich.
 WORTFELD: tuple[dict[str, Any], ...] = (
     {
         "key": "traurig",
@@ -97,6 +120,82 @@ WORTFELD: tuple[dict[str, Any], ...] = (
             {"key": "zweifelnd", "label": "zweifelnd"},
             {"key": "orientierungslos", "label": "orientierungslos"},
             {"key": "taub", "label": "wie betäubt"},
+        ],
+    },
+    {
+        "key": "sehnsuechtig",
+        "label": "Sehnsüchtig",
+        "worte": [
+            {"key": "sehnsuechtig_pur", "label": "sehnsüchtig"},
+            {"key": "vermissend", "label": "vermissend"},
+            {"key": "verlassen", "label": "verlassen"},
+            {"key": "abhaengig", "label": "abhängig"},
+            {"key": "bedduerftig", "label": "bedürftig"},
+            {"key": "wartend", "label": "wartend"},
+        ],
+    },
+    {
+        "key": "gekraenkt",
+        "label": "Gekränkt",
+        "worte": [
+            {"key": "gekraenkt", "label": "gekränkt"},
+            {"key": "uebergangen", "label": "übergangen"},
+            {"key": "nicht_gesehen", "label": "nicht gesehen"},
+            {"key": "abgewertet", "label": "abgewertet"},
+            {"key": "nicht_gemeint", "label": "nicht gemeint"},
+            {"key": "vorgefuehrt", "label": "vorgeführt"},
+        ],
+    },
+    {
+        "key": "eingeengt",
+        "label": "Eingeengt",
+        "worte": [
+            {"key": "eingeengt", "label": "eingeengt"},
+            {"key": "bedraengt", "label": "bedrängt"},
+            {"key": "unfrei", "label": "unfrei"},
+            {"key": "fremdbestimmt", "label": "fremdbestimmt"},
+            {"key": "ueberrollt", "label": "überrollt"},
+            {"key": "nicht_mehr_ich", "label": "nicht mehr ich"},
+        ],
+    },
+    {
+        "key": "erstarrt",
+        "label": "Erstarrt",
+        "worte": [
+            {"key": "erstarrt", "label": "erstarrt"},
+            # „wie betäubt" trägt in „Verwirrt" schon den Schlüssel `taub` — zwei
+            # Wörter mit demselben Schlüssel wären ein Wort mit zwei Bedeutungen.
+            {"key": "versteinert", "label": "versteinert"},
+            {"key": "abgeschnitten", "label": "abgeschnitten"},
+            {"key": "wie_hinter_glas", "label": "wie hinter Glas"},
+            {"key": "weggetreten", "label": "weggetreten"},
+            {"key": "gelaehmt", "label": "gelähmt"},
+        ],
+    },
+    {
+        "key": "abgewandt",
+        "label": "Abgewandt",
+        "worte": [
+            {"key": "zurueckgezogen", "label": "zurückgezogen"},
+            {"key": "verschlossen", "label": "verschlossen"},
+            {"key": "distanziert", "label": "distanziert"},
+            {"key": "abgekuehlt", "label": "abgekühlt"},
+            {"key": "gleichgueltig", "label": "gleichgültig"},
+            {"key": "fertig_damit", "label": "fertig damit"},
+        ],
+    },
+    # Die beiden letzten sind die Gegenpole. Ohne sie entsteht ein Bild, in dem nur
+    # Belastendes vorkommt - dieselbe Ueberlegung wie bei der neunten Wirkung.
+    {
+        "key": "entschlossen",
+        "label": "Entschlossen",
+        "worte": [
+            {"key": "entschlossen", "label": "entschlossen"},
+            {"key": "bei_mir", "label": "bei mir"},
+            {"key": "standhaft", "label": "standhaft"},
+            {"key": "mutig", "label": "mutig"},
+            {"key": "bereit", "label": "bereit"},
+            {"key": "gewachsen", "label": "gewachsen"},
         ],
     },
     {

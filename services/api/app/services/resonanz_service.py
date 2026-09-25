@@ -24,6 +24,7 @@ from app.services import resonanz_fassung, resonanz_uebungen, szenen_verzeichnis
 from app.services.pattern_tags import GROUP_OF, PATTERN_GROUPS
 from app.services.resonanz_katalog import (
     REAKTION_LABELS,
+    TAG_ZU_MUSTER,
     WIEDERERKANNT,
     WIRKUNG_HINWEISE,
     WIRKUNGEN,
@@ -266,6 +267,14 @@ def _aufbereiten(zeile: dict[str, Any]) -> dict[str, Any]:
     daten["perspective"] = szene.get("perspective")
     daten["muster"] = szene.get("muster", [])
     daten["wirkungen"] = szene.get("wirkungen", [])
+    # Worum die Szene KREIST - lesbar, und ohne alles, was ein Verhalten der anderen
+    # Person benennt. Dafuer gibt es `muster`; in einem Satz ueber die eigenen Gefuehle
+    # hat "gaslighting" nichts verloren (siehe gefuehlsbild_service._stichworte, wo
+    # dieselbe Regel aus demselben Grund steht).
+    daten["worum"] = [
+        t.replace("-", " ") for t in (szene.get("scene_tags") or [])
+        if t not in TAG_ZU_MUSTER
+    ]
     # Eine zurueckgezogene Szene: Die Zeile bleibt, aber sie hat keinen Titel mehr. Der
     # Aufrufer soll das erkennen koennen, statt eine Karte ohne Ueberschrift zu zeigen.
     daten["verwaist"] = not szene
@@ -392,6 +401,28 @@ def kontext_block(eintraege: list[dict[str, Any]]) -> str:
     eigene Geschichte anhand einer erfundenen. Der Unterschied zwischen *hat etwas erlebt*
     und *hat etwas wiedererkannt* ist genau der Unterschied, den ein Mensch im Gespraech
     noch machen kann und ein Prompt nicht mehr, wenn er einmal verwischt ist.
+
+    **Wovon eine Szene hier erzaehlt, stand lange nicht drin — nur ihr Titel.** Wer im
+    Gespraech eine wiedererkannte Szene ansprach, traf auf ein Modell, das ihren Namen
+    kannte und sonst nichts; die Sammlung brachte fuer das Gespraech also kaum etwas. Jetzt
+    steht daneben, worum sie kreist: *sehnsucht, naehe distanz, elternschaft*. Das sind die
+    Schlagwoerter aus dem Verzeichnis, nicht aus der Anfrage.
+
+    **Der Szenentext selbst geht ausdruecklich NICHT mit**, und das ist keine Sparsamkeit.
+    Zwei Gruende, beide gemessen:
+
+    * *Ein Modell benutzt jedes benennbare Material im Prompt als SPRACHE.* Im Gefuehlsbild
+      ist genau das dreimal auf drei Ebenen passiert — mit den Titeln, mit den Erklaersaetzen
+      der Kategorien, mit den Familiennamen der Woerter. Es schrieb sie ab. Mit 2 KB Prosa
+      je Szene stuende anschliessend die Sprache einer erfundenen Geschichte im Text ueber
+      das Leben eines Menschen, und er liest sie als seine.
+    * *Die Rechnung.* Eine Szene ist im Schnitt rund 2 KB, also etwa 600 Token. Bei 25
+      Szenen waeren das 15.000 Token in EINEM Aufruf, fuer das schwaechste Material im
+      ganzen Kontext. Die Schlagwoerter kosten keine 100.
+
+    Was hier steht, sagt Echo also, WOHIN die Szene gehoert. Die Worte dafuer holt es sich
+    aus dem, was die Person selbst geschrieben hat — ihre Anmerkung steht ausdruecklich
+    dabei.
     """
     erkannt = [e for e in eintraege if e["reaction"] in WIEDERERKANNT and not e["verwaist"]]
     if not erkannt:
@@ -405,6 +436,10 @@ def kontext_block(eintraege: list[dict[str, Any]]) -> str:
         "Sie hat wiedererkannt, nicht berichtet — was genau bei ihr geschah, steht hier "
         "nicht. Nimm es als Hinweis, worauf sich zu fragen lohnt, nie als Tatsache. "
         "Frage nach, statt die Szene nachzuerzählen._",
+        "",
+        "_Titel und Schlagwörter sagen dir, WOHIN eine Szene gehört, nicht was darin "
+        "steht — den Text kennst du nicht. Sprich die Person auf das Thema an, nie auf "
+        "die Szene, und übernimm keine dieser Vokabeln in deine Antwort._",
         "",
     ]
 
@@ -421,6 +456,8 @@ def kontext_block(eintraege: list[dict[str, Any]]) -> str:
         zeilen.append("- " + ", ".join(teile))
         if e.get("wirkungen"):
             zeilen.append(f'  Wirkt auf: {", ".join(e["wirkungen"])}')
+        if e.get("worum"):
+            zeilen.append(f'  Worum die Szene kreist: {", ".join(e["worum"])}')
         if e.get("note"):
             # Das Eigene der Person zuerst kenntlich machen: Alles andere in dieser Liste
             # stammt aus einer erfundenen Szene, dieser Satz nicht.
