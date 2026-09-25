@@ -346,12 +346,21 @@ export default function EchoPage() {
           {/* Hauptbereich */}
           <div className="flex flex-col flex-1 min-w-0">
 
-            {/* Mobile: Session-Auswahl */}
+            {/* Mobile: Session-Auswahl
+                `min-w-0` ist hier kein Feinschliff, sondern der Fix.
+
+                Ein `<select>` ist so breit wie seine LAENGSTE Option, und ein Chat-Titel ist
+                die erste Nachricht des Gespraechs („Kennst du die Szene, die ich wiedererkannt
+                habe?"). `flex-1` allein setzt `min-width: auto` - das Feld weigert sich dann,
+                unter diese Breite zu schrumpfen, und schiebt den „+"-Knopf aus dem Bild. Die
+                ganze Seite liess sich nach rechts scrollen.
+
+                `truncate` daneben, damit die Anzeige kuerzt statt zu quetschen. */}
             <div className="md:hidden border-b border-brand-border bg-white px-4 py-2 flex gap-2 items-center">
               <select
                 value={selectedSession ?? ''}
                 onChange={(e) => chatWechseln(e.target.value || null)}
-                className="flex-1 rounded-brand border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none"
+                className="min-w-0 flex-1 truncate rounded-brand border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none"
               >
                 <option value="">Neuer Chat</option>
                 {sessions.map((s) => (

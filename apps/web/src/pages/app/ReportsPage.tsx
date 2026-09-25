@@ -135,12 +135,17 @@ function ReportCard({ report: r, caseId, onDelete, isDeleting }: {
 
   return (
     <div className="rounded-brand border border-brand-border bg-white hover:border-accent/30 hover:shadow-sm transition-all overflow-hidden">
-      <div className="flex items-stretch gap-0">
+      {/* Auf dem Telefon untereinander, ab `sm` nebeneinander.
+          Gemessen bei 375px: Die feste Aktionsspalte rechts nahm 89 von 356 Pixeln - ein
+          Viertel der Karte fuer zwei Woerter. Der Vorschautext brach dadurch auf drei
+          Kruemel um, und „Oeffnen" stand senkrecht neben dem Datum in einem schmalen
+          Streifen. Auf breiten Schirmen ist die Spalte rechts richtig, deshalb nur `sm`. */}
+      <div className="flex flex-col sm:flex-row sm:items-stretch gap-0">
 
-        {/* Farbiger Seitenstreifen */}
-        <div className={`w-1 flex-shrink-0 ${meta.bg} border-r ${meta.border}`} />
+        {/* Farbiger Streifen: auf dem Telefon oben quer, ab `sm` seitlich. */}
+        <div className={`h-1 w-full sm:h-auto sm:w-1 flex-shrink-0 ${meta.bg} border-b sm:border-b-0 sm:border-r ${meta.border}`} />
 
-        <div className="flex-1 px-5 py-4 min-w-0">
+        <div className="flex-1 px-5 pt-4 pb-3 sm:py-4 min-w-0">
           {/* Typ-Badge + Datum */}
           <div className="flex items-center gap-2 mb-2">
             <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${meta.bg} ${meta.color} ${meta.border} border`}>
@@ -164,8 +169,11 @@ function ReportCard({ report: r, caseId, onDelete, isDeleting }: {
           )}
         </div>
 
-        {/* Aktionen */}
-        <div className="flex flex-col items-end justify-center gap-2 px-4 py-4 flex-shrink-0">
+        {/* Aktionen — auf dem Telefon eine eigene Zeile unter dem Text.
+            `flex-row-reverse` mit `justify-between`: „Oeffnen" landet rechts, wo der Daumen
+            ist, „Loeschen" links und damit weit weg davon. Ein Loeschen-Knopf direkt neben
+            der Hauptaktion ist ein Fehlgriff, der Arbeit kostet. */}
+        <div className="flex flex-row-reverse items-center justify-between gap-4 px-5 pb-4 sm:flex-col sm:items-end sm:justify-center sm:gap-2 sm:px-4 sm:py-4 flex-shrink-0">
           <Link
             to={`/app/cases/${caseId}/reports/${r.id}`}
             className="text-xs font-semibold text-accent hover:text-navy transition-colors whitespace-nowrap"
