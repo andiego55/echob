@@ -39,22 +39,65 @@ _INIT = Path(__file__).resolve().parents[4] / "infra" / "docker" / "postgres" / 
 
 # ── Katalog gegen Datenbank ─────────────────────────────────────────────────
 
+#: Die Tabelle, um die es hier geht. Steht als Konstante da, damit unten nirgends
+#: versehentlich eine andere geprueft wird.
+_TABELLE = "selbst_vorhaben"
+
+
+def _rumpf(text: str) -> str | None:
+    """Der Inhalt von ``CREATE TABLE selbst_vorhaben ( … )`` — oder None.
+
+    Ueber die Klammertiefe und nicht ueber das erste ``)``: Eine Spaltenliste enthaelt
+    Klammern (``CHECK (art IN (…))``), und das erste ``)`` steht mittendrin.
+    """
+    m = re.search(
+        rf"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?{_TABELLE}\s*\(",
+        text, re.IGNORECASE)
+    if not m:
+        return None
+    i, tiefe = m.end(), 1
+    while i < len(text) and tiefe:
+        tiefe += (text[i] == "(") - (text[i] == ")")
+        i += 1
+    return text[m.end():i]
+
+
 def _bedingung(spalte: str) -> set[str]:
-    muster = re.compile(
-        rf"ADD\s+CONSTRAINT\s+selbst_vorhaben_{spalte}_check\s+"
-        rf"CHECK\s*\({spalte}\s+IN\s*\((?P<werte>[^)]*)\)"
-        rf"|{spalte}\s+TEXT\s+NOT\s+NULL\s+CHECK\s*\({spalte}\s+IN\s*\((?P<werte2>[^)]*)\)",
-        re.IGNORECASE | re.DOTALL,
-    )
+    """Die erlaubten Werte einer Spalte von ``selbst_vorhaben``, aus den Migrationen.
+
+    **Warum das an der TABELLE haengt und nicht an der Datei.** Vorher genuegte es, dass
+    eine Migration das Wort ``selbst_vorhaben`` irgendwo enthielt — auch in einem
+    Kommentar. ``zz_132_ideale.sql`` tut genau das (sie erklaert, warum ein Ideal NICHT in
+    selbst_vorhaben liegt) und hat selbst eine Spalte ``art``. Der Waechter las daraufhin
+    die Beziehungsarten der Traumbeziehung als die Arten der Vorhaben.
+
+    Dieselbe Familie wie der Fall, in dem ``user_id`` in ``owner_user_id`` steckte: Ein
+    Waechter, der auf eine Teilzeichenfolge prueft, wird blind. Hier ging er immerhin laut
+    kaputt statt still — das ist der bessere von beiden Ausgaengen.
+
+    Zwei Formen zaehlen, und beide nur innerhalb dieser Tabelle:
+      * die Spalte im ``CREATE TABLE``-Rumpf,
+      * ein spaeteres ``ALTER TABLE selbst_vorhaben ADD CONSTRAINT …``.
+    Spaeter gewinnt: Die Migrationen laufen der Reihe nach, und die letzte Fassung gilt.
+    """
+    inline = re.compile(
+        rf"\b{spalte}\s+TEXT[^,]*?CHECK\s*\(\s*{spalte}\s+IN\s*\((?P<werte>[^)]*)\)",
+        re.IGNORECASE | re.DOTALL)
+    nachtraeglich = re.compile(
+        rf"ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?{_TABELLE}\s+"
+        rf"ADD\s+CONSTRAINT\s+\w+\s+CHECK\s*\(\s*{spalte}\s+IN\s*\((?P<werte>[^)]*)\)",
+        re.IGNORECASE | re.DOTALL)
+
     letzte: set[str] | None = None
     for datei in sorted(_INIT.glob("*.sql")):
         text = datei.read_text(encoding="utf-8")
-        if "selbst_vorhaben" not in text:
-            continue
-        for treffer in muster.finditer(text):
-            roh = treffer.group("werte") or treffer.group("werte2") or ""
-            letzte = set(re.findall(r"'([a-z_]+)'", roh))
-    assert letzte is not None, f"Keine Bedingung fuer {spalte} gefunden"
+        rumpf = _rumpf(text)
+        if rumpf:
+            for treffer in inline.finditer(rumpf):
+                letzte = set(re.findall(r"'([a-z_]+)'", treffer.group("werte")))
+        for treffer in nachtraeglich.finditer(text):
+            letzte = set(re.findall(r"'([a-z_]+)'", treffer.group("werte")))
+    assert letzte is not None, f"Keine Bedingung fuer {spalte} in {_TABELLE} gefunden"
     return letzte
 
 
@@ -68,6 +111,25 @@ def test_die_staende_stehen_im_katalog_und_in_der_datenbank():
     """Eine Bauart Fehler, die hier schon viermal zugeschlagen hat: Ein Wort im Code,
     das die Bedingung nicht kennt, faellt erst beim INSERT."""
     assert _bedingung("stand") == set(katalog.VORHABEN_STAND_SCHLUESSEL)
+
+
+def test_der_waechter_liest_die_richtige_tabelle():
+    """Das Pruefmuster selbst — der Test, der hier gefehlt hat.
+
+    Am 25.09.2026 kam mit `selbst_ideale` eine zweite Tabelle mit einer Spalte `art` dazu.
+    Ihre Migration erwaehnt `selbst_vorhaben` in einem Kommentar, und genau das genuegte
+    dem alten Muster: Es las die Beziehungsarten der Traumbeziehung als die Arten der
+    Vorhaben. Ein Waechter, der die falsche Tabelle prueft, ist schlimmer als keiner - man
+    verlaesst sich auf ihn.
+    """
+    arten = _bedingung("art")
+
+    assert arten == {"ziel", "krisenplan"}, (
+        f"Gelesen wurden {sorted(arten)}. Kommt das aus einer ANDEREN Tabelle mit einer "
+        "Spalte `art`? Dann greift der Dateifilter wieder statt des Tabellenrumpfs."
+    )
+    # Die Gegenprobe: Die Arten der Traumbeziehung duerfen hier NICHT auftauchen.
+    assert not ({"partner", "family", "friendship"} & arten)
 
 
 def test_die_art_ziel_kennt_die_datenbank():

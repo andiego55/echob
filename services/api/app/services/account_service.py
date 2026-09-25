@@ -30,7 +30,7 @@ _USER_TABLES = (
     "client_notifications", "test_results", "pseudonymous_accounts",
     # Mein Kompass - gehoert der Person, nicht einem Fall.
     "selbst_pulse", "selbst_vorhaben", "selbst_saetze", "selbst_portraits",
-    "selbst_briefe", "selbst_agenda",
+    "selbst_briefe", "selbst_agenda", "selbst_ideale",
     # absprachen steht NICHT hier: Die Tabelle hat keine user_id-Spalte, sondern
     # owner_user_id und professional_user_id. Hier eingetragen erzeugte sie ein
     # "DELETE FROM absprachen WHERE user_id = $1" - und das faellt erst beim Loeschen
@@ -99,6 +99,9 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     # sich selbst im Raum, kein Recht des Betreibers, jemandem seinen Text vorzuenthalten.
     "selbst_briefe":                 {"text": ("text",)},
     "selbst_agenda":                 {"text": ("notiz",)},
+    # Was jemand sich wuenscht, ist nicht weniger heikel als das, was er erlebt hat -
+    # der eigene Text der Skizze liegt deshalb im JSONB verschluesselt.
+    "selbst_ideale":                 {"json": ("inhalt",)},
 }
 
 
@@ -286,6 +289,7 @@ _DELETE_STEPS = (
     ("selbst_saetze", "user_id = $1"),
     ("selbst_portraits", "user_id = $1"),
     ("selbst_briefe", "user_id = $1"),
+    ("selbst_ideale", "user_id = $1"),
     ("pseudonymous_accounts", "user_id = $1"),
     ("user_profiles", "user_id = $1"),
     ("user_consents", "user_id = $1"),

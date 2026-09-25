@@ -40,6 +40,7 @@ from app.api.v1.routers import (
     inbox,
     institute,
     kompass,
+    kompass_ideale,
     notifications,
     onboarding,
     org_billing,
@@ -153,5 +154,8 @@ v1_router.include_router(paar_szenen.router)     # Beziehungsszenen im Paarraum
 
 # ── Ausbildungsbereich (Institute + Student:innen) ────────────────────────────
 v1_router.include_router(kompass.router)     # Mein Kompass - der Raum ohne Fall
+# Eigenes Modul mit eigenem Katalog, Dienst und Router: Meine Traumbeziehung.
+# Bewusst NICHT an kompass.py angehaengt - die Datei traegt schon sechs Werkzeuge.
+v1_router.include_router(kompass_ideale.router)
 v1_router.include_router(institute.router)
 v1_router.include_router(student.router)
