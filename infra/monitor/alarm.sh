@@ -34,6 +34,10 @@ ENV_FILE="${ECHOB_ENV_FILE:-/opt/echob/.env.docker}"
 # Kommt aus der .env.docker. Bewusst OHNE Vorgabewert: Das Repo ist oeffentlich, und
 # eine private Adresse darin waere ein Geschenk an jeden Adress-Sammler. Fehlt sie,
 # wird das laut ins Protokoll geschrieben statt still nichts zu tun.
+# MEHRERE ADRESSEN, mit Komma getrennt. Das ist die halbe Loesung fuer C-14 (Bus-Faktor):
+# Ein Alarm, der nur eine Person erreicht, nuetzt genau dann nichts, wenn diese Person der
+# Grund fuer den Ausfall ist. Eine Adresse bleibt weiter gueltig - es aendert sich fuer
+# bestehende Installationen nichts.
 EMPFAENGER="${ALARM_TO_EMAIL:-}"
 # Neben die uebrigen echob-Logs. Frueher zeigte das auf /opt/echob/backups - ein
 # Verzeichnis, das seinen Zweck verlor, als klar wurde, dass die Backups nach
@@ -76,7 +80,8 @@ import json, os, socket
 rechner = socket.gethostname()
 print(json.dumps({
     "from": "EchoB Betrieb <" + os.environ["ABSENDER"] + ">",
-    "to": [os.environ["EMPFAENGER"]],
+    # Komma-getrennte Liste; Leerzeichen und leere Einträge fallen weg.
+    "to": [a.strip() for a in os.environ["EMPFAENGER"].split(",") if a.strip()],
     "subject": "[EchoB/" + rechner + "] " + os.environ["BETREFF"],
     "text": os.environ["TEXT"] or "(ohne Text)",
 }))
