@@ -34,6 +34,8 @@ import { PageSkeleton } from '@/components/Skeleton'
 import Reihung from '@/components/app/kompass/Reihung'
 import Waage from '@/components/app/kompass/Waage'
 import SkizzeVergleichen from '@/components/app/kompass/SkizzeVergleichen'
+import DeineSkizze from '@/components/app/kompass/DeineSkizze'
+import type { Entwurf } from '@/lib/skizzenbild'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import {
   idealApi,
@@ -51,13 +53,9 @@ const SCHRITTE: { key: Schritt; label: string; frage: string }[] = [
   { key: 'reihung', label: 'Die Reihenfolge', frage: 'Was geht im Zweifel vor?' },
 ]
 
-/** Der Zustand der Skizze im Browser — das, was gespeichert wird. */
-interface Entwurf {
-  aspekte: { key: string; gewicht: number }[]
-  reihung: string[]
-  abwaegungen: Record<string, number>
-  eigenes: string
-}
+// Der Zustand der Skizze liegt jetzt in `lib/skizzenbild` — dort, wo die reinen Funktionen
+// stehen, die ihn in ein Bild und einen Text verwandeln. Eine Seite, die einen Typ besitzt,
+// den andere brauchen, zwingt sie, aus einer Seite zu importieren.
 
 const LEER: Entwurf = { aspekte: [], reihung: [], abwaegungen: {}, eigenes: '' }
 
@@ -275,6 +273,14 @@ export default function TraumbeziehungSkizzePage() {
             )}
           </div>
         </section>
+
+        {/* Der Spiegel steht UNTER den Schritten, und das ist beim Ansehen entschieden
+            worden: Zuerst stand er oben, damit ein Wiederkommer gleich sieht, was dasteht.
+            In der Attrappe war dann zu sehen, was das am Telefon anrichtet — er WAECHST
+            beim Antippen, und damit schiebt sich die Karte, auf die man gerade tippt, nach
+            unten weg. Etwas, das sich unter dem Finger bewegt, ist ein Fehler und kein
+            Feature. Nach unten wachsen darf er. */}
+        <DeineSkizze entwurf={entwurf} vokabular={kat} />
 
         {/* ── In eigenen Worten ───────────────────────────────────────── */}
         <section className="mt-5 rounded-brand-lg border border-brand-border bg-white p-6">

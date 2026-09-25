@@ -260,6 +260,23 @@
     .kompass-bewegt { animation: none; }
   }
 
+  /* ── Das Bild der Skizze: die Baender ────────────────────────── */
+  /* Die Breite IST das Gewicht. Der Uebergang macht aus dem Schieben eines Reglers eine
+     sichtbare Folge - und aus einer Auswahl eine Gestalt, die hereinwaechst. Die Feder
+     schwingt leicht ueber (cubic-bezier > 1), weil ein Wunsch nichts Technisches ist. */
+  .skizze-band {
+    transition: width 520ms cubic-bezier(0.22, 1.12, 0.36, 1),
+                background-color 260ms ease-out;
+    animation: skizze-band-herein 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  @keyframes skizze-band-herein {
+    from { opacity: 0; transform: translateY(-4px) scaleX(0.92); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skizze-band { transition: none; animation: none; }
+  }
+
   /* ── Safety Notice ───────────────────────────────────────────── */
   .safety-notice {
     @apply bg-[#eef5fb] border border-[#c0d8ed] border-l-4 border-l-[#3b6a9a]
