@@ -52,6 +52,11 @@ class SharedBundle:
     verlauf: list[dict[str, Any]] = field(default_factory=list)
     vorhaben: list[dict[str, Any]] = field(default_factory=list)
     krisenplan: dict[str, Any] | None = None
+    #: Die Traumbeziehungs-Skizze zur Beziehungsart DIESES Falls. Nicht die uebrigen Arten:
+    #: Wer seinen Partnerschaftsfall teilt, hat nicht seine Wuensche an seine Eltern, seine
+    #: Freunde und seinen Arbeitsplatz mitgeteilt. Und nicht die blinde Neufassung - ein
+    #: Entwurf ist keine Aussage.
+    traumbeziehung: dict[str, Any] | None = None
     #: Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon —
     #: dass jemand eigene Einschaetzungen revidiert hat, sagt etwas ueber den Fall.
     artifacts_ueberholt: int = 0
@@ -384,6 +389,12 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
         bundle.krisenplan = await kompass_service.krisenplan(
             conn, user_id=share["owner_user_id"])
 
+    # ── Die Traumbeziehung ───────────────────────────────────────────────────
+    if "traumbeziehung" in allowed:
+        from app.services import kompass_ideal_service
+        bundle.traumbeziehung = await kompass_ideal_service.fuer_fall(
+            conn, user_id=share["owner_user_id"], case_id=share["case_id"])
+
     # Festgehaltene Erkenntnisse. Überholte fließen inhaltlich NICHT mit (siehe
     # build_artifact_context) — nur ihre Zahl.
     if "artifacts" in allowed:
@@ -484,6 +495,14 @@ def build_shared_case_context(bundle: SharedBundle) -> str:
         ctx = kompass_service.krisenplan_kontext_block(bundle.krisenplan)
         if ctx:
             parts.append(ctx)
+
+    if bundle.traumbeziehung:
+        from app.services import kompass_ideal_service
+        ctx = kompass_ideal_service.als_prompt_eingabe(bundle.traumbeziehung)
+        if ctx:
+            parts.append("WAS SICH DIE PERSON VON EINER SOLCHEN BEZIEHUNG WUENSCHT\n"
+                         "(ihre eigene Skizze, unabhaengig von diesem Fall entstanden):\n\n"
+                         + ctx)
 
     if bundle.artifacts or bundle.artifacts_ueberholt:
         ctx = build_artifact_context(bundle.artifacts, ueberholt_anzahl=bundle.artifacts_ueberholt)

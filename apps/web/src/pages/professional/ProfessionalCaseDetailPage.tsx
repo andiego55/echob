@@ -35,7 +35,7 @@ import ArbeitsmappePanel from '@/components/professional/ArbeitsmappePanel'
 import FallFaqPanel from '@/components/professional/FallFaqPanel'
 import Absprachen from '@/components/app/Absprachen'
 import {
-  KrisenplanKarte, SaetzeKarte, VorhabenKarte, VerlaufKarte,
+  KrisenplanKarte, SaetzeKarte, VorhabenKarte, VerlaufKarte, TraumbeziehungKarte,
 } from '@/components/professional/KompassPanel'
 
 const TOPIC_LABELS: Record<string, string> = {
@@ -739,6 +739,8 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
           </Section>
         )}
 
+        {/* Vor den Sätzen: Was jemand WILL, ordnet das, was er über sich sagt. */}
+        {has('traumbeziehung') && <TraumbeziehungKarte ideal={bundle.traumbeziehung} />}
         {has('satz') && <SaetzeKarte saetze={bundle.saetze} />}
         {has('vorhaben') && <VorhabenKarte vorhaben={bundle.vorhaben} />}
         {has('verlauf') && <VerlaufKarte verlauf={bundle.verlauf} />}

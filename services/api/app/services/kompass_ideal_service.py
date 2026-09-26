@@ -324,6 +324,37 @@ async def loeschen(conn: asyncpg.Connection, *, user_id: UUID | str, art: str) -
 
 # ── Der Vergleich mit einem Fall ─────────────────────────────────────────────
 
+async def fuer_fall(
+    conn: asyncpg.Connection, *, user_id: UUID | str, case_id: UUID | str
+) -> dict[str, Any] | None:
+    """Die Skizze zur Beziehungsart DIESES Falls — oder nichts.
+
+    **Für die Freigabe an die Fachperson.** Dieselbe Regel wie beim Vergleich, nur ohne
+    Fehler: Gibt es zur Art des Falls keine Skizze, läuft die Freigabe leer, statt jemandem
+    einen Fehler zu zeigen, den er nicht verursacht hat.
+
+    **Und ausdrücklich nur diese eine Art.** Wer seinen Partnerschaftsfall teilt, hat nicht
+    seine Wünsche an seine Eltern, seine Freunde und seinen Arbeitsplatz mitgeteilt.
+
+    Die blinde Neufassung und die abgelöste Vorfassung gehen nicht mit — ``_aufbereiten``
+    liefert sie zwar, hier werden sie ausdrücklich entfernt: Ein Entwurf ist keine Aussage,
+    und was jemand früher einmal wollte, hat er nicht freigegeben.
+    """
+    art = await conn.fetchval(
+        "SELECT relationship_type FROM cases WHERE id = $1 AND user_id = $2",
+        case_id, user_id,
+    )
+    if not art:
+        return None
+    ideal = await holen(conn, user_id=user_id, art=art)
+    if not ideal or ist_leer(ideal):
+        return None
+    ideal.pop("entwurf", None)
+    ideal.pop("vorher", None)
+    ideal.pop("vorher_at", None)
+    return ideal
+
+
 async def require_vergleichbar(
     conn: asyncpg.Connection, *, user_id: UUID | str, art: str, case_id: UUID | str
 ) -> dict[str, Any]:

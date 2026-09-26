@@ -902,6 +902,8 @@ export type ShareElementType =
   // Der Krisenplan ist das, was viele zuerst teilen wollen, der Verlauf das, was manche
   // nie teilen wollen.
   | 'verlauf' | 'vorhaben' | 'krisenplan'
+  // Die Skizze der gewünschten Beziehung — und zwar nur die zur Art DIESES Falls.
+  | 'traumbeziehung'
 
 export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   case_info:       'Fallinformationen',
@@ -921,6 +923,9 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   // Momenten gehen NICHT mit, und das soll man beim Ankreuzen lesen, nicht erst danach.
   verlauf:         'Mein Verlauf (nur die Kurve, keine Notizen)',
   vorhaben:        'Meine Vorhaben',
+  // Die Art steht im Etikett, weil sie die halbe Aussage ist: Freigegeben wird die
+  // Skizze, die zu DIESEM Fall passt — nicht das ganze Wunschbild eines Lebens.
+  traumbeziehung:  'Meine Traumbeziehung (nur die zu dieser Beziehungsart)',
   krisenplan:      'Mein Notfallplan',
   artifacts:       'Festgehaltene Erkenntnisse',
   satz:            'Einzelne Sätze über dich',
@@ -1318,8 +1323,26 @@ export interface SharedCaseBundle {
   verlauf?: import('@/lib/kompass').PulsPunkt[]
   vorhaben?: SharedVorhaben[]
   krisenplan?: SharedKrisenplan | null
+  /**
+   * Die Skizze der gewünschten Beziehung — nur die zur Art DIESES Falls.
+   *
+   * Ohne `entwurf` und `vorher`: Eine blinde Neufassung in Arbeit ist keine Aussage, und
+   * was jemand früher einmal wollte, hat er nicht freigegeben.
+   */
+  traumbeziehung?: SharedTraumbeziehung | null
   notes: ProfessionalNote | null
   echo_summaries: ProfessionalEchoSummary[]
+}
+
+export interface SharedTraumbeziehung {
+  art: string
+  art_label: string | null
+  aspekte: { key: string; gewicht: number; label?: string | null }[]
+  reihung: string[]
+  abwaegungen: Record<string, number>
+  eigenes: string | null
+  geprueft_at: string | null
+  updated_at: string
 }
 
 // ── Paar-Analyse (gekoppelte Fälle) ──────────────────────────────────────────

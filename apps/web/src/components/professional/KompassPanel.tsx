@@ -230,3 +230,70 @@ export function VerlaufKarte({ verlauf }: { verlauf: SharedCaseBundle['verlauf']
     </Karte>
   )
 }
+
+/**
+ * Was sie sich wünscht — ihre eigene Skizze, nicht über diesen Fall geschrieben.
+ *
+ * **Warum das für eine Fachperson wertvoll ist.** Sie bekommt von ihrer Klient:in vor
+ * allem zu hören, was nicht geht. Was die Person WILL, kommt selten vor — und wenn, dann
+ * als Verneinung („nicht mehr so wie bisher"). Hier steht es zum ersten Mal positiv, von
+ * ihr selbst geordnet, und es ist in zwanzig Sekunden gelesen.
+ *
+ * **Und deshalb steht der Satz darüber, dass sie sie unabhängig von diesem Fall
+ * geschrieben hat.** Wer die Skizze als Forderung an das Gegenüber liest, hat sie falsch
+ * gelesen: Sie ist über eine ART von Beziehung geschrieben, nicht über diese eine.
+ *
+ * Die Reihenfolge und die Balkenlängen sind die Aussage — dieselbe Darstellung wie in
+ * ihrem eigenen Bereich, damit beide dasselbe Bild vor Augen haben, wenn sie darauf zu
+ * sprechen kommen.
+ */
+export function TraumbeziehungKarte({ ideal }: { ideal: SharedCaseBundle['traumbeziehung'] }) {
+  if (!ideal) return null
+  const geordnet = new Set(ideal.reihung)
+  const folge = [
+    ...ideal.reihung.map(k => ideal.aspekte.find(a => a.key === k)).filter(Boolean),
+    ...ideal.aspekte.filter(a => !geordnet.has(a.key)).sort((x, y) => y.gewicht - x.gewicht),
+  ] as { key: string; gewicht: number; label?: string | null }[]
+
+  return (
+    <Karte
+      titel={`Was sie sich wünscht${ideal.art_label ? ` (${ideal.art_label})` : ''}`}
+      hinweis={'Ihre eigene Skizze aus dem Kompass — geschrieben über diese ART von '
+        + 'Beziehung, nicht über diesen Fall. Keine Forderung an das Gegenüber, sondern '
+        + 'ein Maßstab, den sie für sich aufgestellt hat.'}
+    >
+      <ul className="space-y-2.5">
+        {folge.map(a => (
+          <li key={a.key}>
+            <span className={`block text-[0.8rem] leading-snug ${
+              geordnet.has(a.key) ? 'font-semibold text-navy' : 'text-brand-text'
+            }`}>
+              {a.label || a.key}
+            </span>
+            <span
+              className={`mt-1 block h-2 rounded-full ${
+                geordnet.has(a.key) ? 'bg-accent' : 'bg-accent/30'
+              }`}
+              style={{ width: `${34 + Math.round(0.66 * a.gewicht)}%` }}
+              aria-hidden="true"
+            />
+          </li>
+        ))}
+      </ul>
+
+      {ideal.eigenes && (
+        <blockquote className="mt-4 border-l-2 border-accent/40 pl-3 text-[0.86rem] leading-relaxed text-brand-text">
+          {ideal.eigenes}
+        </blockquote>
+      )}
+
+      <p className="mt-3 border-t border-brand-border pt-2.5 text-[11px] leading-relaxed text-brand-muted">
+        Kräftig: was sie ausdrücklich in eine Reihenfolge gebracht hat. Die Länge ist das
+        Gewicht.
+        {ideal.geprueft_at
+          ? ` Zuletzt bestätigt am ${datum(ideal.geprueft_at)}.`
+          : ` Zuletzt geändert am ${datum(ideal.updated_at)}.`}
+      </p>
+    </Karte>
+  )
+}

@@ -11,10 +11,15 @@
  * Kästchen fehlte. Der Typ hilft dabei nicht — `Record<ShareElementType, string>` erzwingt
  * ein Etikett, aber nichts erzwingt, dass es auch jemand ankreuzen kann.
  */
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { SHARE_ELEMENT_LABELS } from '@/types'
 import type { ShareElementType } from '@/types'
 import { CATEGORY_ELEMENTS } from '@/pages/app/CaseSharingPage'
+
+const hier = dirname(fileURLToPath(import.meta.url))
 
 /**
  * Was in der Oberfläche in einer EIGENEN Liste steht statt im Kästchen-Raster.
@@ -47,5 +52,39 @@ describe('Freigabe – die ankreuzbaren Inhalte', () => {
     // Der ausdrückliche Wunsch an das Feature: Der Gefühlsstand soll an die Fachperson
     // freigegeben werden können. Ohne diesen Eintrag ist das Feature nur halb da.
     expect(CATEGORY_ELEMENTS).toContain('gefuehlsbild')
+  })
+})
+
+/**
+ * **Die fünfte Stelle** — und die einzige, deren Fehlen wirklich niemand bemerkt.
+ *
+ * Bedingung, Schema, Etikett und Kästchen kann man prüfen, und das tun die Tests oben.
+ * Aber selbst wenn alle vier stimmen, kann die Fachperson den Inhalt nie zu sehen bekommen:
+ * Es fehlt dann nur eine Zeile auf ihrer Fallseite. Die Klient:in kreuzt an, der Server
+ * liefert, die Freigabe steht als Etikett im Kopf der Seite — und darunter kommt nichts.
+ * Niemand meldet etwas, weil niemand weiß, dass etwas fehlt.
+ *
+ * Genau so lagen die Sätze monatelang. Der Test verlangt deshalb für JEDEN freigebbaren
+ * Inhalt eine Abfrage `has('…')` auf der Fallseite der Fachperson.
+ */
+describe('Freigabe – und wird es auch angezeigt?', () => {
+  const SEITE = readFileSync(
+    resolve(hier, '../src/pages/professional/ProfessionalCaseDetailPage.tsx'), 'utf-8')
+
+  it('fragt jeden freigebbaren Inhalt auf der Fallseite ab', () => {
+    const alle = Object.keys(SHARE_ELEMENT_LABELS) as ShareElementType[]
+    const ohneAnzeige = alle.filter(e => !SEITE.includes(`has('${e}')`))
+    expect(
+      ohneAnzeige,
+      'Diese Inhalte lassen sich freigeben, tauchen bei der Fachperson aber nirgends auf:\n  '
+        + ohneAnzeige.join('\n  '),
+    ).toEqual([])
+  })
+
+  it('findet die Seite ueberhaupt', () => {
+    // Ohne diese Schranke prueft der Test nichts, sobald die Datei umzieht - und bleibt
+    // trotzdem gruen.
+    expect(SEITE.length).toBeGreaterThan(5000)
+    expect(SEITE).toContain("has('krisenplan')")
   })
 })

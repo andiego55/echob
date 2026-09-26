@@ -509,3 +509,72 @@ async def test_am_entwurf_arbeiten_laesst_das_alter_der_skizze_in_ruhe(person, d
                                    aspekte=[{"key": "gehoert_werden", "gewicht": 50}])
     nach = await dienst.entwurf_uebernehmen(db, user_id=person, art="partner")
     assert nach["vorher_at"] == vorher
+
+
+# ── Freigabe an die Fachperson ───────────────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_freigegeben_wird_nur_die_skizze_zur_art_des_falls(person, db):
+    """**Die Regel, an der alles hängt.**
+
+    Wer seinen Partnerschaftsfall teilt, hat nicht seine Wünsche an seine Eltern, seine
+    Freunde und seinen Arbeitsplatz mitgeteilt. Und ein Partnerschafts-Wunsch an einem
+    Elternfall wäre kein Zusatzwissen, sondern eine Verwechslung, die sich wie eine Aussage
+    über einen Menschen liest.
+    """
+    partner_fall = await _fall(db, person, "partner")
+    eltern_fall = await _fall(db, person, "family")
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}])
+
+    am_partnerfall = await dienst.fuer_fall(db, user_id=person, case_id=partner_fall)
+    assert am_partnerfall and am_partnerfall["art"] == "partner"
+    assert await dienst.fuer_fall(db, user_id=person, case_id=eltern_fall) is None
+
+
+@pytest.mark.asyncio
+async def test_die_freigabe_nimmt_weder_entwurf_noch_vorfassung_mit(person, db):
+    """Ein Entwurf ist keine Aussage — dieselbe Regel wie beim Gefühlsbild, wo nur das
+    bestätigte Bild freigegeben wird. Und was jemand früher einmal wollte, hat er nicht
+    freigegeben."""
+    fall = await _fall(db, person, "partner")
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}],
+                           eigenes="Die alte Fassung.")
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 50}],
+                                   eigenes="Die neue Fassung.")
+    await dienst.entwurf_uebernehmen(db, user_id=person, art="partner")
+    # Jetzt gibt es eine Vorfassung, und wir legen noch einen Entwurf obendrauf.
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "nicht_klein", "gewicht": 70}],
+                                   eigenes="Noch eine Fassung.")
+
+    freigegeben = await dienst.fuer_fall(db, user_id=person, case_id=fall)
+    assert freigegeben["eigenes"] == "Die neue Fassung."
+    assert "entwurf" not in freigegeben
+    assert "vorher" not in freigegeben
+    assert "Noch eine Fassung." not in str(freigegeben)
+    assert "Die alte Fassung." not in str(freigegeben)
+
+
+@pytest.mark.asyncio
+async def test_ein_fremder_fall_gibt_keine_skizze_her(person, db):
+    """Die Regel steht in der Abfrage, nicht in einer Zusage des Aufrufers."""
+    fremd = uuid.uuid4()
+    await db.execute(
+        "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Andere')", fremd)
+    fremder_fall = await _fall(db, fremd, "partner")
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}])
+
+    assert await dienst.fuer_fall(db, user_id=person, case_id=fremder_fall) is None
+
+
+@pytest.mark.asyncio
+async def test_eine_leere_skizze_wird_nicht_freigegeben(person, db):
+    """Sonst stünde bei der Fachperson eine Überschrift ohne Inhalt — und sie hielte es
+    für einen Fehler statt für eine Skizze, die noch niemand angefangen hat."""
+    fall = await _fall(db, person, "partner")
+    await dienst.speichern(db, user_id=person, art="partner", aspekte=[])
+    assert await dienst.fuer_fall(db, user_id=person, case_id=fall) is None

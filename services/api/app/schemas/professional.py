@@ -22,6 +22,10 @@ ShareElementType = Literal[
     # geoeffnetes Selbstbild. Deshalb traegt diese Art - wie 'scene' - eine eigene
     # Kennung, und in ShareCreate steht daneben `satz_ids`.
     "satz",
+    # Die Skizze der gewuenschten Beziehung - und zwar NUR die zur Art dieses Falls.
+    # Ein Partnerschafts-Wunsch an einem Elternfall waere kein Zusatzwissen, sondern eine
+    # Verwechslung, die sich wie eine Aussage ueber einen Menschen liest.
+    "traumbeziehung",
     # Die uebrigen drei Kompass-Inhalte. Drei Woerter und kein Sammelwort "kompass":
     # Der Krisenplan ist das, was viele zuerst teilen wollen, der Verlauf das, was
     # manche nie teilen wollen. Bei einem Sammelwort muesste man alles geben - und

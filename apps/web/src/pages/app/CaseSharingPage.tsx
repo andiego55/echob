@@ -29,7 +29,13 @@ import { DATENSCHUTZHINWEISE, EINWILLIGUNG_FASSUNG, FALL_FAQ_ERKLAERUNG, WIDERRU
  * nicht danach. Ein Knopf, der Arbeit sparen soll, darf nicht nebenbei den eigenen
  * Notfallplan mitgeben.
  */
-export const KOMPASS_ELEMENTE: ShareElementType[] = ['verlauf', 'vorhaben', 'krisenplan']
+export const KOMPASS_ELEMENTE: ShareElementType[] = [
+  'verlauf', 'vorhaben', 'krisenplan',
+  // Die Traumbeziehung gehört hierher und nicht zum Fall, obwohl nur die Skizze zur
+  // Art DIESES Falls mitgeht: Geschrieben hat die Person sie in ihrem eigenen Raum,
+  // ohne einen Fall vor Augen. Damit greift „Gesamter Fall“ auch hier nicht.
+  'traumbeziehung',
+]
 
 /**
  * Die ankreuzbaren Inhalte — alle bis auf `scene`, das weiter unten einzeln steht.

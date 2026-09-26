@@ -995,6 +995,9 @@ async def case_detail(
         "verlauf": [_public_row(p) for p in bundle.verlauf],
         "vorhaben": [_public_row(v) for v in bundle.vorhaben],
         "krisenplan": _krisenplan_fuer_fachperson(bundle.krisenplan),
+        # Ohne diese Zeile waere alles andere umsonst: Die Fachperson bekaeme die Skizze
+        # nie zu sehen, und nichts waere rot. Genau so lagen die Saetze monatelang.
+        "traumbeziehung": bundle.traumbeziehung,
         "notes": (
             crypto.decrypt_fields({k: note_row[k] for k in _NOTE_FIELDS}, *_NOTE_FIELDS)
             if note_row else None
