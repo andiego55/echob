@@ -35,6 +35,7 @@ import Reihung from '@/components/app/kompass/Reihung'
 import Waage from '@/components/app/kompass/Waage'
 import SkizzeVergleichen from '@/components/app/kompass/SkizzeVergleichen'
 import DeineSkizze from '@/components/app/kompass/DeineSkizze'
+import Vorwahl from '@/components/app/kompass/Vorwahl'
 import type { Entwurf } from '@/lib/skizzenbild'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import {
@@ -65,6 +66,7 @@ export default function TraumbeziehungSkizzePage() {
   const bestaetigen = useBestaetigen()
   const [schritt, setSchritt] = useState<Schritt>(SCHRITTE[0].key)
   const [entwurf, setEntwurf] = useState<Entwurf | null>(null)
+  const [vorwahlLaeuft, setVorwahlLaeuft] = useState(false)
 
   const katalog = useQuery({
     queryKey: ['ideal-katalog', art],
@@ -162,6 +164,49 @@ export default function TraumbeziehungSkizzePage() {
           {kat.arten.find(a => a.key === art)?.frage ?? 'Wie hättest du es gern?'}
         </h1>
 
+        {/* Die Vorwahl steht GANZ OBEN, solange nichts dasteht — sie ist fuer die
+            Menschen da, die sonst gar nicht anfangen. Wer schon etwas angetippt hat,
+            braucht sie nicht mehr und bekommt sie deshalb auch nicht mehr angeboten:
+            Ein zweiter Weg neben einem begonnenen Weg ist eine Frage, keine Hilfe. */}
+        {vorwahlLaeuft ? (
+          <div className="mt-6">
+            <Vorwahl
+              familien={kat.aspekt_familien}
+              onAbbruch={() => setVorwahlLaeuft(false)}
+              onFertig={v => {
+                aendern({ aspekte: v.aspekte, reihung: v.reihung })
+                setVorwahlLaeuft(false)
+                setSchritt('zaehlt')
+              }}
+            />
+          </div>
+        ) : entwurf.aspekte.length === 0 && (
+          <button
+            type="button"
+            onClick={() => setVorwahlLaeuft(true)}
+            className="group mt-6 flex w-full flex-wrap items-center justify-between gap-3 rounded-brand-lg border border-accent/40 bg-accent/[0.04] p-5 text-left transition-all hover:border-accent hover:shadow-brand-sm"
+          >
+            <span className="min-w-0">
+              <span className="block text-[1rem] font-bold text-navy transition-colors group-hover:text-accent">
+                Du weisst nicht, wo du anfangen sollst?
+              </span>
+              <span className="mt-1 block max-w-[58ch] text-[0.85rem] leading-snug text-brand-muted">
+                Dann lass dich fragen. {kat.aspekt_familien.length - 1} Mal zwei Karten,
+                jeweils: Was fehlt dir mehr? Danach steht ein Anfang da, den du aendern
+                kannst.
+              </span>
+            </span>
+            <span className="shrink-0 text-[0.78rem] font-semibold text-accent">
+              Los geht{"\u2019"}s →
+            </span>
+          </button>
+        )}
+
+
+        {/* Solange die Vorwahl laeuft, tritt der Arbeitsbereich zurueck. Zwei Wege
+            nebeneinander sind kein Angebot, sondern eine zusaetzliche Entscheidung —
+            und die zu treffen ist genau das, was hier gerade niemand kann. */}
+        {!vorwahlLaeuft && (<>
         {/* ── Die Schritte ────────────────────────────────────────────── */}
         <nav className="mt-7 flex flex-wrap gap-1.5" aria-label="Schritte">
           {SCHRITTE.map((s, i) => {
@@ -325,6 +370,7 @@ export default function TraumbeziehungSkizzePage() {
             Skizze verwerfen
           </button>
         )}
+        </>)}
       </div>
     </AppShell>
   )

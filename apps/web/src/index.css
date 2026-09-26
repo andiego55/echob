@@ -277,6 +277,21 @@
     .skizze-band { transition: none; animation: none; }
   }
 
+  /* ── Die Vorwahl: der Herausforderer kommt herein ────────────── */
+  /* Der Regent bleibt liegen, der Gegenueber wechselt. Ohne sichtbaren Wechsel sieht ein
+     Tipp aus wie nichts - der Text auf der rechten Karte ist einfach ein anderer, und man
+     ist sich nicht sicher, ob man getroffen hat. Von rechts, weil dort der Neue herkommt. */
+  .vorwahl-herein {
+    animation: vorwahl-herein 320ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  @keyframes vorwahl-herein {
+    from { opacity: 0; transform: translateX(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vorwahl-herein { animation: none; }
+  }
+
   /* ── Safety Notice ───────────────────────────────────────────── */
   .safety-notice {
     @apply bg-[#eef5fb] border border-[#c0d8ed] border-l-4 border-l-[#3b6a9a]
