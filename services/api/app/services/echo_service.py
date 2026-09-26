@@ -104,6 +104,29 @@ def skalenpunkt_fuer_bericht(s: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+#: Hoechstens so viele offene Fragen. Wer mit drei aus einem Text kommt, hat genug zu tun.
+MAX_OFFENE_FRAGEN = 3
+
+
+def offene_fragen(roh: Any) -> list[str]:
+    """Die offenen Fragen eines Vergleichs, gesaeubert.
+
+    **Eigene Funktion, damit sie ohne Modellaufruf pruefbar ist.** Aus diesen Zeichenketten
+    werden Knoepfe; ein leerer Eintrag waere ein Knopf ohne Frage, und eine Liste aus
+    fuenfzehn machte aus einem Abschluss eine Aufgabenliste.
+    """
+    if not isinstance(roh, list):
+        return []
+    sauber: list[str] = []
+    for eintrag in roh:
+        if not isinstance(eintrag, str):
+            continue
+        text = " ".join(eintrag.split())
+        if text and text not in sauber:
+            sauber.append(text)
+    return sauber[:MAX_OFFENE_FRAGEN]
+
+
 def build_case_context(
     case: dict[str, Any],
     onboarding: dict[str, Any] | None,
@@ -2025,6 +2048,10 @@ class EchoService:
             "sections": abschnitte,
             "disclaimer": REPORT_DISCLAIMER,
         }
+        fragen = offene_fragen(parsed.get("fragen"))
+        if fragen:
+            ergebnis["fragen"] = fragen
+
         if str(parsed.get("hinweis") or "").strip():
             ergebnis["hinweis"] = str(parsed["hinweis"]).strip()
         return ergebnis

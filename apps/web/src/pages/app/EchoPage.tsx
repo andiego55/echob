@@ -4,7 +4,7 @@
  * Glossar-Begriffe als Schnellauswahl.
  */
 import { useEffect, useRef, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
@@ -65,7 +65,20 @@ export default function EchoPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const verlaufRef = useRef<HTMLDivElement>(null)
 
-  const [input, setInput]           = useState('')
+  /**
+   * Eine mitgebrachte Frage steht schon im Feld — abgeschickt wird sie nicht.
+   *
+   * Sie kommt aus dem Vergleich "Wunsch und Wirklichkeit", dessen letzter Abschnitt
+   * Fragen aufwirft, die dort bisher im Nichts endeten. **Über den Router-Zustand und
+   * nicht über die Adresszeile:** In so einer Frage steht Persönliches, und Adressen
+   * landen in Verläufen, Lesezeichen und Protokollen.
+   *
+   * Nur beim ersten Aufbau (Lazy-Initialisierung): Ein Effekt, der sie später noch einmal
+   * setzt, überschriebe, was jemand gerade tippt.
+   */
+  const mitgebracht = (useLocation().state as { frage?: string } | null)?.frage
+  const [input, setInput]           = useState(
+    () => (typeof mitgebracht === 'string' ? mitgebracht : ''))
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const [showGlossary, setGlossary] = useState(false)
   const [threadType]                = useState<ThreadType>('topic')

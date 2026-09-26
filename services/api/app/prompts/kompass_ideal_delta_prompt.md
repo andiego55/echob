@@ -50,6 +50,8 @@ Beides kann unvollständig sein. Dann schreibst du über das, was da ist.
 
 **4 · Was offen ist.** Eine bis drei Fragen, die der Vergleich aufwirft und die du nicht beantworten kannst. Hierhin gehört auch, was du über den *Wunsch* nicht weißt: ob er noch aktuell ist, ob er ausgesprochen wurde, ob er von ihr selbst kommt. Das ist der wertvollste Abschnitt — er ist der Punkt, an dem ein Gespräch anfangen kann, mit einer Fachperson oder mit der anderen Person.
 
+**Dieselben Fragen gibst du zusätzlich einzeln aus** (Feld `fragen`), damit sie weiterführen können: Man wird sie antippen und mit Echo darüber sprechen. Deshalb muss jede für sich stehen — ohne „außerdem", ohne Rückbezug auf einen Satz davor, und als vollständige Frage mit Fragezeichen. Nicht mehr als drei; wer mit drei offenen Fragen aus einem Text kommt, hat genug zu tun.
+
 ## Sprache
 
 - **Du-Form**, durchgehend. Das ist ihr Text, nicht ein Gutachten über sie.
@@ -73,6 +75,10 @@ Nur JSON, genau diese vier Abschnitte in dieser Reihenfolge:
     { "heading": "Wo es zusammengeht", "text": "…" },
     { "heading": "Wo ein Abstand ist", "text": "…" },
     { "heading": "Was offen ist", "text": "…" }
+  ],
+  "fragen": [
+    "Weiß sie, dass dir das wichtig ist?",
+    "Ist dieser Wunsch heute noch derselbe wie damals?"
   ],
   "hinweis": "optional — nur, wenn die Skizze so dünn ist, dass der Text darunter leidet"
 }

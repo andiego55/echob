@@ -166,6 +166,14 @@ export default function ReportDetailPage() {
 
   const sections: { heading: string; text: string }[] = report.content?.sections ?? []
   const cfg = TYPE_CONFIG[report.report_type as ReportType] ?? DEFAULT_CONFIG
+  // Nur beim Vergleich, und nur wenn wirklich welche da sind. Der Server liefert
+  // höchstens drei; hier wird nichts nachgezählt, sondern nur auf Text geprüft — ein
+  // leerer Eintrag wäre ein Knopf ohne Frage.
+  const offeneFragen: string[] =
+    report.report_type === 'ideal_delta'
+      ? ((report.content as { fragen?: unknown }).fragen as string[] | undefined ?? [])
+          .filter(f => typeof f === 'string' && f.trim())
+      : []
   const createdAt = new Date(report.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })
   const renderItems = buildRenderList(
     sections,
@@ -302,6 +310,11 @@ export default function ReportDetailPage() {
             </div>
           )}
 
+          {/* Die offenen Fragen aus "Wunsch und Wirklichkeit" — und der Weg weiter.
+              Sie stehen auch im letzten Abschnitt als Prosa; aus Prosa lässt sich aber
+              kein Knopf machen, und bisher endeten sie genau dort. */}
+          {!isEditing && <OffeneFragen fragen={offeneFragen} caseId={caseId!} />}
+
           {/* Footer */}
           {!isEditing && (
             <div className="no-print mt-10 pt-6 border-t border-brand-border flex items-center justify-between gap-4">
@@ -323,6 +336,56 @@ export default function ReportDetailPage() {
         </div>
       </AppShell>
     </>
+  )
+}
+
+// ── Die offenen Fragen ──────────────────────────────────────────────
+
+/**
+ * Der letzte Abschnitt des Vergleichs wirft Fragen auf — hier führen sie weiter.
+ *
+ * **Warum das fehlte.** "Was offen ist" ist der wertvollste Abschnitt: der Punkt, an dem
+ * ein Gespräch anfangen kann. Er stand aber als Prosa da und endete dort. Man las drei
+ * gute Fragen und legte den Bericht weg.
+ *
+ * **Warum Echo und nicht die Tagesordnung.** Die Tagesordnung hängt an einem Satz, einem
+ * Moment oder einem Porträt — an etwas, das es schon gibt. Eine Frage ist keines davon,
+ * und ihr eine vierte Art zu bauen hieße, ein fremdes Feature zu erweitern, damit dieses
+ * hier einen Knopf bekommt. Echo dagegen IST das Gespräch, und genau dorthin gehört eine
+ * offene Frage.
+ *
+ * **Die Frage wird nicht abgeschickt, sondern steht im Feld.** Wer sie so übernimmt, hat
+ * sie übernommen; wer sie umformuliert, hat sie sich zu eigen gemacht. Beides ist besser
+ * als eine Frage, die man im eigenen Namen gestellt bekommt.
+ */
+function OffeneFragen({ fragen, caseId }: { fragen: string[]; caseId: string }) {
+  const navigate = useNavigate()
+  if (fragen.length === 0) return null
+
+  return (
+    <section className="no-print mt-8 rounded-brand border border-accent/30 bg-accent/[0.04] p-5">
+      <h2 className="text-[0.95rem] font-bold text-navy">Damit könntest du weitermachen</h2>
+      <p className="mt-1 max-w-[62ch] text-[0.82rem] leading-relaxed text-brand-muted">
+        Diese Fragen sind offen geblieben. Tipp eine an, wenn du darüber sprechen willst —
+        sie steht dann im Feld, abgeschickt wird sie nicht.
+      </p>
+      <ul className="mt-3 space-y-2">
+        {fragen.map(f => (
+          <li key={f}>
+            <button
+              type="button"
+              onClick={() => navigate(`/app/cases/${caseId}/echo`, { state: { frage: f } })}
+              className="group flex w-full items-center gap-3 rounded-brand border border-brand-border bg-white px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-brand-sm motion-reduce:hover:translate-y-0"
+            >
+              <span className="min-w-0 flex-1 text-[0.88rem] leading-snug text-navy">{f}</span>
+              <span className="shrink-0 text-[0.72rem] font-semibold text-accent opacity-0 transition-opacity group-hover:opacity-100">
+                Mit Echo →
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 

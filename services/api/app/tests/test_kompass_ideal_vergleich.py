@@ -313,3 +313,46 @@ async def test_das_ablegen_beweist_das_eigentum_selbst(person, db):
     assert fehler.value.status_code == 404
     assert await db.fetchval(
         "SELECT COUNT(*) FROM reports WHERE case_id = $1", fremder_fall) == 0
+
+
+# ── Die offenen Fragen ───────────────────────────────────────────────────────
+
+def test_offene_fragen_werden_gesaeubert():
+    """Aus diesen Zeichenketten werden Knöpfe. Ein leerer Eintrag wäre ein Knopf ohne
+    Frage, und fünfzehn machten aus einem Abschluss eine Aufgabenliste."""
+    from app.services.echo_service import MAX_OFFENE_FRAGEN, offene_fragen
+
+    assert offene_fragen(["Weiß sie das?", "  ", "", "Und heute noch?"]) == [
+        "Weiß sie das?", "Und heute noch?"]
+    # Zeilenumbrüche aus der Modellantwort werden zu einfachen Abständen: Eine Frage über
+    # zwei Zeilen sähe auf einem Knopf aus wie zwei.
+    assert offene_fragen(["Weiß sie,\n  dass dir das wichtig ist?"]) == [
+        "Weiß sie, dass dir das wichtig ist?"]
+    assert offene_fragen(["A?", "A?", "B?"]) == ["A?", "B?"]
+    assert len(offene_fragen([f"Frage {i}?" for i in range(10)])) == MAX_OFFENE_FRAGEN
+
+
+def test_offene_fragen_haelt_unsinn_aus():
+    """Das Modell antwortet als JSON — aber nicht immer als das JSON, das dasteht."""
+    from app.services.echo_service import offene_fragen
+
+    assert offene_fragen(None) == []
+    assert offene_fragen("eine Zeichenkette") == []
+    assert offene_fragen([1, None, {"frage": "x"}]) == []
+
+
+@pytest.mark.asyncio
+async def test_die_fragen_ueberstehen_die_verschluesselung(person, db):
+    """Sie liegen in einer LISTE, nicht in einem Feld — und Listen sind die Stelle, an der
+    eine rekursive Verschlüsselung gern vorbeiläuft. Dann stünden sie im Klartext in der
+    Datenbank, und niemand sähe es dem Bericht an."""
+    fall = await _fall(db, person, "partner")
+    ideal = await _skizze(db, person)
+    inhalt = {**_INHALT, "fragen": ["Weiß sie, dass dir das wichtig ist?"]}
+
+    zeile = await vergleich.bericht_ablegen(
+        db, user_id=person, case_id=fall, ideal=ideal, inhalt=inhalt)
+
+    assert "Weiß sie" not in zeile["content"], "Klartext in der Datenbank"
+    wieder = crypto.decrypt_json_strings(json.loads(zeile["content"]))
+    assert wieder["fragen"] == ["Weiß sie, dass dir das wichtig ist?"]
