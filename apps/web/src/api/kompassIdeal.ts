@@ -41,6 +41,8 @@ export interface IdealAbwaegung {
   links: string
   rechts: string
   hinweis: string
+  /** Worauf das Paar antwortet. Leer = gilt immer; die Waage fragt es später. */
+  familien: string[]
   arten: string[]
 }
 

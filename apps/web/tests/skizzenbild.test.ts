@@ -11,7 +11,10 @@
  * Bildes. Ein Band, das die falsche Breite hat, behauptet ein Gewicht, das niemand gesetzt hat.
  */
 import { describe, expect, it } from 'vitest'
-import { gestalt, satzTeile, zitat, type Entwurf, type Vokabular } from '@/lib/skizzenbild'
+import {
+  gestalt, reihungsVorschlag, satzTeile, zitat,
+  type Entwurf, type Vokabular,
+} from '@/lib/skizzenbild'
 
 const V: Vokabular = {
   aspekt_familien: [
@@ -255,5 +258,43 @@ describe('zitat', () => {
   it('schweigt bei Leerraum', () => {
     expect(zitat('   ')).toBeNull()
     expect(zitat('')).toBeNull()
+  })
+})
+
+// ── Der Reihenfolge-Vorschlag ────────────────────────────────────────────────
+
+describe('reihungsVorschlag', () => {
+  it('ordnet nach Gewicht und schneidet bei der Obergrenze ab', () => {
+    const e: Entwurf = {
+      ...LEER,
+      aspekte: [
+        { key: 'eigener_raum', gewicht: 30 },
+        { key: 'nicht_wachsam', gewicht: 90 },
+        { key: 'gehoert_werden', gewicht: 60 },
+      ],
+    }
+    expect(reihungsVorschlag(e, V, 2)).toEqual(['nicht_wachsam', 'gehoert_werden'])
+  })
+
+  it('schlaegt nichts vor, wo nichts gewaehlt ist', () => {
+    expect(reihungsVorschlag(LEER, V, 5)).toEqual([])
+  })
+
+  it('haelt eine bestehende Reihenfolge, statt sie zu ueberschreiben', () => {
+    // Ein Gewicht sagt, wie viel man von etwas will; die Reihenfolge sagt, was im Zweifel
+    // vorgeht. Wer schon geordnet hat, hat das Zweite gesagt - und es darf nicht vom
+    // Ersten ueberstimmt werden.
+    const e: Entwurf = {
+      ...LEER,
+      aspekte: [{ key: 'nicht_wachsam', gewicht: 20 }, { key: 'gehoert_werden', gewicht: 95 }],
+      reihung: ['nicht_wachsam'],
+    }
+    expect(reihungsVorschlag(e, V, 5)[0]).toBe('nicht_wachsam')
+  })
+
+  it('haelt eine Obergrenze von null oder weniger aus', () => {
+    const e: Entwurf = { ...LEER, aspekte: [{ key: 'nicht_wachsam', gewicht: 50 }] }
+    expect(reihungsVorschlag(e, V, 0)).toEqual([])
+    expect(reihungsVorschlag(e, V, -3)).toEqual([])
   })
 })

@@ -36,7 +36,7 @@ import Waage from '@/components/app/kompass/Waage'
 import SkizzeVergleichen from '@/components/app/kompass/SkizzeVergleichen'
 import DeineSkizze from '@/components/app/kompass/DeineSkizze'
 import Vorwahl from '@/components/app/kompass/Vorwahl'
-import type { Entwurf } from '@/lib/skizzenbild'
+import { reihungsVorschlag, type Entwurf } from '@/lib/skizzenbild'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import {
   idealApi,
@@ -267,36 +267,24 @@ export default function TraumbeziehungSkizzePage() {
               <>
                 <p className="mb-4 max-w-[60ch] text-[0.92rem] leading-relaxed text-brand-muted">
                   Beide Seiten sind gut. Es geht nicht darum, was richtig ist, sondern
-                  darum, was dir mehr fehlt, wenn du nicht beides haben kannst.
+                  darum, was dir mehr fehlt, wenn du nicht beides haben kannst. Eine Frage
+                  nach der anderen, und jede ist ein Tipp — du kannst jederzeit aufhören.
                 </p>
                 <Waage
                   paare={kat.abwaegungen}
                   werte={entwurf.abwaegungen}
                   onAendern={abwaegungen => aendern({ abwaegungen })}
+                  bezug={familienDerWahl(entwurf, kat)}
                 />
               </>
             )}
 
             {schritt === 'reihung' && (
-              <>
-                <p className="mb-4 max-w-[60ch] text-[0.92rem] leading-relaxed text-brand-muted">
-                  Die {kat.max_reihung} wichtigsten, von oben nach unten. Nicht, weil der
-                  Rest egal wäre — sondern weil man in einer echten Beziehung irgendwann
-                  eines gegen das andere abwägen muss.
-                </p>
-                <Reihung
-                  punkte={reihungsPunkte(entwurf, kat)}
-                  onAendern={reihung => aendern({ reihung })}
-                  leerText="Wähle erst ein paar Aspekte aus — ordnen kannst du sie danach."
-                />
-                {entwurf.aspekte.length > entwurf.reihung.length && (
-                  <NochNichtGeordnet
-                    entwurf={entwurf}
-                    kat={kat}
-                    onDazu={key => aendern({ reihung: [...entwurf.reihung, key] })}
-                  />
-                )}
-              </>
+              <Reihenfolge
+                entwurf={entwurf}
+                kat={kat}
+                onAendern={reihung => aendern({ reihung })}
+              />
             )}
           </div>
 
@@ -524,6 +512,82 @@ function GewichtsRegler({ familien, gewaehlt, onAendern }: {
 }
 
 // ── Schritt 4: die Reihenfolge ───────────────────────────────────────────────
+
+// ── Schritt 4: die Reihenfolge ───────────────────────────────────────────────
+
+/**
+ * Die Familien, aus denen etwas gewählt wurde — daran richtet die Waage ihre Fragen aus.
+ */
+function familienDerWahl(entwurf: Entwurf, kat: IdealKatalog): string[] {
+  const keys = new Set(entwurf.aspekte.map(a => a.key))
+  return kat.aspekt_familien.filter(f => f.aspekte.some(a => keys.has(a.key))).map(f => f.key)
+}
+
+/**
+ * „So hätte ich dich verstanden — stimmt die Reihenfolge?"
+ *
+ * **Vorher wurde hier zweimal dasselbe gefragt.** Schritt 2 will Gewichte, Schritt 4 wollte
+ * eine Reihenfolge, die man von Hand aus Chips zusammensetzt — obwohl die Gewichte sie
+ * längst gesagt haben. Wer „Sicherheit 90" und „Zärtlichkeit 40" gesetzt hat, soll nicht
+ * noch einmal von vorn anfangen.
+ *
+ * **Der Vorschlag wird nicht gespeichert, bevor jemand ihn anfasst.** Er steht da,
+ * erkennbar als Vorschlag, und die erste Bewegung — ein Pfeil oder „Stimmt so" — macht ihn
+ * zur Aussage. Ein Gewicht sagt, wie viel man von etwas will; die Reihenfolge sagt, was im
+ * Zweifel vorgeht, und das ist nicht dasselbe. Man kann von einer Sache wenig wollen und
+ * trotzdem darauf bestehen.
+ */
+function Reihenfolge({ entwurf, kat, onAendern }: {
+  entwurf: Entwurf
+  kat: IdealKatalog
+  onAendern: (reihung: string[]) => void
+}) {
+  const vorschlag = useMemo(
+    () => reihungsVorschlag(entwurf, kat, kat.max_reihung),
+    [entwurf, kat],
+  )
+  const istVorschlag = entwurf.reihung.length === 0 && vorschlag.length > 0
+  const gezeigt = istVorschlag ? { ...entwurf, reihung: vorschlag } : entwurf
+
+  return (
+    <>
+      <p className="mb-4 max-w-[60ch] text-[0.92rem] leading-relaxed text-brand-muted">
+        Die {kat.max_reihung} wichtigsten, von oben nach unten. Nicht, weil der Rest egal
+        wäre — sondern weil man in einer echten Beziehung irgendwann eines gegen das andere
+        abwägen muss.
+      </p>
+
+      {istVorschlag && (
+        <p className="mb-3 rounded-brand border border-accent/30 bg-accent/[0.05] px-4 py-3 text-[0.86rem] leading-snug text-navy">
+          <strong className="font-semibold">So hätte ich dich verstanden</strong> — aus dem,
+          wie viel du von jedem wolltest. Schieb um, was nicht stimmt.
+        </p>
+      )}
+
+      <Reihung
+        punkte={reihungsPunkte(gezeigt, kat)}
+        onAendern={onAendern}
+        leerText="Wähle erst ein paar Aspekte aus — ordnen kannst du sie danach."
+      />
+
+      {istVorschlag ? (
+        <button
+          type="button"
+          onClick={() => onAendern(vorschlag)}
+          className="btn-primary !py-2 !px-4 !text-sm mt-4"
+        >
+          Stimmt so
+        </button>
+      ) : entwurf.aspekte.length > entwurf.reihung.length && (
+        <NochNichtGeordnet
+          entwurf={entwurf}
+          kat={kat}
+          onDazu={key => onAendern([...entwurf.reihung, key])}
+        />
+      )}
+    </>
+  )
+}
 
 function reihungsPunkte(entwurf: Entwurf, kat: IdealKatalog) {
   const alle = kat.aspekt_familien.flatMap(f => f.aspekte)

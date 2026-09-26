@@ -97,6 +97,24 @@ function clamp(n: number): number {
   return Math.max(0, Math.min(100, Number.isFinite(n) ? n : 50))
 }
 
+/**
+ * Eine Reihenfolge, wie sie sich aus den Gewichten ergibt — als Vorschlag.
+ *
+ * **Warum es den gibt.** Schritt 2 fragt nach Gewichten, Schritt 4 nach der Reihenfolge:
+ * zwei Instrumente für dieselbe Auskunft. Wer „Sicherheit 90" und „Zärtlichkeit 40" gesetzt
+ * hat, hat die Reihenfolge schon gesagt — ihn danach noch einmal von vorn ordnen zu lassen
+ * ist keine Gründlichkeit, sondern doppelte Arbeit.
+ *
+ * **Und warum trotzdem nur ein Vorschlag.** Ein Gewicht sagt, wie viel man von etwas will.
+ * Die Reihenfolge sagt, was im Zweifel vorgeht — und das ist nicht dasselbe: Man kann von
+ * einer Sache wenig wollen und trotzdem darauf bestehen. Deshalb wird hier nichts
+ * gespeichert und nichts behauptet; es steht nur schon einmal da, und korrigieren ist
+ * leichter als ordnen.
+ */
+export function reihungsVorschlag(entwurf: Entwurf, vokabular: Vokabular, max: number): string[] {
+  return gestalt(entwurf, vokabular).slice(0, Math.max(0, max)).map(b => b.key)
+}
+
 // ── Der Text ─────────────────────────────────────────────────────────────────
 
 /**

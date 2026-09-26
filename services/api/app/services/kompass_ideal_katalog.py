@@ -222,57 +222,108 @@ ASPEKT_SCHLUESSEL: frozenset[str] = frozenset(
 )
 
 
+
+
 # ── Die Abwägungen ───────────────────────────────────────────────────────────
 #
-# Beide Seiten sind gut — das ist der ganze Punkt. Ein Gegensatzpaar, bei dem eine Seite
-# offensichtlich die richtige ist, ist keine Abwägung, sondern eine Prüfungsfrage; und wer
-# eine Prüfungsfrage erkennt, antwortet nicht mehr ehrlich.
+# **Beide Seiten sind gut.** Das ist keine Höflichkeit, sondern die Bedingung: Ein
+# Gegensatzpaar, bei dem eine Seite offensichtlich die richtige ist, ist eine Prüfungsfrage
+# — und wer eine Prüfungsfrage erkennt, antwortet nicht mehr ehrlich.
 #
-# Der Regler steht in der Mitte, solange niemand ihn anfasst. „Weder noch" und „beides
-# gleich" sind gültige Antworten und dürfen nicht wie eine Lücke aussehen.
+# **`familien` sagt, worauf ein Paar antwortet.** Die Oberfläche stellt zuerst die Fragen,
+# die etwas Gewähltes berühren: Wer aus der Familie „Nähe und Abstand" nichts angetippt hat,
+# braucht die Frage nach gemeinsamer Zeit nicht als erste. Ein Paar mit leerem `familien`
+# gilt immer — manche Spannungen liegen in jeder Beziehung, unabhängig davon, was jemand
+# ausgewählt hat.
+#
+# **Warum es achtzehn sind und nicht sechs.** Eine Abwägung ist ein Klick und dauert
+# Sekunden, und sie ist die einzige Stelle, an der eine Skizze ehrlich wird: Wer alles
+# anhakt, hat nichts gesagt. Sechs Paare zwangen zu drei, vier Entscheidungen; achtzehn,
+# nach Bezug sortiert, ergeben ein Bild mit Kanten.
+
+
+def _p(key: str, links: str, rechts: str, hinweis: str,
+       familien: tuple[str, ...] = (), arten: tuple[str, ...] = _ALLE) -> dict[str, Any]:
+    return {
+        "key": key, "links": links, "rechts": rechts, "hinweis": hinweis,
+        "familien": list(familien), "arten": list(arten),
+    }
+
+
 ABWAEGUNGEN: tuple[dict[str, Any], ...] = (
-    {
-        "key": "naehe_raum",
-        "links": "Viel gemeinsame Zeit",
-        "rechts": "Viel Zeit für mich",
-        "hinweis": "Beides ist gut. Es geht darum, was dir heute mehr fehlt.",
-        "arten": list(_PRIVAT),
-    },
-    {
-        "key": "ruhe_klaerung",
-        "links": "Frieden im Alltag",
-        "rechts": "Dinge ansprechen, auch wenn es knirscht",
-        "hinweis": "Manche brauchen Ruhe zum Auftanken, andere ersticken daran.",
-        "arten": list(_ALLE),
-    },
-    {
-        "key": "halt_freiheit",
-        "links": "Verlässliche Abläufe",
-        "rechts": "Spontan und offen",
-        "hinweis": "Das eine gibt Boden, das andere Luft.",
-        "arten": list(_ALLE),
-    },
-    {
-        "key": "fuersorge_selbst",
-        "links": "Füreinander sorgen",
-        "rechts": "Jeder steht für sich",
-        "hinweis": "Zwischen Getragenwerden und Getragenwerden-Müssen liegt nicht viel.",
-        "arten": list(_PRIVAT),
-    },
-    {
-        "key": "gemeinsam_eigen",
-        "links": "Vieles zusammen machen",
-        "rechts": "Getrennte Interessen",
-        "hinweis": "Ein gemeinsames Leben ist nicht dasselbe wie dasselbe Leben.",
-        "arten": list(_PRIVAT),
-    },
-    {
-        "key": "gewissheit_entwicklung",
-        "links": "So bleiben, wie wir sind",
-        "rechts": "Uns weiterentwickeln",
-        "hinweis": "Nicht jede Beziehung muss ein Projekt sein.",
-        "arten": list(_ALLE),
-    },
+    # ── Nähe und Abstand ─────────────────────────────────────────────────────
+    _p("naehe_raum", "Viel gemeinsame Zeit", "Viel Zeit für mich",
+       "Beides ist gut. Es geht darum, was dir heute mehr fehlt.",
+       ("naehe",), _PRIVAT),
+    _p("gemeinsam_eigen", "Vieles zusammen machen", "Getrennte Interessen",
+       "Ein gemeinsames Leben ist nicht dasselbe wie dasselbe Leben.",
+       ("naehe",), _PRIVAT),
+    _p("taeglich_selten", "Jeden Tag ein bisschen", "Seltener, dafür ganz",
+       "Manche brauchen den Faden, andere den Moment.",
+       ("naehe",), _PRIVAT),
+    _p("worte_dasein", "Nähe über Worte", "Nähe, ohne dass geredet wird",
+       "Nebeneinander schweigen kann näher sein als ein Gespräch.",
+       ("naehe",), _PRIVAT),
+
+    # ── Sicherheit ───────────────────────────────────────────────────────────
+    _p("offen_geschuetzt", "Alles sagen können", "Manches für mich behalten dürfen",
+       "Offenheit ist ein Angebot, kein Anspruch — in beide Richtungen.",
+       ("sicherheit",)),
+    _p("gewissheit_vertrauen", "Wissen, woran ich bin", "Nicht alles wissen müssen",
+       "Das eine gibt Boden, das andere Luft. Beides kann Sicherheit heißen.",
+       ("sicherheit", "verlaesslichkeit")),
+
+    # ── Wie wir streiten ─────────────────────────────────────────────────────
+    _p("ruhe_klaerung", "Frieden im Alltag", "Dinge ansprechen, auch wenn es knirscht",
+       "Manche brauchen Ruhe zum Auftanken, andere ersticken daran.",
+       ("umgang",)),
+    _p("sofort_sacken", "Sofort aussprechen", "Erst sacken lassen, dann reden",
+       "Der eine braucht es vom Tisch, der andere braucht erst Boden.",
+       ("umgang",)),
+    _p("deutlich_schonend", "Deutlich gesagt bekommen", "Schonend gesagt bekommen",
+       "Deutlichkeit spart Zeit. Schonung spart Kraft.",
+       ("umgang", "wert")),
+    _p("reden_machen", "Darüber reden", "Es einfach anders machen",
+       "Nicht jede Veränderung braucht ein Gespräch — und nicht jedes Gespräch verändert.",
+       ("umgang", "wachsen")),
+
+    # ── Verlässlichkeit ──────────────────────────────────────────────────────
+    _p("halt_freiheit", "Verlässliche Abläufe", "Spontan und offen",
+       "Das eine gibt Boden, das andere Luft.",
+       ("verlaesslichkeit",)),
+    _p("zusage_spielraum", "Zusagen, die stehen", "Spielraum, wenn sich etwas ändert",
+       "Zwischen Verbindlichkeit und Enge liegt nicht viel.",
+       ("verlaesslichkeit",)),
+
+    # ── Was getragen wird ────────────────────────────────────────────────────
+    _p("fuersorge_selbst", "Füreinander sorgen", "Jeder steht für sich",
+       "Zwischen Getragenwerden und Getragenwerden-Müssen liegt nicht viel.",
+       ("last",), _PRIVAT),
+    _p("teilen_verschonen", "Auch das Schwere teilen", "Einander damit verschonen",
+       "Mitteilen entlastet den einen und belastet den anderen. Manchmal umgekehrt.",
+       ("last",)),
+    _p("annehmen_alleine", "Hilfe annehmen können", "Es allein schaffen dürfen",
+       "Beides ist Stärke, und beides kann einsam machen.",
+       ("last",)),
+
+    # ── Wie ich vorkomme ─────────────────────────────────────────────────────
+    _p("bestaerkt_gespiegelt", "Bestärkt werden", "Ehrlich gespiegelt bekommen",
+       "Zuspruch trägt. Widerspruch auch — nur anders.",
+       ("wert",)),
+
+    # ── Dass sich etwas bewegt ───────────────────────────────────────────────
+    _p("gewissheit_entwicklung", "So bleiben, wie wir sind", "Uns weiterentwickeln",
+       "Nicht jede Beziehung muss ein Projekt sein.",
+       ("wachsen",)),
+    _p("zusammen_einzeln", "Gemeinsam wachsen", "Jeder für sich wachsen",
+       "Zwei Wege können nebeneinander laufen, ohne derselbe zu sein.",
+       ("wachsen",), _PRIVAT),
+
+    # ── Ohne Bezug: Spannungen, die in jeder Beziehung liegen ────────────────
+    _p("aehnlich_ergaenzen", "Uns ähnlich sein", "Uns ergänzen",
+       "Das eine ist bequem, das andere interessant. Keins ist besser."),
+    _p("leicht_tief", "Leichtigkeit", "Tiefe",
+       "Wer immer nur tief geht, kommt nicht zum Luftholen. Wer nie, kommt nicht an."),
 )
 
 ABWAEGUNG_SCHLUESSEL: frozenset[str] = frozenset(a["key"] for a in ABWAEGUNGEN)

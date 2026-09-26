@@ -79,6 +79,39 @@ def test_jede_abwaegung_hat_zwei_gute_seiten():
         assert paar["arten"], f"{paar['key']} gilt für keine einzige Art"
 
 
+def test_jeder_bezug_zeigt_auf_eine_echte_familie():
+    """Ein Bezug auf eine Familie, die es nicht gibt, ist unsichtbar kaputt.
+
+    Die Oberfläche sortiert die Fragen danach, was jemand gewählt hat: Paare, deren
+    ``familien`` eine gewählte Familie berühren, kommen zuerst. Ein Tippfehler im Bezug
+    lässt das Paar einfach nie vorne erscheinen — kein Fehler, keine Warnung, nur eine
+    Frage, die fast niemand mehr zu sehen bekommt.
+    """
+    echte = {f["key"] for f in katalog.ASPEKT_FAMILIEN}
+    for paar in katalog.ABWAEGUNGEN:
+        unbekannt = set(paar["familien"]) - echte
+        assert not unbekannt, f"{paar['key']} verweist auf {unbekannt}"
+
+
+def test_es_gibt_auch_paare_ohne_bezug():
+    """Manche Spannungen liegen in jeder Beziehung, egal was jemand angetippt hat.
+
+    Ohne sie bekäme jemand, der nur aus einer Familie gewählt hat, fast nur Fragen aus
+    genau dieser Ecke — und die Skizze bestätigte, was sie schon weiß.
+    """
+    assert any(not p["familien"] for p in katalog.ABWAEGUNGEN)
+
+
+def test_die_waage_hat_genug_zu_fragen():
+    """Sechs Paare zwangen zu drei, vier Entscheidungen. Eine Abwägung ist ein Klick und
+    die einzige Stelle, an der eine Skizze ehrlich wird: Wer alles anhakt, hat nichts
+    gesagt."""
+    assert len(katalog.ABWAEGUNGEN) >= 15
+    # Und je Art bleibt genug übrig, auch nach dem Zuschnitt.
+    for art in katalog.ART_SCHLUESSEL:
+        assert len(katalog.fuer_art(art)["abwaegungen"]) >= 10, art
+
+
 def test_die_routen_sind_wirklich_angemeldet():
     """Ein Router, den niemand einbindet, ist unsichtbar — und nichts wird deswegen rot.
 
