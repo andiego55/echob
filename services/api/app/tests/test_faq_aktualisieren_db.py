@@ -161,12 +161,30 @@ async def test_bei_aufgebrauchtem_kontingent_sagt_es_das_auch(welt):
 
 
 async def test_ein_laufendes_paket_wird_nicht_doppelt_gestartet(welt):
+    """Der laufende Lauf entsteht OHNE einen ersten POST — und das ist der Punkt.
+
+    **Was hier schiefging.** Der Test hat den laufenden Lauf vorher ueber einen ersten POST
+    erzeugt und danach auf ``laeuft`` gesetzt. Dieser POST startet aber die
+    Hintergrundaufgabe, und die schreibt am Ende selbst ``status = 'fertig'``. Landet ihr
+    Schreiben NACH dem des Tests — im Mock-Betrieb eine Frage von Millisekunden —, sieht der
+    zweite POST keinen laufenden Lauf mehr und antwortet 200. Auf dem eigenen Rechner ging
+    das jahrelang gut, auf dem CI-Laeufer nicht (Lauf #407).
+
+    Ein Test, der davon abhaengt, dass eine Hintergrundaufgabe langsamer ist als zwei
+    HTTP-Aufrufe, prueft nicht den Waechter, sondern den Rechner. Der Lauf wird deshalb
+    direkt ueber ``sicher_anlegen`` erzeugt: derselbe Weg, dieselbe Verbuchung — nur ohne
+    ``spawn``, also ohne Nebenlaeufer, der dazwischenschreibt.
+    """
+    from app.services import fall_faq_service
+
     pool, owner, case_id, share_id = welt
+    async with pool.acquire() as conn:
+        share = await conn.fetchrow("SELECT * FROM case_shares WHERE id = $1", share_id)
+        await fall_faq_service.sicher_anlegen(conn, share=dict(share), gewuenscht=True)
+        await conn.execute(
+            "UPDATE case_faq_runs SET status = 'laeuft' WHERE share_id = $1", share_id)
+
     with _client(owner) as c:
-        c.post(_pfad(case_id, share_id))
-        async with pool.acquire() as conn:
-            await conn.execute(
-                "UPDATE case_faq_runs SET status = 'laeuft' WHERE share_id = $1", share_id)
         antwort = c.post(_pfad(case_id, share_id))
 
     assert antwort.status_code == 409
