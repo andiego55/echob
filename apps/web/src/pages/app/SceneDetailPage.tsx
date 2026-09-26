@@ -9,6 +9,8 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import WasGebraucht from '@/components/app/kompass/WasGebraucht'
+import { casesApi } from '@/api/cases'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
 import { scenesApi } from '@/api/scenes'
@@ -49,6 +51,16 @@ export default function SceneDetailPage() {
     queryKey: ['kompass-saetze-szene', sceneId],
     queryFn: () => kompassApi.saetzeZuSzene(sceneId!),
     enabled: !!sceneId,
+    retry: false,
+  })
+
+  // Die Beziehungsart des Falls — sie entscheidet, welche Skizze gemeint ist. Scheitert
+  // die Abfrage, bleibt die Szene vollständig: Ein Angebot, das fehlt, ist kein Grund,
+  // die Seite mit einer Fehlermeldung zu stören.
+  const { data: fall } = useQuery({
+    queryKey: ['case', caseId],
+    queryFn: () => casesApi.get(caseId!),
+    enabled: !!caseId,
     retry: false,
   })
 
@@ -293,6 +305,12 @@ export default function SceneDetailPage() {
         {/* ── Der Rueckverweis ──────────────────────────────────────────────
             Steht nur da, wenn wirklich ein bestaetigter Satz daraus gewachsen ist.
             Eine Marke, die immer da ist und meistens leer, waere Moebel. */}
+        {/* Der umgekehrte Weg: Aus dem, was hier gefehlt hat, wird ein Wunsch.
+            Menschen merken, was sie wollen, wenn etwas schiefgeht — und an einer Szene
+            ist die Frage leicht, die im eigenen Raum die schwerste überhaupt ist.
+            Nicht im Bearbeiten-Modus: Dort ist die Szene selbst der Vorgang. */}
+        {!editMode && <WasGebraucht art={fall?.relationship_type} />}
+
         {saetze && saetze.length > 0 && (
           <div className="mb-6 rounded-brand border border-accent/40 bg-accent/[0.05] p-4">
             <p className="text-sm font-semibold text-navy">
