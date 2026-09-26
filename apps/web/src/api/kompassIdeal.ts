@@ -63,6 +63,18 @@ export interface AspektWahl {
   label?: string | null
 }
 
+/**
+ * Eine Skizze ohne ihre Zeile — für die blinde Neufassung und die abgelöste Fassung.
+ *
+ * Dieselben vier Felder wie in `Ideal`, weil es dasselbe Ding ist.
+ */
+export interface SkizzenInhalt {
+  aspekte: AspektWahl[]
+  reihung: string[]
+  abwaegungen: Record<string, number>
+  eigenes: string | null
+}
+
 export interface Ideal {
   id: string
   art: string
@@ -72,6 +84,16 @@ export interface Ideal {
   abwaegungen: Record<string, number>
   eigenes: string | null
   geprueft_at: string | null
+  /**
+   * Die blinde Neufassung, solange sie in Arbeit ist.
+   *
+   * Solange sie da ist, arbeitet die Seite AUF IHR und zeigt die geltende Skizze nirgends:
+   * Wer die alte beim Neuschreiben sieht, häkelt sie nach.
+   */
+  entwurf: SkizzenInhalt | null
+  /** Die zuletzt abgelöste Fassung — genau eine, keine Geschichte. */
+  vorher: SkizzenInhalt | null
+  vorher_at: string | null
   created_at: string
   updated_at: string
 }
@@ -108,8 +130,26 @@ export const idealApi = {
   speichern: (art: string, body: IdealSpeichern) =>
     apiClient.put<Ideal>(`${basis}/${art}`, body).then(r => r.data),
 
+  /** „Das stimmt noch." — setzt den Prüfzeitpunkt, ändert sonst nichts. */
   bestaetigen: (art: string) =>
     apiClient.post<Ideal | null>(`${basis}/${art}/bestaetigen`).then(r => r.data),
+
+  /**
+   * Die blinde Neufassung fortschreiben. Die geltende Skizze bleibt unangetastet.
+   *
+   * Sie liegt auf dem Server und nicht nur im Browser, weil vier Schritte nichts sind, was
+   * man in einem Rutsch erledigt — ein Neuladen dürfte sie nicht kosten.
+   */
+  entwurfSpeichern: (art: string, body: IdealSpeichern) =>
+    apiClient.put<Ideal | null>(`${basis}/${art}/entwurf`, body).then(r => r.data),
+
+  /** Die Neufassung wird die geltende Skizze, die alte rückt eine Stelle weiter. */
+  entwurfUebernehmen: (art: string) =>
+    apiClient.post<Ideal | null>(`${basis}/${art}/entwurf/uebernehmen`).then(r => r.data),
+
+  /** Die Neufassung wegwerfen. Die geltende Skizze war nie in Gefahr. */
+  entwurfVerwerfen: (art: string) =>
+    apiClient.delete<Ideal | null>(`${basis}/${art}/entwurf`).then(r => r.data),
 
   loeschen: (art: string) =>
     apiClient.delete(`${basis}/${art}`).then(() => undefined),

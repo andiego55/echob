@@ -344,3 +344,168 @@ async def test_die_eigenen_worte_wiegen_schwerer(person, db):
 
     assert _EIGENES in text
     assert "wiegen schwerer" in text
+
+
+# ── Noch einmal, ohne die alte zu sehen ──────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_der_entwurf_laesst_die_geltende_skizze_in_ruhe(person, db):
+    """**Das Wichtigste am ganzen blinden Weg.**
+
+    Wer mittendrin merkt, dass er heute keine Lust darauf hat, darf nichts verlieren. Und
+    wer nie bis zum Übernehmen kommt, behält seine alte Skizze für immer.
+    """
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}],
+                           eigenes="Der alte Satz.")
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 40}],
+                                   eigenes="Der neue Satz.")
+
+    jetzt = await dienst.holen(db, user_id=person, art="partner")
+    assert [a["key"] for a in jetzt["aspekte"]] == ["nicht_wachsam"]
+    assert jetzt["eigenes"] == "Der alte Satz."
+    assert [a["key"] for a in jetzt["entwurf"]["aspekte"]] == ["gehoert_werden"]
+    assert jetzt["entwurf"]["eigenes"] == "Der neue Satz."
+
+
+@pytest.mark.asyncio
+async def test_uebernehmen_ruecke_die_alte_eine_stelle_weiter(person, db):
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}],
+                           eigenes="Der alte Satz.")
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 40}],
+                                   eigenes="Der neue Satz.")
+
+    nach = await dienst.entwurf_uebernehmen(db, user_id=person, art="partner")
+    assert [a["key"] for a in nach["aspekte"]] == ["gehoert_werden"]
+    assert nach["vorher"]["eigenes"] == "Der alte Satz."
+    assert nach["vorher_at"] is not None
+    assert nach["entwurf"] is None
+    # Und der Pruefzeitpunkt steht: Wer neu skizziert hat, hat gerade nachgesehen.
+    assert nach["geprueft_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_ein_zweiter_klick_frisst_die_vorfassung_nicht(person, db):
+    """Ohne ``WHERE entwurf IS NOT NULL`` schriebe der zweite Klick die eben übernommene
+    Fassung als „vorher" über sich selbst — und die echte Vorfassung wäre weg. Ein
+    Doppelklick oder ein hängender Knopf genügt dafür."""
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}], eigenes="Alt.")
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 40}],
+                                   eigenes="Neu.")
+    await dienst.entwurf_uebernehmen(db, user_id=person, art="partner")
+
+    nochmal = await dienst.entwurf_uebernehmen(db, user_id=person, art="partner")
+    assert nochmal is None, "der zweite Klick darf nichts tun"
+    stand = await dienst.holen(db, user_id=person, art="partner")
+    assert stand["vorher"]["eigenes"] == "Alt."
+    assert stand["eigenes"] == "Neu."
+
+
+@pytest.mark.asyncio
+async def test_verwerfen_nimmt_nur_den_entwurf(person, db):
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}], eigenes="Alt.")
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 40}])
+
+    nach = await dienst.entwurf_verwerfen(db, user_id=person, art="partner")
+    assert nach["entwurf"] is None
+    assert nach["eigenes"] == "Alt."
+    assert [a["key"] for a in nach["aspekte"]] == ["nicht_wachsam"]
+
+
+@pytest.mark.asyncio
+async def test_der_entwurf_geht_durch_dieselbe_pruefung(person, db):
+    """Ein Entwurf, der lockerer behandelt wird als die Skizze, wird beim Übernehmen zu
+    einer Skizze, die nie geprüft wurde."""
+    await dienst.speichern(db, user_id=person, art="work",
+                           aspekte=[{"key": "gehoert_werden", "gewicht": 50}])
+    nach = await dienst.entwurf_speichern(
+        db, user_id=person, art="work",
+        # „Zärtlichkeit" gibt es im Arbeitsverhältnis nicht — auch nicht im Entwurf.
+        aspekte=[{"key": "zaertlichkeit", "gewicht": 90},
+                 {"key": "gehoert_werden", "gewicht": 60}],
+        reihung=["zaertlichkeit", "gehoert_werden"],
+    )
+    assert [a["key"] for a in nach["entwurf"]["aspekte"]] == ["gehoert_werden"]
+    assert nach["entwurf"]["reihung"] == ["gehoert_werden"]
+
+
+@pytest.mark.asyncio
+async def test_ohne_skizze_gibt_es_keinen_entwurf(person, db):
+    """Eine Neufassung von nichts ist keine Neufassung, sondern eine erste Fassung."""
+    assert await dienst.entwurf_speichern(
+        db, user_id=person, art="partner",
+        aspekte=[{"key": "nicht_wachsam", "gewicht": 50}]) is None
+    assert await dienst.entwurf_uebernehmen(db, user_id=person, art="partner") is None
+
+
+@pytest.mark.asyncio
+async def test_der_entwurf_liegt_verschluesselt_in_der_datenbank(person, db):
+    """Dieselbe Regel wie für die Skizze: Es ist derselbe Text."""
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 50}])
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 50}],
+                                   eigenes=_EIGENES)
+
+    roh = await db.fetchval(
+        "SELECT entwurf::text FROM selbst_ideale WHERE user_id = $1 AND art = 'partner'",
+        person)
+    assert _EIGENES not in roh
+    assert "enc:" in roh
+
+
+@pytest.mark.asyncio
+async def test_loeschen_nimmt_entwurf_und_vorfassung_mit(person, db):
+    """Sie hängen an derselben Zeile — dieser Test hält fest, dass das so bleibt.
+
+    Zöge jemand sie eines Tages in eine eigene Tabelle, fiele die Löschung still
+    auseinander: Der Nutzer löscht seine Skizze, und die alte Fassung bliebe liegen.
+    """
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 50}])
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 50}])
+    await dienst.entwurf_uebernehmen(db, user_id=person, art="partner")
+
+    await dienst.loeschen(db, user_id=person, art="partner")
+    assert await db.fetchval(
+        "SELECT COUNT(*) FROM selbst_ideale WHERE user_id = $1", person) == 0
+
+
+@pytest.mark.asyncio
+async def test_am_entwurf_arbeiten_laesst_das_alter_der_skizze_in_ruhe(person, db):
+    """**Sonst wäre der Vergleich wertlos.**
+
+    ``updated_at`` sagt, wann die GELTENDE Skizze zuletzt anders wurde; beim Übernehmen
+    wandert sie als ``vorher_at`` mit und trägt dort den Satz „verglichen mit vor acht
+    Monaten". Würde jeder Tastendruck in der Neufassung sie hochsetzen, stünde dort am Ende
+    „vor einem Moment" — und die einzige Zahl, die den Vergleich interessant macht, wäre weg.
+    """
+    await dienst.speichern(db, user_id=person, art="partner",
+                           aspekte=[{"key": "nicht_wachsam", "gewicht": 90}])
+    vorher = await db.fetchval(
+        "SELECT updated_at FROM selbst_ideale WHERE user_id = $1 AND art = 'partner'", person)
+
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 50}])
+    nach_entwurf = await db.fetchval(
+        "SELECT updated_at FROM selbst_ideale WHERE user_id = $1 AND art = 'partner'", person)
+    assert nach_entwurf == vorher, "die Arbeit am Entwurf hat die Skizze verjuengt"
+
+    await dienst.entwurf_verwerfen(db, user_id=person, art="partner")
+    assert await db.fetchval(
+        "SELECT updated_at FROM selbst_ideale WHERE user_id = $1 AND art = 'partner'",
+        person) == vorher
+
+    # Und beim Uebernehmen traegt vorher_at genau diesen Zeitpunkt.
+    await dienst.entwurf_speichern(db, user_id=person, art="partner",
+                                   aspekte=[{"key": "gehoert_werden", "gewicht": 50}])
+    nach = await dienst.entwurf_uebernehmen(db, user_id=person, art="partner")
+    assert nach["vorher_at"] == vorher

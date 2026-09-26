@@ -49,8 +49,36 @@ def _aufbereiten(zeile: asyncpg.Record | None) -> dict[str, Any] | None:
     d["abwaegungen"] = inhalt.get("abwaegungen") or {}
     d["eigenes"] = inhalt.get("eigenes")
     d["art_label"] = katalog.art_label(d.get("art"))
+
+    # Die blinde Neufassung und die abgelöste Vorfassung gehen als FERTIGE Skizzen mit —
+    # nicht als rohes JSON. Wer sie anzeigt, soll dieselben Felder vorfinden wie bei der
+    # aktuellen, samt aufgelösten Etiketten. Sonst entstünde an der Oberfläche eine zweite
+    # Aufbereitung, und zwei Aufbereitungen desselben Dings gehen auseinander.
+    d["entwurf"] = _inhalt_lesen(d.pop("entwurf", None))
+    d["vorher"] = _inhalt_lesen(d.pop("vorher", None))
+
     d.pop("inhalt", None)
     return d
+
+
+def _inhalt_lesen(roh: Any) -> dict[str, Any] | None:
+    """Ein gespeicherter Skizzen-Inhalt, entschlüsselt und auf den Katalog gefiltert."""
+    if roh is None:
+        return None
+    inhalt = json.loads(roh) if isinstance(roh, str) else roh
+    if not isinstance(inhalt, dict) or not inhalt:
+        return None
+    inhalt = crypto.decrypt_json_strings(inhalt)
+    return {
+        "aspekte": [
+            {**a, "label": katalog.aspekt_label(a.get("key", ""))}
+            for a in (inhalt.get("aspekte") or [])
+            if isinstance(a, dict) and katalog.aspekt_label(a.get("key", ""))
+        ],
+        "reihung": [k for k in (inhalt.get("reihung") or []) if katalog.aspekt_label(k)],
+        "abwaegungen": inhalt.get("abwaegungen") or {},
+        "eigenes": inhalt.get("eigenes"),
+    }
 
 
 def ist_leer(ideal: dict[str, Any]) -> bool:
@@ -124,6 +152,34 @@ def _saubere_abwaegungen(art: str, roh: Any) -> dict[str, int]:
     return sauber
 
 
+def _inhalt_bauen(
+    art: str, aspekte: Any, reihung: Any, abwaegungen: Any, eigenes: str | None,
+) -> dict[str, Any]:
+    """Der geprüfte Inhalt einer Skizze — für die aktuelle wie für die blinde Neufassung.
+
+    Herausgelöst, damit **beide Wege durch dieselbe Prüfung gehen.** Ein Entwurf, der
+    lockerer behandelt wird als die Skizze, wird beim Übernehmen zu einer Skizze, die nie
+    geprüft wurde — und was der Katalog nicht kennt, stünde danach drin.
+    """
+    if art not in katalog.ART_SCHLUESSEL:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekannte Beziehungsart.")
+
+    saubere_aspekte = _saubere_aspekte(art, aspekte)
+    erlaubte_keys = {a["key"] for a in saubere_aspekte}
+    # Die Reihung ist ein Abschluss, kein Zugang: Sie ordnet, was schon gewählt wurde.
+    # Ein Schlüssel darin, der nicht gewählt ist, waere eine Ordnung ueber Unsichtbares.
+    saubere_reihung = [
+        k for k in dict.fromkeys(reihung or []) if k in erlaubte_keys
+    ][: katalog.MAX_REIHUNG]
+
+    return {
+        "aspekte": saubere_aspekte,
+        "reihung": saubere_reihung,
+        "abwaegungen": _saubere_abwaegungen(art, abwaegungen),
+        "eigenes": (eigenes or "").strip()[: katalog.MAX_ZEICHEN_EIGENES] or None,
+    }
+
+
 async def speichern(
     conn: asyncpg.Connection,
     *,
@@ -141,23 +197,7 @@ async def speichern(
     niemand mehr anzeigt und niemand mehr löscht — und beim Vergleich später einen Satz
     erzeugt, den keiner geschrieben hat.
     """
-    if art not in katalog.ART_SCHLUESSEL:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekannte Beziehungsart.")
-
-    saubere_aspekte = _saubere_aspekte(art, aspekte)
-    erlaubte_keys = {a["key"] for a in saubere_aspekte}
-    # Die Reihung ist ein Abschluss, kein Zugang: Sie ordnet, was schon gewählt wurde.
-    # Ein Schlüssel darin, der nicht gewählt ist, waere eine Ordnung ueber Unsichtbares.
-    saubere_reihung = [
-        k for k in dict.fromkeys(reihung or []) if k in erlaubte_keys
-    ][: katalog.MAX_REIHUNG]
-
-    inhalt = {
-        "aspekte": saubere_aspekte,
-        "reihung": saubere_reihung,
-        "abwaegungen": _saubere_abwaegungen(art, abwaegungen),
-        "eigenes": (eigenes or "").strip()[: katalog.MAX_ZEICHEN_EIGENES] or None,
-    }
+    inhalt = _inhalt_bauen(art, aspekte, reihung, abwaegungen, eigenes)
 
     zeile = await conn.fetchrow(
         """
@@ -184,6 +224,91 @@ async def bestaetigen(
     """
     zeile = await conn.fetchrow(
         "UPDATE selbst_ideale SET geprueft_at = NOW(), updated_at = clock_timestamp() "
+        "WHERE user_id = $1 AND art = $2 RETURNING *",
+        user_id, art,
+    )
+    return _aufbereiten(zeile)
+
+
+# ── Noch einmal, ohne die alte zu sehen ──────────────────────────────────────
+#
+# **Warum blind.** Wer die alte Fassung beim Neuschreiben sieht, häkelt sie nach. Das ist
+# keine Böswilligkeit, sondern wie Erinnerung funktioniert: Ein vorhandener Text ist ein
+# Anker, und man weicht von einem Anker kaum ab. Erst wenn beide fertig nebeneinander
+# liegen, wird der Unterschied zu einer Auskunft statt zu einer Abweichung.
+#
+# Die alte Skizze bleibt die ganze Zeit unangetastet. Wer abbricht, verliert nichts —
+# und wer mittendrin merkt, dass er heute keine Lust darauf hat, soll nichts verlieren.
+
+
+async def entwurf_speichern(
+    conn: asyncpg.Connection,
+    *,
+    user_id: UUID | str,
+    art: str,
+    aspekte: Any = None,
+    reihung: Any = None,
+    abwaegungen: Any = None,
+    eigenes: str | None = None,
+) -> dict[str, Any] | None:
+    """Schreibt die blinde Neufassung fort. Die geltende Skizze bleibt, wie sie ist.
+
+    Gibt ``None`` zurück, wenn es zu dieser Art gar keine Skizze gibt: Eine Neufassung von
+    nichts ist keine Neufassung, sondern eine erste Fassung — und die gehört in
+    ``speichern``.
+    """
+    inhalt = _inhalt_bauen(art, aspekte, reihung, abwaegungen, eigenes)
+    # **``updated_at`` bleibt stehen** — und das ist keine Nachlässigkeit. Die Spalte sagt,
+    # wann die GELTENDE Skizze zuletzt anders wurde; beim Übernehmen wandert sie als
+    # ``vorher_at`` mit und trägt dort den Satz „verglichen mit vor acht Monaten". Würde
+    # jeder Tastendruck in der Neufassung sie hochsetzen, stünde dort am Ende „vor einem
+    # Moment" — und die einzige Zahl, die den Vergleich interessant macht, wäre weg.
+    zeile = await conn.fetchrow(
+        "UPDATE selbst_ideale SET entwurf = $3::jsonb "
+        "WHERE user_id = $1 AND art = $2 RETURNING *",
+        user_id, art, json.dumps(crypto.encrypt_json_strings(inhalt)),
+    )
+    return _aufbereiten(zeile)
+
+
+async def entwurf_uebernehmen(
+    conn: asyncpg.Connection, *, user_id: UUID | str, art: str
+) -> dict[str, Any] | None:
+    """Die Neufassung wird die geltende Skizze — und die alte rückt eine Stelle weiter.
+
+    **In einer einzigen Anweisung**, und das ist Absicht: Zwischen „alte wegschreiben" und
+    „neue eintragen" darf es keinen Moment geben, in dem beides halb passiert ist. Die
+    Reihenfolge der ``SET``-Zuweisungen spielt in Postgres keine Rolle — rechts steht überall
+    der Wert VOR dem Update.
+
+    Ohne Entwurf passiert nichts: ``WHERE entwurf IS NOT NULL`` verhindert, dass ein zweiter
+    Klick die eben übernommene Fassung als „vorher" über sich selbst schreibt.
+    """
+    zeile = await conn.fetchrow(
+        """
+        UPDATE selbst_ideale SET
+            vorher      = inhalt,
+            vorher_at   = updated_at,
+            inhalt      = entwurf,
+            entwurf     = NULL,
+            geprueft_at = NOW(),
+            updated_at  = clock_timestamp()
+        WHERE user_id = $1 AND art = $2 AND entwurf IS NOT NULL
+        RETURNING *
+        """,
+        user_id, art,
+    )
+    return _aufbereiten(zeile)
+
+
+async def entwurf_verwerfen(
+    conn: asyncpg.Connection, *, user_id: UUID | str, art: str
+) -> dict[str, Any] | None:
+    """Die Neufassung wegwerfen. Die geltende Skizze war nie in Gefahr."""
+    # Auch hier bleibt ``updated_at`` stehen: An der geltenden Skizze hat sich nichts
+    # geändert, und genau das ist die Zusicherung dieses Knopfs.
+    zeile = await conn.fetchrow(
+        "UPDATE selbst_ideale SET entwurf = NULL "
         "WHERE user_id = $1 AND art = $2 RETURNING *",
         user_id, art,
     )

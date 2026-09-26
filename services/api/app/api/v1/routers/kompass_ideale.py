@@ -106,6 +106,50 @@ async def bestaetigen(
     return Ideal(**zeile) if zeile else None
 
 
+# ── Noch einmal, ohne die alte zu sehen ──────────────────────────────────────
+
+
+@router.put("/{art}/entwurf", response_model=Ideal | None)
+async def entwurf_speichern(
+    art: str, body: IdealSpeichern,
+    current: dict = Depends(get_current_user), pool=Depends(get_pool),
+) -> Ideal | None:
+    """Schreibt die blinde Neufassung fort. Die geltende Skizze bleibt unangetastet.
+
+    Sie braucht einen Platz auf dem Server, weil vier Schritte nichts sind, was man in
+    einem Rutsch erledigt — ein Neuladen dürfte sie nicht kosten.
+    """
+    async with pool.acquire() as conn:
+        zeile = await dienst.entwurf_speichern(
+            conn, user_id=current["user_id"], art=art,
+            aspekte=[a.model_dump() for a in body.aspekte],
+            reihung=body.reihung, abwaegungen=body.abwaegungen, eigenes=body.eigenes,
+        )
+    return Ideal(**zeile) if zeile else None
+
+
+@router.post("/{art}/entwurf/uebernehmen", response_model=Ideal | None)
+async def entwurf_uebernehmen(
+    art: str,
+    current: dict = Depends(get_current_user), pool=Depends(get_pool),
+) -> Ideal | None:
+    """Die Neufassung wird die geltende Skizze, die alte rückt eine Stelle weiter."""
+    async with pool.acquire() as conn:
+        zeile = await dienst.entwurf_uebernehmen(conn, user_id=current["user_id"], art=art)
+    return Ideal(**zeile) if zeile else None
+
+
+@router.delete("/{art}/entwurf", response_model=Ideal | None)
+async def entwurf_verwerfen(
+    art: str,
+    current: dict = Depends(get_current_user), pool=Depends(get_pool),
+) -> Ideal | None:
+    """Die Neufassung wegwerfen. Die geltende Skizze war nie in Gefahr."""
+    async with pool.acquire() as conn:
+        zeile = await dienst.entwurf_verwerfen(conn, user_id=current["user_id"], art=art)
+    return Ideal(**zeile) if zeile else None
+
+
 @router.delete("/{art}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def loeschen(
     art: str,

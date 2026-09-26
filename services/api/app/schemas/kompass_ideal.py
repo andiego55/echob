@@ -53,6 +53,20 @@ class AspektAusgabe(BaseModel):
     label: str | None = None
 
 
+class SkizzenInhalt(BaseModel):
+    """Eine Skizze ohne ihre Zeile — für die Neufassung und die abgelöste Fassung.
+
+    Dieselben vier Felder wie in ``Ideal``, weil es dasselbe Ding ist. Ein eigenes Modell
+    dafür und nicht ``dict``: Ein Feld, das der Dienst liefert und das ``response_model``
+    nicht kennt, streicht FastAPI lautlos heraus — und Tests gegen das Dienst-Wörterbuch
+    merken davon nichts.
+    """
+    aspekte: list[AspektAusgabe] = Field(default_factory=list)
+    reihung: list[str] = Field(default_factory=list)
+    abwaegungen: dict[str, int] = Field(default_factory=dict)
+    eigenes: str | None = None
+
+
 class Ideal(BaseModel):
     id: UUID
     art: str
@@ -63,6 +77,12 @@ class Ideal(BaseModel):
     eigenes: str | None = None
     #: Wann zuletzt bestätigt wurde, dass die Skizze noch stimmt. Ein Ideal veraltet leise.
     geprueft_at: datetime | None = None
+    #: Die blinde Neufassung, solange sie in Arbeit ist. Die Oberfläche zeigt sie STATT der
+    #: geltenden Skizze — wer die alte beim Neuschreiben sieht, häkelt sie nach.
+    entwurf: SkizzenInhalt | None = None
+    #: Die zuletzt abgelöste Fassung — genau eine, keine Geschichte.
+    vorher: SkizzenInhalt | None = None
+    vorher_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 
