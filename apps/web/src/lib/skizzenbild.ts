@@ -38,25 +38,24 @@ export interface Vokabular {
 
 // ── Das Bild ─────────────────────────────────────────────────────────────────
 
+/**
+ * Ein Band des Bildes.
+ *
+ * **Es trägt das Gewicht und nicht die Breite.** Die Umrechnung steht in
+ * `components/app/kompass/SkizzenBaender` — dort, wo gezeichnet wird, und nur dort. Sie
+ * hier ein zweites Mal zu haben hiesse: zwei Zahlen für dieselbe Sache, und irgendwann
+ * sieht dieselbe Skizze an zwei Orten verschieden aus.
+ */
 export interface Band {
   key: string
   label: string
-  /** Breite in Prozent — das Gewicht, sichtbar gemacht. */
-  breite: number
+  /** 0–100 — wie viel davon. */
+  gewicht: number
   /** Steht der Aspekt in der Reihenfolge? Dann trägt er das Bild, sonst gehört er dazu. */
   geordnet: boolean
   /** 0 = ganz oben. Nur für die Abstufung der Farbe, nicht für eine Rangzahl im Bild. */
   rang: number
 }
-
-/**
- * Die kleinste Breite, die ein Band bekommt.
- *
- * Nicht 0: Ein Wunsch mit Gewicht 0 ist immer noch ein Wunsch, und ein unsichtbares Band
- * wäre eine Aussage, die niemand getroffen hat. Nicht 60 oder mehr: Dann unterscheiden sich
- * zwei Skizzen kaum noch, und die Gestalt wäre bei allen dieselbe.
- */
-const MIN_BREITE = 34
 
 /**
  * Die Bänder des Bildes, von oben nach unten.
@@ -87,7 +86,7 @@ export function gestalt(entwurf: Entwurf, vokabular: Vokabular): Band[] {
   return folge.map(({ eintrag, geordnet: fest }, i) => ({
     key: eintrag.key,
     label: label(eintrag.key)!,
-    breite: MIN_BREITE + Math.round((100 - MIN_BREITE) * clamp(eintrag.gewicht) / 100),
+    gewicht: clamp(eintrag.gewicht),
     geordnet: fest,
     rang: i,
   }))

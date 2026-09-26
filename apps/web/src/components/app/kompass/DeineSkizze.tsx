@@ -26,6 +26,7 @@
  */
 import { useMemo } from 'react'
 import { gestalt, satzTeile, type Entwurf, type Vokabular } from '@/lib/skizzenbild'
+import SkizzenBaender, { BaenderHinweis } from '@/components/app/kompass/SkizzenBaender'
 
 export default function DeineSkizze({ entwurf, vokabular }: {
   entwurf: Entwurf
@@ -44,34 +45,12 @@ export default function DeineSkizze({ entwurf, vokabular }: {
         {baender.length > 0 && (
           <div>
             <span className="label">Deine Skizze</span>
-            <ul className="mt-3 space-y-2.5">
-              {baender.map(b => (
-                <li key={b.key}>
-                  <span
-                    className={`block text-[0.78rem] leading-snug ${
-                      b.geordnet ? 'font-semibold text-navy' : 'text-brand-text'
-                    }`}
-                  >
-                    {b.label}
-                  </span>
-                  <span
-                    // Die Breite ist das Gewicht. Sie ändert sich am Regler, und der Übergang
-                    // macht aus dem Verschieben eine sichtbare Folge.
-                    style={{ width: `${b.breite}%` }}
-                    className={`skizze-band mt-1 block h-2 rounded-full ${
-                      b.geordnet ? 'bg-accent' : 'bg-accent/30'
-                    }`}
-                    aria-hidden="true"
-                  />
-                </li>
-              ))}
-            </ul>
-            {baender.some(b => !b.geordnet) && baender.some(b => b.geordnet) && (
-              // Zwei Farben brauchen einen Satz, sonst rät man.
-              <p className="mt-3 text-[0.7rem] leading-snug text-brand-muted">
-                Kräftig: was du in eine Reihenfolge gebracht hast. Die Länge ist das Gewicht.
-              </p>
-            )}
+            <div className="mt-3">
+              {/* Die Breite ist das Gewicht. Sie ändert sich am Regler, und der Übergang
+                  macht aus dem Verschieben eine sichtbare Folge — deshalb hier `bewegt`. */}
+              <SkizzenBaender baender={baender} />
+            </div>
+            <BaenderHinweis baender={baender} />
           </div>
         )}
 

@@ -15,6 +15,7 @@ import {
   gestalt, reihungsVorschlag, satzTeile, zitat,
   type Entwurf, type Vokabular,
 } from '@/lib/skizzenbild'
+import { bandBreite } from '@/components/app/kompass/SkizzenBaender'
 
 const V: Vokabular = {
   aspekt_familien: [
@@ -100,19 +101,27 @@ describe('gestalt', () => {
     for (let i = 0; i < 5; i++) expect(gestalt(e, V).map(x => x.key)).toEqual(einmal)
   })
 
-  it('macht aus dem Gewicht eine Breite, und Gewicht 0 verschwindet nicht', () => {
+  it('reicht das Gewicht durch und rechnet es NICHT in eine Breite um', () => {
+    // Die Umrechnung steht dort, wo gezeichnet wird (`bandBreite`). Zwei Zahlen fuer
+    // dieselbe Sache liefen auseinander, und dieselbe Skizze saehe an zwei Orten
+    // verschieden aus.
     const e: Entwurf = {
       ...LEER,
       aspekte: [{ key: 'nicht_wachsam', gewicht: 0 }, { key: 'gehoert_werden', gewicht: 100 }],
     }
     const b = gestalt(e, V)
-    const null_gewicht = b.find(x => x.key === 'nicht_wachsam')!
-    // Ein Wunsch mit Gewicht 0 ist immer noch ein Wunsch. Ein unsichtbares Band waere eine
-    // Aussage, die niemand getroffen hat.
-    expect(null_gewicht.breite).toBeGreaterThan(20)
-    expect(b.find(x => x.key === 'gehoert_werden')!.breite).toBe(100)
-    // Und die Abstufung ist wirklich eine: sonst sehen alle Skizzen gleich aus.
-    expect(100 - null_gewicht.breite).toBeGreaterThan(40)
+    expect(b.find(x => x.key === 'nicht_wachsam')!.gewicht).toBe(0)
+    expect(b.find(x => x.key === 'gehoert_werden')!.gewicht).toBe(100)
+  })
+
+  it('haelt das Gewicht in den Grenzen', () => {
+    const e: Entwurf = {
+      ...LEER,
+      aspekte: [{ key: 'nicht_wachsam', gewicht: 999 }, { key: 'gehoert_werden', gewicht: -5 }],
+    }
+    const b = gestalt(e, V)
+    expect(b.find(x => x.key === 'nicht_wachsam')!.gewicht).toBe(100)
+    expect(b.find(x => x.key === 'gehoert_werden')!.gewicht).toBe(0)
   })
 
   it('haelt unbekannte und kaputte Eingaben aus', () => {
@@ -125,7 +134,7 @@ describe('gestalt', () => {
     }
     const b = gestalt(e, V)
     expect(b.map(x => x.key)).toEqual(['nicht_wachsam'])
-    expect(Number.isFinite(b[0].breite)).toBe(true)
+    expect(Number.isFinite(b[0].gewicht)).toBe(true)
   })
 })
 
@@ -296,5 +305,34 @@ describe('reihungsVorschlag', () => {
     const e: Entwurf = { ...LEER, aspekte: [{ key: 'nicht_wachsam', gewicht: 50 }] }
     expect(reihungsVorschlag(e, V, 0)).toEqual([])
     expect(reihungsVorschlag(e, V, -3)).toEqual([])
+  })
+})
+
+// ── Die Breite, dort wo gezeichnet wird ──────────────────────────────────────
+
+describe('bandBreite', () => {
+  it('laesst ein Gewicht von 0 sichtbar', () => {
+    // Ein Wunsch mit Gewicht 0 ist immer noch ein Wunsch. Ein unsichtbares Band waere
+    // eine Aussage, die niemand getroffen hat.
+    expect(bandBreite(0)).toBeGreaterThan(20)
+  })
+
+  it('stuft wirklich ab', () => {
+    // Waere die kleinste Breite bei 60, saehen alle Skizzen gleich aus - und das Bild
+    // haette nichts mehr zu sagen.
+    expect(bandBreite(100)).toBe(100)
+    expect(bandBreite(100) - bandBreite(0)).toBeGreaterThan(40)
+    expect(bandBreite(50)).toBeGreaterThan(bandBreite(20))
+  })
+
+  it('haelt Unsinn aus, statt eine Breite von NaN zu setzen', () => {
+    // Eine Breite von "NaN%" faellt in CSS still weg, und das Band waere weg - ohne
+    // dass irgendwo etwas rot wird.
+    for (const wert of [NaN, Infinity, -10, 1000]) {
+      const b = bandBreite(wert)
+      expect(Number.isFinite(b), String(wert)).toBe(true)
+      expect(b).toBeGreaterThanOrEqual(20)
+      expect(b).toBeLessThanOrEqual(100)
+    }
   })
 })

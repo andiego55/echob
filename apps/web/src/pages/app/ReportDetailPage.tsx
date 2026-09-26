@@ -12,6 +12,7 @@ import Fehlermeldung from '@/components/Fehlermeldung'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import { scoreLevel } from '@/utils/profileScoring'
 import { SKALA_MAX, balkenBreite, skalenFarbe, skalenwert } from '@/lib/skalen'
+import SkizzenBaender, { BaenderHinweis, baenderAus } from '@/components/app/kompass/SkizzenBaender'
 
 // ── Typ-Konfiguration ─────────────────────────────────────────────────────────
 
@@ -169,6 +170,27 @@ export default function ReportDetailPage() {
   // Nur beim Vergleich, und nur wenn wirklich welche da sind. Der Server liefert
   // höchstens drei; hier wird nichts nachgezählt, sondern nur auf Text geprüft — ein
   // leerer Eintrag wäre ein Knopf ohne Frage.
+  /**
+   * Der Hinweis des Modells und die Momentaufnahme der Skizze.
+   *
+   * **Beide wurden bisher geschrieben und nie gelesen.** Der Hinweis entsteht, wenn die
+   * Skizze so dünn war, dass der Text darunter leidet — also genau dann, wenn jemand
+   * wissen müsste, warum sein Bericht kurz ist. Und die Momentaufnahme liegt im Inhalt,
+   * damit der Vergleich in einem halben Jahr noch seine andere Hälfte hat; stand sie
+   * nirgends, war es ein Vergleich ohne Grundlage.
+   */
+  const inhalt = report.content as {
+    hinweis?: unknown
+    skizze_damals?: {
+      art_label?: string | null
+      aspekte?: { key: string; gewicht: number; label?: string | null }[]
+      reihung?: string[]
+      eigenes?: string | null
+    } | null
+  }
+  const modellHinweis = typeof inhalt.hinweis === 'string' ? inhalt.hinweis.trim() : ''
+  const damals = report.report_type === 'ideal_delta' ? inhalt.skizze_damals ?? null : null
+
   const offeneFragen: string[] =
     report.report_type === 'ideal_delta'
       ? ((report.content as { fragen?: unknown }).fragen as string[] | undefined ?? [])
@@ -308,6 +330,42 @@ export default function ReportDetailPage() {
             <div className="rounded-brand border border-dashed border-brand-border bg-transparent px-6 py-8 text-center">
               <p className="text-sm text-brand-muted">Dieser Bericht hat keinen generierten Inhalt.</p>
             </div>
+          )}
+
+          {/* Die Skizze, gegen die verglichen wurde — so, wie sie in dem Moment aussah.
+              Ohne sie liest man einen Vergleich, dessen eine Hälfte fehlt, und hält die
+              Aussagen für Behauptungen. */}
+          {!isEditing && damals && (
+            <section className="mt-8 rounded-brand border border-brand-border bg-brand-bg/60 p-5">
+              <h2 className="text-[0.95rem] font-bold text-navy">
+                Deine Skizze, wie sie damals war
+                {damals.art_label ? ` — ${damals.art_label}` : ''}
+              </h2>
+              <p className="mt-1 max-w-[62ch] text-[0.82rem] leading-relaxed text-brand-muted">
+                Festgehalten, als dieser Vergleich entstand. Änderst du deine Skizze später,
+                bleibt hier stehen, was damals dastand.
+              </p>
+              <div className="mt-4">
+                <SkizzenBaender
+                  baender={baenderAus(damals.aspekte ?? [], damals.reihung ?? [])}
+                  bewegt={false}
+                />
+                <BaenderHinweis
+                  baender={baenderAus(damals.aspekte ?? [], damals.reihung ?? [])} />
+              </div>
+              {damals.eigenes && (
+                <blockquote className="mt-4 border-l-2 border-accent/40 pl-3 text-[0.86rem] leading-relaxed text-brand-text">
+                  {damals.eigenes}
+                </blockquote>
+              )}
+            </section>
+          )}
+
+          {/* Der Hinweis des Modells — warum dieser Text kurz ausgefallen ist. */}
+          {!isEditing && modellHinweis && (
+            <p className="mt-6 rounded-brand border border-amber-200 bg-amber-50/60 px-4 py-3 text-[0.84rem] leading-relaxed text-amber-900">
+              {modellHinweis}
+            </p>
           )}
 
           {/* Die offenen Fragen aus "Wunsch und Wirklichkeit" — und der Weg weiter.

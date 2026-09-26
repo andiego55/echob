@@ -88,6 +88,10 @@ export default function TraumbeziehungSkizzePage() {
   // Gezeigt wird die Enthuellung erst, wenn jemand sagt, dass er fertig ist — nicht
   // automatisch beim letzten Schritt. Wann eine Skizze fertig ist, entscheidet sie.
   const [zeigeWandel, setZeigeWandel] = useState(false)
+  // Die abgeloeste Fassung steht eingeklappt da. Wer neu skizziert hat, hat den
+  // Unterschied schon einmal gesehen; ihn dauerhaft offen zu zeigen hiesse, jemanden
+  // bei jedem Besuch an sein frueheres Ich zu erinnern.
+  const [zeigeFrueher, setZeigeFrueher] = useState(false)
 
   const katalog = useQuery({
     queryKey: ['ideal-katalog', art],
@@ -268,6 +272,43 @@ export default function TraumbeziehungSkizzePage() {
               </button>
             </div>
             <Fehlermeldung error={nachsehen.error ?? neuAnfangen.error} />
+          </div>
+        )}
+
+        {/* ── Was vorher dastand ─────────────────────────────────────
+            Die abgeloeste Fassung wurde beim Übernehmen weggeschrieben — und war danach
+            von nichts mehr gelesen worden. Genau davor hatte ich in der Migration selbst
+            gewarnt: Eine aufbewahrte Fassung ohne Leser ist totes Gewicht. Hier ist der
+            Leser, und er ist der eigentliche Lohn: Ein halbes Jahr später noch einmal zu
+            sehen, was sich bewegt hat, ist die Auskunft, die man sich selbst nicht geben
+            kann. Eingeklappt, damit sie einen nicht bei jedem Besuch anspringt. */}
+        {!blind && skizze?.vorher && (
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setZeigeFrueher(v => !v)}
+              aria-expanded={zeigeFrueher}
+              className="flex w-full items-center justify-between gap-3 rounded-brand border border-brand-border bg-white px-5 py-3.5 text-left transition-colors hover:border-accent/50"
+            >
+              <span className="min-w-0 text-[0.88rem] leading-snug text-navy">
+                {skizze.vorher_at
+                  ? `Vor ${altersWort(skizze.vorher_at)} hast du das anders gesehen`
+                  : 'Davor hast du das anders gesehen'}
+              </span>
+              <span className="shrink-0 text-[0.75rem] font-semibold text-accent">
+                {zeigeFrueher ? 'Zuklappen' : 'Ansehen'}
+              </span>
+            </button>
+            {zeigeFrueher && (
+              <div className="mt-3">
+                <SkizzenWandel
+                  vorher={skizze.vorher}
+                  jetzt={skizze}
+                  vorherAt={skizze.vorher_at}
+                  paare={kat.abwaegungen}
+                />
+              </div>
+            )}
           </div>
         )}
 

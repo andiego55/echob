@@ -21,6 +21,7 @@
 import VerlaufsKurve from '@/components/app/kompass/VerlaufsKurve'
 import { IconKompass } from '@/components/professional/ProfIcons'
 import type { SharedCaseBundle } from '@/types'
+import SkizzenBaender, { baenderAus } from '@/components/app/kompass/SkizzenBaender'
 
 /** Wie viele Tage die Kurve zeigt. Ein Jahr — der Server gibt nicht mehr her. */
 const KURVE_TAGE = 365
@@ -249,11 +250,7 @@ export function VerlaufKarte({ verlauf }: { verlauf: SharedCaseBundle['verlauf']
  */
 export function TraumbeziehungKarte({ ideal }: { ideal: SharedCaseBundle['traumbeziehung'] }) {
   if (!ideal) return null
-  const geordnet = new Set(ideal.reihung)
-  const folge = [
-    ...ideal.reihung.map(k => ideal.aspekte.find(a => a.key === k)).filter(Boolean),
-    ...ideal.aspekte.filter(a => !geordnet.has(a.key)).sort((x, y) => y.gewicht - x.gewicht),
-  ] as { key: string; gewicht: number; label?: string | null }[]
+  const baender = baenderAus(ideal.aspekte, ideal.reihung)
 
   return (
     <Karte
@@ -262,24 +259,9 @@ export function TraumbeziehungKarte({ ideal }: { ideal: SharedCaseBundle['traumb
         + 'Beziehung, nicht über diesen Fall. Keine Forderung an das Gegenüber, sondern '
         + 'ein Maßstab, den sie für sich aufgestellt hat.'}
     >
-      <ul className="space-y-2.5">
-        {folge.map(a => (
-          <li key={a.key}>
-            <span className={`block text-[0.8rem] leading-snug ${
-              geordnet.has(a.key) ? 'font-semibold text-navy' : 'text-brand-text'
-            }`}>
-              {a.label || a.key}
-            </span>
-            <span
-              className={`mt-1 block h-2 rounded-full ${
-                geordnet.has(a.key) ? 'bg-accent' : 'bg-accent/30'
-              }`}
-              style={{ width: `${34 + Math.round(0.66 * a.gewicht)}%` }}
-              aria-hidden="true"
-            />
-          </li>
-        ))}
-      </ul>
+      {/* Ohne Bewegung: Hier ändert sich nichts, und eine Animation beim Aufbau wäre
+          Zierrat auf einer Seite, die gelesen und nicht bedient wird. */}
+      <SkizzenBaender baender={baender} bewegt={false} />
 
       {ideal.eigenes && (
         <blockquote className="mt-4 border-l-2 border-accent/40 pl-3 text-[0.86rem] leading-relaxed text-brand-text">
