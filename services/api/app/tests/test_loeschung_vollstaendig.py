@@ -299,6 +299,9 @@ async def test_beispielkonten_und_erfundene_fallpersonen_bleiben(db):
 FAELLT_MIT = {
     "case_artifacts.user_id": "gehört zum Fall der Person (ON DELETE CASCADE auf cases)",
     "case_documents.user_id": "gehört zum Fall der Person (Kaskade auf cases)",
+    "case_podcasts.user_id": "gehört zum Fall der Person (Kaskade auf cases); die Kapitel samt Tonspuren "
+        "hängen wiederum an der Folge. Steht zusätzlich in _USER_TABLES, damit die "
+        "AUSKUNFT sie enthält - dort ist sie eine Angabe, hier eine Kaskade",
     "case_faq_runs.owner_user_id": "der eigene Fall; die Profi-Seite steht in der Liste",
     "absprachen.owner_user_id": "faellt mit dem eigenen Fall (Kaskade) UND steht zusaetzlich in _DELETE_STEPS - beide Seiten loeschen sie, weil eine Verabredung ohne Gegenseite kein Text mehr ist",
     "couple_appreciations.from_user_id": "gehört zum Paarraum (Kaskade auf couple_links)",

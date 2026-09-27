@@ -27,6 +27,11 @@ _USER_TABLES = (
     "ai_usage_log", "user_consents", "professional_profiles",
     "professional_assignments", "professional_appointments",
     "scene_resonance", "feeling_snapshots",
+    # Podcast-Folgen. Sie fielen ueber cases ohnehin mit - hier stehen sie, damit die
+    # AUSKUNFT sie enthaelt: Der Titel und die Einstellungen sind die Angaben der Person.
+    # Die Kapiteltexte haengen an case_podcast_kapitel und kommen ueber _SONDERFAELLE
+    # dazu, ohne die Tonspuren.
+    "case_podcasts",
     "client_notifications", "test_results", "pseudonymous_accounts",
     # Mein Kompass - gehoert der Person, nicht einem Fall.
     "selbst_pulse", "selbst_vorhaben", "selbst_saetze", "selbst_portraits",
@@ -77,6 +82,15 @@ _SONDERFAELLE = (
     ("organization_invites", "invited_by_user_id = $1"),
     ("directory_listings", "claimed_by_user_id = $1"),
     ("institute_access_codes", "used_by_user_id = $1"),
+    # Die Kapitel einer Folge haben keine eigene user_id - sie haengen an der Folge. Die
+    # Bedingung greift deshalb ueber sie.
+    #
+    # **Ohne die Tonspur**, und das ist kein Vorenthalten: Der gesprochene Text IST der
+    # Kapiteltext, und der steht hier. Zwanzig Megabyte Audio als Base64 in einer
+    # JSON-Auskunft waeren eine Datei, die sich nicht mehr oeffnen laesst - also eine
+    # Auskunft, die niemand lesen kann.
+    ("case_podcast_kapitel",
+     "podcast_id IN (SELECT id FROM case_podcasts WHERE user_id = $1)"),
 )
 
 #: Verschlüsselte Felder je Tabelle — sonst bekommt die Person Geheimtext statt Auskunft.
@@ -102,6 +116,8 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     # Was jemand sich wuenscht, ist nicht weniger heikel als das, was er erlebt hat -
     # der eigene Text der Skizze liegt deshalb im JSONB verschluesselt.
     "selbst_ideale":                 {"json": ("inhalt",)},
+    "case_podcasts":                 {"text": ("titel",)},
+    "case_podcast_kapitel":          {"text": ("text",)},
 }
 
 
