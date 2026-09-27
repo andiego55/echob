@@ -113,7 +113,15 @@ _AI_USAGE_LIMITS = {
                        "Satz-Vorschläge"),
     "selbstportrait": ("selbstportrait_limit", "PORTRAIT_LIMIT_REACHED",
                        "Selbstporträts"),
+    # **Gezählt in Minuten, nicht in Folgen.** Eine Folge zu zählen belohnt die lange und
+    # bestraft die kurze — und wer drei kurze machen wollte, macht dann drei lange, weil
+    # sie gleich viel kosten. Die Sprachausgabe kostet je Minute; das Kontingent auch.
+    "podcast":    ("podcast_minuten_limit", "PODCAST_LIMIT_REACHED",
+                   "Podcast-Minuten"),
 }
+
+#: Welche Arten in etwas anderem als Stück zählen — nur für die Anzeige.
+_EINHEIT = {"podcast": "Minuten"}
 
 
 def _start_of_day(now: datetime) -> datetime:
@@ -142,12 +150,15 @@ async def _count_ai_usage_this_month(user_id: str, conn, kind: str) -> int:
     und Sperre garantiert übereinstimmen.
     """
     month_start = _month_start(datetime.now(UTC))
+    # **SUM(menge), nicht COUNT(*).** Alles, was in Stück zählt, trägt die Menge 1 — dort
+    # ergibt die Summe dieselbe Zahl wie die Zählung vorher. Podcasts tragen ihre Minuten.
+    # Ein COUNT hier hiesse: eine Folge ist eine Folge, ob fünf Minuten oder zwanzig.
     count = await conn.fetchval(
-        "SELECT COUNT(*) FROM ai_usage_log "
+        "SELECT COALESCE(SUM(menge), 0) FROM ai_usage_log "
         "WHERE user_id = $1 AND kind = $2 AND created_at >= $3",
         user_id, kind, month_start,
     )
-    return count or 0
+    return int(count or 0)
 
 
 async def enforce_ai_usage_limit(user_id: str, conn, kind: str) -> None:
@@ -184,11 +195,15 @@ async def has_ai_usage_left(user_id: str, conn, kind: str) -> bool:
     return await _count_ai_usage_this_month(user_id, conn, kind) < limit
 
 
-async def log_ai_usage(user_id: str, conn, kind: str) -> None:
-    """Verbucht eine erfolgreich ausgeführte KI-Aktion."""
+async def log_ai_usage(user_id: str, conn, kind: str, menge: int = 1) -> None:
+    """Verbucht eine erfolgreich ausgeführte KI-Aktion.
+
+    ``menge`` ist für alles, was in Stück zählt, 1 — und bleibt es. Podcasts verbuchen die
+    angefangenen Minuten, weil sie auch je Minute kosten.
+    """
     await conn.execute(
-        "INSERT INTO ai_usage_log (user_id, kind) VALUES ($1, $2)",
-        user_id, kind,
+        "INSERT INTO ai_usage_log (user_id, kind, menge) VALUES ($1, $2, $3)",
+        user_id, kind, max(1, int(menge)),
     )
 
 
@@ -202,6 +217,7 @@ async def get_ai_usage_status(user_id: str, conn) -> dict:
         quotas.append({
             "kind": kind,
             "label": label,
+            "einheit": _EINHEIT.get(kind),
             "used": used,
             "limit": None if unlimited else limit,
             "remaining": None if unlimited else max(0, limit - used),

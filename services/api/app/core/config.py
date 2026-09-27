@@ -87,6 +87,13 @@ class Settings(BaseSettings):
     # zehnmal "nochmal schreiben", weil die erste Fassung nicht traf.
     # Vier, wie im Bauplan am 20.09.2026 entschieden ("Eigene Art, vier im Monat").
     selbstportrait_limit: int = 4  # max. Portraet-Laeufe pro Nutzer/Monat
+    #: Podcast-Kontingent in MINUTEN je Nutzer/Monat, nicht in Folgen: Eine Folge zu
+    #: zaehlen belohnt die lange und bestraft die kurze. 30 = sechs kurze Folgen
+    #: oder eineinhalb lange.
+    podcast_minuten_limit: int = 30
+    #: Modell fuer die Sprachausgabe. Eigene Einstellung, weil es das einzige ist,
+    #: das sich je Umgebung unterscheiden koennte.
+    podcast_tts_model: str = "gpt-4o-mini-tts"
     # Harter Deckel der kostenlosen Spielwiese (Demo-Fälle), pro Fachperson:
     demo_echo_limit: int = 30      # max. Echo-Nachrichten auf Demo-Fällen (gesamt)
     demo_report_limit: int = 6     # max. Berichte pro Demo-Fall (inkl. Beispielbericht)

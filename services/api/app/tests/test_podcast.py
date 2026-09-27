@@ -367,3 +367,155 @@ async def test_ein_fremder_fall_gibt_kein_material(person, db):
             db, user_id=person, case_id=fremder_fall,
             gewichte=dienst.gewichte_pruefen("ganzer_fall", {}))
     assert fehler.value.status_code == 404
+
+
+# ── Die Stimme ───────────────────────────────────────────────────────────────
+
+def test_zu_lange_kapitel_werden_am_satzende_getrennt():
+    """Eine Naht mitten in einem Satz hört man sofort, und sie klingt wie ein Fehler in
+    der Datei."""
+    from app.services.podcast_stimme import _abschnitte
+
+    satz = "Das ist ein vollstaendiger Satz mit ausreichend Zeichen darin. "
+    lang = satz * 120
+    stuecke = _abschnitte(lang)
+
+    assert len(stuecke) > 1
+    for st in stuecke:
+        assert len(st) <= katalog.MAX_ZEICHEN_JE_ABSCHNITT
+    # Jedes Stueck bis auf vielleicht das letzte endet an einem Satzzeichen.
+    for st in stuecke[:-1]:
+        assert st.rstrip()[-1] in ".!?", st[-40:]
+    # Und nichts geht verloren.
+    assert "".join(s.strip() for s in stuecke).replace(" ", "") == lang.replace(" ", "")
+
+
+def test_kurze_kapitel_bleiben_ein_stueck():
+    from app.services.podcast_stimme import _abschnitte
+    assert _abschnitte("Ein kurzer Text.") == ["Ein kurzer Text."]
+
+
+def test_ein_kapitel_ohne_satzzeichen_haelt_die_erzeugung_nicht_an():
+    """Ein Kapitel ohne einen einzigen Punkt ist kein Kapitel mehr — es darf aber trotzdem
+    nicht alles anhalten."""
+    from app.services.podcast_stimme import _abschnitte
+    stuecke = _abschnitte("wort " * 2000)
+    assert len(stuecke) > 1
+    assert all(len(s) <= katalog.MAX_ZEICHEN_JE_ABSCHNITT for s in stuecke)
+
+
+def test_die_dauer_wird_knapp_geschaetzt():
+    """Lieber knapp als grosszuegig: Wer zu viel abrechnet, nimmt jemandem etwas weg, das
+    er bezahlt hat."""
+    from app.services.podcast_stimme import WOERTER_JE_MINUTE, sekunden_schaetzen
+
+    eine_minute = "wort " * WOERTER_JE_MINUTE
+    assert 55 <= sekunden_schaetzen(eine_minute) <= 65
+    assert sekunden_schaetzen("") >= 1
+
+
+def test_die_sprechanweisung_passt_sich_dem_format_an():
+    """Ohne diese Zeilen liest ein Sprachmodell einen Text über eine schwierige Beziehung
+    im Tonfall einer Bahnhofsdurchsage."""
+    from app.services.podcast_stimme import anweisung
+
+    an_mich = anweisung("an_mich", "du", "sage")
+    termin = anweisung("vor_dem_termin", "ich", "ash")
+    assert an_mich != termin
+    assert "langsam" in an_mich.lower()
+    assert "sachlich" in termin.lower()
+    # Die Ich-Form muss die Stimme wissen, sonst klingt sie wie eine Vorleserin.
+    assert "Ich-Form" in termin
+
+
+def test_die_anweisung_verbietet_den_nachrichtenton_in_jedem_format():
+    from app.services.podcast_stimme import anweisung
+    for f in katalog.FORMATE:
+        text = anweisung(f["key"], f["ansprachen"][0], "sage")
+        assert "Nachrichtenton" in text, f["key"]
+
+
+# ── Das Skript ───────────────────────────────────────────────────────────────
+
+def test_das_skript_folgt_der_bestellung_und_nicht_der_antwort():
+    """**Der wichtigste Test am Skript.** Ein Modell liefert gelegentlich ein Kapitel zu
+    viel, eines zu wenig oder in anderer Reihenfolge. Bestimmte die Antwort die Struktur,
+    bekäme die Folge Kapitel, die niemand bestellt hat — und die Sprungmarken im Abspieler
+    zeigten ins Leere.
+    """
+    from app.services.echo_service import EchoService
+
+    bestellt = [
+        {"key": "a", "titel": "A", "auftrag": "x", "woerter": 100},
+        {"key": "b", "titel": "B", "auftrag": "y", "woerter": 100},
+    ]
+    antwort = {
+        "titel": "Ein Titel",
+        "kapitel": [
+            {"key": "b", "text": "Text B"},
+            {"key": "erfunden", "text": "Kommt nicht vor"},
+            {"key": "a", "text": "Text A"},
+        ],
+    }
+    ergebnis = EchoService._podcast_skript_ordnen(antwort, bestellt)
+
+    assert [k["key"] for k in ergebnis["kapitel"]] == ["a", "b"]
+    assert ergebnis["kapitel"][0]["text"] == "Text A"
+    assert ergebnis["titel"] == "Ein Titel"
+
+
+def test_ein_stummes_kapitel_faellt_heraus():
+    """Ein Kapitel ohne Text sieht im Abspieler aus wie ein Fehler in der Datei."""
+    from app.services.echo_service import EchoService
+
+    bestellt = [{"key": "a", "titel": "A", "auftrag": "x", "woerter": 100},
+                {"key": "b", "titel": "B", "auftrag": "y", "woerter": 100}]
+    ergebnis = EchoService._podcast_skript_ordnen(
+        {"kapitel": [{"key": "a", "text": "Da"}, {"key": "b", "text": "   "}]}, bestellt)
+    assert [k["key"] for k in ergebnis["kapitel"]] == ["a"]
+
+
+def test_das_skript_haelt_unsinn_aus():
+    from app.services.echo_service import EchoService
+    bestellt = [{"key": "a", "titel": "A", "auftrag": "x", "woerter": 100}]
+    for antwort in ({}, {"kapitel": None}, {"kapitel": ["kein dict"]}):
+        ergebnis = EchoService._podcast_skript_ordnen(antwort, bestellt)
+        assert ergebnis["kapitel"] == []
+        assert ergebnis["titel"] is None
+
+
+# ── Das Kontingent ───────────────────────────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_das_kontingent_zaehlt_minuten_und_nicht_folgen(person, db):
+    """**Eine Folge zu zählen belohnt die lange und bestraft die kurze** — und wer drei
+    kurze machen wollte, macht dann drei lange, weil sie gleich viel kosten."""
+    from app.services.subscription_service import _count_ai_usage_this_month, log_ai_usage
+
+    await log_ai_usage(person, db, "podcast", menge=5)
+    await log_ai_usage(person, db, "podcast", menge=20)
+    assert await _count_ai_usage_this_month(str(person), db, "podcast") == 25
+
+
+@pytest.mark.asyncio
+async def test_alte_kontingente_zaehlen_weiter_wie_bisher(person, db):
+    """Die Summe über `menge` muss für alles, was in Stück zählt, dieselbe Zahl ergeben wie
+    die Zählung vorher — sonst hätte diese Migration still jedem Nutzer sein Kontingent
+    verschoben."""
+    from app.services.subscription_service import _count_ai_usage_this_month, log_ai_usage
+
+    for _ in range(3):
+        await log_ai_usage(person, db, "report")
+    assert await _count_ai_usage_this_month(str(person), db, "report") == 3
+
+
+@pytest.mark.asyncio
+async def test_die_art_podcast_laesst_sich_wirklich_verbuchen(person, db):
+    """Ohne den Eintrag in der CHECK-Bedingung käme die Anfrage durch, das Modell schriebe,
+    die Sprachausgabe liefe eine Minute — und ERST das Verbuchen bräche ab. Dieselbe
+    Reihenfolge wie beim Berichtstyp 'partner'."""
+    from app.services.subscription_service import log_ai_usage
+    await log_ai_usage(person, db, "podcast", menge=7)
+    assert await db.fetchval(
+        "SELECT menge FROM ai_usage_log WHERE user_id = $1 AND kind = 'podcast'",
+        person) == 7

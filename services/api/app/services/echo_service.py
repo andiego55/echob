@@ -2056,6 +2056,115 @@ class EchoService:
             ergebnis["hinweis"] = str(parsed["hinweis"]).strip()
         return ergebnis
 
+    # ── Podcast: das Skript ───────────────────────────────────────────────────
+
+    async def generate_podcast_skript(
+        self,
+        *,
+        material_text: str,
+        format_haltung: str,
+        ansprache_anweisung: str,
+        kapitel: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Alle Kapitel einer Folge in EINEM Aufruf.
+
+        **Warum nicht ein Aufruf je Kapitel.** Ein Podcast ist ein zusammenhängender Text,
+        kein Stapel Abschnitte. Getrennt erzeugt, begrüßt jedes Kapitel die hörende Person
+        neu, erklärt die Lage noch einmal und endet mit einem Schluss — sechsmal
+        hintereinander. Zusammen erzeugt, weiß Kapitel vier, was Kapitel zwei schon gesagt
+        hat.
+
+        Die Sprachausgabe läuft danach trotzdem kapitelweise, aus einem anderen Grund: Dort
+        ist die Grenze technisch (rund 4.000 Zeichen je Aufruf), hier ist sie inhaltlich.
+
+        ``kapitel`` trägt je Eintrag ``key``, ``titel``, ``auftrag`` und ``woerter``.
+        """
+        if not self._use_openai:
+            return self._mock_podcast_skript(kapitel)
+
+        import json
+
+        system_prompt = _load_prompt("podcast_skript_prompt.md")
+
+        auftraege = "\n".join(
+            f"KAPITEL {i} — Schlüssel `{k['key']}`, Überschrift „{k['titel']}“\n"
+            f"Auftrag: {k['auftrag']}\n"
+            f"Wortbudget: etwa {k['woerter']} Wörter."
+            for i, k in enumerate(kapitel, start=1)
+        )
+
+        anweisung = (
+            "HALTUNG DIESER FOLGE:\n" + format_haltung
+            + "\n\nANSPRACHE:\n" + ansprache_anweisung
+            + "\n\nDIE KAPITEL, IN DIESER REIHENFOLGE:\n\n" + auftraege
+        )
+
+        response = await self._chat(  # type: ignore[union-attr]
+            model=self._model_smart,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": "DAS MATERIAL DIESES FALLS\n\n" + material_text},
+                {"role": "system", "content": anweisung},
+                {"role": "user", "content": (
+                    "Schreib das Skript. Zum Hören, nicht zum Lesen: kurze Sätze, keine "
+                    "Aufzählungszeichen, keine Ziffern, keine Abkürzungen. Kapitel"
+                    "überschriften werden nicht gesprochen.\n"
+                    "Antworte ausschließlich als gültiges JSON-Objekt."
+                )},
+            ],
+            # Grosszuegig: Das Wortbudget der langen Folge liegt bei 2.800 Woertern, und
+            # deutscher Text braucht mehr Token je Wort als englischer.
+            max_tokens=9000,
+            # Hoeher als bei Berichten. Ein Bericht soll belegen, ein Podcast soll KLINGEN -
+            # und ein Text, der zum Vorlesen entsteht, darf Rhythmus haben. Nicht hoeher:
+            # Ab hier faengt ein Modell an, Zusammenhaenge zu ergaenzen, die niemand
+            # geschrieben hat.
+            temperature=0.55,
+            response_format={"type": "json_object"},
+        )
+        parsed = json.loads(response.choices[0].message.content or "{}")
+        return self._podcast_skript_ordnen(parsed, kapitel)
+
+    @staticmethod
+    def _podcast_skript_ordnen(
+        parsed: dict[str, Any], kapitel: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Die Antwort auf die BESTELLTEN Kapitel abbilden — nicht umgekehrt.
+
+        Ein Modell liefert gelegentlich ein Kapitel zu viel, eines zu wenig oder in anderer
+        Reihenfolge. Würde die Antwort die Struktur bestimmen, bekäme die Folge Kapitel, die
+        niemand bestellt hat, und die Sprungmarken im Abspieler zeigten ins Leere. Also
+        andersherum: Die Bestellung steht, und was dazu nicht passt, fällt weg.
+
+        Ein Kapitel ohne Text fällt ebenfalls heraus — ein stummes Kapitel im Abspieler
+        sieht aus wie ein Fehler in der Datei.
+        """
+        nach_key = {
+            str(k.get("key")): str(k.get("text") or "").strip()
+            for k in (parsed.get("kapitel") or [])
+            if isinstance(k, dict)
+        }
+        fertig = [
+            {"key": k["key"], "titel": k["titel"], "text": nach_key[k["key"]]}
+            for k in kapitel
+            if nach_key.get(k["key"])
+        ]
+        titel = str(parsed.get("titel") or "").strip()[:120]
+        return {"titel": titel or None, "kapitel": fertig}
+
+    @staticmethod
+    def _mock_podcast_skript(kapitel: list[dict[str, Any]]) -> dict[str, Any]:
+        return {
+            "titel": "Probeaufnahme",
+            "kapitel": [
+                {"key": k["key"], "titel": k["titel"],
+                 "text": ("Dies ist eine Probeaufnahme. Sobald Echo mit einer "
+                          "KI-Anbindung läuft, steht hier der wirkliche Text.")}
+                for k in kapitel
+            ],
+            "_mock": True,
+        }
+
     def _mock_report(self, report_type: str, case_context: dict) -> dict:
         from app.schemas.report import REPORT_DISCLAIMER, REPORT_TYPE_LABELS
         return {

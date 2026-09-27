@@ -11,6 +11,7 @@ from app.core.database import create_pool, create_supabase_admin
 from app.core.logging import get_logger, setup_logging
 from app.core.rate_limit import rate_limit_middleware
 from app.services.echo_service import create_echo_service
+from app.services.podcast_stimme import PodcastStimme
 
 
 def _create_echo_service():
@@ -86,6 +87,11 @@ def create_app() -> FastAPI:
         app.state.pool        = await create_pool()
         app.state.supabase    = create_supabase_admin()
         app.state.echo_service = _create_echo_service()
+        # Die Sprachausgabe steht neben dem Echo-Dienst und nicht darin: Sie ist
+        # die einzige Stelle, die OpenAI-Audio kennt, und soll sich austauschen
+        # lassen, ohne den Dienst anzufassen, der alles andere erzeugt.
+        app.state.podcast_stimme = PodcastStimme(
+            openai_api_key=getattr(settings, "openai_api_key", ""))
         yield
         # ── Shutdown ─────────────────────────────────────────────────────
         if app.state.pool is not None:

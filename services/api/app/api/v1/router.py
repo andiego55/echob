@@ -47,6 +47,7 @@ from app.api.v1.routers import (
     organizations,
     paar_szenen,
     person_profile,
+    podcasts,
     professional,
     professional_archiv,
     professional_collab,
@@ -122,6 +123,7 @@ v1_router.include_router(organizations.router)
 v1_router.include_router(org_billing.router)
 v1_router.include_router(case_artifacts.router)
 v1_router.include_router(case_documents.router)
+v1_router.include_router(podcasts.router)
 v1_router.include_router(case_shares.router)
 v1_router.include_router(client_invites.router)
 v1_router.include_router(pseudonymous.router)

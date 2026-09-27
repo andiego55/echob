@@ -313,3 +313,202 @@ async def umbenennen(
         podcast_id, user_id, crypto.encrypt(sauber) if sauber else None,
     )
     return _folge(zeile)
+
+
+# ── Die Tonspuren ────────────────────────────────────────────────────────────
+
+async def offene_kapitel(
+    conn: asyncpg.Connection, *, user_id: UUID | str, podcast_id: UUID | str,
+) -> list[dict[str, Any]]:
+    """Welche Kapitel noch nicht gesprochen sind — in ihrer Reihenfolge.
+
+    **Daran hängt die Wiederaufnahme.** Bricht die Sprachausgabe bei Kapitel vier ab, sind
+    eins bis drei gesprochen und bleiben es; ein neuer Anlauf nimmt nur den Rest. Ohne diese
+    Abfrage würde jeder Anlauf alles neu sprechen — und jedes Mal das volle Kontingent
+    kosten.
+    """
+    zeilen = await conn.fetch(
+        "SELECT k.id, k.nr, k.titel, k.text "
+        "  FROM case_podcast_kapitel k JOIN case_podcasts p ON p.id = k.podcast_id "
+        " WHERE k.podcast_id = $1 AND p.user_id = $2 AND k.audio IS NULL "
+        " ORDER BY k.nr",
+        podcast_id, user_id,
+    )
+    return [{**dict(z), "text": crypto.decrypt(z["text"])} for z in zeilen]
+
+
+async def ton_ablegen(
+    conn: asyncpg.Connection,
+    *,
+    user_id: UUID | str,
+    kapitel_id: UUID | str,
+    audio: bytes,
+    typ: str,
+    sekunden: int,
+) -> None:
+    """Die Tonspur eines Kapitels — mit Eigentumsnachweis in der Abfrage selbst.
+
+    Das Kapitel trägt keine ``user_id``; sie hängt an der Folge. Die Bedingung greift
+    deshalb über sie, statt sich darauf zu verlassen, dass der Aufrufer vorher geprüft hat.
+    """
+    ergebnis = await conn.execute(
+        "UPDATE case_podcast_kapitel SET audio = $3, audio_typ = $4, sekunden = $5 "
+        " WHERE id = $1 "
+        "   AND podcast_id IN (SELECT id FROM case_podcasts WHERE user_id = $2)",
+        kapitel_id, user_id, audio, typ, sekunden,
+    )
+    if ergebnis == "UPDATE 0":
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Kapitel nicht gefunden.")
+
+
+async def stand_setzen(
+    conn: asyncpg.Connection,
+    *,
+    user_id: UUID | str,
+    podcast_id: UUID | str,
+    status_neu: str,
+    fehler: str | None = None,
+) -> None:
+    """Setzt den Stand — und bei ``fertig`` zugleich die Gesamtlänge.
+
+    Die Sekunden werden aus den Kapiteln summiert und nicht mitgegeben: Sie sind die Summe
+    dessen, was wirklich gesprochen wurde, und nicht die Summe dessen, was geplant war.
+    """
+    await conn.execute(
+        "UPDATE case_podcasts SET status = $3, fehler = $4, "
+        "  sekunden = CASE WHEN $3 = 'fertig' THEN ("
+        "     SELECT COALESCE(SUM(sekunden), 0) FROM case_podcast_kapitel "
+        "      WHERE podcast_id = $1) ELSE sekunden END, "
+        "  updated_at = clock_timestamp() "
+        " WHERE id = $1 AND user_id = $2",
+        podcast_id, user_id, status_neu, fehler,
+    )
+
+
+async def ton_holen(
+    conn: asyncpg.Connection, *, user_id: UUID | str, kapitel_id: UUID | str,
+) -> tuple[bytes, str] | None:
+    """Die Bytes eines Kapitels — für den Ausliefer-Endpunkt.
+
+    **Die einzige Stelle, an der Audiodaten die Datenbank verlassen**, und sie prüft das
+    Eigentum in derselben Abfrage. Es gibt keine öffentliche Adresse und keinen Link, den
+    man weiterschicken kann, ohne es zu wollen: Eine Tonaufnahme über eine Beziehung ist im
+    Nebenzimmer sofort das, was sie ist.
+    """
+    zeile = await conn.fetchrow(
+        "SELECT k.audio, k.audio_typ FROM case_podcast_kapitel k "
+        " WHERE k.id = $1 AND k.audio IS NOT NULL "
+        "   AND k.podcast_id IN (SELECT id FROM case_podcasts WHERE user_id = $2)",
+        kapitel_id, user_id,
+    )
+    if not zeile:
+        return None
+    return bytes(zeile["audio"]), zeile["audio_typ"] or "audio/mpeg"
+
+
+async def ton_der_folge(
+    conn: asyncpg.Connection, *, user_id: UUID | str, podcast_id: UUID | str,
+) -> tuple[bytes, str] | None:
+    """Alle Kapitel als EIN Stück — für den Download.
+
+    Aneinandergehängt, nicht zusammengeschnitten: MP3-Rahmen lassen sich verketten, und für
+    das Ohr entsteht daraus eine Datei. Ein echter Schnitt bräuchte eine Audio-Bibliothek im
+    Container, und die wäre für eine Naht an einem Kapitelende zu viel Apparat.
+    """
+    zeilen = await conn.fetch(
+        "SELECT k.audio, k.audio_typ FROM case_podcast_kapitel k "
+        " WHERE k.podcast_id = $1 AND k.audio IS NOT NULL "
+        "   AND k.podcast_id IN (SELECT id FROM case_podcasts WHERE user_id = $2) "
+        " ORDER BY k.nr",
+        podcast_id, user_id,
+    )
+    if not zeilen:
+        return None
+    return b"".join(bytes(z["audio"]) for z in zeilen), zeilen[0]["audio_typ"] or "audio/mpeg"
+
+
+# ── Das Material als Text für das Modell ─────────────────────────────────────
+
+def als_prompt_material(material: dict[str, Any], gewichte: dict[str, str]) -> str:
+    """Das geladene Material, wie das Modell es bekommt.
+
+    **Die Gewichtung geht als WORT mit, nicht als Zahl.** „Szenen: 0.6" ist für ein Modell
+    bedeutungslos; „darum geht es hier vor allem" ist eine Anweisung. Die Wörter stehen im
+    Katalog neben der Stufe, damit Anzeige und Anweisung nicht auseinanderlaufen.
+
+    **Was auf ``aus`` steht, kommt hier gar nicht vor** — es wurde nicht einmal geladen.
+    Eine Zeile „Skalen: nicht berücksichtigen" wäre schlimmer als nichts: Sie nennt das
+    Material, und ein Modell benutzt jedes benennbare Material auch als Sprache.
+    """
+    from app.services.echo_service import build_case_context
+
+    teile: list[str] = []
+
+    kopf = build_case_context(
+        case=material["fall"],
+        onboarding=material.get("onboarding"),
+        scenes=material.get("szenen") or [],
+        scale_scores=material.get("skalen") or [],
+        include_scene_section=bool(material.get("szenen")),
+        # Mit Titel statt Nummer: Eine gesprochene „Szene zwölf" ist tote Auskunft — beim
+        # Hören liegt der Fall nicht daneben.
+        szenen_als="titel",
+    )
+    if kopf:
+        teile.append(kopf)
+
+    def gewicht_zeile(key: str) -> str:
+        wort = katalog.gewichtung(gewichte.get(key))["wort"]
+        label = katalog.element_label(key) or key
+        return f"[{label} — {wort}]" if wort else ""
+
+    if material.get("person_profil"):
+        from app.services.person_profile_service import build_person_context
+        ctx = build_person_context(material["person_profil"])
+        if ctx:
+            teile.append(gewicht_zeile("person_profil") + "\n" + ctx)
+
+    if material.get("themen"):
+        from app.services.topic_summary_service import build_topic_context
+        ctx = build_topic_context(material["themen"])
+        if ctx:
+            teile.append(gewicht_zeile("themen") + "\n" + ctx)
+
+    if material.get("hypothesen"):
+        from app.services.hypothesis_service import build_hypothesis_context
+        ctx = build_hypothesis_context(material["hypothesen"])
+        if ctx:
+            teile.append(gewicht_zeile("hypothesen") + "\n" + ctx)
+
+    if material.get("artefakte"):
+        zeilen = [
+            f"- {a.get('title') or 'Ohne Titel'}: {a.get('body') or ''}".strip()
+            for a in material["artefakte"]
+        ]
+        teile.append(
+            gewicht_zeile("artefakte")
+            + "\nWAS DIE PERSON SELBST FESTGEHALTEN HAT:\n" + "\n".join(zeilen)
+        )
+
+    if material.get("gefuehlsbild"):
+        from app.services import gefuehlsbild_service
+        ctx = gefuehlsbild_service.kontext_block(material["gefuehlsbild"])
+        if ctx:
+            teile.append(gewicht_zeile("gefuehlsbild") + "\n" + ctx)
+
+    if material.get("traumbeziehung"):
+        from app.services import kompass_ideal_service
+        ctx = kompass_ideal_service.als_prompt_eingabe(material["traumbeziehung"])
+        if ctx:
+            teile.append(
+                gewicht_zeile("traumbeziehung")
+                + "\nWAS SICH DIE PERSON VON EINER SOLCHEN BEZIEHUNG WÜNSCHT:\n" + ctx
+            )
+
+    # Die Gewichtung der Szenen steht am Ende und noch einmal eigens: Sie sind das
+    # umfangreichste Material, und ihr Gewicht entscheidet, ob der Podcast erzählt oder
+    # zusammenfasst.
+    if material.get("szenen"):
+        teile.append(gewicht_zeile("szenen"))
+
+    return "\n\n---\n\n".join(t for t in teile if t.strip())
