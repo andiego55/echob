@@ -33,6 +33,20 @@ export const CODE_TEXTS: Record<string, string> = {
   SCALE_LIMIT_REACHED:
     'Du hast dein Monatskontingent an Skalen-Analysen erreicht. ' +
     'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  PODCAST_LIMIT_REACHED:
+    'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  // Diese drei fehlten, seit es sie gibt. Ein Wächter auf der Python-Seite hat sie gemeldet
+  // (test_podcast.py), als der Podcast-Code dazukam: Zwei davon werden im Kompass wirklich
+  // erzwungen, also hätte dort jemand „SATZ_VORSCHLAG_LIMIT_REACHED" gelesen.
+  SATZ_VORSCHLAG_LIMIT_REACHED:
+    'Du hast dein Monatskontingent an Vorschlägen erreicht. ' +
+    'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  PORTRAIT_LIMIT_REACHED:
+    'Du hast dein Monatskontingent an Selbstporträts erreicht. ' +
+    'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  FAQ_LIMIT_REACHED:
+    'Das Kontingent für Fall-Fragebögen ist diesen Monat erschöpft. ' +
+    'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
   TRIAL_EXPIRED: 'Dein Testzeitraum ist abgelaufen. Wähle einen Plan, um fortzufahren.',
   TRIAL_SCENE_LIMIT: 'Im Testzugang sind maximal 5 Szenen möglich.',
   TRIAL_CASE_LIMIT: 'Im Testzugang ist maximal 1 Fall möglich.',
@@ -73,6 +87,24 @@ export function apiErrorMessage(err: unknown, fallback = 'Das hat leider nicht g
 
   // Ein bekannter Code zuerst: Er ist für Maschinen geschrieben, nicht für Menschen.
   if (typeof detail === 'string' && CODE_TEXTS[detail]) return CODE_TEXTS[detail]
+
+  // **Code MIT Begründung dahinter: „CODE: konkreter Satz".**
+  //
+  // Ein Kontingent in Minuten kann nicht mit einem festen Satz auskommen. „Kontingent
+  // aufgebraucht" stimmt bei zwölf freien Minuten einfach nicht — es fehlt, dass diese
+  // Folge zwanzig braucht. Also schickt der Server beides: den Code für uns und den
+  // konkreten Satz für die lesende Person.
+  //
+  // Der Code wird abgeschnitten und nie gezeigt. Erst das Konkrete, dann der allgemeine
+  // Hinweis, den es zu diesem Code schon gibt. Abgeschnitten wird nur bei einem BEKANNTEN
+  // Code: Sonst würde ein gewöhnlicher Satz, der zufällig mit einem Großwort und Doppelpunkt
+  // beginnt, um seinen Anfang gebracht.
+  if (typeof detail === 'string') {
+    const geteilt = detail.match(/^([A-Z][A-Z0-9_]{3,}):\s*(.+)$/s)
+    if (geteilt && CODE_TEXTS[geteilt[1]]) {
+      return `${geteilt[2].trim()} ${CODE_TEXTS[geteilt[1]]}`
+    }
+  }
 
   // Nur eine ECHTE Begründung gewinnt. FastAPIs Standardtexte („Not Found“ bei einer
   // unbekannten Route) sagen der lesenden Person nichts – da ist unsere Erklärung besser.

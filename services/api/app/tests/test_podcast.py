@@ -686,3 +686,94 @@ def test_jedes_kapitel_hat_einen_auftrag_und_jedes_format_eine_haltung():
         assert len(f["haltung"]) > 40, f["key"]
         for kap in f["kapitel"]:
             assert len(kap["auftrag"]) > 40, f"{f['key']}/{kap['key']}"
+
+
+@pytest.mark.asyncio
+async def test_das_kontingent_prueft_die_menge_und_nicht_nur_den_rest(person, db):
+    """**Sonst laesst sich das Kontingent um fast eine ganze Folge ueberziehen.**
+
+    „Hast du noch etwas uebrig" ist bei allem richtig, was in Stueck zaehlt: Ein Bericht ist
+    ein Bericht. Bei Minuten nicht. Wer 28 von 30 verbraucht hat, kaeme mit einer
+    Zwanzigminueter durch und stuende danach auf 48 von 30 — ohne etwas falsch gemacht zu
+    haben.
+    """
+    from app.services.subscription_service import enforce_ai_usage_menge, log_ai_usage
+
+    await log_ai_usage(person, db, "podcast", menge=28)
+
+    # Zwei Minuten sind noch frei: eine geht.
+    await enforce_ai_usage_menge(str(person), db, "podcast", 2)
+
+    # Zwanzig nicht — und die Meldung sagt, wie viel wirklich frei ist.
+    with pytest.raises(HTTPException) as fehler:
+        await enforce_ai_usage_menge(str(person), db, "podcast", 20)
+    assert fehler.value.status_code == 403
+    assert "PODCAST_LIMIT_REACHED" in fehler.value.detail
+    assert "2" in fehler.value.detail, "die Meldung nennt den Rest nicht"
+    assert "Minuten" in fehler.value.detail
+
+
+@pytest.mark.asyncio
+async def test_ein_abgeschaltetes_kontingent_laesst_alles_durch(person, db):
+    """0 heisst „deaktiviert" — dieselbe Regel wie bei allen anderen Arten."""
+    from app.core.config import settings
+    from app.services.subscription_service import enforce_ai_usage_menge
+
+    alt = settings.podcast_minuten_limit
+    try:
+        settings.podcast_minuten_limit = 0
+        await enforce_ai_usage_menge(str(person), db, "podcast", 9999)
+    finally:
+        settings.podcast_minuten_limit = alt
+
+
+def test_die_geschaetzte_dauer_taugt_als_grundlage_fuers_kontingent():
+    """Die Schaetzung entscheidet, was jemand bezahlt — sie muss zur Laenge passen, die im
+    Katalog versprochen wird."""
+    import math
+
+    from app.services.podcast_stimme import sekunden_schaetzen
+
+    for laenge in katalog.LAENGEN:
+        text = "wort " * laenge["woerter"]
+        minuten = math.ceil(sekunden_schaetzen(text) / 60)
+        # Die Schaetzung liegt bewusst knapp (150 Woerter/Minute gegen 140 im Katalog):
+        # Wer zu viel abrechnet, nimmt jemandem etwas weg, das er bezahlt hat.
+        assert minuten <= laenge["minuten"], (
+            f'{laenge["key"]}: {minuten} Minuten abgerechnet fuer eine '
+            f'{laenge["minuten"]}-Minuten-Folge'
+        )
+        assert minuten >= laenge["minuten"] - 2, f'{laenge["key"]}: viel zu knapp'
+
+
+# ── Ueber die Sprachgrenze ────────────────────────────────────────────────────
+
+def test_jeder_kontingent_code_hat_eine_uebersetzung_im_frontend():
+    """**Ein Code ohne Uebersetzung landet woertlich beim Nutzer.**
+
+    Genau das ist im Paarraum passiert: Sieben Router riefen die Echo-Pruefung, der Paarraum
+    hatte aber seinen eigenen Uebersetzer ohne die Tabelle — wer an sein Kontingent stiess,
+    las „ECHO_LIMIT_REACHED".
+
+    Dieser Waechter steht auf der Python-Seite, weil hier die Codes ENTSTEHEN. Ein Test im
+    Frontend koennte nur pruefen, was er kennt; er wuesste nichts von einem Code, den gerade
+    jemand hier ergaenzt hat.
+    """
+    from pathlib import Path
+
+    from app.services.subscription_service import _AI_USAGE_LIMITS
+
+    # parents: [0]=tests [1]=app [2]=api [3]=services [4]=Projektwurzel
+    tabelle = Path(__file__).resolve().parents[4] / "apps/web/src/api/errors.ts"
+    assert tabelle.is_file(), f"Uebersetzungstabelle nicht gefunden: {tabelle}"
+    text = tabelle.read_text(encoding="utf-8")
+
+    fehlend = [
+        code for _feld, code, _label in _AI_USAGE_LIMITS.values()
+        if f"{code}:" not in text
+    ]
+    assert not fehlend, (
+        "Diese Kontingent-Codes haben keine Uebersetzung in apps/web/src/api/errors.ts "
+        "und wuerden woertlich angezeigt:\n" + \
+        "\n".join(f"  {c}" for c in fehlend)
+    )

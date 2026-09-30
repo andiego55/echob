@@ -178,6 +178,38 @@ async def enforce_ai_usage_limit(user_id: str, conn, kind: str) -> None:
         )
 
 
+async def enforce_ai_usage_menge(user_id: str, conn, kind: str, menge: int) -> None:
+    """Wie ``enforce_ai_usage_limit``, aber für eine bekannte Menge — und der Unterschied
+    ist keine Feinheit.
+
+    ``enforce_ai_usage_limit`` fragt „hast du noch etwas übrig?". Bei allem, was in Stück
+    zählt, ist das genau richtig: Ein Bericht ist ein Bericht. Bei Podcast-Minuten nicht.
+    Wer 28 von 30 Minuten verbraucht hat, kommt dort durch — und verbucht dann zwanzig. Das
+    Kontingent stünde am Ende auf 48 von 30, und niemand hätte etwas falsch gemacht.
+
+    Diese Fassung fragt stattdessen: **reicht es für DAS hier?** Und sie sagt in der
+    Fehlermeldung, wie viel übrig ist, weil „Kontingent aufgebraucht" bei 12 freien Minuten
+    einfach nicht stimmt.
+    """
+    setting_name, error_code, label = _AI_USAGE_LIMITS[kind]
+    limit = getattr(settings, setting_name)
+    if limit <= 0:
+        return
+    verbraucht = await _count_ai_usage_this_month(user_id, conn, kind)
+    frei = max(0, limit - verbraucht)
+    if menge > frei:
+        einheit = _EINHEIT.get(kind, "")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            # Der Code bleibt derselbe, damit die Oberfläche ihn kennt; der Klartext
+            # dahinter sagt, woran es liegt.
+            detail=(
+                f"{error_code}: Dafür bräuchte es {menge} {einheit}, frei sind noch "
+                f"{frei} von {limit}. ({label})"
+            ).strip(),
+        )
+
+
 async def has_ai_usage_left(user_id: str, conn, kind: str) -> bool:
     """Wie ``enforce_ai_usage_limit``, aber ohne 403 — für Aktionen, die *nebenbei* laufen.
 

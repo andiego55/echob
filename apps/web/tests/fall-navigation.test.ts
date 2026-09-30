@@ -10,7 +10,7 @@
  * bis hierhin nur im Kopf durchgespielt.
  */
 import { describe, expect, it } from 'vitest'
-import { GRUPPEN, gruppeFuer } from '@/components/app/caseNavGroups'
+import { ANHAENGSEL, GRUPPEN, gruppeFuer } from '@/components/app/caseNavGroups'
 
 /** Kurzform: nur das Etikett der getroffenen Gruppe. */
 const gruppe = (pfad: string) => gruppeFuer(pfad).label
@@ -72,6 +72,27 @@ describe('Die Gliederung selbst', () => {
     // bekäme keine Pillenreihe und ihre Kinder wären unerreichbar.
     const allein = GRUPPEN.filter(g => g.kinder.length === 1)
     expect(allein.map(g => g.label)).toEqual(['Überblick'])
+  })
+
+  it('jeder ANHAENGSEL-Wert ist wirklich ein Gruppenname', () => {
+    // **Ein falscher Wert hier tut gar nichts, und das ist das Problem.** gruppeFuer sucht
+    // die Gruppe mit diesem Label; findet es keine, faellt es still auf die normale
+    // Zuordnung zurueck. Kein Fehler, keine Warnung - nur ein Eintrag, der aussieht, als
+    // wuerde er etwas regeln. Genau das ist mir beim Podcast passiert: Ich hatte '/podcast'
+    // als Wert eingetragen statt 'Zeigen'.
+    const namen = GRUPPEN.map(g => g.label)
+    const falsch = Object.entries(ANHAENGSEL).filter(([, wert]) => !namen.includes(wert))
+    expect(
+      falsch.map(([k, v]) => `${k} -> ${v}`),
+      'diese Werte sind kein Gruppenname und bleiben damit wirkungslos',
+    ).toEqual([])
+  })
+
+  it('fuehrt eine einzelne Podcast-Folge zu „Zeigen"', () => {
+    // Die Folge hat keine eigene Pille - man landet dort aus dem Regal heraus. Ohne die
+    // richtige Zuordnung leuchtete „Ueberblick", und man stuende woanders, als man ist.
+    expect(gruppeFuer('/podcast').label).toBe('Zeigen')
+    expect(gruppeFuer('/podcast/7f3a-1234').label).toBe('Zeigen')
   })
 
   it('vergibt keinen Pfad zweimal', () => {

@@ -56,7 +56,10 @@ export const GRUPPEN: Gruppe[] = [
  * plötzlich woanders, als man gerade arbeitet.
  */
 export const ANHAENGSEL: Record<string, string> = {
-  '/podcast/': '/podcast',
+  // Kein Eintrag fuer '/podcast/:id': Eine einzelne Folge braucht keinen, weil '/podcast'
+  // selbst eine Pille ist und die normale Zuordnung Unterpfade schon mitnimmt. Hier stand
+  // zuerst einer - mit einem PFAD als Wert statt eines Gruppennamens. Er tat gar nichts,
+  // und niemand haette es gemerkt.
   '/selbsttest': 'Verstehen',
   '/topics': 'Verstehen',
 }

@@ -75,4 +75,43 @@ describe('Prueffehler des Servers (422)', () => {
     expect(apiErrorMessage(fehler, 'RUECKFALL')).not.toBe('RUECKFALL')
     expect(apiErrorMessage(fehler, 'RUECKFALL')).toBe('Die Eingabe passt so nicht.')
   })
+
+  it('schneidet einen bekannten Code vor seiner Begruendung ab', () => {
+    // Ein Kontingent in Minuten kann nicht mit einem festen Satz auskommen: „Kontingent
+    // aufgebraucht" stimmt bei zwei freien Minuten nicht. Der Server schickt deshalb beides.
+    const text = apiErrorMessage({
+      isAxiosError: true,
+      response: {
+        status: 403,
+        data: {
+          detail: 'PODCAST_LIMIT_REACHED: Dafuer braeuchte es 20 Minuten, frei sind noch '
+            + '2 von 30. (Podcast-Minuten)',
+        },
+      },
+    } as never)
+
+    expect(text).not.toContain('PODCAST_LIMIT_REACHED')
+    expect(text).toContain('20 Minuten')      // das Konkrete zuerst
+    expect(text).toContain('naechsten Monats'.replace('ae', 'ä'))  // dann der Hinweis
+  })
+
+  it('laesst einen gewoehnlichen Satz mit Doppelpunkt unversehrt', () => {
+    // Abgeschnitten wird nur bei einem BEKANNTEN Code. Sonst kaeme ein Satz wie
+    // „ACHTUNG: ..." um seinen Anfang.
+    const text = apiErrorMessage({
+      isAxiosError: true,
+      response: { status: 422, data: { detail: 'ACHTUNG: das geht so nicht.' } },
+    } as never)
+    expect(text).toBe('ACHTUNG: das geht so nicht.')
+  })
+
+  it('zeigt auch bei einem unbekannten Code keinen Code', () => {
+    // Faengt ein Code ohne Eintrag in CODE_TEXTS beim Nutzer an, ist das ein Fehler in
+    // unserer Tabelle - aber lieber der ganze Satz als ein halber.
+    const text = apiErrorMessage({
+      isAxiosError: true,
+      response: { status: 403, data: { detail: 'GIBT_ES_NICHT: Etwas ist schiefgelaufen.' } },
+    } as never)
+    expect(text).toContain('Etwas ist schiefgelaufen.')
+  })
 })

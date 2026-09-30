@@ -29,7 +29,7 @@ from app.schemas.podcast import PodcastAnlegen, PodcastUmbenennen
 from app.services import podcast_katalog as katalog
 from app.services import podcast_service as dienst
 from app.services import podcast_stimme as stimm_modul
-from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
+from app.services.subscription_service import enforce_ai_usage_menge, log_ai_usage
 
 router = APIRouter(prefix="/cases/{case_id}/podcasts", tags=["podcasts"])
 
@@ -167,16 +167,28 @@ async def sprechen(
         )
 
     async with pool.acquire() as conn:
-        await enforce_ai_usage_limit(user_id, conn, "podcast")
         folge = await dienst.holen(conn, user_id=user_id, podcast_id=podcast_id)
         if not folge:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Folge nicht gefunden.")
-        if folge["status"] == "entwurf":
+        offen = await dienst.offene_kapitel(conn, user_id=user_id, podcast_id=podcast_id)
+        if not offen:
             raise HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Zu dieser Folge gibt es noch kein Skript.",
+                detail=(
+                    "Zu dieser Folge gibt es keinen Text zum Sprechen."
+                    if not folge.get("kapitel")
+                    else "Diese Folge ist schon vollständig gesprochen."
+                ),
             )
-        offen = await dienst.offene_kapitel(conn, user_id=user_id, podcast_id=podcast_id)
+
+        # **Geprüft wird die MENGE, nicht bloß „ist noch was übrig".** Wer 28 von 30
+        # Minuten verbraucht hat, käme sonst mit einer Zwanzigminüter durch und stünde
+        # danach auf 48 von 30. Gerechnet wird über die noch offenen Kapitel: Bei einer
+        # Wiederaufnahme zahlt niemand für das, was schon gesprochen ist.
+        noetig = math.ceil(
+            sum(stimm_modul.sekunden_schaetzen(k["text"]) for k in offen) / 60)
+        await enforce_ai_usage_menge(user_id, conn, "podcast", noetig)
+
         await dienst.stand_setzen(
             conn, user_id=user_id, podcast_id=podcast_id, status_neu="spricht")
 
