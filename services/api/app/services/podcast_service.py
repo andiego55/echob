@@ -33,6 +33,39 @@ from app.services import podcast_katalog as katalog
 _SZENEN_JE_GEWICHT = {"rand": 5, "normal": 15, "mittelpunkt": 30}
 
 
+def _mit_json(zeile: dict[str, Any], *felder: str) -> dict[str, Any]:
+    """JSONB-Spalten von Zeichenkette zu Dict — bevor sie an einen Kontextbauer gehen.
+
+    **asyncpg gibt JSONB als Zeichenkette zurück**, nicht als Dict. ``build_person_context``
+    erwartet ein Dict und ruft darauf ``.get()``: Das wirft einen AttributeError, und im
+    Browser blitzt nur kurz etwas auf.
+
+    Genau so ist es passiert. Mein Test dafür hatte Material mit Szenen und Erkenntnissen —
+    aber ohne Personenprofil, ohne Themendialoge, ohne Hypothesen. Die Zweige liefen nie,
+    also war der grüne Test eine Aussage über drei von neun Elementen. Wer ein Profil
+    angelegt hatte, bekam beim ersten Klick einen Fehler.
+
+    Die bestehenden Aufrufer lösen das an fünf Stellen jeweils mit einem eigenen
+    ``import json`` mitten in der Funktion. Hier steht es einmal, mit dem Grund daneben.
+    """
+    for feld in felder:
+        wert = zeile.get(feld)
+        if isinstance(wert, str):
+            try:
+                wert = json.loads(wert)
+            except (ValueError, TypeError):
+                wert = None
+        # **Geprüft wird auf Dict, nicht auf Parsebarkeit.** `"kein objekt"` ist gültiges
+        # JSON und ergibt eine Zeichenkette — der Kontextbauer ruft darauf `.get()` und
+        # scheitert genauso. Ein Test hat genau diesen Fall gefunden, nachdem die erste
+        # Fassung nur den Parsefehler abfing.
+        #
+        # Ein leeres Dict statt eines Fehlers: Der Kontextbauer kommt damit zurecht, und ein
+        # fehlender Block ist besser als eine Folge, die nicht entsteht.
+        zeile[feld] = wert if isinstance(wert, dict) else {}
+    return zeile
+
+
 def gewichte_pruefen(format_key: str, roh: Any) -> dict[str, str]:
     """Die Regler, gesäubert — und auf das beschnitten, was dieses Format verträgt.
 
@@ -102,7 +135,7 @@ async def material_laden(
     if "person_profil" in an:
         zeile = await conn.fetchrow(
             "SELECT * FROM person_profiles WHERE case_id = $1", case_id)
-        material["person_profil"] = dict(zeile) if zeile else None
+        material["person_profil"] = _mit_json(dict(zeile), "modules", "summary") if zeile             else None
 
     if "themen" in an:
         zeilen = await conn.fetch(

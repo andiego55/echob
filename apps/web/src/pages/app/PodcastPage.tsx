@@ -63,13 +63,16 @@ export default function PodcastPage() {
           Länge und woraus er entsteht.
         </p>
 
-        <Fehlermeldung error={regal.error ?? bestellen.error} className="mt-4" />
+        {/* Nur der Fehler des REGALS steht hier oben. Der des Bestellens gehört an den
+            Knopf, den man gerade gedrückt hat — sonst erscheint er außerhalb des Bildes. */}
+        <Fehlermeldung error={regal.error} className="mt-4" />
 
         {zeigeStudio ? (
           <div className="mt-6">
             <Studio
               caseId={caseId!}
               laeuft={bestellen.isPending}
+              fehler={bestellen.error}
               onBestellen={b => bestellen.mutate(b)}
               onAbbruch={() => setStudioOffen(false)}
             />

@@ -777,3 +777,100 @@ def test_jeder_kontingent_code_hat_eine_uebersetzung_im_frontend():
         "und wuerden woertlich angezeigt:\n" + \
         "\n".join(f"  {c}" for c in fehlend)
     )
+
+
+# ── Der Weg mit ALLEM Material ────────────────────────────────────────────────
+
+async def _fall_mit_allem(db, person):
+    """Ein Fall, der jedes Element wirklich fuellt.
+
+    **Ohne diesen Aufbau ist jeder Test ueber den Prompt eine Aussage ueber drei von neun
+    Elementen.** Genau daran ist es gescheitert: Mein Waechter benutzte Material mit Szenen
+    und Erkenntnissen, die Zweige fuer Personenprofil, Themendialoge und Hypothesen liefen
+    nie - und wer ein Profil angelegt hatte, bekam beim ersten Klick einen Fehler.
+    """
+    fall = await _fall(db, person)
+    await db.execute(
+        "INSERT INTO scenes (case_id, user_id, title, description, confirmed_by_user) "
+        "VALUES ($1,$2,'Der Abend',$3,true)",
+        fall, person, crypto.encrypt("Etwas ist passiert."))
+    await db.execute(
+        "INSERT INTO scale_scores (case_id, user_id, scale_key, score, confidence) "
+        "VALUES ($1,$2,'boundary_violation',70,'high')", fall, person)
+    # Das Personenprofil ist der Grund fuer diesen Aufbau: Seine JSONB-Spalten kommen von
+    # asyncpg als ZEICHENKETTE, und build_person_context ruft darauf .get().
+    await db.execute(
+        "INSERT INTO person_profiles (case_id, user_id) VALUES ($1,$2)", fall, person)
+    await db.execute(
+        "INSERT INTO topic_summaries (case_id, user_id, topic, summary_text) "
+        "VALUES ($1,$2,'topic_self',$3)", fall, person, crypto.encrypt("Zusammenfassung."))
+    await db.execute(
+        "INSERT INTO case_hypotheses (case_id, user_id, hypothesis_type, summary_text) "
+        "VALUES ($1,$2,'bindung',$3)", fall, person, crypto.encrypt("Eine Hypothese."))
+    await db.execute(
+        "INSERT INTO case_artifacts (case_id, user_id, artifact_no, title, body, status) "
+        "VALUES ($1,$2,1,'Eine Einsicht',$3,'aktiv')",
+        fall, person, crypto.encrypt("Ich merke es vorher."))
+    return fall
+
+
+@pytest.mark.asyncio
+async def test_der_prompt_entsteht_auch_mit_vollem_material(person, db):
+    """**Der Test, der den Fehler gefunden haette.**
+
+    Ein Nutzer klickte auf „Skript schreiben", es blitzte kurz etwas auf, und nichts
+    entstand: AttributeError in build_person_context, weil die JSONB-Spalten des
+    Personenprofils als Zeichenkette ankommen.
+    """
+    fall = await _fall_mit_allem(db, person)
+    g = dienst.gewichte_pruefen("ganzer_fall", {})
+    material = await dienst.material_laden(db, user_id=person, case_id=fall, gewichte=g)
+
+    # Jedes Element ist wirklich da - sonst prueft der Rest nichts.
+    for key in katalog.format_("ganzer_fall")["elemente"]:
+        assert key in material, f"{key} fehlt im Material"
+
+    text = dienst.als_prompt_material(material, g)
+    assert len(text) > 200
+    assert "Der Abend" in text
+    assert "Eine Einsicht" in text
+
+
+@pytest.mark.asyncio
+async def test_jedes_element_einzeln_traegt_den_prompt(person, db):
+    """Jedes Element ALLEIN, mit allen anderen aus.
+
+    Zusammen koennte ein kaputter Zweig von einem anderen verdeckt werden: Ein Block, der
+    nicht entsteht, faellt in einem langen Prompt nicht auf. Einzeln nicht.
+    """
+    fall = await _fall_mit_allem(db, person)
+    for key in katalog.format_("ganzer_fall")["elemente"]:
+        g = dienst.gewichte_pruefen(
+            "ganzer_fall", {k: ("mittelpunkt" if k == key else "aus")
+                            for k in katalog.ELEMENT_SCHLUESSEL})
+        material = await dienst.material_laden(
+            db, user_id=person, case_id=fall, gewichte=g)
+        # Darf nicht werfen - das ist die eigentliche Pruefung.
+        dienst.als_prompt_material(material, g)
+
+
+@pytest.mark.asyncio
+async def test_ein_personenprofil_mit_unlesbarem_json_haelt_nichts_an(person, db):
+    """Ein fehlender Block ist besser als eine Fehlermeldung."""
+    fall = await _fall_mit_allem(db, person)
+    await db.execute(
+        "UPDATE person_profiles SET modules = $2::jsonb WHERE case_id = $1",
+        fall, '"kein objekt"')
+    g = dienst.gewichte_pruefen("ganzer_fall", {})
+    material = await dienst.material_laden(db, user_id=person, case_id=fall, gewichte=g)
+    dienst.als_prompt_material(material, g)
+
+
+def test_json_felder_werden_zu_dicts():
+    assert dienst._mit_json({"a": '{"x": 1}'}, "a")["a"] == {"x": 1}
+    assert dienst._mit_json({"a": None}, "a")["a"] == {}
+    assert dienst._mit_json({"a": "kein json"}, "a")["a"] == {}
+    # Gueltiges JSON, das kein Objekt ist - der haertere Fall.
+    assert dienst._mit_json({"a": chr(34) + "text" + chr(34)}, "a")["a"] == {}
+    assert dienst._mit_json({"a": "[1,2]"}, "a")["a"] == {}
+    assert dienst._mit_json({"a": {"schon": "dict"}}, "a")["a"] == {"schon": "dict"}

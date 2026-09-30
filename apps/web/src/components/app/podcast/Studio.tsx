@@ -21,9 +21,18 @@ import { useQuery } from '@tanstack/react-query'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { podcastApi, type PodcastBestellung } from '@/api/podcast'
 
-export default function Studio({ caseId, laeuft, onBestellen, onAbbruch }: {
+export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch }: {
   caseId: string
   laeuft: boolean
+  /**
+   * Was beim Bestellen schiefging — **hier unten, nicht am Seitenkopf.**
+   *
+   * Dasselbe Versehen zweimal: Zuerst stand der Wartehinweis oben und war bei diesem langen
+   * Formular außerhalb des Bildes. Die Fehlermeldung stand daneben und blieb dort, als der
+   * Hinweis umzog. Ein Nutzer sah deshalb nur das Rad kurz aufblitzen und hielt es für „es
+   * passiert nichts" — die Erklärung lag anderthalb Bildschirme höher.
+   */
+  fehler: unknown
   onBestellen: (b: PodcastBestellung) => void
   onAbbruch: () => void
 }) {
@@ -258,13 +267,14 @@ export default function Studio({ caseId, laeuft, onBestellen, onAbbruch }: {
           </div>
         ) : (
           <div className="flex flex-wrap items-center gap-3">
+            <Fehlermeldung error={fehler} className="w-full !mt-0" />
             <button
               type="button"
               onClick={bestellen}
               disabled={alleAus}
               className="btn-primary !py-2.5 !px-5 !text-sm disabled:opacity-40"
             >
-              Skript schreiben
+              {fehler ? 'Noch einmal versuchen' : 'Skript schreiben'}
             </button>
             <span className="text-[0.78rem] leading-snug text-brand-muted">
               Erst der Text, dann die Stimme. Das Skript kostet nichts von deinem
