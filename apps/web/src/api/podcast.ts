@@ -49,6 +49,23 @@ export interface PodcastStimme {
 }
 export interface PodcastAnsprache { key: string; label: string; hinweis: string }
 
+/**
+ * Eine Art von Kapitel im Baukasten.
+ *
+ * Ohne `auftrag`: Der fachliche Auftrag bleibt auf dem Server. Er liest sich wie eine
+ * Beschreibung und ist eine Anweisung an ein Modell — auf einem Bildschirm gelesen klingt er
+ * wie ein geprüftes Versprechen.
+ */
+export interface PodcastBaustein {
+  key: string
+  label: string
+  titel_vorschlag: string
+  hinweis: string
+  braucht_szene?: boolean
+}
+
+export interface PodcastKapitelLaenge { key: string; label: string; gewicht: number }
+
 export interface PodcastKatalog {
   formate: PodcastFormat[]
   max_folgen_je_fall?: number
@@ -59,6 +76,12 @@ export interface PodcastKatalog {
   gewichtungen?: PodcastGewichtung[]
   laengen?: PodcastLaenge[]
   stimmen?: PodcastStimme[]
+  /** Der Baukasten — nur beim Abruf ohne `?format=`. */
+  eigenes_format?: string
+  bausteine?: PodcastBaustein[]
+  kapitel_laengen?: PodcastKapitelLaenge[]
+  max_eigene_kapitel?: number
+  max_eigene_anweisung?: number
 }
 
 export interface PodcastKapitel {
@@ -68,6 +91,10 @@ export interface PodcastKapitel {
   titel: string
   text: string
   sekunden: number | null
+  /** Nur bei selbstgebauten Kapiteln: was die Person bestellt hat. */
+  auftrag?: string | null
+  szene_id?: string | null
+  kapitel_laenge?: string | null
   /** Ob dieses Kapitel schon eine Tonspur hat. Daran hängt die Wiederaufnahme. */
   gesprochen: boolean
 }
@@ -85,6 +112,8 @@ export interface Podcast {
   ansprache: string
   gewichte: Record<string, string>
   titel: string | null
+  /** Der Freitext für diese Folge, falls einer gesetzt wurde. */
+  eigene_anweisung?: string | null
   status: PodcastStatus
   fehler: string | null
   sekunden: number | null
@@ -100,6 +129,16 @@ export interface PodcastBestellung {
   ansprache: string
   gewichte: Record<string, string>
   ohne_kapitel?: string[]
+  /** Selbstgebaute Kapitel — nur bei `format: "eigenes"`. */
+  kapitel?: {
+    baustein: string
+    titel: string
+    eigener_auftrag: string
+    kapitel_laenge: string
+    szene_id: string | null
+  }[]
+  /** Freitext für diese Folge. Gilt für jedes Format. */
+  eigene_anweisung?: string
 }
 
 export const podcastApi = {

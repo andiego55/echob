@@ -201,6 +201,17 @@ export default function PodcastFolgePage() {
         {/* Der Sprech-Fehler steht NICHT hier, sondern unten am Sprechen-Knopf. Dasselbe
             hatte ich im Studio zweimal falsch: Rückmeldung am Seitenkopf ist bei einer
             langen Seite außerhalb des Bildes, und wer unten klickt, sieht nichts. */}
+        {/* **Was bestellt war, gehoert neben das Ergebnis.**
+            Wer in drei Monaten hoert, soll nachlesen koennen, was er wollte — nicht nur,
+            was dabei herauskam. Ohne das wirkt ein Satz, der nicht getroffen hat, wie ein
+            Fehler des Werkzeugs statt wie ein Auftrag, der anders verstanden wurde. */}
+        {f.eigene_anweisung && (
+          <p className="mt-4 rounded-brand border-l-2 border-accent/40 bg-brand-bg px-4 py-3 text-[0.84rem] leading-relaxed text-brand-text">
+            <span className="label block">Dein Hinweis für diese Folge</span>
+            {f.eigene_anweisung}
+          </p>
+        )}
+
         <Fehlermeldung error={umbenennen.error ?? loeschen.error} className="mt-4" />
         {ladeFehler && <p role="alert" className="mt-4 text-sm text-red-600">{ladeFehler}</p>}
 
@@ -330,6 +341,13 @@ export default function PodcastFolgePage() {
                     </span>
                   )}
                 </h3>
+                {/* Nur bei selbstgebauten Kapiteln: Bei einem Format aus dem Katalog
+                    steht der Auftrag dort und ist keine Angabe der Person. */}
+                {k.auftrag && (
+                  <p className="mt-1 text-[0.76rem] italic leading-snug text-brand-muted">
+                    Dein Auftrag: {k.auftrag}
+                  </p>
+                )}
                 <p className="mt-1.5 whitespace-pre-wrap text-[0.92rem] leading-[1.75] text-brand-text">
                   {k.text}
                 </p>

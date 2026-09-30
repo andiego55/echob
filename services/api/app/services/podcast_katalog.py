@@ -619,6 +619,47 @@ def fuer_format(format_key: str) -> dict[str, Any] | None:
     }
 
 
+def zuschnitt_eigenes() -> dict[str, Any]:
+    """Der Zuschnitt für den selbstgebauten Podcast.
+
+    **Warum das hier steht und nicht als Sonderfall in der Oberfläche.** Die Oberfläche fragt
+    für jedes Format denselben Endpunkt und bekommt dieselben Listen zurück. Gäbe es für den
+    Baukasten keinen Zuschnitt, müsste sie an fünf Stellen unterscheiden, woher Elemente,
+    Gewichtungen, Längen, Stimmen und Ansprachen kommen — und die fünfte würde irgendwann
+    vergessen.
+
+    Das Pseudo-Format trägt eine leere Kapitelliste: Es gibt keine Struktur, die es
+    beschreiben könnte. Genau das ist der Unterschied zu allen anderen.
+
+    **Ohne die Ansprache an die andere Person.** Sie gehört zu ihrem Format, wo die Haltung
+    ihre Grenzen trägt: keine Abrechnung, kein Appell, keine du-Sätze über einen abwesenden
+    Menschen. Frei kombiniert wäre sie ein gesprochener Text an einen namentlich bekannten
+    Menschen ohne diese Grenzen.
+    """
+    ansprachen = [a for a in ANSPRACHEN if a["key"] != "an_person"]
+    return {
+        "format": {
+            "key": EIGENES_FORMAT,
+            "label": "Eigener Podcast",
+            "beschreibung": "Du baust die Kapitel selbst.",
+            "ansprachen": tuple(a["key"] for a in ansprachen),
+            "elemente": tuple(e["key"] for e in ELEMENTE),
+            "kapitel": (),
+        },
+        "elemente": list(ELEMENTE),
+        "ansprachen": ansprachen,
+        "gewichtungen": list(GEWICHTUNGEN),
+        "laengen": list(LAENGEN),
+        "stimmen": list(STIMMEN),
+        "bausteine": [
+            {k: v for k, v in b.items() if k != "auftrag"} for b in KAPITEL_BAUSTEINE
+        ],
+        "kapitel_laengen": list(KAPITEL_LAENGEN),
+        "max_eigene_kapitel": MAX_EIGENE_KAPITEL,
+        "max_eigene_anweisung": MAX_EIGENE_ANWEISUNG,
+    }
+
+
 def kapitel_budget(format_key: str, laenge_key: str, aus: set[str] | None = None) -> dict[str, int]:
     """Wie viele Wörter je Kapitel — nach Anteil, ohne abgewählte Kapitel.
 

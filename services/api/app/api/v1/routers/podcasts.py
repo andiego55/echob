@@ -102,7 +102,10 @@ async def katalog_lesen(
     übertragen.
     """
     if format:
-        zuschnitt = katalog.fuer_format(format)
+        zuschnitt = (
+            katalog.zuschnitt_eigenes() if format == katalog.EIGENES_FORMAT
+            else katalog.fuer_format(format)
+        )
         if not zuschnitt:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
         return {"formate": [katalog.fuers_auge(f) for f in katalog.FORMATE], **zuschnitt}

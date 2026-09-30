@@ -18,6 +18,8 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { scenesApi } from '@/api/scenes'
+import KapitelBaukasten, { type EntwurfKapitel } from './KapitelBaukasten'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { anspracheFuerFormat, reglerFuerFormat } from '@/lib/podcast'
 import { podcastApi, type PodcastBestellung } from '@/api/podcast'
@@ -47,15 +49,32 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
   // Wer zwei Stimmen vergleicht, tippt schnell hin und her, und dann sollen nicht zwei
   // gleichzeitig reden.
   const [probeLaeuft, setProbeLaeuft] = useState<string | null>(null)
+  const [eigeneKapitel, setEigeneKapitel] = useState<EntwurfKapitel[]>([])
+  const [anweisung, setAnweisung] = useState('')
 
   const formate = useQuery({
     queryKey: ['podcast-katalog', caseId],
     queryFn: () => podcastApi.katalog(caseId),
     staleTime: Infinity,
   })
+  // Nur fuer den Baukasten: Der Baustein „Eine Szene ausbauen" braucht eine Auswahl.
+  // `enabled` haengt am Format, damit ein Katalog-Podcast die Liste nicht holt.
+  const szenen = useQuery({
+    queryKey: ['scenes', caseId],
+    queryFn: () => scenesApi.list(caseId!),
+    enabled: !!caseId && formatKey === formate.data?.eigenes_format,
+    staleTime: 60_000,
+  })
+
+  const eigenes = !!formatKey && formatKey === formate.data?.eigenes_format
+
   const zuschnitt = useQuery({
     queryKey: ['podcast-katalog', caseId, formatKey],
     queryFn: () => podcastApi.katalog(caseId, formatKey!),
+    // **Ein Weg fuer beide Faelle.** Auch der Baukasten hat einen Zuschnitt — mit leerer
+    // Kapitelliste. Sonst muesste diese Datei an fuenf Stellen unterscheiden, woher
+    // Elemente, Gewichtungen, Laengen, Stimmen und Ansprachen kommen, und die fuenfte
+    // wuerde irgendwann vergessen.
     enabled: !!formatKey,
     staleTime: Infinity,
   })
@@ -95,6 +114,30 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
         </p>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {/* **Der Baukasten steht ZUERST und sieht anders aus.**
+              Nicht als achte Variante zwischen sieben Formaten: Er ist keine Vorlage,
+              sondern das Gegenteil. Als letzte Karte in einer Reihe gleich aussehender
+              Kacheln wuerde ihn kaum jemand bemerken — und wer ihn bemerkt, hielte ihn fuer
+              den Rest. */}
+          {formate.data?.eigenes_format && (
+            <button
+              type="button"
+              onClick={() => setFormatKey(formate.data!.eigenes_format!)}
+              className="group rounded-brand border-2 border-dashed border-accent/40 bg-accent/[0.03] p-5 text-left transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-brand motion-reduce:hover:translate-y-0 sm:col-span-2"
+            >
+              <span className="block text-[1rem] font-bold leading-snug text-accent">
+                Eigener Podcast
+              </span>
+              <span className="mt-1.5 block text-[0.83rem] leading-snug text-brand-muted">
+                Du baust die Kapitel selbst und bringst sie in deine Reihenfolge — zum
+                Beispiel eine einzelne Szene ausbauen und dabei besonders auf dein eigenes
+                Erleben schauen.
+              </span>
+              <span className="mt-3 block text-[0.74rem] font-medium text-accent/80">
+                Bis zu {formate.data?.max_eigene_kapitel ?? 8} Kapitel, frei sortierbar
+              </span>
+            </button>
+          )}
           {(formate.data?.formate ?? []).map(f => (
             <button
               key={f.key}
@@ -129,9 +172,25 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
     ansprache: ansprache ?? format.ansprachen[0],
     gewichte,
     ohne_kapitel: ohneKapitel,
+    kapitel: eigenes
+      ? eigeneKapitel.map(({ lid: _lid, ...rest }) => rest)
+      : undefined,
+    eigene_anweisung: anweisung.trim() || undefined,
   })
 
-  const alleAus = ohneKapitel.length >= format.kapitel.length
+  // **Was den Knopf sperrt, ist in beiden Faellen etwas anderes.**
+  // Bei einem Format: alle Kapitel abgewaehlt. Beim Baukasten: kein Kapitel gebaut, oder
+  // eines ist unfertig — ein Szenen-Kapitel ohne Szene und ein freier Auftrag ohne Text
+  // weist der Server ab, und eine Fehlermeldung nach einer Minute Wartezeit ist die
+  // schlechteste Art, das zu erfahren.
+  const unfertigeKapitel = eigeneKapitel.filter(kap => {
+    const b = (k.bausteine ?? []).find(x => x.key === kap.baustein)
+    return (b?.braucht_szene && !kap.szene_id)
+      || (kap.baustein === 'frei' && !kap.eigener_auftrag.trim())
+  })
+  const alleAus = eigenes
+    ? eigeneKapitel.length === 0 || unfertigeKapitel.length > 0
+    : ohneKapitel.length >= format.kapitel.length
 
   // ── Schritt 2: der Zuschnitt ───────────────────────────────────────────────
   return (
@@ -152,6 +211,16 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
       </div>
 
       {/* ── Die Kapitel ─────────────────────────────────────────────────── */}
+      {eigenes ? (
+        <KapitelBaukasten
+          bausteine={k.bausteine ?? []}
+          laengen={k.kapitel_laengen ?? []}
+          szenen={(szenen.data?.scenes ?? []).filter(x => x.confirmed_by_user)}
+          maxKapitel={k.max_eigene_kapitel ?? 8}
+          kapitel={eigeneKapitel}
+          setKapitel={setEigeneKapitel}
+        />
+      ) : (
       <Block titel="Die Kapitel"
         hinweis="So ist die Folge aufgebaut. Tipp eines an, wenn es nicht vorkommen soll.">
         <ul className="space-y-2">
@@ -192,6 +261,7 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
           </p>
         )}
       </Block>
+      )}
 
       {/* ── Die Regler ──────────────────────────────────────────────────── */}
       <Block titel="Woraus soll sie entstehen?"
@@ -260,6 +330,28 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
           an derselben Stelle wie der Knopf, mit einem Rad, das sich dreht - ein
           ausgegrauter Knopf mit anderer Beschriftung ist zu still fuer eine Minute
           Wartezeit. */}
+      {/* ── Der Eingriffspunkt ──────────────────────────────────────────── */}
+      <Block titel="Willst du noch etwas dazusagen?"
+        hinweis="Ein Satz für diese Folge — alles, was die Einstellungen oben nicht treffen.">
+        <textarea
+          value={anweisung}
+          onChange={e => setAnweisung(e.target.value)}
+          maxLength={k.max_eigene_anweisung ?? 600}
+          rows={3}
+          placeholder="Zum Beispiel: Bleib bei dem Abend im März. Oder: weniger über sie, mehr über mich."
+          className="input-brand w-full resize-y"
+        />
+        <p className="mt-1.5 flex flex-wrap items-baseline justify-between gap-2 text-[0.72rem] text-brand-muted">
+          <span>
+            Wird ernst genommen — aber die Grenzen bleiben: keine Diagnose, kein Urteil über
+            die andere Person, kein Rat.
+          </span>
+          <span className="tabular-nums">
+            {anweisung.length} / {k.max_eigene_anweisung ?? 600}
+          </span>
+        </p>
+      </Block>
+
       <div className="border-t border-brand-border pt-5">
         {laeuft ? (
           <div
@@ -289,8 +381,11 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
               {fehler ? 'Noch einmal versuchen' : 'Skript schreiben'}
             </button>
             <span className="text-[0.78rem] leading-snug text-brand-muted">
-              Erst der Text, dann die Stimme. Das Skript kostet nichts von deinem
-              Kontingent — du kannst es lesen und verwerfen.
+              {eigenes && eigeneKapitel.length === 0
+                ? 'Bau erst ein Kapitel — ohne Kapitel gibt es nichts zu erzählen.'
+                : eigenes && unfertigeKapitel.length > 0
+                  ? `${unfertigeKapitel.length === 1 ? 'Einem Kapitel' : `${unfertigeKapitel.length} Kapiteln`} fehlt noch etwas — klapp es auf.`
+                  : 'Erst der Text, dann die Stimme. Das Skript kostet nichts von deinem Kontingent — du kannst es lesen und verwerfen.'}
             </span>
           </div>
         )}
