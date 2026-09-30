@@ -179,6 +179,15 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
   },
 
   // ── Berichte und Profile ─────────────────────────────────────────────────
+  '/app/cases/:caseId/bild': {
+    titel: 'Bild',
+    zweck: 'Deine Lage als Form \u2014 wie viel, wann, wie dicht und was fehlt. '
+      + 'Kein Mensch, kein Raum, kein Gegenstand.',
+    schritte: ['Anordnung w\u00e4hlen', 'Regler ziehen \u2014 das Bild folgt sofort',
+      'Einen Satz dazuschreiben und aufheben'],
+    tipp: 'Der Wert kommt mit dem zweiten Bild: Leg es neben das erste, und du siehst '
+      + 'eine Ver\u00e4nderung, die dir sonst niemand zeigen kann.',
+  },
   '/app/cases/:caseId/podcast': {
     titel: 'Podcast',
     zweck: 'Dein Fall als gesprochene Nachricht — zum Hören unterwegs, nicht zum Lesen '

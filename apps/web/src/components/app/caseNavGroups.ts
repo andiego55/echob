@@ -42,6 +42,7 @@ export const GRUPPEN: Gruppe[] = [
     kinder: [
       { path: '/reports', label: 'Berichte' },
       { path: '/podcast', label: 'Podcast' },
+      { path: '/bild', label: 'Bild' },
       { path: '/share', label: 'Freigaben' },
       { path: '/export', label: 'Zusammenfassung' },
     ],
