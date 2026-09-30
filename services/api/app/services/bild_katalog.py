@@ -829,6 +829,17 @@ def _regie_teile(
 
     if regie.get("licht"):
         teile.append(_satz(regie["licht"]))
+
+    # **Das Wagnis kommt zuletzt und allein.**
+    #
+    # Es ist die eine Entscheidung, die ein vorsichtiger Illustrator nicht treffen würde —
+    # Wasser auf dem Küchenboden, eine Tür im offenen Feld, ein Gegenstand unmöglich groß.
+    # Mitten in einer Aufzählung ginge sie unter; am Ende, mit eigenem Vorspann, liest ein
+    # Bildmodell sie als Auftrag.
+    if regie.get("wagnis"):
+        teile.append(
+            "One deliberate break with realism, and only this one: "
+            + regie["wagnis"].rstrip(".") + ".")
     return teile
 
 
@@ -1214,4 +1225,19 @@ def legende(
             })
     if einstellungen.get("figur") == "ich":
         zeilen.append(_gestalt_zeile(einstellungen))
+
+    # **Der Rückfall wird gesagt, nicht verschwiegen.**
+    #
+    # Wer „Aus deinem Fall" gewählt hat und ein Bild aus dem Baukasten bekommt, sieht sonst
+    # nur, dass nichts anders ist — und glaubt, das Umstellen habe nichts gebracht. Genau so
+    # ist es einmal gelaufen: Ein einziges verbotenes Wort hat drei Aufträge verworfen, und
+    # von außen war das nicht zu unterscheiden von „das Tool kann es nicht".
+    if str(einstellungen.get("quelle") or "") == "fall":
+        zeilen.append({
+            "was": "Dieses Bild kommt aus dem Baukasten",
+            "wofuer": "Aus deinem Fall ließ sich diesmal kein Bildauftrag machen, der durch "
+                      "die Prüfung kam — meist, weil noch zu wenig eigener Text da ist oder "
+                      "weil der Entwurf jemanden abgebildet hätte. Versuch es noch einmal, "
+                      "beim nächsten Mal geht es oft durch",
+        })
     return zeilen

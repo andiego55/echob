@@ -59,9 +59,14 @@ class _Modell:
     async def generate_json(self, *, system: str, user: str, max_tokens: int, mock: Any) -> Any:
         self.gerufen = True
         self.user = user
+        self.mock = mock
         if self.wirft:
             raise RuntimeError("kein Schluessel")
-        return self.antwort if self.antwort is not None else mock
+        # **Die Antwort kommt von HIER, nicht aus `mock`.** Erst gab dieses Fake den
+        # uebergebenen `mock` zurueck - und damit haetten die Tests nicht gemerkt, dass der
+        # Dienst `mock=None` schickt. Ein Fake, der die Luecke des Dienstes ausfuellt, prueft
+        # nichts.
+        return self.antwort if self.antwort is not None else bild_regie.MOCK
 
 
 # ── Die Prüfung ───────────────────────────────────────────────────────────────
@@ -426,3 +431,308 @@ def test_eine_unbrauchbare_antwort_verhindert_kein_bild():
     assert asyncio.run(bild_regie.fuehren(
         modell, fall=material["fall"], material=material)) is None
     assert modell.gerufen is True
+
+
+# == Der Fehler aus dem Betrieb ================================================
+#
+# Drei Bilder hintereinander sahen aus wie vorher. In den Logs stand dreimal dieselbe Zeile:
+# "Bildregie verworfen: verbotene Woerter ['eye']". Das Wort kam aus MEINEM Systemtext -
+# "where the eye goes" stand in der Beschreibung des Kompositionsfeldes. Ich habe dem Modell
+# ein Wort vorgesagt, das mein eigener Filter verbietet, und danach jeden Auftrag verworfen.
+#
+# Von aussen war das nicht zu unterscheiden von "das Tool kann es nicht". Die Tests waren
+# gruen, weil der Mock durchkam - sie haben den Filter gegen einen Auftrag geprueft, den ich
+# selbst geschrieben habe, und nie gegen den Text, der das Modell steuert.
+
+
+def test_mein_eigener_schematext_stolpert_nicht_ueber_meinen_eigenen_filter():
+    """**Der Waechter, der gefehlt hat.**
+
+    Was in der Beschreibung der Felder steht, sagt das Modell nach. Steht dort ein Wort, das
+    die Pruefung verbietet, verwirft sie jede Antwort - und kein Test merkt es, weil der Mock
+    von Hand geschrieben ist.
+    """
+    assert bild_regie._verbotene(bild_regie.SYSTEM_SCHEMA) == []
+
+    # Und das konkrete Wort, an dem es gescheitert ist, ist nicht wieder drin.
+    assert "the eye" not in bild_regie.SYSTEM_SCHEMA.lower()
+
+    # **Der Namenspruefer gilt hier ausdruecklich NICHT.** Er sucht Grossschreibung mitten im
+    # Satz - und im Schematext stehen "JSON", "English", "German" und ein deutsches Beispiel.
+    # Ihn hier anzulegen hiesse, die Anweisung um einer Pruefung willen zu verstuemmeln, die
+    # fuer die ANTWORT des Modells gedacht ist. Dieselbe Trennung wie bei den deutschen
+    # Legendenzeilen, nur eine Ebene hoeher.
+    assert bild_regie.verdacht_auf_namen(bild_regie.SYSTEM_SCHEMA), (
+        "wenn hier nichts mehr anschlaegt, prueft der Namenspruefer den falschen Text"
+    )
+
+
+def test_die_regeln_duerfen_die_verbotenen_woerter_nennen():
+    """Die Gegenprobe zum Waechter darueber - und der Grund fuer die Zweiteilung.
+
+    Im Regelteil MUSS "not man, woman, partner ..." stehen; dort werden die Woerter verboten
+    und nicht benutzt. Ein Waechter ueber den ganzen Systemtext waere deshalb nicht strenger,
+    sondern falsch: Er liesse sich nur erfuellen, indem man die Regeln vage macht.
+    """
+    assert bild_regie._verbotene(bild_regie.SYSTEM_REGELN), "die Regeln nennen nichts mehr"
+    assert bild_regie.SYSTEM_SCHEMA in bild_regie.SYSTEM
+    assert bild_regie.SYSTEM_REGELN in bild_regie.SYSTEM
+
+
+def test_die_normale_sprache_einer_bildregie_wird_nicht_verworfen():
+    """**Eine Liste aus Woertern liegt quer zur Sprache, in der ueber Bilder geredet wird.**
+
+    "the rock face", "signs of wear", "a note of rust", "man-made" - alles harmlos, alles
+    haette die erste Fassung verworfen. Deshalb stehen die mehrdeutigen Faelle jetzt als
+    WENDUNGEN mit Zusammenhang da, und die Idiome werden vorher weggenommen.
+    """
+    harmlos = (
+        "the sheer rock face above the water",
+        "the face of the lake is completely still",
+        "signs of wear on the threshold",
+        "a man-made embankment overgrown with grass",
+        "where the viewer looks first is the empty chair",
+        "the eye travels along the fence and stops",
+        "a note of rust in the wet grass",
+        "a close view of the doorframe",
+        "an expression of long use in the worn wood",
+    )
+    for satz in harmlos:
+        assert bild_regie._verbotene(satz) == [], satz
+
+
+def test_die_wendungen_beissen_trotzdem():
+    """Die Gegenprobe: Was gemeint war, wird weiter verworfen."""
+    schlimm = {
+        "her face turned away from the window": "a face",
+        "two dark eyes in the glass": "eyes",
+        "a man standing at the end of the jetty": "a man",
+        "a small wooden sign at the gate": "something readable",
+        "a name written on the door": "something readable",
+        "a clock on the wall": "a clock",
+    }
+    for satz, erwartet in schlimm.items():
+        assert erwartet in bild_regie._verbotene(satz), satz
+
+
+# == Der zweite Versuch ========================================================
+
+class _ZweiAntworten:
+    """Ein Modell, das erst etwas Verbotenes liefert und dann etwas Gutes."""
+
+    def __init__(self, erste, zweite):
+        self.antworten = [erste, zweite]
+        self.systeme = []
+
+    async def generate_json(self, *, system, user, max_tokens, mock):
+        self.systeme.append(system)
+        return self.antworten[min(len(self.systeme) - 1, len(self.antworten) - 1)]
+
+
+def _material():
+    return {"fall": {"relationship_type": "partner"},
+            "szenen": [{"title": "x", "description": "y" * 500}]}
+
+
+def test_ein_verworfener_auftrag_bekommt_einen_zweiten_versuch():
+    """**Die Lehre aus dem Betrieb, und sie hat drei Bilder gekostet.**
+
+    Ein Filter, den ich schreibe, liegt immer irgendwo quer zur Sprache eines Modells. Eine
+    zweite Runde, die SAGT was gestoert hat, kostet ein paar Sekunden und faengt genau das
+    ab - besser als eine Liste, die ich nie ganz richtig hinbekomme.
+    """
+    material = _material()
+    modell = _ZweiAntworten(
+        {**bild_regie.MOCK, "motiv": "a man waiting at the kitchen table in the dark"},
+        bild_regie.MOCK)
+
+    regie = asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material))
+
+    assert regie is not None, "der zweite Versuch kam nicht durch"
+    assert len(modell.systeme) == 2, "es gab keinen zweiten Versuch"
+    # Und der zweite Versuch weiss, woran der erste gescheitert ist.
+    assert "a man" in modell.systeme[1]
+    assert "rejected" in modell.systeme[1]
+    # Der erste nicht - sonst waere der Hinweis Teil des normalen Auftrags.
+    assert "rejected" not in modell.systeme[0]
+
+
+def test_der_hinweis_bittet_nicht_um_vorsicht():
+    """Ein "sei vorsichtiger" waere genau das Gegenteil von dem, was hier gewollt ist: Das
+    Bild soll nicht braver werden, nur ohne das eine Wort."""
+    material = _material()
+    modell = _ZweiAntworten(
+        {**bild_regie.MOCK, "ort": "a courtyard where a woman once stood"},
+        bild_regie.MOCK)
+    asyncio.run(bild_regie.fuehren(modell, fall=material["fall"], material=material))
+
+    hinweis = modell.systeme[1]
+    assert "just as bold" in hinweis
+    assert "Do not become vague" in hinweis
+
+
+def test_kein_zweiter_versuch_wenn_die_form_nicht_stimmt():
+    """Zu wenige Gegenstaende sind kein Wortproblem. Ein Hinweis auf Woerter hilft dagegen
+    nicht, und ein zweiter Modellaufruf waere bezahlte Zeit fuer nichts."""
+    material = _material()
+    duenn = {**bild_regie.MOCK, "gegenstaende": [
+        {"was": "a chair", "zeigt": "Der Stuhl", "woher": "x"}]}
+    modell = _ZweiAntworten(duenn, bild_regie.MOCK)
+
+    assert asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material)) is None
+    assert len(modell.systeme) == 1, "es wurde umsonst ein zweites Mal gerufen"
+
+
+def test_zweimal_verworfen_heisst_katalog():
+    """Nach zwei Versuchen ist Schluss. Ein Bild mit weniger Eigenart ist besser als eine
+    Schleife, die Geld kostet."""
+    material = _material()
+    schlimm = {**bild_regie.MOCK, "motiv": "a man waiting at the table"}
+    modell = _ZweiAntworten(schlimm, schlimm)
+
+    assert asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material)) is None
+    assert len(modell.systeme) == 2
+
+
+# == Das Wagnis ================================================================
+
+def test_das_wagnis_steht_im_prompt_und_als_einzelner_auftrag():
+    """**Die eine Entscheidung, die ein vorsichtiger Illustrator nicht treffen wuerde.**
+
+    Mitten in einer Aufzaehlung ginge sie unter. Am Ende, mit eigenem Vorspann, liest ein
+    Bildmodell sie als Auftrag - und genau daran haengt, ob ein Bild etwas wagt.
+    """
+    regie = bild_regie.pruefen(bild_regie.MOCK)
+    prompt = prompt_bauen(_werte(), EINST, regie)
+
+    assert bild_regie.MOCK["wagnis"].rstrip(".") in prompt
+    assert "One deliberate break with realism, and only this one" in prompt
+    assert prompt.count("One deliberate break with realism") == 1
+
+
+def test_ohne_wagnis_faellt_die_zeile_weg():
+    """Eine leere Ansage ist schlimmer als keine: "One deliberate break with realism: ."
+    waere eine Einladung, sich etwas auszudenken."""
+    regie = bild_regie.pruefen({**bild_regie.MOCK, "wagnis": ""})
+    assert regie is not None
+    assert "deliberate break" not in prompt_bauen(_werte(), EINST, regie)
+
+
+# == Der Rueckfall ist sichtbar =================================================
+
+def test_der_rueckfall_auf_den_katalog_steht_in_der_legende():
+    """**Sonst sieht die Person nur, dass nichts anders ist.**
+
+    Genau so ist es gelaufen: Drei Bilder kamen aus dem Baukasten, weil ein Wort den Auftrag
+    verworfen hat, und von aussen war das nicht zu unterscheiden von "das Tool kann es
+    nicht".
+    """
+    zeilen = legende({**EINST, "quelle": "fall"}, _werte(), None)
+    assert any("aus dem Baukasten" in z["was"] for z in zeilen)
+
+    # Mit Regie steht die Zeile nicht da - dann kommt das Bild ja aus dem Fall.
+    mit = legende({**EINST, "quelle": "fall"}, _werte(), bild_regie.pruefen(bild_regie.MOCK))
+    assert not any("Baukasten" in z["was"] for z in mit)
+
+    # Und wer den Baukasten SELBST gewaehlt hat, braucht keine Entschuldigung dafuer.
+    gewaehlt = legende({**EINST, "quelle": "baukasten"}, _werte(), None)
+    assert not any("Baukasten" in z["was"] for z in gewaehlt)
+
+
+def test_der_eingebaute_auftrag_wird_nie_an_das_modell_uebergeben():
+    """**Sonst bekaeme jeder Mensch dieselbe ausgedachte Kueche als sein Bild.**
+
+    `generate_json` gibt bei einer Antwort, die sich nicht als JSON lesen laesst, `mock or {}`
+    zurueck. Stand dort `MOCK`, wurde aus jeder abgeschnittenen Modellantwort still derselbe
+    Bildauftrag aus dieser Datei - und von aussen waere das genau der Zustand, den dieser
+    Umbau beenden soll: bei allen dasselbe Bild.
+    """
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(modell, fall=material["fall"], material=material))
+    assert modell.mock is None, "der eingebaute Auftrag geht an das Modell"
+
+
+def test_eine_leere_antwort_ergibt_keine_regie():
+    """Der Weg, der bei kaputtem JSON uebrig bleibt: leeres Objekt, kein Auftrag, Katalog."""
+    material = _material()
+    # `None` steht hier nicht: `generate_json` gibt `mock or {}` zurueck und damit nie `None`
+    # - und beim Fake oben heisst `antwort=None` "keine Antwort gesetzt".
+    for leer in ({}, [], "kaputt", {"motiv": "a chair"}):
+        modell = _Modell(antwort=leer)
+        assert asyncio.run(bild_regie.fuehren(
+            modell, fall=material["fall"], material=material)) is None, repr(leer)
+
+
+# == Der Wunsch der Person =====================================================
+
+def test_der_wunsch_geht_an_die_regie():
+    """**Der einzige Freitext in der Bildwerkstatt.**
+
+    Beim Podcast gibt es einen, hier war er ausdruecklich ausgeschlossen: "zeig, wie er
+    weggeht" ginge als Satz direkt an ein Bildmodell. Seit die Regie dazwischen steht, wird
+    er GELESEN - und was hinausgeht, ist der geprueste Auftrag.
+    """
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material,
+        wunsch="Bitte etwas Helles am Rand, es ist nicht nur dunkel."))
+
+    assert "etwas Helles am Rand" in modell.user
+    assert "rules above override it" in modell.user
+
+
+def test_ohne_wunsch_steht_die_ueberschrift_nicht_da():
+    """Eine Ueberschrift "What the person asks for" mit nichts darunter ist eine Aufforderung
+    an das Modell, sich etwas auszudenken. Dieselbe Ueberlegung wie bei den Gewichten des
+    Podcasts: Was nicht da ist, wird nicht genannt."""
+    material = _material()
+    for leer in ("", "   ", chr(10)):
+        modell = _Modell()
+        asyncio.run(bild_regie.fuehren(
+            modell, fall=material["fall"], material=material, wunsch=leer))
+        assert "asks for" not in modell.user, repr(leer)
+
+
+def test_der_wunsch_wird_beschnitten():
+    """Ein Wunsch, der den halben Auftrag ausmacht, ist kein Wunsch mehr."""
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material, wunsch="x" * 5000))
+    assert "x" * bild_regie.MAX_WUNSCH in modell.user
+    assert "x" * (bild_regie.MAX_WUNSCH + 1) not in modell.user
+
+
+def test_der_wunsch_geht_nie_an_das_bildmodell():
+    """**Der Leak-Waechter fuer den Freitext.**
+
+    Er sind die Worte der Person. Landeten sie im Bildprompt, waere genau die Zwischenstufe
+    umgangen, die diesen Freitext ueberhaupt moeglich macht.
+    """
+    regie = bild_regie.pruefen(bild_regie.MOCK)
+    satz = "Bitte ein Fenster mit Morgenlicht, so wie damals in der alten Wohnung"
+    prompt = prompt_bauen(_werte(), {**EINST, "wunsch": satz}, regie)
+
+    assert satz not in prompt
+    assert "Morgenlicht" not in prompt
+    assert "alten Wohnung" not in prompt
+
+
+def test_ein_wunsch_nach_einem_menschen_ergibt_keinen_menschen():
+    """Die Regie bekommt gesagt, dass die Regeln den Wunsch ueberstimmen - und wenn sie es
+    trotzdem tut, faellt der Auftrag durch die Pruefung. Zwei Sicherungen, nicht eine."""
+    material = _material()
+    # Ein Modell, das dem Wunsch folgt statt den Regeln - zweimal, damit auch der zweite
+    # Versuch nichts rettet.
+    folgsam = {**bild_regie.MOCK,
+               "motiv": "a man walking away down the hallway, seen from the kitchen"}
+    modell = _ZweiAntworten(folgsam, folgsam)
+
+    assert asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material,
+        wunsch="Zeig, wie er weggeht")) is None

@@ -56,30 +56,90 @@ MAX_SYMBOLE = 3
 #: Gewicht im Prompt und hebelt die Reihenfolge aus, die den Bildaufbau bestimmt.
 LAENGEN: dict[str, int] = {
     "motiv": 240, "ort": 200, "licht": 200, "komposition": 260, "titel": 60,
-    "was": 120, "zeigt": 70, "woher": 200,
+    "wagnis": 240, "was": 120, "zeigt": 70, "woher": 200,
 }
 
-#: Was in der englischen Bildregie nie vorkommen darf.
+#: Was in der englischen Bildregie nie vorkommen darf — **die eindeutigen Wörter.**
 #:
 #: **Mit Wortgrenzen.** Dieses Projekt hat den Fehler schon gemacht: „face" steckt in
 #: „surface", „user_id" in „owner_user_id". Ein Wächter, der auf eine Teilzeichenfolge prüft,
 #: wird still blind.
+#:
+#: **Hier stehen nur Wörter ohne zweite Bedeutung.** Die erste Fassung dieser Liste hatte
+#: „face", „eye", „sign", „note", „expression" und „close-up" mit drin — und damit lag sie
+#: quer zur normalen Sprache einer Bildregie. In der Praxis hat sie JEDEN Auftrag verworfen,
+#: an einem einzigen Wort: „eye". Es kam aus meinem eigenen Systemtext („where the eye goes"),
+#: also habe ich dem Modell ein Wort vorgesagt, das mein eigener Wächter verbietet. Drei
+#: Bilder, dreimal Rückfall auf den Katalog, und von außen sah es aus, als hätte der ganze
+#: Umbau nichts gebracht.
+#:
+#: Was mehrdeutig ist, steht unten in `WENDUNGEN` — dort mit Zusammenhang statt als Wort.
 VERBOTEN: tuple[str, ...] = (
-    # Gesichter — die Regel, die am Anfang des ganzen Moduls stand.
-    "face", "faces", "facial", "portrait", "eyes", "eye", "gaze", "smiling", "smile",
-    "expression", "selfie", "close-up",
+    # Gesichter, eindeutig.
+    "facial", "portrait", "portraits", "selfie", "smiling", "eyebrow", "eyelid",
     # Eine zweite erwachsene Gestalt wäre die Person, um die es im Fall geht.
-    "couple", "partner", "husband", "wife", "boyfriend", "girlfriend", "man", "woman",
-    "men", "women", "mother", "father", "parents",
+    "couple", "partner", "husband", "wife", "boyfriend", "girlfriend", "woman", "women",
+    "mother", "father", "parents", "person", "people", "figure", "figures", "silhouette",
     # Lesbares im Bild: ein Bildmodell schreibt Wörter falsch, und ein falsch geschriebener
     # Satz über das eigene Leben ist schlimmer als keiner.
-    "text", "texts", "writing", "written", "words", "word", "letters", "letter", "label",
-    "labels", "sign", "signs", "signage", "handwriting", "note", "notes", "logo", "caption",
-    "inscription", "inscribed", "numbers", "date", "dates", "calendar", "clock",
+    "handwriting", "handwritten", "signage", "lettering", "calendar", "logo", "caption",
+    "inscription", "inscribed", "typography", "graffiti",
     # Gewalt und Angst gehören in kein Bild über die eigene Lage.
-    "blood", "bruise", "bruises", "wound", "weapon", "knife", "gun", "corpse", "grave",
-    "noose", "pills", "syringe",
+    "blood", "bloody", "bruise", "bruises", "wound", "wounds", "weapon", "weapons", "knife",
+    "gun", "corpse", "grave", "noose", "syringe", "scar", "scars",
 )
+
+#: Was nur im Zusammenhang verboten ist — **Wendungen statt Wörter.**
+#:
+#: „the rock face", „the face of the water" und „signs of wear" sind die Sprache, in der über
+#: Bilder geredet wird. „her face" und „a sign at the gate" sind das, was hier nicht entstehen
+#: darf. Ein Wort trennt das nicht, ein Zusammenhang schon.
+#:
+#: Jeder Eintrag ist (Muster, Name für die Meldung). Die Namen gehen im zweiten Versuch an das
+#: Modell zurück, also sind sie so formuliert, dass man daraus etwas ändern kann.
+WENDUNGEN: tuple[tuple[str, str], ...] = (
+    (r"\b(his|her|their|its|your|my|the|a|one|someone'?s?)\s+face\b", "a face"),
+    (r"\bfaces?\s+(of\s+)?(a\s+|the\s+)?(child|adult|figure|person|man|woman)\b",
+     "a face"),
+    (r"\b(his|her|their|its|your|closed|open|two|dark|wide)\s+eyes?\b", "eyes"),
+    (r"\beyes?\s+(of|looking|staring|meeting|watching)\b", "eyes"),
+    (r"\bgaz(e|ing)\s+(of|at|back|toward)", "a gaze"),
+    (r"\bfacial\s+expression\b", "an expression"),
+    # Ein Mensch im Bild. „man-made" und „management" sind keine.
+    (r"\bman\b(?!\s*-\s*made)", "a man"),
+    (r"\bmen\b", "men"),
+    (r"\bchild(ren)?'s\b", "a child as an owner"),
+    # Lesbares. „signs of wear", „a note of green" und „a trace of" sind keins.
+    (r"\b(a|the|one|small|wooden|metal|painted|handwritten)\s+"
+     r"(sign|note|label|letter|placard|poster|plaque|banner)s?\b", "something readable"),
+    (r"\b(text|texts|words?|letters|numbers|digits)\s+"
+     r"(on|across|in|over|written|carved|painted|visible)\b", "something readable"),
+    (r"\b(written|printed|carved|painted|scrawled)\s+(on|in|across|over)\b",
+     "something readable"),
+    (r"\breading\s*[\"'“„]", "something readable"),
+    (r"\bclock\s*(face)?\b", "a clock"),
+    (r"\bdates?\s+(on|written|visible)\b", "a date"),
+    # Angst und Medizin.
+    (r"\bpills?\b", "pills"),
+    (r"\b(hospital|medical|morgue|autopsy)\b", "a medical scene"),
+)
+
+#: Wendungen, die **erst weggenommen** werden, damit sie unten nicht anschlagen.
+#:
+#: Ohne das würde „the rock face of the cliff" über die Wendung „the face" stolpern. Statt das
+#: Muster immer komplizierter zu machen, wird die harmlose Stelle vorher aus dem Text
+#: genommen — man kann die Liste lesen und prüfen, ob sie stimmt.
+IDIOME: tuple[str, ...] = (
+    r"\b(rock|cliff|stone|wall|mountain|glacier|ice|water|sheer)\s+face\b",
+    r"\bthe face of the (water|sea|lake|cliff|rock|earth|building|house)\b",
+    r"\bman\s*-\s*made\b",
+    r"\bsigns? of (wear|age|use|neglect|rain|frost|weather|life)\b",
+    r"\bnotes? of (colour|color|green|blue|red|rust|warmth|light)\b",
+    r"\bwhere the (viewer|eye) (looks|goes|rests|travels)\b",
+    r"\bthe eye (is|travels|moves|goes|rests)\b",
+    r"\bhuman\s*-\s*scale\b",
+)
+
 
 #: Wörter, die in einer englischen Bildregie groß geschrieben sein dürfen.
 #:
@@ -93,7 +153,12 @@ GROSS_ERLAUBT: frozenset[str] = frozenset({
     "Far", "Near", "Light", "Dark",
 })
 
-SYSTEM = """\
+#: Die Regeln — **hier dürfen verbotene Wörter stehen**, weil sie hier verboten WERDEN.
+#:
+#: Getrennt vom Schema darunter, und das ist keine Kosmetik: Ein Modell schreibt die Wörter
+#: einer Verbotsliste nicht in seine Antwort, aber es übernimmt die Wörter einer ANWEISUNG.
+#: Genau daran ist die erste Fassung gescheitert (siehe `VERBOTEN`).
+SYSTEM_REGELN = """\
 You are an art director. You receive the material of one person's case from a German app for
 people in difficult relationships, and you write the brief for ONE still image about their
 situation. A separate image model will paint from your brief; it never sees the material.
@@ -106,33 +171,44 @@ metaphors. A worn kitchen chair at two in the morning says more than "a lonely p
 
 Rules you must follow, without exception:
 
-1. NO PEOPLE except at most the one figure the app adds itself. Do not describe any person,
-   any part of a person, any face, any eyes. The other person in this case is NEVER depicted:
-   not as a figure, not as a silhouette, not as a shadow, not as a reflection. They may be
-   present only as weather, as a force, as a mass, as a direction, or as traces they left —
-   an object of theirs, a door, a distance.
-   Do not use ANY word for a person in the English fields — not man, woman, partner, husband,
-   wife, mother, father, parents, couple, nor a possessive referring to one. Traces are
-   allowed, but name the object and not its owner: "a coat left over a chair", never "his
-   coat". A brief that contains such a word is discarded whole and the person gets a duller
-   picture, so this matters.
-2. NOTHING READABLE. No text, letters, numbers, words, signs, notes, labels, logos, clocks or
-   calendars anywhere in the image.
+1. NOBODY IS DEPICTED. Do not describe any human being or any part of one. The app adds one
+   figure of its own afterwards, seen from behind; that is not your job. The other person in
+   this case is NEVER shown: not as a body, not as a shape in the distance, not as a shadow,
+   not as a reflection. They may be present only as weather, as a force, as a mass, as a
+   direction, or as traces they left — an object, a door left open, a distance.
+   Do not use ANY noun for a human being in the English fields — not man, woman, partner,
+   husband, wife, mother, father, parents, couple, person, people, figure, silhouette, nor a
+   possessive referring to one. Traces are allowed, but name the object and not its owner:
+   "a coat left over a chair", never "his coat". A brief containing such a noun is discarded
+   whole and the person gets a duller picture, so this matters.
+2. NOTHING READABLE. Nothing in the image may carry writing of any kind — no signs, labels,
+   letters, numbers, calendars, clocks or logos.
 3. NO NAMES of people, places, companies, brands or streets — not in any field. Write in
    plain lowercase English prose; capitalise only the first letter of a sentence. If the
    material names a city, use what it looks like, not what it is called.
 4. INVENT NOTHING. Every object you name must come from the material. If the material is thin,
    use fewer objects rather than made-up ones.
-5. NOTHING FRIGHTENING. No violence, no wounds, no weapons, no medical scenes, no graves. This
-   image is shown to the person whose situation it is. It may be sad, heavy, cold, ambiguous
-   or bleak. It must not be a threat.
-6. IT IS A PLACE, NOT AN EVENT. Not an illustration of a scene that happened, and not a
-   narrative in panels: one place, one moment, carrying a mood.
+5. NOTHING FRIGHTENING. No violence, no injuries, no weapons, no medical scenes, no graves.
+   This image is shown to the person whose situation it is. It may be sad, heavy, cold,
+   ambiguous or bleak. It must not be a threat.
+6. IT IS A PLACE, NOT AN EVENT. Not an illustration of something that happened, and not a
+   sequence: one place, one moment, carrying a mood.
 
-Be a real art director. Decide a vantage point, a time of day, a season, a distance, a focal
-point, what is sharp and what dissolves. Be specific and be brave. A striking, strange,
-beautiful image is allowed — it should not look like stock illustration.
+Now be a real art director, not a cautious one. Decide a vantage point, a time of day, a
+season, a distance, what is sharp and what dissolves. You are allowed — encouraged — to bend
+reality the way a dream does: scale that is wrong on purpose, a room with weather in it, a
+door standing in open ground, water where a floor should be, one object impossibly large. The
+symbolic language of dreams and of old archetypes is welcome here; so is beauty.
 
+What this must never look like: a stock illustration, an advertisement, a greeting card, a
+generic "sad landscape". If your brief could be used for somebody else's case, it is wrong.
+"""
+
+#: Das Schema — **hier darf kein verbotenes Wort stehen.** Wächter dafür.
+#:
+#: Was hier steht, sagt das Modell nach: „where the eye goes" hat drei Bilder in den Rückfall
+#: geschickt, weil mein eigener Filter „eye" verbot.
+SYSTEM_SCHEMA = """\
 Answer as JSON, with exactly these keys:
 
 {
@@ -144,24 +220,29 @@ Answer as JSON, with exactly these keys:
      "zeigt": "the same thing named in German, two to five words, as it would be pointed at
                in the finished picture: 'Die gepackte Tasche im Flur'",
      "woher": "German, one short phrase: what in the case this came from, addressed to the
-               person as du — 'die Tasche, von der du mehrmals geschrieben hast'"}
+               reader as du — 'die Tasche, von der du mehrmals geschrieben hast'"}
   ],
   "symbole": [
     {"was": "an archetypal or dream-symbol element, English, short phrase",
      "zeigt": "the same in German, two to five words",
      "woher": "German, one short phrase, as above"}
   ],
+  "wagnis": "one English sentence: the ONE bold decision in this image — the thing a cautious
+             illustrator would not do. Impossible scale, weather indoors, a season that
+             contradicts the hour, one element out of place. Exactly one; two make noise.",
   "licht": "one English sentence: light, weather, time of day, season.",
-  "komposition": "one English sentence: how the image is built — depth, where the eye goes,
-                  what is empty, what dominates.",
+  "komposition": "one English sentence: how the image is built — depth, where the viewer
+                  looks first, what is left empty, what dominates.",
   "titel": "a German title of two to five words for this image, no quotation marks"
 }
 
-Between two and six gegenstaende, at most three symbole. The German "zeigt" and "woher" lines are
-read by the person, as the legend beside the finished picture. Write them plainly and without
-interpretation — "die Küche, von der du mehrmals erzählt hast", not "dein Gefühl der
-Einsamkeit". Never put a name into them either.\
+Between two and six gegenstaende, at most three symbole. The German "zeigt" and "woher" lines
+are shown beside the finished picture, so write them plainly and without interpretation — "die
+Küche, von der du mehrmals erzählt hast", not "dein Gefühl der Einsamkeit". No names there
+either.
 """
+
+SYSTEM = SYSTEM_REGELN + "\n" + SYSTEM_SCHEMA
 
 
 def _text(wert: Any, feld: str) -> str:
@@ -191,8 +272,23 @@ def verdacht_auf_namen(text: str) -> list[str]:
 
 
 def _verbotene(text: str) -> list[str]:
+    """Was an dieser Bildregie nicht durchgeht — als Namen, nicht als Musterkürzel.
+
+    Die Namen gehen im zweiten Versuch an das Modell zurück. Ein „r'\\b(his|her)\\s+face'"
+    wäre für ein Modell keine Auskunft; „a face" ist eine.
+    """
     tief = text.lower()
-    return [w for w in VERBOTEN if re.search(rf"\b{re.escape(w)}\b", tief)]
+    for idiom in IDIOME:
+        tief = re.sub(idiom, " ", tief)
+
+    gefunden: list[str] = [
+        w for w in VERBOTEN if re.search(rf"\b{re.escape(w)}\b", tief)
+    ]
+    gefunden += [
+        name for muster, name in WENDUNGEN if re.search(muster, tief)
+    ]
+    # Reihenfolge erhalten, Doppelte weg: Die Meldung soll lesbar sein.
+    return list(dict.fromkeys(gefunden))
 
 
 def pruefen(roh: Any) -> dict[str, Any] | None:
@@ -242,6 +338,7 @@ def pruefen(roh: Any) -> dict[str, Any] | None:
         "ort": ort,
         "gegenstaende": gegenstaende,
         "symbole": paare("symbole", MAX_SYMBOLE),
+        "wagnis": _text(roh.get("wagnis"), "wagnis"),
         "licht": _text(roh.get("licht"), "licht"),
         "komposition": _text(roh.get("komposition"), "komposition"),
         "titel": _text(roh.get("titel"), "titel"),
@@ -250,7 +347,7 @@ def pruefen(roh: Any) -> dict[str, Any] | None:
     # **Geprüft wird nur, was an das Bildmodell geht.** Die deutschen `woher`-Zeilen bleiben
     # hier im Haus; sie sind die Legende und werden der Person gezeigt.
     hinaus = " ".join([
-        regie["motiv"], regie["ort"], regie["licht"], regie["komposition"],
+        regie["motiv"], regie["ort"], regie["licht"], regie["komposition"], regie["wagnis"],
         *(g["was"] for g in regie["gegenstaende"]),
         *(s["was"] for s in regie["symbole"]),
     ])
@@ -332,10 +429,14 @@ def als_material(fall: dict[str, Any], material: dict[str, Any]) -> str:
     return "\n\n".join(teile)
 
 
-#: Ein Auftrag ohne Modell — damit der ganze Weg auch ohne Schlüssel läuft.
+#: Ein Auftrag, wie ein Modell ihn liefern würde — **nur für Tests.**
 #:
-#: **Nicht bloß eine Bequemlichkeit für Tests.** Ohne ihn wäre der Prompt-Bau mit Regie nur am
-#: echten Modell prüfbar, und dann wird er nie geprüft.
+#: Ohne ihn wäre der Prompt-Bau mit Regie nur am echten Modell prüfbar, und dann wird er nie
+#: geprüft.
+#:
+#: **Er geht NICHT als `mock` in `generate_json`.** Dort würde er bei jeder Antwort, die sich
+#: nicht als JSON lesen lässt, zurückgegeben — und dann bekäme jeder Mensch dieselbe
+#: ausgedachte Küche als sein Bild.
 MOCK: dict[str, Any] = {
     "motiv": "a kitchen chair pulled out from a table, seen from the doorway of a dark flat",
     "ort": "a small kitchen late at night, seen from the hallway a few steps away",
@@ -352,6 +453,7 @@ MOCK: dict[str, Any] = {
          "zeigt": "Die offene Tür",
          "woher": "etwas, das offen ist, ohne begangen zu sein"},
     ],
+    "wagnis": "the kitchen floor is an inch deep in still black water that reflects nothing",
     "licht": "a single overhead bulb, cold and too bright, everything outside it in blue dark",
     "komposition": "the chair in the near middle distance, the hallway framing it, "
                    "generous empty floor in the foreground",
@@ -359,9 +461,16 @@ MOCK: dict[str, Any] = {
 }
 
 
+#: Wie lang der Wunsch der Person werden darf.
+#:
+#: Kurz genug, dass er ein Wunsch bleibt und nicht der halbe Auftrag wird — und lang genug für
+#: „bitte etwas Helles am Rand, es ist nicht nur dunkel".
+MAX_WUNSCH = 400
+
+
 async def fuehren(
     echo_service: Any, *, fall: dict[str, Any], material: dict[str, Any],
-    welt: dict[str, Any] | None = None,
+    welt: dict[str, Any] | None = None, wunsch: str = "",
 ) -> dict[str, Any] | None:
     """Der Bildauftrag zu diesem Fall — oder ``None``, wenn es keinen gibt, der taugt.
 
@@ -393,15 +502,94 @@ async def fuehren(
             "place."
         )
 
-    try:
-        roh = await echo_service.generate_json(
-            system=SYSTEM,
-            user=text,
-            max_tokens=1800,
-            mock=MOCK,
+    # ── Der Wunsch der Person ───────────────────────────────────────────────
+    #
+    # **Warum es diesen Freitext jetzt geben kann und vorher nicht.**
+    #
+    # Beim Podcast gibt es ein Freitextfeld, in der Bildwerkstatt war es ausdrücklich
+    # ausgeschlossen: „zeig, wie er weggeht" ginge als Satz direkt an ein Bildmodell und wäre
+    # die Abbildung eines echten Menschen. Seit die Regie dazwischen steht, liegt der Wunsch
+    # eine Ebene weiter weg — er wird von einem Sprachmodell GELESEN, und was danach
+    # hinausgeht, ist die geprüfte Regie. Ein Wunsch, der jemanden abbilden will, erzeugt
+    # entweder einen Auftrag ohne diese Person oder einen, der durch `pruefen` fällt.
+    #
+    # Deshalb steht er hier unten und nicht im Systemtext: Er ist Material, keine Regel.
+    if wunsch.strip():
+        text += (
+            "\n\n## What the person asks for in their image\n"
+            + wunsch.strip()[:MAX_WUNSCH]
+            + "\n\nTake this seriously — it is their picture. But the rules above override it "
+              "completely: if they ask for a person, for writing, for a name or for something "
+              "frightening, give them everything else they asked for and leave that out."
         )
-    except Exception:  # noqa: BLE001 — eine gescheiterte Regie darf kein Bild verhindern
-        logger.exception("Bildregie: Modellaufruf gescheitert.")
-        return None
 
-    return pruefen(roh)
+    # ── Zwei Versuche, und der zweite weiß, woran der erste gescheitert ist ──
+    #
+    # **Das ist die Lehre aus dem Betrieb, und sie hat drei Bilder gekostet.** Ein einziges
+    # Wort — „eye", aus meinem eigenen Systemtext — hat jeden Auftrag verworfen. Von außen
+    # war nichts zu sehen als drei Bilder, die aussahen wie vorher.
+    #
+    # Ein Filter, den ich schreibe, wird immer irgendwo quer zur Sprache eines Modells
+    # liegen. Eine zweite Runde, die SAGT was gestört hat, kostet ein paar Sekunden und
+    # fängt genau das ab — besser als eine Liste, die ich nie ganz richtig hinbekomme.
+    hinweis = ""
+    for versuch in (1, 2):
+        try:
+            roh = await echo_service.generate_json(
+                system=SYSTEM + hinweis,
+                user=text,
+                max_tokens=1800,
+                # **`mock` bleibt leer, und das ist keine Kleinigkeit.**
+                #
+                # `generate_json` gibt bei einer Antwort, die sich nicht als JSON lesen
+                # lässt, `mock or {}` zurück. Stünde hier `MOCK`, bekäme bei jedem
+                # abgeschnittenen oder kaputten Modellantwort JEDER Mensch dieselbe
+                # ausgedachte Küchenszene aus dieser Datei — als wäre sie sein Fall. Von
+                # außen wäre das genau das Bild, das hier gerade nicht mehr entstehen soll:
+                # bei allen dasselbe. `MOCK` ist für Tests da, nicht für den Betrieb.
+                mock=None,
+            )
+        except Exception:  # noqa: BLE001 — eine gescheiterte Regie darf kein Bild verhindern
+            logger.exception("Bildregie: Modellaufruf gescheitert.")
+            return None
+
+        regie = pruefen(roh)
+        if regie is not None:
+            if versuch == 2:
+                logger.info("Bildregie: im zweiten Versuch durchgekommen.")
+            return regie
+
+        if versuch == 1:
+            stoerer = _verbotene(_hinausgehendes(roh)) or verdacht_auf_namen(
+                _hinausgehendes(roh))
+            if not stoerer:
+                # Nicht die Wortprüfung, sondern die Form: zu dünn, zu wenige Gegenstände.
+                # Dagegen hilft ein Hinweis auf Wörter nicht.
+                return None
+            hinweis = (
+                "\n\nIMPORTANT: your previous answer was rejected because the English fields "
+                f"contained: {', '.join(str(x) for x in stoerer[:6])}. Write the same image "
+                "again without any of that. Do not become vague or cautious to avoid it — "
+                "name the object instead of whoever it belongs to, and keep the image just "
+                "as specific and just as bold."
+            )
+            logger.info("Bildregie: zweiter Versuch wegen %s.", stoerer[:6])
+
+    return None
+
+
+def _hinausgehendes(roh: Any) -> str:
+    """Die englischen Felder einer ROHEN Antwort, aneinandergehängt.
+
+    Für die Meldung an den zweiten Versuch: ``pruefen`` hat schon abgelehnt und gibt nichts
+    zurück, woran man ablesen könnte, WAS gestört hat. Deshalb wird hier noch einmal in die
+    Rohantwort gesehen — bewusst großzügig, es geht nur um eine Auskunft an das Modell.
+    """
+    if not isinstance(roh, dict):
+        return ""
+    teile = [str(roh.get(f) or "") for f in ("motiv", "ort", "licht", "komposition", "wagnis")]
+    for schluessel in ("gegenstaende", "symbole"):
+        for eintrag in roh.get(schluessel) or []:
+            if isinstance(eintrag, dict):
+                teile.append(str(eintrag.get("was") or ""))
+    return " ".join(teile)

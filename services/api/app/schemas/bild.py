@@ -38,6 +38,15 @@ class BildMalen(BaseModel):
     #: ``baukasten``  Nur Zahlen gehen hinaus, und die Bildsprache steht im Katalog. Die
     #:                Bilder sind sich untereinander ähnlicher — das ist der Preis.
     quelle: str = "fall"
+    #: Ein Wunsch der Person zum Bild. Leer ist der Normalfall.
+    #:
+    #: **Der einzige Freitext hier, und er geht nie an das Bildmodell.** Er wird von der
+    #: Bildregie GELESEN; was danach hinausgeht, ist der geprüfte Bildauftrag. Ohne diese
+    #: Zwischenstufe wäre „zeig, wie er weggeht" die Abbildung eines echten Menschen —
+    #: genau deshalb gab es dieses Feld vorher nicht.
+    #:
+    #: Wirkt nur mit ``quelle = "fall"``: Im Baukasten gibt es nichts zu lesen.
+    wunsch: str = Field(default="", max_length=400)
     #: Die Metapher — was das Bild ZEIGT. Von der Person gewählt, nie vom Modell.
     bildwelt: str
     #: Die Handschrift — WIE gemalt wird.

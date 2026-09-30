@@ -91,6 +91,7 @@ export default function BildwerkstattPage() {
    * und das steht an der Wahl dran.
    */
   const [quelle, setQuelle] = useState('fall')
+  const [wunsch, setWunsch] = useState('')
   const [haltung, setHaltung] = useState('stehend')
   const [begleitung, setBegleitung] = useState('keine')
 
@@ -159,7 +160,7 @@ export default function BildwerkstattPage() {
   const malen = useMutation({
     mutationFn: () => bilderApi.malen(caseId!, {
       bildwelt, handschrift, palette, schichten, symbolik, figur, haltung, begleitung,
-      quelle,
+      quelle, wunsch: quelle === 'fall' ? wunsch : '',
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bilder', caseId] })
@@ -322,6 +323,32 @@ export default function BildwerkstattPage() {
                         </button>
                       ))}
                     </div>
+
+                    {/* **Der einzige Freitext hier — und er geht nie an das Bildmodell.**
+                        Die Regie liest ihn, hinaus geht der geprüfte Auftrag. Ohne diese
+                        Zwischenstufe wäre „zeig, wie er weggeht" die Abbildung eines echten
+                        Menschen; genau deshalb gab es dieses Feld vorher nicht. */}
+                    {quelle === 'fall' && (
+                      <label className="mt-3 block">
+                        <span className="label">Wünschst du dir etwas für das Bild?</span>
+                        <p className="mb-1.5 mt-0.5 max-w-[62ch] text-[0.74rem] leading-snug text-brand-muted">
+                          Freiwillig. Eine Jahreszeit, ein Gegenstand, ein Licht — „bitte
+                          etwas Helles am Rand" ändert mehr, als man denkt. Ein Mensch kann
+                          nicht darin vorkommen, auch wenn du danach fragst.
+                        </p>
+                        <textarea
+                          value={wunsch}
+                          onChange={e => setWunsch(e.target.value)}
+                          maxLength={400}
+                          rows={2}
+                          placeholder="z. B. Es soll Winter sein, und irgendwo eine offene Tür."
+                          className="input-brand w-full resize-y !text-[0.84rem]"
+                        />
+                        <span className="mt-0.5 block text-right text-[0.68rem] text-brand-muted">
+                          {wunsch.length}/400
+                        </span>
+                      </label>
+                    )}
                   </div>
 
                   {/* **Die Bildwelt zuerst: Sie ist die Entscheidung, das Übrige ist

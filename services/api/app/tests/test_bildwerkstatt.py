@@ -1544,3 +1544,92 @@ def test_die_legende_sagt_wer_im_bild_ist_und_wer_nicht():
     assert "Schützen" in gestalt["wofuer"]
     # Und ausdruecklich, wer NICHT vorkommt.
     assert "kommt nicht als Gestalt vor" in gestalt["wofuer"]
+
+
+# == Das Bildmodell ============================================================
+
+class _Bilder:
+    """Der images-Teil eines OpenAI-Clients, der mitschreibt."""
+
+    def __init__(self, wirft_bei_quality=False, fehlertext="unknown parameter: quality"):
+        self.wirft = wirft_bei_quality
+        self.fehlertext = fehlertext
+        self.rufe = []
+
+    async def generate(self, **kw):
+        self.rufe.append(kw)
+        if self.wirft and "quality" in kw:
+            raise TypeError(self.fehlertext)
+
+        class Daten:
+            b64_json = "aGk="
+
+        class Antwort:
+            data = [Daten()]
+
+        return Antwort()
+
+
+def _modell(bilder):
+    from app.services.bild_modell import BildModell
+
+    m = BildModell.__new__(BildModell)
+    m._model = "gpt-image-2"
+    m._client = type("Klient", (), {"images": bilder})()
+    return m
+
+
+def test_das_bildmodell_malt_in_der_hoechsten_stufe():
+    """**Ohne Angabe malt der Anbieter in seiner Vorgabe, und die ist auf Tempo gerechnet.**
+
+    Ein Bild hier ist einmalig - dasselbe kommt nie zweimal -, wird aufgehoben und kostet ein
+    Kontingent. An dieser Stelle zu sparen waere am falschen Ende, und es war der Grund,
+    warum die Bilder flau aussahen, noch bevor es um die Bildsprache ging.
+    """
+    import asyncio
+
+    from app.services.bild_modell import QUALITAET
+
+    bilder = _Bilder()
+    daten = asyncio.run(_modell(bilder).malen("ein Prompt"))
+
+    assert daten == b"hi"
+    assert len(bilder.rufe) == 1
+    assert bilder.rufe[0]["quality"] == QUALITAET == "high"
+
+
+def test_ein_modell_ohne_qualitaetsstufe_bekommt_trotzdem_ein_bild():
+    """**Der Name des Parameters gehoert dem Anbieter, nicht mir.**
+
+    Wer das Bildmodell ueber eine Umgebungsvariable tauscht, soll kein "unknown parameter"
+    bekommen, sondern ein Bild. Dieselbe Ueberlegung wie bei b64_json gegen url in derselben
+    Datei: Ein Modellwechsel darf hier nichts brechen.
+    """
+    import asyncio
+
+    bilder = _Bilder(wirft_bei_quality=True)
+    daten = asyncio.run(_modell(bilder).malen("ein Prompt"))
+
+    assert daten == b"hi"
+    assert len(bilder.rufe) == 2, "es gab keinen zweiten Versuch ohne Stufe"
+    assert "quality" not in bilder.rufe[1]
+
+
+def test_ein_anderer_fehler_wird_nicht_verschluckt():
+    """Der Rueckweg gilt fuer die Qualitaetsstufe und fuer nichts sonst. Ein
+    Netzwerkfehler, der hier still zu einem zweiten Aufruf wird, waere ein doppelt bezahltes
+    Bild - oder eine Fehlersuche an der falschen Stelle.
+    """
+    import asyncio
+
+    import pytest as _pytest
+
+    class Kaputt(_Bilder):
+        async def generate(self, **kw):
+            self.rufe.append(kw)
+            raise RuntimeError("connection reset by peer")
+
+    bilder = Kaputt()
+    with _pytest.raises(RuntimeError, match="connection reset"):
+        asyncio.run(_modell(bilder).malen("ein Prompt"))
+    assert len(bilder.rufe) == 1

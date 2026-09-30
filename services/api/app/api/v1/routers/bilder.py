@@ -176,6 +176,9 @@ async def malen(
         "haltung": body.haltung,
         "begleitung": body.begleitung,
         "quelle": body.quelle,
+        # Der Wunsch steht in den Einstellungen, damit man ein Bild wieder aufgreifen kann -
+        # und damit in der Galerie ablesbar ist, was jemand sich gewuenscht hat.
+        "wunsch": body.wunsch.strip()[:bild_regie.MAX_WUNSCH],
     }
 
     async with pool.acquire() as conn:
@@ -218,7 +221,8 @@ async def malen(
             regie = await bild_regie.fuehren(
                 echo_svc, fall=material["fall"], material=material,
                 welt=next((b for b in katalog.BILDWELTEN
-                           if b["key"] == body.bildwelt), None))
+                           if b["key"] == body.bildwelt), None),
+                wunsch=str(einstellungen.get("wunsch") or ""))
         if regie is None:
             # **Kein Fehler, ein Rueckfall.** Eine Regie, die nicht taugt - zu wenig
             # Material, ein verbotenes Wort, ein Verdacht auf einen Namen -, darf kein Bild

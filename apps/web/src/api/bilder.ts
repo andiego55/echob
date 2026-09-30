@@ -131,6 +131,14 @@ export const bilderApi = {
      * denselben Anbieter, der sie für Echo und die Berichte schon bekommt.
      */
     quelle: string
+    /**
+     * Ein Wunsch zum Bild — **der einzige Freitext hier, und er geht nie an das Bildmodell.**
+     *
+     * Die Bildregie LIEST ihn; hinaus geht der geprüfte Bildauftrag. Ohne diese
+     * Zwischenstufe wäre „zeig, wie er weggeht" die Abbildung eines echten Menschen — genau
+     * deshalb gab es dieses Feld vorher nicht. Wirkt nur mit `quelle: 'fall'`.
+     */
+    wunsch: string
   }) => apiClient
     .post<GespeichertesBild & { legende: LegendenZeile[] }>(
       `${basis(caseId)}/malen`, body, { timeout: 240_000 })

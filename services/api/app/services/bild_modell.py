@@ -23,6 +23,12 @@ logger = logging.getLogger(__name__)
 GROESSE = "1024x1024"
 INHALTSTYP = "image/png"
 
+#: Die Qualitätsstufe des Bildmodells.
+#:
+#: Ein Bild hier ist einmalig (dasselbe kommt nie zweimal), wird aufgehoben und kostet ein
+#: Kontingent. Die Vorgabe des Anbieters ist auf Tempo gerechnet — hier zählt das Bild.
+QUALITAET = "high"
+
 
 class BildModell:
     """Malt ein Bild. Ohne Schlüssel liefert es nichts und sagt das auch."""
@@ -55,14 +61,36 @@ class BildModell:
         if self._client is None:
             raise RuntimeError("Das Bildmodell ist nicht konfiguriert.")
 
-        antwort = await self._client.images.generate(
-            model=self._model,
-            prompt=prompt,
-            size=GROESSE,
-            n=1,
+        gemeinsam: dict[str, Any] = {
+            "model": self._model,
+            "prompt": prompt,
+            "size": GROESSE,
+            "n": 1,
             # `moderation` bleibt bei der Vorgabe des Anbieters. Sie herabzusetzen wäre bei
             # Bildern über die Lage eines Menschen genau die falsche Sparsamkeit.
-        )
+        }
+
+        # **Die höchste Qualitätsstufe, und ein Rückweg, wenn das Modell sie nicht kennt.**
+        #
+        # Ohne Angabe malt der Anbieter in seiner Vorgabe — und die ist auf Tempo gerechnet,
+        # nicht auf ein Bild, das jemand aufhängt. Ein Bild hier ist einmalig, wird
+        # aufgehoben und kostet ohnehin ein Kontingent; an dieser Stelle zu sparen wäre am
+        # falschen Ende.
+        #
+        # Der Name des Parameters gehört dem Anbieter, nicht mir. Wer das Modell über eine
+        # Umgebungsvariable tauscht, soll kein „unknown parameter" bekommen, sondern ein
+        # Bild — deshalb der zweite Versuch ohne ihn, und eine Zeile im Log.
+        try:
+            antwort = await self._client.images.generate(**gemeinsam, quality=QUALITAET)
+        except TypeError:
+            antwort = await self._client.images.generate(**gemeinsam)
+            logger.info("BildModell: quality wird von diesem Client nicht angenommen.")
+        except Exception as fehler:  # noqa: BLE001 — nur die Qualität ist verhandelbar
+            if "quality" not in str(fehler).lower():
+                raise
+            logger.warning("BildModell: quality=%s abgelehnt (%s) — ohne Stufe.",
+                           QUALITAET, type(fehler).__name__)
+            antwort = await self._client.images.generate(**gemeinsam)
         daten = (getattr(antwort, "data", None) or [None])[0]
         if daten is None:
             raise RuntimeError("Das Bildmodell hat kein Bild zurückgegeben.")
