@@ -374,3 +374,242 @@ def test_die_normalisierung_bleibt_zwischen_null_und_eins():
         (3, 5, 5, 0.5),                           # leerer Bereich
     ]:
         assert dienst._null_eins(wert, von, bis) == soll, (wert, von, bis)
+
+
+# ── Der gemalte Weg ───────────────────────────────────────────────────────────
+
+def _werte_beispiel() -> dict:
+    return {
+        "grundton": {"temperatur": 0.3, "unruhe": 0.7},
+        "szenen": [
+            {"id": f"s{i}", "tag": t, "gewicht": 0.8 if t > 600 else 0.2,
+             "haerte": 0.9 if t > 600 else 0.1}
+            for i, t in enumerate([0, 14, 21, 63, 690, 700, 705, 712, 726, 733])
+        ],
+        "durchgaenge": [{"key": "boundary_violation", "wert": 0.8},
+                        {"key": "devaluation", "wert": 0.4},
+                        {"key": "kaum", "wert": 0.1}],
+        "lichter": [{"id": "a1", "tag": 100}],
+        "leerstellen": [{"key": "verlaesslichkeit", "wunsch": 0.9}],
+        "druck": 0.6,
+        "spanne": 733,
+    }
+
+
+ALLE_SCHICHTEN = ["grundton", "szenen", "durchgaenge", "lichter", "leerstellen", "druck"]
+
+
+def test_der_prompt_traegt_nur_struktur_und_keine_geschichte():
+    """**Der wichtigste Test am gemalten Weg.**
+
+    Ein Modell, das „eine schwierige Partnerschaft" hoert, malt zwei Menschen - eine Abbildung
+    eines echten, namentlich bekannten Abwesenden, erzeugt aus den Angaben einer Seite.
+    „Keine Menschen" als Bitte hilft nicht zuverlaessig. Kein figuratives Material im Prompt
+    hilft.
+    """
+    from app.services.bild_katalog import prompt_bauen
+
+    prompt = prompt_bauen(
+        _werte_beispiel(),
+        {"handschrift": "tusche", "palette": "nacht", "schichten": ALLE_SCHICHTEN})
+
+    # Keine Skalennamen: Sonst koennte ein Modell „boundary violation" bildlich nehmen.
+    for verraeterisch in ("boundary", "violation", "devaluation", "verlaesslichkeit"):
+        assert verraeterisch not in prompt.lower(), verraeterisch
+    # Und kein Wort ueber eine Beziehung.
+    for wort in ("relationship", "partner", "beziehung", "conflict", "abuse", "person"):
+        assert wort not in prompt.lower(), wort
+
+
+def test_der_prompt_verbietet_gestalten_positiv_und_negativ():
+    """Positiv zuerst, weil ein Modell mit „no people" allein oft trotzdem Menschen malt:
+    Die Verneinung nennt das Wort, und das Wort wirkt."""
+    from app.services.bild_katalog import GRENZE, prompt_bauen
+
+    prompt = prompt_bauen(_werte_beispiel(), {"handschrift": "tusche", "palette": "kuehl",
+                                              "schichten": ALLE_SCHICHTEN})
+    # Die Grenze steht am ENDE - dort gewichtet ein Modell am staerksten.
+    assert prompt.rstrip().endswith(GRENZE.rstrip())
+    # Positiv: was es IST.
+    assert "purely abstract" in GRENZE
+    assert "non-figurative" in GRENZE
+    # Und die Liste dessen, was nicht vorkommen darf.
+    tief = GRENZE.lower()
+    for verboten in ("no people", "no faces", "no hands", "no silhouettes", "no rooms",
+                     "no symbols", "no letters", "no words"):
+        assert verboten in tief, verboten
+
+
+def test_der_prompt_folgt_den_schichten():
+    """Ein abgewaehltes Element darf nicht im Prompt stehen - sonst malt das Modell etwas,
+    das die Person ausgeschaltet hat, und sie kann sich das nicht erklaeren."""
+    from app.services.bild_katalog import prompt_bauen
+
+    werte = _werte_beispiel()
+    nur_szenen = prompt_bauen(werte, {"handschrift": "tusche", "palette": "kuehl",
+                                      "schichten": ["szenen"]})
+    assert "marks" in nur_szenen
+    assert "continuous lines" not in nur_szenen, "die Muster gehen mit, obwohl abgewaehlt"
+    assert "voids" not in nur_szenen
+    assert "compressed towards one edge" not in nur_szenen
+
+    mit_druck = prompt_bauen(werte, {"handschrift": "tusche", "palette": "kuehl",
+                                     "schichten": ["szenen", "druck"]})
+    assert "compressed towards one edge" in mit_druck
+
+
+def test_der_prompt_beschreibt_die_haeufung_wenn_es_eine_gibt():
+    """Die Ballung ist aus den Abstaenden GERECHNET, nicht geschaetzt - dieselbe Eigenschaft,
+    die der gerechnete Weg als Position zeigt."""
+    from app.services.bild_katalog import prompt_bauen
+
+    geballt = _werte_beispiel()   # vier frueh, sechs im letzten Monat
+    gleichmaessig = _werte_beispiel()
+    gleichmaessig["szenen"] = [
+        {"id": f"s{i}", "tag": i * 70, "gewicht": 0.4, "haerte": 0.4} for i in range(10)
+    ]
+
+    a = prompt_bauen(geballt, {"handschrift": "tusche", "palette": "kuehl",
+                               "schichten": ["szenen"]})
+    b = prompt_bauen(gleichmaessig, {"handschrift": "tusche", "palette": "kuehl",
+                                     "schichten": ["szenen"]})
+    assert "clustered" in a
+    assert "even rhythm" in b
+
+
+def test_jede_handschrift_ergibt_einen_anderen_prompt():
+    from app.services.bild_katalog import HANDSCHRIFTEN, prompt_bauen
+
+    werte = _werte_beispiel()
+    prompts = {
+        h["key"]: prompt_bauen(werte, {"handschrift": h["key"], "palette": "kuehl",
+                                       "schichten": ["szenen"]})
+        for h in HANDSCHRIFTEN
+    }
+    assert len(set(prompts.values())) == len(HANDSCHRIFTEN)
+    # Und keine Handschrift kann eine Szene malen - alle fuenf sind gegenstandslos.
+    #
+    # Geprueft wird die HANDSCHRIFT selbst und nicht der fertige Prompt: In dem steht die
+    # Verbotsliste, und die enthaelt „no landscapes". Mein erster Versuch hat sich damit
+    # selbst gefunden - ein Test, der die eigene Verneinung als Fund meldet.
+    for h in HANDSCHRIFTEN:
+        for gegenstand in ("portrait", "figure", "scene of", "landscape", "person"):
+            assert gegenstand not in h["prompt"].lower(), f'{h["key"]}: {gegenstand}'
+
+
+def test_jede_handschrift_hat_was_die_oberflaeche_braucht():
+    from app.services.bild_katalog import HANDSCHRIFTEN
+
+    for h in HANDSCHRIFTEN:
+        assert h["label"] and h["hinweis"]
+        assert len(h["prompt"]) > 40, h["key"]
+
+
+def test_die_oberflaeche_bekommt_die_prompt_texte_nicht():
+    """Sie lesen sich wie Beschreibungen und sind Anweisungen an ein Modell."""
+    from app.services.bild_katalog import HANDSCHRIFTEN
+
+    fuers_auge = [{k: v for k, v in h.items() if k != "prompt"} for h in HANDSCHRIFTEN]
+    for h in fuers_auge:
+        assert "prompt" not in h
+        assert h["label"]
+
+
+@pytest.mark.asyncio
+async def test_ein_gemaltes_bild_liegt_mit_seinem_prompt(person, db):
+    """Der Prompt hilft nicht, dasselbe Bild wiederzubekommen - ein Bildmodell malt jedes Mal
+    anders. Er ist die einzige Auskunft darueber, WORAUS es entstanden ist."""
+    fall = await _fall(db, person)
+    bild = await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall,
+        einstellungen={"handschrift": "tusche", "palette": "nacht"},
+        bild=b"PNG-Bytes", bild_typ="image/png", prompt="An abstract composition ...")
+
+    assert bild["art"] == "erzeugt"
+    assert bild["svg"] is None
+    roh = await db.fetchval("SELECT prompt FROM case_bilder WHERE id = $1", bild["id"])
+    assert roh.startswith("enc:"), "der Prompt liegt im Klartext"
+
+    gelesen = await dienst.holen(db, user_id=person, bild_id=bild["id"])
+    assert gelesen["prompt"] == "An abstract composition ..."
+
+
+@pytest.mark.asyncio
+async def test_die_galerie_schleppt_die_bildbytes_nicht_mit(person, db):
+    """Ein SVG ist wenige Kilobyte und kommt mit; ein gemaltes Bild ist ein Megabyte, und
+    zwanzig davon in einer Antwort waeren eine Ladezeit, die niemand versteht."""
+    fall = await _fall(db, person)
+    await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall, einstellungen={},
+        bild=bytes(4000), bild_typ="image/png", prompt="x")
+
+    regal = await dienst.liste(db, user_id=person, case_id=fall)
+    assert len(regal) == 1
+    assert "bild" not in regal[0] or regal[0]["bild"] is None
+    assert regal[0]["hat_datei"] is True
+
+
+@pytest.mark.asyncio
+async def test_die_bytes_kommen_nur_ueber_den_endpunkt_und_nur_fuer_den_eigentuemer(person, db):
+    fall = await _fall(db, person)
+    bild = await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall, einstellungen={},
+        bild=b"meine Bytes", bild_typ="image/png", prompt="x")
+
+    daten, typ = await dienst.datei_holen(db, user_id=person, bild_id=bild["id"])
+    assert daten == b"meine Bytes"
+    assert typ == "image/png"
+
+    fremd = uuid.uuid4()
+    await db.execute(
+        "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Andere')", fremd)
+    assert await dienst.datei_holen(db, user_id=fremd, bild_id=bild["id"]) is None
+
+
+@pytest.mark.asyncio
+async def test_ein_gerechnetes_bild_hat_keine_datei(person, db):
+    fall = await _fall(db, person)
+    bild = await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={},
+                                svg=SVG, satz="")
+    assert await dienst.datei_holen(db, user_id=person, bild_id=bild["id"]) is None
+
+
+@pytest.mark.asyncio
+async def test_ohne_bytes_entsteht_kein_gemaltes_bild(person, db):
+    fall = await _fall(db, person)
+    with pytest.raises(HTTPException) as fehler:
+        await dienst.gemaltes_anlegen(db, user_id=person, case_id=fall, einstellungen={},
+                                     bild=b"", bild_typ="image/png", prompt="x")
+    assert fehler.value.status_code == 502
+    assert await db.fetchval(
+        "SELECT COUNT(*) FROM case_bilder WHERE case_id = $1", fall) == 0
+
+
+@pytest.mark.asyncio
+async def test_das_bild_kontingent_zaehlt_in_stueck(person, db):
+    """Anders als beim Podcast: Dort macht die Laenge den Preis, hier ist die Groesse fest.
+    Ein Bild ist ein Bild."""
+    from app.core.config import settings
+    from app.services.subscription_service import (
+        _count_ai_usage_this_month,
+        enforce_ai_usage_limit,
+        log_ai_usage,
+    )
+
+    for _ in range(settings.bild_limit):
+        await log_ai_usage(person, db, "bild")
+    assert await _count_ai_usage_this_month(str(person), db, "bild") == settings.bild_limit
+
+    with pytest.raises(HTTPException) as fehler:
+        await enforce_ai_usage_limit(str(person), db, "bild")
+    assert fehler.value.status_code == 403
+    assert "BILD_LIMIT_REACHED" in fehler.value.detail
+
+
+def test_der_gerechnete_weg_hat_kein_kontingent():
+    """Er kostet nichts: kein Modellaufruf, keine Wartezeit. Ein Eintrag dafuer waere eine
+    Sperre ohne Grund."""
+    from app.services.subscription_service import _AI_USAGE_LIMITS
+
+    assert "bild" in _AI_USAGE_LIMITS          # der gemalte Weg
+    assert "lagebild" not in _AI_USAGE_LIMITS  # der gerechnete nicht

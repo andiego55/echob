@@ -295,6 +295,84 @@ async def anlegen(
     return _bild(zeile)
 
 
+async def gemaltes_anlegen(
+    conn: asyncpg.Connection,
+    *,
+    user_id: UUID | str,
+    case_id: UUID | str,
+    einstellungen: dict[str, Any],
+    bild: bytes,
+    bild_typ: str,
+    prompt: str,
+) -> dict[str, Any] | None:
+    """Legt ein GEMALTES Bild ab — Bytes statt SVG.
+
+    **Die Bytes sind die einzige Fassung.** Ein Bildmodell malt jedes Mal anders; dasselbe
+    Bild noch einmal gibt es nicht. Beim gerechneten Weg ist das SVG eine Kopie von etwas
+    Reproduzierbarem — hier ist es das Original.
+
+    Der Prompt wird mitgeschrieben, obwohl er nicht hilft, das Bild wiederzubekommen: Er ist
+    die einzige Auskunft darüber, WORAUS es entstanden ist. Bei einem erfundenen Bild ist das
+    die ganze Nachvollziehbarkeit, die es gibt.
+
+    **Nicht feldverschlüsselt sind nur die Bytes** — dieselbe Abwägung wie bei den
+    Podcast-Tonspuren: Feldkrypto auf ein Megabyte bei jedem Abruf kostet Rechenzeit, und die
+    Bytes sind ohnehin nur über einen Endpunkt mit Eigentumsprüfung erreichbar.
+    """
+    if not bild:
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            detail="Es ist kein Bild entstanden. Versuch es noch einmal.",
+        )
+
+    anzahl = await conn.fetchval(
+        "SELECT COUNT(*) FROM case_bilder WHERE case_id = $1 AND user_id = $2",
+        case_id, user_id) or 0
+    if anzahl >= MAX_BILDER_JE_FALL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"In dieser Galerie hängen schon {MAX_BILDER_JE_FALL} Bilder. "
+                "Lösch eines, bevor du ein neues aufhebst."
+            ),
+        )
+
+    zeile = await conn.fetchrow(
+        """
+        INSERT INTO case_bilder
+          (case_id, user_id, art, einstellungen, bild, bild_typ, prompt)
+        SELECT c.id, $2, 'erzeugt', $3::jsonb, $4, $5, $6
+          FROM cases c
+         WHERE c.id = $1 AND c.user_id = $2
+        RETURNING *
+        """,
+        case_id, user_id, json.dumps(einstellungen), bild, bild_typ,
+        crypto.encrypt(prompt) if prompt else None,
+    )
+    if zeile is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
+    return _bild(zeile)
+
+
+async def datei_holen(
+    conn: asyncpg.Connection, *, user_id: UUID | str, bild_id: UUID | str,
+) -> tuple[bytes, str] | None:
+    """Die Bytes eines gemalten Bildes — für den Ausliefer-Endpunkt.
+
+    **Die einzige Stelle, an der Bildbytes die Datenbank verlassen**, und sie prüft das
+    Eigentum in derselben Abfrage. Keine öffentliche Adresse: Ein Bild reist weiter als Text,
+    und wovon es keine Adresse gibt, kann auch keine herumliegen.
+    """
+    zeile = await conn.fetchrow(
+        "SELECT bild, bild_typ FROM case_bilder "
+        " WHERE id = $1 AND user_id = $2 AND bild IS NOT NULL",
+        bild_id, user_id,
+    )
+    if not zeile:
+        return None
+    return bytes(zeile["bild"]), zeile["bild_typ"] or "image/png"
+
+
 async def liste(
     conn: asyncpg.Connection, *, user_id: UUID | str, case_id: UUID | str,
 ) -> list[dict[str, Any]]:
@@ -304,8 +382,14 @@ async def liste(
     und eine Galerie OHNE Bilder wäre eine Liste von Daten. Zwanzig Bilder sind zusammen
     kleiner als eine einzige Minute Audio.
     """
+    # **Ohne die Bildbytes.** Ein SVG ist wenige Kilobyte und kommt mit; ein gemaltes Bild
+    # ist ein Megabyte, und zwanzig davon in einer Galerie-Antwort wären eine Ladezeit, die
+    # niemand versteht. Für die gemalten steht stattdessen ein Merkmal da, und der Browser
+    # holt jedes einzeln über den Ausliefer-Endpunkt.
     zeilen = await conn.fetch(
-        "SELECT * FROM case_bilder WHERE case_id = $1 AND user_id = $2 "
+        "SELECT id, case_id, user_id, art, einstellungen, svg, satz, bild_typ, prompt, "
+        "       created_at, updated_at, (bild IS NOT NULL) AS hat_datei "
+        "  FROM case_bilder WHERE case_id = $1 AND user_id = $2 "
         " ORDER BY created_at DESC",
         case_id, user_id,
     )

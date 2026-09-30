@@ -35,6 +35,10 @@ export const CODE_TEXTS: Record<string, string> = {
     'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
   PODCAST_LIMIT_REACHED:
     'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  BILD_LIMIT_REACHED:
+    'Du hast dein Monatskontingent an gemalten Bildern erreicht. Gerechnete Bilder kannst '
+    + 'du weiter machen, so viele du willst — die kosten nichts. '
+    + 'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
   // Diese drei fehlten, seit es sie gibt. Ein Wächter auf der Python-Seite hat sie gemeldet
   // (test_podcast.py), als der Podcast-Code dazukam: Zwei davon werden im Kompass wirklich
   // erzwungen, also hätte dort jemand „SATZ_VORSCHLAG_LIMIT_REACHED" gelesen.

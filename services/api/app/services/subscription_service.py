@@ -118,6 +118,8 @@ _AI_USAGE_LIMITS = {
     # sie gleich viel kosten. Die Sprachausgabe kostet je Minute; das Kontingent auch.
     "podcast":    ("podcast_minuten_limit", "PODCAST_LIMIT_REACHED",
                    "Podcast-Minuten"),
+    # Gemalte Bilder, in Stueck. Der gerechnete Weg kostet nichts und steht hier nicht.
+    "bild":       ("bild_limit", "BILD_LIMIT_REACHED", "Gemalte Bilder"),
 }
 
 #: Welche Arten in etwas anderem als Stück zählen — nur für die Anzeige.

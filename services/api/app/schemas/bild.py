@@ -19,6 +19,19 @@ class BildAblegen(BaseModel):
     satz: str = ""
 
 
+class BildMalen(BaseModel):
+    """Die Bestellung eines GEMALTEN Bildes.
+
+    **Kein Freitext, und das ist eine Entscheidung.** Beim Podcast gibt es einen — dort führt
+    er zu einem Satz mehr über eigenes Erleben. Hier führte er zu einer Gestalt: „zeig, wie er
+    weggeht" ist genau die Abbildung eines echten Menschen, die es nicht geben soll. Gesteuert
+    werden Handschrift, Farbe und welche Schichten mitgehen.
+    """
+    handschrift: str
+    palette: str = "kuehl"
+    schichten: list[str] = Field(default_factory=list)
+
+
 class BildSatz(BaseModel):
     #: Leer setzt zurück. Ein Satz, der sich nicht wieder entfernen lässt, ist eine Falle.
     satz: str = ""

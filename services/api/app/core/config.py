@@ -94,6 +94,16 @@ class Settings(BaseSettings):
     #: Modell fuer die Sprachausgabe. Eigene Einstellung, weil es das einzige ist,
     #: das sich je Umgebung unterscheiden koennte.
     podcast_tts_model: str = "gpt-4o-mini-tts"
+    #: Wie viele GEMALTE Bilder je Nutzer/Monat. Der gerechnete Weg kostet nichts und
+    #: zaehlt nicht mit.
+    #:
+    #: Acht ist eine Annahme: Was ein Bild bei diesem Modell kostet, ist noch nicht
+    #: gemessen. Lieber knapp anfangen - eine Grenze zu lockern ist leicht, eine
+    #: Rechnung nachtraeglich zu erklaeren nicht.
+    bild_limit: int = 8
+    #: Das Bildmodell. Eigene Einstellung, damit ein Wechsel eine Umgebungsvariable ist
+    #: und kein Commit.
+    bild_modell: str = "gpt-image-2"
     # Harter Deckel der kostenlosen Spielwiese (Demo-Fälle), pro Fachperson:
     demo_echo_limit: int = 30      # max. Echo-Nachrichten auf Demo-Fällen (gesamt)
     demo_report_limit: int = 6     # max. Berichte pro Demo-Fall (inkl. Beispielbericht)

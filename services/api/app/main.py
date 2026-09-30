@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.core.database import create_pool, create_supabase_admin
 from app.core.logging import get_logger, setup_logging
 from app.core.rate_limit import rate_limit_middleware
+from app.services.bild_modell import BildModell
 from app.services.echo_service import create_echo_service
 from app.services.podcast_stimme import PodcastStimme
 
@@ -91,6 +92,10 @@ def create_app() -> FastAPI:
         # die einzige Stelle, die OpenAI-Audio kennt, und soll sich austauschen
         # lassen, ohne den Dienst anzufassen, der alles andere erzeugt.
         app.state.podcast_stimme = PodcastStimme(
+            openai_api_key=getattr(settings, "openai_api_key", ""))
+        # Dasselbe Muster: die einzige Stelle, die OpenAI-Bilder kennt, steht fuer sich und
+        # laesst sich ohne den Dienst austauschen, der alles andere erzeugt.
+        app.state.bild_modell = BildModell(
             openai_api_key=getattr(settings, "openai_api_key", ""))
         yield
         # ── Shutdown ─────────────────────────────────────────────────────

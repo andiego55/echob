@@ -41,6 +41,9 @@ const MODELL_PFADE = [
   // Tonspuren. Der zweite ist der laengste Modellaufruf im Projekt - eine zwanzigminuetige
   // Folge sind sechs Sprachaufrufe hintereinander.
   '/podcasts', '/sprechen',
+  // Bildwerkstatt: `/malen` laesst ein Bildmodell arbeiten. Der GERECHNETE Weg steht hier
+  // nicht - er ruft kein Modell und braucht keine Frist.
+  '/malen',
 ]
 
 /** Kürzer als das ist für einen Modellaufruf keine Frist, sondern ein Abbruch. */
@@ -106,6 +109,16 @@ describe('Fristen fuer Modellaufrufe', () => {
     // Und die laengere Frist gehoert an den laengeren Aufruf.
     const sprechen = funde.find(f => f.pfad.includes('/sprechen'))!
     expect(sprechen.frist).toBeGreaterThanOrEqual(300_000)
+  })
+
+  it('erkennt den Bild-Aufruf der Werkstatt', () => {
+    // Der gemalte Weg ist der einzige in der Bildwerkstatt, der ein Modell ruft. Ohne Frist
+    // braeche der Browser nach 15 Sekunden ab, waehrend der Server weitermalt - das Bild
+    // entstuende, das Kontingent waere verbucht, und auf dem Schirm stuende ein
+    // Netzwerkfehler.
+    const malen = modellAufrufe().find(f => f.pfad.includes('/malen'))
+    expect(malen, 'der Bild-Aufruf wird nicht gesehen').toBeTruthy()
+    expect(malen!.frist).toBeGreaterThanOrEqual(120_000)
   })
 
   it('jeder Modellaufruf setzt eine eigene Frist', () => {

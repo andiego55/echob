@@ -21,6 +21,7 @@ import { PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import BildRegler from '@/components/app/bild/BildRegler'
 import { bilderApi, type GespeichertesBild } from '@/api/bilder'
+import GemaltesBild from '@/components/app/bild/GemaltesBild'
 import {
   STANDARD_EINSTELLUNGEN, STANDARD_PALETTE, genugFuerEinBild, lagebild,
   type Anordnung, type Dichte, type Schicht,
@@ -58,6 +59,16 @@ export default function BildwerkstattPage() {
   const [dichte, setDichte] = useState<Dichte>('normal')
   const [schichten, setSchichten] = useState<Schicht[]>(STANDARD_EINSTELLUNGEN.schichten)
   const [satz, setSatz] = useState('')
+  /**
+   * Gerechnet oder gemalt.
+   *
+   * **Gerechnet ist die Vorauswahl, und das ist eine Entscheidung.** Es kostet nichts,
+   * reagiert sofort und jede Stelle im Bild hat eine Antwort auf „warum sieht das so aus?".
+   * Der gemalte Weg ist das Angebot daneben, nicht der Hauptweg — wer ihn wählt, soll es
+   * gewollt haben.
+   */
+  const [weg, setWeg] = useState<'gerechnet' | 'gemalt'>('gerechnet')
+  const [handschrift, setHandschrift] = useState('tusche')
 
   /**
    * Alle Schichten, die diese Sitzung schon einmal gesehen hat.
@@ -72,6 +83,15 @@ export default function BildwerkstattPage() {
     queryFn: () => bilderApi.werte(caseId!, geladen),
     enabled: !!caseId,
     staleTime: 60_000,
+  })
+
+  // Nur wenn der gemalte Weg gewaehlt ist: Ein Abruf auf Vorrat fuer eine Liste, die die
+  // meisten nie sehen, ist Arbeit fuer nichts.
+  const handschriften = useQuery({
+    queryKey: ['bild-handschriften', caseId],
+    queryFn: () => bilderApi.handschriften(caseId!),
+    enabled: !!caseId && weg === 'gemalt',
+    staleTime: Infinity,
   })
 
   const galerie = useQuery({
@@ -96,6 +116,16 @@ export default function BildwerkstattPage() {
     mutationFn: (p: { id: string; satz: string }) =>
       bilderApi.satz(caseId!, p.id, p.satz),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['bilder', caseId] }),
+  })
+
+  const malen = useMutation({
+    mutationFn: () => bilderApi.malen(caseId!, {
+      handschrift, palette, schichten,
+    }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['bilder', caseId] })
+      qc.invalidateQueries({ queryKey: ['usage-status'] })
+    },
   })
 
   const loeschen = useMutation({
@@ -155,7 +185,34 @@ export default function BildwerkstattPage() {
           <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
             {/* ── Das Bild ──────────────────────────────────────────────── */}
             <div>
-              {gerechnet && (
+              {/* **Zwei Wege, und der gerechnete steht zuerst.**
+                  Er kostet nichts, reagiert sofort, und jede Stelle im Bild hat eine
+                  Antwort auf „warum sieht das so aus?". Der gemalte ist das Angebot
+                  daneben — wer ihn waehlt, soll es gewollt haben. */}
+              <div className="mb-3 flex flex-wrap gap-2" role="tablist">
+                {([
+                  ['gerechnet', 'Gerechnet', 'Aus deinen Zahlen. Kostet nichts.'],
+                  ['gemalt', 'Gemalt', 'Ein Bildmodell malt dieselbe Struktur.'],
+                ] as const).map(([k, label, hinweis]) => (
+                  <button
+                    key={k}
+                    type="button"
+                    role="tab"
+                    aria-selected={weg === k}
+                    onClick={() => setWeg(k)}
+                    className={`rounded-brand border px-4 py-2 text-left transition-colors ${
+                      weg === k ? 'border-accent bg-accent/[0.06]'
+                        : 'border-brand-border bg-white hover:border-accent/50'
+                    }`}
+                  >
+                    <span className={`block text-[0.86rem] font-semibold ${
+                      weg === k ? 'text-accent' : 'text-navy'
+                    }`}>{label}</span>
+                    <span className="block text-[0.72rem] text-brand-muted">{hinweis}</span>
+                  </button>
+                ))}
+              </div>
+              {weg === 'gerechnet' && gerechnet && (
                 <img
                   src={alsBildAdresse(gerechnet.svg)}
                   alt={`Dein Lagebild: ${gerechnet.marken.length} festgehaltene Momente, `
@@ -163,12 +220,93 @@ export default function BildwerkstattPage() {
                   className="block w-full rounded-brand-lg border border-brand-border bg-white"
                 />
               )}
-              <p className="mt-2 text-[0.74rem] text-brand-muted">
-                {gerechnet?.marken.length ?? 0} von {werte.data?.szenen.length ?? 0} Momenten
-                {werte.data?.spanne ? ` · über ${Math.round(werte.data.spanne / 30)} Monate` : ''}
-              </p>
 
-              {/* ── Aufheben ───────────────────────────────────────────── */}
+              {weg === 'gemalt' && (
+                <div className="rounded-brand-lg border border-brand-border bg-white p-5">
+                  <h2 className="card-title-lg">Ein Bildmodell malen lassen</h2>
+                  <p className="mt-1.5 max-w-[62ch] text-[0.86rem] leading-relaxed text-brand-muted">
+                    Es bekommt <strong className="font-semibold">dieselbe Struktur</strong> wie
+                    das gerechnete Bild — wie viele Momente, wie dicht, welcher Rhythmus, was
+                    fehlt. Kein Satz aus deinen Szenen geht hinaus, und nichts darin wird
+                    erkennbar: keine Menschen, keine Räume, keine Gegenstände.
+                  </p>
+                  <p className="mt-2 max-w-[62ch] text-[0.8rem] leading-relaxed text-brand-muted">
+                    Das kostet — anders als der gerechnete Weg — von deinem Monatskontingent,
+                    und dasselbe Bild kommt nie zweimal heraus.
+                  </p>
+
+                  <div className="mt-4">
+                    <span className="label">Handschrift</span>
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                      {(handschriften.data ?? []).map(h => (
+                        <button
+                          key={h.key}
+                          type="button"
+                          onClick={() => setHandschrift(h.key)}
+                          aria-pressed={handschrift === h.key}
+                          className={`rounded-brand border px-3.5 py-2.5 text-left transition-colors ${
+                            handschrift === h.key
+                              ? 'border-accent bg-accent/[0.06]'
+                              : 'border-brand-border bg-white hover:border-accent/50'
+                          }`}
+                        >
+                          <span className={`block text-[0.84rem] font-semibold ${
+                            handschrift === h.key ? 'text-accent' : 'text-navy'
+                          }`}>{h.label}</span>
+                          <span className="block text-[0.72rem] leading-snug text-brand-muted">
+                            {h.hinweis}
+                          </span>
+                        </button>
+                      ))}
+                      {handschriften.isLoading && (
+                        <p className="text-sm text-brand-muted">Einen Moment …</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <Fehlermeldung error={malen.error} className="mt-4" />
+
+                  {malen.isPending ? (
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      className="mt-4 flex items-start gap-3 rounded-brand border border-accent/40 bg-accent/[0.06] px-5 py-4"
+                    >
+                      <span aria-hidden="true"
+                        className="mt-0.5 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
+                      <span className="text-[0.86rem] leading-relaxed text-navy">
+                        <strong className="font-semibold">Wird gemalt.</strong> Das braucht
+                        eine halbe bis ganze Minute. Lass die Seite offen — du musst nicht
+                        noch einmal klicken.
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => malen.mutate()}
+                      disabled={!handschriften.data?.length}
+                      className="btn-primary !py-2.5 !px-5 !text-sm mt-4 disabled:opacity-40"
+                    >
+                      {malen.error ? 'Noch einmal versuchen' : 'Malen lassen'}
+                    </button>
+                  )}
+                  <p className="mt-3 text-[0.76rem] leading-snug text-brand-muted">
+                    Ein gemaltes Bild landet direkt in deiner Galerie — es lässt sich nicht
+                    reproduzieren, also wird es gleich aufgehoben.
+                  </p>
+                </div>
+              )}
+              {weg === 'gerechnet' && (
+                <p className="mt-2 text-[0.74rem] text-brand-muted">
+                  {gerechnet?.marken.length ?? 0} von {werte.data?.szenen.length ?? 0} Momenten
+                  {werte.data?.spanne
+                    ? ` · über ${Math.round(werte.data.spanne / 30)} Monate` : ''}
+                </p>
+              )}
+
+              {/* ── Aufheben: nur beim gerechneten Weg. Ein gemaltes Bild wird sofort
+                     aufgehoben, weil es sich nicht wiederholen laesst. ──────── */}
+              {weg === 'gerechnet' && (
               <div className="mt-4 rounded-brand-lg border border-brand-border bg-white p-5">
                 <label className="block">
                   <span className="label">Dein Satz darunter</span>
@@ -201,6 +339,7 @@ export default function BildwerkstattPage() {
                   </span>
                 </div>
               </div>
+              )}
             </div>
 
             {/* ── Die Regler ────────────────────────────────────────────── */}
@@ -271,7 +410,7 @@ function BildKarte({ bild, onSatz, onLoeschen }: {
    * ohne Server — das Bild liegt schon im Browser.
    */
   const laden = async (als: 'svg' | 'png') => {
-    if (!bild.svg) return
+    if (!bild.svg) return  // gemalte Bilder werden ueber ihren eigenen Knopf geladen
     const name = (bild.satz || 'Lagebild').replace(/[^\p{L}\p{N} _-]/gu, '').slice(0, 60)
     if (als === 'svg') {
       const url = URL.createObjectURL(new Blob([bild.svg], { type: 'image/svg+xml' }))
@@ -310,13 +449,19 @@ function BildKarte({ bild, onSatz, onLoeschen }: {
 
   return (
     <figure className="m-0 overflow-hidden rounded-brand-lg border border-brand-border bg-white">
-      {bild.svg && (
+      {/* Zwei Arten, zwei Wege zum Bild: Das gerechnete liegt als SVG in der Antwort, das
+          gemalte muss als Datei geholt werden. */}
+      {bild.art === 'gerechnet' && bild.svg && (
         <img
           src={alsBildAdresse(bild.svg)}
           alt={bild.satz || `Lagebild vom ${new Date(bild.created_at)
             .toLocaleDateString('de-DE')}`}
           className="block w-full"
         />
+      )}
+      {bild.art === 'erzeugt' && (
+        <GemaltesBild caseId={bild.case_id} bildId={bild.id}
+          alt={bild.satz || 'Gemaltes Lagebild'} />
       )}
       <figcaption className="border-t border-brand-border p-3">
         {entwurf === null ? (

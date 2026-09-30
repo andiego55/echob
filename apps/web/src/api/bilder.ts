@@ -20,11 +20,29 @@ export interface GespeichertesBild {
     anordnung?: string
     dichte?: string
     schichten?: string[]
+    handschrift?: string
   }
+  /** Nur bei `art: 'gerechnet'`. */
   svg: string | null
   satz: string | null
+  /**
+   * Nur bei `art: 'erzeugt'`: Es LIEGT eine Datei.
+   *
+   * Die Bytes kommen nicht mit der Galerie — ein gemaltes Bild ist ein Megabyte, und zwanzig
+   * davon in einer Antwort wären eine Ladezeit, die niemand versteht. Jedes wird einzeln
+   * über `datei()` geholt.
+   */
+  hat_datei?: boolean
+  /** Nur bei `art: 'erzeugt'`: woraus es entstanden ist. */
+  prompt?: string | null
   created_at: string
   updated_at: string
+}
+
+export interface Handschrift {
+  key: string
+  label: string
+  hinweis: string
 }
 
 export const bilderApi = {
@@ -52,6 +70,38 @@ export const bilderApi = {
 
   satz: (caseId: string, bildId: string, satz: string) =>
     apiClient.patch<GespeichertesBild>(`${basis(caseId)}/${bildId}`, { satz })
+      .then(r => r.data),
+
+  handschriften: (caseId: string) =>
+    apiClient.get<{ handschriften: Handschrift[] }>(`${basis(caseId)}/handschriften`)
+      .then(r => r.data.handschriften),
+
+  /**
+   * Lässt ein Bildmodell malen — **der einzige Aufruf hier, der etwas kostet und dauert.**
+   *
+   * Deshalb hat er als einziger eine eigene Frist: Ein Bildmodell braucht eine halbe bis
+   * ganze Minute, und die Vorgabe des Clients (15 Sekunden) würde abbrechen, während der
+   * Server weiterarbeitet — das Bild entstünde, das Kontingent wäre verbucht, und auf dem
+   * Schirm stünde ein Netzwerkfehler.
+   */
+  malen: (caseId: string, body: {
+    handschrift: string
+    palette: string
+    schichten: string[]
+  }) => apiClient
+    .post<GespeichertesBild>(`${basis(caseId)}/malen`, body, { timeout: 180_000 })
+    .then(r => r.data),
+
+  /**
+   * Die Bytes eines gemalten Bildes.
+   *
+   * Über den API-Client, also mit Anmeldung: Ein `<img src>` kann sich nicht anmelden, und
+   * eine öffentliche Adresse soll es nicht geben — ein Bild reist weiter als Text.
+   */
+  datei: (caseId: string, bildId: string) =>
+    apiClient
+      .get<Blob>(`${basis(caseId)}/${bildId}/datei`,
+        { responseType: 'blob', timeout: 120_000 })
       .then(r => r.data),
 
   loeschen: (caseId: string, bildId: string) =>
