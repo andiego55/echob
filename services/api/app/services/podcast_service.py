@@ -137,6 +137,52 @@ async def material_laden(
     return material
 
 
+async def pruefen_und_zaehlen(
+    conn: asyncpg.Connection,
+    *,
+    user_id: UUID | str,
+    case_id: UUID | str,
+    format_key: str,
+    laenge: str,
+    stimme: str,
+    ansprache: str,
+) -> None:
+    """Alles, was VOR dem Modellaufruf abgewiesen werden kann — und nichts geschrieben.
+
+    Getrennt von ``anlegen``, weil zwischen Prüfung und Schreiben der Modellaufruf liegt und
+    die Verbindung dabei zurück in den Pool geht. Wer hier abgewiesen wird, hat nichts
+    gekostet: kein Modell gelaufen, keine Zeile entstanden.
+    """
+    if format_key not in katalog.FORMAT_SCHLUESSEL:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
+    if laenge not in katalog.LAENGEN_SCHLUESSEL:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Länge.")
+    if stimme not in katalog.STIMM_SCHLUESSEL:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Stimme.")
+    if ansprache not in katalog.format_(format_key)["ansprachen"]:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Diese Ansprache passt nicht zu diesem Format.",
+        )
+
+    # **An die Nutzer-Id gebunden, obwohl die case_id schon eindeutig ist.** Der
+    # Zugriffs-Waechter hat das gefordert, und er hat recht: Eine fremde case_id liefert
+    # hier sonst die Zahl der Folgen eines anderen Menschen. Sie wuerde diesen Aufrufer nur
+    # ausbremsen und nichts verraten — aber eine Abfrage auf Nutzerdaten, die das Eigentum
+    # nicht feststellt, ist eine Zeile, auf die sich spaeter jemand verlaesst.
+    anzahl = await conn.fetchval(
+        "SELECT COUNT(*) FROM case_podcasts WHERE case_id = $1 AND user_id = $2",
+        case_id, user_id) or 0
+    if anzahl >= katalog.MAX_FOLGEN_JE_FALL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"An diesem Fall liegen schon {katalog.MAX_FOLGEN_JE_FALL} Folgen. "
+                "Lösch eine, bevor du eine neue erzeugst."
+            ),
+        )
+
+
 async def anlegen(
     conn: asyncpg.Connection,
     *,
@@ -147,91 +193,59 @@ async def anlegen(
     stimme: str,
     ansprache: str,
     gewichte: dict[str, str],
-) -> asyncpg.Record:
-    """Legt die Folge als Entwurf an — bevor irgendetwas erzeugt wird.
-
-    **Das INSERT beweist das Eigentum selbst** (``INSERT … SELECT … FROM cases WHERE
-    user_id``). Der Aufrufer hat es über ``material_laden`` schon geprüft; sich darauf zu
-    verlassen hieße, die Sicherheit dieser Funktion in die Reihenfolge ihrer Aufrufe zu
-    legen — und beim zweiten Aufrufer wäre sie offen.
-    """
-    if format_key not in katalog.FORMAT_SCHLUESSEL:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
-    if laenge not in katalog.LAENGEN_SCHLUESSEL:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Länge.")
-    if stimme not in katalog.STIMM_SCHLUESSEL:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Stimme.")
-    f = katalog.format_(format_key)
-    if ansprache not in f["ansprachen"]:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Diese Ansprache passt nicht zu diesem Format.",
-        )
-
-    anzahl = await conn.fetchval(
-        "SELECT COUNT(*) FROM case_podcasts WHERE case_id = $1", case_id) or 0
-    if anzahl >= katalog.MAX_FOLGEN_JE_FALL:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=(
-                f"An diesem Fall liegen schon {katalog.MAX_FOLGEN_JE_FALL} Folgen. "
-                "Lösch eine, bevor du eine neue erzeugst."
-            ),
-        )
-
-    zeile = await conn.fetchrow(
-        """
-        INSERT INTO case_podcasts
-          (case_id, user_id, format, laenge, stimme, ansprache, gewichte, status)
-        SELECT c.id, $2, $3, $4, $5, $6, $7::jsonb, 'entwurf'
-          FROM cases c
-         WHERE c.id = $1 AND c.user_id = $2
-        RETURNING *
-        """,
-        case_id, user_id, format_key, laenge, stimme, ansprache, json.dumps(gewichte),
-    )
-    if zeile is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
-    return zeile
-
-
-async def skript_ablegen(
-    conn: asyncpg.Connection,
-    *,
-    user_id: UUID | str,
-    podcast_id: UUID | str,
     titel: str | None,
     kapitel: list[dict[str, Any]],
 ) -> dict[str, Any] | None:
-    """Schreibt Titel und Kapiteltexte — und setzt den Stand auf ``skript``.
+    """Legt die Folge MIT ihrem Skript an — in einer Transaktion, oder gar nicht.
 
-    Alte Kapitel fliegen vorher heraus: Ein zweiter Lauf soll die Folge ersetzen und nicht
-    verdoppeln. Wäre das ein UPSERT je Nummer, bliebe bei einem kürzeren zweiten Skript das
-    überzählige Kapitel des ersten stehen — und niemand sähe der Folge an, woher es kommt.
+    **Die erste Fassung hat das falsch herum gemacht**, und ein Nutzer hat es sofort
+    gefunden: Die Zeile entstand VOR dem Modellaufruf. Brach danach etwas ab — ein Fehler am
+    Modell, ein geschlossener Browser, eine abgelaufene Frist —, blieb eine Folge ohne
+    Kapitel zurück. Die zeigt keinen Abspieler, keinen Knopf und ein leeres Skript: eine
+    Seite, auf der nichts zu tun ist. Und sie zählt auf die zwölf Folgen je Fall, also
+    verbraucht ein Fehlschlag stillschweigend einen Platz.
+
+    Dass jemand mehrmals klickt, weil er nicht sieht, ob etwas passiert, machte daraus
+    mehrere solche Seiten auf einmal.
+
+    Jetzt entsteht nichts, bis der Text da ist. Ohne Kapitel wird gar nicht geschrieben —
+    eine Folge ohne Skript ist keine Folge.
+
+    Das INSERT beweist das Eigentum selbst (``INSERT … SELECT … FROM cases WHERE user_id``).
+    Der Aufrufer hat es über ``material_laden`` schon geprüft; sich darauf zu verlassen
+    hieße, die Sicherheit dieser Funktion in die Reihenfolge ihrer Aufrufe zu legen.
     """
-    eigen = await conn.fetchval(
-        "SELECT EXISTS (SELECT 1 FROM case_podcasts WHERE id = $1 AND user_id = $2)",
-        podcast_id, user_id,
-    )
-    if not eigen:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Folge nicht gefunden.")
-
-    await conn.execute(
-        "DELETE FROM case_podcast_kapitel WHERE podcast_id = $1", podcast_id)
-    for nr, k in enumerate(kapitel, start=1):
-        await conn.execute(
-            "INSERT INTO case_podcast_kapitel "
-            "  (podcast_id, nr, kapitel_key, titel, text) "
-            "VALUES ($1,$2,$3,$4,$5)",
-            podcast_id, nr, k["key"], k["titel"], crypto.encrypt(k["text"]),
+    if not kapitel:
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            detail="Es ist kein Text entstanden. Versuch es noch einmal.",
         )
 
-    await conn.execute(
-        "UPDATE case_podcasts SET titel = $2, status = 'skript', fehler = NULL, "
-        "  sekunden = NULL, updated_at = clock_timestamp() WHERE id = $1",
-        podcast_id, crypto.encrypt(titel) if titel else None,
-    )
-    return await holen(conn, user_id=user_id, podcast_id=podcast_id)
+    async with conn.transaction():
+        zeile = await conn.fetchrow(
+            """
+            INSERT INTO case_podcasts
+              (case_id, user_id, format, laenge, stimme, ansprache, gewichte, titel, status)
+            SELECT c.id, $2, $3, $4, $5, $6, $7::jsonb, $8, 'skript'
+              FROM cases c
+             WHERE c.id = $1 AND c.user_id = $2
+            RETURNING *
+            """,
+            case_id, user_id, format_key, laenge, stimme, ansprache,
+            json.dumps(gewichte), crypto.encrypt(titel) if titel else None,
+        )
+        if zeile is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
+
+        for nr, k in enumerate(kapitel, start=1):
+            await conn.execute(
+                "INSERT INTO case_podcast_kapitel "
+                "  (podcast_id, nr, kapitel_key, titel, text) "
+                "VALUES ($1,$2,$3,$4,$5)",
+                zeile["id"], nr, k["key"], k["titel"], crypto.encrypt(k["text"]),
+            )
+
+    return await holen(conn, user_id=user_id, podcast_id=zeile["id"])
 
 
 def _folge(zeile: asyncpg.Record | None) -> dict[str, Any] | None:

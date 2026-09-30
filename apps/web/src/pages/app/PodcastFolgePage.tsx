@@ -145,6 +145,11 @@ export default function PodcastFolgePage() {
   const kapitel = f.kapitel ?? []
   const gesprochen = kapitel.filter(k => k.gesprochen).length
   const offen = kapitel.length - gesprochen
+  // **Folgen ohne einen einzigen Kapiteltext.** Die gibt es seit dem Umbau nicht mehr neu
+  // — aber wer welche hat, stand vorher auf einer Seite, auf der nichts zu tun war: kein
+  // Abspieler (nichts gesprochen), kein Sprechen-Knopf (nichts zu sprechen), ein leeres
+  // Skript. Genau die Sackgasse, wegen der gefragt wurde, wie man denn abspielt.
+  const leer = kapitel.length === 0
   const sicherheitshinweis =
     (profil.data?.safety_status ?? 'no_indication') !== 'no_indication'
 
@@ -197,6 +202,29 @@ export default function PodcastFolgePage() {
           className="mt-4" />
         {ladeFehler && <p role="alert" className="mt-4 text-sm text-red-600">{ladeFehler}</p>}
 
+        {leer && (
+          <section className="mt-6 rounded-brand-lg border border-amber-300/60 bg-amber-50 p-5">
+            <h2 className="text-[0.95rem] font-bold text-amber-900">
+              Zu dieser Folge ist kein Text entstanden
+            </h2>
+            <p className="mt-1.5 max-w-[62ch] text-[0.86rem] leading-relaxed text-amber-900">
+              Beim Erzeugen ist etwas abgebrochen, bevor das Skript geschrieben war. Daran
+              lässt sich nichts mehr retten — lösch die Folge und bestell eine neue. Deine
+              Einstellungen siehst du oben, du kannst sie genauso wieder wählen.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <button type="button" onClick={() => void loeschenFragen()}
+                className="btn-primary !py-2 !px-4 !text-xs">
+                Folge löschen
+              </button>
+              <Link to={`/app/cases/${caseId}/podcast`}
+                className="text-[0.8rem] text-amber-900 underline">
+                Zurück zu deinen Folgen
+              </Link>
+            </div>
+          </section>
+        )}
+
         {/* ── Der Abspieler ───────────────────────────────────────────────── */}
         {gesprochen > 0 && (
           <div className="mt-6">
@@ -215,7 +243,7 @@ export default function PodcastFolgePage() {
         )}
 
         {/* ── Der Knopf, der Kontingent kostet ────────────────────────────── */}
-        {offen > 0 && (
+        {offen > 0 && !leer && (
           <section className="mt-6 rounded-brand-lg border border-brand-border bg-white p-5">
             <h2 className="card-title-lg">
               {gesprochen === 0 ? 'Noch nicht gesprochen' : `Noch ${offen} Kapitel offen`}
@@ -238,23 +266,34 @@ export default function PodcastFolgePage() {
               </p>
             )}
 
-            <button
-              type="button"
-              onClick={() => sprechen.mutate()}
-              disabled={sprechen.isPending}
-              className="btn-primary !py-2.5 !px-5 !text-sm mt-4 disabled:opacity-50"
-            >
-              {sprechen.isPending
-                ? 'Wird gesprochen …'
-                : gesprochen === 0 ? 'Jetzt sprechen lassen' : 'Weitermachen'}
-            </button>
-
-            {sprechen.isPending && (
-              // Mehrere Minuten Stille an einem Knopf sieht aus wie ein Fehler.
-              <p className="mt-3 text-[0.82rem] leading-relaxed text-brand-muted">
-                Jedes Kapitel wird einzeln gesprochen und sofort gespeichert. Lass die Seite
-                offen — und falls doch etwas abbricht, bleibt alles Fertige erhalten.
-              </p>
+            {/* Mehrere Minuten Stille an einem Knopf sieht aus wie ein Fehler — und das
+                ist hier der laengste Vorgang im ganzen Programm. Also ein Rad, eine
+                ehrliche Zahl und der Satz, dass nichts verloren geht. */}
+            {sprechen.isPending ? (
+              <div
+                role="status"
+                aria-live="polite"
+                className="mt-4 flex items-start gap-3 rounded-brand border border-accent/40 bg-accent/[0.06] px-5 py-4"
+              >
+                <span
+                  aria-hidden="true"
+                  className="mt-0.5 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-accent/30 border-t-accent"
+                />
+                <span className="min-w-0 text-[0.86rem] leading-relaxed text-navy">
+                  <strong className="font-semibold">Wird gesprochen.</strong> {offen}{' '}
+                  Kapitel, eines nach dem anderen. Das braucht ein paar Minuten. Jedes wird
+                  gespeichert, sobald es fertig ist — lass die Seite offen. Bricht etwas ab,
+                  bleibt alles Fertige erhalten, und du zahlst nichts doppelt.
+                </span>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => sprechen.mutate()}
+                className="btn-primary !py-2.5 !px-5 !text-sm mt-4"
+              >
+                {gesprochen === 0 ? 'Jetzt sprechen lassen' : 'Weitermachen'}
+              </button>
             )}
 
             {f.status === 'fehler' && f.fehler && (
@@ -267,6 +306,7 @@ export default function PodcastFolgePage() {
         )}
 
         {/* ── Das Skript ──────────────────────────────────────────────────── */}
+        {!leer && (
         <section className="mt-8">
           <h2 className="card-title-lg">Das Skript</h2>
           <p className="mt-1 max-w-[62ch] text-[0.82rem] leading-relaxed text-brand-muted">
@@ -292,8 +332,9 @@ export default function PodcastFolgePage() {
             ))}
           </div>
         </section>
+        )}
 
-        {gesprochen === 0 && (
+        {gesprochen === 0 && !leer && (
           <button type="button" onClick={() => void loeschenFragen()}
             className="mt-8 text-[0.8rem] text-brand-muted hover:text-red-600">
             Folge löschen

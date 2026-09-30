@@ -89,18 +89,36 @@ async def anlegen(
     Das Kontingent wird hier NICHT geprüft und nicht verbucht: Ein Skript kostet einen
     Bruchteil, und es ist die Stufe, auf der jemand merkt, dass das Format nicht passt. Wer
     dafür Minuten zahlte, würde zweimal zahlen, um einmal zu bekommen, was er wollte.
+
+    **Die Folge entsteht ERST, wenn der Text da ist.** Die erste Fassung hat die Zeile vor
+    dem Modellaufruf angelegt; brach danach etwas ab, blieb eine Folge ohne Kapitel zurück —
+    eine Seite ohne Abspieler, ohne Knopf und mit leerem Skript, die zusätzlich einen der
+    zwölf Plätze je Fall verbrauchte. Wer mehrmals klickte, bekam mehrere davon.
     """
     user_id = current["user_id"]
     echo_svc = getattr(request.app.state, "echo_service", None)
     gewichte = dienst.gewichte_pruefen(body.format, body.gewichte)
 
+    f = katalog.format_(body.format)
+    if f is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
+    budget = katalog.kapitel_budget(body.format, body.laenge, set(body.ohne_kapitel or []))
+    if not budget:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Du hast alle Kapitel abgewählt — dann gibt es nichts zu erzählen.",
+        )
+    kapitel = [
+        {**k, "woerter": budget[k["key"]]} for k in f["kapitel"] if k["key"] in budget
+    ]
+
+    # ── Erstes Verbindungsfenster: prüfen und lesen, nichts schreiben ────────
     async with pool.acquire() as conn:
+        await dienst.pruefen_und_zaehlen(
+            conn, user_id=user_id, case_id=case_id, format_key=body.format,
+            laenge=body.laenge, stimme=body.stimme, ansprache=body.ansprache)
         material = await dienst.material_laden(
             conn, user_id=user_id, case_id=case_id, gewichte=gewichte)
-        zeile = await dienst.anlegen(
-            conn, user_id=user_id, case_id=case_id, format_key=body.format,
-            laenge=body.laenge, stimme=body.stimme, ansprache=body.ansprache,
-            gewichte=gewichte)
 
     if echo_svc is None:  # pragma: no cover — nur ohne konfigurierten Dienst
         raise HTTPException(
@@ -108,17 +126,7 @@ async def anlegen(
             detail="Echo ist gerade nicht erreichbar. Versuch es später noch einmal.",
         )
 
-    f = katalog.format_(body.format)
-    budget = katalog.kapitel_budget(body.format, body.laenge, set(body.ohne_kapitel or []))
-    kapitel = [
-        {**k, "woerter": budget[k["key"]]} for k in f["kapitel"] if k["key"] in budget
-    ]
-    if not kapitel:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Du hast alle Kapitel abgewählt — dann gibt es nichts zu erzählen.",
-        )
-
+    # ── Kein Verbindungsfenster über dem Modellaufruf ────────────────────────
     skript = await echo_svc.generate_podcast_skript(
         material_text=dienst.als_prompt_material(material, gewichte),
         format_haltung=f["haltung"],
@@ -126,10 +134,12 @@ async def anlegen(
         kapitel=kapitel,
     )
 
+    # ── Zweites Fenster: alles oder nichts ──────────────────────────────────
     async with pool.acquire() as conn:
-        return await dienst.skript_ablegen(
-            conn, user_id=user_id, podcast_id=zeile["id"],
-            titel=skript.get("titel"), kapitel=skript["kapitel"])
+        return await dienst.anlegen(
+            conn, user_id=user_id, case_id=case_id, format_key=body.format,
+            laenge=body.laenge, stimme=body.stimme, ansprache=body.ansprache,
+            gewichte=gewichte, titel=skript.get("titel"), kapitel=skript["kapitel"])
 
 
 @router.post("/{podcast_id}/sprechen", response_model=dict)

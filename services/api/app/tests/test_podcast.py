@@ -149,21 +149,32 @@ async def _fall(db, user_id, art: str = "partner"):
         "contact_frequency) VALUES ($1,$2,'together','daily') RETURNING id", user_id, art)
 
 
+_EIN_KAPITEL = [{"key": "anfang", "titel": "Wie es anfing", "text": "Ein Text."}]
+
+
 async def _folge(db, person, fall, **abweichend):
+    """Eine Folge anlegen — pruefen und schreiben, genau wie der Router es tut."""
     daten = dict(
         format_key="ganzer_fall", laenge="kurz", stimme="sage", ansprache="du",
         gewichte=dienst.gewichte_pruefen("ganzer_fall", {}),
+        titel=None, kapitel=list(_EIN_KAPITEL),
     )
     daten.update(abweichend)
+    await dienst.pruefen_und_zaehlen(
+        db, user_id=person, case_id=fall,
+        **{k: daten[k] for k in ("format_key", "laenge", "stimme", "ansprache")})
     return await dienst.anlegen(db, user_id=person, case_id=fall, **daten)
 
 
 @pytest.mark.asyncio
-async def test_eine_folge_entsteht_als_entwurf(person, db):
+async def test_eine_folge_entsteht_mit_ihrem_skript(person, db):
+    """Es gibt keinen Zwischenzustand mehr: Entweder die Folge hat einen Text, oder sie
+    existiert nicht."""
     fall = await _fall(db, person)
     zeile = await _folge(db, person, fall)
-    assert zeile["status"] == "entwurf"
+    assert zeile["status"] == "skript"
     assert zeile["sekunden"] is None
+    assert len(zeile["kapitel"]) == 1
 
 
 @pytest.mark.asyncio
@@ -206,11 +217,9 @@ async def test_bei_zwoelf_folgen_ist_schluss(person, db):
 @pytest.mark.asyncio
 async def test_das_skript_liegt_verschluesselt_und_kommt_im_klartext_zurueck(person, db):
     fall = await _fall(db, person)
-    folge = await _folge(db, person, fall)
     text = "Du bist an einem Abend nach Hause gekommen und hast erst die Stimmung geprüft."
-
-    await dienst.skript_ablegen(
-        db, user_id=person, podcast_id=folge["id"], titel="Der lange Abend",
+    folge = await _folge(
+        db, person, fall, titel="Der lange Abend",
         kapitel=[{"key": "anfang", "titel": "Wie es anfing", "text": text}])
 
     roh = await db.fetchval(
@@ -225,19 +234,40 @@ async def test_das_skript_liegt_verschluesselt_und_kommt_im_klartext_zurueck(per
 
 
 @pytest.mark.asyncio
-async def test_ein_zweiter_lauf_ersetzt_die_kapitel_statt_sie_zu_verdoppeln(person, db):
-    """Wäre das ein UPSERT je Nummer, bliebe bei einem kürzeren zweiten Skript das
-    überzählige Kapitel des ersten stehen — und niemand sähe der Folge an, woher es kommt."""
-    fall = await _fall(db, person)
-    folge = await _folge(db, person, fall)
-    drei = [{"key": f"k{i}", "titel": f"T{i}", "text": f"Text {i}"} for i in range(3)]
-    await dienst.skript_ablegen(db, user_id=person, podcast_id=folge["id"],
-                                titel=None, kapitel=drei)
-    await dienst.skript_ablegen(db, user_id=person, podcast_id=folge["id"],
-                                titel=None, kapitel=drei[:1])
+async def test_ohne_kapitel_entsteht_keine_folge(person, db):
+    """**Der Waechter gegen den Fehler, den ein Nutzer sofort gefunden hat.**
 
-    gelesen = await dienst.holen(db, user_id=person, podcast_id=folge["id"])
-    assert len(gelesen["kapitel"]) == 1
+    Die erste Fassung legte die Zeile VOR dem Modellaufruf an. Brach danach etwas ab, blieb
+    eine Folge ohne Kapitel zurueck: kein Abspieler, kein Knopf, leeres Skript — eine Seite,
+    auf der nichts zu tun ist. Und sie zaehlte auf die zwoelf Folgen je Fall, verbrauchte
+    also stillschweigend einen Platz. Wer mehrmals klickte, bekam mehrere davon.
+    """
+    fall = await _fall(db, person)
+    with pytest.raises(HTTPException) as fehler:
+        await _folge(db, person, fall, kapitel=[])
+    assert fehler.value.status_code == 502
+    assert await db.fetchval(
+        "SELECT COUNT(*) FROM case_podcasts WHERE case_id = $1", fall) == 0
+
+
+@pytest.mark.asyncio
+async def test_ein_fehlschlag_beim_schreiben_laesst_nichts_halbes_zurueck(person, db):
+    """Zeile und Kapitel entstehen in einer Transaktion — oder gar nicht.
+
+    Ohne sie blieben bei einem Fehler im dritten Kapitel die ersten zwei stehen, und die
+    Folge waere kuerzer als ihr Format, ohne dass es jemandem auffiele.
+    """
+    fall = await _fall(db, person)
+    kaputt = [
+        {"key": "a", "titel": "A", "text": "geht"},
+        {"key": "b", "titel": "B"},  # kein text -> Fehler mitten im Schreiben
+    ]
+    with pytest.raises(KeyError):
+        await _folge(db, person, fall, kapitel=kaputt)
+
+    assert await db.fetchval(
+        "SELECT COUNT(*) FROM case_podcasts WHERE case_id = $1", fall) == 0
+    assert await db.fetchval("SELECT COUNT(*) FROM case_podcast_kapitel") == 0
 
 
 @pytest.mark.asyncio
@@ -246,8 +276,6 @@ async def test_das_regal_bringt_keine_tonspuren_mit(person, db):
     niemand versteht."""
     fall = await _fall(db, person)
     folge = await _folge(db, person, fall)
-    await dienst.skript_ablegen(db, user_id=person, podcast_id=folge["id"], titel=None,
-                                kapitel=[{"key": "a", "titel": "A", "text": "x"}])
     await db.execute(
         "UPDATE case_podcast_kapitel SET audio = $2 WHERE podcast_id = $1",
         folge["id"], b"\x00" * 1000)
@@ -291,10 +319,8 @@ async def test_fremde_folgen_sind_unsichtbar_und_unloeschbar(person, db):
     assert await dienst.loeschen(db, user_id=person, podcast_id=fremde_folge["id"]) is False
     assert await dienst.umbenennen(
         db, user_id=person, podcast_id=fremde_folge["id"], titel="x") is None
-    with pytest.raises(HTTPException):
-        await dienst.skript_ablegen(
-            db, user_id=person, podcast_id=fremde_folge["id"], titel=None,
-            kapitel=[{"key": "a", "titel": "A", "text": "x"}])
+    assert await dienst.offene_kapitel(
+        db, user_id=person, podcast_id=fremde_folge["id"]) == []
 
 
 # ── Das Material ─────────────────────────────────────────────────────────────

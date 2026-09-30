@@ -65,14 +65,6 @@ export default function PodcastPage() {
 
         <Fehlermeldung error={regal.error ?? bestellen.error} className="mt-4" />
 
-        {bestellen.isPending && (
-          // Eine Minute Stille an einem Knopf sieht aus wie ein Fehler, und wer zweimal
-          // drueckt, bekommt zwei Folgen.
-          <p className="mt-6 rounded-brand border border-accent/30 bg-accent/[0.05] px-5 py-4 text-[0.9rem] leading-relaxed text-navy">
-            Das Skript entsteht. Das dauert bis zu einer Minute — lass die Seite offen.
-          </p>
-        )}
-
         {zeigeStudio ? (
           <div className="mt-6">
             <Studio
@@ -95,6 +87,10 @@ export default function PodcastPage() {
         {folgen.length > 0 && (
           <section className="mt-10">
             <h2 className="card-title-lg">Deine Folgen</h2>
+            <p className="mt-1 max-w-[62ch] text-[0.82rem] leading-relaxed text-brand-muted">
+              Es geht in zwei Schritten: Erst entsteht der Text, dann lässt du ihn in der
+              Folge sprechen. Zu hören ist erst danach etwas.
+            </p>
             <ul className="mt-3 space-y-2">
               {folgen.map(f => <Zeile key={f.id} folge={f} caseId={caseId!} />)}
             </ul>
@@ -105,14 +101,22 @@ export default function PodcastPage() {
   )
 }
 
-/** Eine Zeile im Regal. Der Stand steht dabei — eine Folge ohne Ton ist keine. */
+/**
+ * Eine Zeile im Regal.
+ *
+ * **Der Stand sagt, was zu TUN ist, nicht nur wie es steht.** „Skript steht — noch nicht
+ * gesprochen" ist eine Zustandsbeschreibung; wer sie liest, weiss noch nicht, dass er
+ * hineingehen und einen Knopf druecken muss. Ein Nutzer hat genau das gefragt: wie er den
+ * Podcast abspielen kann. Die Antwort gehoert in die Zeile, in der er sucht.
+ */
 function Zeile({ folge, caseId }: { folge: Podcast; caseId: string }) {
+  const zuTun = folge.status === 'skript' || folge.status === 'fehler'
   const stand =
     folge.status === 'fertig' ? zeit(folge.sekunden)
-    : folge.status === 'skript' ? 'Skript steht — noch nicht gesprochen'
+    : folge.status === 'skript' ? 'Text steht · noch sprechen lassen →'
     : folge.status === 'spricht' ? 'wird gerade gesprochen …'
-    : folge.status === 'fehler' ? 'abgebrochen'
-    : 'Entwurf'
+    : folge.status === 'fehler' ? 'abgebrochen · weitermachen →'
+    : 'ohne Text · öffnen →'
 
   return (
     <li>
@@ -130,7 +134,7 @@ function Zeile({ folge, caseId }: { folge: Podcast; caseId: string }) {
         </span>
         <span className={`shrink-0 text-[0.76rem] font-medium ${
           folge.status === 'fehler' ? 'text-red-500'
-          : folge.status === 'fertig' ? 'text-accent' : 'text-brand-muted'
+          : zuTun || folge.status === 'fertig' ? 'text-accent' : 'text-brand-muted'
         }`}>
           {stand}
         </span>

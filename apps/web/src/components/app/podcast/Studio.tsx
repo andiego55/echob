@@ -122,16 +122,20 @@ export default function Studio({ caseId, laeuft, onBestellen, onAbbruch }: {
 
   // ── Schritt 2: der Zuschnitt ───────────────────────────────────────────────
   return (
-    <section className="space-y-6">
+    <section className="space-y-6" aria-busy={laeuft}>
       <div className="flex items-baseline justify-between gap-3">
         <div className="min-w-0">
           <span className="label">Format</span>
           <h2 className="text-[1.2rem] font-bold leading-snug text-navy">{format.label}</h2>
         </div>
-        <button type="button" onClick={() => setFormatKey(null)}
-          className="shrink-0 text-xs text-brand-muted hover:text-navy">
-          Anderes Format
-        </button>
+        {/* Waehrend das Skript entsteht, keine Formatwahl: Wer jetzt umstellt, sieht
+            hinterher etwas anderes, als er bekommen hat. */}
+        {!laeuft && (
+          <button type="button" onClick={() => setFormatKey(null)}
+            className="shrink-0 text-xs text-brand-muted hover:text-navy">
+            Anderes Format
+          </button>
+        )}
       </div>
 
       {/* ── Die Kapitel ─────────────────────────────────────────────────── */}
@@ -228,19 +232,46 @@ export default function Studio({ caseId, laeuft, onBestellen, onAbbruch }: {
         )}
       </Block>
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-brand-border pt-5">
-        <button
-          type="button"
-          onClick={bestellen}
-          disabled={laeuft || alleAus}
-          className="btn-primary !py-2.5 !px-5 !text-sm disabled:opacity-40"
-        >
-          {laeuft ? 'Das Skript entsteht …' : 'Skript schreiben'}
-        </button>
-        <span className="text-[0.78rem] leading-snug text-brand-muted">
-          Erst der Text, dann die Stimme. Das Skript kostet nichts von deinem Kontingent —
-          du kannst es lesen und verwerfen.
-        </span>
+      {/* **Die Rueckmeldung steht hier, nicht am Seitenkopf.**
+          Ein Nutzer hat mehrmals geklickt, weil er nicht sah, ob etwas passiert - und
+          jeder Klick legte eine Folge an. Ein Hinweis oben am Rand ist bei einem langen
+          Formular ausserhalb des Bildes: Man klickt unten und sieht nichts. Also steht er
+          an derselben Stelle wie der Knopf, mit einem Rad, das sich dreht - ein
+          ausgegrauter Knopf mit anderer Beschriftung ist zu still fuer eine Minute
+          Wartezeit. */}
+      <div className="border-t border-brand-border pt-5">
+        {laeuft ? (
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex items-start gap-3 rounded-brand border border-accent/40 bg-accent/[0.06] px-5 py-4"
+          >
+            <span
+              aria-hidden="true"
+              className="mt-0.5 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-accent/30 border-t-accent"
+            />
+            <span className="min-w-0 text-[0.86rem] leading-relaxed text-navy">
+              <strong className="font-semibold">Das Skript entsteht.</strong> Das dauert
+              meistens zwanzig bis sechzig Sekunden — bei einer langen Folge etwas mehr.
+              Lass die Seite offen; du musst nicht noch einmal klicken.
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={bestellen}
+              disabled={alleAus}
+              className="btn-primary !py-2.5 !px-5 !text-sm disabled:opacity-40"
+            >
+              Skript schreiben
+            </button>
+            <span className="text-[0.78rem] leading-snug text-brand-muted">
+              Erst der Text, dann die Stimme. Das Skript kostet nichts von deinem
+              Kontingent — du kannst es lesen und verwerfen.
+            </span>
+          </div>
+        )}
       </div>
     </section>
   )
