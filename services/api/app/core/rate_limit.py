@@ -66,6 +66,12 @@ REGELN: tuple[Regel, ...] = (
           "Oeffentlicher Modellaufruf ohne Anmeldung. Fuenf in fuenf Minuten reichen "
           "einem Menschen, der eine Beschreibung tippt und das Ergebnis liest - und sie "
           "sind wenig genug, dass ein Skript daran nichts verdient."),
+    # Hoerproben sind Sprachaufrufe, auch wenn sie nur zwei Saetze lang sind. Zwanzig in
+    # fuenf Minuten: Wer vier Stimmen vergleicht, hoert jede zwei- oder dreimal an - mehr
+    # braucht niemand, der sich entscheidet. Nach dem ersten Abruf je Stimme kostet es
+    # nichts mehr, aber die Grenze steht vor dem ERSTEN.
+    Regel("/api/v1/podcast/stimmprobe", 20, 300,
+          "Hoerprobe: ein Sprachaufruf auf unsere Rechnung."),
     Regel("", 300, 60,
           "Auffangnetz gegen Schleifen im Frontend. Von Hand nicht erreichbar."),
 )

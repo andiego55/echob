@@ -118,6 +118,18 @@ def sekunden_schaetzen(text: str) -> int:
     return max(1, round(woerter / WOERTER_JE_MINUTE * 60))
 
 
+#: Fertige Hörproben, je Stimme eine. Gefüllt beim ersten Abruf.
+#:
+#: **Ein Zwischenspeicher im Arbeitsspeicher, keine Tabelle.** Der Text ist fest und es gibt
+#: vier Stimmen — es kann also nie mehr als vier Einträge geben, jeder etwa dreißig Kilobyte.
+#: Eine Tabelle dafür wäre eine Migration, eine Löschregel und ein Eintrag in der Auskunft
+#: für Daten, die keiner Person gehören.
+#:
+#: Nach einem Neustart sind sie weg und werden neu erzeugt: vier Aufrufe über zwei Sekunden
+#: Audio. Das ist billiger als der Apparat, der das verhindern würde.
+_PROBEN: dict[str, bytes] = {}
+
+
 class PodcastStimme:
     """Der Zugang zur Sprachausgabe. Ohne Schlüssel liefert sie nichts und sagt das auch."""
 
@@ -159,3 +171,36 @@ class PodcastStimme:
             teile.append(antwort.read() if hasattr(antwort, "read") else antwort.content)
 
         return b"".join(teile), sekunden_schaetzen(text)
+
+    async def probe(self, stimme: str) -> bytes:
+        """Eine Hörprobe — zwei Sätze, damit niemand eine Stimme blind wählen muss.
+
+        **Warum das den Aufwand wert ist.** Wer die Stimme erst hört, nachdem zwanzig Minuten
+        gesprochen und abgerechnet sind, hat für die falsche bezahlt. Genau diese
+        Verschwendung sollte der Zweischritt aus Skript und Stimme vermeiden — sie blieb aber
+        an der Stimme selbst bestehen.
+
+        **Warum das keine allgemeine Sprachausgabe ist.** Der Text kommt aus dem Katalog, nie
+        vom Aufrufer. Es gibt genau vier mögliche Antworten, und die liegen nach dem ersten
+        Abruf im Speicher. Ein Endpunkt, der beliebigen Text spricht, wäre etwas anderes: ein
+        Dienst, den man anderswo verkaufen kann, auf unsere Rechnung.
+        """
+        if self._client is None:
+            raise RuntimeError("Sprachausgabe ist nicht konfiguriert.")
+        if stimme not in katalog.STIMM_SCHLUESSEL:
+            raise KeyError(stimme)
+
+        fertig = _PROBEN.get(stimme)
+        if fertig is not None:
+            return fertig
+
+        antwort = await self._client.audio.speech.create(
+            model=self._model,
+            voice=stimme,
+            input=katalog.STIMMPROBE_TEXT,
+            instructions=katalog.STIMMPROBE_ANWEISUNG,
+            response_format=FORMAT,
+        )
+        audio = antwort.read() if hasattr(antwort, "read") else antwort.content
+        _PROBEN[stimme] = audio
+        return audio

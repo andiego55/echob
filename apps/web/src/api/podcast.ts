@@ -160,6 +160,19 @@ export const podcastApi = {
         { responseType: 'blob', timeout: 120_000 })
       .then(r => r.data),
 
+  /**
+   * Zwei gesprochene Sätze — ohne Fall, ohne Kontingent.
+   *
+   * Eigener Pfad ohne `case_id`: Die Probe hat mit einem Fall nichts zu tun, und nur so
+   * lässt sich dieser eine Endpunkt eigens begrenzen (die Anfragebegrenzung arbeitet über
+   * Pfad-Präfixe).
+   */
+  stimmprobe: (stimme: string) =>
+    apiClient
+      .get<Blob>(`/podcast/stimmprobe/${stimme}`,
+        { responseType: 'blob', timeout: 60_000 })
+      .then(r => r.data),
+
   ganzeFolgeHolen: (caseId: string, podcastId: string) =>
     apiClient
       .get<Blob>(`${basis(caseId)}/${podcastId}/ton`,

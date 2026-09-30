@@ -874,3 +874,87 @@ def test_json_felder_werden_zu_dicts():
     assert dienst._mit_json({"a": chr(34) + "text" + chr(34)}, "a")["a"] == {}
     assert dienst._mit_json({"a": "[1,2]"}, "a")["a"] == {}
     assert dienst._mit_json({"a": {"schon": "dict"}}, "a")["a"] == {"schon": "dict"}
+
+
+# ── Die Hoerprobe ─────────────────────────────────────────────────────────────
+
+def test_die_hoerprobe_spricht_ueber_sich_selbst_und_nicht_ueber_eine_beziehung():
+    """**Eine Probe mit einem Beispielsatz waere eine erfundene Aussage ueber ein Leben.**
+
+    „Er hat wieder abgesagt" als Hoerprobe, gesprochen in genau dem Ton, in dem spaeter das
+    Echte kommt - das bleibt im Ohr, und es ist nicht wahr. Der Text handelt deshalb von
+    sich selbst.
+    """
+    t = katalog.STIMMPROBE_TEXT.lower()
+    assert "stimme" in t
+    # Zwei Saetze: Wie eine Stimme klingt, hoert man an der Pause dazwischen.
+    assert katalog.STIMMPROBE_TEXT.count(".") >= 2
+    # Kurz genug, dass niemand abwarten muss.
+    assert len(katalog.STIMMPROBE_TEXT) < 200
+    # Und nichts, was nach einem Fall klingt.
+    #
+    # **Keine Pronomen in dieser Liste.** Die erste Fassung pruefte auf „sie " und wurde
+    # sofort rot: „So klingt diese Stimme. SIE liest dir gleich deinen Text vor." Das
+    # Pronomen meint die Stimme. Ein gewoehnliches Wort taugt nicht als Merkmal - es macht
+    # den Waechter laut, wo nichts ist, und einen lauten Waechter klickt man weg.
+    for wort in ("partner", "beziehung", "streit", "abgesagt", "gesagt hat", "vorwurf"):
+        assert wort not in t, f"die Hoerprobe klingt nach einem Fall: {wort!r}"
+
+
+def test_die_sprechanweisung_der_probe_traegt_keine_format_haltung():
+    """Die Probe soll die STIMME zeigen. Wer sie mit der Haltung einer „Nachricht an mich
+    selbst" spricht, vergleicht nicht vier Stimmen, sondern vier Lesungen."""
+    for f in katalog.FORMATE:
+        assert f["haltung"] not in katalog.STIMMPROBE_ANWEISUNG, f["key"]
+
+
+@pytest.mark.asyncio
+async def test_die_probe_nimmt_keinen_fremden_text_an():
+    """**Das Entscheidende an diesem Endpunkt.** Er spricht ausschliesslich den Text aus dem
+    Katalog. Nimmt er irgendwann einen mit, ist es kein Werkzeug mehr, sondern eine
+    Sprachausgabe, die jemand anderswo verkaufen kann - auf unsere Rechnung.
+    """
+    import inspect
+
+    from app.services.podcast_stimme import PodcastStimme
+
+    unterschrift = inspect.signature(PodcastStimme.probe)
+    assert list(unterschrift.parameters) == ["self", "stimme"], (
+        "probe() hat einen weiteren Parameter bekommen - wenn das ein Text ist, ist der "
+        "Endpunkt eine offene Sprachausgabe"
+    )
+    quelle = inspect.getsource(PodcastStimme.probe)
+    assert "katalog.STIMMPROBE_TEXT" in quelle
+    assert "input=katalog.STIMMPROBE_TEXT" in quelle
+
+
+@pytest.mark.asyncio
+async def test_eine_unbekannte_stimme_wird_abgewiesen():
+    from app.services.podcast_stimme import PodcastStimme
+
+    # Ohne Schluessel: der RuntimeError kommt VOR der Stimmpruefung, also mit Schluessel
+    # pruefen - aber ohne echten Aufruf. Ein Platzhalter-Client genuegt.
+    dienst_stimme = PodcastStimme.__new__(PodcastStimme)
+    dienst_stimme._client = object()
+    dienst_stimme._model = "egal"
+    with pytest.raises(KeyError):
+        await dienst_stimme.probe("gibtesnicht")
+
+
+def test_die_hoerprobe_hat_eine_eigene_anfragebegrenzung():
+    """**Ein Sprachaufruf braucht eine engere Grenze als eine gewoehnliche Anfrage** — und
+    er bekommt sie nur, wenn seine Regel VOR dem Auffangnetz steht: Die erste passende
+    gewinnt.
+
+    Sie stand zuerst unter /cases/{case_id}/podcasts/, mit einem case_id, das die Funktion
+    gar nicht benutzte. Unter einem Pfad mit Platzhalter davor laesst sich ein einzelner
+    Endpunkt nicht begrenzen - die Begrenzung arbeitet ueber Praefixe.
+    """
+    from app.core.rate_limit import REGELN
+
+    treffer = [i for i, r in enumerate(REGELN) if "stimmprobe" in r.praefix]
+    assert treffer, "keine eigene Regel fuer die Hoerprobe"
+    i = treffer[0]
+    auffang = [j for j, r in enumerate(REGELN) if r.praefix == ""]
+    assert i < auffang[0], "die Regel steht hinter dem Auffangnetz und greift nie"
+    assert REGELN[i].anfragen <= 30, "so viele Sprachaufrufe braucht niemand zum Vergleichen"

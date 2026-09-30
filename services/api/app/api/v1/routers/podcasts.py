@@ -33,6 +33,61 @@ from app.services.subscription_service import enforce_ai_usage_menge, log_ai_usa
 
 router = APIRouter(prefix="/cases/{case_id}/podcasts", tags=["podcasts"])
 
+#: Ein zweiter Router ohne Fall-Bezug.
+#:
+#: **Die Hörprobe hat mit einem Fall nichts zu tun** — sie spricht zwei feste Sätze aus dem
+#: Katalog. Sie stand zuerst unter ``/cases/{case_id}/podcasts/``, mit einem ``case_id``, das
+#: die Funktion gar nicht benutzte. Das war nicht nur überflüssig: Die Anfragebegrenzung
+#: arbeitet über Pfad-Präfixe, und unter einem Pfad mit Platzhalter davor lässt sich ein
+#: einzelner Endpunkt nicht eigens begrenzen. Ein Sprachaufruf, der auf unsere Rechnung
+#: läuft, braucht aber genau das.
+probe_router = APIRouter(prefix="/podcast", tags=["podcasts"])
+
+
+@probe_router.get("/stimmprobe/{stimme}")
+async def stimmprobe(
+    stimme: str, request: Request,
+    _current: dict = Depends(get_current_user),
+) -> Response:
+    """Zwei gesprochene Sätze — damit niemand eine Stimme blind wählen muss.
+
+    **Warum das den Aufwand wert ist.** Wer die Stimme erst hört, nachdem zwanzig Minuten
+    gesprochen und abgerechnet sind, hat für die falsche bezahlt. Genau diese Verschwendung
+    sollte der Zweischritt aus Skript und Stimme vermeiden — an der Stimme selbst blieb sie
+    bestehen.
+
+    **Ohne Datenbankverbindung und ohne Kontingent.** Es gehen keine Falldaten hinein, und es
+    gibt genau vier mögliche Antworten, die nach dem ersten Abruf im Speicher liegen. Dafür
+    eine Verbindung aus dem Pool zu holen oder Minuten abzurechnen wäre Buchhaltung über zwei
+    Sekunden Audio.
+
+    Angemeldet sein muss man trotzdem — nicht wegen der Daten, sondern weil ein offener
+    Sprach-Endpunkt auf unsere Rechnung läuft. Dazu eine eigene Anfragebegrenzung.
+    """
+    dienst_stimme = getattr(request.app.state, "podcast_stimme", None)
+    if dienst_stimme is None or not dienst_stimme.verfuegbar:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Die Sprachausgabe ist gerade nicht erreichbar.",
+        )
+    try:
+        audio = await dienst_stimme.probe(stimme)
+    except KeyError:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail="Unbekannte Stimme.") from None
+    except Exception as fehler:  # noqa: BLE001 — eine Probe darf nichts anhalten
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            detail="Die Hörprobe lässt sich gerade nicht erzeugen.",
+        ) from fehler
+
+    return Response(
+        content=audio, media_type=stimm_modul.INHALTSTYP,
+        # Lange haltbar: Der Text ist fest, die Stimme auch. Privat trotzdem — es gibt keinen
+        # Grund, warum ein Zwischenspeicher unterwegs sie halten sollte.
+        headers={"Cache-Control": "private, max-age=86400"},
+    )
+
 
 @router.get("/katalog", response_model=dict)
 async def katalog_lesen(

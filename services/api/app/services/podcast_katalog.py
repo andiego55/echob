@@ -327,6 +327,30 @@ VORBEHALT = (
     "mit einem Menschen."
 )
 
+#: Der Text der Hörprobe.
+#:
+#: **Er handelt von sich selbst und von nichts anderem.** Eine Probe mit einem Beispielsatz
+#: über eine Beziehung („Er hat wieder abgesagt …") wäre eine erfundene Aussage über ein
+#: Leben, gesprochen in dem Ton, in dem später das echte kommt — und sie bliebe im Ohr.
+#:
+#: Zwei Sätze, weil einer den Rhythmus nicht zeigt: Wie eine Stimme klingt, hört man an der
+#: Pause dazwischen. Und beide kurz, weil eine lange Probe zum Abwarten zwingt.
+STIMMPROBE_TEXT = (
+    "So klingt diese Stimme. "
+    "Sie liest dir gleich deinen eigenen Text vor — ruhig, und ohne Eile."
+)
+
+#: Wie die Probe gesprochen wird.
+#:
+#: Neutral und ohne Format-Anteil: Die Probe soll die STIMME zeigen, nicht die Haltung einer
+#: bestimmten Folge. Wer „Eine Nachricht an mich selbst" wählt, bekommt später eine
+#: langsamere Lesung derselben Stimme — das ist gewollt, aber es gehört nicht in den
+#: Vergleich zwischen vier Stimmen.
+STIMMPROBE_ANWEISUNG = (
+    "Sprich ruhig und deutlich, in mäßigem Tempo. Mach an Satzenden eine echte Pause. "
+    "Kein Nachrichtenton, keine Werbestimme."
+)
+
 #: Höchstens so viele Zeichen je Sprachaufruf. Die Schnittstelle nimmt rund 4.000; wir
 #: bleiben darunter, weil ein abgeschnittenes Kapitel mitten im Satz endet.
 MAX_ZEICHEN_JE_ABSCHNITT = 3600

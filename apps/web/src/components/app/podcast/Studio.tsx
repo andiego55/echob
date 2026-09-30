@@ -16,7 +16,7 @@
  * erklären will" fehlen Muster, Hypothesen und Personenprofil — nicht ausgegraut, sondern
  * abwesend. Ein Regler, den man nicht bewegen darf, ist eine Aufforderung, es zu versuchen.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { podcastApi, type PodcastBestellung } from '@/api/podcast'
@@ -42,6 +42,10 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
   const [ansprache, setAnsprache] = useState<string | null>(null)
   const [gewichte, setGewichte] = useState<Record<string, string>>({})
   const [ohneKapitel, setOhneKapitel] = useState<string[]>([])
+  // Welche Hoerprobe gerade spielt. Im Elternteil, damit eine neue die vorige anhaelt:
+  // Wer zwei Stimmen vergleicht, tippt schnell hin und her, und dann sollen nicht zwei
+  // gleichzeitig reden.
+  const [probeLaeuft, setProbeLaeuft] = useState<string | null>(null)
 
   const formate = useQuery({
     queryKey: ['podcast-katalog', caseId],
@@ -232,7 +236,15 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
 
         <Wahl titel="Stimme" wert={stimme} setzen={setStimme}
           optionen={(k.stimmen ?? []).map(s => ({
-            key: s.key, label: s.label, hinweis: s.hinweis }))} />
+            key: s.key, label: s.label, hinweis: s.hinweis }))}
+          zusatz={key => (
+            <Hoerprobe
+              stimme={key}
+              laeuftHier={probeLaeuft === key}
+              onStart={() => setProbeLaeuft(key)}
+              onEnde={() => setProbeLaeuft(p => (p === key ? null : p))}
+            />
+          )} />
 
         {(k.ansprachen ?? []).length > 1 && (
           <Wahl titel="Ansprache" wert={ansprache ?? ''} setzen={setAnsprache}
@@ -287,6 +299,91 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
   )
 }
 
+/**
+ * Der Abspielknopf an einer Stimme.
+ *
+ * **Warum die Bytes durch den API-Client gehen und nicht in ein `<audio src>`.** Der Endpunkt
+ * verlangt eine Anmeldung; ein `src`-Attribut kann sich nicht anmelden. Also holen, eine
+ * Objekt-URL machen, abspielen — und die URL behalten, damit ein zweites Anhoeren nichts
+ * mehr kostet.
+ *
+ * Der Knopf ist ein GESCHWISTER der Stimmkarte, nicht ihr Kind: Ein Knopf in einem Knopf ist
+ * ungueltiges HTML, und der Klick kaeme womoeglich nie an.
+ *
+ * Jede Probe hat ihr EIGENES Audio-Element. Ein gemeinsames waere weniger Code und schlechter:
+ * Wer zwei Stimmen vergleicht, tippt schnell hin und her, und dann soll die eine aufhoeren,
+ * wenn die andere anfaengt — aber der Fortschritt der einen soll nicht am Knopf der anderen
+ * erscheinen. Das Umschalten uebernimmt daher der Elternteil ueber `laeuftHier`.
+ */
+function Hoerprobe({ stimme, laeuftHier, onStart, onEnde }: {
+  stimme: string
+  laeuftHier: boolean
+  onStart: () => void
+  onEnde: () => void
+}) {
+  const audio = useRef<HTMLAudioElement | null>(null)
+  const url = useRef<string | null>(null)
+  const [holt, setHolt] = useState(false)
+  const [fehler, setFehler] = useState(false)
+
+  useEffect(() => () => { if (url.current) URL.revokeObjectURL(url.current) }, [])
+
+  // Spielt eine andere Probe, haelt diese an. Ohne das reden zwei Stimmen gleichzeitig.
+  useEffect(() => {
+    if (!laeuftHier && audio.current) {
+      audio.current.pause()
+      audio.current.currentTime = 0
+    }
+  }, [laeuftHier])
+
+  const spielen = async () => {
+    if (laeuftHier) { audio.current?.pause(); onEnde(); return }
+
+    setFehler(false)
+    onStart()
+    try {
+      if (!url.current) {
+        setHolt(true)
+        const blob = await podcastApi.stimmprobe(stimme)
+        url.current = URL.createObjectURL(blob)
+      }
+      if (!audio.current) audio.current = new Audio()
+      audio.current.src = url.current
+      audio.current.onended = onEnde
+      await audio.current.play()
+    } catch {
+      setFehler(true)
+      onEnde()
+    } finally {
+      setHolt(false)
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => void spielen()}
+      aria-label={laeuftHier ? 'Hoerprobe anhalten' : 'Hoerprobe abspielen'}
+      className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-current px-2.5 py-1 text-[0.7rem] font-medium text-brand-muted transition-colors hover:text-accent"
+    >
+      {holt ? (
+        <span aria-hidden="true"
+          className="h-2.5 w-2.5 animate-spin rounded-full border border-current border-t-transparent" />
+      ) : laeuftHier ? (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="h-2.5 w-2.5" aria-hidden="true">
+          <rect x="6" y="5" width="4" height="14" rx="1" />
+          <rect x="14" y="5" width="4" height="14" rx="1" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="h-2.5 w-2.5" aria-hidden="true">
+          <path d="M8 5.5v13l11-6.5z" />
+        </svg>
+      )}
+      {fehler ? 'geht gerade nicht' : laeuftHier ? 'laeuft' : 'anhoeren'}
+    </button>
+  )
+}
+
 function Block({ titel, hinweis, children }: {
   titel: string
   hinweis?: string
@@ -305,40 +402,57 @@ function Block({ titel, hinweis, children }: {
   )
 }
 
-/** Eine Reihe gleichrangiger Karten. Keine sieht wie die empfohlene aus. */
-function Wahl({ titel, wert, setzen, optionen }: {
+/**
+ * Eine Reihe gleichrangiger Karten. Keine sieht wie die empfohlene aus.
+ *
+ * `zusatz` haengt etwas unter eine Karte — bei den Stimmen die Hoerprobe. Als eigener
+ * Parameter und nicht fest eingebaut, weil Laenge und Ansprache keinen brauchen und eine
+ * Karte mit leerem Fuss darunter schief aussieht.
+ */
+function Wahl({ titel, wert, setzen, optionen, zusatz }: {
   titel: string
   wert: string
   setzen: (k: string) => void
   optionen: { key: string; label: string; hinweis: string }[]
+  zusatz?: (key: string) => React.ReactNode
 }) {
   return (
     <div className="mb-5 last:mb-0">
       <span className="label">{titel}</span>
+      {/* **Der Rahmen sitzt am umgebenden div, nicht am Knopf.**
+          Die Hoerprobe ist selbst ein Knopf, und ein Knopf in einem Knopf ist ungueltiges
+          HTML: Browser behandeln das unterschiedlich, und im schlechtesten Fall kommt der
+          Klick auf die Probe nie an. Also zwei Geschwister in einem Rahmen - der obere
+          waehlt, der untere spielt. */}
       <div className="mt-2 grid gap-2 sm:grid-cols-3">
         {optionen.map(o => {
           const an = wert === o.key
           return (
-            <button
+            <div
               key={o.key}
-              type="button"
-              onClick={() => setzen(o.key)}
-              aria-pressed={an}
-              className={`rounded-brand border px-3.5 py-3 text-left transition-all ${
+              className={`rounded-brand border px-3.5 py-3 transition-all ${
                 an
                   ? 'border-accent bg-accent/[0.06] shadow-brand-sm'
                   : 'border-brand-border bg-white hover:border-accent/50'
               }`}
             >
-              <span className={`block text-[0.86rem] font-semibold leading-snug ${
-                an ? 'text-accent' : 'text-navy'
-              }`}>
-                {o.label}
-              </span>
-              <span className="mt-0.5 block text-[0.74rem] leading-snug text-brand-muted">
-                {o.hinweis}
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setzen(o.key)}
+                aria-pressed={an}
+                className="block w-full text-left"
+              >
+                <span className={`block text-[0.86rem] font-semibold leading-snug ${
+                  an ? 'text-accent' : 'text-navy'
+                }`}>
+                  {o.label}
+                </span>
+                <span className="mt-0.5 block text-[0.74rem] leading-snug text-brand-muted">
+                  {o.hinweis}
+                </span>
+              </button>
+              {zusatz?.(o.key)}
+            </div>
           )
         })}
       </div>
