@@ -27,6 +27,9 @@ class BildMalen(BaseModel):
     weggeht" ist genau die Abbildung eines echten Menschen, die es nicht geben soll. Gesteuert
     werden Handschrift, Farbe und welche Schichten mitgehen.
     """
+    #: Die Metapher — was das Bild ZEIGT. Von der Person gewählt, nie vom Modell.
+    bildwelt: str
+    #: Die Handschrift — WIE gemalt wird.
     handschrift: str
     palette: str = "kuehl"
     schichten: list[str] = Field(default_factory=list)

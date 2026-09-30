@@ -60,15 +60,19 @@ export default function BildwerkstattPage() {
   const [schichten, setSchichten] = useState<Schicht[]>(STANDARD_EINSTELLUNGEN.schichten)
   const [satz, setSatz] = useState('')
   /**
-   * Gerechnet oder gemalt.
+   * Gemalt oder gerechnet.
    *
-   * **Gerechnet ist die Vorauswahl, und das ist eine Entscheidung.** Es kostet nichts,
-   * reagiert sofort und jede Stelle im Bild hat eine Antwort auf „warum sieht das so aus?".
-   * Der gemalte Weg ist das Angebot daneben, nicht der Hauptweg — wer ihn wählt, soll es
-   * gewollt haben.
+   * **Gemalt ist die Vorauswahl — nach dem ersten Blick auf die gerechneten Bilder.**
+   * Sie waren korrekt und unlesbar: eine Wolke aus Formen, aus der niemand etwas ablesen
+   * konnte. Ein Gleichnis, das man deuten kann, hilft mehr als eine Struktur, die stimmt.
+   *
+   * Das gerechnete Bild bleibt daneben stehen, weil es etwas kann, was das gemalte nie
+   * kann: Es ist exakt, sofort da, kostet nichts, und jede Stelle darin hat eine Antwort
+   * auf „warum sieht das so aus?".
    */
-  const [weg, setWeg] = useState<'gerechnet' | 'gemalt'>('gerechnet')
-  const [handschrift, setHandschrift] = useState('tusche')
+  const [weg, setWeg] = useState<'gerechnet' | 'gemalt'>('gemalt')
+  const [bildwelt, setBildwelt] = useState('landschaft')
+  const [handschrift, setHandschrift] = useState('aquarell')
 
   /**
    * Alle Schichten, die diese Sitzung schon einmal gesehen hat.
@@ -87,9 +91,9 @@ export default function BildwerkstattPage() {
 
   // Nur wenn der gemalte Weg gewaehlt ist: Ein Abruf auf Vorrat fuer eine Liste, die die
   // meisten nie sehen, ist Arbeit fuer nichts.
-  const handschriften = useQuery({
-    queryKey: ['bild-handschriften', caseId],
-    queryFn: () => bilderApi.handschriften(caseId!),
+  const bildwelten = useQuery({
+    queryKey: ['bild-welten', caseId],
+    queryFn: () => bilderApi.bildwelten(caseId!),
     enabled: !!caseId && weg === 'gemalt',
     staleTime: Infinity,
   })
@@ -120,7 +124,7 @@ export default function BildwerkstattPage() {
 
   const malen = useMutation({
     mutationFn: () => bilderApi.malen(caseId!, {
-      handschrift, palette, schichten,
+      bildwelt, handschrift, palette, schichten,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bilder', caseId] })
@@ -191,8 +195,8 @@ export default function BildwerkstattPage() {
                   daneben — wer ihn waehlt, soll es gewollt haben. */}
               <div className="mb-3 flex flex-wrap gap-2" role="tablist">
                 {([
-                  ['gerechnet', 'Gerechnet', 'Aus deinen Zahlen. Kostet nichts.'],
-                  ['gemalt', 'Gemalt', 'Ein Bildmodell malt dieselbe Struktur.'],
+                  ['gemalt', 'Gemalt', 'Ein Gleichnis, das du lesen kannst.'],
+                  ['gerechnet', 'Datenbild', 'Exakt und abstrakt. Kostet nichts.'],
                 ] as const).map(([k, label, hinweis]) => (
                   <button
                     key={k}
@@ -225,42 +229,70 @@ export default function BildwerkstattPage() {
                 <div className="rounded-brand-lg border border-brand-border bg-white p-5">
                   <h2 className="card-title-lg">Ein Bildmodell malen lassen</h2>
                   <p className="mt-1.5 max-w-[62ch] text-[0.86rem] leading-relaxed text-brand-muted">
-                    Es bekommt <strong className="font-semibold">dieselbe Struktur</strong> wie
-                    das gerechnete Bild — wie viele Momente, wie dicht, welcher Rhythmus, was
-                    fehlt. Kein Satz aus deinen Szenen geht hinaus, und nichts darin wird
-                    erkennbar: keine Menschen, keine Räume, keine Gegenstände.
+                    Du wählst ein Gleichnis — eine Landschaft, ein Haus, Wasser —, und deine
+                    Zahlen werden hineingesetzt: wie viele Momente, wie dicht, wo Pausen
+                    waren, was fehlt. <strong className="font-semibold">Kein Satz aus deinen
+                    Szenen geht hinaus</strong>, und es kommt kein Mensch darin vor.
                   </p>
                   <p className="mt-2 max-w-[62ch] text-[0.8rem] leading-relaxed text-brand-muted">
-                    Das kostet — anders als der gerechnete Weg — von deinem Monatskontingent,
-                    und dasselbe Bild kommt nie zweimal heraus.
+                    Das kostet — anders als das Datenbild — von deinem Monatskontingent, und
+                    dasselbe Bild kommt nie zweimal heraus.
                   </p>
 
-                  <div className="mt-4">
-                    <span className="label">Handschrift</span>
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                      {(handschriften.data ?? []).map(h => (
+                  {/* **Die Bildwelt zuerst: Sie ist die Entscheidung, das Übrige ist
+                      Ausführung.** Und sie gehört der Person — ein Modell, das sich das
+                      Gleichnis selbst aussucht, würde deuten. */}
+                  <div className="mt-5">
+                    <span className="label">Worin?</span>
+                    <p className="mb-2 mt-0.5 text-[0.74rem] leading-snug text-brand-muted">
+                      Dieselben Zahlen, ein anderes Gleichnis — und du siehst etwas anderes.
+                    </p>
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      {(bildwelten.data?.bildwelten ?? []).map(b => (
                         <button
-                          key={h.key}
+                          key={b.key}
                           type="button"
-                          onClick={() => setHandschrift(h.key)}
-                          aria-pressed={handschrift === h.key}
+                          onClick={() => setBildwelt(b.key)}
+                          aria-pressed={bildwelt === b.key}
                           className={`rounded-brand border px-3.5 py-2.5 text-left transition-colors ${
-                            handschrift === h.key
+                            bildwelt === b.key
                               ? 'border-accent bg-accent/[0.06]'
                               : 'border-brand-border bg-white hover:border-accent/50'
                           }`}
                         >
                           <span className={`block text-[0.84rem] font-semibold ${
-                            handschrift === h.key ? 'text-accent' : 'text-navy'
-                          }`}>{h.label}</span>
+                            bildwelt === b.key ? 'text-accent' : 'text-navy'
+                          }`}>{b.label}</span>
                           <span className="block text-[0.72rem] leading-snug text-brand-muted">
-                            {h.hinweis}
+                            {b.hinweis}
                           </span>
                         </button>
                       ))}
-                      {handschriften.isLoading && (
+                      {bildwelten.isLoading && (
                         <p className="text-sm text-brand-muted">Einen Moment …</p>
                       )}
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <span className="label">Wie gemalt?</span>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {(bildwelten.data?.handschriften ?? []).map(h => (
+                        <button
+                          key={h.key}
+                          type="button"
+                          onClick={() => setHandschrift(h.key)}
+                          aria-pressed={handschrift === h.key}
+                          title={h.hinweis}
+                          className={`rounded-full border px-3.5 py-1.5 text-[0.78rem] transition-colors ${
+                            handschrift === h.key
+                              ? 'border-accent bg-accent/[0.06] font-semibold text-accent'
+                              : 'border-brand-border bg-white text-brand-muted hover:border-accent/50'
+                          }`}
+                        >
+                          {h.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
@@ -284,7 +316,7 @@ export default function BildwerkstattPage() {
                     <button
                       type="button"
                       onClick={() => malen.mutate()}
-                      disabled={!handschriften.data?.length}
+                      disabled={!bildwelten.data?.bildwelten?.length}
                       className="btn-primary !py-2.5 !px-5 !text-sm mt-4 disabled:opacity-40"
                     >
                       {malen.error ? 'Noch einmal versuchen' : 'Malen lassen'}
@@ -294,6 +326,30 @@ export default function BildwerkstattPage() {
                     Ein gemaltes Bild landet direkt in deiner Galerie — es lässt sich nicht
                     reproduzieren, also wird es gleich aufgehoben.
                   </p>
+
+                  {/* **Die Legende, direkt nach dem Bild.**
+                      Eine Metapher, die niemand auflöst, bleibt Dekoration — daran ist der
+                      erste Entwurf gescheitert. Sie sagt, was wofür steht, und deutet
+                      nichts: „die Lichter sind deine Erkenntnisse", nicht „du hast viel
+                      verstanden". */}
+                  {malen.data?.legende?.length ? (
+                    <div className="mt-5 rounded-brand border border-accent/30 bg-accent/[0.04] p-4">
+                      <p className="text-[0.82rem] font-semibold text-navy">
+                        Was du im letzten Bild siehst
+                      </p>
+                      <dl className="mt-2 space-y-1.5">
+                        {malen.data.legende.map(z => (
+                          <div key={z.was} className="text-[0.78rem] leading-snug">
+                            <dt className="inline font-medium text-navy">{z.was}: </dt>
+                            <dd className="inline text-brand-muted">{z.wofuer}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                      <p className="mt-3 text-[0.72rem] text-brand-muted">
+                        Es steht in deiner Galerie ganz oben.
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
               )}
               {weg === 'gerechnet' && (

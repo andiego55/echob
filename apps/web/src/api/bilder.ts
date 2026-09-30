@@ -45,6 +45,9 @@ export interface Handschrift {
   hinweis: string
 }
 
+/** Eine Zeile der Legende: was im Bild wofür steht. */
+export interface LegendenZeile { was: string; wofuer: string }
+
 export const bilderApi = {
   /**
    * Die Zahlen für ein Lagebild.
@@ -72,9 +75,12 @@ export const bilderApi = {
     apiClient.patch<GespeichertesBild>(`${basis(caseId)}/${bildId}`, { satz })
       .then(r => r.data),
 
-  handschriften: (caseId: string) =>
-    apiClient.get<{ handschriften: Handschrift[] }>(`${basis(caseId)}/handschriften`)
-      .then(r => r.data.handschriften),
+  /** Bildwelten (was zu sehen ist) und Handschriften (wie gemalt wird). */
+  bildwelten: (caseId: string) =>
+    apiClient
+      .get<{ bildwelten: Handschrift[]; handschriften: Handschrift[] }>(
+        `${basis(caseId)}/handschriften`)
+      .then(r => r.data),
 
   /**
    * Lässt ein Bildmodell malen — **der einzige Aufruf hier, der etwas kostet und dauert.**
@@ -85,11 +91,13 @@ export const bilderApi = {
    * Schirm stünde ein Netzwerkfehler.
    */
   malen: (caseId: string, body: {
+    bildwelt: string
     handschrift: string
     palette: string
     schichten: string[]
   }) => apiClient
-    .post<GespeichertesBild>(`${basis(caseId)}/malen`, body, { timeout: 180_000 })
+    .post<GespeichertesBild & { legende: LegendenZeile[] }>(
+      `${basis(caseId)}/malen`, body, { timeout: 180_000 })
     .then(r => r.data),
 
   /**

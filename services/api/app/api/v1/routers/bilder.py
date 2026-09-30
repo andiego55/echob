@@ -111,9 +111,13 @@ async def malen(
     if body.handschrift not in katalog.HANDSCHRIFT_SCHLUESSEL:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Handschrift.")
+    if body.bildwelt not in katalog.BILDWELT_SCHLUESSEL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Bildwelt.")
 
     gewaehlt = {s.strip() for s in body.schichten} & ERLAUBTE_SCHICHTEN
     einstellungen = {
+        "bildwelt": body.bildwelt,
         "handschrift": body.handschrift,
         "palette": body.palette,
         "schichten": sorted(gewaehlt),
@@ -140,7 +144,9 @@ async def malen(
             conn, user_id=user_id, case_id=case_id, einstellungen=einstellungen,
             bild=bytes_, bild_typ=bild_modell.INHALTSTYP, prompt=prompt)
         await log_ai_usage(user_id, conn, "bild")
-    return bild
+    # **Die Legende geht mit.** Eine Metapher, die niemand aufloest, bleibt Dekoration —
+    # und genau daran ist der erste Entwurf gescheitert: Man konnte nichts darin lesen.
+    return {**bild, "legende": katalog.legende(einstellungen, werte)}
 
 
 @router.get("/{bild_id}/datei")
@@ -170,14 +176,21 @@ async def datei(
 async def handschriften(
     case_id: UUID, _current: dict = Depends(get_current_user),
 ) -> dict:
-    """Die Handschriften — **ohne die Prompt-Texte.**
+    """Bildwelten und Handschriften — **ohne die Prompt-Texte.**
 
-    Sie lesen sich wie Beschreibungen und sind Anweisungen an ein Modell. Auf einem Bildschirm
-    gelesen klingen sie wie ein geprüftes Versprechen.
+    Die Bildwelt sagt, WAS zu sehen ist; die Handschrift, WIE es gemalt wird.
+
+    Von jeder gehen nur Etikett und Hinweis hinaus. Die Prompt-Texte lesen sich wie
+    Beschreibungen und sind Anweisungen an ein Modell — auf einem Bildschirm gelesen klingen
+    sie wie ein geprüftes Versprechen.
     """
+    fuers_auge = ("key", "label", "hinweis")
     return {
+        "bildwelten": [
+            {k: v for k, v in b.items() if k in fuers_auge} for b in katalog.BILDWELTEN
+        ],
         "handschriften": [
-            {k: v for k, v in h.items() if k != "prompt"} for h in katalog.HANDSCHRIFTEN
+            {k: v for k, v in h.items() if k in fuers_auge} for h in katalog.HANDSCHRIFTEN
         ],
     }
 

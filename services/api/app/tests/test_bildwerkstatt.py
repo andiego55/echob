@@ -19,6 +19,7 @@ werden sie übersprungen.
 from __future__ import annotations
 
 import os
+import re
 import uuid
 
 import asyncpg
@@ -421,47 +422,79 @@ def test_der_prompt_traegt_nur_struktur_und_keine_geschichte():
         assert wort not in prompt.lower(), wort
 
 
-def test_der_prompt_verbietet_gestalten_positiv_und_negativ():
-    """Positiv zuerst, weil ein Modell mit „no people" allein oft trotzdem Menschen malt:
-    Die Verneinung nennt das Wort, und das Wort wirkt."""
+def test_der_prompt_verbietet_menschen_und_nicht_das_gegenstaendliche():
+    """**Die Grenze lag erst am falschen Ort.**
+
+    Die erste Fassung verbot alles Gegenstaendliche und liess nur Formen zu - mit dem
+    Ergebnis, dass niemand etwas darin lesen konnte und es nebenbei auch nicht schoen war.
+
+    Die Sorge dahinter war richtig, zielte aber auf etwas Engeres: keine Abbildung der
+    anderen Person, keine Nachstellung eines Vorfalls. Ein Pfad, ein Fenster, Wetter sind
+    Gleichnisse und keine Zeugen.
+    """
     from app.services.bild_katalog import GRENZE, prompt_bauen
 
-    prompt = prompt_bauen(_werte_beispiel(), {"handschrift": "tusche", "palette": "kuehl",
-                                              "schichten": ALLE_SCHICHTEN})
+    prompt = prompt_bauen(_werte_beispiel(), {
+        "bildwelt": "landschaft", "handschrift": "aquarell", "palette": "erdig",
+        "schichten": ALLE_SCHICHTEN})
+
     # Die Grenze steht am ENDE - dort gewichtet ein Modell am staerksten.
     assert prompt.rstrip().endswith(GRENZE.rstrip())
-    # Positiv: was es IST.
-    assert "purely abstract" in GRENZE
-    assert "non-figurative" in GRENZE
-    # Und die Liste dessen, was nicht vorkommen darf.
+
     tief = GRENZE.lower()
-    for verboten in ("no people", "no faces", "no hands", "no silhouettes", "no rooms",
-                     "no symbols", "no letters", "no words"):
+    # Was verboten bleibt: Menschen, Wesen, Schrift, Gewalt.
+    for verboten in ("no people", "no figures", "faces", "silhouettes",
+                     "no animals", "no letters", "nothing violent"):
         assert verboten in tief, verboten
+    # Und ausdruecklich: keine Nachstellung eines Geschehens.
+    assert "not an illustration of an event" in tief
+
+    # Was NICHT mehr verboten ist - sonst waere das Bild wieder unlesbar.
+    for erlaubt in ("no landscape", "no rooms", "no objects", "non-figurative"):
+        assert erlaubt not in tief, f"die Grenze verbietet wieder zu viel: {erlaubt}"
+
+
+def test_der_prompt_traegt_weiter_keine_geschichte():
+    """Auch mit Metaphern geht kein Satz aus dem Fall hinaus - nur Zahlen, uebersetzt."""
+    from app.services.bild_katalog import prompt_bauen
+
+    prompt = prompt_bauen(_werte_beispiel(), {
+        "bildwelt": "wasser", "handschrift": "tusche", "palette": "nacht",
+        "schichten": ALLE_SCHICHTEN}).lower()
+
+    for verraeterisch in ("boundary", "violation", "devaluation", "verlaesslichkeit",
+                          "relationship", "partner", "beziehung", "conflict", "abuse"):
+        assert verraeterisch not in prompt, verraeterisch
 
 
 def test_der_prompt_folgt_den_schichten():
     """Ein abgewaehltes Element darf nicht im Prompt stehen - sonst malt das Modell etwas,
     das die Person ausgeschaltet hat, und sie kann sich das nicht erklaeren."""
-    from app.services.bild_katalog import prompt_bauen
+    from app.services.bild_katalog import BILDWELTEN, prompt_bauen
 
+    welt = next(b for b in BILDWELTEN if b["key"] == "landschaft")
     werte = _werte_beispiel()
-    nur_szenen = prompt_bauen(werte, {"handschrift": "tusche", "palette": "kuehl",
-                                      "schichten": ["szenen"]})
-    assert "marks" in nur_szenen
-    assert "continuous lines" not in nur_szenen, "die Muster gehen mit, obwohl abgewaehlt"
-    assert "voids" not in nur_szenen
-    assert "compressed towards one edge" not in nur_szenen
+    einst = {"bildwelt": "landschaft", "handschrift": "aquarell", "palette": "kuehl"}
 
-    mit_druck = prompt_bauen(werte, {"handschrift": "tusche", "palette": "kuehl",
-                                     "schichten": ["szenen", "druck"]})
-    assert "compressed towards one edge" in mit_druck
+    nur_szenen = prompt_bauen(werte, {**einst, "schichten": ["szenen"]})
+    assert welt["faden"] not in nur_szenen, "die Muster gehen mit, obwohl abgewaehlt"
+    assert welt["leere"] not in nur_szenen
+    assert welt["druck"] not in nur_szenen
+    assert welt["licht"] not in nur_szenen
+
+    alles = prompt_bauen(werte, {**einst, "schichten": ALLE_SCHICHTEN})
+    for stueck in (welt["faden"], welt["leere"], welt["druck"], welt["licht"]):
+        assert stueck in alles
 
 
 def test_der_prompt_beschreibt_die_haeufung_wenn_es_eine_gibt():
-    """Die Ballung ist aus den Abstaenden GERECHNET, nicht geschaetzt - dieselbe Eigenschaft,
-    die der gerechnete Weg als Position zeigt."""
-    from app.services.bild_katalog import prompt_bauen
+    """Die Ballung ist aus den Abstaenden GERECHNET, nicht geschaetzt - und sie ist das, was
+    eine Liste nie zeigt."""
+    from app.services.bild_katalog import BILDWELTEN, prompt_bauen
+
+    welt = next(b for b in BILDWELTEN if b["key"] == "landschaft")
+    einst = {"bildwelt": "landschaft", "handschrift": "aquarell", "palette": "kuehl",
+             "schichten": ["szenen"]}
 
     geballt = _werte_beispiel()   # vier frueh, sechs im letzten Monat
     gleichmaessig = _werte_beispiel()
@@ -469,12 +502,59 @@ def test_der_prompt_beschreibt_die_haeufung_wenn_es_eine_gibt():
         {"id": f"s{i}", "tag": i * 70, "gewicht": 0.4, "haerte": 0.4} for i in range(10)
     ]
 
-    a = prompt_bauen(geballt, {"handschrift": "tusche", "palette": "kuehl",
-                               "schichten": ["szenen"]})
-    b = prompt_bauen(gleichmaessig, {"handschrift": "tusche", "palette": "kuehl",
-                                     "schichten": ["szenen"]})
-    assert "clustered" in a
-    assert "even rhythm" in b
+    assert welt["ballung"] in prompt_bauen(geballt, einst)
+    assert welt["ballung"] not in prompt_bauen(gleichmaessig, einst)
+
+
+def test_jede_bildwelt_uebersetzt_dieselben_sechs_groessen():
+    """**Der Waechter gegen eine halb gebaute Bildwelt.**
+
+    Fehlt einer Welt ein Stueck, faellt beim Bauen des Prompts eine Schicht still weg - das
+    Bild entsteht trotzdem und sieht gut aus, nur fehlt darin etwas, das die Person
+    eingeschaltet hat.
+    """
+    from app.services.bild_katalog import BILDWELTEN
+
+    for b in BILDWELTEN:
+        assert b["label"] and b["hinweis"], b["key"]
+        for stueck in ("szene", "ballung", "faden", "licht", "leere", "druck"):
+            assert len(b[stueck]) > 20, f'{b["key"]}: {stueck}'
+        for raum in ("dicht", "mittel", "weit"):
+            assert len(b["weg"][raum]) > 20, f'{b["key"]}: weg/{raum}'
+        for haerte in ("weich", "mittel", "hart"):
+            assert len(b["textur"][haerte]) > 15, f'{b["key"]}: textur/{haerte}'
+
+
+def test_jede_bildwelt_ergibt_ein_anderes_bild():
+    from app.services.bild_katalog import BILDWELTEN, prompt_bauen
+
+    werte = _werte_beispiel()
+    prompts = {
+        b["key"]: prompt_bauen(werte, {
+            "bildwelt": b["key"], "handschrift": "aquarell", "palette": "kuehl",
+            "schichten": ALLE_SCHICHTEN})
+        for b in BILDWELTEN
+    }
+    assert len(set(prompts.values())) == len(BILDWELTEN)
+
+
+def test_keine_bildwelt_setzt_einen_menschen_ins_bild():
+    """Die Bildwelten sind der Ort, an dem eine Gestalt sich einschleichen wuerde - ein
+    „leerer Stuhl" waere schon einer, weil er jemanden meint, der fehlt."""
+    from app.services.bild_katalog import BILDWELTEN
+
+    for b in BILDWELTEN:
+        alles = " ".join([
+            b["szene"], b["ballung"], b["faden"], b["licht"], b["leere"], b["druck"],
+            *b["weg"].values(), *b["textur"].values(),
+        ]).lower()
+        # **Mit Wortgrenzen, nicht als Teilzeichenfolge.** Die erste Fassung suchte „face"
+        # und fand es in „surface" - genau der Fehler, den dieses Projekt schon einmal
+        # gemacht hat („user_id" steckt in „owner_user_id"). Ein Waechter, der bei jedem
+        # Wasserbild anschlaegt, wird weggeklickt.
+        for gestalt in ("person", "figure", "someone", "child", "woman", "man",
+                        "chair", "bed", "portrait", "face", "body"):
+            assert not re.search(rf"{gestalt}s?", alles), f'{b["key"]}: {gestalt}'
 
 
 def test_jede_handschrift_ergibt_einen_anderen_prompt():
@@ -482,19 +562,68 @@ def test_jede_handschrift_ergibt_einen_anderen_prompt():
 
     werte = _werte_beispiel()
     prompts = {
-        h["key"]: prompt_bauen(werte, {"handschrift": h["key"], "palette": "kuehl",
-                                       "schichten": ["szenen"]})
+        h["key"]: prompt_bauen(werte, {
+            "bildwelt": "landschaft", "handschrift": h["key"], "palette": "kuehl",
+            "schichten": ["szenen"]})
         for h in HANDSCHRIFTEN
     }
     assert len(set(prompts.values())) == len(HANDSCHRIFTEN)
-    # Und keine Handschrift kann eine Szene malen - alle fuenf sind gegenstandslos.
-    #
-    # Geprueft wird die HANDSCHRIFT selbst und nicht der fertige Prompt: In dem steht die
-    # Verbotsliste, und die enthaelt „no landscapes". Mein erster Versuch hat sich damit
-    # selbst gefunden - ein Test, der die eigene Verneinung als Fund meldet.
+    # Die Handschrift sagt, WIE gemalt wird - nicht, WAS darauf ist.
     for h in HANDSCHRIFTEN:
-        for gegenstand in ("portrait", "figure", "scene of", "landscape", "person"):
+        for gegenstand in ("person", "figure", "portrait"):
             assert gegenstand not in h["prompt"].lower(), f'{h["key"]}: {gegenstand}'
+
+
+# ── Die Legende ───────────────────────────────────────────────────────────────
+
+def test_die_legende_loest_jede_eingeschaltete_schicht_auf():
+    """**Eine Metapher, die niemand aufloest, bleibt Dekoration.**
+
+    Das war der Kern der Kritik am ersten Entwurf: Man konnte nichts darin lesen. Die
+    Legende sagt fuer jede Schicht, welches Element des Bildes daraus entstanden ist.
+    """
+    from app.services.bild_katalog import legende
+
+    werte = _werte_beispiel()
+    zeilen = legende({"bildwelt": "haus", "schichten": ALLE_SCHICHTEN}, werte)
+    assert len(zeilen) == 6, "nicht jede Schicht wird aufgeloest"
+    for z in zeilen:
+        assert z["was"] and z["wofuer"]
+
+
+def test_die_legende_nennt_nur_was_wirklich_im_bild_ist():
+    from app.services.bild_katalog import legende
+
+    werte = _werte_beispiel()
+    nur_szenen = legende({"bildwelt": "wald", "schichten": ["szenen"]}, werte)
+    assert len(nur_szenen) == 1
+
+    # Und was es im Fall nicht gibt, steht auch nicht in der Legende.
+    ohne_lichter = dict(werte, lichter=[])
+    zeilen = legende({"bildwelt": "wald", "schichten": ALLE_SCHICHTEN}, ohne_lichter)
+    assert all("verstanden" not in z["wofuer"] for z in zeilen)
+
+
+def test_die_legende_deutet_nicht():
+    """Sie sagt „die Lichter sind deine Erkenntnisse", nicht „du hast viel verstanden"."""
+    from app.services.bild_katalog import legende
+
+    zeilen = legende({"bildwelt": "landschaft", "schichten": ALLE_SCHICHTEN},
+                     _werte_beispiel())
+    text = " ".join(z["wofuer"] for z in zeilen).lower()
+    for deutung in ("du hast viel", "das zeigt, dass", "offenbar", "vermutlich",
+                    "du solltest"):
+        assert deutung not in text, deutung
+
+
+def test_jede_bildwelt_hat_eine_legende():
+    """Ohne sie stuende bei einer Welt eine leere Zeile - oder der Code braeche."""
+    from app.services.bild_katalog import BILDWELTEN, legende
+
+    for b in BILDWELTEN:
+        zeilen = legende({"bildwelt": b["key"], "schichten": ALLE_SCHICHTEN},
+                         _werte_beispiel())
+        assert len(zeilen) == 6, b["key"]
 
 
 def test_jede_handschrift_hat_was_die_oberflaeche_braucht():
