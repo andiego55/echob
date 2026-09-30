@@ -407,6 +407,59 @@ async def ton_ablegen(
     if ergebnis == "UPDATE 0":
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Kapitel nicht gefunden.")
 
+    # **Die Uhr der Folge neu stellen.** Daran hängt der Riegel: Eine zwanzigminütige Folge
+    # arbeitet länger als die Verwaist-Frist, und ohne diesen Schlag gälte sie mitten in der
+    # Arbeit als aufgegeben — ein zweiter Anlauf könnte einsteigen und dieselben Kapitel
+    # noch einmal sprechen.
+    await conn.execute(
+        "UPDATE case_podcasts SET updated_at = clock_timestamp() "
+        " WHERE id IN (SELECT podcast_id FROM case_podcast_kapitel WHERE id = $1) "
+        "   AND user_id = $2",
+        kapitel_id, user_id,
+    )
+
+
+#: Nach so vielen Minuten ohne Fortschritt gilt eine laufende Sprachausgabe als verwaist.
+#:
+#: **Ohne diese Frist wäre der Riegel eine Falle.** Stirbt der Server mitten in der
+#: Sprachausgabe, bleibt der Stand auf „spricht" stehen — und eine Folge, die nur auf
+#: ``status <> 'spricht'`` prüft, ließe sich nie wieder anfassen. Zwölf Minuten, weil jedes
+#: fertige Kapitel die Uhr neu stellt: Solange wirklich gearbeitet wird, läuft sie nicht ab,
+#: und eine Pause von zwölf Minuten zwischen zwei Kapiteln bedeutet, dass niemand mehr
+#: arbeitet.
+VERWAIST_NACH_MINUTEN = 12
+
+
+async def sprechen_beginnen(
+    conn: asyncpg.Connection, *, user_id: UUID | str, podcast_id: UUID | str,
+) -> bool:
+    """Nimmt die Folge in Arbeit — **oder sagt Nein, weil schon jemand daran ist.**
+
+    **Warum das ein Riegel sein muss und nicht Sorgfalt in der Oberfläche.** Der Knopf ist
+    während des Sprechens ausgeblendet, das genügt für eine Seite. Es genügt nicht für zwei
+    Reiter, einen Wiederholungsversuch nach einem Netzaussetzer oder jemanden, der auf dem
+    Handy und am Rechner dieselbe Folge öffnet. Beide Anfragen sähen dieselben offenen
+    Kapitel, sprächen beide alle sechs und verbuchten beide die Minuten. Die Person zahlt
+    zweimal für eine Folge, und die zweite Tonspur überschreibt die erste.
+
+    Genau dieser Nutzer hat mehrmals geklickt, weil er nicht sah, ob etwas passiert. Das war
+    beim Skript, wo es „nur" überzählige Zeilen gab. Hier kostet es Kontingent.
+
+    Verglichen wird ausschließlich mit der Uhr der DATENBANK (``clock_timestamp()`` gegen
+    ``updated_at``). Ein Vergleich gegen die Uhr der Anwendung ergäbe keinen Fehler, nur ein
+    falsches Ergebnis, wenn die beiden auseinanderlaufen.
+    """
+    zeile = await conn.fetchrow(
+        "UPDATE case_podcasts SET status = 'spricht', fehler = NULL, "
+        "  updated_at = clock_timestamp() "
+        " WHERE id = $1 AND user_id = $2 "
+        "   AND (status <> 'spricht' "
+        "        OR updated_at < clock_timestamp() - make_interval(mins => $3)) "
+        "RETURNING id",
+        podcast_id, user_id, VERWAIST_NACH_MINUTEN,
+    )
+    return zeile is not None
+
 
 async def stand_setzen(
     conn: asyncpg.Connection,

@@ -958,3 +958,90 @@ def test_die_hoerprobe_hat_eine_eigene_anfragebegrenzung():
     auffang = [j for j, r in enumerate(REGELN) if r.praefix == ""]
     assert i < auffang[0], "die Regel steht hinter dem Auffangnetz und greift nie"
     assert REGELN[i].anfragen <= 30, "so viele Sprachaufrufe braucht niemand zum Vergleichen"
+
+
+# ── Der Riegel gegen doppeltes Sprechen ───────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_zwei_gleichzeitige_anlaeufe_sprechen_nicht_beide(person, db):
+    """**Sonst zahlt die Person zweimal fuer eine Folge.**
+
+    Der Knopf ist waehrend des Sprechens ausgeblendet - das genuegt fuer EINE Seite. Nicht
+    fuer zwei Reiter, einen Wiederholungsversuch nach einem Netzaussetzer oder Handy und
+    Rechner gleichzeitig. Beide Anfragen sehen dieselben offenen Kapitel, sprechen beide
+    alle und verbuchen beide die Minuten.
+    """
+    fall = await _fall(db, person)
+    folge = await _folge(db, person, fall)
+
+    assert await dienst.sprechen_beginnen(
+        db, user_id=person, podcast_id=folge["id"]) is True
+    # Der zweite Anlauf kommt nicht durch.
+    assert await dienst.sprechen_beginnen(
+        db, user_id=person, podcast_id=folge["id"]) is False
+
+
+@pytest.mark.asyncio
+async def test_eine_verwaiste_folge_laesst_sich_wieder_anfassen(person, db):
+    """**Ohne Frist waere der Riegel eine Falle.**
+
+    Stirbt der Server mitten in der Sprachausgabe, bleibt der Stand auf „spricht" stehen.
+    Ein Riegel, der nur den Stand prueft, liesse die Folge nie wieder anfassen - und niemand
+    koennte sich erklaeren, warum ein Knopf nichts tut.
+    """
+    fall = await _fall(db, person)
+    folge = await _folge(db, person, fall)
+    assert await dienst.sprechen_beginnen(db, user_id=person, podcast_id=folge["id"])
+
+    # Die Uhr zurueckdrehen - mit der Uhr der DATENBANK, nicht der der Anwendung.
+    await db.execute(
+        "UPDATE case_podcasts SET updated_at = clock_timestamp() "
+        "  - make_interval(mins => $2) WHERE id = $1",
+        folge["id"], dienst.VERWAIST_NACH_MINUTEN + 1)
+
+    assert await dienst.sprechen_beginnen(
+        db, user_id=person, podcast_id=folge["id"]) is True
+
+
+@pytest.mark.asyncio
+async def test_ein_fertiges_kapitel_stellt_die_uhr_neu(person, db):
+    """Daran haengt der Riegel bei langen Folgen.
+
+    Eine zwanzigminuetige Folge arbeitet laenger als die Verwaist-Frist. Ohne diesen Schlag
+    gaelte sie MITTEN IN DER ARBEIT als aufgegeben, und ein zweiter Anlauf koennte einsteigen
+    und dieselben Kapitel noch einmal sprechen.
+    """
+    fall = await _fall(db, person)
+    folge = await _folge(db, person, fall)
+    await dienst.sprechen_beginnen(db, user_id=person, podcast_id=folge["id"])
+
+    # Kurz vor der Frist: ein fertiges Kapitel muss sie zuruecksetzen.
+    await db.execute(
+        "UPDATE case_podcasts SET updated_at = clock_timestamp() "
+        "  - make_interval(mins => $2) WHERE id = $1",
+        folge["id"], dienst.VERWAIST_NACH_MINUTEN - 1)
+
+    kapitel = await db.fetchval(
+        "SELECT id FROM case_podcast_kapitel WHERE podcast_id = $1", folge["id"])
+    await dienst.ton_ablegen(
+        db, user_id=person, kapitel_id=kapitel, audio=b"x", typ="audio/mpeg", sekunden=5)
+
+    alter = await db.fetchval(
+        "SELECT EXTRACT(EPOCH FROM (clock_timestamp() - updated_at)) "
+        "  FROM case_podcasts WHERE id = $1", folge["id"])
+    assert float(alter) < 60, "die Uhr wurde nicht neu gestellt"
+
+
+@pytest.mark.asyncio
+async def test_eine_fremde_folge_laesst_sich_nicht_in_arbeit_nehmen(person, db):
+    fremd = uuid.uuid4()
+    await db.execute(
+        "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Andere')", fremd)
+    fremder_fall = await _fall(db, fremd)
+    fremde_folge = await _folge(db, fremd, fremder_fall)
+
+    assert await dienst.sprechen_beginnen(
+        db, user_id=person, podcast_id=fremde_folge["id"]) is False
+    # Und der Stand der fremden Folge ist unberuehrt.
+    assert await db.fetchval(
+        "SELECT status FROM case_podcasts WHERE id = $1", fremde_folge["id"]) == "skript"

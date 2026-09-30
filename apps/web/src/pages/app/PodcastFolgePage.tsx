@@ -198,8 +198,10 @@ export default function PodcastFolgePage() {
           {kapitel.length ? ` · ${kapitel.length} Kapitel` : ''}
         </p>
 
-        <Fehlermeldung error={sprechen.error ?? umbenennen.error ?? loeschen.error}
-          className="mt-4" />
+        {/* Der Sprech-Fehler steht NICHT hier, sondern unten am Sprechen-Knopf. Dasselbe
+            hatte ich im Studio zweimal falsch: Rückmeldung am Seitenkopf ist bei einer
+            langen Seite außerhalb des Bildes, und wer unten klickt, sieht nichts. */}
+        <Fehlermeldung error={umbenennen.error ?? loeschen.error} className="mt-4" />
         {ladeFehler && <p role="alert" className="mt-4 text-sm text-red-600">{ladeFehler}</p>}
 
         {leer && (
@@ -266,6 +268,8 @@ export default function PodcastFolgePage() {
               </p>
             )}
 
+            <Fehlermeldung error={sprechen.error} className="mt-4" />
+
             {/* Mehrere Minuten Stille an einem Knopf sieht aus wie ein Fehler — und das
                 ist hier der laengste Vorgang im ganzen Programm. Also ein Rad, eine
                 ehrliche Zahl und der Satz, dass nichts verloren geht. */}
@@ -292,7 +296,8 @@ export default function PodcastFolgePage() {
                 onClick={() => sprechen.mutate()}
                 className="btn-primary !py-2.5 !px-5 !text-sm mt-4"
               >
-                {gesprochen === 0 ? 'Jetzt sprechen lassen' : 'Weitermachen'}
+                {sprechen.error ? 'Noch einmal versuchen'
+                  : gesprochen === 0 ? 'Jetzt sprechen lassen' : 'Weitermachen'}
               </button>
             )}
 

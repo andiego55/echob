@@ -244,8 +244,18 @@ async def sprechen(
             sum(stimm_modul.sekunden_schaetzen(k["text"]) for k in offen) / 60)
         await enforce_ai_usage_menge(user_id, conn, "podcast", noetig)
 
-        await dienst.stand_setzen(
-            conn, user_id=user_id, podcast_id=podcast_id, status_neu="spricht")
+        # **Der Riegel, und er steht NACH der Kontingentprüfung.** Wer abgewiesen wird,
+        # weil nichts frei ist, soll die Folge nicht in einem Zustand hinterlassen, in dem
+        # sie eine Viertelstunde lang niemand anfassen kann.
+        if not await dienst.sprechen_beginnen(
+                conn, user_id=user_id, podcast_id=podcast_id):
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                detail=(
+                    "Diese Folge wird gerade gesprochen. Lass die andere Seite offen — "
+                    "die fertigen Kapitel erscheinen von allein."
+                ),
+            )
 
     anweisung = stimm_modul.anweisung(
         folge["format"], folge["ansprache"], folge["stimme"])
