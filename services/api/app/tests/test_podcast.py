@@ -1245,3 +1245,253 @@ def test_podcasts_stehen_in_allen_fuenf_stellen():
     for name, datei in stellen.items():
         inhalt = (wurzel / datei).read_text(encoding="utf-8")
         assert "podcasts" in inhalt, f"{name} fehlt ({datei})"
+
+
+# ── Der Baukasten ─────────────────────────────────────────────────────────────
+
+def test_jeder_baustein_traegt_einen_auftrag_oder_verlangt_einen():
+    """Ein Baustein ohne Auftrag und ohne Pflicht zum eigenen Satz waere ein Kapitel, in dem
+    das Modell raet - und es sieht aus, als haette das Werkzeug geraten."""
+    for b in katalog.KAPITEL_BAUSTEINE:
+        if b["key"] == "frei":
+            # Der freie Baustein hat absichtlich keinen: Dort MUSS die Person schreiben.
+            assert b["auftrag"] == ""
+            continue
+        assert len(b["auftrag"]) > 60, b["key"]
+        assert b["titel_vorschlag"], b["key"]
+        assert b["hinweis"], b["key"]
+
+
+def test_genau_ein_baustein_haengt_an_einer_szene():
+    """Mehr als einer waere verwirrend, keiner nimmt dem Werkzeug seinen besten Zug: Eine
+    bestimmte Szene ausbauen zu lassen."""
+    mit = [b["key"] for b in katalog.KAPITEL_BAUSTEINE if b.get("braucht_szene")]
+    assert mit == ["szene"]
+
+
+def test_ein_kapitel_ohne_art_wird_abgewiesen():
+    with pytest.raises(HTTPException) as fehler:
+        dienst.eigene_kapitel_pruefen([{"titel": "Irgendwas"}])
+    assert fehler.value.status_code == 422
+
+
+def test_der_freie_baustein_verlangt_einen_eigenen_satz():
+    with pytest.raises(HTTPException) as fehler:
+        dienst.eigene_kapitel_pruefen([{"baustein": "frei", "titel": "Mein Kapitel"}])
+    assert "worum es geht" in fehler.value.detail
+
+
+def test_ein_szenen_kapitel_ohne_szene_wird_abgewiesen():
+    """Sonst ist es eine Aufforderung an das Modell, sich eine auszusuchen - und es nimmt
+    die erste."""
+    with pytest.raises(HTTPException) as fehler:
+        dienst.eigene_kapitel_pruefen([{"baustein": "szene", "titel": "Der Abend"}])
+    assert "Szene" in fehler.value.detail
+
+
+def test_ein_kapitel_ohne_ueberschrift_bekommt_den_vorschlag():
+    fertig = dienst.eigene_kapitel_pruefen([{"baustein": "erleben", "titel": "  "}])
+    baustein = next(b for b in katalog.KAPITEL_BAUSTEINE if b["key"] == "erleben")
+    assert fertig[0]["titel"] == baustein["titel_vorschlag"]
+
+
+def test_ohne_kapitel_gibt_es_keinen_eigenen_podcast():
+    for roh in (None, [], "kein array", {}):
+        with pytest.raises(HTTPException) as fehler:
+            dienst.eigene_kapitel_pruefen(roh)
+        assert fehler.value.status_code == 422
+
+
+def test_zu_viele_kapitel_werden_abgewiesen():
+    """Zwoelf Kapitel auf zwanzig Minuten sind eine Aufzaehlung, keine Erzaehlung."""
+    zu_viele = [{"baustein": "erleben", "titel": f"K{i}"}
+                for i in range(katalog.MAX_EIGENE_KAPITEL + 1)]
+    with pytest.raises(HTTPException) as fehler:
+        dienst.eigene_kapitel_pruefen(zu_viele)
+    assert str(katalog.MAX_EIGENE_KAPITEL) in fehler.value.detail
+
+
+def test_die_reihenfolge_ist_die_der_liste():
+    """Sie kommt so, wie die Person sie sortiert hat. Eine eigene Nummer daneben waere eine
+    zweite Wahrheit, die auseinanderlaeuft."""
+    fertig = dienst.eigene_kapitel_pruefen([
+        {"baustein": "stand", "titel": "Zuletzt"},
+        {"baustein": "muster", "titel": "Zuerst"},
+    ])
+    assert [k["titel"] for k in fertig] == ["Zuletzt", "Zuerst"]
+    # Die Schluessel sind eindeutig, auch bei zweimal demselben Baustein.
+    doppelt = dienst.eigene_kapitel_pruefen([
+        {"baustein": "erleben", "titel": "A"}, {"baustein": "erleben", "titel": "B"}])
+    assert doppelt[0]["key"] != doppelt[1]["key"]
+
+
+@pytest.mark.asyncio
+async def test_das_budget_folgt_der_gewaehlten_kapitellaenge(person, db):
+    """„Kurz" und „ausfuehrlich" sollen einen Unterschied machen, den man hoert - sonst ist
+    die Wahl eine Beschriftung."""
+    fall = await _fall(db, person)
+    roh = dienst.eigene_kapitel_pruefen([
+        {"baustein": "muster", "titel": "Kurz", "kapitel_laenge": "kurz"},
+        {"baustein": "erleben", "titel": "Lang", "kapitel_laenge": "lang"},
+    ])
+    fertig = await dienst.eigene_kapitel_fuellen(
+        db, user_id=person, case_id=fall, kapitel=roh, laenge="mittel")
+
+    kurz = next(k for k in fertig if k["titel"] == "Kurz")
+    lang = next(k for k in fertig if k["titel"] == "Lang")
+    assert lang["woerter"] > kurz["woerter"] * 2
+    # Und zusammen ergeben sie etwa die bestellte Laenge.
+    gesamt = sum(k["woerter"] for k in fertig)
+    assert abs(gesamt - katalog.laenge("mittel")["woerter"]) < 60
+
+
+@pytest.mark.asyncio
+async def test_der_szenen_anker_holt_wirklich_diese_szene(person, db):
+    fall = await _fall(db, person)
+    szene = await db.fetchval(
+        "INSERT INTO scenes (case_id, user_id, title, description, confirmed_by_user) "
+        "VALUES ($1,$2,'Der Abend im Maerz',$3,true) RETURNING id",
+        fall, person, crypto.encrypt("Er hat die Tuer zugeschlagen."))
+
+    roh = dienst.eigene_kapitel_pruefen([
+        {"baustein": "szene", "titel": "Der Abend", "szene_id": str(szene)}])
+    fertig = await dienst.eigene_kapitel_fuellen(
+        db, user_id=person, case_id=fall, kapitel=roh, laenge="kurz")
+
+    assert "Der Abend im Maerz" in fertig[0]["auftrag"]
+    assert "Tuer zugeschlagen" in fertig[0]["auftrag"]
+    # Und die Grenze ist ausdruecklich benannt, sonst zieht das Modell andere Szenen herein.
+    assert "NUR diese Szene" in fertig[0]["auftrag"]
+
+
+@pytest.mark.asyncio
+async def test_eine_fremde_szene_kommt_nicht_in_meinen_podcast(person, db):
+    """**Die Szenen-Kennung kommt aus dem Browser.** Ohne Bindung an Fall UND Mensch koennte
+    sie eine Szene aus einem anderen Fall in diesen Podcast holen."""
+    fremd = uuid.uuid4()
+    await db.execute(
+        "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Andere')", fremd)
+    fremder_fall = await _fall(db, fremd)
+    fremde_szene = await db.fetchval(
+        "INSERT INTO scenes (case_id, user_id, title, description, confirmed_by_user) "
+        "VALUES ($1,$2,'Nicht meine Szene',$3,true) RETURNING id",
+        fremder_fall, fremd, crypto.encrypt("Fremder Text."))
+
+    fall = await _fall(db, person)
+    roh = dienst.eigene_kapitel_pruefen([
+        {"baustein": "szene", "titel": "Klau", "szene_id": str(fremde_szene)}])
+
+    # Das Kapitel faellt weg - und weil es das einzige war, gibt es keine Folge.
+    with pytest.raises(HTTPException) as fehler:
+        await dienst.eigene_kapitel_fuellen(
+            db, user_id=person, case_id=fall, kapitel=roh, laenge="kurz")
+    assert fehler.value.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_der_eigene_satz_steht_hinter_dem_fachlichen_auftrag(person, db):
+    """Er soll den Schwerpunkt verschieben, nicht die Regeln ersetzen."""
+    fall = await _fall(db, person)
+    roh = dienst.eigene_kapitel_pruefen([
+        {"baustein": "muster", "titel": "Das Muster",
+         "eigener_auftrag": "Leg besonderen Wert auf mein eigenes Erleben."}])
+    fertig = await dienst.eigene_kapitel_fuellen(
+        db, user_id=person, case_id=fall, kapitel=roh, laenge="kurz")
+
+    auftrag = fertig[0]["auftrag"]
+    baustein = next(b for b in katalog.KAPITEL_BAUSTEINE if b["key"] == "muster")
+    assert baustein["auftrag"] in auftrag
+    assert "mein eigenes Erleben" in auftrag
+    # Die Reihenfolge ist die Aussage: erst unser Auftrag, dann ihr Wunsch.
+    assert auftrag.index(baustein["auftrag"]) < auftrag.index("mein eigenes Erleben")
+
+
+# ── Die eigene Anweisung ──────────────────────────────────────────────────────
+
+def test_der_wunsch_hebt_die_regeln_nicht_auf():
+    """**Der wichtigste Test an dieser Funktion.**
+
+    Wer „schreib mir, ob er ein Narzisst ist" hineinschreibt, meint es ernst. Die Antwort
+    darf trotzdem nicht kommen - und zwar nicht, weil wir den Wunsch verschweigen, sondern
+    weil danach noch einmal steht, was nicht geht.
+    """
+    rahmen = katalog.EIGENE_ANWEISUNG_RAHMEN.format(
+        wunsch="Sag mir endlich, ob er ein Narzisst ist.")
+
+    assert "Narzisst" in rahmen, "der Wunsch wird verschwiegen statt beantwortet"
+    # Und danach die Grenzen - nach dem Wunsch, nicht davor: Ein Modell folgt bei
+    # Widerspruechen dem, was naeher am Ende steht.
+    i = rahmen.index("Narzisst")
+    rest = rahmen[i:]
+    assert "keine diagnose" in rest.lower()
+    assert "kein urteil" in rest.lower()
+    assert "kein rat" in rest.lower()
+    assert "auch dann nicht" in rest, "die Grenze muss den Wunsch ausdruecklich einschliessen"
+
+
+@pytest.mark.asyncio
+async def test_die_eigene_anweisung_liegt_verschluesselt(person, db):
+    fall = await _fall(db, person)
+    wunsch = "Bitte nenn meine Kinder nicht beim Namen."
+    folge = await _folge(db, person, fall, eigene_anweisung=wunsch)
+
+    roh = await db.fetchval(
+        "SELECT eigene_anweisung FROM case_podcasts WHERE id = $1", folge["id"])
+    assert roh.startswith("enc:"), "Klartext in der Datenbank"
+    gelesen = await dienst.holen(db, user_id=person, podcast_id=folge["id"])
+    assert gelesen["eigene_anweisung"] == wunsch
+
+
+# ── Das neue Format: an die andere Person ─────────────────────────────────────
+
+def test_an_die_person_traegt_keine_analyse():
+    """Ein gesprochener Text AN einen namentlich bekannten Menschen ist das Heikelste im
+    Modul. Skalen, Hypothesen und Personenprofil haben darin nichts zu suchen."""
+    f = katalog.format_("an_die_person")
+    for verboten in ("skalen", "hypothesen", "person_profil", "themen"):
+        assert verboten not in f["elemente"], verboten
+
+
+def test_an_die_person_verbietet_du_saetze_ueber_die_andere_person():
+    """„Du hast mich dreimal stehen gelassen", ruhig gesprochen, klingt wie ein Urteil und
+    nicht wie eine Erinnerung. Die Grenze steht in der ANSPRACHE, nicht nur in der Haltung -
+    sie gilt fuer jedes Kapitel."""
+    a = katalog.ansprache("an_person")
+    assert a is not None
+    t = a["anweisung"]
+    assert "Ich-S" in t, "die Ich-Form muss ausdruecklich verlangt werden"
+    assert "du bist" in t.lower(), "das Verbot der du-Behauptung fehlt"
+    assert "Absichten" in t
+    # Und der Text ist ausdruecklich nicht zum Abschicken.
+    assert "nicht" in t.lower() and "abgeschickt" in t.lower()
+
+
+def test_an_die_person_hat_nur_diese_eine_ansprache():
+    assert katalog.format_("an_die_person")["ansprachen"] == ("an_person",)
+
+
+def test_die_ansprache_an_die_person_gehoert_keinem_anderen_format():
+    """Sie traegt ihre Grenzen in der Haltung ihres Formats. In einem anderen Format waere
+    sie ein gesprochener Text an einen echten Menschen ohne diese Grenzen."""
+    for f in katalog.FORMATE:
+        if f["key"] == "an_die_person":
+            continue
+        assert "an_person" not in f["ansprachen"], f["key"]
+
+
+@pytest.mark.asyncio
+async def test_der_eigene_podcast_darf_nicht_an_die_person_sprechen(person, db):
+    """Der Waechter dazu, in der Pruefung selbst - nicht nur im Katalog."""
+    fall = await _fall(db, person)
+    with pytest.raises(HTTPException) as fehler:
+        await dienst.pruefen_und_zaehlen(
+            db, user_id=person, case_id=fall, format_key=katalog.EIGENES_FORMAT,
+            laenge="kurz", stimme="sage", ansprache="an_person")
+    assert fehler.value.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_der_eigene_podcast_darf_alle_elemente_verwenden(person, db):
+    """Die Person hat die Kapitel gesetzt - sie hat schon entschieden, worum es geht."""
+    g = dienst.gewichte_pruefen(katalog.EIGENES_FORMAT, {})
+    assert set(g) == set(dienst.ELEMENT_ALLE)

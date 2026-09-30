@@ -105,6 +105,25 @@ ANSPRACHEN: tuple[dict[str, Any], ...] = (
      "hinweis": "Sachlich, in der dritten Person.",
      "anweisung": "Schreibe in der dritten Person („die Person“, „sie“ / „er“ je nach "
                   "Angabe). Sachlich, ohne Anrede."},
+    # **Die heikelste Ansprache des Moduls.** „Du“ ist hier nicht die hörende Person,
+    # sondern der Mensch, um den es geht — ein echter, abwesender, namentlich bekannter
+    # Mensch. Ein gesprochener Text an ihn ist etwas anderes als einer über ihn: Er kann
+    # vorgespielt werden, und eine ruhige Stimme, die „du hast mich dreimal stehen
+    # gelassen“ sagt, klingt wie ein Urteil und nicht wie eine Erinnerung.
+    #
+    # Deshalb steht die Grenze in der Anweisung selbst und nicht nur in der Haltung des
+    # Formats: **ich-Sätze über eigenes Erleben, nie du-Sätze über den anderen.**
+    {"key": "an_person", "label": "An die andere Person",
+     "hinweis": "Als würdest du mit ihr sprechen — für dich, nicht zum Abschicken.",
+     "anweisung": "Der Text ist an die andere Person gerichtet: „du“ bist SIE, nicht die "
+                  "hörende Person. Sprich durchgehend in Ich-Sätzen über eigenes Erleben "
+                  "(„ich habe …“, „mir ging es …“, „ich hätte gebraucht …“). "
+                  "**Keine du-Sätze, die etwas über sie behaupten** — kein „du bist“, "
+                  "kein „du wolltest“, keine Absichten, keine Vorwürfe, keine Fragen, die "
+                  "eine Antwort verlangen. Wenn eine Handlung vorkommt, dann als Angabe "
+                  "(„an dem Abend bist du gegangen“) und nie als Deutung. Das ist kein "
+                  "Brief, der abgeschickt wird; es ist ein Satz, der einmal ausgesprochen "
+                  "sein will."},
 )
 
 ANSPRACHE_SCHLUESSEL = {a["key"] for a in ANSPRACHEN}
@@ -280,6 +299,36 @@ FORMATE: tuple[dict[str, Any], ...] = (
         ),
     },
     {
+        "key": "an_die_person",
+        "label": "Was ich dir sagen würde",
+        "beschreibung": "An die andere Person gerichtet — für dich gesprochen, nicht zum "
+                        "Abschicken. Verwandt mit einem Brief, den man schreibt und nicht "
+                        "wegschickt.",
+        "haltung": "Du sprichst für einen Menschen, der etwas loswerden will, das er der "
+                   "anderen Person nie so sagen konnte. Ruhig, in Ich-Sätzen, ohne "
+                   "Anklage. **Keine Abrechnung und keine Bilanz** — wer eine Liste von "
+                   "Verfehlungen hört, hört danach nicht sich selbst, sondern den anderen. "
+                   "Es geht um eigenes Erleben und um einen Wunsch, nicht um Schuld. Am "
+                   "Ende steht kein Appell und keine Forderung: Dieser Text wird nicht "
+                   "abgeschickt, und er soll nicht so klingen.",
+        "ansprachen": ("an_person",),
+        "elemente": _OHNE_ANALYSE,
+        "kapitel": (
+            _k("erlebt", "Was ich erlebt habe",
+               "Eigenes Erleben an einer oder zwei konkreten Szenen. Nur was in den "
+               "Angaben steht, in Ich-Sätzen. Keine Zuschreibung von Absichten.", 0.3),
+            _k("wirkung", "Was das mit mir gemacht hat",
+               "Die Wirkung auf die sprechende Person — ihre Worte, nicht unsere. Ohne "
+               "Steigerung: Der Stoff trägt sich selbst.", 0.25),
+            _k("gebraucht", "Was ich gebraucht hätte",
+               "Was in diesen Momenten gefehlt hat, als Wunsch formuliert und nicht als "
+               "Vorwurf („ich hätte gebraucht, dass …“ statt „du hättest sollen …“).", 0.25),
+            _k("nicht_gesagt", "Was ich dir nie gesagt habe",
+               "Ein oder zwei Sätze, die bisher nicht ausgesprochen wurden. Ruhig, ohne "
+               "Pointe, ohne Frage am Ende — es wartet keine Antwort.", 0.2),
+        ),
+    },
+    {
         "key": "wunsch_wirklichkeit",
         "label": "Wunsch und Wirklichkeit",
         "beschreibung": "Deine Traumbeziehungs-Skizze neben diesen Fall gelegt — "
@@ -309,6 +358,145 @@ FORMATE: tuple[dict[str, Any], ...] = (
 )
 
 FORMAT_SCHLUESSEL = {f["key"] for f in FORMATE}
+
+
+# ── Der Baukasten: eigene Kapitel ────────────────────────────────────────────
+#
+# **Warum eine Palette und kein leeres Feld.**
+#
+# „Schreib eine Anweisung für dieses Kapitel" ist für die meisten Menschen keine Einladung,
+# sondern eine Prüfung. Wer sie besteht, bekommt etwas Gutes; wer sie nicht besteht, bekommt
+# einen Absatz, der klingt wie eine Bedienungsanleitung — und glaubt dann, das Werkzeug sei
+# nichts für ihn.
+#
+# Ein Kapitel ist im Kern eine Frage, die jemand über seinen eigenen Fall gestellt haben
+# will. Die Palette nennt die Fragen, die sich lohnen, und trägt den fachlich geformten
+# Auftrag schon bei sich. Wer mehr will, legt einen eigenen Satz dazu („leg besonderen Wert
+# auf …"), und wer ganz frei sein will, nimmt den letzten Baustein.
+#
+# ``braucht_szene``: Dieser Baustein hängt an einer bestimmten Szene, die die Person wählt.
+# Ohne sie wäre „Eine Szene ausbauen" eine Aufforderung an das Modell, sich eine auszusuchen
+# — und es nähme die erste.
+
+KAPITEL_BAUSTEINE: tuple[dict[str, Any], ...] = (
+    {"key": "szene", "label": "Eine Szene ausbauen",
+     "titel_vorschlag": "Der Abend, an dem …",
+     "hinweis": "Ein einzelner Vorfall, langsam erzählt.",
+     "braucht_szene": True,
+     "auftrag": "Erzähle DIESE eine Szene aus — in der Reihenfolge, in der sie passiert "
+                "ist, mit den Angaben, die dazu vorliegen. Langsam und ohne Deutung. Was "
+                "nicht in der Szene steht, kommt nicht hinein; erfinde keine Details, um "
+                "sie runder zu machen."},
+    {"key": "erleben", "label": "Was das mit mir gemacht hat",
+     "titel_vorschlag": "Was es mit mir macht",
+     "hinweis": "Die Wirkung auf dich — in deinen Worten.",
+     "auftrag": "Die Wirkung auf die hörende Person: was sie gespürt, gedacht, ausgehalten "
+                "hat. Ausschließlich aus ihren eigenen Angaben, ohne Steigerung und ohne "
+                "Beschwichtigung."},
+    {"key": "muster", "label": "Ein Muster benennen",
+     "titel_vorschlag": "Was immer wieder passiert",
+     "hinweis": "Das Wiederkehrende, an Beispielen belegt.",
+     "auftrag": "Benenne das Wiederkehrende und belege es an konkreten Szenen. Hier sind "
+                "Belege wichtiger als Formulierungen. Wo ein Muster nur einmal vorkommt, "
+                "sag das — einmal ist kein Muster."},
+    {"key": "gebraucht", "label": "Was ich gebraucht hätte",
+     "titel_vorschlag": "Was gefehlt hat",
+     "hinweis": "Nicht der Vorwurf, sondern das Fehlende.",
+     "auftrag": "Was in diesen Momenten gefehlt hat — als Bedürfnis formuliert, nicht als "
+                "Vorwurf. „Ich hätte gebraucht, dass …“ und nicht „du hättest sollen …“. "
+                "Nur was in den Angaben steht."},
+    {"key": "wunsch", "label": "Was ich mir wünsche",
+     "titel_vorschlag": "Was ich mir wünsche",
+     "hinweis": "Nach vorn, ohne Plan und ohne Rat.",
+     "auftrag": "Was sich die Person wünscht, aus ihren Angaben. Kein Plan, keine Schritte, "
+                "kein Rat — ein Wunsch darf unfertig bleiben."},
+    {"key": "verstanden", "label": "Was ich schon verstanden habe",
+     "titel_vorschlag": "Was ich schon weiß",
+     "hinweis": "Deine eigenen Erkenntnisse, nicht unsere.",
+     "auftrag": "Was die Person selbst erkannt hat — belegt, nicht behauptet. Kein Lob, "
+                "eine Feststellung. Wo sie eine frühere Einschätzung verworfen hat, gehört "
+                "auch das dazu."},
+    {"key": "frage", "label": "Eine offene Frage",
+     "titel_vorschlag": "Was offen ist",
+     "hinweis": "Was der Stoff aufwirft und niemand von außen beantwortet.",
+     "auftrag": "Eine oder zwei Fragen, die der Stoff aufwirft und die niemand von außen "
+                "beantworten kann. Offen gestellt, ohne Vermutung darin, und ohne Antwort "
+                "hinterher."},
+    {"key": "stand", "label": "Wo ich heute stehe",
+     "titel_vorschlag": "Wo ich heute stehe",
+     "hinweis": "Der Punkt, an dem es gerade ist.",
+     "auftrag": "Der heutige Stand, nüchtern, ohne Prognose und ohne Rat. Mit Datum, wo "
+                "eines in den Angaben steht."},
+    {"key": "frei", "label": "Freier Auftrag",
+     "titel_vorschlag": "",
+     "hinweis": "Du schreibst selbst, worum es in diesem Kapitel geht.",
+     "auftrag": ""},
+)
+
+BAUSTEIN_SCHLUESSEL = {b["key"] for b in KAPITEL_BAUSTEINE}
+
+#: Der Schlüssel des Formats „eigener Podcast". Kein Eintrag in ``FORMATE``: Es gibt dort
+#: keine Kapitelstruktur, die es beschreiben könnte — die kommt von der Person.
+EIGENES_FORMAT = "eigenes"
+
+#: Die Haltung, wenn die Person die Kapitel selbst gebaut hat.
+#:
+#: **Zurückhaltender als jedes Katalog-Format, und das ist Absicht.** Ein Format sagt, wie
+#: etwas klingen soll, weil jemand es so bestellt hat, ohne die Kapitel zu kennen. Hier hat
+#: die Person die Kapitel selbst gesetzt: Sie hat schon entschieden, worum es geht. Was
+#: bleibt, ist das Handwerk — und die Regeln, die nirgends verhandelbar sind.
+#:
+#: Ein Satz über Übergänge steht drin, weil selbstgebaute Kapitel oft nicht aufeinander
+#: aufbauen: Wer „Eine Szene ausbauen" hinter „Was ich mir wünsche" stellt, hat einen Grund,
+#: aber der Text muss den Sprung tragen.
+EIGENES_HALTUNG = (
+    "Die Kapitel dieser Folge hat die hörende Person selbst zusammengestellt — sie hat "
+    "entschieden, worum es geht und in welcher Reihenfolge. Halte dich an ihre Aufträge und "
+    "füge nichts hinzu, was sie nicht bestellt hat. "
+    "Ruhig und ohne Dramatisierung, wie im Gespräch mit einem Menschen, der die Sache kennt. "
+    "Wo zwei Kapitel nicht aufeinander aufbauen, überbrücke das mit einem Satz, statt neu "
+    "anzufangen — sie sollen als eine Folge zu hören sein."
+)
+
+#: Wie ausführlich ein eigenes Kapitel wird. Drei Stufen, aus demselben Grund wie die vier
+#: bei den Reglern: Niemand meint den Unterschied zwischen 0,27 und 0,31.
+KAPITEL_LAENGEN: tuple[dict[str, Any], ...] = (
+    {"key": "kurz", "label": "Kurz", "gewicht": 1.0},
+    {"key": "normal", "label": "Normal", "gewicht": 2.0},
+    {"key": "lang", "label": "Ausführlich", "gewicht": 3.0},
+)
+
+KAPITEL_LAENGEN_SCHLUESSEL = {k["key"] for k in KAPITEL_LAENGEN}
+
+#: Höchstens so viele Kapitel in einem eigenen Podcast.
+#:
+#: Nicht gegen Kosten — die Länge steuert das Wortbudget —, sondern gegen eine Folge, in der
+#: jedes Kapitel vierzig Wörter hat. Zwölf Kapitel auf zwanzig Minuten sind eine Aufzählung,
+#: keine Erzählung.
+MAX_EIGENE_KAPITEL = 8
+
+#: Höchstens so lang darf die eigene Anweisung sein.
+#:
+#: Ein Absatz, nicht ein Aufsatz. Wer zweitausend Zeichen Anweisung schreibt, schreibt den
+#: Podcast selbst — und die Regeln, die darüber stehen, verlieren gegen die schiere Menge.
+MAX_EIGENE_ANWEISUNG = 600
+
+#: Wie die eigene Anweisung in den Prompt eingebettet wird.
+#:
+#: **Sie steht als WUNSCH da, nicht als Anweisung — und sie steht vor der Wiederholung der
+#: Regeln, nicht danach.** Ein Modell folgt bei Widersprüchen dem, was näher am Ende steht
+#: und bestimmter formuliert ist. Wer „schreib mir, ob er ein Narzisst ist" hineinschreibt,
+#: meint es ernst; die Antwort darauf darf trotzdem nicht kommen, und zwar nicht, weil wir
+#: den Wunsch ignorieren, sondern weil danach noch einmal steht, was nicht geht.
+EIGENE_ANWEISUNG_RAHMEN = (
+    "WAS SICH DIE PERSON FÜR DIESE FOLGE GEWÜNSCHT HAT\n"
+    "(ihre eigenen Worte — nimm sie ernst, soweit sie den Regeln nicht widersprechen):\n\n"
+    "{wunsch}\n\n"
+    "Und weil dieser Wunsch von einem Menschen kommt, der mitten in der Sache steht: Die "
+    "Regeln oben gelten weiter. Keine Diagnose, kein Urteil über die andere Person, kein "
+    "Rat — auch dann nicht, wenn genau danach gefragt wurde. Wo der Wunsch dort hinführt, "
+    "folge ihm bis zur Grenze und nicht darüber hinaus."
+)
 
 
 # ── Der Vorbehalt, gesprochen ────────────────────────────────────────────────

@@ -2065,6 +2065,7 @@ class EchoService:
         format_haltung: str,
         ansprache_anweisung: str,
         kapitel: list[dict[str, Any]],
+        eigene_anweisung: str = "",
     ) -> dict[str, Any]:
         """Alle Kapitel einer Folge in EINEM Aufruf.
 
@@ -2084,6 +2085,8 @@ class EchoService:
 
         import json
 
+        from app.services.podcast_katalog import EIGENE_ANWEISUNG_RAHMEN
+
         system_prompt = _load_prompt("podcast_skript_prompt.md")
 
         auftraege = "\n".join(
@@ -2099,12 +2102,26 @@ class EchoService:
             + "\n\nDIE KAPITEL, IN DIESER REIHENFOLGE:\n\n" + auftraege
         )
 
+        # **Der Wunsch der Person kommt als EIGENE Nachricht nach den Kapiteln.**
+        #
+        # Nicht in den Block oben hineingemischt: Dort stehen unsere Auftraege, und ein
+        # fremder Satz mitten darin waere von ihnen nicht mehr zu unterscheiden. Als
+        # eigene Nachricht bleibt sichtbar, was von wem kommt - und der Rahmen
+        # wiederholt danach, was auch auf Wunsch nicht geht.
+        wunsch = (eigene_anweisung or "").strip()
+        wunsch_nachricht = (
+            [{"role": "system",
+              "content": EIGENE_ANWEISUNG_RAHMEN.format(wunsch=wunsch)}]
+            if wunsch else []
+        )
+
         response = await self._chat(  # type: ignore[union-attr]
             model=self._model_smart,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "system", "content": "DAS MATERIAL DIESES FALLS\n\n" + material_text},
                 {"role": "system", "content": anweisung},
+                *wunsch_nachricht,
                 {"role": "user", "content": (
                     "Schreib das Skript. Zum Hören, nicht zum Lesen: kurze Sätze, keine "
                     "Aufzählungszeichen, keine Ziffern, keine Abkürzungen. Kapitel"

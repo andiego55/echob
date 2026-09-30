@@ -34,6 +34,16 @@ Dazu für jedes Kapitel: sein Auftrag und sein **Wortbudget**. Halte das Budget 
 
 **Nichts erfinden, auch nicht zum Zusammenhalt.** Wenn zwei Angaben nicht zusammenpassen, bleibt der Widerspruch stehen. Ein glatter Text, der eine Lücke füllt, ist eine Erzählung über jemanden, der sie nicht geschrieben hat.
 
+## Wenn die Kapitel von der Person selbst gebaut sind
+
+Dann steht in manchen Aufträgen ein Satz, der mit „Was sich die Person für dieses Kapitel
+besonders gewünscht hat" beginnt. **Nimm ihn ernst und halte dich trotzdem an die Regeln
+oben.** Er verschiebt den Schwerpunkt — er hebt nichts auf.
+
+Und bei einem Kapitel, das an einer bestimmten Szene hängt: **nur diese Szene.** Andere
+Szenen stehen im Material, weil sie für andere Kapitel gebraucht werden. Sie hier
+hereinzuziehen macht aus einem Kapitel über einen Abend eine Zusammenfassung des Falls.
+
 ## Der Titel
 
 Ein kurzer Titel, höchstens sechs Wörter, aus dem Stoff genommen — nicht aus dem Formatnamen. Kein Doppelpunkt, kein Untertitel, keine Frage. Er steht später im Regal, und die Person soll die Folge daran wiedererkennen.

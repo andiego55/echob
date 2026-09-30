@@ -109,6 +109,17 @@ async def katalog_lesen(
     return {
         "formate": [katalog.fuers_auge(f) for f in katalog.FORMATE],
         "max_folgen_je_fall": katalog.MAX_FOLGEN_JE_FALL,
+        # Der Baukasten. OHNE die Auftragstexte: Ein Kapitelauftrag liest sich wie eine
+        # Beschreibung und ist eine Anweisung an ein Modell — auf einem Bildschirm gelesen
+        # klingt er wie ein geprüftes Versprechen.
+        "eigenes_format": katalog.EIGENES_FORMAT,
+        "bausteine": [
+            {k: v for k, v in b.items() if k != "auftrag"}
+            for b in katalog.KAPITEL_BAUSTEINE
+        ],
+        "kapitel_laengen": list(katalog.KAPITEL_LAENGEN),
+        "max_eigene_kapitel": katalog.MAX_EIGENE_KAPITEL,
+        "max_eigene_anweisung": katalog.MAX_EIGENE_ANWEISUNG,
     }
 
 
@@ -152,20 +163,36 @@ async def anlegen(
     """
     user_id = current["user_id"]
     echo_svc = getattr(request.app.state, "echo_service", None)
+    eigenes = body.format == katalog.EIGENES_FORMAT
     gewichte = dienst.gewichte_pruefen(body.format, body.gewichte)
 
-    f = katalog.format_(body.format)
-    if f is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
-    budget = katalog.kapitel_budget(body.format, body.laenge, set(body.ohne_kapitel or []))
-    if not budget:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Du hast alle Kapitel abgewählt — dann gibt es nichts zu erzählen.",
-        )
-    kapitel = [
-        {**k, "woerter": budget[k["key"]]} for k in f["kapitel"] if k["key"] in budget
-    ]
+    # ── Zwei Wege, und die Verzweigung steht nur hier ────────────────────────
+    #
+    # Beim Katalog-Format kommen Kapitel und Auftrag aus dem Katalog; beim eigenen Podcast
+    # hat die Person sie gebaut. Alles danach ist gleich: dasselbe Material, dasselbe Modell,
+    # dieselbe Ablage, dieselbe Sprachausgabe. Deshalb verzweigt es an einer Stelle und nicht
+    # an fünf — ein zweiter Endpunkt für eigene Folgen hätte über kurz oder lang eine andere
+    # Kontingentprüfung, eine andere Transaktion und ein anderes Verhalten bei Fehlern.
+    if eigenes:
+        haltung = katalog.EIGENES_HALTUNG
+        roh_kapitel = dienst.eigene_kapitel_pruefen(body.kapitel)
+    else:
+        f = katalog.format_(body.format)
+        if f is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
+        haltung = f["haltung"]
+        budget = katalog.kapitel_budget(
+            body.format, body.laenge, set(body.ohne_kapitel or []))
+        if not budget:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Du hast alle Kapitel abgewählt — dann gibt es nichts zu erzählen.",
+            )
+        roh_kapitel = [
+            {**k, "woerter": budget[k["key"]], "eigener_auftrag": "", "szene_id": None,
+             "kapitel_laenge": None}
+            for k in f["kapitel"] if k["key"] in budget
+        ]
 
     # ── Erstes Verbindungsfenster: prüfen und lesen, nichts schreiben ────────
     async with pool.acquire() as conn:
@@ -174,6 +201,14 @@ async def anlegen(
             laenge=body.laenge, stimme=body.stimme, ansprache=body.ansprache)
         material = await dienst.material_laden(
             conn, user_id=user_id, case_id=case_id, gewichte=gewichte)
+        # Die Szenen-Anker im selben Fenster: Ein eigenes Kapitel hängt an EINER bestimmten
+        # Szene, und die muss auch geladen werden, wenn sie nicht unter den jüngsten ist.
+        kapitel = (
+            await dienst.eigene_kapitel_fuellen(
+                conn, user_id=user_id, case_id=case_id, kapitel=roh_kapitel,
+                laenge=body.laenge)
+            if eigenes else roh_kapitel
+        )
 
     if echo_svc is None:  # pragma: no cover — nur ohne konfigurierten Dienst
         raise HTTPException(
@@ -184,9 +219,10 @@ async def anlegen(
     # ── Kein Verbindungsfenster über dem Modellaufruf ────────────────────────
     skript = await echo_svc.generate_podcast_skript(
         material_text=dienst.als_prompt_material(material, gewichte),
-        format_haltung=f["haltung"],
+        format_haltung=haltung,
         ansprache_anweisung=katalog.ansprache(body.ansprache)["anweisung"],
         kapitel=kapitel,
+        eigene_anweisung=(body.eigene_anweisung or "")[:katalog.MAX_EIGENE_ANWEISUNG],
     )
 
     # ── Zweites Fenster: alles oder nichts ──────────────────────────────────
@@ -194,7 +230,8 @@ async def anlegen(
         return await dienst.anlegen(
             conn, user_id=user_id, case_id=case_id, format_key=body.format,
             laenge=body.laenge, stimme=body.stimme, ansprache=body.ansprache,
-            gewichte=gewichte, titel=skript.get("titel"), kapitel=skript["kapitel"])
+            gewichte=gewichte, titel=skript.get("titel"), kapitel=skript["kapitel"],
+            eigene_anweisung=body.eigene_anweisung or "")
 
 
 @router.post("/{podcast_id}/sprechen", response_model=dict)

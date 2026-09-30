@@ -27,6 +27,9 @@ from fastapi import HTTPException, status
 from app.core import crypto
 from app.services import podcast_katalog as katalog
 
+#: Alle Elemente — für den selbstgebauten Podcast, der nichts ausschließt.
+ELEMENT_ALLE = tuple(e["key"] for e in katalog.ELEMENTE)
+
 #: Wie viele Szenen höchstens mitgehen, je Gewichtung. „Im Mittelpunkt" heißt mehr Material,
 #: nicht alles: Fünfzig Szenen in einem Prompt ergeben keinen dichteren Text, sondern einen
 #: aufzählenden.
@@ -74,10 +77,17 @@ def gewichte_pruefen(format_key: str, roh: Any) -> dict[str, str]:
     Hypothesen und Personenprofil nicht bloß ausgeblendet — sie werden abgewiesen. Die
     Oberfläche zeigt sie gar nicht erst; hier steht die Grenze.
     """
-    f = katalog.format_(format_key)
-    if not f:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
-    erlaubt = set(f["elemente"])
+    if format_key == katalog.EIGENES_FORMAT:
+        # Ein selbstgebauter Podcast darf alles verwenden: Die Person hat die Kapitel
+        # gesetzt, also hat sie schon entschieden, worum es geht. Ein Format beschneidet die
+        # Regler, weil es einen Zweck hat, den die Person beim Wählen noch nicht überblickt —
+        # hier gibt es diesen Zweck nicht.
+        erlaubt = set(ELEMENT_ALLE)
+    else:
+        f = katalog.format_(format_key)
+        if not f:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
+        erlaubt = set(f["elemente"])
 
     sauber: dict[str, str] = {}
     for key in erlaubt:
@@ -170,6 +180,177 @@ async def material_laden(
     return material
 
 
+def eigene_kapitel_pruefen(roh: Any) -> list[dict[str, Any]]:
+    """Die selbstgebauten Kapitel, gesäubert — und in der Reihenfolge, die ankommt.
+
+    **Was hier passiert, ist keine Formalität.** Diese Liste kommt aus dem Browser und wird
+    danach zu Aufträgen an ein Sprachmodell. Drei Dinge müssen deshalb hier entschieden
+    werden und nicht später:
+
+    * **Der Baustein bestimmt den fachlichen Auftrag, nicht der Aufrufer.** Was in den Prompt
+      geht, steht im Katalog. Die Person legt einen eigenen Satz dazu — sie ersetzt den
+      Auftrag nicht. Ohne diese Trennung wäre jedes Kapitel ein Freitextfeld ins Modell, und
+      die Regeln des Formats hätten kein Gegengewicht.
+    * **Ein Anker ohne Baustein, der ihn braucht, fällt weg** und umgekehrt: Ein
+      Szenen-Kapitel ohne Szene ist eine Aufforderung an das Modell, sich eine auszusuchen.
+    * **Die Reihenfolge ist die der Liste.** Sie kommt so, wie die Person sie sortiert hat;
+      eine eigene Nummer daneben wäre eine zweite Wahrheit, die auseinanderläuft.
+    """
+    if not isinstance(roh, list) or not roh:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Dieser Podcast hat noch kein Kapitel.",
+        )
+    if len(roh) > katalog.MAX_EIGENE_KAPITEL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"Höchstens {katalog.MAX_EIGENE_KAPITEL} Kapitel. Mehr ergeben auf einer "
+                "Folge eine Aufzählung statt einer Erzählung."
+            ),
+        )
+
+    sauber: list[dict[str, Any]] = []
+    for i, k in enumerate(roh, start=1):
+        if not isinstance(k, dict):
+            continue
+        baustein = next(
+            (b for b in katalog.KAPITEL_BAUSTEINE if b["key"] == k.get("baustein")), None)
+        if baustein is None:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Kapitel {i}: unbekannte Art.",
+            )
+
+        titel = str(k.get("titel") or "").strip()[:120] or baustein["titel_vorschlag"]
+        eigener = str(k.get("eigener_auftrag") or "").strip()[:400]
+        if not titel:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Kapitel {i} braucht eine Überschrift.",
+            )
+        # Der freie Baustein trägt keinen Auftrag aus dem Katalog — dann MUSS die Person
+        # sagen, worum es geht. Sonst schreibt das Modell irgendetwas und es sieht aus, als
+        # hätte das Werkzeug geraten.
+        if baustein["key"] == "frei" and not eigener:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Kapitel {i}: Beim freien Auftrag musst du sagen, worum es geht.",
+            )
+
+        laenge = k.get("kapitel_laenge")
+        if laenge not in katalog.KAPITEL_LAENGEN_SCHLUESSEL:
+            laenge = "normal"
+
+        szene_id = k.get("szene_id") if baustein.get("braucht_szene") else None
+        if baustein.get("braucht_szene") and not szene_id:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Kapitel {i}: Wähl die Szene aus, um die es gehen soll.",
+            )
+
+        sauber.append({
+            "key": f"{baustein['key']}_{i}",
+            "baustein": baustein["key"],
+            "titel": titel,
+            "eigener_auftrag": eigener,
+            "kapitel_laenge": laenge,
+            "szene_id": str(szene_id) if szene_id else None,
+        })
+
+    if not sauber:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Dieser Podcast hat noch kein Kapitel.",
+        )
+    return sauber
+
+
+async def eigene_kapitel_fuellen(
+    conn: asyncpg.Connection,
+    *,
+    user_id: UUID | str,
+    case_id: UUID | str,
+    kapitel: list[dict[str, Any]],
+    laenge: str,
+) -> list[dict[str, Any]]:
+    """Macht aus den gebauten Kapiteln Aufträge fürs Modell — mit Wortbudget und Szenentext.
+
+    **Das Budget wird nach Gewicht verteilt und nicht gleichmäßig.** „Kurz" und
+    „ausführlich" sollen einen Unterschied machen, den man hört; sonst ist die Wahl eine
+    Beschriftung.
+
+    Die Szene wird HIER geladen, im selben Verbindungsfenster wie das übrige Material, und an
+    den Auftrag angehängt. Sie noch einmal aus dem allgemeinen Material herauszusuchen hieße,
+    dass ein Kapitel leer bleibt, wenn die Szene nicht unter den geladenen ist — und geladen
+    werden nur die jüngsten.
+    """
+    gewaehlt = katalog.laenge(laenge)
+    gesamt = gewaehlt["woerter"] if gewaehlt else 1400
+    gewichte = {k["key"]: next(
+        (x["gewicht"] for x in katalog.KAPITEL_LAENGEN if x["key"] == k["kapitel_laenge"]),
+        2.0) for k in kapitel}
+    summe = sum(gewichte.values()) or 1.0
+
+    szenen_ids = [k["szene_id"] for k in kapitel if k["szene_id"]]
+    szenen: dict[str, dict[str, Any]] = {}
+    if szenen_ids:
+        # Gebunden an die Nutzer-Id UND den Fall: Eine Szenen-Kennung aus dem Browser darf
+        # keine Szene aus einem anderen Fall in diesen Podcast holen.
+        zeilen = await conn.fetch(
+            "SELECT id, title, description, user_reaction, scene_date FROM scenes "
+            " WHERE id = ANY($1::uuid[]) AND case_id = $2 AND user_id = $3",
+            szenen_ids, case_id, user_id,
+        )
+        for z in zeilen:
+            d = crypto.decrypt_fields(dict(z), "description", "user_reaction")
+            szenen[str(z["id"])] = d
+
+    fertig: list[dict[str, Any]] = []
+    for k in kapitel:
+        baustein = next(b for b in katalog.KAPITEL_BAUSTEINE if b["key"] == k["baustein"])
+        teile = [baustein["auftrag"]] if baustein["auftrag"] else []
+
+        szene = szenen.get(k["szene_id"] or "")
+        if k["szene_id"] and not szene:
+            # Die Szene gibt es nicht (mehr) oder sie gehört nicht zu diesem Fall. Das
+            # Kapitel faellt weg statt ins Leere zu greifen: Ein Modell, das zu „diese
+            # Szene" nichts findet, erfindet eine.
+            continue
+        if szene:
+            datum = szene.get("scene_date")
+            teile.append(
+                "DIE SZENE, UM DIE ES IN DIESEM KAPITEL GEHT"
+                + (f" (vom {datum.isoformat()})" if datum else "")
+                + f":\n„{szene.get('title') or 'ohne Titel'}“\n"
+                + (szene.get("description") or "")
+                + (f"\nWie die Person darauf reagiert hat: {szene['user_reaction']}"
+                   if szene.get("user_reaction") else "")
+                + "\n\nNimm NUR diese Szene. Andere Szenen gehören in andere Kapitel."
+            )
+        if k["eigener_auftrag"]:
+            # **Der eigene Satz steht hinter dem fachlichen Auftrag, nicht an seiner
+            # Stelle.** Er soll den Schwerpunkt verschieben („leg Wert auf mein Erleben"),
+            # nicht die Regeln ersetzen.
+            teile.append(
+                "Was sich die Person für dieses Kapitel besonders gewünscht hat "
+                f"(ihre Worte): „{k['eigener_auftrag']}“"
+            )
+
+        fertig.append({
+            **k,
+            "auftrag": "\n\n".join(teile),
+            "woerter": max(80, round(gesamt * gewichte[k["key"]] / summe)),
+        })
+
+    if not fertig:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Zu den gewählten Szenen ist nichts auffindbar. Wähl andere Kapitel.",
+        )
+    return fertig
+
+
 async def pruefen_und_zaehlen(
     conn: asyncpg.Connection,
     *,
@@ -186,13 +367,26 @@ async def pruefen_und_zaehlen(
     die Verbindung dabei zurück in den Pool geht. Wer hier abgewiesen wird, hat nichts
     gekostet: kein Modell gelaufen, keine Zeile entstanden.
     """
-    if format_key not in katalog.FORMAT_SCHLUESSEL:
+    if (format_key not in katalog.FORMAT_SCHLUESSEL
+            and format_key != katalog.EIGENES_FORMAT):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
     if laenge not in katalog.LAENGEN_SCHLUESSEL:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Länge.")
     if stimme not in katalog.STIMM_SCHLUESSEL:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Stimme.")
-    if ansprache not in katalog.format_(format_key)["ansprachen"]:
+    # Ein selbstgebauter Podcast lässt jede Ansprache zu — bis auf die an die andere
+    # Person.
+    #
+    # **Die ist an ihr Format gebunden, und das ist keine Kleinigkeit.** „Was ich dir sagen
+    # würde" trägt seine Grenzen in der Haltung des Formats: keine Abrechnung, keine Bilanz,
+    # kein Appell. Wer dieselbe Ansprache in einen selbstgebauten Podcast holt, bekäme einen
+    # gesprochenen Text an einen namentlich bekannten Menschen — ohne diese Grenzen.
+    erlaubte = (
+        tuple(a["key"] for a in katalog.ANSPRACHEN if a["key"] != "an_person")
+        if format_key == katalog.EIGENES_FORMAT
+        else katalog.format_(format_key)["ansprachen"]
+    )
+    if ansprache not in erlaubte:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Diese Ansprache passt nicht zu diesem Format.",
@@ -228,6 +422,7 @@ async def anlegen(
     gewichte: dict[str, str],
     titel: str | None,
     kapitel: list[dict[str, Any]],
+    eigene_anweisung: str = "",
 ) -> dict[str, Any] | None:
     """Legt die Folge MIT ihrem Skript an — in einer Transaktion, oder gar nicht.
 
@@ -258,24 +453,31 @@ async def anlegen(
         zeile = await conn.fetchrow(
             """
             INSERT INTO case_podcasts
-              (case_id, user_id, format, laenge, stimme, ansprache, gewichte, titel, status)
-            SELECT c.id, $2, $3, $4, $5, $6, $7::jsonb, $8, 'skript'
+              (case_id, user_id, format, laenge, stimme, ansprache, gewichte, titel,
+               eigene_anweisung, status)
+            SELECT c.id, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, 'skript'
               FROM cases c
              WHERE c.id = $1 AND c.user_id = $2
             RETURNING *
             """,
             case_id, user_id, format_key, laenge, stimme, ansprache,
             json.dumps(gewichte), crypto.encrypt(titel) if titel else None,
+            crypto.encrypt(eigene_anweisung) if eigene_anweisung.strip() else None,
         )
         if zeile is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
 
         for nr, k in enumerate(kapitel, start=1):
+            # ``auftrag`` steht nur bei eigenen Kapiteln: Bei einem Format aus dem Katalog
+            # liegt er dort, und ihn mitzuschreiben wäre eine zweite Wahrheit.
             await conn.execute(
                 "INSERT INTO case_podcast_kapitel "
-                "  (podcast_id, nr, kapitel_key, titel, text) "
-                "VALUES ($1,$2,$3,$4,$5)",
+                "  (podcast_id, nr, kapitel_key, titel, text, auftrag, szene_id, "
+                "   kapitel_laenge) "
+                "VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
                 zeile["id"], nr, k["key"], k["titel"], crypto.encrypt(k["text"]),
+                crypto.encrypt(k["eigener_auftrag"]) if k.get("eigener_auftrag") else None,
+                k.get("szene_id"), k.get("kapitel_laenge"),
             )
 
     return await holen(conn, user_id=user_id, podcast_id=zeile["id"])
@@ -286,12 +488,17 @@ def _folge(zeile: asyncpg.Record | None) -> dict[str, Any] | None:
         return None
     d = dict(zeile)
     d["titel"] = crypto.decrypt(d["titel"]) if d.get("titel") else None
+    d["eigene_anweisung"] = (
+        crypto.decrypt(d["eigene_anweisung"]) if d.get("eigene_anweisung") else None)
     roh = d.get("gewichte")
     d["gewichte"] = json.loads(roh) if isinstance(roh, str) else (roh or {})
     f = katalog.format_(d.get("format"))
     # Die Etiketten kommen aus dem Katalog und nie aus der Zeile: Wird ein Format
     # umbenannt, zeigt das Regal den neuen Namen, nicht den alten.
-    d["format_label"] = f["label"] if f else d.get("format")
+    d["format_label"] = (
+        "Eigener Podcast" if d.get("format") == katalog.EIGENES_FORMAT
+        else f["label"] if f else d.get("format")
+    )
     st = katalog.stimme(d.get("stimme"))
     d["stimme_label"] = st["label"] if st else d.get("stimme")
     return d
@@ -313,13 +520,17 @@ async def holen(
         return None
 
     kapitel = await conn.fetch(
-        "SELECT id, nr, kapitel_key, titel, text, sekunden, "
-        "       (audio IS NOT NULL) AS gesprochen "
+        "SELECT id, nr, kapitel_key, titel, text, sekunden, auftrag, szene_id, "
+        "       kapitel_laenge, (audio IS NOT NULL) AS gesprochen "
         "  FROM case_podcast_kapitel WHERE podcast_id = $1 ORDER BY nr",
         podcast_id,
     )
     folge["kapitel"] = [
-        {**dict(k), "text": crypto.decrypt(k["text"])} for k in kapitel
+        {**dict(k), "text": crypto.decrypt(k["text"]),
+         # Was die Person für dieses Kapitel bestellt hat — sie soll nachlesen können, was
+         # sie wollte, und nicht nur, was dabei herauskam.
+         "auftrag": crypto.decrypt(k["auftrag"]) if k["auftrag"] else None}
+        for k in kapitel
     ]
     return folge
 
