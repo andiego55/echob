@@ -35,6 +35,15 @@ export interface GespeichertesBild {
   hat_datei?: boolean
   /** Nur bei `art: 'erzeugt'`: woraus es entstanden ist. */
   prompt?: string | null
+  /**
+   * Was in DIESEM Bild wofür steht — mitgespeichert, nicht nachgerechnet.
+   *
+   * **Sonst erklärt die Legende irgendwann etwas, das nicht auf dem Bild ist.** Sie wäre
+   * berechenbar, solange die Bildsprache unverändert bleibt, und genau das ist sie nicht.
+   * Vorher kam sie nur mit der Antwort des Malens: Wer die Seite neu lud, hatte ein Bild
+   * ohne Erklärung.
+   */
+  legende?: LegendenZeile[] | null
   created_at: string
   updated_at: string
 }
@@ -96,6 +105,11 @@ export const bilderApi = {
    * ganze Minute, und die Vorgabe des Clients (15 Sekunden) würde abbrechen, während der
    * Server weiterarbeitet — das Bild entstünde, das Kontingent wäre verbucht, und auf dem
    * Schirm stünde ein Netzwerkfehler.
+   *
+   * **Auf dem Weg „fall" sind es ZWEI Modellaufrufe hintereinander:** Erst schreibt ein
+   * Sprachmodell den Bildauftrag, dann malt das Bildmodell. Die vier Minuten sind dafür
+   * gerechnet und nicht für einen — wer hier kürzt, kürzt an der Stelle, an der ein
+   * bezahltes Bild entsteht, das niemand zu sehen bekommt.
    */
   malen: (caseId: string, body: {
     bildwelt: string
@@ -109,9 +123,17 @@ export const bilderApi = {
     haltung: string
     /** „keine", „kind" oder „kinder". Der Server entscheidet, ob das geht. */
     begleitung: string
+    /**
+     * Woraus das Bild entsteht: „fall" oder „baukasten".
+     *
+     * Eine Wahl über die eigenen Texte, deshalb gehört sie der Person: Auf dem Weg „fall"
+     * liest ein Sprachmodell den Fall und entwirft das Bild daraus — die Texte gehen dabei an
+     * denselben Anbieter, der sie für Echo und die Berichte schon bekommt.
+     */
+    quelle: string
   }) => apiClient
     .post<GespeichertesBild & { legende: LegendenZeile[] }>(
-      `${basis(caseId)}/malen`, body, { timeout: 180_000 })
+      `${basis(caseId)}/malen`, body, { timeout: 240_000 })
     .then(r => r.data),
 
   /**

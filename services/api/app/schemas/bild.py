@@ -27,6 +27,17 @@ class BildMalen(BaseModel):
     weggeht" ist genau die Abbildung eines echten Menschen, die es nicht geben soll. Gesteuert
     werden Handschrift, Farbe und welche Schichten mitgehen.
     """
+    #: Woraus das Bild entsteht: ``fall`` oder ``baukasten``.
+    #:
+    #: **Die Wahl gehört der Person, weil es eine Wahl über ihre Texte ist.**
+    #:
+    #: ``fall``       Ein Sprachmodell liest den Fall und schreibt den Bildauftrag. Dabei
+    #:                gehen die eigenen Texte an denselben Anbieter, der sie für Echo, die
+    #:                Berichte und den Podcast schon bekommt. Dafür sieht das Bild aus wie
+    #:                dieser Fall und nicht wie ein Fall.
+    #: ``baukasten``  Nur Zahlen gehen hinaus, und die Bildsprache steht im Katalog. Die
+    #:                Bilder sind sich untereinander ähnlicher — das ist der Preis.
+    quelle: str = "fall"
     #: Die Metapher — was das Bild ZEIGT. Von der Person gewählt, nie vom Modell.
     bildwelt: str
     #: Die Handschrift — WIE gemalt wird.

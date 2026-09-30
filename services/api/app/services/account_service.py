@@ -120,7 +120,10 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     # Was jemand sich wuenscht, ist nicht weniger heikel als das, was er erlebt hat -
     # der eigene Text der Skizze liegt deshalb im JSONB verschluesselt.
     "selbst_ideale":                 {"json": ("inhalt",)},
-    "case_bilder":                   {"text": ("svg", "satz", "prompt")},
+    # `legende` und `regie` tragen JSON in einer verschluesselten TEXT-Spalte. Fehlten sie
+    # hier, bekaeme die Person in ihrer Auskunft "enc:v1:..." zu lesen — Daten, die formal
+    # herausgegeben und praktisch unlesbar sind. Genau dafuer gibt es diese Liste.
+    "case_bilder":                   {"text": ("svg", "satz", "prompt", "legende", "regie")},
     "case_podcasts":                 {"text": ("titel",)},
     "case_podcast_kapitel":          {"text": ("text",)},
 }

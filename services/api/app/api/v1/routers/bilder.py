@@ -10,6 +10,7 @@ gegen eine Galerie, in der man nichts mehr findet.
 """
 from __future__ import annotations
 
+import logging
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
@@ -17,15 +18,35 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.bild import BildAblegen, BildMalen, BildSatz
 from app.services import bild_katalog as katalog
-from app.services import bild_modell
+from app.services import bild_modell, bild_regie
 from app.services import bildwerkstatt_service as dienst
 from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/cases/{case_id}/bilder", tags=["bilder"])
 
 #: Die Schichten, die es gibt. Was nicht hier steht, wird nicht geladen.
 ERLAUBTE_SCHICHTEN = {
     "grundton", "szenen", "durchgaenge", "lichter", "leerstellen", "druck",
+}
+
+#: Was die Bildregie vom Fall zu lesen bekommt.
+#:
+#: Dieselben Gewichte, die der Podcast-Dienst kennt — er bringt den Lader schon mit, und eine
+#: zweite Fassung derselben Akte zu pflegen waere eine Quelle stiller Unterschiede.
+#:
+#: **Was auf `aus` steht, wird nicht einmal geladen.** Das Person-Profil steht bewusst nicht
+#: dabei: Es ist die Sammlung von Merkmalen der ANDEREN Person, und ein Bildauftrag daraus
+#: waere eine Charakterisierung in Bildform. Wie stark die andere Person drueckt, kommt aus
+#: der Schicht `druck` und als eine einzige grobe Zahl.
+REGIE_GEWICHTE: dict[str, str] = {
+    # „mittelpunkt" ist eine der drei Stufen, die der Lader kennt (rand · normal ·
+    # mittelpunkt) und steht fuer 30 Szenen. Ein erfundenes Wort waere hier nicht falsch, es
+    # fiele nur still auf 15 zurueck - und genau solche Stellen findet niemand wieder.
+    "szenen": "mittelpunkt", "onboarding": "normal", "skalen": "normal",
+    "artefakte": "normal", "gefuehlsbild": "normal", "traumbeziehung": "normal",
+    "person_profil": "aus", "themen": "aus", "hypothesen": "aus",
 }
 
 
@@ -90,14 +111,27 @@ async def malen(
 ) -> dict:
     """Lässt ein Bildmodell malen — **der einzige Weg hier, der etwas kostet.**
 
-    **Was hinausgeht, ist ein Prompt aus Formanweisungen.** Kein Szenentext, kein Titel, kein
-    Satz der Person: Es geht dieselbe Struktur hinein, die der gerechnete Weg zeichnet, nur
-    als Beschreibung von Anzahl, Dichte, Rhythmus und Leere. Damit gibt es im Prompt kein
-    figuratives Material, an dem ein Modell eine Gestalt aufhängen könnte — und „keine
-    Menschen" ist keine Bitte mehr, sondern eine Eigenschaft der Eingabe.
+    **Zwei Quellen, und die Person wählt.** Das steht hier oben, weil es der einzige Ort im
+    Modul ist, an dem eigene Texte den Server verlassen können:
 
-    **Kein Verbindungsfenster über dem Modellaufruf.** Prüfen und lesen, loslassen, malen
-    lassen, wieder greifen, schreiben.
+    ``quelle = "baukasten"``
+        Was hinausgeht, ist ein Prompt aus Formanweisungen — kein Szenentext, kein Titel,
+        kein Satz der Person, nur normalisierte Zahlen, übersetzt in Bildsprache aus dem
+        Katalog. Im Prompt gibt es dann kein figuratives Material, an dem ein Modell eine
+        Gestalt aufhängen könnte.
+
+    ``quelle = "fall"`` (Vorgabe)
+        Ein Sprachmodell liest den Fall und schreibt den Bildauftrag. Die eigenen Texte gehen
+        dabei an denselben Anbieter, der sie für Echo, jeden Bericht und jeden Podcast schon
+        bekommt. Der Grund: Der Baukasten konnte Individualität nur sortieren, nicht
+        erzeugen — zwei ganz verschiedene Fälle unterschieden sich in zwei von 22 Zeilen des
+        Prompts, und genau so sahen die Bilder aus. Was dabei NICHT gelockert ist, steht in
+        ``bild_regie.pruefen``: kein Gesicht, keine zweite erwachsene Gestalt, nichts
+        Lesbares, kein Name. Fällt eine Regie durch, malt der Katalog.
+
+    **Kein Verbindungsfenster über den Modellaufrufen.** Prüfen und lesen, loslassen, Regie
+    führen und malen lassen, wieder greifen, schreiben. Elf Paar-Endpunkte dieses Projekts
+    halten eine Verbindung, während OpenAI arbeitet; hier wird das nicht wiederholt.
 
     Verbucht wird NACH dem Malen: Wer kein Bild bekommt, zahlt nicht.
     """
@@ -127,6 +161,9 @@ async def malen(
     if body.begleitung not in katalog.BEGLEITUNG_SCHLUESSEL:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Angabe zur Begleitung.")
+    if body.quelle not in ("fall", "baukasten"):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Bildquelle.")
 
     gewaehlt = {s.strip() for s in body.schichten} & ERLAUBTE_SCHICHTEN
     einstellungen = {
@@ -138,6 +175,7 @@ async def malen(
         "figur": body.figur,
         "haltung": body.haltung,
         "begleitung": body.begleitung,
+        "quelle": body.quelle,
     }
 
     async with pool.acquire() as conn:
@@ -161,7 +199,33 @@ async def malen(
             # Ohne Gestalt gibt es auch keine Begleitung und keine Haltung.
             einstellungen["begleitung"] = "keine"
 
-    prompt = katalog.prompt_bauen(werte, einstellungen)
+        # ── Die Bildregie ────────────────────────────────────────────────────
+        #
+        # **Im selben Verbindungsfenster geladen, aber VOR dem Modellaufruf gelesen.**
+        # Elf Paar-Endpunkte dieses Projekts halten eine Datenbankverbindung, waehrend
+        # OpenAI arbeitet - das ist die bekannte Engstelle, und hier wird sie nicht
+        # wiederholt: lesen, loslassen, Modelle arbeiten lassen.
+        material: dict | None = None
+        if body.quelle == "fall":
+            from app.services import podcast_service
+            material = await podcast_service.material_laden(
+                conn, user_id=user_id, case_id=case_id, gewichte=REGIE_GEWICHTE)
+
+    regie = None
+    if material is not None:
+        echo_svc = getattr(request.app.state, "echo_service", None)
+        if echo_svc is not None:
+            regie = await bild_regie.fuehren(
+                echo_svc, fall=material["fall"], material=material,
+                welt=next((b for b in katalog.BILDWELTEN
+                           if b["key"] == body.bildwelt), None))
+        if regie is None:
+            # **Kein Fehler, ein Rueckfall.** Eine Regie, die nicht taugt - zu wenig
+            # Material, ein verbotenes Wort, ein Verdacht auf einen Namen -, darf kein Bild
+            # verhindern. Dann malt der Katalog wie vorher, und die Legende sagt das.
+            logger.info("Bildwerkstatt: ohne Regie gemalt (Fall %s).", case_id)
+
+    prompt = katalog.prompt_bauen(werte, einstellungen, regie)
 
     try:
         bytes_ = await modell.malen(prompt)
@@ -176,15 +240,18 @@ async def malen(
     # nicht in die Einstellungen einer Galerie-Zeile — dort steht, WAS gewaehlt wurde, nicht,
     # welche Angaben die Person ueber sich gemacht hat.
     zum_ablegen = {k: v for k, v in einstellungen.items() if k != "selbst"}
+    # **Die Legende wird gespeichert, nicht nachgerechnet.** Die Bildsprache aendert sich -
+    # in dieser Woche zweimal -, das Bild nicht. Eine neu gerechnete Legende erklaerte einem
+    # alten Bild irgendwann, was NICHT darauf ist.
+    legende = katalog.legende(einstellungen, werte, regie)
 
     async with pool.acquire() as conn:
         bild = await dienst.gemaltes_anlegen(
             conn, user_id=user_id, case_id=case_id, einstellungen=zum_ablegen,
-            bild=bytes_, bild_typ=bild_modell.INHALTSTYP, prompt=prompt)
+            bild=bytes_, bild_typ=bild_modell.INHALTSTYP, prompt=prompt,
+            legende=legende, regie=regie)
         await log_ai_usage(user_id, conn, "bild")
-    # **Die Legende geht mit.** Eine Metapher, die niemand aufloest, bleibt Dekoration —
-    # und genau daran ist der erste Entwurf gescheitert: Man konnte nichts darin lesen.
-    return {**bild, "legende": katalog.legende(einstellungen, werte)}
+    return bild
 
 
 @router.get("/{bild_id}/datei")

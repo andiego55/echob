@@ -83,6 +83,14 @@ export default function BildwerkstattPage() {
    * den man ungefragt bekommt.
    */
   const [figur, setFigur] = useState('keine')
+  /**
+   * Woraus das Bild entsteht.
+   *
+   * Vorgabe „aus deinem Fall": Der Baukasten war der Grund, warum zwei ganz verschiedene
+   * Fälle fast dasselbe Bild bekamen. Wer seine Texte nicht hinausgeben will, stellt um —
+   * und das steht an der Wahl dran.
+   */
+  const [quelle, setQuelle] = useState('fall')
   const [haltung, setHaltung] = useState('stehend')
   const [begleitung, setBegleitung] = useState('keine')
 
@@ -151,6 +159,7 @@ export default function BildwerkstattPage() {
   const malen = useMutation({
     mutationFn: () => bilderApi.malen(caseId!, {
       bildwelt, handschrift, palette, schichten, symbolik, figur, haltung, begleitung,
+      quelle,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bilder', caseId] })
@@ -265,15 +274,55 @@ export default function BildwerkstattPage() {
                 <div className="rounded-brand-lg border border-brand-border bg-white p-5">
                   <h2 className="card-title-lg">Ein Bildmodell malen lassen</h2>
                   <p className="mt-1.5 max-w-[62ch] text-[0.86rem] leading-relaxed text-brand-muted">
-                    Du wählst ein Gleichnis — eine Landschaft, ein Haus, Wasser —, und deine
-                    Zahlen werden hineingesetzt: wie viele Momente, wie dicht, wo Pausen
-                    waren, was fehlt. <strong className="font-semibold">Kein Satz aus deinen
-                    Szenen geht hinaus</strong>, und es kommt kein Mensch darin vor.
+                    Du wählst ein Gleichnis — eine Landschaft, ein Haus, Wasser — und
+                    bestimmst, wie gemalt wird. Es kommt kein anderer Mensch darin vor, und
+                    nichts Lesbares.
                   </p>
                   <p className="mt-2 max-w-[62ch] text-[0.8rem] leading-relaxed text-brand-muted">
                     Das kostet — anders als das Datenbild — von deinem Monatskontingent, und
                     dasselbe Bild kommt nie zweimal heraus.
                   </p>
+
+                  {/* ── Woraus? ──────────────────────────────────────────────
+                      **Die Wahl gehört der Person, weil es eine Wahl über ihre Texte ist.**
+
+                      Vorher stand hier der Satz „Kein Satz aus deinen Szenen geht hinaus" als
+                      Zusage. Auf dem Weg „Aus deinem Fall" stimmt er nicht mehr — also ist
+                      er keine Zusage mehr, sondern eine Wahl mit zwei ehrlich benannten
+                      Seiten. Eine Zusage, die nur manchmal gilt, ist schlimmer als keine. */}
+                  <div className="mt-5">
+                    <span className="label">Woraus?</span>
+                    <div className="mt-1.5 grid gap-2 sm:grid-cols-2">
+                      {([
+                        ['fall', 'Aus deinem Fall',
+                          'Ein Sprachmodell liest deinen Fall und entwirft das Bild: Ort, '
+                          + 'Licht und Gegenstände kommen aus dem, was du erzählt hast. '
+                          + 'Dafür gehen deine Texte hinaus — an denselben Anbieter, der '
+                          + 'sie für Echo, deine Berichte und den Podcast schon bekommt.'],
+                        ['baukasten', 'Aus dem Baukasten',
+                          'Nur Zahlen gehen hinaus, die Bildsprache steht fest. Dafür sehen '
+                          + 'die Bilder sich untereinander ähnlicher.'],
+                      ] as const).map(([k, label, hinweis]) => (
+                        <button
+                          key={k}
+                          type="button"
+                          onClick={() => setQuelle(k)}
+                          aria-pressed={quelle === k}
+                          className={`rounded-brand border p-3 text-left transition-colors ${
+                            quelle === k ? 'border-accent bg-accent/[0.06]'
+                              : 'border-brand-border bg-white hover:border-accent/50'
+                          }`}
+                        >
+                          <span className={`block text-[0.84rem] font-semibold ${
+                            quelle === k ? 'text-accent' : 'text-navy'
+                          }`}>{label}</span>
+                          <span className="mt-0.5 block text-[0.72rem] leading-snug text-brand-muted">
+                            {hinweis}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
                   {/* **Die Bildwelt zuerst: Sie ist die Entscheidung, das Übrige ist
                       Ausführung.** Und sie gehört der Person — ein Modell, das sich das
@@ -461,10 +510,18 @@ export default function BildwerkstattPage() {
                     >
                       <span aria-hidden="true"
                         className="mt-0.5 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
+                      {/* **Zwei Schritte auf dem Weg „fall", und das steht dran.** Wer
+                          zwei Minuten auf „wird gemalt" schaut, klickt noch einmal. */}
                       <span className="text-[0.86rem] leading-relaxed text-navy">
-                        <strong className="font-semibold">Wird gemalt.</strong> Das braucht
-                        eine halbe bis ganze Minute. Lass die Seite offen — du musst nicht
-                        noch einmal klicken.
+                        <strong className="font-semibold">
+                          {quelle === 'fall'
+                            ? 'Dein Fall wird gelesen, dann wird gemalt.'
+                            : 'Wird gemalt.'}
+                        </strong>{' '}
+                        {quelle === 'fall'
+                          ? 'Beides zusammen braucht ein bis zwei Minuten.'
+                          : 'Das braucht eine halbe bis ganze Minute.'}{' '}
+                        Lass die Seite offen — du musst nicht noch einmal klicken.
                       </span>
                     </div>
                   ) : (
@@ -584,13 +641,13 @@ export default function BildwerkstattPage() {
                 <BildKarte
                   key={b.id}
                   bild={b}
-                  // Die Legende gibt es nur fuer das Bild, das in dieser Sitzung entstanden
-                  // ist: Sie kommt mit der Antwort des Malens und liegt nicht in der Reihe.
+                  // Die Legende liegt beim Bild und wird nicht nachgerechnet — sie ist auch
+                  // nach einem Neuladen da, und sie erklaert das Bild, das damals entstand.
                   onGross={url => setGross({
                     url,
                     alt: b.satz || 'Dein Lagebild',
                     satz: b.satz,
-                    legende: malen.data?.id === b.id ? malen.data.legende : null,
+                    legende: b.legende,
                   })}
                   onSatz={s => satzAendern.mutate({ id: b.id, satz: s })}
                   onLoeschen={async () => {

@@ -18,6 +18,7 @@ werden sie übersprungen.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import uuid
@@ -904,6 +905,68 @@ async def test_ein_gemaltes_bild_liegt_mit_seinem_prompt(person, db):
 
     gelesen = await dienst.holen(db, user_id=person, bild_id=bild["id"])
     assert gelesen["prompt"] == "An abstract composition ..."
+
+
+@pytest.mark.asyncio
+async def test_die_legende_liegt_beim_bild_und_wird_nicht_nachgerechnet(person, db):
+    """**Sonst erklaert die Legende irgendwann etwas, das nicht auf dem Bild ist.**
+
+    Sie waere berechenbar, solange die Bildsprache unveraendert bleibt - und genau das ist sie
+    nicht: Die Muster-Saetze haben sich in einer Woche zweimal geaendert, und die Dichte der
+    Szenen traegt gar nichts mehr. Vorher kam die Legende nur mit der Antwort des Malens; wer
+    die Seite neu lud, hatte ein Bild ohne Erklaerung.
+    """
+    fall = await _fall(db, person)
+    legende = [{"was": "Die gepackte Tasche im Flur",
+                "wofuer": "die Tasche, von der du geschrieben hast"}]
+    regie = {"motiv": "a kitchen chair pulled out from a table", "gegenstaende": []}
+
+    bild = await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall, einstellungen={},
+        bild=b"PNG", bild_typ="image/png", prompt="x",
+        legende=legende, regie=regie)
+
+    assert bild["legende"] == legende
+    assert bild["regie"] == regie
+
+    # Verschluesselt at rest, wie der Prompt.
+    for spalte in ("legende", "regie"):
+        roh = await db.fetchval(
+            f"SELECT {spalte} FROM case_bilder WHERE id = $1", bild["id"])
+        assert roh.startswith("enc:"), f"{spalte} liegt im Klartext"
+
+    # Und sie kommt mit der Galerie, damit sie nach einem Neuladen noch da ist.
+    regal = await dienst.liste(db, user_id=person, case_id=fall)
+    assert regal[0]["legende"] == legende
+    # Die Regie nicht: Sie ist die Auskunft darueber, woraus das Bild entstand, und die
+    # braucht eine Galerie nicht in zwanzigfacher Ausfuehrung.
+    assert "regie" not in regal[0]
+
+
+@pytest.mark.asyncio
+async def test_legende_und_regie_stehen_in_der_auskunft_im_klartext(person, db):
+    """**Eine Auskunft in Geheimtext ist keine Auskunft.**
+
+    Zwei neue verschluesselte Spalten, und die Liste in `account_service` haette sie nicht
+    gekannt. Dann bekaeme die Person "enc:v1:..." zu lesen - formal herausgegeben, praktisch
+    unlesbar. Dieselbe Klasse Fehler hat dieses Projekt bei den Podcast-Kapiteln schon
+    gehabt.
+    """
+    from app.services.account_service import export_user_data
+
+    fall = await _fall(db, person)
+    await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall, einstellungen={},
+        bild=b"PNG", bild_typ="image/png", prompt="ein Prompt",
+        legende=[{"was": "Die Tasche", "wofuer": "woraus sie kommt"}],
+        regie={"motiv": "a chair", "titel": "Die Kueche um zwei"})
+
+    auskunft = await export_user_data(db, str(person), "x@example.org")
+    als_text = json.dumps(auskunft, ensure_ascii=False, default=str)
+
+    assert "Die Tasche" in als_text
+    assert "Die Kueche um zwei" in als_text
+    assert "enc:v1:" not in als_text, "in der Auskunft steht Geheimtext"
 
 
 @pytest.mark.asyncio

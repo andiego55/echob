@@ -20,6 +20,7 @@ keine Skalennamen mit Bedeutung. Zwei Gründe, und der erste ist der wichtigere:
 from __future__ import annotations
 
 import json
+import logging
 from typing import Any
 from uuid import UUID
 
@@ -27,6 +28,8 @@ import asyncpg
 from fastapi import HTTPException, status
 
 from app.core import crypto
+
+logger = logging.getLogger(__name__)
 
 #: Obergrenze je Fall.
 #:
@@ -295,6 +298,22 @@ def _bild(zeile: asyncpg.Record | None) -> dict[str, Any] | None:
             d[feld] = crypto.decrypt(d[feld]) if d.get(feld) else None
     roh = d.get("einstellungen")
     d["einstellungen"] = json.loads(roh) if isinstance(roh, str) else (roh or {})
+
+    # **Legende und Regie liegen als verschluesselter TEXT mit JSON darin.**
+    #
+    # Nicht als JSONB: Verschluesselt ist es eine Zeichenkette, und eine Spalte, in der
+    # manchmal Geheimtext und manchmal echtes JSON steht, wird irgendwann falsch gelesen.
+    # Hier werden sie wieder zu Daten - ein kaputter Eintrag wird `None` und nicht zu einem
+    # 500er beim Oeffnen der Galerie.
+    for feld, leer in (("legende", []), ("regie", None)):
+        if feld not in d:
+            continue
+        text = crypto.decrypt(d[feld]) if d.get(feld) else None
+        try:
+            d[feld] = json.loads(text) if text else leer
+        except (ValueError, TypeError):
+            logger.warning("Bild %s: %s liess sich nicht lesen.", d.get("id"), feld)
+            d[feld] = leer
     return d
 
 
@@ -373,6 +392,8 @@ async def gemaltes_anlegen(
     bild: bytes,
     bild_typ: str,
     prompt: str,
+    legende: list[dict[str, str]] | None = None,
+    regie: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Legt ein GEMALTES Bild ab — Bytes statt SVG.
 
@@ -383,6 +404,15 @@ async def gemaltes_anlegen(
     Der Prompt wird mitgeschrieben, obwohl er nicht hilft, das Bild wiederzubekommen: Er ist
     die einzige Auskunft darüber, WORAUS es entstanden ist. Bei einem erfundenen Bild ist das
     die ganze Nachvollziehbarkeit, die es gibt.
+
+    **Die Legende liegt daneben und wird nicht nachgerechnet.** Sie wäre berechenbar, solange
+    die Bildsprache unverändert bleibt — und genau das ist sie nicht: Die Muster-Sätze haben
+    sich in einer Woche zweimal geändert, und die Dichte der Szenen trägt gar nichts mehr.
+    Eine neu gerechnete Legende erklärte einem alten Bild irgendwann, was NICHT darauf ist.
+
+    Die Regie kommt mit, wenn ein Sprachmodell den Bildauftrag geschrieben hat. Seitdem steht
+    die eigentliche Entscheidung — welche Gegenstände aus dem Fall ins Bild kommen — dort und
+    nicht im Katalog.
 
     **Nicht feldverschlüsselt sind nur die Bytes** — dieselbe Abwägung wie bei den
     Podcast-Tonspuren: Feldkrypto auf ein Megabyte bei jedem Abruf kostet Rechenzeit, und die
@@ -409,14 +439,16 @@ async def gemaltes_anlegen(
     zeile = await conn.fetchrow(
         """
         INSERT INTO case_bilder
-          (case_id, user_id, art, einstellungen, bild, bild_typ, prompt)
-        SELECT c.id, $2, 'erzeugt', $3::jsonb, $4, $5, $6
+          (case_id, user_id, art, einstellungen, bild, bild_typ, prompt, legende, regie)
+        SELECT c.id, $2, 'erzeugt', $3::jsonb, $4, $5, $6, $7, $8
           FROM cases c
          WHERE c.id = $1 AND c.user_id = $2
         RETURNING *
         """,
         case_id, user_id, json.dumps(einstellungen), bild, bild_typ,
         crypto.encrypt(prompt) if prompt else None,
+        crypto.encrypt(json.dumps(legende, ensure_ascii=False)) if legende else None,
+        crypto.encrypt(json.dumps(regie, ensure_ascii=False)) if regie else None,
     )
     if zeile is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
@@ -456,8 +488,11 @@ async def liste(
     # niemand versteht. Für die gemalten steht stattdessen ein Merkmal da, und der Browser
     # holt jedes einzeln über den Ausliefer-Endpunkt.
     zeilen = await conn.fetch(
+        # **Die Legende kommt mit, die Regie nicht.** Die Legende gehoert neben das Bild;
+        # die Regie ist die Auskunft darueber, woraus es entstand, und die braucht eine
+        # Galerie nicht in zwanzigfacher Ausfuehrung.
         "SELECT id, case_id, user_id, art, einstellungen, svg, satz, bild_typ, prompt, "
-        "       created_at, updated_at, (bild IS NOT NULL) AS hat_datei "
+        "       legende, created_at, updated_at, (bild IS NOT NULL) AS hat_datei "
         "  FROM case_bilder WHERE case_id = $1 AND user_id = $2 "
         " ORDER BY created_at DESC",
         case_id, user_id,
