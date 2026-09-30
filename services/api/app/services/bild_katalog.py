@@ -39,6 +39,15 @@ def _stufe(wert: float, niedrig: str, mittel: str, hoch: str) -> str:
     return hoch
 
 
+def _von_hundert(wert: float) -> str:
+    """Ein normalisierter Wert für die Legende — in der Sprache, die der Rest der App spricht.
+
+    Die Skalen stehen überall sonst als „68 von 100" da. Eine Legende, die stattdessen
+    „stark ausgeprägt" sagt, wäre eine zweite Skala neben der ersten.
+    """
+    return f"{round(max(0.0, min(1.0, wert)) * 100)} von 100"
+
+
 def _menge(zahl: int, wenig: str, mittel: str, viel: str) -> str:
     if zahl <= 4:
         return wenig
@@ -49,14 +58,13 @@ def _menge(zahl: int, wenig: str, mittel: str, viel: str) -> str:
 
 # ── Die Bildwelten ───────────────────────────────────────────────────────────
 #
-# Jede übersetzt dieselben sechs Größen in ihre eigene Sprache. Das ist der Kern dieser
+# Jede übersetzt dieselben Größen in ihre eigene Sprache. Das ist der Kern dieser
 # Datei: Nicht „ein Bild zu meinem Fall", sondern **dieselbe Struktur, in einem Gleichnis, das
 # die Person gewählt hat.**
 #
 # Jede Bildwelt bringt mit:
 #   szene      Der Ort selbst, ohne alles Weitere.
-#   weg        Wie die Momente vorkommen (aus Dichte und Rhythmus).
-#   textur     Wie hart die Welt ist (aus der Belastung).
+#   textur     Wie hart die Welt ist (aus der DURCHSCHNITTLICHEN Belastung).
 #   faden      Das Wiederkehrende, das durch alles läuft (aus den Mustern).
 #   licht      Die Erkenntnisse — das Einzige, was leuchtet.
 #   leere      Was fehlt, als sichtbare Abwesenheit.
@@ -68,16 +76,6 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "label": "Landschaft",
         "hinweis": "Ein Gelände mit Wetter und Weite — was zu gehen ist, liegt vor dir.",
         "szene": "a wide open landscape seen from a low vantage point, distant horizon",
-        "weg": {
-            "dicht": "a narrow track almost lost in dense thorny undergrowth that crowds it "
-                     "from both sides",
-            "mittel": "a worn path winding across open ground, sometimes clear, sometimes "
-                      "overgrown",
-            "weit": "a faint trail across a wide empty plain, long stretches of nothing "
-                    "between its traces",
-        },
-        "ballung": "the path is knotted and doubled back on itself in one place, while "
-                   "elsewhere it runs long and straight through emptiness",
         "textur": {
             "weich": "soft moss and low grass, everything rounded by weather",
             "mittel": "gravel and hard-packed earth, some loose stones",
@@ -96,13 +94,6 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "label": "Wasser",
         "hinweis": "Strömung, Tiefe und Stille — was trägt und was zieht.",
         "szene": "a body of water seen close to its surface, depth suggested below",
-        "weg": {
-            "dicht": "the surface broken by close-packed choppy waves that never settle",
-            "mittel": "a current with alternating stretches of ripples and calm",
-            "weit": "a nearly still surface with a few solitary rings spreading far apart",
-        },
-        "ballung": "one area churns violently while the rest of the water lies flat and "
-                   "unmoving",
         "textur": {
             "weich": "warm slow water, soft blurred reflections",
             "mittel": "cool clear water with a defined surface",
@@ -122,13 +113,6 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "hinweis": "Räume, Türen und Fenster — von außen gesehen, leer.",
         "szene": "the inside of an old building seen as empty rooms and passages, no one "
                  "present",
-        "weg": {
-            "dicht": "many doorways crowded close together along a narrow corridor",
-            "mittel": "a sequence of rooms opening one into the next, some wide, some tight",
-            "weit": "a long bare corridor with very few doors, most of it empty wall",
-        },
-        "ballung": "one cluster of rooms is crammed and cluttered, while a long empty wing "
-                   "stretches away from it",
         "textur": {
             "weich": "worn wood, faded fabric, softened edges of long use",
             "mittel": "plain plaster and bare board, honest and unadorned",
@@ -144,13 +128,6 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "label": "Wald",
         "hinweis": "Dickicht, Wurzeln und Lichtungen — was wächst und was verdeckt.",
         "szene": "deep woodland seen from within, trunks receding into depth",
-        "weg": {
-            "dicht": "trees standing so close that almost no ground is visible between them",
-            "mittel": "woodland of moderate density with room to move between the trunks",
-            "weit": "a few isolated trees standing far apart on open ground",
-        },
-        "ballung": "one thicket so dense it is impenetrable, and beyond it a long open "
-                   "stretch with nothing",
         "textur": {
             "weich": "moss, soft bark, deep leaf litter",
             "mittel": "dry bark and fallen branches",
@@ -168,12 +145,6 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "label": "Himmel",
         "hinweis": "Wetter, Weite und Ferne — Stimmung ohne Boden.",
         "szene": "an expanse of sky seen from below, with weather and depth",
-        "weg": {
-            "dicht": "banks of cloud packed tightly one behind another, no gaps",
-            "mittel": "scattered clouds drifting with clear air between them",
-            "weit": "a few high thin wisps in an otherwise open sky",
-        },
-        "ballung": "one dense mass of storm cloud, and beside it an immense clear emptiness",
         "textur": {
             "weich": "soft diffuse cloud, hazy light",
             "mittel": "defined cloud forms with clear edges",
@@ -190,14 +161,6 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "label": "Faden",
         "hinweis": "Gewebe, Knoten und Risse — was hält und was reißt.",
         "szene": "a large woven textile seen close up, its structure visible",
-        "weg": {
-            "dicht": "an area worked so tightly that the individual threads can barely be "
-                     "told apart",
-            "mittel": "an even weave with visible regular structure",
-            "weit": "a loose open weave with wide gaps between the threads",
-        },
-        "ballung": "one dense knotted mass of thread, and a long stretch where the weave is "
-                   "almost bare",
         "textur": {
             "weich": "soft worn wool, gently frayed",
             "mittel": "plain linen, honest and even",
@@ -315,6 +278,110 @@ MUSTER_LABEL: dict[str, str] = {
     "guilt_shifting": "Schuld, die bei dir landet",
     "responsibility_deflection": "Verantwortung, die niemand übernimmt",
 }
+
+
+#: Wie das Musterbild auf Deutsch heißt — **damit die Legende den Gegenstand nennt.**
+#:
+#: Die Legende sagte erst nur „dein stärkstes Muster: Schuld, die bei dir landet. Es bestimmt,
+#: was auf dem Bild zu sehen ist." Damit weiß niemand, WORAN er die Schuld im Bild erkennt —
+#: die Zeile nennt eine Deutung und verschweigt das Motiv. Hier steht dasselbe Bild in der
+#: Sprache der Person: der Gegenstand, und was mit ihm los ist.
+#:
+#: **Getrennt von `MUSTER_BILDER` und nicht als weiteres Feld darin.** Was im selben
+#: Wörterbuch steht wie der Prompt-Baustein, landet eines Tages im Prompt — und ein Modell
+#: benutzt jedes benennbare Material als Sprache. Hier kommt es gar nicht in die Nähe.
+#:
+#: Die Sätze sind so gebaut, dass sie ohne Rückbezug auskommen: `{ding} ist gekippt` geht für
+#: der, die und das. Ein `{ding}, der …` wäre bei „Die Wasserlinie" falsch.
+MUSTER_DEUTSCH: dict[str, dict[str, Any]] = {
+    "boundary_violation": {
+        "satz": "{ding} ist an mehreren Stellen durchbrochen, und die Lücken sind offen "
+                "geblieben",
+        "je_welt": {
+            "landschaft": "Eine lange Steinmauer",
+            "wasser": "Eine Reihe alter Wellenbrecher",
+            "haus": "Eine Wand im Innern",
+            "wald": "Ein alter Zaun zwischen den Bäumen",
+            "himmel": "Eine Wolkenbank",
+            "faden": "Eine gewebte Kante",
+        },
+    },
+    "control_isolation": {
+        "satz": "{ding} führt von allem anderen weg — ein zweiter Weg ist nirgends im Bild "
+                "zu sehen, und die Ränder rücken näher",
+        "je_welt": {
+            "landschaft": "Ein einziger schmaler Pfad",
+            "wasser": "Eine einzige Fahrt zwischen den Sandbänken",
+            "haus": "Ein einziger Gang",
+            "wald": "Eine einzige Lücke im Dickicht",
+            "himmel": "Eine einzige freie Bahn zwischen Wolkenwänden",
+            "faden": "Ein einziger Faden",
+        },
+    },
+    "proximity_distance": {
+        "satz": "{ding} kommt sehr nah und zieht sich wieder weit zurück, immer wieder, und "
+                "bleibt auf keinem Abstand",
+        "je_welt": {
+            "landschaft": "Der Weg", "wasser": "Die Wasserlinie",
+            "haus": "Die Wand des Raums", "wald": "Der Waldrand",
+            "himmel": "Die Wolkenuntergrenze", "faden": "Das Gewebe",
+        },
+    },
+    "conflict_escalation": {
+        "satz": "{ding} beginnt klein an einem Rand und nimmt auf der anderen Seite das "
+                "ganze Bild ein",
+        "je_welt": {
+            "landschaft": "Das Wetter", "wasser": "Eine Dünung", "haus": "Ein Riss",
+            "wald": "Ein Windbruch", "himmel": "Eine Sturmfront",
+            "faden": "Ein Riss im Gewebe",
+        },
+    },
+    "perception_distortion": {
+        "satz": "{ding} passt nicht zu dem, was dort zu sehen sein müsste — Spiegelbild und "
+                "Sache widersprechen sich, leise und unverkennbar",
+        "je_welt": {
+            "landschaft": "Ein stiller Tümpel mit seinem Spiegelbild",
+            "wasser": "Die spiegelnde Oberfläche",
+            "haus": "Eine Spiegelung im Fenster",
+            "wald": "Wasser, das zwischen den Wurzeln steht",
+            "himmel": "Das Licht auf einer Wolkenschicht",
+            "faden": "Ein Muster, das sich wiederholt",
+        },
+    },
+    "guilt_shifting": {
+        "satz": "{ding} ist zu einer Seite gekippt: Alles rutscht dorthin und sammelt sich, "
+                "obwohl nichts es dort hält",
+        "je_welt": {
+            "landschaft": "Der Boden", "wasser": "Die ganze Wasserfläche",
+            "haus": "Der Fußboden", "wald": "Der Waldboden",
+            "himmel": "Der ganze Himmel", "faden": "Der Stoff",
+        },
+    },
+    "responsibility_deflection": {
+        "satz": "{ding} hat keinen Anfang, der im Bild zu finden wäre — einfach da, ohne "
+                "sichtbare Quelle",
+        "je_welt": {
+            "landschaft": "Eine Spur", "wasser": "Eine Strömung",
+            "haus": "Ein Zug kalter Luft", "wald": "Ein Pfad", "himmel": "Ein Wind",
+            "faden": "Ein Faden",
+        },
+    },
+}
+
+
+def muster_deutsch(key: str, welt: str) -> tuple[str, str] | None:
+    """Der Gegenstand und der ganze Satz dazu — **nur für die Legende.**
+
+    Gibt `(„Der Boden", „Der Boden ist zu einer Seite gekippt: …")` zurück: das Erste für die
+    Spalte „was zu sehen ist", das Zweite für die Erklärung daneben.
+    """
+    eintrag = MUSTER_DEUTSCH.get(key)
+    if not eintrag:
+        return None
+    ding = eintrag["je_welt"].get(welt)
+    if not ding:
+        return None
+    return ding, eintrag["satz"].format(ding=ding)
 
 
 def muster_bild(key: str, welt: str) -> str | None:
@@ -439,7 +506,82 @@ FIGUR_SCHLUESSEL = {f["key"] for f in FIGUR_STUFEN}
 STANDARD_FIGUR = "keine"
 
 
-def figur_beschreibung(selbst: dict[str, Any] | None) -> str:
+#: Was die Gestalt tut.
+#:
+#: **Eine Haltung ist eine Aussage — und sie kommt von der Person, nicht von uns.** Wer
+#: „schützend" wählt, sagt etwas über seine Lage; würden WIR die Haltung aus den Daten
+#: ableiten, wäre es eine Deutung in Bildform. Deshalb ist es eine Wahl und keine Rechnung.
+HALTUNGEN: tuple[dict[str, str], ...] = (
+    {"key": "stehend", "label": "Stehen",
+     "hinweis": "Ruhig, in die Ferne sehend.",
+     "prompt": "standing still, looking out into the distance"},
+    {"key": "gehend", "label": "Gehen",
+     "hinweis": "Unterwegs, weg vom Betrachter.",
+     "prompt": "walking away from the viewer, further into the scene"},
+    {"key": "schuetzend", "label": "Schützen",
+     "hinweis": "Zugewandt, schirmend — über jemanden oder etwas.",
+     "prompt": "leaning protectively over what is beside them, sheltering it with their "
+               "body and turned toward it"},
+    {"key": "abgewandt", "label": "Abwenden",
+     "hinweis": "Weg von dem, was drückt.",
+     "prompt": "turned away from the side the weather comes from, shoulders raised"},
+    {"key": "wartend", "label": "Warten",
+     "hinweis": "Stillstehend, ohne Richtung.",
+     "prompt": "standing motionless with no direction of travel, as if waiting"},
+)
+
+HALTUNG_SCHLUESSEL = {h["key"] for h in HALTUNGEN}
+STANDARD_HALTUNG = "stehend"
+
+
+#: Wer sonst noch vorkommen darf.
+#:
+#: **Hier lag meine Regel zu grob.** „Keine zweite Gestalt" sollte EINE Person schützen: die
+#: Fallperson. Ein Kind, um das sich jemand kümmert, ist etwas anderes — es gehört zum Leben
+#: der Person, nicht zur Gegenseite, und wer sein Bild ohne das Kind sieht, sieht sein Leben
+#: nicht.
+#:
+#: **Ein Kind erscheint nur, wenn beides stimmt:** Die Selbstauskunft nennt Kinder, UND der
+#: Fall handelt nicht VON einem Kind. Geht es im Fall um das eigene Kind, wäre die Kindfigur
+#: die Fallperson — und die wird nie eine Gestalt.
+BEGLEITUNGEN: tuple[dict[str, str], ...] = (
+    {"key": "keine", "label": "Niemand sonst", "hinweis": "Nur du.",
+     "prompt": ""},
+    {"key": "kind", "label": "Ein Kind", "hinweis": "Klein, nah bei dir, ohne Gesicht.",
+     "prompt": "Close beside the figure there is one small child, also seen from behind "
+               "and with no face visible, small in the frame."},
+    {"key": "kinder", "label": "Zwei Kinder", "hinweis": "Nah bei dir, ohne Gesicht.",
+     "prompt": "Close beside the figure there are two small children, also seen from "
+               "behind and with no faces visible, small in the frame."},
+)
+
+BEGLEITUNG_SCHLUESSEL = {b["key"] for b in BEGLEITUNGEN}
+STANDARD_BEGLEITUNG = "keine"
+
+#: Bei diesen Angaben der Selbstauskunft gibt es Kinder im Leben der Person.
+KINDER_ANGABEN = {"not_with_person", "shared", "indirectly_affected"}
+
+
+def begleitung_moeglich(selbst: dict[str, Any] | None, beziehungsart: str | None) -> bool:
+    """Darf ein Kind im Bild vorkommen?
+
+    **Zwei Bedingungen, und die zweite ist die wichtige.** Handelt der Fall VON einem Kind,
+    wäre die Kindfigur die Fallperson — und die wird nie eine Gestalt. Eine Abbildung eines
+    echten Kindes aus den Angaben eines Elternteils ist das Letzte, was hier entstehen darf.
+    """
+    # Nur „child": Dort IST das Kind die Fallperson.
+    #
+    # Bei „co_parenting" ist es der andere Elternteil — und gerade dort gehoeren die Kinder
+    # ins Bild, weil sie der Grund fuer fast alles sind, was in so einem Fall steht. Sie
+    # auszuschliessen hiesse, ausgerechnet dem Fall das Wesentliche zu nehmen.
+    if beziehungsart == "child":
+        return False
+    return str((selbst or {}).get("children") or "") in KINDER_ANGABEN
+
+
+def figur_beschreibung(
+    selbst: dict[str, Any] | None, einstellungen: dict[str, Any] | None = None,
+) -> str:
     """Die Rueckenfigur, aus der Selbstauskunft — und aus nichts sonst.
 
     Ohne Angaben bleibt sie unbestimmt. **Eine erfundene Erscheinung waere schlimmer als
@@ -476,12 +618,23 @@ def figur_beschreibung(selbst: dict[str, Any] | None) -> str:
         else:
             teile.append("young")
 
-    return (
-        f"A single small figure far away in the scene: {', '.join(teile)}, "
-        "seen entirely from behind and turned away, facing into the distance. "
-        "The figure is small in the frame and no facial features are visible or implied. "
-        "There is no one else anywhere in the image."
+    haltung = next(
+        (h for h in HALTUNGEN if h["key"] == (einstellungen or {}).get("haltung")),
+        HALTUNGEN[0])
+    begleitung = next(
+        (b for b in BEGLEITUNGEN if b["key"] == (einstellungen or {}).get("begleitung")),
+        BEGLEITUNGEN[0])
+
+    satz = (
+        f"In the scene there is one adult figure, seen from a distance: {', '.join(teile)}, "
+        f"{haltung['prompt']}. The figure is seen entirely from behind, small in the frame, "
+        "and no facial features are visible or implied."
     )
+    if begleitung["prompt"]:
+        satz += " " + begleitung["prompt"]
+    else:
+        satz += " There is no one else anywhere in the image."
+    return satz
 
 
 BILDWELT_SCHLUESSEL = {b["key"] for b in BILDWELTEN}
@@ -553,15 +706,18 @@ FARBWORTE: dict[str, str] = {
 
 GRENZE = (
     "Important constraints:\n"
-    "- There is AT MOST ONE human figure in the image, and only if one is described above. "
-    "Never two people, never a couple, never a group, never a second figure of any kind — "
-    "not in the distance, not as a shadow, not as a reflection.\n"
-    "- Any figure is seen from behind or from far away. No face, no facial features, nobody "
-    "turned toward the viewer, no portrait, no reflection showing a face.\n"
+    "- Only the figures explicitly described above may appear — no one else, anywhere. "
+    "Never an additional adult, not in the distance, not as a shadow, not as a reflection, "
+    "not implied by a second set of belongings.\n"
+    "- There is never a second adult besides the one described. The person this image is "
+    "about is not depicted and must not be suggested in any form.\n"
+    "- No faces, no facial features, nobody turned toward the viewer, no portrait, no "
+    "reflection showing a face. Every figure is seen from behind or from far away.\n"
     "- Animals may appear as described above; they are calm and at a distance, never "
     "threatening, never menacing, never looking at the viewer.\n"
     "- No letters, numbers, words, writing, signatures, logos or frames.\n"
-    "- Nothing violent or gory, no weapons, no blood, no restraints, no cages.\n"
+    "- Nothing violent or gory, no weapons, no blood, no restraints, no cages. Nothing "
+    "frightening involving a child.\n"
     "- This is not an illustration of an event and not a scene from a story. It is a place "
     "that carries a mood.\n"
     "- Quiet and restrained rather than dramatic or spectacular. It should feel true, not "
@@ -569,32 +725,22 @@ GRENZE = (
 )
 
 
-def _jahreszeit(werte: dict[str, Any]) -> str | None:
-    """Die Jahreszeit der dichtesten Stelle — aus echten Daten, nicht geraten.
+def _jahreszeit() -> str:
+    """Die Jahreszeit von HEUTE.
 
-    Billig zu haben und stark in der Wirkung: Wer weiß, dass es im Herbst dicht wurde, sieht
-    den Herbst und erkennt SEINEN Verlauf.
+    **Hier stand erst die Jahreszeit der dichtesten Stelle — und das war falsch.**
+
+    Wo sich Szenen häufen, sagt etwas darüber, wann jemand Zeit zum Schreiben hatte, nicht
+    wann etwas passiert ist. Wer drei Wochen im Urlaub war, hat dort eine Lücke; wer die App
+    gerade entdeckt hat, hat am Anfang eine Häufung. Ein Bild, das sich daran ändert, ändert
+    sich aus dem falschen Grund.
+
+    Was stimmt: Das Bild entsteht jetzt. Die Jahreszeit von heute erdet es im Gegenwärtigen
+    und behauptet nichts über den Verlauf.
     """
-    from datetime import date, timedelta
+    from datetime import date
 
-    szenen = werte.get("szenen") or []
-    beginn = werte.get("beginn")
-    if not szenen or not beginn:
-        return None
-    try:
-        start = date.fromisoformat(str(beginn))
-    except (ValueError, TypeError):
-        return None
-
-    # Die dichteste Stelle: das Fenster von 60 Tagen mit den meisten Momenten.
-    tage = sorted(s["tag"] for s in szenen)
-    bestes, beste_zahl = tage[0], 0
-    for t in tage:
-        zahl = sum(1 for x in tage if t <= x < t + 60)
-        if zahl > beste_zahl:
-            bestes, beste_zahl = t, zahl
-    monat = (start + timedelta(days=bestes + 30)).month
-    return JAHRESZEITEN.get(monat)
+    return JAHRESZEITEN[date.today().month]
 
 
 def _satz(text: str) -> str:
@@ -610,23 +756,41 @@ def _satz(text: str) -> str:
     return text[0].upper() + text[1:] + "."
 
 
-def fuehrendes_muster(werte: dict[str, Any], schichten: set[str]) -> str | None:
-    """Der Schlüssel des stärksten Musters — oder nichts.
+#: Ab wann ein Muster stark genug ist, um ein Bild zu tragen.
+SCHWELLE_MUSTER = 0.45
 
-    **Das ist die Stelle, an der ein Mensch seinen eigenen Fall wiedererkennt:** nicht an der
-    Zahl der Momente, sondern daran, WAS sich wiederholt. Dieselbe Auswahl braucht der Prompt
-    und die Legende, also steht sie an einer Stelle.
+
+def starke_muster(
+    werte: dict[str, Any], schichten: set[str],
+) -> list[tuple[str, float]]:
+    """Die Muster, die das Bild tragen — stärkstes zuerst, als (Schlüssel, Wert).
+
+    **Eine Quelle für den Prompt UND für die Legende.**
+
+    Rechnete die Legende ihre eigene Reihenfolge aus, könnte sie ein Muster nennen, das im
+    Bild gar nicht führt — und dann sucht die Person im Bild etwas, das nicht da ist. Genau
+    das ist der Grund, warum diese Auswahl an einer Stelle steht und nicht an zwei.
+
+    Charakterwerte sind hier nie dabei: Sie haben keinen Eintrag in `MUSTER_BILDER`, und der
+    Filter läuft über diesen Eintrag, nicht über eine Liste von Ausnahmen.
     """
     if "durchgaenge" not in schichten:
-        return None
-    stark = sorted(
-        (d for d in (werte.get("durchgaenge") or []) if float(d.get("wert") or 0) > 0.45),
-        key=lambda d: -float(d["wert"]),
-    )
-    for d in stark:
-        if str(d.get("key")) in MUSTER_BILDER:
-            return str(d["key"])
-    return None
+        return []
+    passend = [
+        d for d in (werte.get("durchgaenge") or [])
+        if float(d.get("wert") or 0) > SCHWELLE_MUSTER
+        and str(d.get("key")) in MUSTER_BILDER
+    ]
+    return [
+        (str(d["key"]), float(d["wert"]))
+        for d in sorted(passend, key=lambda d: -float(d["wert"]))
+    ]
+
+
+def fuehrendes_muster(werte: dict[str, Any], schichten: set[str]) -> str | None:
+    """Das Muster, aus dem das Leitbild entsteht — oder nichts."""
+    stark = starke_muster(werte, schichten)
+    return stark[0][0] if stark else None
 
 
 def prompt_bauen(werte: dict[str, Any], einstellungen: dict[str, Any]) -> str:
@@ -655,31 +819,30 @@ def prompt_bauen(werte: dict[str, Any], einstellungen: dict[str, Any]) -> str:
     szenen = werte.get("szenen") or []
 
     # ── Die Muster, stärkstes zuerst ────────────────────────────────────────
-    muster: list[str] = []
-    if "durchgaenge" in schichten:
-        stark = sorted(
-            (d for d in (werte.get("durchgaenge") or []) if float(d.get("wert") or 0) > 0.45),
-            key=lambda d: -float(d["wert"]),
-        )
-        for d in stark:
-            bild = muster_bild(str(d.get("key")), welt["key"])
-            if bild:
-                muster.append(bild)
+    #
+    # Die Auswahl steht in `starke_muster` und nicht hier: Die Legende braucht dieselbe
+    # Reihenfolge, und zwei Rechnungen driften irgendwann auseinander.
+    muster = [
+        bild for bild in (
+            muster_bild(key, welt["key"]) for key, _ in starke_muster(werte, schichten)
+        ) if bild
+    ]
 
-    # ── Die Zeitgestalt ─────────────────────────────────────────────────────
-    zeitgestalt: str | None = None
-    ballung = False
-    if "szenen" in schichten and szenen:
-        tage = sorted(s["tag"] for s in szenen)
-        spanne = max(1, tage[-1] - tage[0])
-        luecken = [tage[i + 1] - tage[i] for i in range(len(tage) - 1)] or [spanne]
-        je_monat = len(szenen) / max(1.0, spanne / 30)
-        raum = "dicht" if je_monat > 2.5 else ("mittel" if je_monat > 0.8 else "weit")
-        zeitgestalt = welt["weg"][raum]
-        ballung = max(luecken) > spanne * 0.3 and len(szenen) > 4
+    # ── Keine Menge, kein Rhythmus ──────────────────────────────────────────
+    #
+    # **Hier stand die Dichte der Szenen und ihre Häufungen — beides ist draußen.**
+    #
+    # Wie viele Momente jemand festgehalten hat und wo Lücken sind, sagt etwas darüber, wie
+    # lange und wie fleißig er die App benutzt. Wer sie seit zwei Jahren führt, bekäme ein
+    # dichtes Bild; wer drei Wochen im Urlaub war, eine Lücke. Beides ist kein Grund, ein
+    # Bild anders aussehen zu lassen.
+    #
+    # Was bleibt, hängt nicht an der Menge: die Muster (Skalenwerte, gegen den Fall
+    # normalisiert), das Gefühlsbild, die DURCHSCHNITTLICHE Schwere der Momente und die
+    # Wünsche. Alles davon wäre bei acht wie bei achtzig Szenen dasselbe.
 
     # ── Satz 1: das Leitbild ────────────────────────────────────────────────
-    leit = muster[0] if muster else (zeitgestalt or welt["szene"])
+    leit = muster[0] if muster else welt["szene"]
     teile: list[str] = [
         _satz(hand["prompt"]),
         f"A single quiet image. The subject is {leit.rstrip('.')}.",
@@ -711,11 +874,8 @@ def prompt_bauen(werte: dict[str, Any], einstellungen: dict[str, Any]) -> str:
         teile.append(_satz(
             welt["faden"] + " — present everywhere rather than in one spot"))
 
-    if zeitgestalt and not muster:
-        teile.append(_satz(zeitgestalt))
-    if ballung:
-        teile.append(_satz(welt["ballung"]))
-
+    # **Der Durchschnitt, nicht die Summe.** Wie schwer die festgehaltenen Momente im Mittel
+    # waren, ist bei acht wie bei achtzig Szenen dieselbe Aussage — ihre ZAHL wäre es nicht.
     if "szenen" in schichten and szenen:
         haerte = sum(float(s.get("haerte") or 0.5) for s in szenen) / len(szenen)
         teile.append(
@@ -735,9 +895,7 @@ def prompt_bauen(werte: dict[str, Any], einstellungen: dict[str, Any]) -> str:
                      "wind driving hard through the whole scene")
             + "."
         )
-    zeit = _jahreszeit(werte) if "szenen" in schichten else None
-    if zeit:
-        teile.append(f"The season is {zeit}.")
+    teile.append(f"The season is {_jahreszeit()}.")
 
     # ── Was leuchtet und was fehlt ──────────────────────────────────────────
     if "lichter" in schichten and (werte.get("lichter") or []):
@@ -763,6 +921,8 @@ def prompt_bauen(werte: dict[str, Any], einstellungen: dict[str, Any]) -> str:
         if stufe == "deutlich":
             # Der Uebergang nur, wenn kein Muster fuehrt: Sonst stehen zwei Gegenstaende
             # derselben Art im Bild, und das sieht nach Fehler aus.
+            # Der Uebergang nur, wenn kein Muster fuehrt: Sonst stehen zwei Gegenstaende
+            # derselben Art im Bild.
             if not muster and "durchgaenge" in schichten and any(
                     float(d.get("wert") or 0) > 0.25
                     for d in (werte.get("durchgaenge") or [])):
@@ -774,7 +934,7 @@ def prompt_bauen(werte: dict[str, Any], einstellungen: dict[str, Any]) -> str:
             teile.append("Somewhere in the scene: " + "; ".join(zeichen) + ".")
 
     if einstellungen.get("figur") == "ich":
-        teile.append(figur_beschreibung(einstellungen.get("selbst")))
+        teile.append(figur_beschreibung(einstellungen.get("selbst"), einstellungen))
 
     # ── Komposition ─────────────────────────────────────────────────────────
     #
@@ -805,46 +965,61 @@ def legende(einstellungen: dict[str, Any], werte: dict[str, Any]) -> list[dict[s
 
     # **Das Leitbild zuerst — es traegt das Bild.**
     #
-    # Ohne diese Zeile sieht die Person ein Bild, das aus ihrem staerksten Muster entstanden
-    # ist, und erfaehrt es nicht. Genau daran haengt, ob sie ihren eigenen Fall wiedererkennt.
-    fuehrend = fuehrendes_muster(werte, schichten)
-    weitere = [
-        MUSTER_LABEL.get(str(d.get("key")), "")
-        for d in sorted(
-            (d for d in (werte.get("durchgaenge") or [])
-             if float(d.get("wert") or 0) > 0.45 and str(d.get("key")) in MUSTER_BILDER),
-            key=lambda d: -float(d["wert"]),
-        )[1:3]
-    ] if "durchgaenge" in schichten else []
+    # Und es nennt den GEGENSTAND, nicht die Deutung. „Dein staerkstes Muster: Schuld, die bei
+    # dir landet" liess die Person ratlos vor ihrem eigenen Bild stehen: Sie erfuhr, was
+    # gemeint ist, und nicht, woran sie es erkennt. Jetzt steht beides da, und in dieser
+    # Reihenfolge — erst das Sichtbare, dann sein Grund.
+    stark = starke_muster(werte, schichten)
+    fuehrend = stark[0][0] if stark else None
 
     if fuehrend:
+        gemalt = muster_deutsch(fuehrend, welt["key"])
+        name = MUSTER_LABEL.get(fuehrend, fuehrend)
         zeilen.append({
-            "was": "Das Hauptmotiv",
-            "wofuer": f"Dein stärkstes Muster: {MUSTER_LABEL.get(fuehrend, fuehrend)}. "
-                      "Es bestimmt, was auf dem Bild zu sehen ist",
+            "was": gemalt[0] if gemalt else "Das Hauptmotiv",
+            "wofuer": (
+                (gemalt[1] + ". " if gemalt else "")
+                + f"Das ist dein stärkstes Muster: {name} ({_von_hundert(stark[0][1])})"
+            ),
         })
-        if [w for w in weitere if w]:
+        # Die Stuetzen genauso: Gegenstand und Wert, damit niemand im Bild nach einem Wort
+        # sucht. Mehr als zwei stehen nicht im Bild, also nennt die Legende auch nur zwei.
+        weitere = []
+        for key, wert in stark[1:3]:
+            dazu = muster_deutsch(key, welt["key"])
+            if dazu:
+                weitere.append(
+                    f"{dazu[0]} — {MUSTER_LABEL.get(key, key)} ({_von_hundert(wert)})")
+        if weitere:
             zeilen.append({
                 "was": "Was noch im Bild steht",
-                "wofuer": "Weitere Muster: " + ", ".join(w for w in weitere if w),
+                "wofuer": " · ".join(weitere),
             })
 
     if "szenen" in schichten and (werte.get("szenen") or []):
-        # **Wenn ein Muster führt, trägt der Ort nicht mehr die Momente.** Dann sind es die
-        # Häufungen und Pausen darin — und die Legende muss sagen, was wirklich zu sehen ist,
-        # sonst sucht die Person etwas, das nicht da ist.
+        # **Nur noch die Schwere, nicht die Menge.**
+        #
+        # Hier stand, wie viele Momente es sind und wo Pausen lagen. Beides sagt etwas
+        # darueber, wie fleissig jemand schreibt und wann er im Urlaub war — und ein Bild,
+        # das sich daran aendert, aendert sich aus dem falschen Grund. Die Legende sagt das
+        # jetzt ausdruecklich, damit niemand die Zahl im Bild sucht.
         zeilen.append({
-            "was": ("Die Häufungen und die Pausen" if fuehrend else
-                    {"landschaft": "Der Weg und das Gelände",
-                     "wasser": "Die Bewegung des Wassers",
-                     "haus": "Die Räume und Türen", "wald": "Wie dicht die Bäume stehen",
-                     "himmel": "Die Wolken", "faden": "Wie dicht gewebt ist"}[welt["key"]]),
-            "wofuer": f'{len(werte["szenen"])} festgehaltene Momente — wie viele, wie dicht '
-                      "beieinander, und wo Pausen waren",
+            "was": {"landschaft": "Wie hart das Gelände ist",
+                    "wasser": "Wie ruhig oder rauh das Wasser ist",
+                    "haus": "Die Oberflächen der Räume",
+                    "wald": "Der Boden und die Rinde",
+                    "himmel": "Wie weich oder scharf die Wolken sind",
+                    "faden": "Wie grob der Stoff ist"}[welt["key"]],
+            "wofuer": "Wie schwer die Momente im Schnitt waren, die du festgehalten hast. "
+                      "Wie viele es sind und wo Pausen lagen, ändert am Bild nichts",
         })
     if "grundton" in schichten and werte.get("grundton"):
-        zeilen.append({"was": "Licht und Wetter",
-                       "wofuer": "Dein zuletzt bestätigtes Gefühlsbild"})
+        zeilen.append({
+            "was": "Licht und Wetter",
+            "wofuer": "Dein zuletzt bestätigtes Gefühlsbild — angenehm bis unangenehm wird "
+                      "die Temperatur des Lichts, ruhig bis aufgewühlt wird die Bewegung "
+                      "der Luft",
+        })
     if not fuehrend and "durchgaenge" in schichten and any(
             float(d.get("wert") or 0) > 0.25 for d in (werte.get("durchgaenge") or [])):
         zeilen.append({
@@ -856,19 +1031,37 @@ def legende(einstellungen: dict[str, Any], werte: dict[str, Any]) -> list[dict[s
                       "einer Stelle",
         })
     if "lichter" in schichten and (werte.get("lichter") or []):
-        zeilen.append({"was": "Die Lichter",
-                       "wofuer": "Was du selbst verstanden und festgehalten hast"})
+        zahl = len(werte["lichter"])
+        zeilen.append({
+            "was": "Die Lichter",
+            "wofuer": f"Deine {zahl} Erkenntnisse — was du selbst verstanden und "
+                      "festgehalten hast. Sie sind das Einzige im Bild, das leuchtet"
+            if zahl > 1 else
+            "Deine Erkenntnis — was du selbst verstanden und festgehalten hast. Sie ist das "
+            "Einzige im Bild, das leuchtet",
+        })
     if "leerstellen" in schichten and (werte.get("leerstellen") or []):
+        zahl = len(werte["leerstellen"])
         zeilen.append({
             "was": {"landschaft": "Die kahlen Stellen", "wasser": "Das reglose Wasser",
                     "haus": "Die Türen ins Nichts", "wald": "Die Lichtungen",
                     "himmel": "Der leere Himmel", "faden": "Die Löcher im Gewebe"}[welt["key"]],
-            "wofuer": "Was du dir wünschst und im Fall nicht vorkommt",
+            # **Wie viele, nicht welche.** Welcher Wunsch es ist, steht in deiner Skizze und
+            # verlaesst den Server nicht — waere er hier, waere er auch im Prompt, und ein
+            # Modell macht aus jedem Wort, das es bekommt, ein Bild.
+            "wofuer": f"{zahl} Dinge aus deiner Traumbeziehung, die dir viel bedeuten und in "
+                      "diesem Fall nicht vorkommen. Welche das sind, sagt das Bild nicht — "
+                      "nur, dass sie fehlen"
+            if zahl > 1 else
+            "Etwas aus deiner Traumbeziehung, das dir viel bedeutet und in diesem Fall nicht "
+            "vorkommt. Was es ist, sagt das Bild nicht — nur, dass es fehlt",
         })
     if "druck" in schichten and werte.get("druck") is not None:
         zeilen.append({
             "was": "Was von einer Seite drückt",
-            "wofuer": "Die andere Person — als Kraft auf das Ganze, nie als Gestalt darin",
+            "wofuer": "Dass über die andere Person etwas festgehalten ist — als Kraft auf "
+                      "das Ganze, nie als Gestalt darin. Was dort steht, geht nicht ins "
+                      "Bild ein, nur dass es da ist",
         })
 
     # Symbolik und Figur gehören genauso aufgelöst: Ein Zeichen, das niemand erklärt, wird
@@ -889,9 +1082,18 @@ def legende(einstellungen: dict[str, Any], werte: dict[str, Any]) -> list[dict[s
                           "fehlt und erreichbar wäre. Was sie dir bedeuten, entscheidest du",
             })
     if einstellungen.get("figur") == "ich":
+        begleitung = str(einstellungen.get("begleitung") or "keine")
+        wer = {"kind": " und ein Kind neben dir", "kinder": " und zwei Kinder neben dir"}
+        haltung = next(
+            (h["label"].lower() for h in HALTUNGEN
+             if h["key"] == einstellungen.get("haltung")), "stehen")
         zeilen.append({
-            "was": "Die Gestalt von hinten",
-            "wofuer": "Du — nach deiner Selbstauskunft, ohne Gesicht und in Entfernung. "
-                      "Es kommt niemand sonst im Bild vor",
+            "was": "Die Gestalt von hinten" + (
+                " und die Kinder" if begleitung in ("kind", "kinder") else ""),
+            "wofuer": (
+                f"Du beim {haltung.capitalize()}{wer.get(begleitung, '')} — nach deiner "
+                "Selbstauskunft, ohne Gesicht und in Entfernung. Die Person, um die es in "
+                "diesem Fall geht, kommt nicht als Gestalt vor"
+            ),
         })
     return zeilen

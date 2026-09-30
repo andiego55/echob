@@ -18,10 +18,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { bilderApi } from '@/api/bilder'
 
-export default function GemaltesBild({ caseId, bildId, alt }: {
+export default function GemaltesBild({ caseId, bildId, alt, onGross }: {
   caseId: string
   bildId: string
   alt: string
+  /**
+   * Zum Aufschlagen — bekommt die Adresse, die dieser Baustein schon geholt hat.
+   *
+   * **Der Lichtkasten holt das Bild nicht selbst.** Es liegt hier bereits als Objekt-URL im
+   * Browser; ein zweiter Abruf wäre ein zweites Megabyte für dasselbe Bild.
+   */
+  onGross?: (url: string) => void
 }) {
   const [url, setUrl] = useState<string | null>(null)
   const [fehler, setFehler] = useState(false)
@@ -72,7 +79,29 @@ export default function GemaltesBild({ caseId, bildId, alt }: {
   return (
     <div ref={rahmen} className="relative aspect-square w-full bg-brand-bg">
       {url ? (
-        <img src={url} alt={alt} className="block h-full w-full object-cover" />
+        onGross ? (
+          // **Ein Knopf, kein Bild mit Klickfänger.** Auf ein Bild zu klicken, das kein
+          // Knopf ist, findet mit der Tastatur niemand — und die Lupe sagt, dass es geht.
+          <button
+            type="button"
+            onClick={() => onGross(url)}
+            aria-label="Bild groß ansehen"
+            className="group block h-full w-full cursor-zoom-in"
+          >
+            <img src={url} alt={alt} className="block h-full w-full object-cover" />
+            <span className="absolute right-2 top-2 rounded-full bg-navy/60 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+              <svg
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                strokeLinecap="round" className="h-3.5 w-3.5" aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="6" />
+                <path d="M20 20l-4.5-4.5M11 8.5v5M8.5 11h5" />
+              </svg>
+            </span>
+          </button>
+        ) : (
+          <img src={url} alt={alt} className="block h-full w-full object-cover" />
+        )
       ) : (
         <p className="absolute inset-0 grid place-items-center px-4 text-center text-[0.74rem] text-brand-muted">
           {fehler ? 'Dieses Bild lässt sich gerade nicht laden.' : 'Wird geladen …'}

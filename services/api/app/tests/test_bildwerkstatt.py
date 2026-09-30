@@ -400,6 +400,17 @@ def _werte_beispiel() -> dict:
 ALLE_SCHICHTEN = ["grundton", "szenen", "durchgaenge", "lichter", "leerstellen", "druck"]
 
 
+def _inhalt(prompt: str) -> str:
+    """Der Teil des Prompts, der aus dem FALL kommt - ohne unsere Auflagen.
+
+    **Dreimal hintereinander hat ein Test meine eigene Grenze als Fund gemeldet:** Sie sagt
+    „the person this image is about is not depicted" und „nothing frightening involving a
+    child" - da stehen „person" und „child" drin, und zwar zu Recht. Wer den ganzen Prompt
+    nach solchen Woertern absucht, prueft die Regel gegen sich selbst.
+    """
+    return prompt.split("Important constraints")[0].lower()
+
+
 def test_der_prompt_traegt_nur_struktur_und_keine_geschichte():
     """**Der wichtigste Test am gemalten Weg.**
 
@@ -410,16 +421,16 @@ def test_der_prompt_traegt_nur_struktur_und_keine_geschichte():
     """
     from app.services.bild_katalog import prompt_bauen
 
-    prompt = prompt_bauen(
+    prompt = _inhalt(prompt_bauen(
         _werte_beispiel(),
-        {"handschrift": "tusche", "palette": "nacht", "schichten": ALLE_SCHICHTEN})
+        {"handschrift": "tusche", "palette": "nacht", "schichten": ALLE_SCHICHTEN}))
 
     # Keine Skalennamen: Sonst koennte ein Modell „boundary violation" bildlich nehmen.
     for verraeterisch in ("boundary", "violation", "devaluation", "verlaesslichkeit"):
-        assert verraeterisch not in prompt.lower(), verraeterisch
+        assert verraeterisch not in prompt, verraeterisch
     # Und kein Wort ueber eine Beziehung.
     for wort in ("relationship", "partner", "beziehung", "conflict", "abuse", "person"):
-        assert wort not in prompt.lower(), wort
+        assert wort not in prompt, wort
 
 
 def test_die_grenze_laesst_hoechstens_EINE_gestalt_zu():
@@ -436,9 +447,13 @@ def test_die_grenze_laesst_hoechstens_EINE_gestalt_zu():
     from app.services.bild_katalog import GRENZE
 
     tief = GRENZE.lower()
-    assert "at most one human figure" in tief
-    for verboten in ("never two people", "never a couple", "never a group",
-                     "never a second figure"):
+    # **Die Regel schuetzt EINE Person: die, um die es im Fall geht.**
+    # Sie hiess frueher „hoechstens eine Gestalt" und war damit zu grob - ein Kind, um das
+    # sich jemand kuemmert, gehoert zum Leben der Person und nicht zur Gegenseite.
+    assert "never a second adult" in tief
+    assert "is not depicted and must not be suggested" in tief
+    for verboten in ("not as a shadow", "not as a reflection",
+                     "not implied by a second set of belongings"):
         assert verboten in tief, verboten
     # Auch nicht als Schatten oder Spiegelung - das sind die Schlupfloecher.
     assert "not as a shadow" in tief
@@ -590,7 +605,8 @@ def test_die_legende_loest_auch_symbolik_und_figur_auf():
     assert "Schwelle" in text
     assert "Tier" in text
     assert "Gestalt von hinten" in text
-    assert "niemand sonst" in text
+    # Wer NICHT vorkommt, steht ausdruecklich da.
+    assert "kommt nicht als Gestalt vor" in text
     # Und die Sinnbilder werden ausdruecklich NICHT gedeutet.
     assert "entscheidest du" in text
 
@@ -611,9 +627,9 @@ def test_der_prompt_traegt_weiter_keine_geschichte():
     """Auch mit Metaphern geht kein Satz aus dem Fall hinaus - nur Zahlen, uebersetzt."""
     from app.services.bild_katalog import prompt_bauen
 
-    prompt = prompt_bauen(_werte_beispiel(), {
+    prompt = _inhalt(prompt_bauen(_werte_beispiel(), {
         "bildwelt": "wasser", "handschrift": "tusche", "palette": "nacht",
-        "schichten": ALLE_SCHICHTEN}).lower()
+        "schichten": ALLE_SCHICHTEN}))
 
     for verraeterisch in ("boundary", "violation", "devaluation", "verlaesslichkeit",
                           "relationship", "partner", "beziehung", "conflict", "abuse"):
@@ -653,23 +669,71 @@ def test_der_prompt_folgt_den_schichten():
         ohne_muster, {**einst, "schichten": ALLE_SCHICHTEN}))
 
 
-def test_der_prompt_beschreibt_die_haeufung_wenn_es_eine_gibt():
-    """Die Ballung ist aus den Abstaenden GERECHNET, nicht geschaetzt - und sie ist das, was
-    eine Liste nie zeigt."""
+def test_wie_viele_szenen_es_sind_aendert_das_bild_nicht():
+    """**Der Waechter gegen ein Bild, das die Nutzung der App abbildet statt den Fall.**
+
+    Hier stand einmal das Gegenteil: Die Dichte der Szenen bestimmte den Weg durchs Bild, und
+    Haeufungen wurden zu einem eigenen Motiv. Das war falsch. Wer die App seit zwei Jahren
+    fuehrt, haette ein dichtes Bild bekommen; wer drei Wochen im Urlaub war, eine Luecke im
+    Motiv. Beides sagt etwas ueber das Schreiben und nichts ueber die Lage.
+
+    Acht Szenen und achtzig Szenen mit derselben durchschnittlichen Schwere muessen denselben
+    Prompt ergeben - Zeichen fuer Zeichen.
+    """
+    from app.services.bild_katalog import prompt_bauen
+
+    einst = {"bildwelt": "landschaft", "handschrift": "aquarell", "palette": "kuehl",
+             "schichten": ["szenen"]}
+
+    def fall(zahl: int, abstand: int) -> dict:
+        return dict(_werte_beispiel(), szenen=[
+            {"id": f"s{i}", "tag": i * abstand, "gewicht": 0.4, "haerte": 0.4}
+            for i in range(zahl)
+        ])
+
+    wenige = prompt_bauen(fall(8, 70), einst)
+
+    # **Vier Rhythmen, ein Prompt.** Die erste Fassung dieses Waechters pruefte nur Zahl und
+    # eine Luecke - und alle ihre Faelle hatten aehnliche Spannen. Eine Probe, die auf die
+    # Ballung zielte, lief deshalb durch. Die Faelle hier gehen bewusst weit auseinander:
+    andere = {
+        "die Zahl der Momente": fall(80, 3),
+        "die Spanne": fall(8, 1),          # alles in acht Tagen statt in 490
+        # Eine Pause von einem halben Jahr mitten im Verlauf: ein Urlaub, kein Muster.
+        "eine Pause": dict(_werte_beispiel(), szenen=[
+            *({"id": f"a{i}", "tag": i, "gewicht": 0.4, "haerte": 0.4} for i in range(4)),
+            *({"id": f"b{i}", "tag": 200 + i, "gewicht": 0.4, "haerte": 0.4}
+              for i in range(4)),
+        ]),
+        # Und eine Ballung am Ende - das war einmal ein eigenes Motiv im Bild.
+        "eine Ballung": dict(_werte_beispiel(), szenen=[
+            *({"id": f"c{i}", "tag": i * 120, "gewicht": 0.4, "haerte": 0.4}
+              for i in range(3)),
+            *({"id": f"d{i}", "tag": 480 + i, "gewicht": 0.4, "haerte": 0.4}
+              for i in range(5)),
+        ]),
+    }
+    for was, werte in andere.items():
+        assert prompt_bauen(werte, einst) == wenige, f"{was} veraendert das Bild"
+
+
+def test_die_durchschnittliche_schwere_aendert_das_bild_sehr_wohl():
+    """Die Gegenprobe zum Waechter darueber: Was NICHT an der Menge haengt, muss wirken -
+    sonst haette ich die Schicht mit der Menge gleich ganz abgeschaltet."""
     from app.services.bild_katalog import BILDWELTEN, prompt_bauen
 
     welt = next(b for b in BILDWELTEN if b["key"] == "landschaft")
     einst = {"bildwelt": "landschaft", "handschrift": "aquarell", "palette": "kuehl",
              "schichten": ["szenen"]}
 
-    geballt = _werte_beispiel()   # vier frueh, sechs im letzten Monat
-    gleichmaessig = _werte_beispiel()
-    gleichmaessig["szenen"] = [
-        {"id": f"s{i}", "tag": i * 70, "gewicht": 0.4, "haerte": 0.4} for i in range(10)
-    ]
+    def bei(haerte: float) -> str:
+        return prompt_bauen(dict(_werte_beispiel(), szenen=[
+            {"id": f"s{i}", "tag": i * 7, "gewicht": 0.4, "haerte": haerte}
+            for i in range(9)
+        ]), einst)
 
-    assert welt["ballung"].lower() in prompt_bauen(geballt, einst).lower()
-    assert welt["ballung"].lower() not in prompt_bauen(gleichmaessig, einst).lower()
+    assert welt["textur"]["weich"].rstrip(".") in bei(0.1)
+    assert welt["textur"]["hart"].rstrip(".") in bei(0.9)
 
 
 def test_jede_bildwelt_uebersetzt_dieselben_sechs_groessen():
@@ -683,10 +747,13 @@ def test_jede_bildwelt_uebersetzt_dieselben_sechs_groessen():
 
     for b in BILDWELTEN:
         assert b["label"] and b["hinweis"], b["key"]
-        for stueck in ("szene", "ballung", "faden", "licht", "leere", "druck"):
+        for stueck in ("szene", "faden", "licht", "leere", "druck"):
             assert len(b[stueck]) > 20, f'{b["key"]}: {stueck}'
-        for raum in ("dicht", "mittel", "weit"):
-            assert len(b["weg"][raum]) > 20, f'{b["key"]}: weg/{raum}'
+        # `weg` und `ballung` standen hier einmal: der Weg aus der Dichte der Szenen, die
+        # Ballung aus ihren Abstaenden. Beides ist raus, weil es die Nutzung der App abbildet
+        # und nicht den Fall - und die Bausteine sind mit ihm verschwunden, statt unbenutzt
+        # herumzuliegen und den naechsten Leser glauben zu lassen, sie wirkten noch.
+        assert "weg" not in b and "ballung" not in b, b["key"]
         for haerte in ("weich", "mittel", "hart"):
             assert len(b["textur"][haerte]) > 15, f'{b["key"]}: textur/{haerte}'
 
@@ -711,8 +778,8 @@ def test_keine_bildwelt_setzt_einen_menschen_ins_bild():
 
     for b in BILDWELTEN:
         alles = " ".join([
-            b["szene"], b["ballung"], b["faden"], b["licht"], b["leere"], b["druck"],
-            *b["weg"].values(), *b["textur"].values(),
+            b["szene"], b["faden"], b["licht"], b["leere"], b["druck"],
+            *b["textur"].values(),
         ]).lower()
         # **Mit Wortgrenzen, nicht als Teilzeichenfolge.** Die erste Fassung suchte „face"
         # und fand es in „surface" - genau der Fehler, den dieses Projekt schon einmal
@@ -1086,49 +1153,52 @@ def test_die_beziehungsart_setzt_den_ton():
     assert "The place" not in fremd.split("Colour:")[1].split(chr(10))[1]
 
 
-def test_die_jahreszeit_kommt_aus_echten_daten():
-    """Wer weiss, dass es im Herbst dicht wurde, sieht den Herbst - und erkennt SEINEN
-    Verlauf, nicht irgendeinen."""
+def test_die_jahreszeit_ist_die_von_heute():
+    """**Sie kam einmal aus der dichtesten Stelle im Verlauf - und das war eine Aussage ueber
+    das Schreiben, nicht ueber den Fall.**
+
+    Wo sich Szenen haeufen, haengt daran, wann jemand Zeit und Anlass hatte, etwas
+    festzuhalten. Jetzt ist es die Jahreszeit von heute: Das Bild entsteht jetzt, und das
+    behauptet ueber den Verlauf gar nichts.
+    """
+    from datetime import date
+
+    from app.services.bild_katalog import JAHRESZEITEN, prompt_bauen
+
+    heute = JAHRESZEITEN[date.today().month]
+    assert f"The season is {heute}." in prompt_bauen(_werte_beispiel(), EINST)
+
+
+def test_die_jahreszeit_haengt_an_keiner_angabe_der_person():
+    """Weder am Beginn des Falls noch an den Szenen - sonst waere sie wieder eine Aussage
+    ueber den Verlauf, nur versteckter."""
     from app.services.bild_katalog import prompt_bauen
 
-    # Beginn im November, Haeufung am Anfang -> Winter.
-    winter = _fall_mit({"control_isolation": 0.8}, beginn="2024-11-03")
-    winter["szenen"] = [{"id": f"s{i}", "tag": i * 3, "gewicht": 0.5, "haerte": 0.5}
-                        for i in range(8)]
-    # Derselbe Fall, aber im Mai begonnen -> Sommer.
-    sommer = dict(winter, beginn="2024-05-03")
+    november = _fall_mit({"control_isolation": 0.8}, beginn="2024-11-03")
+    mai = dict(november, beginn="2024-05-03")
+    assert prompt_bauen(november, EINST) == prompt_bauen(mai, EINST)
 
-    p_w = prompt_bauen(winter, EINST)
-    p_s = prompt_bauen(sommer, EINST)
-    assert "The season is" in p_w and "The season is" in p_s
-    assert p_w != p_s
-
-
-def test_ohne_datum_gibt_es_keine_jahreszeit():
-    """Lieber keine Angabe als eine erfundene."""
-    from app.services.bild_katalog import prompt_bauen
-
-    ohne = _fall_mit({"control_isolation": 0.8})
-    ohne["beginn"] = None
-    assert "The season is" not in prompt_bauen(ohne, EINST)
-    kaputt = _fall_mit({"control_isolation": 0.8}, beginn="kein datum")
-    assert "The season is" not in prompt_bauen(kaputt, EINST)
+    # Und ohne jedes Datum bleibt die Zeile trotzdem da: Es gibt nichts zu erfinden.
+    ohne = dict(_fall_mit({"control_isolation": 0.8}), beginn=None, szenen=[])
+    assert "The season is" in prompt_bauen(ohne, EINST)
 
 
 def test_kein_zweiter_weg_ins_bild():
-    """**Fuehrt ein Muster, waere die Zeitgestalt ein zweiter Gegenstand derselben Art** - in
-    der Landschaft zwei Pfade, im Haus zwei Gaenge. Das sieht nach Fehler aus."""
+    """**Fuehrt ein Muster, darf kein zweiter Gegenstand derselben Art dazukommen** - in der
+    Landschaft zwei Pfade, im Haus zwei Gaenge. Das sieht nach Fehler aus.
+
+    Seit die Dichte draussen ist, traegt ohne Muster der Ort selbst das Bild - nichts, was aus
+    der Zahl der Momente gerechnet waere.
+    """
     from app.services.bild_katalog import BILDWELTEN, prompt_bauen
 
     welt = next(b for b in BILDWELTEN if b["key"] == "landschaft")
     mit_muster = prompt_bauen(_fall_mit({"control_isolation": 0.9}), EINST)
     ohne_muster = prompt_bauen(_fall_mit({"cluster_b_traits": 0.9}), EINST)
 
-    # Ohne fuehrendes Muster traegt die Zeitgestalt das Bild.
-    assert any(welt["weg"][r].rstrip(".") in ohne_muster for r in ("dicht", "mittel", "weit"))
-    # Mit fuehrendem Muster kommt sie nicht zusaetzlich dazu.
-    assert not any(welt["weg"][r].rstrip(".") in mit_muster
-                   for r in ("dicht", "mittel", "weit"))
+    ort = welt["szene"].rstrip(".")
+    assert f"The subject is {ort}" in ohne_muster
+    assert f"The subject is {ort}" not in mit_muster
 
 
 def test_jedes_muster_hat_ein_bild_in_jeder_bildwelt():
@@ -1153,25 +1223,47 @@ def test_jedes_muster_hat_einen_deutschen_namen():
         assert "_" not in MUSTER_LABEL[key], key
 
 
-def test_die_legende_nennt_das_hauptmotiv():
-    """Ohne diese Zeile sieht die Person ein Bild aus ihrem staerksten Muster und erfaehrt es
-    nicht. Genau daran haengt das Wiedererkennen."""
+def test_die_legende_nennt_den_gegenstand_nicht_nur_die_deutung():
+    """**Der Waechter gegen eine Legende, die nur deutet.**
+
+    Sie sagte einmal: „Dein staerkstes Muster: Schuld, die bei dir landet. Es bestimmt, was
+    auf dem Bild zu sehen ist." Damit weiss niemand, WORAN er die Schuld im Bild erkennt -
+    die Zeile nennt eine Deutung und verschweigt das Motiv. Der Gegenstand muss dastehen.
+    """
+    from app.services.bild_katalog import legende, muster_deutsch
+
+    zeilen = legende(EINST, _fall_mit({"guilt_shifting": 0.9, "control_isolation": 0.68}))
+    ding, satz = muster_deutsch("guilt_shifting", "landschaft")
+    haupt = zeilen[0]
+
+    # Die Spalte „was" ist der Gegenstand selbst, nicht die Ueberschrift „Das Hauptmotiv".
+    assert haupt["was"] == ding == "Der Boden"
+    # Und daneben steht, was mit ihm los ist - vor der Deutung, nicht statt ihrer.
+    assert satz in haupt["wofuer"]
+    assert "Schuld, die bei dir landet" in haupt["wofuer"]
+    assert haupt["wofuer"].index(satz) < haupt["wofuer"].index("Schuld")
+
+
+def test_die_legende_nennt_die_zahl_hinter_dem_muster():
+    """„Praeziser" heisst hier: in derselben Sprache wie der Rest der App. Die Skalen stehen
+    ueberall als „68 von 100" da."""
     from app.services.bild_katalog import legende
 
-    zeilen = legende(EINST, _fall_mit({"control_isolation": 0.9, "guilt_shifting": 0.7}))
-    haupt = next(z for z in zeilen if z["was"] == "Das Hauptmotiv")
-    assert "Kontrolle und Alleinsein" in haupt["wofuer"]
+    zeilen = legende(EINST, _fall_mit({"guilt_shifting": 0.9, "control_isolation": 0.68}))
+    assert "90 von 100" in zeilen[0]["wofuer"]
     weitere = next(z for z in zeilen if z["was"] == "Was noch im Bild steht")
-    assert "Schuld" in weitere["wofuer"]
+    assert "68 von 100" in weitere["wofuer"]
+    # Auch die Stuetze nennt ihren Gegenstand, nicht nur das Muster.
+    assert "Ein einziger schmaler Pfad" in weitere["wofuer"]
 
 
 def test_die_legende_doppelt_die_muster_nicht():
-    """„Hauptmotiv" und „die Mauer, die durchs Bild laeuft" waeren zweimal dasselbe."""
+    """Das Leitbild und „die Mauer, die durchs Bild laeuft" waeren zweimal dasselbe."""
     from app.services.bild_katalog import legende
 
     zeilen = legende(EINST, _fall_mit({"control_isolation": 0.9}))
     was = [z["was"] for z in zeilen]
-    assert "Das Hauptmotiv" in was
+    assert "Ein einziger schmaler Pfad" in was
     assert not any("Mauer" in w for w in was)
 
     # Ohne fuehrendes Muster gilt wieder die allgemeine Zeile.
@@ -1179,16 +1271,66 @@ def test_die_legende_doppelt_die_muster_nicht():
     assert any("Mauer" in z["was"] for z in schwach)
 
 
-def test_die_legende_sagt_was_die_szenen_tragen():
-    """Fuehrt ein Muster, traegt der Ort nicht mehr die Momente - dann sucht die Person
-    sonst etwas, das nicht da ist."""
+def test_die_legende_sagt_dass_die_menge_nichts_aendert():
+    """**Die Zeile, die eine Frage abfaengt, bevor sie entsteht.**
+
+    Wer zehn Momente festgehalten hat und in der Legende „10 festgehaltene Momente - wie
+    viele, wie dicht beieinander" liest, sucht im Bild nach zehn von irgendwas. Es gibt dort
+    nichts zu finden: Aus den Szenen kommt nur noch ihre durchschnittliche Schwere.
+    """
     from app.services.bild_katalog import legende
 
-    mit = legende(EINST, _fall_mit({"control_isolation": 0.9}))
-    assert any(z["was"] == "Die Häufungen und die Pausen" for z in mit)
+    for werte in (_fall_mit({"control_isolation": 0.9}),
+                  _fall_mit({"boundary_violation": 0.3})):
+        zeile = next(z for z in legende(EINST, werte)
+                     if "Gelände" in z["was"] or "hart" in z["was"])
+        assert "im Schnitt" in zeile["wofuer"]
+        assert "ändert am Bild nichts" in zeile["wofuer"]
+        # Und nirgends mehr eine Zahl von Momenten.
+        assert str(len(werte["szenen"])) not in zeile["wofuer"]
 
-    ohne = legende(EINST, _fall_mit({"boundary_violation": 0.3}))
-    assert any(z["was"] == "Der Weg und das Gelände" for z in ohne)
+
+def test_kein_deutsches_wort_der_legende_geht_an_das_modell():
+    """**Derselbe Waechter wie fuer die Skalennamen, eine Ebene tiefer.**
+
+    Die Legende hat jetzt eigene deutsche Saetze. Landeten die im Prompt, haette ein Modell
+    Material, das die Person als Erklaerung liest - und es wuerde daraus malen. Getrennte
+    Woerterbuecher allein halten das nicht auf; nachgesehen wird hier.
+    """
+    from app.services.bild_katalog import BILDWELTEN, MUSTER_DEUTSCH, prompt_bauen
+
+    for b in BILDWELTEN:
+        prompt = prompt_bauen(
+            _fall_mit({k: 0.9 for k in MUSTER_DEUTSCH}),
+            {**EINST, "bildwelt": b["key"]})
+        for key, eintrag in MUSTER_DEUTSCH.items():
+            assert eintrag["je_welt"][b["key"]] not in prompt, f'{b["key"]}/{key}'
+            for stueck in eintrag["satz"].split("{ding}"):
+                if len(stueck.strip()) > 12:
+                    assert stueck.strip() not in prompt, f'{b["key"]}/{key}'
+
+
+def test_jedes_muster_hat_ein_deutsches_bild_in_jeder_bildwelt():
+    """Fehlt eines, nennt die Legende genau dort wieder nur die Deutung - und der Fall, der
+    im Bild fuehrt, bleibt unbenannt."""
+    from app.services.bild_katalog import (
+        BILDWELTEN,
+        MUSTER_BILDER,
+        MUSTER_DEUTSCH,
+        muster_deutsch,
+    )
+
+    assert set(MUSTER_DEUTSCH) == set(MUSTER_BILDER)
+    for key in MUSTER_DEUTSCH:
+        for b in BILDWELTEN:
+            ding, satz = muster_deutsch(key, b["key"])
+            assert ding and ding[0].isupper(), f"{key} / {b['key']}"
+            assert satz.startswith(ding), f"{key} / {b['key']}"
+            assert "{ding}" not in satz, f"{key} / {b['key']}"
+            # **Kein Rueckbezug mit Geschlecht.** „{ding}, der von allem wegfuehrt" waere bei
+            # „Die Wasserlinie" falsch - und der Satz steht der Person gegenueber.
+            for stolperer in (", der ", ", die ", ", das "):
+                assert stolperer not in satz[len(ding):len(ding) + 6], f"{key} / {b['key']}"
 
 
 def test_der_prompt_verlangt_eine_komposition():
@@ -1251,3 +1393,91 @@ def test_keine_eingeschaltete_schicht_faellt_still_aus():
                 f"Schicht {schicht!r} (Muster {list(muster)}) aendert am Prompt nichts - "
                 "sie faellt still aus"
             )
+
+
+# ── Haltung und Begleitung ────────────────────────────────────────────────────
+
+def test_ein_kind_darf_nie_die_fallperson_sein():
+    """**Die schaerfste Regel des Moduls.**
+
+    Handelt der Fall VON einem Kind, waere die Kindfigur die Fallperson - eine Abbildung
+    eines echten Kindes aus den Angaben eines Elternteils. Das ist das Letzte, was hier
+    entstehen darf.
+
+    Bei „co_parenting" ist es dagegen der andere ELTERNTEIL, um den es geht: Dort gehoeren
+    die Kinder ins Bild, weil sie der Grund fuer fast alles sind, was in so einem Fall steht.
+    """
+    from app.services.bild_katalog import begleitung_moeglich
+
+    mit_kindern = {"children": "shared"}
+    assert begleitung_moeglich(mit_kindern, "child") is False
+    assert begleitung_moeglich(mit_kindern, "co_parenting") is True
+    assert begleitung_moeglich(mit_kindern, "partner") is True
+
+
+def test_ohne_kinderangabe_gibt_es_keine_begleitung():
+    """Ein Kind ins Bild zu setzen, das die Person nie erwaehnt hat, waere erfunden - und
+    zwar an der empfindlichsten Stelle."""
+    from app.services.bild_katalog import begleitung_moeglich
+
+    for angabe in ("none", "not_specified", None, ""):
+        assert begleitung_moeglich({"children": angabe}, "partner") is False
+    assert begleitung_moeglich(None, "partner") is False
+    assert begleitung_moeglich({}, "partner") is False
+
+
+def test_die_begleitung_steht_neben_der_gestalt_und_ohne_gesicht():
+    from app.services.bild_katalog import figur_beschreibung
+
+    mit_kind = figur_beschreibung({"age_range": "36-45", "gender": "weiblich"},
+                                  {"haltung": "schuetzend", "begleitung": "kind"})
+    assert "one small child" in mit_kind
+    assert "no face visible" in mit_kind
+    assert "seen from behind" in mit_kind
+    # Und die Haltung steht dabei.
+    assert "protectively" in mit_kind
+
+    zwei = figur_beschreibung({}, {"begleitung": "kinder"})
+    assert "two small children" in zwei
+
+    allein = figur_beschreibung({}, {"begleitung": "keine"})
+    assert "child" not in allein
+    assert "no one else anywhere in the image" in allein
+
+
+def test_jede_haltung_ergibt_eine_andere_gestalt():
+    """Eine Haltung ist eine Aussage - und sie kommt von der Person. Wuerden WIR sie aus den
+    Daten ableiten, waere es eine Deutung in Bildform."""
+    from app.services.bild_katalog import HALTUNGEN, figur_beschreibung
+
+    saetze = {h["key"]: figur_beschreibung({}, {"haltung": h["key"]}) for h in HALTUNGEN}
+    assert len(set(saetze.values())) == len(HALTUNGEN)
+    for h in HALTUNGEN:
+        assert h["label"] and h["hinweis"] and len(h["prompt"]) > 20, h["key"]
+        # Keine Haltung dreht die Gestalt zum Betrachter.
+        assert "toward the viewer" not in h["prompt"].lower(), h["key"]
+        assert "facing the camera" not in h["prompt"].lower(), h["key"]
+
+
+def test_ohne_gestalt_gibt_es_weder_haltung_noch_begleitung():
+    from app.services.bild_katalog import prompt_bauen
+
+    ohne = _inhalt(prompt_bauen(
+        _fall_mit({"control_isolation": 0.8}),
+        {**EINST, "figur": "keine", "haltung": "schuetzend", "begleitung": "kind"}))
+    assert "child" not in ohne
+    assert "protectively" not in ohne
+    assert "adult figure" not in ohne
+
+
+def test_die_legende_sagt_wer_im_bild_ist_und_wer_nicht():
+    from app.services.bild_katalog import legende
+
+    zeilen = legende({**EINST, "figur": "ich", "haltung": "schuetzend",
+                      "begleitung": "kind"}, _fall_mit({"control_isolation": 0.8}))
+    gestalt = next(z for z in zeilen if "Gestalt" in z["was"])
+    assert "Kinder" in gestalt["was"]
+    assert "Kind neben dir" in gestalt["wofuer"]
+    assert "Schützen" in gestalt["wofuer"]
+    # Und ausdruecklich, wer NICHT vorkommt.
+    assert "kommt nicht als Gestalt vor" in gestalt["wofuer"]

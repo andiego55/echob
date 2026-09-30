@@ -83,6 +83,9 @@ export const bilderApi = {
         handschriften: Handschrift[]
         symbolik: Handschrift[]
         figur: Handschrift[]
+        haltungen: Handschrift[]
+        /** Leer, wenn eine Begleitung fuer diesen Fall nicht in Frage kommt. */
+        begleitungen: Handschrift[]
       }>(`${basis(caseId)}/handschriften`)
       .then(r => r.data),
 
@@ -100,8 +103,12 @@ export const bilderApi = {
     palette: string
     schichten: string[]
     symbolik: string
-    /** „keine" oder „ich" — es gibt hoechstens EINE Figur, und sie ist die Person selbst. */
+    /** „keine" oder „ich". Die Person, um die es im Fall geht, wird nie eine Gestalt. */
     figur: string
+    /** Was die Gestalt tut — eine Aussage der Person, keine Ableitung aus den Daten. */
+    haltung: string
+    /** „keine", „kind" oder „kinder". Der Server entscheidet, ob das geht. */
+    begleitung: string
   }) => apiClient
     .post<GespeichertesBild & { legende: LegendenZeile[] }>(
       `${basis(caseId)}/malen`, body, { timeout: 180_000 })

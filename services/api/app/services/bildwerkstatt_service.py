@@ -262,6 +262,10 @@ async def selbstauskunft(
     return {
         "age_range": kontext.get("age_range"),
         "gender": kontext.get("gender"),
+        # Ob Kinder im Leben der Person vorkommen. Nur diese eine Angabe, nicht Zahl,
+        # Alter oder Namen — mehr braucht eine Gestalt von hinten nicht, und mehr waere
+        # eine Abbildung eines echten Kindes.
+        "children": kontext.get("children"),
     }
 
 

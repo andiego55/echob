@@ -20,8 +20,9 @@ import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
 import { useBestaetigen } from '@/components/Bestaetigung'
 import BildRegler from '@/components/app/bild/BildRegler'
-import { bilderApi, type GespeichertesBild } from '@/api/bilder'
+import { bilderApi, type GespeichertesBild, type LegendenZeile } from '@/api/bilder'
 import GemaltesBild from '@/components/app/bild/GemaltesBild'
+import Lichtkasten from '@/components/app/bild/Lichtkasten'
 import {
   STANDARD_EINSTELLUNGEN, STANDARD_PALETTE, genugFuerEinBild, lagebild,
   type Anordnung, type Dichte, type Schicht,
@@ -82,6 +83,8 @@ export default function BildwerkstattPage() {
    * den man ungefragt bekommt.
    */
   const [figur, setFigur] = useState('keine')
+  const [haltung, setHaltung] = useState('stehend')
+  const [begleitung, setBegleitung] = useState('keine')
 
   /**
    * Alle Schichten, die diese Sitzung schon einmal gesehen hat.
@@ -113,6 +116,20 @@ export default function BildwerkstattPage() {
     enabled: !!caseId,
   })
 
+  /**
+   * Das aufgeschlagene Bild.
+   *
+   * **In der Kachel ist ein Bild 260 Pixel breit** — darin erkennt niemand ein Hauptmotiv,
+   * eine Schwelle am Rand oder ein Tier in der Ferne. Die Adresse kommt von dem Baustein,
+   * der sie schon geholt hat; hier wird nichts zweites geladen.
+   */
+  const [gross, setGross] = useState<{
+    url: string
+    alt: string
+    satz?: string | null
+    legende?: LegendenZeile[] | null
+  } | null>(null)
+
   const aufheben = useMutation({
     mutationFn: () => bilderApi.aufheben(caseId!, {
       einstellungen: { palette, anordnung, dichte, schichten },
@@ -133,7 +150,7 @@ export default function BildwerkstattPage() {
 
   const malen = useMutation({
     mutationFn: () => bilderApi.malen(caseId!, {
-      bildwelt, handschrift, palette, schichten, symbolik, figur,
+      bildwelt, handschrift, palette, schichten, symbolik, figur, haltung, begleitung,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bilder', caseId] })
@@ -226,12 +243,22 @@ export default function BildwerkstattPage() {
                 ))}
               </div>
               {weg === 'gerechnet' && gerechnet && (
-                <img
-                  src={alsBildAdresse(gerechnet.svg)}
-                  alt={`Dein Lagebild: ${gerechnet.marken.length} festgehaltene Momente, `
-                    + `Anordnung ${anordnung}`}
-                  className="block w-full rounded-brand-lg border border-brand-border bg-white"
-                />
+                <button
+                  type="button"
+                  onClick={() => setGross({
+                    url: alsBildAdresse(gerechnet.svg),
+                    alt: `Dein Lagebild: ${gerechnet.marken.length} festgehaltene Momente`,
+                  })}
+                  aria-label="Bild groß ansehen"
+                  className="block w-full cursor-zoom-in"
+                >
+                  <img
+                    src={alsBildAdresse(gerechnet.svg)}
+                    alt={`Dein Lagebild: ${gerechnet.marken.length} festgehaltene Momente, `
+                      + `Anordnung ${anordnung}`}
+                    className="block w-full rounded-brand-lg border border-brand-border bg-white"
+                  />
+                </button>
               )}
 
               {weg === 'gemalt' && (
@@ -339,12 +366,66 @@ export default function BildwerkstattPage() {
                       ))}
                     </div>
                     {figur === 'ich' && (
-                      <p className="mt-2 text-[0.72rem] leading-snug text-brand-muted">
-                        Aus deiner Selbstauskunft kommen nur Altersspanne und Geschlecht —
-                        mehr weiß sie über dein Aussehen nicht, und mehr wird auch nicht
-                        erfunden. Es kommt niemand sonst im Bild vor: keine zweite Gestalt,
-                        auch kein Schatten und keine Spiegelung.
-                      </p>
+                      <>
+                        <div className="mt-3">
+                          <span className="label">Was tust du?</span>
+                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            {(bildwelten.data?.haltungen ?? []).map(h => (
+                              <button
+                                key={h.key}
+                                type="button"
+                                onClick={() => setHaltung(h.key)}
+                                aria-pressed={haltung === h.key}
+                                title={h.hinweis}
+                                className={`rounded-full border px-3 py-1.5 text-[0.76rem] transition-colors ${
+                                  haltung === h.key
+                                    ? 'border-accent bg-accent/[0.06] font-semibold text-accent'
+                                    : 'border-brand-border bg-white text-brand-muted hover:border-accent/50'
+                                }`}
+                              >
+                                {h.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* **Die Begleitung steht nur da, wenn sie für diesen Fall in Frage
+                            kommt.** Der Server schickt die Liste leer, wenn die
+                            Selbstauskunft keine Kinder nennt — oder wenn es im Fall UM ein
+                            Kind geht: Dann wäre die Kindfigur die Person, um die es geht. */}
+                        {(bildwelten.data?.begleitungen?.length ?? 0) > 0 && (
+                          <div className="mt-3">
+                            <span className="label">Ist jemand bei dir?</span>
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                              {bildwelten.data!.begleitungen.map(b => (
+                                <button
+                                  key={b.key}
+                                  type="button"
+                                  onClick={() => setBegleitung(b.key)}
+                                  aria-pressed={begleitung === b.key}
+                                  title={b.hinweis}
+                                  className={`rounded-full border px-3 py-1.5 text-[0.76rem] transition-colors ${
+                                    begleitung === b.key
+                                      ? 'border-accent bg-accent/[0.06] font-semibold text-accent'
+                                      : 'border-brand-border bg-white text-brand-muted hover:border-accent/50'
+                                  }`}
+                                >
+                                  {b.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <p className="mt-3 text-[0.72rem] leading-snug text-brand-muted">
+                          Aus deiner Selbstauskunft kommen nur Altersspanne und Geschlecht —
+                          mehr weiß sie über dein Aussehen nicht, und mehr wird auch nicht
+                          erfunden. Alle Gestalten sind von hinten und ohne Gesicht. Die
+                          Person, um die es in diesem Fall geht, kommt nicht vor: keine
+                          zweite erwachsene Gestalt, auch kein Schatten und keine
+                          Spiegelung.
+                        </p>
+                      </>
                     )}
                   </div>
 
@@ -503,6 +584,14 @@ export default function BildwerkstattPage() {
                 <BildKarte
                   key={b.id}
                   bild={b}
+                  // Die Legende gibt es nur fuer das Bild, das in dieser Sitzung entstanden
+                  // ist: Sie kommt mit der Antwort des Malens und liegt nicht in der Reihe.
+                  onGross={url => setGross({
+                    url,
+                    alt: b.satz || 'Dein Lagebild',
+                    satz: b.satz,
+                    legende: malen.data?.id === b.id ? malen.data.legende : null,
+                  })}
                   onSatz={s => satzAendern.mutate({ id: b.id, satz: s })}
                   onLoeschen={async () => {
                     if (await bestaetigen({
@@ -520,15 +609,24 @@ export default function BildwerkstattPage() {
           </section>
         )}
       </div>
+
+      <Lichtkasten
+        url={gross?.url ?? null}
+        alt={gross?.alt ?? ''}
+        satz={gross?.satz}
+        legende={gross?.legende}
+        onSchliessen={() => setGross(null)}
+      />
     </AppShell>
   )
 }
 
 /** Ein Bild in der Galerie — mit seinem Satz, seinem Datum und zum Mitnehmen. */
-function BildKarte({ bild, onSatz, onLoeschen }: {
+function BildKarte({ bild, onSatz, onLoeschen, onGross }: {
   bild: GespeichertesBild
   onSatz: (s: string) => void
   onLoeschen: () => void
+  onGross: (url: string) => void
 }) {
   const [entwurf, setEntwurf] = useState<string | null>(null)
 
@@ -582,16 +680,23 @@ function BildKarte({ bild, onSatz, onLoeschen }: {
       {/* Zwei Arten, zwei Wege zum Bild: Das gerechnete liegt als SVG in der Antwort, das
           gemalte muss als Datei geholt werden. */}
       {bild.art === 'gerechnet' && bild.svg && (
-        <img
-          src={alsBildAdresse(bild.svg)}
-          alt={bild.satz || `Lagebild vom ${new Date(bild.created_at)
-            .toLocaleDateString('de-DE')}`}
-          className="block w-full"
-        />
+        <button
+          type="button"
+          onClick={() => onGross(alsBildAdresse(bild.svg!))}
+          aria-label="Bild groß ansehen"
+          className="block w-full cursor-zoom-in"
+        >
+          <img
+            src={alsBildAdresse(bild.svg)}
+            alt={bild.satz || `Lagebild vom ${new Date(bild.created_at)
+              .toLocaleDateString('de-DE')}`}
+            className="block w-full"
+          />
+        </button>
       )}
       {bild.art === 'erzeugt' && (
         <GemaltesBild caseId={bild.case_id} bildId={bild.id}
-          alt={bild.satz || 'Gemaltes Lagebild'} />
+          alt={bild.satz || 'Gemaltes Lagebild'} onGross={onGross} />
       )}
       <figcaption className="border-t border-brand-border p-3">
         {entwurf === null ? (

@@ -41,6 +41,13 @@ class BildMalen(BaseModel):
     #: die andere Person lesbar — eine Abbildung eines echten Menschen aus den Angaben einer
     #: Seite, und die darf hier nie entstehen.
     figur: str = "keine"
+    #: Was die Gestalt tut. Eine Haltung ist eine Aussage — und sie kommt von der Person.
+    haltung: str = "stehend"
+    #: Wer sonst vorkommt: keine · kind · kinder.
+    #:
+    #: Der Server prüft, OB das geht: nur wenn die Selbstauskunft Kinder nennt und der Fall
+    #: nicht VON einem Kind handelt. Im zweiten Fall wäre die Kindfigur die Fallperson.
+    begleitung: str = "keine"
 
 
 class BildSatz(BaseModel):

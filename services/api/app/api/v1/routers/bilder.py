@@ -121,6 +121,12 @@ async def malen(
     if body.figur not in katalog.FIGUR_SCHLUESSEL:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Angabe zur Figur.")
+    if body.haltung not in katalog.HALTUNG_SCHLUESSEL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Haltung.")
+    if body.begleitung not in katalog.BEGLEITUNG_SCHLUESSEL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Angabe zur Begleitung.")
 
     gewaehlt = {s.strip() for s in body.schichten} & ERLAUBTE_SCHICHTEN
     einstellungen = {
@@ -130,6 +136,8 @@ async def malen(
         "schichten": sorted(gewaehlt),
         "symbolik": body.symbolik,
         "figur": body.figur,
+        "haltung": body.haltung,
+        "begleitung": body.begleitung,
     }
 
     async with pool.acquire() as conn:
@@ -139,7 +147,19 @@ async def malen(
         # Die Selbstauskunft nur, wenn eine Figur gewuenscht ist: Was nicht gebraucht wird,
         # wird nicht abgefragt.
         if body.figur == "ich":
-            einstellungen["selbst"] = await dienst.selbstauskunft(conn, user_id=user_id)
+            selbst = await dienst.selbstauskunft(conn, user_id=user_id)
+            einstellungen["selbst"] = selbst
+            # **Die Begleitung wird HIER entschieden, nicht im Browser.**
+            #
+            # Ob ein Kind im Bild vorkommen darf, haengt an der Selbstauskunft und an der
+            # Beziehungsart — beides liegt auf dem Server. Eine Wahl aus dem Browser, die
+            # das umgeht, ergaebe bei einem Fall UEBER ein Kind eine Abbildung genau dieses
+            # Kindes. Die Oberflaeche zeigt die Wahl gar nicht erst; hier steht die Grenze.
+            if not katalog.begleitung_moeglich(selbst, werte.get("beziehungsart")):
+                einstellungen["begleitung"] = "keine"
+        else:
+            # Ohne Gestalt gibt es auch keine Begleitung und keine Haltung.
+            einstellungen["begleitung"] = "keine"
 
     prompt = katalog.prompt_bauen(werte, einstellungen)
 
@@ -192,7 +212,8 @@ async def datei(
 
 @router.get("/handschriften", response_model=dict)
 async def handschriften(
-    case_id: UUID, _current: dict = Depends(get_current_user),
+    case_id: UUID,
+    current: dict = Depends(get_current_user), pool=Depends(get_pool),
 ) -> dict:
     """Bildwelten und Handschriften — **ohne die Prompt-Texte.**
 
@@ -202,6 +223,16 @@ async def handschriften(
     Beschreibungen und sind Anweisungen an ein Modell — auf einem Bildschirm gelesen klingen
     sie wie ein geprüftes Versprechen.
     """
+    # Ob eine Begleitung ueberhaupt in Frage kommt, haengt an der Selbstauskunft und an der
+    # Beziehungsart. Beides steht auf dem Server, und die Antwort entscheidet, ob die
+    # Oberflaeche die Wahl ueberhaupt zeigt.
+    async with pool.acquire() as conn:
+        art = await conn.fetchval(
+            "SELECT relationship_type FROM cases WHERE id = $1 AND user_id = $2",
+            case_id, current["user_id"])
+        selbst = await dienst.selbstauskunft(conn, user_id=current["user_id"])
+    moeglich = katalog.begleitung_moeglich(selbst, art)
+
     fuers_auge = ("key", "label", "hinweis")
     return {
         "bildwelten": [
@@ -212,6 +243,16 @@ async def handschriften(
         ],
         "symbolik": list(katalog.SYMBOLIK_STUFEN),
         "figur": list(katalog.FIGUR_STUFEN),
+        "haltungen": [
+            {k: v for k, v in h.items() if k in fuers_auge} for h in katalog.HALTUNGEN
+        ],
+        # Die Begleitung steht nur da, wenn sie fuer DIESEN Fall in Frage kommt - ein
+        # Schalter, den man nicht bewegen darf, ist eine Aufforderung, es zu versuchen.
+        "begleitungen": (
+            [{k: v for k, v in b.items() if k in fuers_auge}
+             for b in katalog.BEGLEITUNGEN]
+            if moeglich else []
+        ),
     }
 
 
