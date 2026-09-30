@@ -127,13 +127,17 @@ async def export_user_data(
     """Sammelt alle bei EchoB gespeicherten Daten der Person als JSON-fähiges dict."""
     data: dict = {}
 
+    # Einmal gefragt und an alle Abrufe weitergegeben: Binärspalten gehen nicht mit.
+    spalten = await _lesbare_spalten(conn)
+
     for table in _USER_TABLES:
-        data[table] = await _json_rows(conn, table, "user_id = $1", user_id)
+        data[table] = await _json_rows(conn, table, "user_id = $1", user_id, spalten)
     for table in _PROFESSIONAL_TABLES:
-        data[table] = await _json_rows(conn, table, "professional_user_id = $1", user_id)
+        data[table] = await _json_rows(
+            conn, table, "professional_user_id = $1", user_id, spalten)
 
     for table, where in _SONDERFAELLE:
-        data[table] = await _json_rows(conn, table, where, user_id)
+        data[table] = await _json_rows(conn, table, where, user_id, spalten)
 
     if email:
         data["waitlist"] = await _json_rows_by_email(conn, "waitlist", email)
@@ -210,10 +214,54 @@ async def export_user_data(
     return data
 
 
-async def _json_rows(conn, table: str, where: str, user_id: str) -> list:
+async def _lesbare_spalten(conn) -> dict[str, list[str]]:
+    """Je Tabelle die Spalten, die in eine JSON-Auskunft gehören — **ohne Binärspalten.**
+
+    **Warum eine Binärspalte dort nichts zu suchen hat.** Postgres schreibt ``bytea`` als
+    Hex-Zeichenkette, also doppelt so viele Zeichen wie Bytes. Bei den Tonspuren eines
+    Podcasts sind das ~4,8 MB je Folge und bis zu zwölf Folgen je Fall. Das ist keine
+    vollständigere Auskunft, sondern eine Datei, die sich nicht mehr öffnen lässt — und die
+    Information selbst geht nicht verloren: Der gesprochene Text IST der Kapiteltext, und
+    der steht drin.
+
+    **Warum gefragt und nicht aufgelistet.** Ich hatte in die Migration geschrieben, die
+    Auskunft gehe „ohne die Tonspuren". Das war eine Behauptung, kein Zustand — ``SELECT *``
+    nahm sie mit, und ein Test über den echten Weg hat es gezeigt. Eine Liste hätte dasselbe
+    Problem eine Spalte später: Niemand denkt beim Anlegen einer Spalte an die Auskunft.
+
+    Postgres kennt kein ``SELECT * EXCEPT`` (das ist DuckDB), also wird die Liste
+    ausgeschrieben — in der Reihenfolge der Tabelle, damit die Auskunft lesbar bleibt.
+    """
+    zeilen = await conn.fetch(
+        "SELECT table_name, column_name FROM information_schema.columns "
+        " WHERE table_schema = 'public' AND data_type <> 'bytea' "
+        " ORDER BY table_name, ordinal_position"
+    )
+    nach_tabelle: dict[str, list[str]] = {}
+    for z in zeilen:
+        # Die Namen kommen aus dem Schema, nie von einem Aufrufer. Trotzdem geprüft: Diese
+        # Zeichenkette landet in einer Abfrage, und eine Stelle, an der das nicht geprüft
+        # wird, ist eine, auf die sich später jemand verlässt.
+        if z["column_name"].replace("_", "").isalnum():
+            nach_tabelle.setdefault(z["table_name"], []).append(z["column_name"])
+    return nach_tabelle
+
+
+def _auswahl(table: str, spalten: dict[str, list[str]]) -> str:
+    """Die Spaltenliste für diese Tabelle, oder ``*``, wenn wir sie nicht kennen."""
+    namen = spalten.get(table)
+    if not namen:
+        return "*"
+    return ", ".join(f'"{n}"' for n in namen)
+
+
+async def _json_rows(
+    conn, table: str, where: str, user_id: str,
+    spalten: dict[str, list[str]] | None = None,
+) -> list:
     val = await conn.fetchval(
         f"SELECT COALESCE(json_agg(t), '[]'::json)::text "
-        f"FROM (SELECT * FROM {table} WHERE {where}) t",
+        f"FROM (SELECT {_auswahl(table, spalten or {})} FROM {table} WHERE {where}) t",
         user_id,
     )
     return json.loads(val)

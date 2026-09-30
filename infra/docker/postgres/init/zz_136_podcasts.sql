@@ -25,9 +25,16 @@
 -- indizieren und nicht zurueckholen. Ein privater Eimer mit signierten Links waere neue
 -- Infrastruktur: mit eigener Loeschung, eigenem Export, eigener Sicherung.
 --
--- In der Datenbank faellt all das weg. Die Kontoloeschung nimmt die Zeilen mit, der
--- Datenexport auch, und die naechtliche age-verschluesselte Sicherung deckt sie ab, ohne
--- dass irgendwo eine Liste ergaenzt werden muss. Der Preis ist Groesse: 32 kbit/s Mono
+-- In der Datenbank faellt all das weg. Die Kontoloeschung nimmt die Zeilen mit, und die
+-- naechtliche age-verschluesselte Sicherung deckt sie ab, ohne dass irgendwo eine Liste
+-- ergaenzt werden muss.
+--
+-- NACHTRAG, 30.09.2026: Hier stand, der Datenexport gehe "ohne die Tonspuren". Das war eine
+-- Behauptung und kein Zustand - SELECT * nahm sie mit, und ein Test ueber den echten Weg hat
+-- es gezeigt. Jetzt schliesst die Auskunft JEDE bytea-Spalte aus, gefragt aus dem Schema
+-- statt aufgelistet: Hex ist doppelt so lang wie das Byte, ~4,8 MB je Folge, und eine
+-- JSON-Datei, die sich nicht mehr oeffnen laesst, ist keine Auskunft. Der Kapiteltext steht
+-- drin - und der IST das Gesprochene. Der Preis ist Groesse: 32 kbit/s Mono
 -- ergibt rund 2,4 MB fuer zwanzig Minuten.
 --
 -- Sollte es eng werden, ist der Umzug eine Aenderung an EINER Stelle - deshalb liegt der

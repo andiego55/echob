@@ -184,3 +184,44 @@ async def test_die_auskunft_einer_klientin_bleibt_bei_ihren_eigenen_daten(db):
     assert len(daten["cases"]) == 1
     assert daten["professional_findings"] == [], \
         "die Erkenntnisse der Fachperson sind deren Unterlagen, nicht die der Klient:in"
+
+
+# ── Binaerspalten ─────────────────────────────────────────────────────────────
+
+async def test_keine_binaerspalte_landet_in_der_auskunft(db):
+    """**Eine Binaerspalte in einer JSON-Auskunft macht sie unlesbar.**
+
+    Postgres schreibt ``bytea`` als Hex-Zeichenkette - doppelt so viele Zeichen wie Bytes.
+    Bei den Tonspuren eines Podcasts sind das ~4,8 MB je Folge und bis zu zwoelf Folgen je
+    Fall. Das ist keine vollstaendigere Auskunft, sondern eine Datei, die sich nicht mehr
+    oeffnen laesst.
+
+    Der Waechter prueft die EIGENSCHAFT, nicht eine Liste: Jede bytea-Spalte einer Tabelle,
+    die in der Auskunft vorkommt, muss von der Spaltenauswahl ausgeschlossen sein. Eine
+    Liste kannte die naechste Binaerspalte nicht - und niemand denkt beim Anlegen einer
+    Spalte an die Auskunft.
+    """
+    from app.services.account_service import _auswahl, _lesbare_spalten
+
+    spalten = await _lesbare_spalten(db)
+    binaer = await db.fetch(
+        "SELECT table_name, column_name FROM information_schema.columns "
+        " WHERE table_schema = 'public' AND data_type = 'bytea'"
+    )
+    # Ohne das prueft der Test nichts und bleibt gruen - dieselbe Bauart Fehler, gegen die
+    # er geschrieben ist.
+    assert binaer, "keine bytea-Spalte im Schema gefunden - stimmt die Abfrage?"
+
+    ausgegeben = _ausgegeben()
+    offen = []
+    for z in binaer:
+        if z["table_name"] not in ausgegeben:
+            continue
+        auswahl = _auswahl(z["table_name"], spalten)
+        if auswahl == "*" or f'"{z["column_name"]}"' in auswahl:
+            offen.append(f'{z["table_name"]}.{z["column_name"]}')
+
+    assert not offen, (
+        "Diese Binaerspalten gehen in die Auskunft und machen sie unlesbar:\n"
+        + "\n".join(f"  {t}" for t in offen)
+    )

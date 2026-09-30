@@ -1045,3 +1045,90 @@ async def test_eine_fremde_folge_laesst_sich_nicht_in_arbeit_nehmen(person, db):
     # Und der Stand der fremden Folge ist unberuehrt.
     assert await db.fetchval(
         "SELECT status FROM case_podcasts WHERE id = $1", fremde_folge["id"]) == "skript"
+
+
+# ── Die Datenauskunft, ueber den echten Weg ───────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_die_auskunft_enthaelt_das_skript_im_klartext(person, db):
+    """**Geprueft wird ueber export_user_data, nicht ueber die Listen.**
+
+    Die beiden Waechter (Loeschung, Auskunft) vergleichen nur, ob die Tabelle in den Listen
+    STEHT. Ob der richtige Feldname in _ENTSCHLUESSELN steht, sehen sie nicht - und ein
+    Tippfehler dort liefert der Person ihren eigenen Text als „enc:v1:gAAAA...".
+
+    Das waere eine Auskunft, die formal vollstaendig ist und inhaltlich nichts hergibt.
+    Dieselbe Lektion wie beim Geheimtext im Prompt: Nur der echte Weg zeigt es.
+    """
+    from app.services.account_service import export_user_data
+
+    fall = await _fall(db, person)
+    text = "Du bist an einem Abend nach Hause gekommen und hast die Stimmung geprueft."
+    await _folge(db, person, fall, titel="Der lange Abend",
+                 kapitel=[{"key": "anfang", "titel": "Wie es anfing", "text": text}])
+
+    auskunft = await export_user_data(db, str(person), None)
+
+    assert auskunft.get("case_podcasts"), "die Folge fehlt in der Auskunft"
+    folge = auskunft["case_podcasts"][0]
+    assert folge["titel"] == "Der lange Abend", f'Titel nicht entschluesselt: {folge["titel"]!r}'
+    assert not str(folge["titel"]).startswith("enc:")
+
+    kapitel = auskunft.get("case_podcast_kapitel") or []
+    assert kapitel, "die Kapitel fehlen in der Auskunft"
+    assert kapitel[0]["text"] == text, f'Text nicht entschluesselt: {kapitel[0]["text"][:30]!r}'
+
+
+@pytest.mark.asyncio
+async def test_die_auskunft_traegt_keine_tonspuren(person, db):
+    """**Zwanzig Megabyte Base64 in einer JSON-Auskunft waeren eine Datei, die sich nicht
+    mehr oeffnen laesst** — also eine Auskunft, die niemand lesen kann.
+
+    Kein Vorenthalten: Der gesprochene Text IST der Kapiteltext, und der steht drin.
+    """
+    from app.services.account_service import export_user_data
+
+    fall = await _fall(db, person)
+    folge = await _folge(db, person, fall)
+    await db.execute(
+        "UPDATE case_podcast_kapitel SET audio = $2 WHERE podcast_id = $1",
+        folge["id"], bytes(5000))
+
+    auskunft = await export_user_data(db, str(person), None)
+    for zeile in auskunft.get("case_podcast_kapitel") or []:
+        assert "audio" not in zeile or zeile["audio"] is None, (
+            "die Tonspur liegt in der Auskunft"
+        )
+
+
+@pytest.mark.asyncio
+async def test_eine_fremde_folge_steht_nicht_in_meiner_auskunft(person, db):
+    from app.services.account_service import export_user_data
+
+    fremd = uuid.uuid4()
+    await db.execute(
+        "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Andere')", fremd)
+    fremder_fall = await _fall(db, fremd)
+    await _folge(db, fremd, fremder_fall, titel="Nicht meine Folge")
+
+    auskunft = await export_user_data(db, str(person), None)
+    titel = [f.get("titel") for f in auskunft.get("case_podcasts") or []]
+    assert "Nicht meine Folge" not in titel
+    assert not auskunft.get("case_podcast_kapitel")
+
+
+@pytest.mark.asyncio
+async def test_die_loeschung_nimmt_folgen_und_kapitel_mit(person, db):
+    """Sie fallen ueber cases - dieselbe Kaskade, die in FAELLT_MIT begruendet steht. Ein
+    Test darauf, weil eine Kaskade eine Regel der DATENBANK ist: Wer den Fremdschluessel
+    einmal ohne ON DELETE CASCADE neu anlegt, merkt nichts.
+    """
+    fall = await _fall(db, person)
+    folge = await _folge(db, person, fall)
+
+    await db.execute("DELETE FROM cases WHERE id = $1", fall)
+
+    assert await db.fetchval(
+        "SELECT COUNT(*) FROM case_podcasts WHERE id = $1", folge["id"]) == 0
+    assert await db.fetchval(
+        "SELECT COUNT(*) FROM case_podcast_kapitel WHERE podcast_id = $1", folge["id"]) == 0
