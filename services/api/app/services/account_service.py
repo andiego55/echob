@@ -32,6 +32,10 @@ _USER_TABLES = (
     # Die Kapiteltexte haengen an case_podcast_kapitel und kommen ueber _SONDERFAELLE
     # dazu, ohne die Tonspuren.
     "case_podcasts",
+    # Lagebilder. Fallen ueber cases mit - hier stehen sie, damit die AUSKUNFT sie
+    # enthaelt: Die Einstellungen und der Satz darunter sind Angaben der Person, und das
+    # SVG ist die Form ihrer Lage.
+    "case_bilder",
     "client_notifications", "test_results", "pseudonymous_accounts",
     # Mein Kompass - gehoert der Person, nicht einem Fall.
     "selbst_pulse", "selbst_vorhaben", "selbst_saetze", "selbst_portraits",
@@ -116,6 +120,7 @@ _ENTSCHLUESSELN: dict[str, dict[str, tuple[str, ...]]] = {
     # Was jemand sich wuenscht, ist nicht weniger heikel als das, was er erlebt hat -
     # der eigene Text der Skizze liegt deshalb im JSONB verschluesselt.
     "selbst_ideale":                 {"json": ("inhalt",)},
+    "case_bilder":                   {"text": ("svg", "satz", "prompt")},
     "case_podcasts":                 {"text": ("titel",)},
     "case_podcast_kapitel":          {"text": ("text",)},
 }

@@ -10,6 +10,7 @@ from app.admin import router as admin_router
 from app.api.v1.routers import (
     absprachen,
     account,
+    bilder,
     bindung,
     case_artifacts,
     case_documents,
@@ -124,6 +125,7 @@ v1_router.include_router(org_billing.router)
 v1_router.include_router(case_artifacts.router)
 v1_router.include_router(case_documents.router)
 v1_router.include_router(podcasts.router)
+v1_router.include_router(bilder.router)
 v1_router.include_router(podcasts.probe_router)
 v1_router.include_router(case_shares.router)
 v1_router.include_router(client_invites.router)

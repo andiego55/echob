@@ -299,6 +299,10 @@ async def test_beispielkonten_und_erfundene_fallpersonen_bleiben(db):
 FAELLT_MIT = {
     "case_artifacts.user_id": "gehört zum Fall der Person (ON DELETE CASCADE auf cases)",
     "case_documents.user_id": "gehört zum Fall der Person (Kaskade auf cases)",
+    "case_bilder.user_id":
+        "gehoert zum Fall der Person (Kaskade auf cases). Steht zusaetzlich in "
+        "_USER_TABLES, damit die AUSKUNFT sie enthaelt - dort ist sie eine Angabe, hier "
+        "eine Kaskade",
     "case_podcasts.user_id": "gehört zum Fall der Person (Kaskade auf cases); die Kapitel samt Tonspuren "
         "hängen wiederum an der Folge. Steht zusätzlich in _USER_TABLES, damit die "
         "AUSKUNFT sie enthält - dort ist sie eine Angabe, hier eine Kaskade",

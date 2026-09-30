@@ -46,6 +46,10 @@ ANDERSWO = {
     "waitlist":
         "Hängt an der E-Mail-Adresse, nicht an der Kennung — beide Seiten holen sie über "
         "lower(email) statt über user_id.",
+    "case_bilder":
+        "Fällt mit dem Fall (Kaskade auf cases, und cases steht in _DELETE_STEPS). In der "
+        "Auskunft steht sie eigens, weil Einstellungen und der Satz darunter Angaben der "
+        "Person sind - und das SVG die Form ihrer Lage.",
     "case_podcasts":
         "Fällt mit dem Fall (Kaskade auf cases, und cases steht in _DELETE_STEPS). In der "
         "Auskunft steht sie trotzdem eigens, weil Titel und Einstellungen Angaben der "
