@@ -33,6 +33,14 @@ class BildMalen(BaseModel):
     handschrift: str
     palette: str = "kuehl"
     schichten: list[str] = Field(default_factory=list)
+    #: Wie deutlich Sinnbilder werden: keine · zurueckhaltend · deutlich.
+    symbolik: str = "zurueckhaltend"
+    #: Ob die Person selbst vorkommt: keine · ich (Rückenfigur, ohne Gesicht, in Entfernung).
+    #:
+    #: Es gibt hoechstens EINE Figur, und sie ist die Person selbst. Eine zweite waere als
+    #: die andere Person lesbar — eine Abbildung eines echten Menschen aus den Angaben einer
+    #: Seite, und die darf hier nie entstehen.
+    figur: str = "keine"
 
 
 class BildSatz(BaseModel):

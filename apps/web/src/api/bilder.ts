@@ -78,8 +78,12 @@ export const bilderApi = {
   /** Bildwelten (was zu sehen ist) und Handschriften (wie gemalt wird). */
   bildwelten: (caseId: string) =>
     apiClient
-      .get<{ bildwelten: Handschrift[]; handschriften: Handschrift[] }>(
-        `${basis(caseId)}/handschriften`)
+      .get<{
+        bildwelten: Handschrift[]
+        handschriften: Handschrift[]
+        symbolik: Handschrift[]
+        figur: Handschrift[]
+      }>(`${basis(caseId)}/handschriften`)
       .then(r => r.data),
 
   /**
@@ -95,6 +99,9 @@ export const bilderApi = {
     handschrift: string
     palette: string
     schichten: string[]
+    symbolik: string
+    /** „keine" oder „ich" — es gibt hoechstens EINE Figur, und sie ist die Person selbst. */
+    figur: string
   }) => apiClient
     .post<GespeichertesBild & { legende: LegendenZeile[] }>(
       `${basis(caseId)}/malen`, body, { timeout: 180_000 })

@@ -217,6 +217,41 @@ async def werte_laden(
     return werte
 
 
+async def selbstauskunft(
+    conn: asyncpg.Connection, *, user_id: UUID | str,
+) -> dict[str, Any]:
+    """Die zwei Angaben, aus denen eine Rückenfigur entstehen darf.
+
+    **Nur Altersspanne und Geschlecht — mehr weiß die Selbstauskunft über die Erscheinung
+    nicht, und mehr soll auch nicht erfunden werden.** Für eine Gestalt in der Ferne, von
+    hinten, ohne Gesicht, reicht das genau; alles Weitere wäre ausgedacht, und wer sich in
+    einer erfundenen Gestalt nicht wiedererkennt, liest das Bild als Aussage über jemand
+    anderen.
+
+    ``modules`` ist JSONB und kommt von asyncpg als **Zeichenkette** — derselbe Fallstrick,
+    der beim Podcast einen sofortigen 500er erzeugt hat.
+    """
+    zeile = await conn.fetchrow(
+        "SELECT modules FROM user_profiles WHERE user_id = $1", user_id)
+    if not zeile:
+        return {}
+    modules = zeile["modules"]
+    if isinstance(modules, str):
+        try:
+            modules = json.loads(modules)
+        except (ValueError, TypeError):
+            modules = {}
+    if not isinstance(modules, dict):
+        return {}
+    kontext = modules.get("life_context")
+    if not isinstance(kontext, dict):
+        return {}
+    return {
+        "age_range": kontext.get("age_range"),
+        "gender": kontext.get("gender"),
+    }
+
+
 def _bild(zeile: asyncpg.Record | None) -> dict[str, Any] | None:
     """Eine Zeile als Antwort — **und die Bildbytes fliegen hier raus.**
 

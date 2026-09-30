@@ -115,18 +115,31 @@ async def malen(
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Bildwelt.")
 
+    if body.symbolik not in katalog.SYMBOLIK_SCHLUESSEL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Symbolik.")
+    if body.figur not in katalog.FIGUR_SCHLUESSEL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Angabe zur Figur.")
+
     gewaehlt = {s.strip() for s in body.schichten} & ERLAUBTE_SCHICHTEN
     einstellungen = {
         "bildwelt": body.bildwelt,
         "handschrift": body.handschrift,
         "palette": body.palette,
         "schichten": sorted(gewaehlt),
+        "symbolik": body.symbolik,
+        "figur": body.figur,
     }
 
     async with pool.acquire() as conn:
         await enforce_ai_usage_limit(user_id, conn, "bild")
         werte = await dienst.werte_laden(
             conn, user_id=user_id, case_id=case_id, schichten=gewaehlt)
+        # Die Selbstauskunft nur, wenn eine Figur gewuenscht ist: Was nicht gebraucht wird,
+        # wird nicht abgefragt.
+        if body.figur == "ich":
+            einstellungen["selbst"] = await dienst.selbstauskunft(conn, user_id=user_id)
 
     prompt = katalog.prompt_bauen(werte, einstellungen)
 
@@ -139,9 +152,14 @@ async def malen(
                    "dein Kontingent ist unberührt.",
         ) from fehler
 
+    # **Die Selbstauskunft wird nicht mitgespeichert.** Sie diente dem Prompt und gehoert
+    # nicht in die Einstellungen einer Galerie-Zeile — dort steht, WAS gewaehlt wurde, nicht,
+    # welche Angaben die Person ueber sich gemacht hat.
+    zum_ablegen = {k: v for k, v in einstellungen.items() if k != "selbst"}
+
     async with pool.acquire() as conn:
         bild = await dienst.gemaltes_anlegen(
-            conn, user_id=user_id, case_id=case_id, einstellungen=einstellungen,
+            conn, user_id=user_id, case_id=case_id, einstellungen=zum_ablegen,
             bild=bytes_, bild_typ=bild_modell.INHALTSTYP, prompt=prompt)
         await log_ai_usage(user_id, conn, "bild")
     # **Die Legende geht mit.** Eine Metapher, die niemand aufloest, bleibt Dekoration —
@@ -192,6 +210,8 @@ async def handschriften(
         "handschriften": [
             {k: v for k, v in h.items() if k in fuers_auge} for h in katalog.HANDSCHRIFTEN
         ],
+        "symbolik": list(katalog.SYMBOLIK_STUFEN),
+        "figur": list(katalog.FIGUR_STUFEN),
     }
 
 

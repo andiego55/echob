@@ -211,6 +211,133 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
     },
 )
 
+# ── Archetypen, Tiere und Traumbilder ────────────────────────────────────────
+#
+# **Warum das dazugehoert und nicht Zierde ist.**
+#
+# Eine Schwelle, eine Bruecke, ein Schluessel, ein Tier am Rand — das sind Bilder, die
+# Menschen seit jeher fuer innere Lagen benutzen, in Traeumen wie in der Arbeit mit Menschen.
+# Sie sagen etwas, ohne es festzunageln, und genau das ist hier gebraucht: Ein Bild soll
+# lesbar sein, ohne zu behaupten.
+#
+# **Jedes Symbol haengt an einer Groesse, die es im Fall wirklich gibt.** Eine Schwelle
+# erscheint, wenn es einen Wunsch gibt, der fehlt; ein Uebergang, wenn ein Muster durchlaeuft.
+# Ein Symbol, das ohne Anlass auftaucht, waere Dekoration — und schlimmer: eine Behauptung in
+# Bildform.
+#
+# **Das Tier ist NIE die andere Person.** Ihr einen Wolf zuzuordnen waere eine
+# Charakterisierung, und zwar die schlimmste Art: eine, die sich nicht widersprechen laesst.
+# Das Tier ist Atmosphaere und Gegenwart, es steht am Rand und ist nicht bedrohlich. Die
+# andere Person bleibt Wetter, Masse, Zug von einer Seite — in jeder Bildwelt.
+
+SYMBOLIK: dict[str, dict[str, str]] = {'landschaft': {'schwelle': 'a lone doorframe standing free in the open ground, nothing built around it, the same land visible through it',
+     'tier': 'a single deer standing far off near the edge of the scene, aware but not startled',
+     'zeichen': 'an old lantern left standing on a flat stone beside the path, unlit',
+     'uebergang': 'a narrow footbridge over a dry gully, its far end in shadow'}, 'wasser': {'schwelle': 'a stone step descending into the water and disappearing below the surface',
+     'tier': 'a single heron standing motionless in the shallows at a distance',
+     'zeichen': 'a small wooden boat drifting untethered, empty',
+     'uebergang': 'a line of stepping stones crossing the water, one of them missing'}, 'haus': {'schwelle': 'a door standing open onto the next room, the light beyond it different from the light here',
+     'tier': 'a cat sitting in a far doorway, turned away',
+     'zeichen': 'a key lying on a bare windowsill',
+     'uebergang': 'a narrow staircase leading up out of sight'}, 'wald': {'schwelle': 'two close-standing trunks forming a natural gateway onto a clearing',
+     'tier': 'a single fox at the far edge of the clearing, half turned away',
+     'zeichen': 'a knotted rope hanging from a low branch, old and weathered',
+     'uebergang': 'a fallen trunk laid across a stream as a crossing'}, 'himmel': {'schwelle': 'a gap torn in the cloud with clear depth beyond it',
+     'tier': 'a single bird very high up, small and far away',
+     'zeichen': 'a kite string running up out of the frame, the kite itself unseen',
+     'uebergang': 'a thin bright band where two weather systems meet'}, 'faden': {'schwelle': 'an opening in the weave with the structure changing on the other side',
+     'tier': 'a moth resting on the fabric, wings closed',
+     'zeichen': 'a needle left stuck in the cloth, its thread trailing',
+     'uebergang': 'a seam joining two very different weaves'}}
+
+
+#: Wie deutlich die Symbolik wird.
+SYMBOLIK_STUFEN: tuple[dict[str, str], ...] = (
+    {"key": "keine", "label": "Keine",
+     "hinweis": "Nur der Ort selbst \u2014 kein Gegenstand, kein Tier."},
+    {"key": "zurueckhaltend", "label": "Zur\u00fcckhaltend",
+     "hinweis": "Ein Zeichen, kaum bemerkbar."},
+    {"key": "deutlich", "label": "Deutlich",
+     "hinweis": "Schwelle, \u00dcbergang, ein Tier \u2014 deutlich zu sehen."},
+)
+
+SYMBOLIK_SCHLUESSEL = {s["key"] for s in SYMBOLIK_STUFEN}
+STANDARD_SYMBOLIK = "zurueckhaltend"
+
+
+# ── Die Figur ────────────────────────────────────────────────────────────────
+#
+# **Es gibt hoechstens EINE, und sie ist die Person selbst.**
+#
+# Das ist die Grenze, an der alles haengt. Eine zweite Gestalt waere als die andere Person
+# lesbar — und eine Abbildung eines echten, namentlich bekannten Menschen aus den Angaben
+# einer Seite ist genau das, was hier nie entstehen darf. Ob im Bild zwei Menschen stehen, ist
+# deshalb keine Geschmacksfrage.
+#
+# **Kein Gesicht.** Von hinten, in Entfernung, klein im Bild. Ein Gesicht waere ein Portraet
+# von jemandem, der nie dafuer sass — und es laedt zum Wiedererkennen ein, mit allem, was
+# daran haengt: Haltung, Groesse, Ausdruck. Alles davon waere erfunden.
+#
+# **Die Erscheinung kommt aus der Selbstauskunft und nur daraus.** Sie kennt Altersspanne und
+# Geschlecht (letzteres freiwillig) — mehr nicht. Fuer eine Rueckenfigur in der Ferne reicht
+# das; alles Weitere waere ausgedacht.
+
+FIGUR_STUFEN: tuple[dict[str, str], ...] = (
+    {"key": "keine", "label": "Niemand",
+     "hinweis": "Der Ort ist leer."},
+    {"key": "ich", "label": "Ich, von hinten",
+     "hinweis": "Eine einzelne Gestalt in der Ferne, ohne Gesicht."},
+)
+
+FIGUR_SCHLUESSEL = {f["key"] for f in FIGUR_STUFEN}
+STANDARD_FIGUR = "keine"
+
+
+def figur_beschreibung(selbst: dict[str, Any] | None) -> str:
+    """Die Rueckenfigur, aus der Selbstauskunft — und aus nichts sonst.
+
+    Ohne Angaben bleibt sie unbestimmt. **Eine erfundene Erscheinung waere schlimmer als
+    keine**: Wer sich in einer Gestalt nicht wiedererkennt, liest das Bild als Aussage ueber
+    jemand anderen.
+    """
+    teile: list[str] = []
+    alter = (selbst or {}).get("age_range")
+    geschlecht = (selbst or {}).get("gender")
+
+    if geschlecht in ("weiblich", "female", "w"):
+        wer = "a woman"
+    elif geschlecht in ("maennlich", "m\u00e4nnlich", "male", "m"):
+        wer = "a man"
+    else:
+        wer = "a single person, their build not clearly discernible"
+    teile.append(wer)
+
+    if isinstance(alter, str) and "-" in alter:
+        try:
+            von = int(alter.split("-")[0])
+        except ValueError:
+            von = 0
+        # Die Schwellen liegen an den Spannen der Selbstauskunft (18-25, 26-35, 36-45,
+        # 46-55, 56+) und nicht an runden Zahlen: „36-45" ist Lebensmitte und nicht mehr
+        # jung, und eine Figur, in der sich jemand nicht wiedererkennt, ist schlimmer als
+        # eine unbestimmte.
+        if von >= 56:
+            teile.append("older")
+        elif von >= 36:
+            teile.append("in middle life")
+        elif von >= 26:
+            teile.append("a younger adult")
+        else:
+            teile.append("young")
+
+    return (
+        f"A single small figure far away in the scene: {', '.join(teile)}, "
+        "seen entirely from behind and turned away, facing into the distance. "
+        "The figure is small in the frame and no facial features are visible or implied. "
+        "There is no one else anywhere in the image."
+    )
+
+
 BILDWELT_SCHLUESSEL = {b["key"] for b in BILDWELTEN}
 STANDARD_BILDWELT = "landschaft"
 
@@ -280,11 +407,15 @@ FARBWORTE: dict[str, str] = {
 
 GRENZE = (
     "Important constraints:\n"
-    "- No people at all: no figures, faces, bodies, hands, silhouettes or shadows of people. "
-    "The place is empty of anyone.\n"
-    "- No animals or creatures.\n"
+    "- There is AT MOST ONE human figure in the image, and only if one is described above. "
+    "Never two people, never a couple, never a group, never a second figure of any kind — "
+    "not in the distance, not as a shadow, not as a reflection.\n"
+    "- Any figure is seen from behind or from far away. No face, no facial features, nobody "
+    "turned toward the viewer, no portrait, no reflection showing a face.\n"
+    "- Animals may appear as described above; they are calm and at a distance, never "
+    "threatening, never menacing, never looking at the viewer.\n"
     "- No letters, numbers, words, writing, signatures, logos or frames.\n"
-    "- Nothing violent or gory, no weapons, no blood, no threatening figures.\n"
+    "- Nothing violent or gory, no weapons, no blood, no restraints, no cages.\n"
     "- This is not an illustration of an event and not a scene from a story. It is a place "
     "that carries a mood.\n"
     "- Quiet and restrained rather than dramatic or spectacular. It should feel true, not "
@@ -369,6 +500,33 @@ def prompt_bauen(werte: dict[str, Any], einstellungen: dict[str, Any]) -> str:
     if "druck" in schichten and werte.get("druck") is not None:
         teile.append(welt["druck"] + ".")
 
+    # ── Die Symbolik ────────────────────────────────────────────────────────
+    #
+    # **Jedes Zeichen hängt an einer Größe, die es im Fall wirklich gibt.** Eine Schwelle
+    # erscheint, wenn ein Wunsch fehlt; ein Übergang, wenn ein Muster durchläuft. Ein Symbol
+    # ohne Anlass wäre Dekoration — und schlimmer: eine Behauptung in Bildform.
+    stufe = str(einstellungen.get("symbolik") or STANDARD_SYMBOLIK)
+    sym = SYMBOLIK.get(welt["key"], {})
+    if stufe != "keine" and sym:
+        zeichen: list[str] = []
+        if "leerstellen" in schichten and (werte.get("leerstellen") or []):
+            zeichen.append(sym["schwelle"])
+        if stufe == "deutlich":
+            if "durchgaenge" in schichten and any(
+                    float(d.get("wert") or 0) > 0.25 for d in (werte.get("durchgaenge") or [])):
+                zeichen.append(sym["uebergang"])
+            # Das Tier steht für sich und nie für einen Menschen — siehe der Kommentar bei
+            # SYMBOLIK. Es braucht deshalb keinen Anlass in den Daten.
+            zeichen.append(sym["tier"])
+            if "lichter" in schichten and (werte.get("lichter") or []):
+                zeichen.append(sym["zeichen"])
+        if zeichen:
+            teile.append("Also present: " + "; ".join(zeichen) + ".")
+
+    # ── Die Figur ───────────────────────────────────────────────────────────
+    if einstellungen.get("figur") == "ich":
+        teile.append(figur_beschreibung(einstellungen.get("selbst")))
+
     teile.append(
         "Composition: a single coherent place, unhurried, with room to breathe. "
         "Not decorative, not idyllic, not dramatic."
@@ -424,5 +582,29 @@ def legende(einstellungen: dict[str, Any], werte: dict[str, Any]) -> list[dict[s
         zeilen.append({
             "was": "Was von einer Seite drückt",
             "wofuer": "Die andere Person — als Kraft auf das Ganze, nie als Gestalt darin",
+        })
+
+    # Symbolik und Figur gehören genauso aufgelöst: Ein Zeichen, das niemand erklärt, wird
+    # gedeutet — und dann deutet die Person unser Bild statt ihre Lage.
+    stufe = str(einstellungen.get("symbolik") or STANDARD_SYMBOLIK)
+    if stufe != "keine":
+        # `.capitalize()` waere hier falsch: Es schreibt den REST klein, und aus
+        # „Die Schwelle und das Tier" wuerde „Die schwelle und das tier".
+        was = ["die Schwelle"] if ("leerstellen" in schichten
+                                   and (werte.get("leerstellen") or [])) else []
+        if stufe == "deutlich":
+            was.append("das Tier und die Zeichen")
+        if was:
+            satz = " und ".join(was)
+            zeilen.append({
+                "was": satz[0].upper() + satz[1:],
+                "wofuer": "Sinnbilder, keine Aussagen — eine Schwelle steht für etwas, das "
+                          "fehlt und erreichbar wäre. Was sie dir bedeuten, entscheidest du",
+            })
+    if einstellungen.get("figur") == "ich":
+        zeilen.append({
+            "was": "Die Gestalt von hinten",
+            "wofuer": "Du — nach deiner Selbstauskunft, ohne Gesicht und in Entfernung. "
+                      "Es kommt niemand sonst im Bild vor",
         })
     return zeilen

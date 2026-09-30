@@ -422,36 +422,182 @@ def test_der_prompt_traegt_nur_struktur_und_keine_geschichte():
         assert wort not in prompt.lower(), wort
 
 
-def test_der_prompt_verbietet_menschen_und_nicht_das_gegenstaendliche():
-    """**Die Grenze lag erst am falschen Ort.**
+def test_die_grenze_laesst_hoechstens_EINE_gestalt_zu():
+    """**Die Grenze, an der alles haengt.**
 
-    Die erste Fassung verbot alles Gegenstaendliche und liess nur Formen zu - mit dem
-    Ergebnis, dass niemand etwas darin lesen konnte und es nebenbei auch nicht schoen war.
+    Eine zweite Gestalt waere als die andere Person lesbar — eine Abbildung eines echten,
+    namentlich bekannten Menschen aus den Angaben einer Seite. Ob im Bild zwei Menschen
+    stehen, ist deshalb keine Geschmacksfrage.
 
-    Die Sorge dahinter war richtig, zielte aber auf etwas Engeres: keine Abbildung der
-    anderen Person, keine Nachstellung eines Vorfalls. Ein Pfad, ein Fenster, Wetter sind
-    Gleichnisse und keine Zeugen.
+    Und kein Gesicht: Ein Portraet von jemandem, der nie dafuer sass, laedt zum
+    Wiedererkennen ein — mit allem, was daran haengt: Haltung, Groesse, Ausdruck. Alles davon
+    waere erfunden.
     """
-    from app.services.bild_katalog import GRENZE, prompt_bauen
-
-    prompt = prompt_bauen(_werte_beispiel(), {
-        "bildwelt": "landschaft", "handschrift": "aquarell", "palette": "erdig",
-        "schichten": ALLE_SCHICHTEN})
-
-    # Die Grenze steht am ENDE - dort gewichtet ein Modell am staerksten.
-    assert prompt.rstrip().endswith(GRENZE.rstrip())
+    from app.services.bild_katalog import GRENZE
 
     tief = GRENZE.lower()
-    # Was verboten bleibt: Menschen, Wesen, Schrift, Gewalt.
-    for verboten in ("no people", "no figures", "faces", "silhouettes",
-                     "no animals", "no letters", "nothing violent"):
+    assert "at most one human figure" in tief
+    for verboten in ("never two people", "never a couple", "never a group",
+                     "never a second figure"):
         assert verboten in tief, verboten
-    # Und ausdruecklich: keine Nachstellung eines Geschehens.
-    assert "not an illustration of an event" in tief
+    # Auch nicht als Schatten oder Spiegelung - das sind die Schlupfloecher.
+    assert "not as a shadow" in tief
+    assert "not as a reflection" in tief
+    # Und kein Gesicht, auch nicht in einer Spiegelung.
+    assert "no face" in tief
+    assert "no reflection showing a face" in tief
 
-    # Was NICHT mehr verboten ist - sonst waere das Bild wieder unlesbar.
-    for erlaubt in ("no landscape", "no rooms", "no objects", "non-figurative"):
-        assert erlaubt not in tief, f"die Grenze verbietet wieder zu viel: {erlaubt}"
+
+def test_die_grenze_erlaubt_jetzt_tiere_und_gegenstaende():
+    """Die erste Fassung verbot alles Gegenstaendliche, die zweite auch noch Tiere. Beides
+    war zu viel: Ein Reh am Waldrand ist ein Sinnbild, kein Zeuge."""
+    from app.services.bild_katalog import GRENZE
+
+    tief = GRENZE.lower()
+    assert "animals may appear" in tief
+    # Aber nicht bedrohlich - ein Bild ueber die eigene Lage soll nicht Angst machen.
+    assert "never threatening" in tief
+    assert "never looking at the viewer" in tief
+    # Und was verboten bleibt.
+    for verboten in ("no letters", "nothing violent", "no cages"):
+        assert verboten in tief, verboten
+
+
+def test_ohne_figur_steht_kein_mensch_im_prompt():
+    from app.services.bild_katalog import prompt_bauen
+
+    ohne = prompt_bauen(_werte_beispiel(), {
+        "bildwelt": "wald", "handschrift": "oel", "palette": "erdig",
+        "symbolik": "deutlich", "figur": "keine", "schichten": ALLE_SCHICHTEN})
+    assert "A single small figure" not in ohne
+    assert "seen entirely from behind" not in ohne
+
+
+def test_die_figur_kommt_aus_der_selbstauskunft_und_nur_daraus():
+    """**Eine erfundene Erscheinung waere schlimmer als keine.** Wer sich in einer Gestalt
+    nicht wiedererkennt, liest das Bild als Aussage ueber jemand anderen."""
+    from app.services.bild_katalog import figur_beschreibung
+
+    frau = figur_beschreibung({"age_range": "36-45", "gender": "weiblich"})
+    assert "a woman" in frau
+    assert "in middle life" in frau, "36-45 ist Lebensmitte, nicht mehr jung"
+
+    # Ohne Angaben bleibt sie unbestimmt statt erfunden.
+    unbestimmt = figur_beschreibung({})
+    assert "not clearly discernible" in unbestimmt
+    assert figur_beschreibung(None) == unbestimmt
+
+    # In jeder Fassung: von hinten, kein Gesicht, niemand sonst.
+    for text in (frau, unbestimmt, figur_beschreibung({"age_range": "18-25"})):
+        assert "entirely from behind" in text
+        assert "no facial features" in text
+        assert "no one else anywhere in the image" in text
+
+
+def test_die_altersspannen_der_selbstauskunft_treffen_die_richtige_stufe():
+    from app.services.bild_katalog import figur_beschreibung
+
+    for spanne, erwartet in [
+        ("18-25", "young"), ("26-35", "a younger adult"),
+        ("36-45", "in middle life"), ("46-55", "in middle life"), ("56-99", "older"),
+    ]:
+        assert erwartet in figur_beschreibung({"age_range": spanne}), spanne
+
+
+def test_die_symbolik_haengt_an_den_daten():
+    """**Ein Symbol ohne Anlass waere Dekoration — und schlimmer: eine Behauptung in
+    Bildform.** Eine Schwelle erscheint, wenn ein Wunsch fehlt; ein Uebergang, wenn ein
+    Muster durchlaeuft."""
+    from app.services.bild_katalog import SYMBOLIK, prompt_bauen
+
+    sym = SYMBOLIK["landschaft"]
+    einst = {"bildwelt": "landschaft", "handschrift": "tusche", "palette": "kuehl",
+             "figur": "keine"}
+
+    # Keine Leerstelle -> keine Schwelle.
+    ohne_wunsch = dict(_werte_beispiel(), leerstellen=[])
+    p_ohne = prompt_bauen(ohne_wunsch, {**einst, "symbolik": "deutlich",
+                                        "schichten": ALLE_SCHICHTEN})
+    assert sym["schwelle"] not in p_ohne
+
+    mit = prompt_bauen(_werte_beispiel(), {**einst, "symbolik": "deutlich",
+                                           "schichten": ALLE_SCHICHTEN})
+    assert sym["schwelle"] in mit
+
+
+def test_die_symbolik_hat_drei_deutliche_stufen():
+    from app.services.bild_katalog import SYMBOLIK, prompt_bauen
+
+    sym = SYMBOLIK["landschaft"]
+    einst = {"bildwelt": "landschaft", "handschrift": "tusche", "palette": "kuehl",
+             "figur": "keine", "schichten": ALLE_SCHICHTEN}
+    werte = _werte_beispiel()
+
+    keine = prompt_bauen(werte, {**einst, "symbolik": "keine"})
+    wenig = prompt_bauen(werte, {**einst, "symbolik": "zurueckhaltend"})
+    viel = prompt_bauen(werte, {**einst, "symbolik": "deutlich"})
+
+    assert sym["schwelle"] not in keine and sym["tier"] not in keine
+    assert sym["schwelle"] in wenig and sym["tier"] not in wenig
+    assert sym["tier"] in viel and sym["uebergang"] in viel
+
+
+def test_kein_tier_steht_fuer_die_andere_person():
+    """**Ihr einen Wolf zuzuordnen waere eine Charakterisierung** — und zwar die schlimmste
+    Art: eine, die sich nicht widersprechen laesst. Die andere Person bleibt Wetter, Masse,
+    Zug von einer Seite, in JEDER Bildwelt.
+    """
+    from app.services.bild_katalog import BILDWELTEN, SYMBOLIK
+
+    for b in BILDWELTEN:
+        # Der Druck - das ist die andere Person - nennt kein Lebewesen.
+        for tier in ("wolf", "dog", "snake", "bear", "crow", "raven", "spider", "rat",
+                     "deer", "fox", "cat", "bird", "heron", "moth"):
+            assert tier not in b["druck"].lower(), f'{b["key"]}: Druck als {tier}'
+        # Und das Tier der Symbolik ist ruhig und am Rand, nicht bedrohlich.
+        text = SYMBOLIK[b["key"]]["tier"].lower()
+        for drohend in ("threatening", "menacing", "snarling", "staring", "attacking",
+                        "circling"):
+            assert drohend not in text, f'{b["key"]}: {drohend}'
+
+
+def test_jede_bildwelt_hat_ihre_vier_sinnbilder():
+    """Fehlt einer Welt eines, bricht der Prompt-Bau mit einem KeyError - und zwar erst
+    dann, wenn jemand genau diese Welt mit „deutlich" waehlt."""
+    from app.services.bild_katalog import BILDWELTEN, SYMBOLIK
+
+    for b in BILDWELTEN:
+        assert b["key"] in SYMBOLIK, b["key"]
+        for zeichen in ("schwelle", "tier", "zeichen", "uebergang"):
+            assert len(SYMBOLIK[b["key"]][zeichen]) > 20, f'{b["key"]}: {zeichen}'
+
+
+def test_die_legende_loest_auch_symbolik_und_figur_auf():
+    """Ein Zeichen, das niemand erklaert, wird gedeutet — und dann deutet die Person unser
+    Bild statt ihre Lage."""
+    from app.services.bild_katalog import legende
+
+    zeilen = legende({"bildwelt": "haus", "schichten": ALLE_SCHICHTEN,
+                      "symbolik": "deutlich", "figur": "ich"}, _werte_beispiel())
+    text = " ".join(f'{z["was"]} {z["wofuer"]}' for z in zeilen)
+    assert "Schwelle" in text
+    assert "Tier" in text
+    assert "Gestalt von hinten" in text
+    assert "niemand sonst" in text
+    # Und die Sinnbilder werden ausdruecklich NICHT gedeutet.
+    assert "entscheidest du" in text
+
+
+def test_die_legende_schreibt_nicht_alles_klein():
+    """`.capitalize()` schreibt den REST klein: Aus „Die Schwelle und das Tier" wurde
+    „Die schwelle und das tier"."""
+    from app.services.bild_katalog import legende
+
+    zeilen = legende({"bildwelt": "wald", "schichten": ALLE_SCHICHTEN,
+                      "symbolik": "deutlich", "figur": "keine"}, _werte_beispiel())
+    sinnbild = next(z for z in zeilen if "chwelle" in z["was"])
+    assert "Schwelle" in sinnbild["was"]
+    assert "Tier" in sinnbild["was"]
 
 
 def test_der_prompt_traegt_weiter_keine_geschichte():
@@ -585,7 +731,11 @@ def test_die_legende_loest_jede_eingeschaltete_schicht_auf():
     from app.services.bild_katalog import legende
 
     werte = _werte_beispiel()
-    zeilen = legende({"bildwelt": "haus", "schichten": ALLE_SCHICHTEN}, werte)
+    # Ohne Sinnbilder und Figur: Dieser Test zaehlt die SCHICHTEN, und die beiden anderen
+    # haben eigene Tests. Sonst misst er zwei Dinge auf einmal und wird bei jeder Aenderung
+    # an einem davon rot.
+    zeilen = legende({"bildwelt": "haus", "schichten": ALLE_SCHICHTEN,
+                      "symbolik": "keine", "figur": "keine"}, werte)
     assert len(zeilen) == 6, "nicht jede Schicht wird aufgeloest"
     for z in zeilen:
         assert z["was"] and z["wofuer"]
@@ -595,7 +745,8 @@ def test_die_legende_nennt_nur_was_wirklich_im_bild_ist():
     from app.services.bild_katalog import legende
 
     werte = _werte_beispiel()
-    nur_szenen = legende({"bildwelt": "wald", "schichten": ["szenen"]}, werte)
+    nur_szenen = legende({"bildwelt": "wald", "schichten": ["szenen"],
+                          "symbolik": "keine", "figur": "keine"}, werte)
     assert len(nur_szenen) == 1
 
     # Und was es im Fall nicht gibt, steht auch nicht in der Legende.
@@ -621,8 +772,8 @@ def test_jede_bildwelt_hat_eine_legende():
     from app.services.bild_katalog import BILDWELTEN, legende
 
     for b in BILDWELTEN:
-        zeilen = legende({"bildwelt": b["key"], "schichten": ALLE_SCHICHTEN},
-                         _werte_beispiel())
+        zeilen = legende({"bildwelt": b["key"], "schichten": ALLE_SCHICHTEN,
+                          "symbolik": "keine", "figur": "keine"}, _werte_beispiel())
         assert len(zeilen) == 6, b["key"]
 
 

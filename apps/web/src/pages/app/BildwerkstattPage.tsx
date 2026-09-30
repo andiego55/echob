@@ -73,6 +73,15 @@ export default function BildwerkstattPage() {
   const [weg, setWeg] = useState<'gerechnet' | 'gemalt'>('gemalt')
   const [bildwelt, setBildwelt] = useState('landschaft')
   const [handschrift, setHandschrift] = useState('aquarell')
+  const [symbolik, setSymbolik] = useState('zurueckhaltend')
+  /**
+   * Ob die Person selbst vorkommt.
+   *
+   * **Vorauswahl „keine", und das ist eine Entscheidung.** Sich selbst in einem Bild über
+   * die eigene Lage zu sehen, ist ein Schritt, den man gehen können soll — aber nicht einer,
+   * den man ungefragt bekommt.
+   */
+  const [figur, setFigur] = useState('keine')
 
   /**
    * Alle Schichten, die diese Sitzung schon einmal gesehen hat.
@@ -124,7 +133,7 @@ export default function BildwerkstattPage() {
 
   const malen = useMutation({
     mutationFn: () => bilderApi.malen(caseId!, {
-      bildwelt, handschrift, palette, schichten,
+      bildwelt, handschrift, palette, schichten, symbolik, figur,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bilder', caseId] })
@@ -272,6 +281,71 @@ export default function BildwerkstattPage() {
                         <p className="text-sm text-brand-muted">Einen Moment …</p>
                       )}
                     </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <span className="label">Sinnbilder</span>
+                    <p className="mb-2 mt-0.5 text-[0.74rem] leading-snug text-brand-muted">
+                      Eine Schwelle, ein Übergang, ein Tier am Rand — alte Bilder für innere
+                      Lagen. Jedes hängt an etwas, das es in deinem Fall wirklich gibt.
+                    </p>
+                    <div className="grid grid-cols-3 gap-1">
+                      {(bildwelten.data?.symbolik ?? []).map(st => (
+                        <button
+                          key={st.key}
+                          type="button"
+                          onClick={() => setSymbolik(st.key)}
+                          aria-pressed={symbolik === st.key}
+                          title={st.hinweis}
+                          className={`rounded-brand-sm border px-2 py-1.5 text-[0.74rem] transition-colors ${
+                            symbolik === st.key
+                              ? 'border-accent bg-accent text-white'
+                              : 'border-brand-border bg-white text-brand-muted hover:border-accent/50'
+                          }`}
+                        >
+                          {st.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* **Höchstens EINE Gestalt, und sie bist du.**
+                      Eine zweite wäre als die andere Person lesbar — eine Abbildung eines
+                      echten Menschen aus deinen Angaben, und die soll hier nie entstehen.
+                      Deshalb steht das hier auch so dabei: Wer es liest, weiß, warum es nur
+                      diese eine Wahl gibt. */}
+                  <div className="mt-5">
+                    <span className="label">Kommst du vor?</span>
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                      {(bildwelten.data?.figur ?? []).map(f => (
+                        <button
+                          key={f.key}
+                          type="button"
+                          onClick={() => setFigur(f.key)}
+                          aria-pressed={figur === f.key}
+                          className={`rounded-brand border px-3.5 py-2.5 text-left transition-colors ${
+                            figur === f.key
+                              ? 'border-accent bg-accent/[0.06]'
+                              : 'border-brand-border bg-white hover:border-accent/50'
+                          }`}
+                        >
+                          <span className={`block text-[0.84rem] font-semibold ${
+                            figur === f.key ? 'text-accent' : 'text-navy'
+                          }`}>{f.label}</span>
+                          <span className="block text-[0.72rem] leading-snug text-brand-muted">
+                            {f.hinweis}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    {figur === 'ich' && (
+                      <p className="mt-2 text-[0.72rem] leading-snug text-brand-muted">
+                        Aus deiner Selbstauskunft kommen nur Altersspanne und Geschlecht —
+                        mehr weiß sie über dein Aussehen nicht, und mehr wird auch nicht
+                        erfunden. Es kommt niemand sonst im Bild vor: keine zweite Gestalt,
+                        auch kein Schatten und keine Spiegelung.
+                      </p>
+                    )}
                   </div>
 
                   <div className="mt-5">
