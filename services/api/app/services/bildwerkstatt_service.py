@@ -218,9 +218,26 @@ async def werte_laden(
 
 
 def _bild(zeile: asyncpg.Record | None) -> dict[str, Any] | None:
+    """Eine Zeile als Antwort — **und die Bildbytes fliegen hier raus.**
+
+    Das hat im Betrieb einen 500er erzeugt, beim allerersten „Malen lassen": ``RETURNING *``
+    bringt die ``bild``-Spalte mit, FastAPI versucht rohe PNG-Bytes als JSON zu serialisieren
+    und bricht mit „invalid utf-8 sequence" ab. Das Bild war da, gespeichert und bezahlt —
+    nur die Antwort platzte.
+
+    Dieselbe Art Fehler hatte ich Tage vorher für die Datenauskunft behoben (keine
+    Binärspalte in eine JSON-Antwort) und dort strukturell gelöst. Hier habe ich nicht daran
+    gedacht: Die Auskunft und die API sind zwei Wege, und ich hatte nur einen abgesichert.
+
+    Statt der Bytes geht ``hat_datei`` hinaus — der Browser holt sie einzeln über den
+    Ausliefer-Endpunkt.
+    """
     if zeile is None:
         return None
     d = dict(zeile)
+    if "bild" in d:
+        d["hat_datei"] = d["bild"] is not None
+        del d["bild"]
     for feld in ("svg", "satz", "prompt"):
         if feld in d:
             d[feld] = crypto.decrypt(d[feld]) if d.get(feld) else None

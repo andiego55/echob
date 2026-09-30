@@ -742,3 +742,41 @@ def test_der_gerechnete_weg_hat_kein_kontingent():
 
     assert "bild" in _AI_USAGE_LIMITS          # der gemalte Weg
     assert "lagebild" not in _AI_USAGE_LIMITS  # der gerechnete nicht
+
+
+@pytest.mark.asyncio
+async def test_keine_bildbytes_in_einer_antwort(person, db):
+    """**Der Waechter gegen den 500er beim allerersten „Malen lassen".**
+
+    ``RETURNING *`` bringt die bild-Spalte mit; FastAPI versucht rohe PNG-Bytes als JSON zu
+    serialisieren und bricht mit „invalid utf-8 sequence" ab. Das Bild war erzeugt,
+    gespeichert und bezahlt - nur die Antwort platzte.
+
+    Geprueft werden ALLE Wege, auf denen eine Zeile herauskommt. Beim Anlegen ist es mir
+    passiert, weil ich nur an die Galerie gedacht hatte.
+    """
+    fall = await _fall(db, person)
+    gemalt = await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall, einstellungen={"bildwelt": "landschaft"},
+        bild=bytes([137]) + b"PNG rohe Bytes", bild_typ="image/png", prompt="p")
+
+    wege = {
+        "anlegen": gemalt,
+        "holen": await dienst.holen(db, user_id=person, bild_id=gemalt["id"]),
+        "liste": (await dienst.liste(db, user_id=person, case_id=fall))[0],
+    }
+    for name, antwort in wege.items():
+        assert "bild" not in antwort, f"{name}: die Bildbytes gehen mit"
+        assert antwort["hat_datei"] is True, name
+        # Und die Antwort laesst sich wirklich als JSON schreiben - das ist die
+        # Eigenschaft, um die es geht.
+        import json as _j
+        _j.dumps(antwort, default=str)
+
+
+@pytest.mark.asyncio
+async def test_ein_gerechnetes_bild_meldet_keine_datei(person, db):
+    fall = await _fall(db, person)
+    b = await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={},
+                             svg=SVG, satz="")
+    assert b["hat_datei"] is False
