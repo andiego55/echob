@@ -19,6 +19,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Fehlermeldung from '@/components/Fehlermeldung'
+import { anspracheFuerFormat, reglerFuerFormat } from '@/lib/podcast'
 import { podcastApi, type PodcastBestellung } from '@/api/podcast'
 
 export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch }: {
@@ -65,9 +66,8 @@ export default function Studio({ caseId, laeuft, fehler, onBestellen, onAbbruch 
   useEffect(() => {
     const k = zuschnitt.data
     if (!k?.format) return
-    setAnsprache(a => (a && k.format!.ansprachen.includes(a) ? a : k.format!.ansprachen[0]))
-    setGewichte(g => Object.fromEntries(
-      k.format!.elemente.map(e => [e, g[e] ?? 'normal'])))
+    setAnsprache(a => anspracheFuerFormat(k.format!.ansprachen, a))
+    setGewichte(g => reglerFuerFormat(k.format!.elemente, g))
     setOhneKapitel([])
   }, [zuschnitt.data])
 

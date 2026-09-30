@@ -17,14 +17,11 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { podcastApi, type PodcastKapitel } from '@/api/podcast'
+import { zeit } from '@/lib/podcast'
 
-/** Sekunden als `4:07`. */
-export function zeit(sekunden: number | null | undefined): string {
-  if (!sekunden || sekunden < 0) return '0:00'
-  const m = Math.floor(sekunden / 60)
-  const s = Math.floor(sekunden % 60)
-  return `${m}:${String(s).padStart(2, '0')}`
-}
+// `zeit` wohnt in lib/podcast.ts: Eine Formatierung ist eine reine Funktion, und nur dort
+// ist sie prüfbar — der Testaufbau dieses Projekts rendert bewusst nichts.
+export { zeit }
 
 export default function Abspieler({ caseId, podcastId, kapitel }: {
   caseId: string

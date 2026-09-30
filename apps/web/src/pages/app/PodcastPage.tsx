@@ -13,7 +13,7 @@ import CaseNav from '@/components/app/CaseNav'
 import Fehlermeldung from '@/components/Fehlermeldung'
 import { PageSkeleton } from '@/components/Skeleton'
 import Studio from '@/components/app/podcast/Studio'
-import { zeit } from '@/components/app/podcast/Abspieler'
+import { stand } from '@/lib/podcast'
 import { podcastApi, type Podcast, type PodcastBestellung } from '@/api/podcast'
 import { altersWort } from '@/lib/kompass'
 
@@ -113,13 +113,7 @@ export default function PodcastPage() {
  * Podcast abspielen kann. Die Antwort gehoert in die Zeile, in der er sucht.
  */
 function Zeile({ folge, caseId }: { folge: Podcast; caseId: string }) {
-  const zuTun = folge.status === 'skript' || folge.status === 'fehler'
-  const stand =
-    folge.status === 'fertig' ? zeit(folge.sekunden)
-    : folge.status === 'skript' ? 'Text steht · noch sprechen lassen →'
-    : folge.status === 'spricht' ? 'wird gerade gesprochen …'
-    : folge.status === 'fehler' ? 'abgebrochen · weitermachen →'
-    : 'ohne Text · öffnen →'
+  const { text, offen } = stand(folge)
 
   return (
     <li>
@@ -137,9 +131,9 @@ function Zeile({ folge, caseId }: { folge: Podcast; caseId: string }) {
         </span>
         <span className={`shrink-0 text-[0.76rem] font-medium ${
           folge.status === 'fehler' ? 'text-red-500'
-          : zuTun || folge.status === 'fertig' ? 'text-accent' : 'text-brand-muted'
+          : offen || folge.status === 'fertig' ? 'text-accent' : 'text-brand-muted'
         }`}>
-          {stand}
+          {text}
         </span>
       </Link>
     </li>
