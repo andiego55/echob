@@ -539,7 +539,14 @@ def test_die_symbolik_hat_drei_deutliche_stufen():
 
     assert sym["schwelle"] not in keine and sym["tier"] not in keine
     assert sym["schwelle"] in wenig and sym["tier"] not in wenig
-    assert sym["tier"] in viel and sym["uebergang"] in viel
+    assert sym["tier"] in viel
+
+    # Der Uebergang kommt nur, wenn KEIN Muster fuehrt: Sonst stuenden zwei Gegenstaende
+    # derselben Art im Bild. Mein Umbau hatte ihn dabei ganz stillgelegt.
+    ohne_muster = dict(werte, durchgaenge=[{"key": "cluster_b_traits", "wert": 0.9},
+                                           {"key": "boundary_violation", "wert": 0.3}])
+    assert sym["uebergang"] in prompt_bauen(ohne_muster, {**einst, "symbolik": "deutlich"})
+    assert sym["uebergang"] not in viel
 
 
 def test_kein_tier_steht_fuer_die_andere_person():
@@ -622,15 +629,28 @@ def test_der_prompt_folgt_den_schichten():
     werte = _werte_beispiel()
     einst = {"bildwelt": "landschaft", "handschrift": "aquarell", "palette": "kuehl"}
 
+    # Die Bausteine stehen klein im Katalog und werden im Prompt gross gesetzt - verglichen
+    # wird deshalb ohne Ruecksicht auf den ersten Buchstaben.
+    def drin(stueck: str, text: str) -> bool:
+        return stueck.lower() in text.lower()
+
     nur_szenen = prompt_bauen(werte, {**einst, "schichten": ["szenen"]})
-    assert welt["faden"] not in nur_szenen, "die Muster gehen mit, obwohl abgewaehlt"
-    assert welt["leere"] not in nur_szenen
-    assert welt["druck"] not in nur_szenen
-    assert welt["licht"] not in nur_szenen
+    assert not drin(welt["leere"], nur_szenen)
+    assert not drin(welt["druck"], nur_szenen)
+    assert not drin(welt["licht"], nur_szenen)
 
     alles = prompt_bauen(werte, {**einst, "schichten": ALLE_SCHICHTEN})
-    for stueck in (welt["faden"], welt["leere"], welt["druck"], welt["licht"]):
-        assert stueck in alles
+    for stueck in (welt["leere"], welt["druck"], welt["licht"]):
+        assert drin(stueck, alles), stueck[:40]
+
+    # Der allgemeine Durchgang traegt das Bild nur, wenn KEIN Muster fuehrt - sonst ist das
+    # Muster selbst das Motiv.
+    # Ein Charakterwert allein ergibt KEIN Musterbild - und dann darf die Schicht auch nicht
+    # still ausfallen: Der allgemeine Durchgang traegt sie.
+    ohne_muster = dict(werte, durchgaenge=[{"key": "cluster_b_traits", "wert": 0.9},
+                                           {"key": "boundary_violation", "wert": 0.3}])
+    assert drin(welt["faden"], prompt_bauen(
+        ohne_muster, {**einst, "schichten": ALLE_SCHICHTEN}))
 
 
 def test_der_prompt_beschreibt_die_haeufung_wenn_es_eine_gibt():
@@ -648,8 +668,8 @@ def test_der_prompt_beschreibt_die_haeufung_wenn_es_eine_gibt():
         {"id": f"s{i}", "tag": i * 70, "gewicht": 0.4, "haerte": 0.4} for i in range(10)
     ]
 
-    assert welt["ballung"] in prompt_bauen(geballt, einst)
-    assert welt["ballung"] not in prompt_bauen(gleichmaessig, einst)
+    assert welt["ballung"].lower() in prompt_bauen(geballt, einst).lower()
+    assert welt["ballung"].lower() not in prompt_bauen(gleichmaessig, einst).lower()
 
 
 def test_jede_bildwelt_uebersetzt_dieselben_sechs_groessen():
@@ -734,8 +754,11 @@ def test_die_legende_loest_jede_eingeschaltete_schicht_auf():
     # Ohne Sinnbilder und Figur: Dieser Test zaehlt die SCHICHTEN, und die beiden anderen
     # haben eigene Tests. Sonst misst er zwei Dinge auf einmal und wird bei jeder Aenderung
     # an einem davon rot.
+    # Ohne fuehrendes Muster: Dieser Test zaehlt die SCHICHTEN. Die Musterzeilen haben
+    # eigene Tests, und mit ihnen zaehlte er zwei Dinge auf einmal.
+    schwach = dict(werte, durchgaenge=[{"key": "boundary_violation", "wert": 0.3}])
     zeilen = legende({"bildwelt": "haus", "schichten": ALLE_SCHICHTEN,
-                      "symbolik": "keine", "figur": "keine"}, werte)
+                      "symbolik": "keine", "figur": "keine"}, schwach)
     assert len(zeilen) == 6, "nicht jede Schicht wird aufgeloest"
     for z in zeilen:
         assert z["was"] and z["wofuer"]
@@ -772,8 +795,10 @@ def test_jede_bildwelt_hat_eine_legende():
     from app.services.bild_katalog import BILDWELTEN, legende
 
     for b in BILDWELTEN:
+        schwach = dict(_werte_beispiel(),
+                       durchgaenge=[{"key": "boundary_violation", "wert": 0.3}])
         zeilen = legende({"bildwelt": b["key"], "schichten": ALLE_SCHICHTEN,
-                          "symbolik": "keine", "figur": "keine"}, _werte_beispiel())
+                          "symbolik": "keine", "figur": "keine"}, schwach)
         assert len(zeilen) == 6, b["key"]
 
 
@@ -931,3 +956,298 @@ async def test_ein_gerechnetes_bild_meldet_keine_datei(person, db):
     b = await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={},
                              svg=SVG, satz="")
     assert b["hat_datei"] is False
+
+
+# ── Erkennt man seinen Fall wieder? ───────────────────────────────────────────
+
+def _fall_mit(muster: dict, **rest) -> dict:
+    w = _werte_beispiel()
+    w["durchgaenge"] = [{"key": k, "wert": v} for k, v in muster.items()]
+    w.setdefault("beziehungsart", "partner")
+    w.setdefault("beginn", "2024-11-03")
+    w.update(rest)
+    return w
+
+
+EINST = {"bildwelt": "landschaft", "handschrift": "oel", "palette": "erdig",
+         "symbolik": "zurueckhaltend", "figur": "keine", "schichten": ALLE_SCHICHTEN}
+
+
+def test_zwei_faelle_mit_verschiedenen_mustern_ergeben_verschiedene_bilder():
+    """**Der Test, um den es geht.**
+
+    Bisher entstand der Prompt aus Durchschnitten - wie viele Momente, wie dicht, wie hart im
+    Mittel. Zwei ganz verschiedene Faelle mit aehnlichen Zahlen ergaben aehnliche Bilder, und
+    genau deshalb sah keiner darin seine eigene Lage.
+    """
+    from app.services.bild_katalog import prompt_bauen
+
+    einsam = prompt_bauen(_fall_mit({"control_isolation": 0.9}), EINST)
+    grenze = prompt_bauen(_fall_mit({"boundary_violation": 0.9}), EINST)
+    zweifel = prompt_bauen(_fall_mit({"perception_distortion": 0.9}), EINST)
+
+    assert einsam != grenze != zweifel
+    # Und zwar im LEITBILD, nicht in einer Nebenzeile.
+    def leitbild(t: str) -> str:
+        return next(z for z in t.split(chr(10)) if z.startswith("A single quiet image"))
+    assert len({leitbild(einsam), leitbild(grenze), leitbild(zweifel)}) == 3
+
+
+def test_das_staerkste_muster_fuehrt_das_bild():
+    """Nicht die Zahl der Momente macht einen Fall unterscheidbar, sondern WAS sich
+    wiederholt."""
+    from app.services.bild_katalog import fuehrendes_muster, muster_bild, prompt_bauen
+
+    werte = _fall_mit({"boundary_violation": 0.6, "control_isolation": 0.92,
+                       "guilt_shifting": 0.5})
+    assert fuehrendes_muster(werte, set(ALLE_SCHICHTEN)) == "control_isolation"
+
+    prompt = prompt_bauen(werte, EINST)
+    leit = muster_bild("control_isolation", "landschaft")
+    assert leit.rstrip(".") in prompt
+    # Das zweitstaerkste steht als Stuetze dabei, nicht als Hauptsache.
+    assert "Also present: " + muster_bild("boundary_violation", "landschaft").rstrip(".") \
+        in prompt
+
+
+def test_hoechstens_drei_muster_kommen_ins_bild():
+    """**Dicht in Bedeutung heisst nicht voll.** Sieben Muster nebeneinander ergeben ein
+    Wimmelbild, und ein Wimmelbild sieht sich niemand zweimal an."""
+    from app.services.bild_katalog import prompt_bauen
+
+    alle = _fall_mit({
+        "control_isolation": 0.9, "boundary_violation": 0.85, "guilt_shifting": 0.8,
+        "conflict_escalation": 0.75, "perception_distortion": 0.7,
+        "proximity_distance": 0.65, "responsibility_deflection": 0.6,
+    })
+    prompt = prompt_bauen(alle, EINST)
+    assert prompt.count("Also present:") <= 2
+
+
+def test_ein_charakterwert_wird_nie_ein_bild():
+    """**Die Persoenlichkeitswerte der anderen Person beschreiben einen MENSCHEN, nicht die
+    Lage.** Sie in ein Bild zu uebersetzen waere eine Diagnose in Bildform - dieselbe
+    Behauptung, die dieses Projekt ueberall ausschliesst, nur ohne die Moeglichkeit, ihr zu
+    widersprechen.
+    """
+    from app.services.bild_katalog import (
+        MUSTER_BILDER,
+        fuehrendes_muster,
+        muster_bild,
+        prompt_bauen,
+    )
+
+    for key in ("cluster_b_traits", "empathy_deficit", "personality_neuroticism",
+                "personality_agreeableness", "safety_risk"):
+        assert key not in MUSTER_BILDER, key
+        assert muster_bild(key, "landschaft") is None, key
+
+    # Auch wenn er der hoechste Wert ist, fuehrt er nicht.
+    werte = _fall_mit({"cluster_b_traits": 0.99, "control_isolation": 0.5})
+    assert fuehrendes_muster(werte, set(ALLE_SCHICHTEN)) == "control_isolation"
+
+    # Und ein Fall, in dem NUR Charakterwerte hoch sind, bekommt gar kein Musterbild.
+    nur_charakter = _fall_mit({"cluster_b_traits": 0.95, "empathy_deficit": 0.9})
+    assert fuehrendes_muster(nur_charakter, set(ALLE_SCHICHTEN)) is None
+    assert "Also present:" not in prompt_bauen(nur_charakter, EINST)
+
+
+def test_der_skalenschluessel_geht_nie_an_das_modell():
+    """Er waehlt ein Bild AUS, das wir geschrieben haben. Das Wort bleibt im Haus - sonst
+    denkt sich ein Modell etwas dazu aus."""
+    from app.services.bild_katalog import MUSTER_BILDER, prompt_bauen
+
+    prompt = prompt_bauen(
+        _fall_mit({k: 0.9 for k in MUSTER_BILDER}), EINST).lower()
+    for key in MUSTER_BILDER:
+        assert key not in prompt, key
+        for wort in key.split("_"):
+            if wort in ("distance", "control"):   # kommen legitim in Bildworten vor
+                continue
+            assert wort not in prompt, f"{key}: {wort}"
+
+
+def test_die_beziehungsart_setzt_den_ton():
+    """Ein Elternfall und ein Partnerfall duerfen nicht gleich aussehen - das ist das Erste,
+    was jemand an seinem eigenen Fall wiedererkennt."""
+    from app.services.bild_katalog import BEZIEHUNGSTON, prompt_bauen
+
+    partner = prompt_bauen(_fall_mit({"control_isolation": 0.8}, beziehungsart="partner"),
+                           EINST)
+    eltern = prompt_bauen(_fall_mit({"control_isolation": 0.8}, beziehungsart="parent"),
+                          EINST)
+    assert BEZIEHUNGSTON["partner"] in partner
+    assert BEZIEHUNGSTON["parent"] in eltern
+    assert partner != eltern
+
+    # Eine unbekannte Art wirft nicht, sie schweigt.
+    fremd = prompt_bauen(_fall_mit({"control_isolation": 0.8}, beziehungsart="gibtesnicht"),
+                         EINST)
+    assert "The place" not in fremd.split("Colour:")[1].split(chr(10))[1]
+
+
+def test_die_jahreszeit_kommt_aus_echten_daten():
+    """Wer weiss, dass es im Herbst dicht wurde, sieht den Herbst - und erkennt SEINEN
+    Verlauf, nicht irgendeinen."""
+    from app.services.bild_katalog import prompt_bauen
+
+    # Beginn im November, Haeufung am Anfang -> Winter.
+    winter = _fall_mit({"control_isolation": 0.8}, beginn="2024-11-03")
+    winter["szenen"] = [{"id": f"s{i}", "tag": i * 3, "gewicht": 0.5, "haerte": 0.5}
+                        for i in range(8)]
+    # Derselbe Fall, aber im Mai begonnen -> Sommer.
+    sommer = dict(winter, beginn="2024-05-03")
+
+    p_w = prompt_bauen(winter, EINST)
+    p_s = prompt_bauen(sommer, EINST)
+    assert "The season is" in p_w and "The season is" in p_s
+    assert p_w != p_s
+
+
+def test_ohne_datum_gibt_es_keine_jahreszeit():
+    """Lieber keine Angabe als eine erfundene."""
+    from app.services.bild_katalog import prompt_bauen
+
+    ohne = _fall_mit({"control_isolation": 0.8})
+    ohne["beginn"] = None
+    assert "The season is" not in prompt_bauen(ohne, EINST)
+    kaputt = _fall_mit({"control_isolation": 0.8}, beginn="kein datum")
+    assert "The season is" not in prompt_bauen(kaputt, EINST)
+
+
+def test_kein_zweiter_weg_ins_bild():
+    """**Fuehrt ein Muster, waere die Zeitgestalt ein zweiter Gegenstand derselben Art** - in
+    der Landschaft zwei Pfade, im Haus zwei Gaenge. Das sieht nach Fehler aus."""
+    from app.services.bild_katalog import BILDWELTEN, prompt_bauen
+
+    welt = next(b for b in BILDWELTEN if b["key"] == "landschaft")
+    mit_muster = prompt_bauen(_fall_mit({"control_isolation": 0.9}), EINST)
+    ohne_muster = prompt_bauen(_fall_mit({"cluster_b_traits": 0.9}), EINST)
+
+    # Ohne fuehrendes Muster traegt die Zeitgestalt das Bild.
+    assert any(welt["weg"][r].rstrip(".") in ohne_muster for r in ("dicht", "mittel", "weit"))
+    # Mit fuehrendem Muster kommt sie nicht zusaetzlich dazu.
+    assert not any(welt["weg"][r].rstrip(".") in mit_muster
+                   for r in ("dicht", "mittel", "weit"))
+
+
+def test_jedes_muster_hat_ein_bild_in_jeder_bildwelt():
+    """Fehlt eines, faellt genau dieses Muster in genau dieser Welt still aus - und der Fall
+    sieht aus wie ein anderer."""
+    from app.services.bild_katalog import BILDWELTEN, MUSTER_BILDER, muster_bild
+
+    for key in MUSTER_BILDER:
+        for b in BILDWELTEN:
+            bild = muster_bild(key, b["key"])
+            assert bild and len(bild) > 30, f"{key} / {b['key']}"
+            assert "{ding}" not in bild, f"{key} / {b['key']}: Platzhalter blieb stehen"
+
+
+def test_jedes_muster_hat_einen_deutschen_namen():
+    """Ohne ihn stuende in der Legende der Schluessel - und „control_isolation" sagt einem
+    Menschen nichts."""
+    from app.services.bild_katalog import MUSTER_BILDER, MUSTER_LABEL
+
+    for key in MUSTER_BILDER:
+        assert MUSTER_LABEL.get(key), key
+        assert "_" not in MUSTER_LABEL[key], key
+
+
+def test_die_legende_nennt_das_hauptmotiv():
+    """Ohne diese Zeile sieht die Person ein Bild aus ihrem staerksten Muster und erfaehrt es
+    nicht. Genau daran haengt das Wiedererkennen."""
+    from app.services.bild_katalog import legende
+
+    zeilen = legende(EINST, _fall_mit({"control_isolation": 0.9, "guilt_shifting": 0.7}))
+    haupt = next(z for z in zeilen if z["was"] == "Das Hauptmotiv")
+    assert "Kontrolle und Alleinsein" in haupt["wofuer"]
+    weitere = next(z for z in zeilen if z["was"] == "Was noch im Bild steht")
+    assert "Schuld" in weitere["wofuer"]
+
+
+def test_die_legende_doppelt_die_muster_nicht():
+    """„Hauptmotiv" und „die Mauer, die durchs Bild laeuft" waeren zweimal dasselbe."""
+    from app.services.bild_katalog import legende
+
+    zeilen = legende(EINST, _fall_mit({"control_isolation": 0.9}))
+    was = [z["was"] for z in zeilen]
+    assert "Das Hauptmotiv" in was
+    assert not any("Mauer" in w for w in was)
+
+    # Ohne fuehrendes Muster gilt wieder die allgemeine Zeile.
+    schwach = legende(EINST, _fall_mit({"boundary_violation": 0.3}))
+    assert any("Mauer" in z["was"] for z in schwach)
+
+
+def test_die_legende_sagt_was_die_szenen_tragen():
+    """Fuehrt ein Muster, traegt der Ort nicht mehr die Momente - dann sucht die Person
+    sonst etwas, das nicht da ist."""
+    from app.services.bild_katalog import legende
+
+    mit = legende(EINST, _fall_mit({"control_isolation": 0.9}))
+    assert any(z["was"] == "Die Häufungen und die Pausen" for z in mit)
+
+    ohne = legende(EINST, _fall_mit({"boundary_violation": 0.3}))
+    assert any(z["was"] == "Der Weg und das Gelände" for z in ohne)
+
+
+def test_der_prompt_verlangt_eine_komposition():
+    """**Ohne diesen Absatz wird aus einer guten Aufzaehlung ein schlechtes Bild.** Ein Modell
+    verteilt sonst alles gleichmaessig; was fehlt, ist eine Mitte, Tiefe und Luft."""
+    from app.services.bild_katalog import prompt_bauen
+
+    prompt = prompt_bauen(_fall_mit({"control_isolation": 0.8}), EINST)
+    for verlangt in ("one clear focal point", "foreground", "far distance",
+                     "Generous empty space", "one direction only"):
+        assert verlangt in prompt, verlangt
+    # Und ausdruecklich: ein Ort, keine Sammlung.
+    assert "not a collection of things" in prompt
+
+
+def test_saetze_fangen_gross_an():
+    """Kleingeschriebene Satzanfaenge mitten im Prompt lesen sich wie ein Fehler - und ein
+    Modell, das einen unsauberen Prompt bekommt, malt unsauber."""
+    from app.services.bild_katalog import prompt_bauen
+
+    prompt = prompt_bauen(_fall_mit({"control_isolation": 0.8}), EINST)
+    for zeile in prompt.split(chr(10)):
+        if not zeile.strip() or zeile.startswith("-"):
+            continue
+        assert zeile[0].isupper() or zeile[0].isdigit(), zeile[:60]
+
+
+def test_keine_eingeschaltete_schicht_faellt_still_aus():
+    """**Der Waechter gegen einen Fehler, der mir beim Umbau ZWEIMAL passiert ist.**
+
+    Erst verschwand das Sinnbild „Uebergang", dann die ganze Muster-Schicht, wenn kein
+    Musterbild griff. Beides ohne Fehlermeldung: Das Bild entstand, sah gut aus, und darin
+    fehlte etwas, das die Person eingeschaltet hatte. Sie haette es nie erklaeren koennen.
+
+    Geprueft wird die EIGENSCHAFT: Jede Schicht, die an ist und im Fall Stoff hat, VERAENDERT
+    den Prompt. Das faengt auch die naechste Schicht ab, die noch niemand geschrieben hat.
+
+    Nicht „macht ihn laenger": Eine Schicht kann etwas ERSETZEN statt hinzuzufuegen. Schaltet
+    man die Muster ab, kommen Zeitgestalt und Uebergang zurueck, und der Prompt wird laenger
+    — mein erster Versuch hat genau daran falsch gemessen.
+    """
+    from app.services.bild_katalog import prompt_bauen
+
+    einst = {"bildwelt": "landschaft", "handschrift": "aquarell", "palette": "kuehl",
+             "symbolik": "deutlich", "figur": "keine"}
+
+    # Ein Fall, der zu JEDER Schicht etwas hergibt - und bewusst mit einem Muster, das
+    # unter der Fuehrungsschwelle liegt: So ist der allgemeine Durchgang im Spiel.
+    for muster in ({"control_isolation": 0.9}, {"boundary_violation": 0.3}):
+        werte = dict(_werte_beispiel(),
+                     durchgaenge=[{"key": k, "wert": v} for k, v in muster.items()],
+                     beziehungsart="partner", beginn="2024-11-03")
+        alle = set(ALLE_SCHICHTEN)
+        voll = prompt_bauen(werte, {**einst, "schichten": sorted(alle)})
+
+        for schicht in ALLE_SCHICHTEN:
+            ohne = prompt_bauen(
+                werte, {**einst, "schichten": sorted(alle - {schicht})})
+            assert voll != ohne, (
+                f"Schicht {schicht!r} (Muster {list(muster)}) aendert am Prompt nichts - "
+                "sie faellt still aus"
+            )

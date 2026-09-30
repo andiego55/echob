@@ -77,7 +77,8 @@ async def werte_laden(
     kostet nichts.
     """
     fall = await conn.fetchrow(
-        "SELECT id FROM cases WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
+        "SELECT id, relationship_type FROM cases "
+        " WHERE id = $1 AND user_id = $2 AND archived_at IS NULL",
         case_id, user_id,
     )
     if not fall:
@@ -86,6 +87,17 @@ async def werte_laden(
     werte: dict[str, Any] = {
         "grundton": None, "szenen": [], "durchgaenge": [], "lichter": [],
         "leerstellen": [], "druck": None, "spanne": 0,
+        # **Zwei Angaben, die ein Bild zu DIESEM Fall machen.**
+        #
+        # Die Beziehungsart setzt den Ton: Ein Elternfall und ein Partnerfall duerfen nicht
+        # gleich aussehen. Das ist keine Aussage ueber die andere Person, sondern ueber die
+        # Art der Beziehung — und sie ist das Erste, was jemand wiedererkennt.
+        #
+        # `beginn` ist das Datum der ersten Szene. Daraus wird die Jahreszeit der dichtesten
+        # Stelle: Wer weiss, dass es im Herbst dicht wurde, sieht den Herbst — und damit
+        # SEINEN Verlauf, nicht irgendeinen.
+        "beziehungsart": fall["relationship_type"],
+        "beginn": None,
     }
 
     # ── Die Zeichen: eine Marke je bestätigter Szene ─────────────────────────
@@ -125,6 +137,7 @@ async def werte_laden(
                 for z in zeilen
             ]
             werte["spanne"] = (max(tage) - erster).days
+            werte["beginn"] = erster.isoformat()
 
     # ── Die Durchgänge: Muster als Linien durch alles ────────────────────────
     if "durchgaenge" in schichten:
