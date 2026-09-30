@@ -179,6 +179,22 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
   },
 
   // ── Berichte und Profile ─────────────────────────────────────────────────
+  '/app/cases/:caseId/podcast': {
+    titel: 'Podcast',
+    zweck: 'Dein Fall als gesprochene Nachricht — zum Hören unterwegs, nicht zum Lesen '
+      + 'am Bildschirm.',
+    schritte: ['Format und Länge wählen', 'Skript lesen', 'Sprechen lassen und hören'],
+    tipp: 'Wer seine eigene Lage gesprochen hört, hört sie zum ersten Mal von außen. '
+      + 'Das ist der eigentliche Grund für dieses Werkzeug — nicht die Bequemlichkeit.',
+  },
+  '/app/cases/:caseId/podcast/:podcastId': {
+    titel: 'Diese Folge',
+    zweck: 'Erst der Text, dann die Stimme: Du liest das Skript, und nur wenn es passt, '
+      + 'wird daraus eine Aufnahme.',
+    schritte: ['Skript lesen', 'Sprechen lassen', 'Kapitelweise hören oder herunterladen'],
+    tipp: 'Bricht die Aufnahme ab, bleiben die fertigen Kapitel erhalten — Weitermachen '
+      + 'spricht nur den Rest, und du zahlst nichts doppelt.',
+  },
   '/app/cases/:caseId/reports': {
     titel: 'Berichte',
     zweck: 'Zusammenfassungen deines Falls — für dich, für ein Gespräch oder für eine Fachperson.',

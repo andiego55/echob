@@ -41,6 +41,7 @@ export const GRUPPEN: Gruppe[] = [
     label: 'Zeigen',
     kinder: [
       { path: '/reports', label: 'Berichte' },
+      { path: '/podcast', label: 'Podcast' },
       { path: '/share', label: 'Freigaben' },
       { path: '/export', label: 'Zusammenfassung' },
     ],
@@ -55,6 +56,7 @@ export const GRUPPEN: Gruppe[] = [
  * plötzlich woanders, als man gerade arbeitet.
  */
 export const ANHAENGSEL: Record<string, string> = {
+  '/podcast/': '/podcast',
   '/selbsttest': 'Verstehen',
   '/topics': 'Verstehen',
 }

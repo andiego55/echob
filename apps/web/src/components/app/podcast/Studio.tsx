@@ -1,0 +1,306 @@
+/**
+ * Das Studio — hier wird eine Folge bestellt.
+ *
+ * **Die Reihenfolge der Fragen ist die Reihenfolge der Entscheidungen.** Zuerst das Format,
+ * weil es alles andere bestimmt: welche Kapitel es gibt, welche Regler überhaupt erscheinen,
+ * welche Ansprache möglich ist. Erst danach lohnt es, Regler und Stimmen zu zeigen — vorher
+ * wären es fünf Listen auf Vorrat, von denen die Hälfte gleich wieder verschwindet.
+ *
+ * **Die Kapitelstruktur steht sichtbar daneben, nicht hinter einem Aufklapper.** Sie ist die
+ * eigentliche Auskunft darüber, was man bekommt: „Der ganze Fall“ sagt wenig, „Wie es
+ * angefangen hat · Wer die andere Person ist · Was immer wieder passiert" sagt alles. Und
+ * weil sie sichtbar ist, kann man ein Kapitel abwählen — ein Format ist ein Vorschlag, keine
+ * Schablone.
+ *
+ * **Was ein Format nicht verträgt, steht gar nicht erst da.** Bei „Für jemanden, dem ich es
+ * erklären will" fehlen Muster, Hypothesen und Personenprofil — nicht ausgegraut, sondern
+ * abwesend. Ein Regler, den man nicht bewegen darf, ist eine Aufforderung, es zu versuchen.
+ */
+import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Fehlermeldung from '@/components/Fehlermeldung'
+import { podcastApi, type PodcastBestellung } from '@/api/podcast'
+
+export default function Studio({ caseId, laeuft, onBestellen, onAbbruch }: {
+  caseId: string
+  laeuft: boolean
+  onBestellen: (b: PodcastBestellung) => void
+  onAbbruch: () => void
+}) {
+  const [formatKey, setFormatKey] = useState<string | null>(null)
+  const [laenge, setLaenge] = useState('mittel')
+  const [stimme, setStimme] = useState('sage')
+  const [ansprache, setAnsprache] = useState<string | null>(null)
+  const [gewichte, setGewichte] = useState<Record<string, string>>({})
+  const [ohneKapitel, setOhneKapitel] = useState<string[]>([])
+
+  const formate = useQuery({
+    queryKey: ['podcast-katalog', caseId],
+    queryFn: () => podcastApi.katalog(caseId),
+    staleTime: Infinity,
+  })
+  const zuschnitt = useQuery({
+    queryKey: ['podcast-katalog', caseId, formatKey],
+    queryFn: () => podcastApi.katalog(caseId, formatKey!),
+    enabled: !!formatKey,
+    staleTime: Infinity,
+  })
+
+  // Beim Formatwechsel wird zurückgesetzt, was zum neuen Format nicht mehr passt. Eine
+  // Ansprache, die es dort nicht gibt, würde sonst beim Bestellen mit 422 abgewiesen — und
+  // niemand sähe der Oberfläche an, woran es lag.
+  useEffect(() => {
+    const k = zuschnitt.data
+    if (!k?.format) return
+    setAnsprache(a => (a && k.format!.ansprachen.includes(a) ? a : k.format!.ansprachen[0]))
+    setGewichte(g => Object.fromEntries(
+      k.format!.elemente.map(e => [e, g[e] ?? 'normal'])))
+    setOhneKapitel([])
+  }, [zuschnitt.data])
+
+  const k = zuschnitt.data
+  const format = k?.format
+
+  if (formate.error) return <Fehlermeldung error={formate.error} className="mt-4" />
+
+  // ── Schritt 1: Was für eine Folge? ─────────────────────────────────────────
+  if (!formatKey) {
+    return (
+      <section>
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="text-[1.2rem] font-bold leading-snug text-navy">
+            Was für eine Folge soll es werden?
+          </h2>
+          <button type="button" onClick={onAbbruch}
+            className="shrink-0 text-xs text-brand-muted hover:text-navy">
+            Abbrechen
+          </button>
+        </div>
+        <p className="mt-1.5 max-w-[62ch] text-[0.88rem] leading-relaxed text-brand-muted">
+          Jedes Format ist ein anderer Aufbau und ein anderer Ton. Du siehst gleich, aus
+          welchen Kapiteln es besteht — und kannst jedes einzeln abwählen.
+        </p>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {(formate.data?.formate ?? []).map(f => (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => setFormatKey(f.key)}
+              className="group rounded-brand border border-brand-border bg-white p-5 text-left transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-brand motion-reduce:hover:translate-y-0"
+            >
+              <span className="block text-[1rem] font-bold leading-snug text-navy transition-colors group-hover:text-accent">
+                {f.label}
+              </span>
+              <span className="mt-1.5 block text-[0.83rem] leading-snug text-brand-muted">
+                {f.beschreibung}
+              </span>
+              <span className="mt-3 block text-[0.74rem] text-brand-muted/80">
+                {f.kapitel.map(x => x.titel).join(' · ')}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  if (zuschnitt.isLoading || !k || !format) {
+    return <p className="text-sm text-brand-muted">Einen Moment …</p>
+  }
+
+  const bestellen = () => onBestellen({
+    format: format.key,
+    laenge,
+    stimme,
+    ansprache: ansprache ?? format.ansprachen[0],
+    gewichte,
+    ohne_kapitel: ohneKapitel,
+  })
+
+  const alleAus = ohneKapitel.length >= format.kapitel.length
+
+  // ── Schritt 2: der Zuschnitt ───────────────────────────────────────────────
+  return (
+    <section className="space-y-6">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="min-w-0">
+          <span className="label">Format</span>
+          <h2 className="text-[1.2rem] font-bold leading-snug text-navy">{format.label}</h2>
+        </div>
+        <button type="button" onClick={() => setFormatKey(null)}
+          className="shrink-0 text-xs text-brand-muted hover:text-navy">
+          Anderes Format
+        </button>
+      </div>
+
+      {/* ── Die Kapitel ─────────────────────────────────────────────────── */}
+      <Block titel="Die Kapitel"
+        hinweis="So ist die Folge aufgebaut. Tipp eines an, wenn es nicht vorkommen soll.">
+        <ul className="space-y-2">
+          {format.kapitel.map((kap, i) => {
+            const aus = ohneKapitel.includes(kap.key)
+            return (
+              <li key={kap.key}>
+                <button
+                  type="button"
+                  onClick={() => setOhneKapitel(l =>
+                    aus ? l.filter(x => x !== kap.key) : [...l, kap.key])}
+                  aria-pressed={!aus}
+                  className={`flex w-full items-center gap-3 rounded-brand border px-4 py-2.5 text-left transition-colors ${
+                    aus
+                      ? 'border-brand-border bg-brand-bg text-brand-muted'
+                      : 'border-accent/30 bg-accent/[0.04] text-navy'
+                  }`}
+                >
+                  <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[0.72rem] font-bold tabular-nums ${
+                    aus ? 'bg-brand-border text-brand-muted' : 'bg-accent/15 text-accent'
+                  }`}>
+                    {i + 1}
+                  </span>
+                  <span className={`min-w-0 flex-1 text-[0.88rem] leading-snug ${aus ? 'line-through' : 'font-medium'}`}>
+                    {kap.titel}
+                  </span>
+                  <span className="shrink-0 text-[0.7rem] text-brand-muted">
+                    {aus ? 'kommt nicht vor' : 'dabei'}
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+        {alleAus && (
+          <p role="alert" className="mt-3 text-sm text-red-600">
+            Du hast alle Kapitel abgewählt — dann gibt es nichts zu erzählen.
+          </p>
+        )}
+      </Block>
+
+      {/* ── Die Regler ──────────────────────────────────────────────────── */}
+      <Block titel="Woraus soll sie entstehen?"
+        hinweis="Was auf „gar nicht“ steht, wird nicht einmal geladen — es kommt in der Folge nirgends vor.">
+        <ul className="space-y-4">
+          {(k.elemente ?? []).map(e => (
+            <li key={e.key}>
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="text-[0.88rem] font-medium text-navy">{e.label}</span>
+                <span className="shrink-0 text-[0.7rem] text-brand-muted">{e.hinweis}</span>
+              </div>
+              <div className="mt-1.5 grid grid-cols-4 gap-1">
+                {(k.gewichtungen ?? []).map(g => {
+                  const an = (gewichte[e.key] ?? 'normal') === g.key
+                  return (
+                    <button
+                      key={g.key}
+                      type="button"
+                      onClick={() => setGewichte(w => ({ ...w, [e.key]: g.key }))}
+                      aria-pressed={an}
+                      className={`rounded-brand-sm border px-2 py-1.5 text-[0.72rem] leading-tight transition-colors ${
+                        an
+                          ? 'border-accent bg-accent text-white'
+                          : 'border-brand-border bg-white text-brand-muted hover:border-accent/50'
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Block>
+
+      {/* ── Länge, Stimme, Ansprache ────────────────────────────────────── */}
+      <Block titel="Wie lang, wie gesprochen?">
+        <Wahl titel="Länge" wert={laenge} setzen={setLaenge}
+          optionen={(k.laengen ?? []).map(l => ({
+            key: l.key, label: `${l.label} · ${l.minuten} Min`, hinweis: l.hinweis }))} />
+
+        <Wahl titel="Stimme" wert={stimme} setzen={setStimme}
+          optionen={(k.stimmen ?? []).map(s => ({
+            key: s.key, label: s.label, hinweis: s.hinweis }))} />
+
+        {(k.ansprachen ?? []).length > 1 && (
+          <Wahl titel="Ansprache" wert={ansprache ?? ''} setzen={setAnsprache}
+            optionen={(k.ansprachen ?? []).map(a => ({
+              key: a.key, label: a.label, hinweis: a.hinweis }))} />
+        )}
+      </Block>
+
+      <div className="flex flex-wrap items-center gap-3 border-t border-brand-border pt-5">
+        <button
+          type="button"
+          onClick={bestellen}
+          disabled={laeuft || alleAus}
+          className="btn-primary !py-2.5 !px-5 !text-sm disabled:opacity-40"
+        >
+          {laeuft ? 'Das Skript entsteht …' : 'Skript schreiben'}
+        </button>
+        <span className="text-[0.78rem] leading-snug text-brand-muted">
+          Erst der Text, dann die Stimme. Das Skript kostet nichts von deinem Kontingent —
+          du kannst es lesen und verwerfen.
+        </span>
+      </div>
+    </section>
+  )
+}
+
+function Block({ titel, hinweis, children }: {
+  titel: string
+  hinweis?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="rounded-brand-lg border border-brand-border bg-white p-5">
+      <h3 className="text-[0.95rem] font-bold text-navy">{titel}</h3>
+      {hinweis && (
+        <p className="mt-1 max-w-[62ch] text-[0.8rem] leading-relaxed text-brand-muted">
+          {hinweis}
+        </p>
+      )}
+      <div className="mt-4">{children}</div>
+    </div>
+  )
+}
+
+/** Eine Reihe gleichrangiger Karten. Keine sieht wie die empfohlene aus. */
+function Wahl({ titel, wert, setzen, optionen }: {
+  titel: string
+  wert: string
+  setzen: (k: string) => void
+  optionen: { key: string; label: string; hinweis: string }[]
+}) {
+  return (
+    <div className="mb-5 last:mb-0">
+      <span className="label">{titel}</span>
+      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        {optionen.map(o => {
+          const an = wert === o.key
+          return (
+            <button
+              key={o.key}
+              type="button"
+              onClick={() => setzen(o.key)}
+              aria-pressed={an}
+              className={`rounded-brand border px-3.5 py-3 text-left transition-all ${
+                an
+                  ? 'border-accent bg-accent/[0.06] shadow-brand-sm'
+                  : 'border-brand-border bg-white hover:border-accent/50'
+              }`}
+            >
+              <span className={`block text-[0.86rem] font-semibold leading-snug ${
+                an ? 'text-accent' : 'text-navy'
+              }`}>
+                {o.label}
+              </span>
+              <span className="mt-0.5 block text-[0.74rem] leading-snug text-brand-muted">
+                {o.hinweis}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
