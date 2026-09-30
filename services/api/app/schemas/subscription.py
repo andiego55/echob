@@ -34,6 +34,13 @@ class AiUsageQuota(BaseModel):
     limit: int | None       # None = unbegrenzt/deaktiviert
     remaining: int | None
     unlimited: bool
+    #: Die Einheit, wenn nicht in Stück gezählt wird — bei Podcasts „Minuten“.
+    #:
+    #: **Dieses Feld muss hier stehen, sonst gibt es es nicht.** FastAPI schneidet alles weg,
+    #: was nicht im Antwortmodell steht, und zwar lautlos: Der Dienst liefert es, die Tests
+    #: gegen den Dienst sehen es, der Browser bekommt es nie. Dieselbe Falle wie zuvor bei
+    #: drei anderen Feldern.
+    einheit: str | None = None
 
 
 class AiUsageStatus(BaseModel):

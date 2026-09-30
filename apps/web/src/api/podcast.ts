@@ -7,6 +7,18 @@ import { apiClient } from './client'
  * Dienst und eigenem Router. Wer es eines Tages herausnimmt, nimmt eine Handvoll Dateien
  * mit und lässt nichts zurück.
  */
+/**
+ * Der gemeinsame Pfad — aber **nicht für die beiden Aufrufe, die ein Modell anstoßen.**
+ *
+ * `anlegen` und `sprechen` schreiben ihren Pfad ausgeschrieben hin, obwohl es hier eine
+ * Hilfe gibt. Der Fristen-Wächter (`tests/modell-fristen.test.ts`) liest nur wörtliche
+ * Pfade als erstes Argument eines `post`; hinter einem Funktionsaufruf wird er blind. Er
+ * bliebe dabei grün — und wer die Frist später entfernt, bekäme keinen roten Test, sondern
+ * einen Knopf, der bei langen Antworten abbricht, während der Server weiterschreibt und
+ * das Kontingent verbraucht.
+ *
+ * Die Wiederholung ist also Absicht. Wer sie „aufräumt", nimmt dem Wächter die Sicht.
+ */
 const basis = (caseId: string) => `/cases/${caseId}/podcasts`
 
 export interface PodcastKapitelVorlage {
@@ -111,7 +123,9 @@ export const podcastApi = {
    * Browser ab, während der Server weiterschreibt.
    */
   anlegen: (caseId: string, body: PodcastBestellung) =>
-    apiClient.post<Podcast>(basis(caseId), body, { timeout: 180_000 }).then(r => r.data),
+    apiClient
+      .post<Podcast>(`/cases/${caseId}/podcasts`, body, { timeout: 180_000 })
+      .then(r => r.data),
 
   /**
    * Erzeugt die Tonspuren — kapitelweise, und nimmt auf, wo es aufgehört hat.
@@ -122,7 +136,7 @@ export const podcastApi = {
    */
   sprechen: (caseId: string, podcastId: string) =>
     apiClient
-      .post<Podcast>(`${basis(caseId)}/${podcastId}/sprechen`, undefined,
+      .post<Podcast>(`/cases/${caseId}/podcasts/${podcastId}/sprechen`, undefined,
         { timeout: 600_000 })
       .then(r => r.data),
 

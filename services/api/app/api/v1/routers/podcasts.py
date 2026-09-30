@@ -50,10 +50,9 @@ async def katalog_lesen(
         zuschnitt = katalog.fuer_format(format)
         if not zuschnitt:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unbekanntes Format.")
-        return {"formate": [{k: v for k, v in f.items() if k != "haltung"}
-                            for f in katalog.FORMATE], **zuschnitt}
+        return {"formate": [katalog.fuers_auge(f) for f in katalog.FORMATE], **zuschnitt}
     return {
-        "formate": [{k: v for k, v in f.items() if k != "haltung"} for f in katalog.FORMATE],
+        "formate": [katalog.fuers_auge(f) for f in katalog.FORMATE],
         "max_folgen_je_fall": katalog.MAX_FOLGEN_JE_FALL,
     }
 

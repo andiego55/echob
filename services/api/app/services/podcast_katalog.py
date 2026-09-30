@@ -274,7 +274,9 @@ FORMATE: tuple[dict[str, Any], ...] = (
                "Genau drei Punkte, die zur Sprache kommen sollen. Nummeriert und "
                "einzeln abgeschlossen, damit man sie sich merken kann.", 0.3),
             _k("fragen", "Was ich fragen will",
-               "Zwei bis drei Fragen an die Fachperson.", 0.15),
+               "Zwei bis drei Fragen an die Fachperson, aus dem Stoff genommen und offen "
+               "gestellt. Keine Fragen, auf die es nur eine Antwort gibt, und keine, die "
+               "schon eine Vermutung enthalten.", 0.15),
         ),
     },
     {
@@ -367,6 +369,24 @@ def element_label(key: str) -> str | None:
     return gefunden["label"] if gefunden else None
 
 
+def fuers_auge(f: dict[str, Any]) -> dict[str, Any]:
+    """Ein Format ohne die Texte, die für das Modell gedacht sind.
+
+    **``haltung`` und ``auftrag`` gehen nicht in den Browser.** Nicht weil sie geheim wären —
+    es ist unser eigener Text —, sondern aus zwei nüchternen Gründen: Sie sind Ballast in
+    jeder Antwort, und solange sie mitkommen, wird sie irgendwann jemand anzeigen. Ein
+    Kapitelauftrag liest sich wie eine Beschreibung, ist aber eine Anweisung an ein Modell
+    („beschreibend, nie beurteilend, ausdrücklich ohne Diagnose"). Auf einem Bildschirm
+    gelesen, klingt das wie ein Versprechen, das niemand geprüft hat.
+    """
+    return {
+        **{k: v for k, v in f.items() if k not in ("haltung", "kapitel")},
+        "kapitel": [
+            {k: v for k, v in kap.items() if k != "auftrag"} for kap in f["kapitel"]
+        ],
+    }
+
+
 def fuer_format(format_key: str) -> dict[str, Any] | None:
     """Der Katalog, auf ein Format beschnitten — für die Oberfläche.
 
@@ -378,7 +398,7 @@ def fuer_format(format_key: str) -> dict[str, Any] | None:
         return None
     erlaubt = set(f["elemente"])
     return {
-        "format": {k: v for k, v in f.items() if k != "haltung"},
+        "format": fuers_auge(f),
         "elemente": [e for e in ELEMENTE if e["key"] in erlaubt],
         "ansprachen": [a for a in ANSPRACHEN if a["key"] in f["ansprachen"]],
         "gewichtungen": list(GEWICHTUNGEN),

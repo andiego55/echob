@@ -40,19 +40,32 @@ export default function UsageCard() {
   )
 }
 
+/**
+ * Ab wann gewarnt wird, wenn in Minuten gezaehlt wird.
+ *
+ * Die kuerzeste Folge dauert fuenf Minuten. Bei vier Minuten Rest ist das Kontingent
+ * praktisch leer, die Zahl sagt aber noch etwas anderes — und „Noch 4 Minuten uebrig",
+ * waehrend sich nichts mehr machen laesst, ist irrefuehrender als eine Warnung.
+ */
+const MINUTEN_KNAPP = 5
+
 function QuotaRow({ q }: { q: AiUsageQuota }) {
+  const einheit = q.einheit ? ` ${q.einheit}` : ''
+
   if (q.unlimited || q.limit === null) {
     return (
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-sm font-medium text-navy">{q.label}</span>
-        <span className="text-sm text-brand-muted">{q.used} genutzt · unbegrenzt</span>
+        <span className="text-sm text-brand-muted">
+          {q.used}{einheit} genutzt · unbegrenzt
+        </span>
       </div>
     )
   }
 
   const remaining = q.remaining ?? 0
   const pct = q.limit > 0 ? Math.min(100, Math.round((q.used / q.limit) * 100)) : 0
-  const low = remaining <= 3
+  const low = remaining <= (q.einheit ? MINUTEN_KNAPP : 3)
   const empty = remaining <= 0
   const barColor = empty ? 'bg-red-500' : low ? 'bg-amber-400' : 'bg-accent'
   const hintColor = empty ? 'text-red-600' : low ? 'text-amber-700' : 'text-brand-muted'
@@ -61,13 +74,15 @@ function QuotaRow({ q }: { q: AiUsageQuota }) {
     <div>
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-sm font-medium text-navy">{q.label}</span>
-        <span className="text-sm text-brand-muted">{q.used} von {q.limit} genutzt</span>
+        <span className="text-sm text-brand-muted">
+          {q.used} von {q.limit}{einheit} genutzt
+        </span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-brand-border">
         <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
       </div>
       <p className={`mt-1.5 text-xs font-medium ${hintColor}`}>
-        {empty ? 'Kontingent aufgebraucht' : `Noch ${remaining} übrig`}
+        {empty ? 'Kontingent aufgebraucht' : `Noch ${remaining}${einheit} übrig`}
       </p>
     </div>
   )

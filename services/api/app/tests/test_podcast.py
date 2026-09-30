@@ -519,3 +519,144 @@ async def test_die_art_podcast_laesst_sich_wirklich_verbuchen(person, db):
     assert await db.fetchval(
         "SELECT menge FROM ai_usage_log WHERE user_id = $1 AND kind = 'podcast'",
         person) == 7
+
+
+# ── Das Kontingent, wie es beim Browser ankommt ──────────────────────────────
+
+def test_die_einheit_ueberlebt_das_antwortmodell():
+    """**Der Waechter gegen eine Falle, die dieses Projekt schon viermal gekostet hat.**
+
+    FastAPI schneidet jedes Feld weg, das nicht im Antwortmodell steht — lautlos. Der Dienst
+    liefert ``einheit``, ein Test gegen das Dienst-Dict sieht es, und im Browser stuende
+    trotzdem „Noch 7 uebrig" statt „Noch 7 Minuten uebrig".
+
+    Geprueft wird deshalb am SCHEMA und nicht am Dienst: Nur was das Modell kennt, kommt an.
+    """
+    from app.schemas.subscription import AiUsageQuota
+
+    assert "einheit" in AiUsageQuota.model_fields, (
+        "einheit fehlt im Antwortmodell — der Wert des Dienstes wird lautlos weggeschnitten"
+    )
+    # Und es muss optional sein: Alles, was in Stueck zaehlt, schickt keine Einheit.
+    gefuellt = AiUsageQuota(
+        kind="report", label="Berichte", used=1, limit=10, remaining=9, unlimited=False)
+    assert gefuellt.einheit is None
+
+
+def test_podcast_steht_wirklich_im_kontingent_verzeichnis():
+    """Ohne den Eintrag laeuft die Pruefung ins Leere und die Sperre greift nie — ein
+    Kontingent, das sich nicht verbraucht, faellt niemandem auf."""
+    from app.core.config import settings
+    from app.services.subscription_service import _AI_USAGE_LIMITS, _EINHEIT
+
+    assert "podcast" in _AI_USAGE_LIMITS
+    feld, code, label = _AI_USAGE_LIMITS["podcast"]
+    # Der Name des Feldes muss in den Einstellungen wirklich existieren, sonst liest die
+    # Pruefung None und haelt das fuer „unbegrenzt".
+    assert hasattr(settings, feld), f"{feld} fehlt in den Einstellungen"
+    assert isinstance(getattr(settings, feld), int)
+    assert _EINHEIT.get("podcast") == "Minuten", "sonst zaehlt die Anzeige Folgen"
+    assert "Minuten" in label, "das Etikett soll selbst sagen, worin gezaehlt wird"
+
+
+# ── Zwei Sorten Text, und sie duerfen sich nicht vermischen ───────────────────
+
+def test_die_oberflaeche_bekommt_keine_modellauftraege():
+    """**Der Waechter gegen den Fehler, den dieses Projekt dreimal gemacht hat.**
+
+    ``haltung`` und ``auftrag`` sind Anweisungen an ein Modell, keine Beschreibungen. „Wie
+    die andere Person in den Angaben vorkommt. Beschreibend, nie beurteilend, und
+    ausdruecklich ohne Diagnose" liest sich auf einem Bildschirm wie ein geprueftes
+    Versprechen — es ist aber eine Bitte an ein Sprachmodell.
+
+    Solange sie in der Antwort mitkommen, zeigt sie irgendwann jemand an.
+    """
+    for f in katalog.FORMATE:
+        sichtbar = katalog.fuers_auge(f)
+        assert "haltung" not in sichtbar, f["key"]
+        for kap in sichtbar["kapitel"]:
+            assert "auftrag" not in kap, f"{f['key']}/{kap['key']}"
+        # Was die Oberflaeche BRAUCHT, muss dabei bleiben.
+        assert sichtbar["label"] and sichtbar["beschreibung"]
+        assert len(sichtbar["kapitel"]) == len(f["kapitel"])
+        assert all(kap["titel"] for kap in sichtbar["kapitel"])
+
+
+def test_der_zuschnitt_traegt_auch_keine_auftraege():
+    zuschnitt = katalog.fuer_format("ganzer_fall")
+    assert "haltung" not in zuschnitt["format"]
+    assert all("auftrag" not in k for k in zuschnitt["format"]["kapitel"])
+
+
+def test_die_gewichtungszeile_traegt_nur_etikett_und_wort():
+    """**Die gefaehrlichere Richtung, und der Waechter dafuer.**
+
+    Ein Modell benutzt jedes benennbare Material im Prompt auch als SPRACHE. Der ``hinweis``
+    eines Elements („Was du festgehalten hast — mit Titel und Datum") sieht in dieser Zeile
+    harmlos aus; im Podcast kaeme unser Erklaersatz als Aussage ueber das Leben eines
+    Menschen zurueck.
+
+    **Geprueft wird an der Stelle selbst, nicht am fertigen Prompt.** Die erste Fassung
+    dieses Tests baute nur einen Fall ohne Material zusammen — damit lief die Zeile nie, und
+    der Waechter blieb gruen, als ich probeweise einen Oberflaechentext hineinlegte. Genau
+    die Bauart Fehler, gegen die er geschrieben ist.
+    """
+    for e in katalog.ELEMENTE:
+        for g in katalog.GEWICHTUNGEN:
+            zeile = dienst.gewicht_marke(e["key"], {e["key"]: g["key"]})
+            if g["key"] == "aus":
+                # Was abgewaehlt ist, bekommt keine Zeile — es wird gar nicht geladen.
+                assert zeile == "", e["key"]
+                continue
+            assert e["label"] in zeile
+            assert g["wort"] in zeile
+            # Und nichts sonst: kein Erklaersatz, keine Zahl.
+            assert e["hinweis"] not in zeile, f'{e["key"]}: Oberflaechentext im Prompt'
+            assert str(g["anteil"]) not in zeile, f'{e["key"]}: Zahl statt Wort'
+
+
+def test_kein_oberflaechentext_geraet_in_den_fertigen_prompt():
+    """Dasselbe noch einmal am ganzen Weg — mit Material, das die Bloecke wirklich baut."""
+    material = {
+        "fall": {"relationship_type": "partner", "relationship_status": "together",
+                 "contact_frequency": "daily"},
+        "szenen": [{"title": "Der Abend", "description": "Etwas ist passiert."}],
+        "artefakte": [{"title": "Eine Einsicht", "body": "Ich merke es vorher."}],
+    }
+    text = dienst.als_prompt_material(
+        material, dienst.gewichte_pruefen("ganzer_fall", {}))
+
+    # Die Bloecke sind wirklich entstanden, sonst prueft der Rest nichts.
+    assert "Der Abend" in text and "Eine Einsicht" in text
+
+    for f in katalog.FORMATE:
+        assert f["beschreibung"] not in text, f["key"]
+    for e in katalog.ELEMENTE:
+        assert e["hinweis"] not in text, e["key"]
+    for laenge in katalog.LAENGEN:
+        assert laenge["hinweis"] not in text, laenge["key"]
+    for st in katalog.STIMMEN:
+        assert st["hinweis"] not in text, st["key"]
+
+
+def test_die_gewichtung_geht_als_wort_in_den_prompt_und_nicht_als_zahl():
+    """„Szenen: 0.6" ist fuer ein Modell bedeutungslos; „darum geht es hier vor allem" ist
+    eine Anweisung."""
+    material = {
+        "fall": {"relationship_type": "partner"},
+        "artefakte": [{"title": "Etwas", "body": "Ein Text"}],
+    }
+    text = dienst.als_prompt_material(
+        material, dienst.gewichte_pruefen("ganzer_fall", {"artefakte": "mittelpunkt"}))
+
+    assert katalog.gewichtung("mittelpunkt")["wort"] in text
+    assert "1.0" not in text and "0.6" not in text
+
+
+def test_jedes_kapitel_hat_einen_auftrag_und_jedes_format_eine_haltung():
+    """Ein leeres Feld faellt nicht auf: Das Modell schreibt trotzdem etwas, nur eben etwas
+    Beliebiges."""
+    for f in katalog.FORMATE:
+        assert len(f["haltung"]) > 40, f["key"]
+        for kap in f["kapitel"]:
+            assert len(kap["auftrag"]) > 40, f"{f['key']}/{kap['key']}"

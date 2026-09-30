@@ -37,6 +37,10 @@ const MODELL_PFADE = [
   '/generate', '/vergleich/', '/vorschlaege', '/ai-evaluate', '/didactics',
   '/assist', '/master-solution', '/echo/chat', '/echo/summar', '/reports',
   '/rephrase', '/draft',
+  // Podcast: `POST /cases/{id}/podcasts` schreibt das Skript, `/sprechen` erzeugt die
+  // Tonspuren. Der zweite ist der laengste Modellaufruf im Projekt - eine zwanzigminuetige
+  // Folge sind sechs Sprachaufrufe hintereinander.
+  '/podcasts', '/sprechen',
 ]
 
 /** Kürzer als das ist für einen Modellaufruf keine Frist, sondern ein Abbruch. */
@@ -84,6 +88,24 @@ describe('Fristen fuer Modellaufrufe', () => {
     const v = modellAufrufe().find(f => f.pfad.includes('/vergleich/'))
     expect(v, 'der Traumbeziehungs-Vergleich wird nicht erkannt').toBeTruthy()
     expect(v!.frist).toBeGreaterThanOrEqual(MINDESTFRIST)
+  })
+
+  it('erkennt die beiden Podcast-Aufrufe', () => {
+    // Sie standen zuerst hinter einer `basis()`-Hilfe und waren damit fuer diesen Waechter
+    // unsichtbar - er blieb gruen, ohne hinzusehen. Dieser Test haelt fest, dass die Pfade
+    // woertlich dastehen: Raeumt jemand die Wiederholung auf, wird es hier rot und nicht
+    // erst am echten Modell.
+    const funde = modellAufrufe().filter(f => f.datei === 'podcast.ts')
+    expect(
+      funde.map(f => f.pfad).sort(),
+      'die Podcast-Modellaufrufe werden nicht gesehen - steht der Pfad noch woertlich da?',
+    ).toEqual([
+      '/cases/${caseId}/podcasts',
+      '/cases/${caseId}/podcasts/${podcastId}/sprechen',
+    ])
+    // Und die laengere Frist gehoert an den laengeren Aufruf.
+    const sprechen = funde.find(f => f.pfad.includes('/sprechen'))!
+    expect(sprechen.frist).toBeGreaterThanOrEqual(300_000)
   })
 
   it('jeder Modellaufruf setzt eine eigene Frist', () => {

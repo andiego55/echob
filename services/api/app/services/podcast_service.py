@@ -429,6 +429,28 @@ async def ton_der_folge(
 
 # ── Das Material als Text für das Modell ─────────────────────────────────────
 
+def gewicht_marke(key: str, gewichte: dict[str, str]) -> str:
+    """Die Zeile, die einem Materialblock seine Gewichtung voranstellt.
+
+    **Zwei Dinge dürfen hier stehen und nichts sonst: das Etikett und das Wort.**
+
+    Das Wort und nicht die Zahl, weil „Szenen: 0.6" für ein Modell bedeutungslos ist und
+    „darum geht es hier vor allem" eine Anweisung.
+
+    Und kein Oberflächentext. Der ``hinweis`` eines Elements („Was du festgehalten hast —
+    mit Titel und Datum") sieht hier harmlos aus und ist es nicht: Ein Modell benutzt jedes
+    benennbare Material im Prompt auch als Sprache, und dann kommt unser Erklärsatz als
+    Aussage über das Leben eines Menschen zurück.
+
+    Eigene Funktion und kein Verschluss in ``als_prompt_material``, weil an ihr eine Regel
+    hängt — und eine Regel braucht eine Stelle, an der ein Test sie fassen kann, ohne erst
+    vollständiges Fallmaterial aufbauen zu müssen.
+    """
+    wort = katalog.gewichtung(gewichte.get(key))["wort"]
+    label = katalog.element_label(key) or key
+    return f"[{label} — {wort}]" if wort else ""
+
+
 def als_prompt_material(material: dict[str, Any], gewichte: dict[str, str]) -> str:
     """Das geladene Material, wie das Modell es bekommt.
 
@@ -458,9 +480,7 @@ def als_prompt_material(material: dict[str, Any], gewichte: dict[str, str]) -> s
         teile.append(kopf)
 
     def gewicht_zeile(key: str) -> str:
-        wort = katalog.gewichtung(gewichte.get(key))["wort"]
-        label = katalog.element_label(key) or key
-        return f"[{label} — {wort}]" if wort else ""
+        return gewicht_marke(key, gewichte)
 
     if material.get("person_profil"):
         from app.services.person_profile_service import build_person_context

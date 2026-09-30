@@ -861,12 +861,26 @@ export interface SubscriptionStatus {
 }
 
 export interface AiUsageQuota {
-  kind: 'report' | 'scale_calc' | 'fall_faq'
+  /**
+   * Die Art des Kontingents.
+   *
+   * Die Liste war zweimal veraltet, weil sie hier von Hand nachgezogen werden muss und der
+   * Compiler nichts davon merkt: Der Wert kommt vom Server. Wer eine Art ergaenzt, ergaenzt
+   * sie in `_AI_USAGE_LIMITS` UND hier.
+   */
+  kind: 'report' | 'scale_calc' | 'fall_faq' | 'satz_vorschlag' | 'selbstportrait'
+    | 'podcast'
   label: string
   used: number
   limit: number | null       // null = unbegrenzt/deaktiviert
   remaining: number | null
   unlimited: boolean
+  /**
+   * Die Einheit, wenn nicht in Stueck gezaehlt wird — bei Podcasts „Minuten".
+   *
+   * Ohne sie steht an der Anzeige „Noch 7 uebrig", und das liest sich wie sieben Folgen.
+   */
+  einheit?: string | null
 }
 
 export interface AiUsageStatus {
