@@ -98,9 +98,17 @@ VERBOTEN: tuple[str, ...] = (
 #: Jeder Eintrag ist (Muster, Name für die Meldung). Die Namen gehen im zweiten Versuch an das
 #: Modell zurück, also sind sie so formuliert, dass man daraus etwas ändern kann.
 WENDUNGEN: tuple[tuple[str, str], ...] = (
-    (r"\b(his|her|their|its|your|my|the|a|one|someone'?s?)\s+face\b", "a face"),
-    (r"\bfaces?\s+(of\s+)?(a\s+|the\s+)?(child|adult|figure|person|man|woman)\b",
-     "a face"),
+    # **„face" ist gesperrt, und die Ausnahmen stehen in `IDIOME`.**
+    #
+    # Zwei Korrekturen an einer Zeile, beide aus dem Betrieb. Erst verwarf sie jedes „the
+    # face" und damit „the face of the hill" — normales Landschaftsdeutsch, zweimal ein guter
+    # Auftrag verloren. Dann habe ich sie auf menschliche Zusammenhänge verengt, und damit
+    # kam „a face at the window" durch: ein Gesicht ohne ein Wort für einen Menschen.
+    #
+    # Richtig ist die strenge Richtung mit benannten Ausnahmen. Ein Gesicht ist das, was in
+    # diesem Modul nie entstehen darf; eine Felswand darf dafür einen Umweg über `IDIOME`
+    # nehmen. Wer eine Ausnahme braucht, schreibt sie dort hin und sieht sie beim Lesen.
+    (r"\bfaces?\b", "a face"),
     (r"\b(his|her|their|its|your|closed|open|two|dark|wide)\s+eyes?\b", "eyes"),
     (r"\beyes?\s+(of|looking|staring|meeting|watching)\b", "eyes"),
     (r"\bgaz(e|ing)\s+(of|at|back|toward)", "a gaze"),
@@ -130,8 +138,12 @@ WENDUNGEN: tuple[tuple[str, str], ...] = (
 #: Muster immer komplizierter zu machen, wird die harmlose Stelle vorher aus dem Text
 #: genommen — man kann die Liste lesen und prüfen, ob sie stimmt.
 IDIOME: tuple[str, ...] = (
-    r"\b(rock|cliff|stone|wall|mountain|glacier|ice|water|sheer)\s+face\b",
-    r"\bthe face of the (water|sea|lake|cliff|rock|earth|building|house)\b",
+    # Eine Wand, ein Hang, ein Gebäude hat ein „face". Ein Mensch auch — deshalb ist das Wort
+    # gesperrt und stehen hier die Dinge, die keines haben können.
+    r"\b(rock|cliff|stone|wall|mountain|glacier|ice|water|sheer|north|south|east|west|barn"
+    r"|house|building|hill|slope|brick|concrete|quarry|cliffs?)(\'s)?\s+faces?\b",
+    r"\bfaces? of the (water|sea|lake|cliff|rock|earth|building|house|hill|wall|barn|slope"
+    r"|moor|field|glacier|dune|ridge)\b",
     r"\bman\s*-\s*made\b",
     r"\bsigns? of (wear|age|use|neglect|rain|frost|weather|life)\b",
     r"\bnotes? of (colour|color|green|blue|red|rust|warmth|light)\b",

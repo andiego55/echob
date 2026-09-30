@@ -794,6 +794,32 @@ def fuehrendes_muster(werte: dict[str, Any], schichten: set[str]) -> str | None:
     return stark[0][0] if stark else None
 
 
+#: Anläufe, die ein Modell einem Satz voranstellt, obwohl ein Satzteil gefragt war.
+_ANLAEUFE = (
+    "this is ", "it is ", "the image is ", "the scene is ", "we see ", "we are looking at ",
+    "seen is ", "there is ", "an image of ", "a picture of ", "a view of ",
+)
+
+
+def _einfuegbar(satz: str) -> str:
+    """Ein Feld der Regie, das mitten in einen Satz gesetzt wird.
+
+    **Ohne das steht im Prompt „It is set in This is inside an old house".** Das Modell
+    antwortet mit vollständigen Sätzen, auch wenn nach einem Satzteil gefragt war — es ist
+    darauf trainiert, in Sätzen zu reden, und keine Bitte hält das zuverlässig auf.
+
+    Ein Bildmodell stolpert darüber nicht sichtbar, es verteilt nur seine Aufmerksamkeit
+    anders. Gerade darum wird es hier geradegezogen und nicht per Anweisung erbeten.
+    """
+    text = satz.strip().rstrip(".").strip()
+    tief = text.lower()
+    for anlauf in _ANLAEUFE:
+        if tief.startswith(anlauf):
+            text = text[len(anlauf):].strip()
+            break
+    return (text[0].lower() + text[1:]) if text else text
+
+
 def _regie_teile(
     regie: dict[str, Any], farbe: str, einstellungen: dict[str, Any],
 ) -> list[str]:
@@ -810,8 +836,8 @@ def _regie_teile(
     zurück: Sie würden das Bild wieder in die Mitte ziehen, aus der es gerade herauskommt.
     """
     teile = [
-        f"A single image. The subject is {regie['motiv'].rstrip('.')}.",
-        f"It is set in {regie['ort'].rstrip('.')}. Colour: {farbe}.",
+        f"A single image. The subject is {_einfuegbar(regie['motiv'])}.",
+        f"It is set in {_einfuegbar(regie['ort'])}. Colour: {farbe}.",
     ]
 
     dinge = [g["was"].rstrip(".") for g in regie.get("gegenstaende") or [] if g.get("was")]

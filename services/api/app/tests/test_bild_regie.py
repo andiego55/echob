@@ -736,3 +736,65 @@ def test_ein_wunsch_nach_einem_menschen_ergibt_keinen_menschen():
     assert asyncio.run(bild_regie.fuehren(
         modell, fall=material["fall"], material=material,
         wunsch="Zeig, wie er weggeht")) is None
+
+
+# == Korrekturen aus dem Betrieb ===============================================
+
+def test_ein_gesicht_ist_nur_mit_einem_menschen_ein_gesicht():
+    """**Korrektur aus dem Betrieb: die erste Fassung verwarf jedes "the face".**
+
+    Damit fielen "the face of the hill", "the cliff's face" und "the face of the wall" durch -
+    normales Landschaftsdeutsch. Zweimal hintereinander ging ein guter Auftrag verloren, auch
+    nach dem zweiten Versuch, und die Person sah wieder ein Bild aus dem Baukasten.
+
+    Breiter muss die Regel auch nicht sein: Jedes Wort fuer einen Menschen steht schon in
+    VERBOTEN. Ein Gesicht ohne Mensch ist eine Felswand.
+    """
+    harmlos = (
+        "the face of the hill catches the last light",
+        "the north face of the old barn",
+        "a terrace edge facing the open lawn",
+        "the face of the wall is streaked with rain",
+        "the sheer rock face above the water",
+        "the cliff's face in shadow",
+    )
+    for satz in harmlos:
+        assert bild_regie._verbotene(satz) == [], satz
+
+    # **Und die zweite Korrektur: streng bleibt streng.** Eine Fassung, die nur auf
+    # menschliche Zusammenhaenge sah, liess "a face at the window" durch - ein Gesicht ohne
+    # ein Wort fuer einen Menschen. Das Wort ist gesperrt, die Ausnahmen stehen in IDIOME.
+    for satz in ("her face turned to the window", "the sleeping face in the chair",
+                 "the face of a child at the glass", "a face at the window",
+                 "two faces in the dark"):
+        assert "a face" in bild_regie._verbotene(satz), satz
+
+
+def test_ein_ganzer_satz_wird_zum_satzteil():
+    """**Ohne das stand im Prompt "It is set in This is inside an old house".**
+
+    Das Modell antwortet in vollstaendigen Saetzen, auch wenn nach einem Satzteil gefragt war -
+    darauf ist es trainiert, und keine Bitte haelt das zuverlaessig auf. Ein Bildmodell
+    stolpert darueber nicht sichtbar, es verteilt nur seine Aufmerksamkeit anders.
+    """
+    from app.services.bild_katalog import _einfuegbar
+
+    assert _einfuegbar("This is inside an old house, seen from the landing.")         == "inside an old house, seen from the landing"
+    assert _einfuegbar("An old interior passage with a new lock.")         == "an old interior passage with a new lock"
+    assert _einfuegbar("We see a jetty at dusk") == "a jetty at dusk"
+    assert _einfuegbar("a wide lawn in october") == "a wide lawn in october"
+    assert _einfuegbar("") == ""
+
+
+def test_der_prompt_liest_sich_als_ein_satz():
+    """Die Gegenprobe am fertigen Prompt - dort entsteht der Schaden, nicht im Hilfsmittel."""
+    regie = bild_regie.pruefen({
+        **bild_regie.MOCK,
+        "motiv": "An old passage with a newly changed lock.",
+        "ort": "This is inside an old house, seen from the stair landing.",
+    })
+    prompt = prompt_bauen(_werte(), EINST, regie)
+
+    assert "The subject is an old passage with a newly changed lock." in prompt
+    assert "It is set in inside an old house, seen from the stair landing." in prompt
+    assert "is This is" not in prompt
