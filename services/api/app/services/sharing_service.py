@@ -57,6 +57,10 @@ class SharedBundle:
     #: Freunde und seinen Arbeitsplatz mitgeteilt. Und nicht die blinde Neufassung - ein
     #: Entwurf ist keine Aussage.
     traumbeziehung: dict[str, Any] | None = None
+    #: Die Podcast-Folgen dieses Falls, als Text. Ohne Tonspuren: Der gesprochene
+    #: Text IST der Kapiteltext, und zwei Megabyte je Folge durch einen Weg, der für
+    #: Text gebaut ist, wären ein zweiter Ausliefer-Endpunkt für keinen Gewinn.
+    podcasts: list[dict[str, Any]] = field(default_factory=list)
     #: Zahl der verworfenen Erkenntnisse. Ihr Inhalt geht nicht mit, ihre Zahl schon —
     #: dass jemand eigene Einschaetzungen revidiert hat, sagt etwas ueber den Fall.
     artifacts_ueberholt: int = 0
@@ -395,6 +399,12 @@ async def load_shared_bundle(professional_user_id, case_id, conn) -> SharedBundl
         bundle.traumbeziehung = await kompass_ideal_service.fuer_fall(
             conn, user_id=share["owner_user_id"], case_id=share["case_id"])
 
+    # ── Die Podcast-Folgen ───────────────────────────────────────────────────
+    if "podcasts" in allowed:
+        from app.services import podcast_service
+        bundle.podcasts = await podcast_service.fuer_freigabe(
+            conn, owner_user_id=share["owner_user_id"], case_id=share["case_id"])
+
     # Festgehaltene Erkenntnisse. Überholte fließen inhaltlich NICHT mit (siehe
     # build_artifact_context) — nur ihre Zahl.
     if "artifacts" in allowed:
@@ -503,6 +513,19 @@ def build_shared_case_context(bundle: SharedBundle) -> str:
             parts.append("WAS SICH DIE PERSON VON EINER SOLCHEN BEZIEHUNG WUENSCHT\n"
                          "(ihre eigene Skizze, unabhaengig von diesem Fall entstanden):\n\n"
                          + ctx)
+
+    if bundle.podcasts:
+        # **Nur die Liste, nie der Wortlaut** — der einzige Inhalt, bei dem das so ist.
+        #
+        # Ein Podcast-Skript ist AUS dem Material entstanden, das in diesem Prompt schon
+        # steht: Szenen, Skalen, Themendialoge. Noch einmal hinein gelegt, käme derselbe Fall
+        # ein zweites Mal — als flüssiger Text, der sich wie eine Quelle liest. Ein Modell,
+        # das eine Zusammenfassung neben ihren Belegen sieht, zitiert die Zusammenfassung:
+        # Sie ist besser formuliert. Damit würde unsere eigene Verdichtung zur Tatsache.
+        from app.services import podcast_service
+        ctx = podcast_service.freigabe_kontext(bundle.podcasts)
+        if ctx:
+            parts.append(ctx)
 
     if bundle.artifacts or bundle.artifacts_ueberholt:
         ctx = build_artifact_context(bundle.artifacts, ueberholt_anzahl=bundle.artifacts_ueberholt)

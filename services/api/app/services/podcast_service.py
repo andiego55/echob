@@ -527,6 +527,93 @@ async def ton_der_folge(
     return b"".join(bytes(z["audio"]) for z in zeilen), zeilen[0]["audio_typ"] or "audio/mpeg"
 
 
+# ── Für die Freigabe an eine Fachperson ──────────────────────────────────────
+
+async def fuer_freigabe(
+    conn: asyncpg.Connection, *, owner_user_id: UUID | str, case_id: UUID | str,
+) -> list[dict[str, Any]]:
+    """Die Folgen dieses Falls als Text — für die Fachperson.
+
+    **Die Tonspuren gehen nicht mit, und das ist kein Vorenthalten.** Der gesprochene Text
+    IST der Kapiteltext. Eine Fachperson liest in zwei Minuten, was zwanzig Minuten lang
+    gesprochen wird; zwei Megabyte je Folge durch einen Weg zu schicken, der für Text gebaut
+    ist, wäre ein zweiter Ausliefer-Endpunkt mit eigener Rechteprüfung für keinen Gewinn.
+
+    **Die Einstellungen gehen mit.** Was jemand in den Mittelpunkt gestellt und was er
+    abgewählt hat, ist selbst eine Aussage — und ohne sie liest sich eine Folge, in der die
+    Skalen fehlen, wie eine Lücke statt wie eine Entscheidung.
+
+    Gebunden an ``owner_user_id``: Die Freigabe nennt den Fall, und der Fall gehört einem
+    Menschen. Eine Abfrage nur über ``case_id`` wäre eine Zeile, auf die sich später jemand
+    verlässt.
+    """
+    zeilen = await conn.fetch(
+        "SELECT id, format, laenge, stimme, ansprache, gewichte, titel, status, "
+        "       sekunden, created_at "
+        "  FROM case_podcasts WHERE case_id = $1 AND user_id = $2 "
+        " ORDER BY created_at DESC",
+        case_id, owner_user_id,
+    )
+    folgen: list[dict[str, Any]] = []
+    for z in zeilen:
+        folge = _folge(z)
+        if folge is None:  # pragma: no cover — fetch liefert keine None-Zeilen
+            continue
+        kapitel = await conn.fetch(
+            "SELECT nr, titel, text FROM case_podcast_kapitel "
+            " WHERE podcast_id = $1 ORDER BY nr",
+            z["id"],
+        )
+        # Eine Folge ohne Text ist keine Aussage. Die gibt es seit dem Umbau nicht mehr neu,
+        # aber aeltere Zeilen haben sie - und in einer Freigabe waere sie eine leere Karte,
+        # die aussieht, als fehle etwas.
+        if not kapitel:
+            continue
+        folge["kapitel"] = [
+            {**dict(k), "text": crypto.decrypt(k["text"])} for k in kapitel
+        ]
+        folge["gewichte_lesbar"] = [
+            {"label": katalog.element_label(key) or key,
+             "stufe": katalog.gewichtung(stufe)["label"]}
+            for key, stufe in (folge.get("gewichte") or {}).items()
+        ]
+        folgen.append(folge)
+    return folgen
+
+
+def freigabe_kontext(folgen: list[dict[str, Any]]) -> str:
+    """Was von den Folgen in den PROMPT geht — **nur die Liste, nie der Text.**
+
+    Der wichtigste Unterschied zu allen anderen freigegebenen Inhalten, und er ist bewusst.
+
+    Ein Podcast-Skript ist AUS dem Material entstanden, das die Fachperson ohnehin hat:
+    Szenen, Skalen, Themendialoge. Ins Kontextfenster gelegt, käme derselbe Fall ein zweites
+    Mal hinein — als flüssiger Text, der sich wie eine Quelle liest. Und ein Modell, das eine
+    Zusammenfassung neben ihren Belegen sieht, zitiert die Zusammenfassung: Sie ist besser
+    formuliert. Damit würde unsere eigene Verdichtung zur Tatsache.
+
+    Dass es die Folge gibt, ist die Information — mit Format, Titel und Datum. Der Text steht
+    in der Anzeige, wo ein Mensch ihn liest und einordnet.
+    """
+    if not folgen:
+        return ""
+    zeilen = [
+        f"- {f.get('format_label')}: „{f.get('titel') or 'ohne Titel'}“"
+        f" ({f['created_at'].date().isoformat()}"
+        + (f", {round((f['sekunden'] or 0) / 60)} Min" if f.get("sekunden") else "")
+        + ")"
+        for f in folgen
+    ]
+    return (
+        "PODCAST-FOLGEN, DIE SICH DIE PERSON ERZEUGT HAT\n"
+        "(Der Wortlaut steht der Fachperson in der Anzeige zur Verfuegung und ist hier "
+        "ABSICHTLICH nicht enthalten: Er ist aus demselben Material entstanden, das du "
+        "ohnehin hast, und waere hier eine zweite, glatter formulierte Fassung derselben "
+        "Angaben. Dass es diese Folgen gibt und was die Person gewaehlt hat, ist die "
+        "Information.)\n\n" + "\n".join(zeilen)
+    )
+
+
 # ── Das Material als Text für das Modell ─────────────────────────────────────
 
 def gewicht_marke(key: str, gewichte: dict[str, str]) -> str:

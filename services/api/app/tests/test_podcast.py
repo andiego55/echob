@@ -1132,3 +1132,116 @@ async def test_die_loeschung_nimmt_folgen_und_kapitel_mit(person, db):
         "SELECT COUNT(*) FROM case_podcasts WHERE id = $1", folge["id"]) == 0
     assert await db.fetchval(
         "SELECT COUNT(*) FROM case_podcast_kapitel WHERE podcast_id = $1", folge["id"]) == 0
+
+
+# ── Die Freigabe an eine Fachperson ───────────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_die_freigabe_traegt_den_text_und_die_regler(person, db):
+    """Was jemand in den Mittelpunkt gestellt und was er abgewaehlt hat, ist selbst eine
+    Aussage - ohne die Regler liest sich eine Folge ohne Skalen wie eine Luecke statt wie
+    eine Entscheidung."""
+    fall = await _fall(db, person)
+    text = "An diesem Abend habe ich erst die Stimmung geprueft, bevor ich etwas gesagt habe."
+    await _folge(
+        db, person, fall, titel="Die leisen Abende",
+        gewichte=dienst.gewichte_pruefen("ganzer_fall", {"skalen": "aus",
+                                                        "szenen": "mittelpunkt"}),
+        kapitel=[{"key": "anfang", "titel": "Wie es anfing", "text": text}])
+
+    folgen = await dienst.fuer_freigabe(db, owner_user_id=person, case_id=fall)
+    assert len(folgen) == 1
+    f = folgen[0]
+    assert f["titel"] == "Die leisen Abende"
+    assert f["kapitel"][0]["text"] == text
+    assert "audio" not in f["kapitel"][0], "die Tonspur geht mit"
+
+    lesbar = {g["label"]: g["stufe"] for g in f["gewichte_lesbar"]}
+    assert lesbar["Muster"] == "gar nicht"
+    assert lesbar["Szenen"] == "im Mittelpunkt"
+
+
+@pytest.mark.asyncio
+async def test_der_prompt_bekommt_die_liste_und_nicht_den_wortlaut(person, db):
+    """**Der wichtigste Test an dieser Freigabe.**
+
+    Ein Podcast-Skript ist AUS dem Material entstanden, das im Prompt schon steht. Noch
+    einmal hineingelegt, kaeme derselbe Fall ein zweites Mal - als fluessiger Text, der sich
+    wie eine Quelle liest. Ein Modell, das eine Zusammenfassung neben ihren Belegen sieht,
+    zitiert die Zusammenfassung: Sie ist besser formuliert. Damit wuerde unsere eigene
+    Verdichtung zur Tatsache.
+    """
+    fall = await _fall(db, person)
+    text = "Ein sehr eigener Satz, der nur in diesem Kapitel vorkommt und sonst nirgends."
+    await _folge(db, person, fall, titel="Die leisen Abende",
+                 kapitel=[{"key": "anfang", "titel": "Wie es anfing", "text": text}])
+
+    folgen = await dienst.fuer_freigabe(db, owner_user_id=person, case_id=fall)
+    kontext = dienst.freigabe_kontext(folgen)
+
+    # Der Titel und das Format ja - der Wortlaut nein.
+    assert "Die leisen Abende" in kontext
+    assert "Der ganze Fall" in kontext
+    assert text not in kontext, "der Wortlaut steht im Prompt"
+    assert "Wie es anfing" not in kontext, "sogar die Kapiteltitel gehen mit"
+    # Und das Modell erfaehrt, WARUM der Wortlaut fehlt - sonst fragt es danach.
+    assert "ABSICHTLICH" in kontext
+
+
+@pytest.mark.asyncio
+async def test_eine_folge_ohne_text_kommt_nicht_in_die_freigabe(person, db):
+    """Aeltere Zeilen aus der ersten Fassung haben keine Kapitel. In einer Freigabe waeren
+    sie eine leere Karte, die aussieht, als fehle etwas."""
+    fall = await _fall(db, person)
+    folge = await _folge(db, person, fall)
+    await db.execute(
+        "DELETE FROM case_podcast_kapitel WHERE podcast_id = $1", folge["id"])
+
+    assert await dienst.fuer_freigabe(db, owner_user_id=person, case_id=fall) == []
+    assert dienst.freigabe_kontext([]) == ""
+
+
+@pytest.mark.asyncio
+async def test_die_freigabe_ist_an_den_eigentuemer_gebunden(person, db):
+    """Die Freigabe nennt den Fall, und der Fall gehoert einem Menschen. Eine Abfrage nur
+    ueber die case_id waere eine Zeile, auf die sich spaeter jemand verlaesst."""
+    fremd = uuid.uuid4()
+    await db.execute(
+        "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Andere')", fremd)
+    fremder_fall = await _fall(db, fremd)
+    await _folge(db, fremd, fremder_fall, titel="Nicht meine Folge")
+
+    # Mit der richtigen case_id, aber dem falschen Menschen: nichts.
+    assert await dienst.fuer_freigabe(
+        db, owner_user_id=person, case_id=fremder_fall) == []
+
+
+def test_podcasts_stehen_in_allen_fuenf_stellen():
+    """**Der Waechter gegen den Fehler, der die Saetze monatelang unsichtbar liess.**
+
+    Ein neuer freigebbarer Inhalt braucht fuenf Stellen: die Pruefbedingung der Datenbank,
+    das Python-Literal, das Etikett, die Ankreuzliste und die ANZEIGE bei der Fachperson.
+    Fehlt die fuenfte, laesst sich der Inhalt freigeben und niemand sieht ihn - ohne Fehler,
+    ohne Warnung.
+
+    Die vorhandenen Waechter pruefen das je einzeln. Dieser hier prueft es fuer DIESEN
+    Inhalt an einer Stelle, damit beim Lesen klar ist, wo ueberall er haengt.
+    """
+    from pathlib import Path
+
+    from app.schemas.professional import ShareElementType
+
+    wurzel = Path(__file__).resolve().parents[4]
+    assert "podcasts" in getattr(ShareElementType, "__args__", ()), "Python-Literal"
+
+    stellen = {
+        "DB-Pruefbedingung":
+            "infra/docker/postgres/init/zz_138_freigabe_podcasts.sql",
+        "TS-Literal und Etikett": "apps/web/src/types/index.ts",
+        "Ankreuzliste": "apps/web/src/pages/app/CaseSharingPage.tsx",
+        "Anzeige bei der Fachperson":
+            "apps/web/src/pages/professional/ProfessionalCaseDetailPage.tsx",
+    }
+    for name, datei in stellen.items():
+        inhalt = (wurzel / datei).read_text(encoding="utf-8")
+        assert "podcasts" in inhalt, f"{name} fehlt ({datei})"

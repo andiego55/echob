@@ -918,6 +918,7 @@ export type ShareElementType =
   | 'verlauf' | 'vorhaben' | 'krisenplan'
   // Die Skizze der gewünschten Beziehung — und zwar nur die zur Art DIESES Falls.
   | 'traumbeziehung'
+  | 'podcasts'
 
 export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   case_info:       'Fallinformationen',
@@ -940,6 +941,7 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   // Die Art steht im Etikett, weil sie die halbe Aussage ist: Freigegeben wird die
   // Skizze, die zu DIESEM Fall passt — nicht das ganze Wunschbild eines Lebens.
   traumbeziehung:  'Meine Traumbeziehung (nur die zu dieser Beziehungsart)',
+  podcasts:        'Meine Podcast-Folgen (als Text, ohne die Tonaufnahmen)',
   krisenplan:      'Mein Notfallplan',
   artifacts:       'Festgehaltene Erkenntnisse',
   satz:            'Einzelne Sätze über dich',
@@ -1293,6 +1295,25 @@ export interface SharedKrisenplan {
 }
 
 export interface SharedCaseBundle {
+  /**
+   * Die Podcast-Folgen dieses Falls, als Text.
+   *
+   * Ohne `audio`: Der gesprochene Wortlaut IST der Kapiteltext. `gewichte_lesbar` trägt die
+   * Regler in Worten — was jemand in den Mittelpunkt gestellt und was er abgewählt hat, ist
+   * selbst eine Aussage.
+   */
+  podcasts: {
+    id: string
+    format: string
+    format_label: string
+    titel: string | null
+    status: string
+    sekunden: number | null
+    created_at: string
+    kapitel: { nr: number; titel: string; text: string }[]
+    gewichte_lesbar: { label: string; stufe: string }[]
+  }[]
+
   case_id: string
   client_display_name: string
   client_avatar?: string | null

@@ -11,6 +11,7 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { casesApi } from '@/api/cases'
 import { scenesApi } from '@/api/scenes'
 import { personProfileApi } from '@/api/personProfile'
+import { podcastApi } from '@/api/podcast'
 import { topicSummariesApi, type TopicSummary } from '@/api/topicSummaries'
 import { testResultsApi } from '@/api/testResults'
 import SavedTestResultView from '@/components/selftests/SavedTestResultView'
@@ -62,6 +63,12 @@ export default function CaseDetailPage() {
     enabled: !!caseId,
   })
 
+  const { data: podcasts = [] } = useQuery({
+    queryKey: ['podcasts', caseId],
+    queryFn: () => podcastApi.liste(caseId!),
+    enabled: !!caseId,
+  })
+
   if (isLoading || !caseData) {
     return (
       <AppShell>
@@ -72,6 +79,11 @@ export default function CaseDetailPage() {
 
   const c = caseData
   const sceneCount = scenesData?.total ?? 0
+  // Nur das Regal - ohne Kapitel und ohne Tonspuren. Fuer eine Karte auf dem Ueberblick
+  // genuegen zwei Zahlen, und ein Fehler hier darf die Seite nicht umwerfen.
+  const podcastCount = podcasts.length
+  const podcastOffen = podcasts.filter(
+    f => f.status === 'skript' || f.status === 'fehler').length
   const coreSummaryCount = topicSummaries.filter((s) => !s.topic.startsWith('content_')).length
 
   return (
@@ -138,7 +150,10 @@ export default function CaseDetailPage() {
         {/* Schnell-Aktionen */}
         <Abschnitt titel="Weitermachen" />
 
-        <div className="grid gap-4 sm:grid-cols-3 mt-2">
+        {/* Vier Karten: zwei zu zwei auf dem Telefon, vier in einer Reihe auf dem
+            Schirm. Eine vierte in einem Dreierraster wäre ein Waisenkind in einer
+            eigenen Zeile — und sähe aus wie versehentlich dort. */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-2">
           <QuickCard
             title="Szenen"
             value={
@@ -163,6 +178,26 @@ export default function CaseDetailPage() {
             to={`/app/cases/${caseId}/reports`}
             cta="Bericht erstellen"
             icon={<QuickIcon><path d="M6 20V12M12 20V6M18 20v-5" /></QuickIcon>}
+          />
+          {/* **Der Stand sagt, was zu tun ist.** Eine Folge mit Text, aber ohne Stimme ist
+              der Zustand, in dem ein Nutzer nicht weiterwusste — auf dem Überblick soll das
+              gar nicht erst zur Frage werden. */}
+          <QuickCard
+            title="Podcast"
+            value={
+              podcastCount === 0
+                ? 'Dein Fall zum Hören'
+                : podcastOffen > 0
+                  ? `${podcastOffen} ${podcastOffen === 1 ? 'Folge wartet' : 'Folgen warten'} auf die Stimme`
+                  : `${podcastCount} ${podcastCount === 1 ? 'Folge' : 'Folgen'}`
+            }
+            to={`/app/cases/${caseId}/podcast`}
+            cta={
+              podcastCount === 0 ? 'Erste Folge erzeugen'
+                : podcastOffen > 0 ? 'Sprechen lassen'
+                  : 'Folgen anhören'
+            }
+            icon={<QuickIcon><path d="M12 3v11" /><path d="M8.5 6.5a5 5 0 0 0 0 7" /><path d="M15.5 6.5a5 5 0 0 1 0 7" /><path d="M7 19h10" /></QuickIcon>}
           />
         </div>
 

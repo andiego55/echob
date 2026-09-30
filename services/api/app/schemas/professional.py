@@ -26,6 +26,7 @@ ShareElementType = Literal[
     # Ein Partnerschafts-Wunsch an einem Elternfall waere kein Zusatzwissen, sondern eine
     # Verwechslung, die sich wie eine Aussage ueber einen Menschen liest.
     "traumbeziehung",
+    "podcasts",
     # Die uebrigen drei Kompass-Inhalte. Drei Woerter und kein Sammelwort "kompass":
     # Der Krisenplan ist das, was viele zuerst teilen wollen, der Verlauf das, was
     # manche nie teilen wollen. Bei einem Sammelwort muesste man alles geben - und

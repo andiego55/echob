@@ -50,6 +50,11 @@ export const CATEGORY_ELEMENTS: ShareElementType[] = [
   'case_info', 'onboarding', 'all_scenes', 'scales', 'gefuehlsbild',
   'reports', 'topic_summaries', 'person_profile', 'self_profile', 'hypotheses', 'test_results',
   'documents', 'artifacts',
+  // Die Podcast-Folgen gehören zum Fall und nicht in die Kompass-Gruppe: Sie
+  // entstehen AN diesem Fall, aus seinem Material. „Gesamter Fall“ greift hier
+  // also mit — anders als bei der Traumbeziehung, die im eigenen Raum ohne einen
+  // Fall vor Augen geschrieben wird.
+  'podcasts',
   // Aus dem Kompass. „satz“ fehlt hier mit Absicht — Sätze wählt man einzeln aus,
   // siehe die eigene Liste weiter unten.
   ...KOMPASS_ELEMENTE,

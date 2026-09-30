@@ -37,6 +37,7 @@ import Absprachen from '@/components/app/Absprachen'
 import {
   KrisenplanKarte, SaetzeKarte, VorhabenKarte, VerlaufKarte, TraumbeziehungKarte,
 } from '@/components/professional/KompassPanel'
+import PodcastKarte from '@/components/professional/PodcastKarte'
 
 const TOPIC_LABELS: Record<string, string> = {
   topic_self: 'Über mich', topic_person: 'Über die Fallperson',
@@ -740,6 +741,7 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
         )}
 
         {/* Vor den Sätzen: Was jemand WILL, ordnet das, was er über sich sagt. */}
+        {has('podcasts') && <PodcastKarte folgen={bundle.podcasts} />}
         {has('traumbeziehung') && <TraumbeziehungKarte ideal={bundle.traumbeziehung} />}
         {has('satz') && <SaetzeKarte saetze={bundle.saetze} />}
         {has('vorhaben') && <VorhabenKarte vorhaben={bundle.vorhaben} />}
