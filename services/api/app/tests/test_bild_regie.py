@@ -1121,3 +1121,22 @@ def test_ein_besitz_ist_kein_abgebildeter_mensch():
     # **Was ein Kind im Bild wirklich verhindert, haengt anderswo** - und das bleibt.
     assert bild_regie.personen_zu_nah("two children right beside the chair")
     assert bild_regie._verbotene("a child's face at the window")
+
+
+def test_das_begleitungs_feld_nennt_seine_ausnahme():
+    """**Aus dem Probelauf: das Feld kam leer zurueck, obwohl der Fall voller Kinder war.**
+
+    Regel 1 sagt "jeder Mensch ist fern und undeutlich", und ein Modell liest das als Verbot
+    fuer alles, was nah steht - also auch fuer die Begleitung, deren ganzer Sinn das Nahe ist.
+    Die Ausnahme muss im Feld selbst stehen, nicht nur im Schema-Satz darueber; sonst waehlt
+    jemand "aus deinem Fall" und bekommt dauerhaft niemanden.
+    """
+    # **Leerzeichen zusammengefasst.** Der Satz steht im Schema ueber einen Zeilenumbruch
+    # verteilt; ein Test, der an meiner Umbruchstelle haengt, wird beim naechsten Umformatieren
+    # rot und sagt nichts ueber die Sache.
+    schema = " ".join(bild_regie.SYSTEM_SCHEMA.split())
+    assert "THIS FIELD IS THE ONE EXCEPTION" in schema
+    assert "do not leave the field empty out of caution" in schema
+    # Und die Pruefung bleibt, wie sie ist: nah ja, Gesicht nein.
+    assert bild_regie.pruefen(_regie(begleitung="a child holding on to the coat")) is not None
+    assert bild_regie.pruefen(_regie(begleitung="a child with a bright face")) is None

@@ -385,8 +385,14 @@ Answer as JSON, with exactly these keys:
               walking, sheltering something, turning away from what presses, or waiting?
               Use exactly one of those five words and nothing else.",
   "begleitung": "who or what stands close beside that figure, in English, a short phrase —
-                 or an empty string if nobody does. A child, two children, an animal, a
-                 bag. Never the person this case is about: they are never close.",
+                 or an empty string if nobody does. A child, two children, an animal, a bag.
+                 THIS FIELD IS THE ONE EXCEPTION to the rule that people are far away: a
+                 companion belongs to that figure and stands right next to it, and the app
+                 adds the rest of the wording itself (seen from behind, no face). So do not
+                 write that they are distant or indistinct here, and do not leave the field
+                 empty out of caution — if the material shows somebody who belongs to this
+                 person's daily life, name them. Never the person this case is about: that
+                 one is never close.",
   "titel": "a German title of two to five words for this image, no quotation marks"
 }
 
