@@ -977,3 +977,109 @@ def test_die_bitte_verbietet_das_motiv_nicht():
         modell, fall=material["fall"], material=material, fruehere=["a locked door"]))
     assert "it may come back" in modell.user
     assert "not out of habit" in modell.user
+
+
+# == Die Begleitung aus dem Fall ===============================================
+
+def test_eine_begleitung_mit_gesicht_verwirft_die_regie():
+    """**Fuer die Begleitung gilt die Entfernungsregel NICHT** - sie steht nah bei der
+    eigenen Gestalt, das ist ihr Sinn. Das Gesicht gilt trotzdem: Genau EINES ist im Bild,
+    und das ist das der Person selbst."""
+    assert bild_regie.pruefen(
+        _regie(begleitung="a child looking up with a bright face")) is None
+    assert bild_regie.pruefen(
+        _regie(begleitung="a smiling child holding a toy")) is None
+
+    # Nah und ohne Gesicht geht.
+    regie = bild_regie.pruefen(_regie(begleitung="two small children close by the coat"))
+    assert regie is not None
+    assert regie["begleitung"] == "two small children close by the coat"
+
+
+def test_eine_nahe_begleitung_scheitert_nicht_an_der_entfernungsregel():
+    """Sonst waere die ganze Wahl „wer ist bei dir" unmoeglich: Jede Begleitung steht nah,
+    und `personen_zu_nah` wuerde jede verwerfen.
+
+    **Die Wendung hier hat bewusst KEIN Entfernungswort.** Die erste Fassung pruefte mit „one
+    small child right beside the figure" - und „small" steht in `FERNE_WORTE`, also waere sie
+    auch unter der Entfernungsregel durchgekommen. Ein Test, der ohne die Ausnahme gruen
+    bleibt, prueft die Ausnahme nicht.
+    """
+    nah = "a child holding on to the coat"
+    assert bild_regie.personen_zu_nah(nah), "die Probe traegt nicht"
+
+    regie = bild_regie.pruefen(_regie(begleitung=nah))
+    assert regie is not None
+    assert regie["begleitung"] == nah
+    # Aber im uebrigen Auftrag gilt sie weiter.
+    assert bild_regie.pruefen(
+        _regie(ort="a kitchen with a woman at the table")) is None
+
+
+def test_eine_haltung_ausserhalb_der_liste_wird_keine():
+    """Die Regie waehlt einen Schluessel aus, sie formuliert nicht."""
+    assert bild_regie.pruefen(_regie(haltung="schuetzend"))["haltung"] == "schuetzend"
+    assert bild_regie.pruefen(_regie(haltung="SCHUETZEND"))["haltung"] == "schuetzend"
+    for falsch in ("tanzend auf dem Tisch", "standing and weeping", "", None, 7):
+        assert bild_regie.pruefen(_regie(haltung=falsch))["haltung"] == "", repr(falsch)
+
+
+def test_bei_einem_fall_ueber_ein_kind_kommt_kein_kind_ins_bild():
+    """**Die schaerfste Regel des Moduls, und sie steht jetzt in der Anweisung.**
+
+    Handelt der Fall VON einem Kind, waere die Kindfigur die Person, die nicht abgebildet
+    werden darf. Die Regie kann das nicht wissen - sie liest die Beziehungsart nicht.
+    """
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material, kinder_erlaubt=False))
+
+    assert "No children" in modell.user
+    assert "no child may appear anywhere" in modell.user
+
+    frei = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        frei, fall=material["fall"], material=material, kinder_erlaubt=True))
+    assert "No children" not in frei.user
+
+
+def test_der_begleitungs_wunsch_geht_nie_an_das_bildmodell():
+    """Er ist deutsch und es sind die Worte der Person. Die Regie LIEST ihn und macht eine
+    englische Wendung daraus - dieselbe Zwischenstufe wie beim Wunsch."""
+    from app.services.bild_katalog import prompt_bauen
+
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material,
+        begleitung_wunsch="Meine zwei Kinder und der Hund"))
+    assert "Meine zwei Kinder und der Hund" in modell.user
+
+    regie = bild_regie.pruefen(_regie(begleitung="two small children and a dog"))
+    prompt = prompt_bauen(
+        _werte(), {**EINST, "figur": "ich", "begleitung": "freitext",
+                   "begleitung_text": "Meine zwei Kinder und der Hund"}, regie)
+    assert "Meine zwei Kinder" not in prompt
+    assert "two small children and a dog" in prompt
+
+
+def test_die_gewichte_gehen_als_woerter_mit():
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material,
+        gewichte=["the concrete moments: THIS is what the image is mainly about."]))
+    assert "How much each part should weigh" in modell.user
+    assert "mainly about" in modell.user
+
+
+def test_die_gewaehlten_szenen_stehen_im_auftrag():
+    """Eine Auswahl, die danach untergeht, ist keine."""
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material,
+        szenen_wunsch=["Der Abend mit dem Schluessel", "Das Telefon auf dem Tisch"]))
+    assert "Der Abend mit dem Schluessel" in modell.user
+    assert "the subject comes from here" in modell.user

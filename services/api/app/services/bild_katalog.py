@@ -485,6 +485,178 @@ SYMBOLIK_SCHLUESSEL = {s["key"] for s in SYMBOLIK_STUFEN}
 STANDARD_SYMBOLIK = "zurueckhaltend"
 
 
+# ── Was im Bild wie schwer wiegt ─────────────────────────────────────────────
+#
+# **Hier standen Ankreuzfelder: an oder aus.** Das war zu grob für die Frage, die jemand an
+# sein Bild hat. „Meine Szenen sollen vorkommen, aber worum es wirklich geht, sind die
+# Muster" ist mit zwei Häkchen nicht sagbar.
+#
+# Die Stufen steuern ZWEI Dinge auf einmal, und das ist der Grund, warum sie eine Stufe sind
+# und keine Zahl: Sie entscheiden, **was überhaupt geladen wird** (``aus`` heißt: nicht
+# abfragen, nicht in den Prompt, nicht ins Modell), und sie gehen als **Wort** mit. „Szenen:
+# 0.8" ist für ein Modell bedeutungslos; „darum geht es hier vor allem" ist eine Anweisung.
+# Dieselbe Bauart wie die Gewichte des Podcast-Studios, und aus demselben Grund.
+
+GEWICHTE_STUFEN: tuple[dict[str, str], ...] = (
+    {"key": "aus", "label": "Aus",
+     "hinweis": "Kommt nicht vor und wird nicht geladen.",
+     "prompt": ""},
+    {"key": "wenig", "label": "Am Rand",
+     "hinweis": "Klingt mit, trägt aber nicht.",
+     "prompt": "present only at the edge of the image"},
+    {"key": "normal", "label": "Normal",
+     "hinweis": "Einer von mehreren Trägern.",
+     "prompt": "one of the things this image is built from"},
+    {"key": "viel", "label": "Darum geht es",
+     "hinweis": "Bestimmt, was man zuerst sieht.",
+     "prompt": "THIS is what the image is mainly about — it decides the subject and what the "
+               "viewer sees first"},
+)
+GEWICHTE_SCHLUESSEL = {g["key"] for g in GEWICHTE_STUFEN}
+STANDARD_GEWICHT = "normal"
+
+#: Die Elemente, die ein Gewicht bekommen — und die Schicht, die daran hängt.
+#:
+#: **Eins zu eins auf die alten Schichten.** Ein Gewicht über ``aus`` schaltet dieselbe Schicht
+#: ein, die vorher ein Häkchen einschaltete; der gerechnete Weg und der Katalog arbeiten
+#: unverändert weiter. Zwei Regler über dieselbe Sache wären einer zu viel — das ist heute
+#: schon zweimal passiert (eine Bildwelt ohne Wirkung, eine Symbolik-Stufe auf nur einem Weg).
+ELEMENTE: tuple[dict[str, str], ...] = (
+    {"key": "szenen", "label": "Deine Momente",
+     "hinweis": "Was du festgehalten hast — die Orte, Dinge und Uhrzeiten daraus.",
+     "prompt": "the concrete moments this person wrote down"},
+    {"key": "gefuehl", "label": "Dein Gefühlsbild",
+     "hinweis": "Wie es dir zuletzt ging. Wird Licht, Wetter und Luft.",
+     "prompt": "how this person feels right now — it becomes light, weather and air"},
+    {"key": "muster", "label": "Die Muster",
+     "hinweis": "Was sich wiederholt. Wird die Form des Ortes.",
+     "prompt": "what repeats in this relationship — it becomes the shape of the place"},
+    {"key": "erkenntnisse", "label": "Deine Erkenntnisse",
+     "hinweis": "Was du selbst verstanden hast. Das Einzige, was leuchtet.",
+     "prompt": "what this person has understood by themselves — the only thing that glows"},
+    {"key": "wuensche", "label": "Was du dir wünschst",
+     "hinweis": "Aus deiner Traumbeziehung. Wird sichtbare Abwesenheit.",
+     "prompt": "what this person wishes for and does not have — visible as absence"},
+    {"key": "druck", "label": "Die andere Person",
+     "hinweis": "Nie als Gestalt — als Kraft, Masse oder Richtung.",
+     "prompt": "the other person as a force on the whole scene, never as a figure"},
+)
+
+#: Welche Schicht zu welchem Element gehört.
+#:
+#: Die Namen sind andere, weil die alten technisch waren: „grundton" sagt einem Menschen
+#: nichts, „Dein Gefühlsbild" schon. Die Schichten darunter bleiben, wie sie sind.
+ELEMENT_ZU_SCHICHT: dict[str, str] = {
+    "szenen": "szenen",
+    "gefuehl": "grundton",
+    "muster": "durchgaenge",
+    "erkenntnisse": "lichter",
+    "wuensche": "leerstellen",
+    "druck": "druck",
+}
+
+
+def schichten_aus_gewichten(gewichte: dict[str, str]) -> set[str]:
+    """Die Schichten, die bei diesen Gewichten geladen werden.
+
+    **Was auf ``aus`` steht, wird nicht geladen** — und was nicht geladen ist, kann auch nicht
+    versehentlich in einen Prompt geraten. Das ist dieselbe Überlegung, aus der die Gewichte
+    des Podcasts das Laden steuern und nicht bloß die Formulierung.
+    """
+    return {
+        schicht for element, schicht in ELEMENT_ZU_SCHICHT.items()
+        if str(gewichte.get(element) or STANDARD_GEWICHT) != "aus"
+    }
+
+
+def gewicht_marke(element: str, gewichte: dict[str, str]) -> str:
+    """Das Gewicht eines Elements als Satz für das Modell — oder leer."""
+    stufe = str(gewichte.get(element) or STANDARD_GEWICHT)
+    eintrag = next((g for g in GEWICHTE_STUFEN if g["key"] == stufe), None)
+    if not eintrag or not eintrag["prompt"]:
+        return ""
+    name = next((e["prompt"] for e in ELEMENTE if e["key"] == element), element)
+    return f"{name}: {eintrag['prompt']}."
+
+
+# ── Wie abstrakt ─────────────────────────────────────────────────────────────
+#
+# **Der Regler, der am meisten entscheidet.** Er sagt, ob jemand seinen Küchenstuhl sieht oder
+# ein Feld aus Licht. Beides ist richtig — für verschiedene Menschen und für verschiedene Tage.
+#
+# Er wirkt auf BEIDEN Wegen. Ein Regler, der nur auf einem von zwei Wegen etwas tut, ist
+# schlimmer als keiner; das ist hier heute schon zweimal vorgekommen.
+
+ABSTRAKTION_STUFEN: tuple[dict[str, str], ...] = (
+    {"key": "konkret", "label": "Konkret",
+     "hinweis": "Dinge, die du wiedererkennst. Ein Stuhl ist ein Stuhl.",
+     "prompt": "Render everything as a recognisable place with recognisable things in it. "
+               "Objects keep their edges and their weight; a chair is a chair. Nothing "
+               "dissolves into pattern.",
+     "prompt_baukasten": "Everything is clearly rendered and recognisable, with firm edges."},
+    {"key": "normal", "label": "Normal",
+     "hinweis": "Erkennbare Dinge in einem Bild, das atmet.",
+     "prompt": "Recognisable things, but painted rather than illustrated: edges soften where "
+               "the light is weak, and some areas give way to atmosphere.",
+     "prompt_baukasten": "Recognisable forms, softened where the light is weak."},
+    {"key": "abstrakt", "label": "Abstrakt",
+     "hinweis": "Form, Farbe und Licht. Dinge nur noch angedeutet.",
+     "prompt": "Push this far toward abstraction: the named things must still be the source "
+               "of the composition, but they appear as mass, direction, light and colour "
+               "rather than as objects. At most one or two things stay legible; everything "
+               "else becomes field, texture and tone. No illustration.",
+     "prompt_baukasten": "Pushed far toward abstraction: mass, direction, light and colour "
+                         "rather than objects. At most one or two forms stay legible."},
+)
+ABSTRAKTION_SCHLUESSEL = {a["key"] for a in ABSTRAKTION_STUFEN}
+STANDARD_ABSTRAKTION = "normal"
+
+
+# ── Stimmungen ───────────────────────────────────────────────────────────────
+#
+# **Das Gegenstück zum Gefühlsbild, und zwar absichtlich.** Das Gefühlsbild ist eine Angabe
+# über den Zustand; eine Stimmung ist ein Wunsch an das Bild. „Mir geht es gerade dreckig" und
+# „ich möchte heute ein weites Bild sehen" sind zwei verschiedene Sätze, und beide dürfen
+# gleichzeitig wahr sein.
+#
+# Mehrfach wählbar, aber nicht beliebig: Über drei Stimmungen heben sich auf.
+
+STIMMUNGEN: tuple[dict[str, str], ...] = (
+    {"key": "still", "label": "Still",
+     "prompt": "very quiet, almost nothing moving"},
+    {"key": "weit", "label": "Weit",
+     "prompt": "wide and open, with distance in every direction"},
+    {"key": "eng", "label": "Eng",
+     "prompt": "close and narrow, the edges pressing in"},
+    {"key": "kalt", "label": "Kalt",
+     "prompt": "cold, with hard thin light"},
+    {"key": "warm", "label": "Warm",
+     "prompt": "warm, with low golden light"},
+    {"key": "aufgewuehlt", "label": "Aufgewühlt",
+     "prompt": "turbulent, with weather and movement running through everything"},
+    {"key": "zart", "label": "Zart",
+     "prompt": "delicate and easily hurt, thin and translucent"},
+    {"key": "hart", "label": "Hart",
+     "prompt": "hard and unforgiving, with sharp surfaces"},
+    {"key": "nachts", "label": "Nachts",
+     "prompt": "deep night, lit only by what is inside the scene"},
+    {"key": "morgen", "label": "Früh am Morgen",
+     "prompt": "very early morning, before the day has started"},
+    {"key": "nach_dem_regen", "label": "Nach dem Regen",
+     "prompt": "just after rain, everything wet and holding light"},
+    {"key": "aufbruch", "label": "Aufbruch",
+     "prompt": "on the edge of leaving: something is about to move"},
+    {"key": "halten", "label": "Haltend",
+     "prompt": "something is being held and protected, carefully"},
+    {"key": "schwer", "label": "Schwer",
+     "prompt": "heavy, with weight pressing down from above"},
+    {"key": "schwebend", "label": "Schwebend",
+     "prompt": "weightless, as if nothing were quite touching the ground"},
+)
+STIMMUNG_SCHLUESSEL = {st["key"] for st in STIMMUNGEN}
+MAX_STIMMUNGEN = 3
+
+
 # ── Die Figur ────────────────────────────────────────────────────────────────
 #
 # **Genau EIN Gesicht, und es gehoert der Person selbst.**
@@ -541,7 +713,23 @@ STANDARD_FIGUR = "keine"
 #: **Eine Haltung ist eine Aussage — und sie kommt von der Person, nicht von uns.** Wer
 #: „schützend" wählt, sagt etwas über seine Lage; würden WIR die Haltung aus den Daten
 #: ableiten, wäre es eine Deutung in Bildform. Deshalb ist es eine Wahl und keine Rechnung.
+#: Der Schlüssel, bei dem die Regie die Haltung wählt.
+HALTUNG_AUS_FALL = "fall"
+
 HALTUNGEN: tuple[dict[str, str], ...] = (
+    # **Zuerst die Wahl, die nichts behauptet.**
+    #
+    # Hier stand: „Eine Haltung ist eine Aussage — und sie kommt von der Person. Würden WIR
+    # sie aus den Daten ableiten, wäre es eine Deutung in Bildform." Das bleibt richtig, und
+    # deshalb ist das Ableiten eine EIGENE Wahl und nicht die stille Vorgabe: Wer sie trifft,
+    # hat selbst entschieden, dass der Fall das beantworten darf.
+    #
+    # Gewählt wird dann aus genau dieser Liste, nicht frei formuliert — die Regie sucht einen
+    # Schlüssel aus, der hier steht. Dasselbe Verfahren wie bei den Musterbildern: Das Modell
+    # wählt aus, was wir geschrieben haben.
+    {"key": HALTUNG_AUS_FALL, "label": "Aus deinem Fall",
+     "hinweis": "Das Bild entscheidet, was du darin tust.",
+     "prompt": "", "prompt_sichtbar": ""},
     {"key": "stehend", "label": "Stehen",
      "hinweis": "Ruhig, in die Ferne sehend.",
      "prompt": "standing still, looking out into the distance",
@@ -586,43 +774,115 @@ STANDARD_HALTUNG = "stehend"
 #: **Ein Kind erscheint nur, wenn beides stimmt:** Die Selbstauskunft nennt Kinder, UND der
 #: Fall handelt nicht VON einem Kind. Geht es im Fall um das eigene Kind, wäre die Kindfigur
 #: die Fallperson — und die wird nie eine Gestalt.
+#: Wer sonst nah bei der eigenen Gestalt steht.
+#:
+#: **Hier standen „ein Kind" und „zwei Kinder".** Das war eine Liste, die nur raten konnte:
+#: Wer sonst im Leben eines Menschen vorkommt, steht in seinem Fall und nicht in meinem
+#: Katalog. Jetzt gibt es drei Antworten — niemand, der Fall entscheidet, oder die Person
+#: sagt es selbst.
+#:
+#: **Der Freitext geht nie direkt an das Bildmodell**, sondern wird von der Bildregie gelesen,
+#: die daraus eine englische Wendung macht. Dieselbe Zwischenstufe wie beim Wunsch, und sie
+#: ist der Grund, warum es diesen Freitext überhaupt geben kann.
+#:
+#: **Ein Gesicht hat auch eine Begleitung nicht.** Nah stehen darf sie; genau EIN Gesicht ist
+#: im Bild, und das ist das der Person selbst. Damit kann eine Begleitung nicht als die
+#: Person gelesen werden, um die es im Fall geht.
 BEGLEITUNGEN: tuple[dict[str, str], ...] = (
-    {"key": "keine", "label": "Niemand sonst", "hinweis": "Nur du.",
-     "prompt": ""},
-    {"key": "kind", "label": "Ein Kind", "hinweis": "Klein, nah bei dir, ohne Gesicht.",
-     "prompt": "Close beside the figure there is one small child, also seen from behind "
-               "and with no face visible, small in the frame."},
-    {"key": "kinder", "label": "Zwei Kinder", "hinweis": "Nah bei dir, ohne Gesicht.",
-     "prompt": "Close beside the figure there are two small children, also seen from "
-               "behind and with no faces visible, small in the frame."},
+    {"key": "keine", "label": "Niemand sonst", "hinweis": "Nur du."},
+    {"key": "fall", "label": "Aus deinem Fall",
+     "hinweis": "Das Bild entscheidet, wer zu dir gehört."},
+    {"key": "freitext", "label": "Ich sage es",
+     "hinweis": "Schreib, wer bei dir sein soll."},
 )
 
+#: Wie eine Begleitung in den Prompt kommt — **der Rahmen gehört uns, der Inhalt dem Fall.**
+#:
+#: Ohne den Rahmen stünde dort eine Wendung ohne Regel, und ein Bildmodell macht daraus eine
+#: zweite Hauptfigur mit Gesicht.
+BEGLEITUNG_RAHMEN = (
+    "Close beside the figure, belonging to it: {was}. Seen from behind or from the side, "
+    "with no face visible and no facial features implied, smaller in the frame than the "
+    "figure itself."
+)
+
+#: Höchstens so lang darf der Freitext zur Begleitung werden.
+MAX_BEGLEITUNG_TEXT = 200
+
 BEGLEITUNG_SCHLUESSEL = {b["key"] for b in BEGLEITUNGEN}
+
+#: Die Haltungen, die eine Gestalt wirklich einnehmen kann (ohne „aus deinem Fall").
+HALTUNGEN_ECHT = tuple(h for h in HALTUNGEN if h["key"] != HALTUNG_AUS_FALL)
+HALTUNG_SCHLUESSEL_ECHT = {h["key"] for h in HALTUNGEN_ECHT}
+
+
+def gestalt_wahl(
+    einstellungen: dict[str, Any], regie: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Haltung und Begleitung, aufgelöst — **eine Quelle für Prompt UND Legende.**
+
+    Beide können jetzt aus dem Fall kommen, und beide stehen danach an zwei Stellen: im
+    Prompt und in der Erklärung daneben. Zwei Auflösungen würden irgendwann auseinanderlaufen,
+    und dann erklärt die Legende eine Haltung, die im Bild nicht steht — derselbe Fehler, den
+    `starke_muster` für die Muster verhindert.
+
+    Ohne Regie (Weg „Baukasten") lässt sich „aus deinem Fall" nicht beantworten. Dann steht
+    die Gestalt, und die Legende sagt genau das — statt still etwas anderes zu zeigen.
+    """
+    schluessel = str(einstellungen.get("haltung") or STANDARD_HALTUNG)
+    aus_fall = schluessel == HALTUNG_AUS_FALL
+    # **Geprüft wird die GÜLTIGKEIT, nicht die Anwesenheit.** Die erste Fassung fragte, ob
+    # die Regie überhaupt etwas gesagt hat — und hätte „tanzend auf dem Tisch" als erfüllt
+    # gezählt, obwohl die Gestalt dann steht. `pruefen` streicht einen unbekannten Schlüssel
+    # schon vorher; dass es hier trotzdem nachgesehen wird, ist der Grund, warum die Legende
+    # nicht lügen kann, wenn jemand diesen Weg einmal umgeht.
+    taugt = str((regie or {}).get("haltung") or "") in HALTUNG_SCHLUESSEL_ECHT
+    if aus_fall:
+        schluessel = (
+            str(regie["haltung"]) if taugt else STANDARD_HALTUNG  # type: ignore[index]
+        )
+    haltung = next(
+        (h for h in HALTUNGEN_ECHT if h["key"] == schluessel), HALTUNGEN_ECHT[0])
+
+    art = str(einstellungen.get("begleitung") or "keine")
+    # Beide Wege gehen über die Regie: Der Freitext ist deutsch und wird von ihr übersetzt,
+    # die Ableitung kommt von ihr sowieso. Ohne Regie gibt es keine Begleitung.
+    was = str((regie or {}).get("begleitung") or "") if art in ("fall", "freitext") else ""
+
+    return {
+        "haltung": haltung,
+        "haltung_aus_fall": aus_fall,
+        "haltung_erfuellt": not aus_fall or taugt,
+        "begleitung_art": art,
+        "begleitung_was": was,
+    }
 STANDARD_BEGLEITUNG = "keine"
 
 #: Bei diesen Angaben der Selbstauskunft gibt es Kinder im Leben der Person.
 KINDER_ANGABEN = {"not_with_person", "shared", "indirectly_affected"}
 
 
-def begleitung_moeglich(selbst: dict[str, Any] | None, beziehungsart: str | None) -> bool:
-    """Darf ein Kind im Bild vorkommen?
+def kinder_erlaubt(beziehungsart: str | None) -> bool:
+    """Ob in diesem Fall überhaupt ein Kind im Bild vorkommen darf.
 
-    **Zwei Bedingungen, und die zweite ist die wichtige.** Handelt der Fall VON einem Kind,
-    wäre die Kindfigur die Fallperson — und die wird nie eine Gestalt. Eine Abbildung eines
-    echten Kindes aus den Angaben eines Elternteils ist das Letzte, was hier entstehen darf.
+    **Die schärfste Regel des Moduls.** Handelt der Fall VON einem Kind, wäre die Kindfigur
+    die Person, um die es geht — eine Abbildung eines echten Kindes aus den Angaben eines
+    Elternteils. Das ist das Letzte, was hier entstehen darf.
+
+    Bei ``co_parenting`` ist es dagegen der andere ELTERNTEIL, um den es geht: Dort gehören die
+    Kinder ins Bild, weil sie der Grund für fast alles sind, was in so einem Fall steht.
+
+    **Hier stand `begleitung_moeglich(selbst, beziehungsart)`** und fragte zusätzlich die
+    Selbstauskunft: Nur wer dort Kinder angegeben hatte, durfte die Wahl „ein Kind" überhaupt
+    sehen. Diese Wahl gibt es nicht mehr — wer dazugehört, sagt der Fall oder die Person
+    selbst. Was bleibt, ist die eine Regel, und sie hängt an der Beziehungsart allein.
     """
-    # Nur „child": Dort IST das Kind die Fallperson.
-    #
-    # Bei „co_parenting" ist es der andere Elternteil — und gerade dort gehoeren die Kinder
-    # ins Bild, weil sie der Grund fuer fast alles sind, was in so einem Fall steht. Sie
-    # auszuschliessen hiesse, ausgerechnet dem Fall das Wesentliche zu nehmen.
-    if beziehungsart == "child":
-        return False
-    return str((selbst or {}).get("children") or "") in KINDER_ANGABEN
+    return str(beziehungsart or "") != "child"
 
 
 def figur_beschreibung(
     selbst: dict[str, Any] | None, einstellungen: dict[str, Any] | None = None,
+    regie: dict[str, Any] | None = None,
 ) -> str:
     """Die eigene Gestalt, aus der Selbstauskunft — in einer von zwei Formen.
 
@@ -671,12 +931,8 @@ def figur_beschreibung(
         else:
             teile.append("young")
 
-    haltung = next(
-        (h for h in HALTUNGEN if h["key"] == (einstellungen or {}).get("haltung")),
-        HALTUNGEN[0])
-    begleitung = next(
-        (b for b in BEGLEITUNGEN if b["key"] == (einstellungen or {}).get("begleitung")),
-        BEGLEITUNGEN[0])
+    wahl = gestalt_wahl(einstellungen or {}, regie)
+    haltung = wahl["haltung"]
 
     sichtbar = str((einstellungen or {}).get("figur") or "") == "ich_sichtbar"
     if sichtbar:
@@ -697,8 +953,8 @@ def figur_beschreibung(
             "behind, small in the frame, and no facial features are visible or implied."
         )
 
-    if begleitung["prompt"]:
-        satz += " " + begleitung["prompt"]
+    if wahl["begleitung_was"]:
+        satz += " " + BEGLEITUNG_RAHMEN.format(was=wahl["begleitung_was"].rstrip("."))
     return satz
 
 
@@ -1107,7 +1363,8 @@ def prompt_bauen(
                 teile.append("Somewhere in the scene: " + "; ".join(zeichen) + ".")
 
     if zeigt_mich(einstellungen):
-        teile.append(figur_beschreibung(einstellungen.get("selbst"), einstellungen))
+        teile.append(figur_beschreibung(
+            einstellungen.get("selbst"), einstellungen, regie))
     else:
         # **„Niemand" muss gesagt werden, seit andere Menschen vorkommen dürfen.**
         #
@@ -1118,6 +1375,31 @@ def prompt_bauen(
         teile.append(
             "There are no people anywhere in this image, and nothing that implies one: no "
             "figure, no silhouette, no shadow of a person, no reflection of one.")
+
+    # ── Stimmungen ──────────────────────────────────────────────────────────
+    #
+    # **Das Gegenstück zum Gefühlsbild.** Das eine ist eine Angabe über den Zustand, das
+    # andere ein Wunsch an das Bild — „mir geht es dreckig" und „ich möchte heute ein weites
+    # Bild sehen" dürfen gleichzeitig wahr sein. Deshalb steht es NACH dem Licht aus dem
+    # Gefühlsbild: Was die Person für dieses Bild will, hat das letzte Wort.
+    gewaehlt = [
+        st["prompt"] for st in STIMMUNGEN
+        if st["key"] in set(einstellungen.get("stimmungen") or [])
+    ][:MAX_STIMMUNGEN]
+    if gewaehlt:
+        teile.append("The whole image is " + ", and ".join(gewaehlt) + ".")
+
+    # ── Wie abstrakt ────────────────────────────────────────────────────────
+    #
+    # Vor der Komposition und nach allem Inhalt: Es ist eine Anweisung über die ganze Fläche,
+    # und sie gilt auf beiden Wegen — ein Regler, der nur bei der Regie etwas tut, wäre der
+    # dritte Schalter dieser Woche ohne Wirkung auf einem von zwei Wegen.
+    stufe_abs = next(
+        (a for a in ABSTRAKTION_STUFEN
+         if a["key"] == str(einstellungen.get("abstraktion") or STANDARD_ABSTRAKTION)),
+        None)
+    if stufe_abs:
+        teile.append(stufe_abs["prompt"] if regie else stufe_abs["prompt_baukasten"])
 
     # ── Komposition ─────────────────────────────────────────────────────────
     #
@@ -1178,6 +1460,25 @@ def _regie_legende(
                           + " — was es dir bedeutet, entscheidest du",
             })
 
+    gewaehlt = [st["label"] for st in STIMMUNGEN
+                if st["key"] in set(einstellungen.get("stimmungen") or [])]
+    if gewaehlt:
+        zeilen.append({
+            "was": "Die Stimmung, die du gewählt hast",
+            "wofuer": ", ".join(gewaehlt[:MAX_STIMMUNGEN])
+                      + " — das hast du für dieses Bild gewollt, unabhängig davon, wie es "
+                        "dir gerade geht",
+        })
+
+    stufe_abs = next(
+        (a for a in ABSTRAKTION_STUFEN
+         if a["key"] == str(einstellungen.get("abstraktion") or STANDARD_ABSTRAKTION)), None)
+    if stufe_abs and stufe_abs["key"] != STANDARD_ABSTRAKTION:
+        zeilen.append({
+            "was": f"Gemalt: {stufe_abs['label']}",
+            "wofuer": stufe_abs["hinweis"].rstrip("."),
+        })
+
     zeilen.append({
         "was": "Warum dieses Bild so aussieht",
         "wofuer": "Es ist nicht aus einer Vorlage entstanden, sondern aus deinem Fall: Ort, "
@@ -1185,39 +1486,57 @@ def _regie_legende(
                   "zweites Bild zu denselben Angaben sieht deshalb wieder anders aus",
     })
     if zeigt_mich(einstellungen):
-        zeilen.append(_gestalt_zeile(einstellungen))
+        zeilen.append(_gestalt_zeile(einstellungen, regie))
     return zeilen
 
 
-def _gestalt_zeile(einstellungen: dict[str, Any]) -> dict[str, str]:
-    """Wer im Bild ist und wer ausdrücklich nicht — auf beiden Wegen dieselbe Zeile."""
-    begleitung = str(einstellungen.get("begleitung") or "keine")
-    wer = {"kind": " und ein Kind neben dir", "kinder": " und zwei Kinder neben dir"}
-    haltung = next(
-        (h["label"].lower() for h in HALTUNGEN
-         if h["key"] == einstellungen.get("haltung")), "stehen")
+def _gestalt_zeile(
+    einstellungen: dict[str, Any], regie: dict[str, Any] | None = None,
+) -> dict[str, str]:
+    """Wer im Bild ist, wie er dasteht, und wer ausdrücklich nicht.
+
+    Aufgelöst über `gestalt_wahl`, damit hier nie etwas anderes steht als im Prompt.
+    """
+    wahl = gestalt_wahl(einstellungen, regie)
     sichtbar = str(einstellungen.get("figur") or "") == "ich_sichtbar"
-    kinder = " und die Kinder" if begleitung in ("kind", "kinder") else ""
+    haltung = wahl["haltung"]["label"].lower()
+
+    was = "Die Gestalt" if sichtbar else "Die Gestalt von hinten"
+    if wahl["begleitung_was"]:
+        was += " und wer bei dir ist"
+
+    teile: list[str] = [f"Du beim {haltung.capitalize()}"]
+    if wahl["haltung_aus_fall"]:
+        teile[0] += " — das hat dein Fall entschieden, nicht du"
+    elif not wahl["haltung_erfuellt"]:  # pragma: no cover — nur mit „fall" erreichbar
+        teile[0] += " — aus deinem Fall ließ sich das diesmal nicht ableiten"
+
+    if wahl["begleitung_was"]:
+        teile.append(
+            "Neben dir steht, was du angegeben hast, wenn du es gesagt hast — und sonst, "
+            "was aus deinem Fall dazugehört. Ohne Gesicht, wie alle außer dir"
+        )
+    elif wahl["begleitung_art"] in ("fall", "freitext"):
+        # **Eine Wahl, die nicht erfuellt wurde, wird gesagt.** Sonst sucht die Person eine
+        # Begleitung, die nicht im Bild ist, und haelt das Werkzeug fuer kaputt.
+        teile.append(
+            "Du wolltest jemanden neben dir — dafür ließ sich diesmal nichts finden, das "
+            "durch die Prüfung kam. Versuch es noch einmal"
+        )
 
     if sichtbar:
-        return {
-            "was": "Die Gestalt" + kinder,
-            "wofuer": (
-                f"Du beim {haltung.capitalize()}{wer.get(begleitung, '')}. "
-                "**Ihr Aussehen ist frei erfunden** — aus deiner Selbstauskunft kommen nur "
-                "Altersspanne und Geschlecht, alles Weitere hat das Bildmodell sich "
-                "ausgedacht. Es ist kein Abbild von dir. Die Person, um die es in diesem "
-                "Fall geht, kommt nie mit Gesicht vor und nie nah"
-            ),
-        }
-    return {
-        "was": "Die Gestalt von hinten" + kinder,
-        "wofuer": (
-            f"Du beim {haltung.capitalize()}{wer.get(begleitung, '')} — nach deiner "
-            "Selbstauskunft, ohne Gesicht und in Entfernung. Die Person, um die es in "
-            "diesem Fall geht, kommt nie mit Gesicht vor und nie nah"
-        ),
-    }
+        teile.append(
+            "**Dein Aussehen ist frei erfunden** — aus deiner Selbstauskunft kommen nur "
+            "Altersspanne und Geschlecht, alles Weitere hat das Bildmodell sich ausgedacht. "
+            "Es ist kein Abbild von dir"
+        )
+    else:
+        teile.append("nach deiner Selbstauskunft, ohne Gesicht und in Entfernung")
+
+    teile.append(
+        "Die Person, um die es in diesem Fall geht, kommt nie mit Gesicht vor und nie nah"
+    )
+    return {"was": was, "wofuer": ". ".join(teile)}
 
 
 def legende(
@@ -1360,7 +1679,7 @@ def legende(
                           "fehlt und erreichbar wäre. Was sie dir bedeuten, entscheidest du",
             })
     if zeigt_mich(einstellungen):
-        zeilen.append(_gestalt_zeile(einstellungen))
+        zeilen.append(_gestalt_zeile(einstellungen, regie))
 
     # **Der Rückfall wird gesagt, nicht verschwiegen.**
     #

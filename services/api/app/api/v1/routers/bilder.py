@@ -1,22 +1,28 @@
 """Router: die Bildwerkstatt — /api/v1/cases/{case_id}/bilder
 
-**Vier Routen, und keine davon rechnet ein Bild.** Gezeichnet wird im Browser; der Server
-liefert Zahlen und nimmt das fertige Bild zur Ablage. Der Grund steht im Konzept: Nur so
-können die Regler sofort wirken.
+**Ein Weg zum Bild, und er kostet.** ``POST /malen`` lässt ein Bildmodell arbeiten, auf dem
+Weg „fall" mit einem Sprachmodell davor. Alles andere hier ist Auskunft (Kataloge, Szenen zum
+Auswählen, die Galerie) oder Verwaltung (Satz, Löschen, die Bilddatei).
 
-**Kein Modellaufruf, also kein Kontingent, keine Frist, keine Sperre.** Das ist der praktische
-Gewinn des gerechneten Wegs — es gibt hier nichts abzurechnen. Nur eine Obergrenze je Fall
-gegen eine Galerie, in der man nichts mehr findet.
+**Hier gab es einen zweiten Weg, und er ist draußen.** Das „Datenbild" lieferte Zahlen
+(``GET /werte``) und nahm ein im Browser gezeichnetes SVG zur Ablage an (``POST ""``) — kein
+Modell, kein Kontingent, sofortige Wirkung am Regler. Es half niemandem weiter: Man sah, dass
+man viele Momente festgehalten hat, und sonst nichts. Bilder dieser Art, die jemand aufgehoben
+hat, bleiben in seiner Galerie; entstehen soll nur nichts Neues davon.
+
+Mit dem Weg ist auch die Prüfung von Fremd-SVG gegangen: Ein gemaltes Bild kommt als Bytes vom
+Bildmodell, nie aus dem Browser. Es gibt hier keine Textspalte mehr, in die jemand von außen
+schreiben kann.
 """
 from __future__ import annotations
 
 import logging
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from app.core.dependencies import get_current_user, get_pool
-from app.schemas.bild import BildAblegen, BildMalen, BildSatz
+from app.schemas.bild import BildMalen, BildSatz
 from app.services import bild_katalog as katalog
 from app.services import bild_modell, bild_regie
 from app.services import bildwerkstatt_service as dienst
@@ -26,10 +32,31 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/cases/{case_id}/bilder", tags=["bilder"])
 
-#: Die Schichten, die es gibt. Was nicht hier steht, wird nicht geladen.
-ERLAUBTE_SCHICHTEN = {
-    "grundton", "szenen", "durchgaenge", "lichter", "leerstellen", "druck",
-}
+#: Hoechstens so viele Szenen darf jemand von Hand auswaehlen.
+MAX_GEWAEHLTE_SZENEN = 8
+
+def _regie_gewichte(gewichte: dict[str, str]) -> dict[str, str]:
+    """Die Gewichte der Person, uebersetzt in die Gewichte des Material-Laders.
+
+    **Was auf „aus" steht, wird nicht geladen** — nicht abgefragt, nicht entschluesselt, nicht
+    an ein Modell geschickt. Eine Zeile „Gefuehlsbild: nicht beruecksichtigen" waere schlimmer
+    als nichts: Sie nennt das Material, und ein Modell benutzt jedes benennbare Material auch
+    als Sprache.
+    """
+    stufen = {"wenig": "rand", "normal": "normal", "viel": "mittelpunkt"}
+
+    def fuer(element: str) -> str:
+        return stufen.get(str(gewichte.get(element) or "normal"), "aus")
+
+    return {
+        **REGIE_GEWICHTE,
+        "szenen": fuer("szenen"),
+        "gefuehlsbild": fuer("gefuehl"),
+        "skalen": fuer("muster"),
+        "artefakte": fuer("erkenntnisse"),
+        "traumbeziehung": fuer("wuensche"),
+    }
+
 
 #: Was die Bildregie vom Fall zu lesen bekommt.
 #:
@@ -50,31 +77,6 @@ REGIE_GEWICHTE: dict[str, str] = {
 }
 
 
-@router.get("/werte", response_model=dict)
-async def werte(
-    case_id: UUID,
-    schichten: str = Query(
-        "grundton,szenen,durchgaenge,lichter,leerstellen",
-        description="Komma-getrennt. Was nicht dabei ist, wird nicht abgefragt.",
-    ),
-    current: dict = Depends(get_current_user), pool=Depends(get_pool),
-) -> dict:
-    """Die Zahlen für ein Lagebild.
-
-    **Nur normalisierte Werte gehen hinaus** — keine Szenentitel, keine Texte. Für ein Bild
-    braucht niemand den Text einer Szene, und was nicht übertragen wird, kann auch nicht im
-    Speicher eines fremden Geräts landen.
-
-    Eine unbekannte Schicht wird stillschweigend weggelassen und nicht abgewiesen: Ein neuer
-    Browser, der eine Schicht anfragt, die es hier noch nicht gibt, soll ein Bild ohne sie
-    bekommen und keine Fehlermeldung.
-    """
-    gewaehlt = {s.strip() for s in schichten.split(",") if s.strip()} & ERLAUBTE_SCHICHTEN
-    async with pool.acquire() as conn:
-        return await dienst.werte_laden(
-            conn, user_id=current["user_id"], case_id=case_id, schichten=gewaehlt)
-
-
 @router.get("", response_model=list[dict])
 async def galerie(
     case_id: UUID,
@@ -87,21 +89,6 @@ async def galerie(
     """
     async with pool.acquire() as conn:
         return await dienst.liste(conn, user_id=current["user_id"], case_id=case_id)
-
-
-@router.post("", response_model=dict, status_code=status.HTTP_201_CREATED)
-async def aufheben(
-    case_id: UUID, body: BildAblegen,
-    current: dict = Depends(get_current_user), pool=Depends(get_pool),
-) -> dict:
-    """Hebt ein Bild auf — samt seinen Einstellungen und dem Satz darunter."""
-    async with pool.acquire() as conn:
-        bild = await dienst.anlegen(
-            conn, user_id=current["user_id"], case_id=case_id,
-            einstellungen=body.einstellungen, svg=body.svg, satz=body.satz)
-    if not bild:  # pragma: no cover — anlegen wirft schon bei fehlendem Fall
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
-    return bild
 
 
 @router.post("/malen", response_model=dict, status_code=status.HTTP_201_CREATED)
@@ -165,11 +152,36 @@ async def malen(
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannte Bildquelle.")
 
-    gewaehlt = {s.strip() for s in body.schichten} & ERLAUBTE_SCHICHTEN
+    if body.abstraktion not in katalog.ABSTRAKTION_SCHLUESSEL:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unbekannter Abstraktionsgrad.")
+
+    # **Gewichte statt Haekchen.** Was nicht in `ELEMENTE` steht, wird verworfen; was dort
+    # steht und fehlt, bekommt die Vorgabe. Eine unbekannte Stufe ist ein Fehler und nicht
+    # still "normal": Sonst waehlt jemand "aus" und bekommt das Element doch.
+    gewichte: dict[str, str] = {}
+    for element in katalog.ELEMENTE:
+        stufe = str(body.gewichte.get(element["key"]) or katalog.STANDARD_GEWICHT)
+        if stufe not in katalog.GEWICHTE_SCHLUESSEL:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unbekanntes Gewicht fuer {element['label']}.")
+        gewichte[element["key"]] = stufe
+
+    stimmungen = [
+        st for st in dict.fromkeys(body.stimmungen) if st in katalog.STIMMUNG_SCHLUESSEL
+    ][:katalog.MAX_STIMMUNGEN]
+
+    gewaehlt = katalog.schichten_aus_gewichten(gewichte)
     einstellungen = {
         "bildwelt": body.bildwelt,
         "handschrift": body.handschrift,
         "palette": body.palette,
+        "gewichte": gewichte,
+        "abstraktion": body.abstraktion,
+        "stimmungen": stimmungen,
+        # Die Schichten sind abgeleitet und stehen trotzdem dabei: Der Prompt-Bau und die
+        # Legende lesen sie, und eine Galerie-Zeile soll ohne Umrechnung lesbar bleiben.
         "schichten": sorted(gewaehlt),
         "symbolik": body.symbolik,
         "figur": body.figur,
@@ -179,6 +191,7 @@ async def malen(
         # Der Wunsch steht in den Einstellungen, damit man ein Bild wieder aufgreifen kann -
         # und damit in der Galerie ablesbar ist, was jemand sich gewuenscht hat.
         "wunsch": body.wunsch.strip()[:bild_regie.MAX_WUNSCH],
+        "begleitung_text": body.begleitung_text.strip()[:katalog.MAX_BEGLEITUNG_TEXT],
     }
 
     async with pool.acquire() as conn:
@@ -190,17 +203,10 @@ async def malen(
         if katalog.zeigt_mich(einstellungen):
             selbst = await dienst.selbstauskunft(conn, user_id=user_id)
             einstellungen["selbst"] = selbst
-            # **Die Begleitung wird HIER entschieden, nicht im Browser.**
-            #
-            # Ob ein Kind im Bild vorkommen darf, haengt an der Selbstauskunft und an der
-            # Beziehungsart — beides liegt auf dem Server. Eine Wahl aus dem Browser, die
-            # das umgeht, ergaebe bei einem Fall UEBER ein Kind eine Abbildung genau dieses
-            # Kindes. Die Oberflaeche zeigt die Wahl gar nicht erst; hier steht die Grenze.
-            if not katalog.begleitung_moeglich(selbst, werte.get("beziehungsart")):
-                einstellungen["begleitung"] = "keine"
         else:
             # Ohne Gestalt gibt es auch keine Begleitung und keine Haltung.
             einstellungen["begleitung"] = "keine"
+            einstellungen["begleitung_text"] = ""
 
         # ── Die Bildregie ────────────────────────────────────────────────────
         #
@@ -210,18 +216,29 @@ async def malen(
         # wiederholt: lesen, loslassen, Modelle arbeiten lassen.
         material: dict | None = None
         fruehere: list[str] = []
+        gewaehlte_titel: list[str] = []
         if body.quelle == "fall":
             from app.services import podcast_service
             material = await podcast_service.material_laden(
-                conn, user_id=user_id, case_id=case_id, gewichte=REGIE_GEWICHTE)
+                conn, user_id=user_id, case_id=case_id,
+                gewichte=_regie_gewichte(gewichte))
             # **Die Szenen kommen NICHT aus dem Podcast-Lader.**
             #
             # Der holt die dreissig neuesten, immer dieselben - fuer eine Folge ueber den
             # Verlauf richtig, fuer ein Bild falsch. Bei einem Fall mit siebzig Szenen bekam
             # das Modell jedes Mal dieselbe Auswahl und nahm daraus dieselben Motive: Zwei
             # Bilder hintereinander zeigten drei gemeinsame, und es sah aus wie ein Zufall.
-            material["szenen"] = await dienst.szenen_streuen(
-                conn, user_id=user_id, case_id=case_id)
+            if gewichte["szenen"] == "aus":
+                material["szenen"] = []
+            else:
+                material["szenen"] = await dienst.szenen_streuen(
+                    conn, user_id=user_id, case_id=case_id,
+                    bevorzugt=[str(u) for u in body.szenen][:MAX_GEWAEHLTE_SZENEN])
+                gewaehlte_titel = [
+                    z["titel"] for z in await dienst.szenen_liste(
+                        conn, user_id=user_id, case_id=case_id)
+                    if z["id"] in {str(u) for u in body.szenen}
+                ][:MAX_GEWAEHLTE_SZENEN]
             fruehere = await dienst.fruehere_motive(
                 conn, user_id=user_id, case_id=case_id)
 
@@ -229,6 +246,9 @@ async def malen(
     if material is not None:
         echo_svc = getattr(request.app.state, "echo_service", None)
         if echo_svc is not None:
+            stufe_abs = next(
+                (a for a in katalog.ABSTRAKTION_STUFEN
+                 if a["key"] == body.abstraktion), None)
             regie = await bild_regie.fuehren(
                 echo_svc, fall=material["fall"], material=material,
                 welt=next((b for b in katalog.BILDWELTEN
@@ -237,7 +257,27 @@ async def malen(
                 # „Niemand ist auf dem Bild" gilt auch fuer die Regie: Wer das gewaehlt hat,
                 # soll keine Gestalten im Bild finden, auch keine fernen.
                 menschen=body.figur != "keine",
-                fruehere=fruehere)
+                fruehere=fruehere,
+                gewichte=[
+                    m for m in (katalog.gewicht_marke(e["key"], gewichte)
+                                for e in katalog.ELEMENTE) if m
+                ],
+                abstraktion=(stufe_abs or {}).get("prompt", ""),
+                stimmungen=[
+                    st["prompt"] for st in katalog.STIMMUNGEN
+                    if st["key"] in set(stimmungen)
+                ],
+                szenen_wunsch=gewaehlte_titel,
+                begleitung_wunsch=(
+                    str(einstellungen.get("begleitung_text") or "")
+                    if body.begleitung == "freitext" else ""
+                ),
+                # **Handelt der Fall VON einem Kind, kommt kein Kind ins Bild.** Es waere
+                # genau die Person, die nicht abgebildet werden darf - und die Regie kann das
+                # nicht wissen, weil sie die Beziehungsart nicht liest. Die Regel steht im
+                # Katalog und nicht hier: Sie ist zu wichtig, um als Vergleich in einer Zeile
+                # zu stehen, die jemand beim Umbauen uebersieht.
+                kinder_erlaubt=katalog.kinder_erlaubt(werte.get("beziehungsart")))
         if regie is None:
             # **Kein Fehler, ein Rueckfall.** Eine Regie, die nicht taugt - zu wenig
             # Material, ein verbotenes Wort, ein Verdacht auf einen Namen -, darf kein Bild
@@ -274,7 +314,9 @@ async def malen(
         bild = await dienst.gemaltes_anlegen(
             conn, user_id=user_id, case_id=case_id, einstellungen=zum_ablegen,
             bild=bytes_, bild_typ=bild_modell.INHALTSTYP, prompt=prompt,
-            legende=legende, regie=regie)
+            legende=legende, regie=regie,
+            # Der Titel der Regie als erster Satz - ein Vorschlag, den man ueberschreibt.
+            satz=str((regie or {}).get("titel") or ""))
         await log_ai_usage(user_id, conn, "bild")
     return bild
 
@@ -302,10 +344,26 @@ async def datei(
     )
 
 
+@router.get("/szenen", response_model=list[dict])
+async def szenen(
+    case_id: UUID,
+    current: dict = Depends(get_current_user), pool=Depends(get_pool),
+) -> list[dict]:
+    """Die bestätigten Szenen zum Auswählen — **Titel und Datum, kein Text.**
+
+    Für das Menü, in dem jemand sagt, welche Momente in sein Bild sollen. Der Text der Szene
+    wird dafür nicht gebraucht, er ist das Empfindlichste, was der Fall hat, und was nicht
+    übertragen wird, kann auch nicht im Speicher eines fremden Geräts landen.
+    """
+    async with pool.acquire() as conn:
+        return await dienst.szenen_liste(
+            conn, user_id=current["user_id"], case_id=case_id)
+
+
 @router.get("/handschriften", response_model=dict)
 async def handschriften(
     case_id: UUID,
-    current: dict = Depends(get_current_user), pool=Depends(get_pool),
+    _current: dict = Depends(get_current_user),
 ) -> dict:
     """Bildwelten und Handschriften — **ohne die Prompt-Texte.**
 
@@ -315,16 +373,13 @@ async def handschriften(
     Beschreibungen und sind Anweisungen an ein Modell — auf einem Bildschirm gelesen klingen
     sie wie ein geprüftes Versprechen.
     """
-    # Ob eine Begleitung ueberhaupt in Frage kommt, haengt an der Selbstauskunft und an der
-    # Beziehungsart. Beides steht auf dem Server, und die Antwort entscheidet, ob die
-    # Oberflaeche die Wahl ueberhaupt zeigt.
-    async with pool.acquire() as conn:
-        art = await conn.fetchval(
-            "SELECT relationship_type FROM cases WHERE id = $1 AND user_id = $2",
-            case_id, current["user_id"])
-        selbst = await dienst.selbstauskunft(conn, user_id=current["user_id"])
-    moeglich = katalog.begleitung_moeglich(selbst, art)
-
+    # **Hier wurde einmal die Selbstauskunft gelesen**, um zu entscheiden, ob die Wahl „ein
+    # Kind" ueberhaupt erscheinen darf. Das braucht es nicht mehr: Wer dazugehoert, sagt der
+    # Fall oder die Person selbst, und ob ein Kind ins Bild darf, entscheidet der Server beim
+    # Malen (`kinder_erlaubt`) und nicht die Sichtbarkeit eines Knopfes.
+    #
+    # Damit ist diese Route wieder, was sie sein soll: eine Auskunft ueber den Katalog, ohne
+    # Datenbank.
     fuers_auge = ("key", "label", "hinweis")
     return {
         "bildwelten": [
@@ -338,13 +393,27 @@ async def handschriften(
         "haltungen": [
             {k: v for k, v in h.items() if k in fuers_auge} for h in katalog.HALTUNGEN
         ],
-        # Die Begleitung steht nur da, wenn sie fuer DIESEN Fall in Frage kommt - ein
-        # Schalter, den man nicht bewegen darf, ist eine Aufforderung, es zu versuchen.
-        "begleitungen": (
-            [{k: v for k, v in b.items() if k in fuers_auge}
-             for b in katalog.BEGLEITUNGEN]
-            if moeglich else []
-        ),
+        "gewichte": [
+            {k: v for k, v in g.items() if k in fuers_auge} for g in katalog.GEWICHTE_STUFEN
+        ],
+        "elemente": [
+            {k: v for k, v in e.items() if k in fuers_auge} for e in katalog.ELEMENTE
+        ],
+        "abstraktion": [
+            {k: v for k, v in a.items() if k in fuers_auge}
+            for a in katalog.ABSTRAKTION_STUFEN
+        ],
+        "stimmungen": [
+            {k: v for k, v in st.items() if k in fuers_auge} for st in katalog.STIMMUNGEN
+        ],
+        "max_stimmungen": katalog.MAX_STIMMUNGEN,
+        # **Die Begleitung haengt nicht mehr an der Selbstauskunft.** Vorher war sie eine
+        # Liste aus „ein Kind" und „zwei Kinder", und die durfte nur erscheinen, wenn die
+        # Selbstauskunft Kinder nannte. Jetzt sagt der Fall oder die Person selbst, wer
+        # dazugehoert - danach muss man nicht erst fragen.
+        "begleitungen": [
+            {k: v for k, v in b.items() if k in fuers_auge} for b in katalog.BEGLEITUNGEN
+        ],
     }
 
 

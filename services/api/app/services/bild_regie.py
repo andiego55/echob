@@ -54,9 +54,17 @@ MAX_SYMBOLE = 3
 
 #: Obergrenzen je Feld. Ein Modell, das in ein Feld einen Absatz schreibt, verschiebt das
 #: Gewicht im Prompt und hebelt die Reihenfolge aus, die den Bildaufbau bestimmt.
+#: Die fuenf Haltungen, aus denen die Regie waehlen darf.
+#:
+#: **Sie waehlt einen Schluessel aus, sie formuliert nicht.** Dasselbe Verfahren wie bei den
+#: Musterbildern: Was ins Bild geht, steht im Katalog; das Modell entscheidet nur, welches.
+#: Ein frei formulierter Satz ueber die Haltung eines Menschen waere eine Deutung in Bildform.
+HALTUNGEN_ERLAUBT: frozenset[str] = frozenset(
+    {"stehend", "gehend", "schuetzend", "abgewandt", "wartend"})
+
 LAENGEN: dict[str, int] = {
     "motiv": 240, "ort": 200, "licht": 200, "komposition": 260, "titel": 60,
-    "wagnis": 240, "was": 120, "zeigt": 70, "woher": 200,
+    "wagnis": 240, "was": 120, "zeigt": 70, "woher": 200, "begleitung": 160,
 }
 
 #: Was in der englischen Bildregie nie vorkommen darf — **die eindeutigen Wörter.**
@@ -340,6 +348,14 @@ Answer as JSON, with exactly these keys:
   "licht": "one English sentence: light, weather, time of day, season.",
   "komposition": "one English sentence: how the image is built — depth, where the viewer
                   looks first, what is left empty, what dominates.",
+  "haltung": "what the one figure the app adds is doing, as ONE of these exact words:
+              stehend, gehend, schuetzend, abgewandt, wartend. Read it from the case: what is
+              this person actually doing in their situation — standing and looking out,
+              walking, sheltering something, turning away from what presses, or waiting?
+              Use exactly one of those five words and nothing else.",
+  "begleitung": "who or what stands close beside that figure, in English, a short phrase —
+                 or an empty string if nobody does. A child, two children, an animal, a
+                 bag. Never the person this case is about: they are never close.",
   "titel": "a German title of two to five words for this image, no quotation marks"
 }
 
@@ -449,6 +465,14 @@ def pruefen(roh: Any, *, menschen: bool = True) -> dict[str, Any] | None:
         "ort": ort,
         "gegenstaende": gegenstaende,
         "symbole": paare("symbole", MAX_SYMBOLE),
+        # **Eine Haltung, die nicht in der Liste steht, wird keine.** Dann steht die Gestalt,
+        # und die Legende sagt, dass es sich nicht ableiten liess - lieber das als eine
+        # erfundene Haltung, die wie eine Aussage ueber einen Menschen aussieht.
+        "haltung": (
+            h if (h := str(roh.get("haltung") or "").strip().lower())
+            in HALTUNGEN_ERLAUBT else ""
+        ),
+        "begleitung": _text(roh.get("begleitung"), "begleitung"),
         "wagnis": _text(roh.get("wagnis"), "wagnis"),
         "licht": _text(roh.get("licht"), "licht"),
         "komposition": _text(roh.get("komposition"), "komposition"),
@@ -464,6 +488,11 @@ def pruefen(roh: Any, *, menschen: bool = True) -> dict[str, Any] | None:
     # „Inside an old house" wurde damit als Name verworfen. Dieselbe Art Fehler wie das Wort
     # „eye" aus meinem eigenen Prompt: Der Wächter schlug auf meine Struktur an, nicht auf
     # das, wogegen er gebaut ist.
+    # Die Begleitung steht hier mit drin: Sie geht als englische Wendung an das Bildmodell,
+    # also gelten fuer sie dieselben Verbote. **Nur die Entfernung gilt fuer sie nicht** -
+    # eine Begleitung steht nah bei der eigenen Gestalt, das ist ihr Sinn. Ein Gesicht hat
+    # sie trotzdem nicht; das setzt der Rahmen in `bild_katalog.BEGLEITUNG_RAHMEN` durch.
+    nah_erlaubt = regie["begleitung"]
     hinaus = ". ".join([
         regie["motiv"], regie["ort"], regie["licht"], regie["komposition"], regie["wagnis"],
         *(g["was"] for g in regie["gegenstaende"]),
@@ -475,6 +504,10 @@ def pruefen(roh: Any, *, menschen: bool = True) -> dict[str, Any] | None:
         return None
     if namen := verdacht_auf_namen(hinaus):
         logger.warning("Bildregie verworfen: Verdacht auf Namen %s.", namen[:5])
+        return None
+
+    if schlimm_nah := _verbotene(nah_erlaubt):
+        logger.warning("Bildregie verworfen: Begleitung mit %s.", schlimm_nah[:3])
         return None
 
     if menschen:
@@ -599,7 +632,10 @@ MAX_WUNSCH = 400
 async def fuehren(
     echo_service: Any, *, fall: dict[str, Any], material: dict[str, Any],
     welt: dict[str, Any] | None = None, wunsch: str = "", menschen: bool = True,
-    fruehere: list[str] | None = None,
+    fruehere: list[str] | None = None, gewichte: list[str] | None = None,
+    abstraktion: str = "", stimmungen: list[str] | None = None,
+    szenen_wunsch: list[str] | None = None, begleitung_wunsch: str = "",
+    kinder_erlaubt: bool = True,
 ) -> dict[str, Any] | None:
     """Der Bildauftrag zu diesem Fall — oder ``None``, wenn es keinen gibt, der taugt.
 
@@ -638,6 +674,52 @@ async def fuehren(
             "bag can stand on a jetty, a kitchen chair can sit in a clearing. If an object "
             "cannot plausibly be there, choose a different object rather than a different "
             "place."
+        )
+
+    # ── Was wie schwer wiegt ────────────────────────────────────────────────
+    #
+    # **Als Woerter, nicht als Zahlen.** „Szenen: 0.8" ist fuer ein Modell bedeutungslos;
+    # „darum geht es hier vor allem" ist eine Anweisung. Was auf „aus" steht, kommt hier gar
+    # nicht vor - es wurde nicht einmal geladen, und eine Zeile „Gefuehlsbild: nicht
+    # beruecksichtigen" waere schlimmer als nichts: Sie nennt das Material.
+    if gewichte:
+        text += "\n\n## How much each part should weigh\n" + "\n".join(gewichte)
+
+    if abstraktion:
+        text += "\n\n## How abstract this image should be\n" + abstraktion
+
+    if stimmungen:
+        text += (
+            "\n\n## The mood the person asked for\n" + ", and ".join(stimmungen)
+            + "\n\nThis is a wish for THIS image, not a statement about how they feel. "
+              "Both can be true at once; follow the wish."
+        )
+
+    # **Die Szenen, die die Person selbst ausgesucht hat.** Mit Titel, weil sie den Titel
+    # geschrieben hat und ihn wiedererkennt - der Text dazu steht ohnehin im Material.
+    if szenen_wunsch:
+        text += (
+            "\n\n## Scenes the person chose for this image\n"
+            + "; ".join(szenen_wunsch[:8])
+            + "\n\nBuild the image mainly out of these. Other material may support them, "
+              "but the subject comes from here."
+        )
+
+    if begleitung_wunsch:
+        text += (
+            "\n\n## Who the person wants close beside their own figure\n"
+            + begleitung_wunsch
+            + "\n\nPut that into the \"begleitung\" field as a short English phrase. If "
+              "what they ask for is the person this case is about, give them something else "
+              "that belongs to them instead — that one person is never close."
+        )
+
+    if not kinder_erlaubt:
+        text += (
+            "\n\n## No children\n"
+            "This case is about a child, so no child may appear anywhere in this image — not "
+            "beside the figure, not in the distance. A child here would be the very person "
+            "the image must not depict."
         )
 
     # ── Was schon im Bild war ───────────────────────────────────────────────

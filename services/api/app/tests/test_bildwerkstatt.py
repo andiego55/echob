@@ -213,68 +213,58 @@ async def test_ein_fremder_fall_gibt_keine_werte(person, db):
 
 # ── Das Ablegen ───────────────────────────────────────────────────────────────
 
+
+async def _altes_datenbild(db, fall, person, satz=""):
+    """Eine Zeile, wie sie der geloeschte Weg hinterlassen hat - **direkt in die Tabelle.**
+
+    Es gibt keinen Dienst mehr, der ein gerechnetes Bild anlegt. Die Bilder, die Menschen
+    aufgehoben haben, liegen aber noch da und muessen weiter angezeigt, geaendert und geloescht
+    werden koennen. Also wird so eine Zeile hier von Hand erzeugt: Der Test prueft den Weg,
+    den es noch gibt, fuer Daten, die es noch gibt.
+    """
+    return await db.fetchval(
+        "INSERT INTO case_bilder (case_id, user_id, art, einstellungen, svg, satz) "
+        "VALUES ($1, $2, 'gerechnet', '{}'::jsonb, $3, $4) RETURNING id",
+        fall, person, crypto.encrypt(SVG),
+        crypto.encrypt(satz) if satz else None)
+
+
+async def _ablegen(db, fall, person, satz="", **rest):
+    """Ein Bild ablegen - **ueber den einen Weg, den es noch gibt.**
+
+    Hier stand `dienst.anlegen`, der ein SVG aus dem Browser annahm. Die Pruefungen darunter
+    (Obergrenze, Satzlaenge, Eigentum) gelten unveraendert weiter, also laufen sie jetzt ueber
+    `gemaltes_anlegen` - ein Test, der mit der geloeschten Funktion verschwindet, nimmt eine
+    Regel mit, die es noch gibt.
+    """
+    return await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall, einstellungen=rest.pop("einstellungen", {}),
+        bild=b"PNG-Bytes", bild_typ="image/png", prompt="ein Prompt", satz=satz, **rest)
+
 @pytest.mark.asyncio
 async def test_ein_bild_liegt_verschluesselt_und_kommt_im_klartext(person, db):
     fall = await _fall(db, person)
     satz = "Viel Enge, wenig Bewegung."
-    bild = await dienst.anlegen(
-        db, user_id=person, case_id=fall,
-        einstellungen={"palette": "kuehl", "anordnung": "zeit"}, svg=SVG, satz=satz)
+    bild = await _ablegen(db, fall, person, satz=satz,
+                          einstellungen={"palette": "kuehl", "bildwelt": "landschaft"})
 
     roh = await db.fetchrow(
-        "SELECT svg, satz FROM case_bilder WHERE id = $1", bild["id"])
-    assert roh["svg"].startswith("enc:"), "Klartext in der Datenbank"
+        "SELECT prompt, satz FROM case_bilder WHERE id = $1", bild["id"])
+    assert roh["prompt"].startswith("enc:"), "Klartext in der Datenbank"
     assert roh["satz"].startswith("enc:")
 
     gelesen = await dienst.holen(db, user_id=person, bild_id=bild["id"])
-    assert gelesen["svg"] == SVG
+    assert gelesen["prompt"] == "ein Prompt"
     assert gelesen["satz"] == satz
     assert gelesen["einstellungen"]["palette"] == "kuehl"
-    assert gelesen["art"] == "gerechnet"
+    assert gelesen["art"] == "erzeugt"
 
 
-@pytest.mark.asyncio
-async def test_nur_ein_echtes_svg_wird_angenommen(person, db):
-    """**Was der Server aus dem Browser annimmt, muss er prüfen.**
-
-    Es ist der eigene Text der Person in ihrem eigenen Fall, wird niemandem sonst gezeigt und
-    nie als HTML ausgeführt. Aber eine Textspalte, in die der Browser beliebig viel schreiben
-    darf, ist eine Zeile, auf die sich später jemand verlässt.
-    """
-    fall = await _fall(db, person)
-    for unsinn in ("", "kein svg", "<html></html>", "<svg>ohne Ende"):
-        with pytest.raises(HTTPException) as fehler:
-            await dienst.anlegen(db, user_id=person, case_id=fall,
-                                 einstellungen={}, svg=unsinn, satz="")
-        assert fehler.value.status_code == 422, unsinn
-
-
-@pytest.mark.asyncio
-async def test_ein_svg_mit_skript_oder_fremdem_bild_wird_abgewiesen(person, db):
-    """Ein SVG darf Skripte und fremde Adressen enthalten. Unser eigenes tut das nicht —
-    also nehmen wir auch keines an, das es tut."""
-    fall = await _fall(db, person)
-    boese = [
-        '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
-        '<svg xmlns="http://www.w3.org/2000/svg"><image href="http://x/y.png"/></svg>',
-        '<svg xmlns="http://www.w3.org/2000/svg"><a href="javascript:x">y</a></svg>',
-        '<svg xmlns="http://www.w3.org/2000/svg"><foreignObject/></svg>',
-    ]
-    for svg in boese:
-        with pytest.raises(HTTPException) as fehler:
-            await dienst.anlegen(db, user_id=person, case_id=fall,
-                                 einstellungen={}, svg=svg, satz="")
-        assert fehler.value.status_code == 422, svg[:60]
-
-
-@pytest.mark.asyncio
-async def test_ein_riesiges_svg_wird_abgewiesen(person, db):
-    fall = await _fall(db, person)
-    riese = '<svg xmlns="http://www.w3.org/2000/svg">' + "<rect/>" * 80_000 + "</svg>"
-    with pytest.raises(HTTPException) as fehler:
-        await dienst.anlegen(db, user_id=person, case_id=fall,
-                             einstellungen={}, svg=riese, satz="")
-    assert "zu groß" in fehler.value.detail
+# **Hier standen drei Pruefungen fuer ein SVG aus dem Browser** - kein echtes SVG, ein
+# SVG mit <script> oder fremder Adresse, ein riesiges. Sie sind mit `anlegen` gegangen:
+# Der gerechnete Weg nahm ein im Browser gezeichnetes Bild an, und den gibt es nicht
+# mehr. Ein gemaltes Bild kommt als Bytes vom Bildmodell und nie aus dem Browser - damit
+# gibt es keine Textspalte mehr, in die jemand von aussen schreiben kann.
 
 
 @pytest.mark.asyncio
@@ -284,11 +274,9 @@ async def test_bei_zwanzig_bildern_ist_schluss(person, db):
     ersten; bei fünfzig vergleicht niemand mehr."""
     fall = await _fall(db, person)
     for _ in range(dienst.MAX_BILDER_JE_FALL):
-        await dienst.anlegen(db, user_id=person, case_id=fall,
-                             einstellungen={}, svg=SVG, satz="")
+        await _ablegen(db, fall, person)
     with pytest.raises(HTTPException) as fehler:
-        await dienst.anlegen(db, user_id=person, case_id=fall,
-                             einstellungen={}, svg=SVG, satz="")
+        await _ablegen(db, fall, person)
     assert str(dienst.MAX_BILDER_JE_FALL) in fehler.value.detail
 
 
@@ -301,8 +289,7 @@ async def test_ein_fremder_fall_bekommt_kein_bild(person, db):
     fremder_fall = await _fall(db, fremd)
 
     with pytest.raises(HTTPException) as fehler:
-        await dienst.anlegen(db, user_id=person, case_id=fremder_fall,
-                             einstellungen={}, svg=SVG, satz="")
+        await _ablegen(db, fremder_fall, person)
     assert fehler.value.status_code == 404
     assert await db.fetchval(
         "SELECT COUNT(*) FROM case_bilder WHERE case_id = $1", fremder_fall) == 0
@@ -313,8 +300,7 @@ async def test_der_satz_laesst_sich_wieder_leeren(person, db):
     """Ein COALESCE hier hieße, dass sich ein einmal geschriebener Satz nie wieder entfernen
     ließe — derselbe Fehler, der im Paarraum an drei Stellen steckte."""
     fall = await _fall(db, person)
-    bild = await dienst.anlegen(db, user_id=person, case_id=fall,
-                                einstellungen={}, svg=SVG, satz="Erst so")
+    bild = await _ablegen(db, fall, person, satz="Erst so")
     leer = await dienst.satz_setzen(db, user_id=person, bild_id=bild["id"], satz="   ")
     assert leer["satz"] is None
 
@@ -322,8 +308,7 @@ async def test_der_satz_laesst_sich_wieder_leeren(person, db):
 @pytest.mark.asyncio
 async def test_ein_zu_langer_satz_wird_gekuerzt(person, db):
     fall = await _fall(db, person)
-    bild = await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={},
-                                svg=SVG, satz="x" * 500)
+    bild = await _ablegen(db, fall, person, satz="x" * 500)
     assert len(bild["satz"]) == dienst.MAX_SATZ
 
 
@@ -333,8 +318,7 @@ async def test_fremde_bilder_sind_unsichtbar_und_unloeschbar(person, db):
     await db.execute(
         "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Andere')", fremd)
     fremder_fall = await _fall(db, fremd)
-    fremdes = await dienst.anlegen(db, user_id=fremd, case_id=fremder_fall,
-                                  einstellungen={}, svg=SVG, satz="nicht meins")
+    fremdes = await _ablegen(db, fremder_fall, fremd, satz="nicht meins")
 
     assert await dienst.holen(db, user_id=person, bild_id=fremdes["id"]) is None
     assert await dienst.loeschen(db, user_id=person, bild_id=fremdes["id"]) is False
@@ -348,8 +332,7 @@ async def test_die_galerie_kommt_mit_den_bildern(person, db):
     """Anders als beim Podcast, wo die Tonspuren draußen bleiben: Ein SVG ist wenige
     Kilobyte. Eine Galerie ohne Bilder wäre eine Liste von Daten."""
     fall = await _fall(db, person)
-    await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={}, svg=SVG,
-                         satz="Eins")
+    await _altes_datenbild(db, fall, person, satz="Eins")
     regal = await dienst.liste(db, user_id=person, case_id=fall)
     assert regal[0]["svg"] == SVG
 
@@ -359,11 +342,10 @@ async def test_ein_bild_faellt_mit_dem_fall(person, db):
     """Eine Kaskade ist eine Regel der DATENBANK: Wer den Fremdschlüssel einmal ohne
     ON DELETE CASCADE neu anlegt, merkt nichts."""
     fall = await _fall(db, person)
-    bild = await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={},
-                                svg=SVG, satz="")
+    bild_id = await _altes_datenbild(db, fall, person)
     await db.execute("DELETE FROM cases WHERE id = $1", fall)
     assert await db.fetchval(
-        "SELECT COUNT(*) FROM case_bilder WHERE id = $1", bild["id"]) == 0
+        "SELECT COUNT(*) FROM case_bilder WHERE id = $1", bild_id) == 0
 
 
 def test_die_normalisierung_bleibt_zwischen_null_und_eins():
@@ -1015,9 +997,8 @@ async def test_die_bytes_kommen_nur_ueber_den_endpunkt_und_nur_fuer_den_eigentue
 @pytest.mark.asyncio
 async def test_ein_gerechnetes_bild_hat_keine_datei(person, db):
     fall = await _fall(db, person)
-    bild = await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={},
-                                svg=SVG, satz="")
-    assert await dienst.datei_holen(db, user_id=person, bild_id=bild["id"]) is None
+    bild_id = await _altes_datenbild(db, fall, person)
+    assert await dienst.datei_holen(db, user_id=person, bild_id=bild_id) is None
 
 
 @pytest.mark.asyncio
@@ -1094,8 +1075,8 @@ async def test_keine_bildbytes_in_einer_antwort(person, db):
 @pytest.mark.asyncio
 async def test_ein_gerechnetes_bild_meldet_keine_datei(person, db):
     fall = await _fall(db, person)
-    b = await dienst.anlegen(db, user_id=person, case_id=fall, einstellungen={},
-                             svg=SVG, satz="")
+    bild_id = await _altes_datenbild(db, fall, person)
+    b = await dienst.holen(db, user_id=person, bild_id=bild_id)
     assert b["hat_datei"] is False
 
 
@@ -1474,47 +1455,64 @@ def test_keine_eingeschaltete_schicht_faellt_still_aus():
 def test_ein_kind_darf_nie_die_fallperson_sein():
     """**Die schaerfste Regel des Moduls.**
 
-    Handelt der Fall VON einem Kind, waere die Kindfigur die Fallperson - eine Abbildung
-    eines echten Kindes aus den Angaben eines Elternteils. Das ist das Letzte, was hier
-    entstehen darf.
+    Handelt der Fall VON einem Kind, waere die Kindfigur die Fallperson - eine Abbildung eines
+    echten Kindes aus den Angaben eines Elternteils. Das ist das Letzte, was hier entstehen
+    darf.
 
-    Bei „co_parenting" ist es dagegen der andere ELTERNTEIL, um den es geht: Dort gehoeren
-    die Kinder ins Bild, weil sie der Grund fuer fast alles sind, was in so einem Fall steht.
+    Bei „co_parenting" ist es dagegen der andere ELTERNTEIL, um den es geht: Dort gehoeren die
+    Kinder ins Bild, weil sie der Grund fuer fast alles sind, was in so einem Fall steht.
+
+    **Hier hiess die Regel `begleitung_moeglich(selbst, beziehungsart)`** und fragte auch die
+    Selbstauskunft: Nur wer dort Kinder angegeben hatte, sah die Wahl „ein Kind". Diese Wahl
+    gibt es nicht mehr - wer dazugehoert, sagt der Fall oder die Person selbst. Was bleibt,
+    haengt an der Beziehungsart allein.
     """
-    from app.services.bild_katalog import begleitung_moeglich
+    from app.services.bild_katalog import kinder_erlaubt
 
-    mit_kindern = {"children": "shared"}
-    assert begleitung_moeglich(mit_kindern, "child") is False
-    assert begleitung_moeglich(mit_kindern, "co_parenting") is True
-    assert begleitung_moeglich(mit_kindern, "partner") is True
+    assert kinder_erlaubt("child") is False
+    assert kinder_erlaubt("co_parenting") is True
+    assert kinder_erlaubt("partner") is True
+    assert kinder_erlaubt("ex_partner") is True
+    # Eine unbekannte oder fehlende Art ist kein Fall ueber ein Kind.
+    assert kinder_erlaubt(None) is True
+    assert kinder_erlaubt("") is True
+    assert kinder_erlaubt("gibtesnicht") is True
 
 
-def test_ohne_kinderangabe_gibt_es_keine_begleitung():
-    """Ein Kind ins Bild zu setzen, das die Person nie erwaehnt hat, waere erfunden - und
-    zwar an der empfindlichsten Stelle."""
-    from app.services.bild_katalog import begleitung_moeglich
-
-    for angabe in ("none", "not_specified", None, ""):
-        assert begleitung_moeglich({"children": angabe}, "partner") is False
-    assert begleitung_moeglich(None, "partner") is False
-    assert begleitung_moeglich({}, "partner") is False
+# **Hier stand `test_ohne_kinderangabe_gibt_es_keine_begleitung`.**
+#
+# Er prueft, dass ohne Kinder in der Selbstauskunft kein Kind ins Bild kommt - und die
+# Selbstauskunft entscheidet das nicht mehr. Wer bei jemandem steht, sagt der Fall oder
+# die Person selbst; die eine Regel, die bleibt, steht im Test darueber.
 
 
 def test_die_begleitung_steht_neben_der_gestalt_und_ohne_gesicht():
+    """**Der Rahmen gehoert uns, der Inhalt dem Fall.**
+
+    Hier standen „ein Kind" und „zwei Kinder" als feste Auswahl - eine Liste, die nur raten
+    konnte. Jetzt kommt die Wendung aus der Regie (aus dem Fall oder aus dem Freitext der
+    Person), und was sie umgibt, steht im Katalog: nah, von hinten, ohne Gesicht. Ohne diesen
+    Rahmen macht ein Bildmodell daraus eine zweite Hauptfigur.
+    """
     from app.services.bild_katalog import figur_beschreibung
 
-    mit_kind = figur_beschreibung({"age_range": "36-45", "gender": "weiblich"},
-                                  {"haltung": "schuetzend", "begleitung": "kind"})
-    assert "one small child" in mit_kind
-    assert "no face visible" in mit_kind
-    assert "seen from behind" in mit_kind
+    mit_kind = figur_beschreibung(
+        {"age_range": "36-45", "gender": "weiblich"},
+        {"figur": "ich", "haltung": "schuetzend", "begleitung": "fall"},
+        {"begleitung": "two small children holding on to the coat"})
+    assert "two small children holding on to the coat" in mit_kind
+    assert "no face visible and no facial features implied" in mit_kind
+    assert "Seen from behind or from the side" in mit_kind
+    assert "smaller in the frame than the figure itself" in mit_kind
     # Und die Haltung steht dabei.
     assert "protectively" in mit_kind
 
-    zwei = figur_beschreibung({}, {"begleitung": "kinder"})
-    assert "two small children" in zwei
+    # Ohne Regie laesst sich „aus dem Fall" nicht beantworten - dann steht die Gestalt allein.
+    ohne_regie = figur_beschreibung({}, {"figur": "ich", "begleitung": "fall"})
+    assert "Close beside the figure" not in ohne_regie
 
-    allein = figur_beschreibung({}, {"begleitung": "keine"})
+    allein = figur_beschreibung({}, {"figur": "ich", "begleitung": "keine"},
+                                {"begleitung": "two small children"})
     assert "child" not in allein
     # **Hier stand „no one else anywhere in the image".** Der Satz ist aus der Gestalt raus,
     # weil andere Menschen jetzt vorkommen duerfen - gesagt wird das zentral, bei der Wahl
@@ -1525,11 +1523,16 @@ def test_die_begleitung_steht_neben_der_gestalt_und_ohne_gesicht():
 def test_jede_haltung_ergibt_eine_andere_gestalt():
     """Eine Haltung ist eine Aussage - und sie kommt von der Person. Wuerden WIR sie aus den
     Daten ableiten, waere es eine Deutung in Bildform."""
-    from app.services.bild_katalog import HALTUNGEN, figur_beschreibung
+    from app.services.bild_katalog import HALTUNGEN_ECHT, figur_beschreibung
 
-    saetze = {h["key"]: figur_beschreibung({}, {"haltung": h["key"]}) for h in HALTUNGEN}
-    assert len(set(saetze.values())) == len(HALTUNGEN)
-    for h in HALTUNGEN:
+    # **Ueber HALTUNGEN_ECHT, nicht ueber HALTUNGEN.** Seit es die Wahl „aus deinem Fall"
+    # gibt, steht in der Liste ein Schluessel, der selbst keine Haltung ist - er sagt, dass
+    # die Regie eine aussuchen soll. Ihn mitzupruefen hiesse, einen leeren Prompt zu
+    # verlangen, den es absichtlich gibt.
+    saetze = {h["key"]: figur_beschreibung({}, {"figur": "ich", "haltung": h["key"]})
+              for h in HALTUNGEN_ECHT}
+    assert len(set(saetze.values())) == len(HALTUNGEN_ECHT)
+    for h in HALTUNGEN_ECHT:
         assert h["label"] and h["hinweis"] and len(h["prompt"]) > 20, h["key"]
         # Keine Haltung dreht die Gestalt zum Betrachter.
         assert "toward the viewer" not in h["prompt"].lower(), h["key"]
@@ -1551,10 +1554,11 @@ def test_die_legende_sagt_wer_im_bild_ist_und_wer_nicht():
     from app.services.bild_katalog import legende
 
     zeilen = legende({**EINST, "figur": "ich", "haltung": "schuetzend",
-                      "begleitung": "kind"}, _fall_mit({"control_isolation": 0.8}))
+                      "begleitung": "fall"}, _fall_mit({"control_isolation": 0.8}),
+                     {"begleitung": "two small children"})
     gestalt = next(z for z in zeilen if "Gestalt" in z["was"])
-    assert "Kinder" in gestalt["was"]
-    assert "Kind neben dir" in gestalt["wofuer"]
+    assert "wer bei dir ist" in gestalt["was"]
+    assert "Neben dir steht" in gestalt["wofuer"]
     assert "Schützen" in gestalt["wofuer"]
     # Und ausdruecklich, wie die Person, um die es geht, NICHT vorkommt.
     assert "kommt nie mit Gesicht vor und nie nah" in gestalt["wofuer"]
@@ -1755,9 +1759,9 @@ def test_jede_haltung_hat_eine_fassung_fuer_beide_formen():
     "the face is visible". Ein Bildmodell loest so etwas still auf - und dann stimmt entweder
     die Haltung nicht oder das Gesicht fehlt.
     """
-    from app.services.bild_katalog import HALTUNGEN
+    from app.services.bild_katalog import HALTUNGEN_ECHT
 
-    for h in HALTUNGEN:
+    for h in HALTUNGEN_ECHT:
         assert len(h["prompt"]) > 20, h["key"]
         assert len(h["prompt_sichtbar"]) > 20, h["key"]
         tief = h["prompt_sichtbar"].lower()
@@ -1950,3 +1954,234 @@ async def test_ohne_frueheres_bild_gibt_es_keine_motive(person, db):
         db, user_id=person, case_id=fall, einstellungen={},
         bild=b"PNG", bild_typ="image/png", prompt="x", regie=None)
     assert await dienst.fruehere_motive(db, user_id=person, case_id=fall) == []
+
+
+# == Gewichte statt Haekchen ===================================================
+
+def test_ein_gewicht_auf_aus_laedt_die_schicht_nicht():
+    """**Was nicht geladen ist, kann auch nicht versehentlich in einen Prompt geraten.**
+
+    Das ist der Grund, warum die Gewichte das LADEN steuern und nicht bloss die
+    Formulierung - dieselbe Ueberlegung wie bei den Gewichten des Podcast-Studios.
+    """
+    from app.services.bild_katalog import ELEMENT_ZU_SCHICHT, schichten_aus_gewichten
+
+    alle = schichten_aus_gewichten({})
+    assert alle == set(ELEMENT_ZU_SCHICHT.values()), "die Vorgabe laedt nicht alles"
+
+    ohne = schichten_aus_gewichten({"gefuehl": "aus", "wuensche": "aus"})
+    assert "grundton" not in ohne
+    assert "leerstellen" not in ohne
+    assert "szenen" in ohne
+
+    assert schichten_aus_gewichten({e: "aus" for e in ELEMENT_ZU_SCHICHT}) == set()
+
+
+def test_jedes_element_hat_eine_schicht_und_umgekehrt():
+    """**Der Waechter gegen das halb umgebaute Menue.** Ein Element ohne Schicht ist ein
+    Regler ohne Wirkung; eine Schicht ohne Element ist Material, das niemand abwaehlen kann.
+    """
+    from app.services.bild_katalog import ELEMENT_ZU_SCHICHT, ELEMENTE
+
+    assert {e["key"] for e in ELEMENTE} == set(ELEMENT_ZU_SCHICHT)
+    # Die Schichten sind genau die, mit denen `werte_laden` arbeitet.
+    assert set(ELEMENT_ZU_SCHICHT.values()) == {
+        "szenen", "grundton", "durchgaenge", "lichter", "leerstellen", "druck"}
+    for e in ELEMENTE:
+        assert e["label"] and e["hinweis"] and e["prompt"], e["key"]
+
+
+def test_das_gewicht_geht_als_wort_hinaus_und_nicht_als_zahl():
+    """„Szenen: 0.8" ist fuer ein Modell bedeutungslos; „darum geht es hier vor allem" ist
+    eine Anweisung."""
+    from app.services.bild_katalog import gewicht_marke
+
+    viel = gewicht_marke("szenen", {"szenen": "viel"})
+    wenig = gewicht_marke("szenen", {"szenen": "wenig"})
+    assert "mainly about" in viel
+    assert "only at the edge" in wenig
+    assert viel != wenig
+    # Und was aus ist, sagt gar nichts - eine Zeile "nicht beruecksichtigen" nennt das
+    # Material und ein Modell benutzt jedes benennbare Material als Sprache.
+    assert gewicht_marke("szenen", {"szenen": "aus"}) == ""
+    # Keine Zahl im Satz.
+    assert not any(z.isdigit() for z in viel)
+
+
+# == Der Abstraktionsgrad ======================================================
+
+def test_der_abstraktionsgrad_wirkt_auf_beiden_wegen():
+    """**Ein Regler, der nur auf einem von zwei Wegen etwas tut, ist schlimmer als keiner.**
+
+    Das ist in dieser Woche zweimal passiert: eine Bildwelt ohne Wirkung auf dem Regie-Weg,
+    eine Symbolik-Stufe, die nur den Katalog erreichte.
+    """
+    from app.services.bild_katalog import ABSTRAKTION_STUFEN, prompt_bauen
+
+    einst = {"bildwelt": "landschaft", "handschrift": "oel", "palette": "nacht",
+             "symbolik": "keine", "figur": "keine", "schichten": []}
+    regie = {"motiv": "a chair in a field", "ort": "an open field",
+             "gegenstaende": [], "symbole": [], "komposition": "", "wagnis": "",
+             "licht": "", "begleitung": "", "haltung": ""}
+
+    for stufe in ABSTRAKTION_STUFEN:
+        mit = prompt_bauen({}, {**einst, "abstraktion": stufe["key"]}, regie)
+        ohne = prompt_bauen({}, {**einst, "abstraktion": stufe["key"]})
+        assert stufe["prompt"] in mit, f'{stufe["key"]}: Regie-Weg'
+        assert stufe["prompt_baukasten"] in ohne, f'{stufe["key"]}: Baukasten'
+
+    # Und die Stufen unterscheiden sich wirklich.
+    prompts = {
+        s["key"]: prompt_bauen({}, {**einst, "abstraktion": s["key"]}, regie)
+        for s in ABSTRAKTION_STUFEN
+    }
+    assert len(set(prompts.values())) == len(ABSTRAKTION_STUFEN)
+
+
+# == Stimmungen ================================================================
+
+def test_hoechstens_drei_stimmungen_kommen_ins_bild():
+    """Ueber drei heben sich auf - dann ist das Bild still UND aufgewuehlt UND weit."""
+    from app.services.bild_katalog import MAX_STIMMUNGEN, STIMMUNGEN, prompt_bauen
+
+    alle = [st["key"] for st in STIMMUNGEN]
+    prompt = prompt_bauen({}, {"bildwelt": "landschaft", "handschrift": "oel",
+                               "palette": "nacht", "symbolik": "keine", "figur": "keine",
+                               "schichten": [], "stimmungen": alle})
+    getroffen = [st for st in STIMMUNGEN if st["prompt"] in prompt]
+    assert len(getroffen) == MAX_STIMMUNGEN
+
+
+def test_eine_stimmung_steht_in_der_legende_als_eigene_wahl():
+    """Sie ist ausdruecklich NICHT das Gefuehlsbild: Das eine ist eine Angabe ueber den
+    Zustand, das andere ein Wunsch an das Bild."""
+    from app.services.bild_katalog import legende
+
+    zeilen = legende({"bildwelt": "landschaft", "schichten": [], "symbolik": "keine",
+                      "figur": "keine", "stimmungen": ["still", "kalt"]},
+                     _werte_beispiel(), {"motiv": "x", "gegenstaende": [], "symbole": []})
+    zeile = next(z for z in zeilen if "Stimmung" in z["was"])
+    assert "Still" in zeile["wofuer"] and "Kalt" in zeile["wofuer"]
+    assert "unabhängig davon, wie es dir gerade geht" in zeile["wofuer"]
+
+
+# == Haltung und Begleitung aus dem Fall ========================================
+
+def test_die_haltung_aus_dem_fall_kommt_aus_unserer_liste():
+    """**Die Regie waehlt einen Schluessel aus, sie formuliert nicht.**
+
+    Dasselbe Verfahren wie bei den Musterbildern: Was ins Bild geht, steht im Katalog; das
+    Modell entscheidet nur, welches. Ein frei formulierter Satz ueber die Haltung eines
+    Menschen waere eine Deutung in Bildform.
+    """
+    from app.services.bild_katalog import HALTUNGEN_ECHT, gestalt_wahl
+
+    schuetzend = next(h for h in HALTUNGEN_ECHT if h["key"] == "schuetzend")
+    wahl = gestalt_wahl({"haltung": "fall"}, {"haltung": "schuetzend"})
+    assert wahl["haltung"] == schuetzend
+    assert wahl["haltung_aus_fall"] is True
+    assert wahl["haltung_erfuellt"] is True
+
+    # Ein erfundener Schluessel wird keine Haltung - dann steht die Gestalt.
+    erfunden = gestalt_wahl({"haltung": "fall"}, {"haltung": "tanzend auf dem Tisch"})
+    assert erfunden["haltung"]["key"] == "stehend"
+    assert erfunden["haltung_erfuellt"] is False
+
+    # Und eine selbst gewaehlte Haltung ueberschreibt die Regie nicht umgekehrt.
+    selbst = gestalt_wahl({"haltung": "wartend"}, {"haltung": "schuetzend"})
+    assert selbst["haltung"]["key"] == "wartend"
+    assert selbst["haltung_aus_fall"] is False
+
+
+def test_die_legende_sagt_wenn_die_haltung_aus_dem_fall_kam():
+    """Eine Haltung ist eine Aussage. Wenn sie NICHT von der Person kommt, muss das dastehen -
+    sonst liest sie eine Deutung als ihre eigene Angabe."""
+    from app.services.bild_katalog import legende
+
+    einst = {"bildwelt": "landschaft", "schichten": [], "symbolik": "keine",
+             "figur": "ich", "begleitung": "keine"}
+    aus_fall = legende({**einst, "haltung": "fall"}, _werte_beispiel(),
+                       {"motiv": "x", "gegenstaende": [], "symbole": [],
+                        "haltung": "abgewandt"})
+    zeile = next(z for z in aus_fall if "Gestalt" in z["was"])
+    assert "das hat dein Fall entschieden, nicht du" in zeile["wofuer"]
+    assert "Abwenden" in zeile["wofuer"]
+
+    selbst = legende({**einst, "haltung": "wartend"}, _werte_beispiel(),
+                     {"motiv": "x", "gegenstaende": [], "symbole": []})
+    zeile = next(z for z in selbst if "Gestalt" in z["was"])
+    assert "dein Fall entschieden" not in zeile["wofuer"]
+
+
+def test_eine_nicht_erfuellte_begleitung_wird_gesagt():
+    """Sonst sucht die Person jemanden im Bild, der nicht da ist - und haelt das Werkzeug
+    fuer kaputt. Dieselbe Ueberlegung wie beim Rueckfall auf den Baukasten."""
+    from app.services.bild_katalog import legende
+
+    zeilen = legende({"bildwelt": "landschaft", "schichten": [], "symbolik": "keine",
+                      "figur": "ich", "haltung": "stehend", "begleitung": "freitext"},
+                     _werte_beispiel(),
+                     {"motiv": "x", "gegenstaende": [], "symbole": [], "begleitung": ""})
+    zeile = next(z for z in zeilen if "Gestalt" in z["was"])
+    assert "dafür ließ sich diesmal nichts finden" in zeile["wofuer"]
+
+
+@pytest.mark.asyncio
+async def test_eine_gewaehlte_szene_kommt_sicher_mit(person, db):
+    """**Eine Auswahl, die der Zufall wieder wegwirft, ist keine Auswahl.**
+
+    Die Streuung war die Behebung des einen Fehlers (immer dieselben Szenen); sie darf nicht
+    der Grund fuer den naechsten werden. Wer eine Szene aussucht, bekommt sie - zehn Ziehungen
+    hintereinander.
+    """
+    fall = await _fall(db, person)
+    ids = []
+    for i in range(30):
+        await _szene(db, fall, person, titel=f"S{i}", tage_zurueck=i * 4, text="x" * 80)
+    liste = await dienst.szenen_liste(db, user_id=person, case_id=fall)
+    gewollt = {liste[3]["titel"], liste[17]["titel"]}
+    ids = [liste[3]["id"], liste[17]["id"]]
+
+    for _ in range(10):
+        gezogen = {z["title"] for z in await dienst.szenen_streuen(
+            db, user_id=person, case_id=fall, anzahl=5, bevorzugt=ids)}
+        assert gewollt <= gezogen, "eine gewaehlte Szene fiel weg"
+        assert len(gezogen) == 5, "die Streuung fuellt nicht auf"
+
+
+@pytest.mark.asyncio
+async def test_mehr_gewaehlte_szenen_als_platz_sprengen_nichts(person, db):
+    """Wer alles auswaehlt, bekommt so viele, wie ins Bild passen - und keinen Fehler."""
+    fall = await _fall(db, person)
+    for i in range(10):
+        await _szene(db, fall, person, titel=f"S{i}", tage_zurueck=i, text="x" * 80)
+    liste = await dienst.szenen_liste(db, user_id=person, case_id=fall)
+
+    gezogen = await dienst.szenen_streuen(
+        db, user_id=person, case_id=fall, anzahl=3,
+        bevorzugt=[z["id"] for z in liste])
+    assert len(gezogen) == len(liste), (
+        "mehr Gewaehlte als Platz: dann gewinnt die Auswahl, nicht die Obergrenze"
+    )
+
+
+@pytest.mark.asyncio
+async def test_die_szenenliste_traegt_keinen_text(person, db):
+    """**Der Text wird fuer die Auswahl nicht gebraucht**, er ist das Empfindlichste, was der
+    Fall hat - und was nicht uebertragen wird, kann auch nicht im Speicher eines fremden
+    Geraets landen."""
+    fall = await _fall(db, person)
+    await _szene(db, fall, person, titel="Der Abend im Maerz", tage_zurueck=3,
+                 text="Er hat die Tuer zugeschlagen.")
+    await db.execute(
+        "INSERT INTO scenes (case_id, user_id, title, description, confirmed_by_user) "
+        "VALUES ($1,$2,'Entwurf',$3,false)", fall, person, crypto.encrypt("x"))
+
+    liste = await dienst.szenen_liste(db, user_id=person, case_id=fall)
+
+    assert len(liste) == 1, "ein Entwurf ist keine Angabe"
+    assert set(liste[0]) == {"id", "nummer", "titel", "datum"}
+    assert liste[0]["titel"] == "Der Abend im Maerz"
+    assert "Tuer" not in repr(liste)
+    # Und nur das eigene.
+    assert await dienst.szenen_liste(db, user_id=uuid.uuid4(), case_id=fall) == []

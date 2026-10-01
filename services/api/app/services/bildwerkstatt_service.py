@@ -317,72 +317,6 @@ def _bild(zeile: asyncpg.Record | None) -> dict[str, Any] | None:
     return d
 
 
-async def anlegen(
-    conn: asyncpg.Connection,
-    *,
-    user_id: UUID | str,
-    case_id: UUID | str,
-    einstellungen: dict[str, Any],
-    svg: str,
-    satz: str,
-) -> dict[str, Any] | None:
-    """Legt ein gerechnetes Bild ab.
-
-    **Das SVG kommt aus dem Browser, und das ist eine Entscheidung mit einer Kehrseite.**
-    Dafür: Es ist genau das Bild, das die Person gesehen hat — nicht eine Nachrechnung, die
-    davon abweichen könnte. Dagegen: Der Server prüft nicht, WAS dort steht.
-
-    Deshalb wird die Größe begrenzt und der Inhalt oberflächlich geprüft. Es ist der eigene
-    Text der Person in ihrem eigenen Fall, wird niemandem sonst gezeigt und nie als HTML
-    ausgeführt — aber eine Textspalte, in die der Browser beliebig viel schreiben darf, ist
-    eine Zeile, auf die sich später jemand verlässt.
-
-    Das INSERT beweist das Eigentum selbst (``INSERT … SELECT … FROM cases``).
-    """
-    sauber = (svg or "").strip()
-    if not sauber.startswith("<svg") or not sauber.endswith("</svg>"):
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Das ist kein Bild.")
-    if len(sauber) > 400_000:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Das Bild ist zu groß.")
-    # Ein SVG darf Skripte und fremde Adressen enthalten. Unser eigenes tut das nicht — also
-    # nehmen wir auch keines an, das es tut.
-    tief = sauber.lower()
-    for verboten in ("<script", "<foreignobject", "javascript:", "<image", "<use "):
-        if verboten in tief:
-            raise HTTPException(
-                status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Dieses Bild enthält etwas, das dort nicht hingehört.")
-
-    anzahl = await conn.fetchval(
-        "SELECT COUNT(*) FROM case_bilder WHERE case_id = $1 AND user_id = $2",
-        case_id, user_id) or 0
-    if anzahl >= MAX_BILDER_JE_FALL:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=(
-                f"In dieser Galerie hängen schon {MAX_BILDER_JE_FALL} Bilder. "
-                "Lösch eines, bevor du ein neues aufhebst."
-            ),
-        )
-
-    zeile = await conn.fetchrow(
-        """
-        INSERT INTO case_bilder (case_id, user_id, art, einstellungen, svg, satz)
-        SELECT c.id, $2, 'gerechnet', $3::jsonb, $4, $5
-          FROM cases c
-         WHERE c.id = $1 AND c.user_id = $2
-        RETURNING *
-        """,
-        case_id, user_id, json.dumps(einstellungen), crypto.encrypt(sauber),
-        crypto.encrypt(satz.strip()[:MAX_SATZ]) if satz and satz.strip() else None,
-    )
-    if zeile is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
-    return _bild(zeile)
-
-
 async def gemaltes_anlegen(
     conn: asyncpg.Connection,
     *,
@@ -394,6 +328,7 @@ async def gemaltes_anlegen(
     prompt: str,
     legende: list[dict[str, str]] | None = None,
     regie: dict[str, Any] | None = None,
+    satz: str = "",
 ) -> dict[str, Any] | None:
     """Legt ein GEMALTES Bild ab — Bytes statt SVG.
 
@@ -439,8 +374,9 @@ async def gemaltes_anlegen(
     zeile = await conn.fetchrow(
         """
         INSERT INTO case_bilder
-          (case_id, user_id, art, einstellungen, bild, bild_typ, prompt, legende, regie)
-        SELECT c.id, $2, 'erzeugt', $3::jsonb, $4, $5, $6, $7, $8
+          (case_id, user_id, art, einstellungen, bild, bild_typ, prompt, legende, regie,
+           satz)
+        SELECT c.id, $2, 'erzeugt', $3::jsonb, $4, $5, $6, $7, $8, $9
           FROM cases c
          WHERE c.id = $1 AND c.user_id = $2
         RETURNING *
@@ -449,6 +385,13 @@ async def gemaltes_anlegen(
         crypto.encrypt(prompt) if prompt else None,
         crypto.encrypt(json.dumps(legende, ensure_ascii=False)) if legende else None,
         crypto.encrypt(json.dumps(regie, ensure_ascii=False)) if regie else None,
+        # **Der Titel der Regie wird der erste Satz unter dem Bild.**
+        #
+        # Eine Galerie, in der unter jedem Bild „Satz dazuschreiben …" steht, sieht
+        # unfertig aus — und die Regie hat schon einen deutschen Titel erfunden („Die Küche
+        # um zwei", „Regen im Flur"). Er ist ein Vorschlag und kein Urteil: Die Person
+        # überschreibt ihn mit einem Klick, und ein leerer Satz bleibt leer.
+        crypto.encrypt(sauber) if (sauber := (satz or "").strip()[:MAX_SATZ]) else None,
     )
     if zeile is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Fall nicht gefunden.")
@@ -465,9 +408,41 @@ MAX_SZENEN_JE_BILD = 24
 FRUEHERE_BILDER = 4
 
 
+async def szenen_liste(
+    conn: asyncpg.Connection, *, user_id: UUID | str, case_id: UUID | str,
+) -> list[dict[str, Any]]:
+    """Die bestätigten Szenen als Liste zum Auswählen — **Titel und Datum, nichts weiter.**
+
+    Für das Menü, in dem jemand sagt, welche Momente in sein Bild sollen. Der Text der Szene
+    kommt nicht mit: Er wird hier nicht gebraucht, er ist das Empfindlichste, was der Fall
+    hat, und was nicht übertragen wird, kann auch nicht im Speicher eines fremden Geräts
+    landen. Der Titel steht im Klartext in der Tabelle — er ist das, was die Person selbst
+    als Überschrift geschrieben hat, und ohne ihn wäre die Liste nicht benutzbar.
+
+    Neueste zuerst: Wer etwas auswählen will, sucht meistens etwas Jüngeres.
+    """
+    zeilen = await conn.fetch(
+        "SELECT id, scene_no, title, scene_date, created_at "
+        "  FROM scenes "
+        " WHERE case_id = $1 AND user_id = $2 AND confirmed_by_user = true "
+        " ORDER BY COALESCE(scene_date, created_at::date) DESC, created_at DESC "
+        " LIMIT 200",
+        case_id, user_id,
+    )
+    return [
+        {
+            "id": str(z["id"]),
+            "nummer": z["scene_no"],
+            "titel": z["title"] or "Ohne Titel",
+            "datum": (z["scene_date"] or z["created_at"].date()).isoformat(),
+        }
+        for z in zeilen
+    ]
+
+
 async def szenen_streuen(
     conn: asyncpg.Connection, *, user_id: UUID | str, case_id: UUID | str,
-    anzahl: int = MAX_SZENEN_JE_BILD,
+    anzahl: int = MAX_SZENEN_JE_BILD, bevorzugt: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Eine ZUFÄLLIGE Auswahl bestätigter Szenen — **und das ist eine Fehlerbehebung.**
 
@@ -484,13 +459,32 @@ async def szenen_streuen(
     Mitgenommen wird nur, was ein Bildauftrag braucht — Titel, Text, eigene Reaktion und das
     Datum. Die Belastung kommt über die Schicht ``szenen`` als Zahl.
     """
-    zeilen = await conn.fetch(
-        "SELECT title, description, user_reaction, scene_date, created_at "
-        "  FROM scenes "
-        " WHERE case_id = $1 AND user_id = $2 AND confirmed_by_user = true "
-        " ORDER BY random() LIMIT $3",
-        case_id, user_id, max(1, anzahl),
-    )
+    # **Was die Person ausgesucht hat, kommt zuerst und sicher.**
+    #
+    # Eine Auswahl, die der Zufall danach wieder wegwirft, ist keine Auswahl. Deshalb stehen
+    # die gewaehlten Szenen vorn, und die Streuung fuellt nur auf, was noch frei ist.
+    ids = [u for u in (bevorzugt or []) if u][:MAX_SZENEN_JE_BILD]
+    zeilen: list[Any] = []
+    if ids:
+        zeilen = list(await conn.fetch(
+            "SELECT title, description, user_reaction, scene_date, created_at "
+            "  FROM scenes "
+            " WHERE case_id = $1 AND user_id = $2 AND confirmed_by_user = true "
+            "   AND id = ANY($3::uuid[])",
+            case_id, user_id, ids,
+        ))
+
+    rest = max(0, max(1, anzahl) - len(zeilen))
+    if rest:
+        zeilen += list(await conn.fetch(
+            "SELECT title, description, user_reaction, scene_date, created_at "
+            "  FROM scenes "
+            " WHERE case_id = $1 AND user_id = $2 AND confirmed_by_user = true "
+            "   AND NOT (id = ANY($3::uuid[])) "
+            " ORDER BY random() LIMIT $4",
+            case_id, user_id, ids, rest,
+        ))
+
     return [
         crypto.decrypt_fields(dict(z), "description", "user_reaction") for z in zeilen
     ]
