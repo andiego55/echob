@@ -18,9 +18,24 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-#: Quadratisch, wie der gerechnete Weg — damit die Galerie eine Wand wird und kein
-#: Flickenteppich, und damit zwei Bilder derselben Lage vergleichbar sind.
+#: Quadratisch, wenn nichts anderes gesagt ist.
 GROESSE = "1024x1024"
+
+#: Welches Maß zu welchem Format gehört.
+#:
+#: **Vorher war alles quadratisch, und das kostete die Landschaften ihre Weite.** Ein 1:1
+#: Ausschnitt nimmt einem weiten Gelände genau das, was es ist; ein Gang im Haus und ein Wald
+#: stehen umgekehrt hochkant besser. Welches Format zu einem Ort gehört, entscheidet der
+#: Katalog (``BILDWELTEN[*]["format"]``) — hier stehen nur die Zeichenketten, die der Anbieter
+#: dafür versteht.
+#:
+#: Die Galerie legt die Bilder deshalb mit ``object-contain`` ab: Ein gemischtes Raster mit
+#: Letterbox ist besser als ein beschnittenes Bild.
+GROESSEN: dict[str, str] = {
+    "quadrat": "1024x1024",
+    "breit": "1536x1024",
+    "hoch": "1024x1536",
+}
 INHALTSTYP = "image/png"
 
 #: Die Qualitätsstufe des Bildmodells.
@@ -47,13 +62,16 @@ class BildModell:
     def verfuegbar(self) -> bool:
         return self._client is not None
 
-    async def malen(self, prompt: str) -> bytes:
+    async def malen(self, prompt: str, format_: str = "quadrat") -> bytes:
         """Ein Bild als PNG-Bytes.
 
         **Die Antwort kommt je Modell unterschiedlich zurück** — als Base64 im Feld
         ``b64_json`` oder als Adresse in ``url``. Beide Wege werden bedient, weil ein
         Modellwechsel über eine Umgebungsvariable möglich sein soll, ohne dass hier etwas
         bricht.
+
+        ``format_`` kommt aus der gewählten Bildwelt (``breit`` · ``hoch`` · ``quadrat``):
+        Ein weites Gelände quadratisch zu beschneiden nimmt ihm genau das, was es ist.
 
         Eine Adresse wird nachgeladen und nie weitergegeben: Sie läuft nach kurzer Zeit ab,
         und ein Bild, das nach zwei Stunden verschwindet, wäre schlimmer als keines.
@@ -64,7 +82,9 @@ class BildModell:
         gemeinsam: dict[str, Any] = {
             "model": self._model,
             "prompt": prompt,
-            "size": GROESSE,
+            # Ein unbekanntes Format ergibt ein quadratisches Bild und keinen Fehler: Eine
+            # neue Bildwelt ohne Eintrag soll gemalt werden, nicht abbrechen.
+            "size": GROESSEN.get(format_, GROESSE),
             "n": 1,
             # `moderation` bleibt bei der Vorgabe des Anbieters. Sie herabzusetzen wäre bei
             # Bildern über die Lage eines Menschen genau die falsche Sparsamkeit.

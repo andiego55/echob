@@ -358,7 +358,14 @@ def pruefen(roh: Any) -> dict[str, Any] | None:
 
     # **Geprüft wird nur, was an das Bildmodell geht.** Die deutschen `woher`-Zeilen bleiben
     # hier im Haus; sie sind die Legende und werden der Person gezeigt.
-    hinaus = " ".join([
+    #
+    # **Verbunden mit einem Punkt, nicht mit einem Leerzeichen.** Jedes Feld ist ein eigener
+    # Satz, und der Namensprüfer sieht Großschreibung am Satzanfang durch. Mit einem
+    # Leerzeichen verbunden stand jedes Feld außer dem ersten mitten im Satz — ein `ort` wie
+    # „Inside an old house" wurde damit als Name verworfen. Dieselbe Art Fehler wie das Wort
+    # „eye" aus meinem eigenen Prompt: Der Wächter schlug auf meine Struktur an, nicht auf
+    # das, wogegen er gebaut ist.
+    hinaus = ". ".join([
         regie["motiv"], regie["ort"], regie["licht"], regie["komposition"], regie["wagnis"],
         *(g["was"] for g in regie["gegenstaende"]),
         *(s["was"] for s in regie["symbole"]),
@@ -604,4 +611,6 @@ def _hinausgehendes(roh: Any) -> str:
         for eintrag in roh.get(schluessel) or []:
             if isinstance(eintrag, dict):
                 teile.append(str(eintrag.get("was") or ""))
-    return " ".join(teile)
+    # Mit Punkt verbunden, wie in `pruefen` — sonst nennt der Hinweis an den zweiten Versuch
+    # einen „Namen", den es nicht gibt, und das Modell schreibt dasselbe noch einmal.
+    return ". ".join(teile)

@@ -232,7 +232,13 @@ async def malen(
     prompt = katalog.prompt_bauen(werte, einstellungen, regie)
 
     try:
-        bytes_ = await modell.malen(prompt)
+        bytes_ = await modell.malen(
+            prompt,
+            # Das Seitenverhaeltnis gehoert zur gewaehlten Bildwelt: Eine Landschaft wird
+            # breit, ein Gang im Haus hochkant.
+            format_=str(next((b["format"] for b in katalog.BILDWELTEN
+                              if b["key"] == body.bildwelt), "quadrat")),
+        )
     except Exception as fehler:  # noqa: BLE001 — der Grund gehört in die Meldung
         raise HTTPException(
             status.HTTP_502_BAD_GATEWAY,

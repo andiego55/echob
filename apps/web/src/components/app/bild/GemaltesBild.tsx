@@ -88,7 +88,11 @@ export default function GemaltesBild({ caseId, bildId, alt, onGross }: {
             aria-label="Bild groß ansehen"
             className="group block h-full w-full cursor-zoom-in"
           >
-            <img src={url} alt={alt} className="block h-full w-full object-cover" />
+            {/* **`object-contain`, nicht `object-cover`.** Seit die Bildwelt das
+                Seitenverhältnis bestimmt, sind nicht alle Bilder quadratisch — und ein
+                breites Gelände im 1:1-Ausschnitt verliert genau das, was es ist. Lieber
+                Letterbox in der Kachel als ein beschnittenes Bild. */}
+            <img src={url} alt={alt} className="block h-full w-full object-contain" />
             <span className="absolute right-2 top-2 rounded-full bg-navy/60 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
               <svg
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
@@ -100,7 +104,7 @@ export default function GemaltesBild({ caseId, bildId, alt, onGross }: {
             </span>
           </button>
         ) : (
-          <img src={url} alt={alt} className="block h-full w-full object-cover" />
+          <img src={url} alt={alt} className="block h-full w-full object-contain" />
         )
       ) : (
         <p className="absolute inset-0 grid place-items-center px-4 text-center text-[0.74rem] text-brand-muted">

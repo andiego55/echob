@@ -755,6 +755,10 @@ def test_jede_bildwelt_uebersetzt_dieselben_sechs_groessen():
         # und nicht den Fall - und die Bausteine sind mit ihm verschwunden, statt unbenutzt
         # herumzuliegen und den naechsten Leser glauben zu lassen, sie wirkten noch.
         assert "weg" not in b and "ballung" not in b, b["key"]
+        # **Jede Welt sagt, welches Seitenverhaeltnis zu ihr gehoert.** Fehlt es, wird das
+        # Bild still quadratisch - und eine Landschaft verliert ihre Weite, ohne dass
+        # irgendwo ein Fehler steht.
+        assert b["format"] in ("breit", "hoch", "quadrat"), b["key"]
         for haerte in ("weich", "mittel", "hart"):
             assert len(b["textur"][haerte]) > 15, f'{b["key"]}: textur/{haerte}'
 
@@ -1633,3 +1637,45 @@ def test_ein_anderer_fehler_wird_nicht_verschluckt():
     with _pytest.raises(RuntimeError, match="connection reset"):
         asyncio.run(_modell(bilder).malen("ein Prompt"))
     assert len(bilder.rufe) == 1
+
+
+def test_jedes_format_hat_ein_mass_beim_anbieter():
+    """Ein Format ohne Mass faellt still auf quadratisch zurueck - also genau der Zustand, aus
+    dem es herausfuehren soll, und nichts im Log sagt es."""
+    from app.services.bild_katalog import BILDWELTEN
+    from app.services.bild_modell import GROESSEN
+
+    for b in BILDWELTEN:
+        assert b["format"] in GROESSEN, f'{b["key"]}: {b["format"]}'
+
+    # Und die Masse sind nicht alle gleich - sonst waere die ganze Unterscheidung Zierde.
+    assert len(set(GROESSEN.values())) == len(GROESSEN)
+    breit_x, breit_y = (int(t) for t in GROESSEN["breit"].split("x"))
+    hoch_x, hoch_y = (int(t) for t in GROESSEN["hoch"].split("x"))
+    assert breit_x > breit_y
+    assert hoch_y > hoch_x
+
+
+def test_die_bildwelt_bestimmt_das_mass_des_bildes():
+    """**Vorher war alles quadratisch.** Ein 1:1 Ausschnitt nimmt einem weiten Gelaende genau
+    das, was es ist; ein Gang im Haus steht umgekehrt hochkant besser."""
+    import asyncio
+
+    from app.services.bild_modell import GROESSEN
+
+    for format_, mass in GROESSEN.items():
+        bilder = _Bilder()
+        asyncio.run(_modell(bilder).malen("ein Prompt", format_=format_))
+        assert bilder.rufe[0]["size"] == mass, format_
+
+
+def test_ein_unbekanntes_format_ergibt_ein_bild_und_keinen_fehler():
+    """Eine neue Bildwelt ohne Eintrag soll gemalt werden, nicht abbrechen - quadratisch ist
+    die unauffaellige Wahl."""
+    import asyncio
+
+    from app.services.bild_modell import GROESSE
+
+    bilder = _Bilder()
+    asyncio.run(_modell(bilder).malen("ein Prompt", format_="gibtesnicht"))
+    assert bilder.rufe[0]["size"] == GROESSE

@@ -792,9 +792,59 @@ def test_der_prompt_liest_sich_als_ein_satz():
         **bild_regie.MOCK,
         "motiv": "An old passage with a newly changed lock.",
         "ort": "This is inside an old house, seen from the stair landing.",
+        "wagnis": "The bold decision is that rain falls inside the passage.",
     })
     prompt = prompt_bauen(_werte(), EINST, regie)
 
     assert "The subject is an old passage with a newly changed lock." in prompt
-    assert "It is set in inside an old house, seen from the stair landing." in prompt
     assert "is This is" not in prompt
+    # **Keine Praeposition in der Vorlage.** Im Betrieb stand im Prompt "It is set in in a
+    # flat open landscape": Das Modell hatte "In a flat open landscape ..." geschrieben, und
+    # die Vorlage brachte das "in" schon mit. Eine Vorlage ohne Praeposition nimmt jede Form
+    # an, die ein Modell liefert.
+    assert "Setting: inside an old house, seen from the stair landing." in prompt
+    assert " in in " not in prompt
+    # Und das Wagnis sagt nicht erst, DASS es eine Entscheidung ist.
+    assert "only this one: rain falls inside the passage." in prompt
+    assert "bold decision" not in prompt
+
+
+def test_eine_praeposition_vom_modell_verdoppelt_sich_nicht():
+    """Die Gegenprobe zu allen Formen, in denen ein Modell einen Ort nennt - jede muss im
+    Prompt lesbar bleiben."""
+    formen = (
+        "In a flat open landscape seen from very low to the ground",
+        "Inside an old house, seen from the landing",
+        "At the edge of a garden at first light",
+        "a small kitchen late at night",
+        "This is on a jetty at dusk",
+    )
+    for ort in formen:
+        regie = bild_regie.pruefen({**bild_regie.MOCK, "ort": ort})
+        prompt = prompt_bauen(_werte(), EINST, regie)
+        assert " in in " not in prompt, ort
+        assert "Setting: " in prompt, ort
+        # Der Ort steht noch drin - gekuerzt wird der Anlauf, nicht der Inhalt.
+        assert ort.lower().replace("this is ", "")[:25] in prompt.lower(), ort
+
+
+def test_ein_feld_am_satzanfang_ist_kein_name():
+    """**Dieselbe Art Fehler wie das Wort "eye" aus meinem eigenen Prompt.**
+
+    Die Felder werden fuer die Pruefung aneinandergehaengt. Mit einem Leerzeichen verbunden
+    stand jedes Feld ausser dem ersten mitten im Satz - und ein `ort` wie "Inside an old
+    house" wurde als Name verworfen. Der Waechter schlug auf meine Struktur an, nicht auf
+    das, wogegen er gebaut ist.
+
+    Jedes Feld ist ein eigener Satz, also werden sie mit einem Punkt verbunden.
+    """
+    for ort in ("Inside an old house, seen from the landing",
+                "Across a wide lawn at dusk",
+                "Beneath a low ceiling in a narrow room",
+                "Along the edge of a field after rain"):
+        regie = bild_regie.pruefen({**bild_regie.MOCK, "ort": ort})
+        assert regie is not None, ort
+
+    # Und ein echter Name mitten im Feld wird weiter gefunden.
+    assert bild_regie.pruefen({**bild_regie.MOCK,
+                               "ort": "a courtyard in Kassel at dusk"}) is None

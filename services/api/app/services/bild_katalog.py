@@ -63,6 +63,7 @@ def _menge(zahl: int, wenig: str, mittel: str, viel: str) -> str:
 # die Person gewählt hat.**
 #
 # Jede Bildwelt bringt mit:
+#   format     Welches Seitenverhaeltnis dem Ort entspricht (breit/hoch/quadrat).
 #   szene      Der Ort selbst, ohne alles Weitere.
 #   textur     Wie hart die Welt ist (aus der DURCHSCHNITTLICHEN Belastung).
 #   faden      Das Wiederkehrende, das durch alles läuft (aus den Mustern).
@@ -75,6 +76,7 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "key": "landschaft",
         "label": "Landschaft",
         "hinweis": "Ein Gelände mit Wetter und Weite — was zu gehen ist, liegt vor dir.",
+        "format": "breit",
         "szene": "a wide open landscape seen from a low vantage point, distant horizon",
         "textur": {
             "weich": "soft moss and low grass, everything rounded by weather",
@@ -93,6 +95,7 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "key": "wasser",
         "label": "Wasser",
         "hinweis": "Strömung, Tiefe und Stille — was trägt und was zieht.",
+        "format": "breit",
         "szene": "a body of water seen close to its surface, depth suggested below",
         "textur": {
             "weich": "warm slow water, soft blurred reflections",
@@ -111,6 +114,7 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "key": "haus",
         "label": "Haus",
         "hinweis": "Räume, Türen und Fenster — von außen gesehen, leer.",
+        "format": "hoch",
         "szene": "the inside of an old building seen as empty rooms and passages, no one "
                  "present",
         "textur": {
@@ -127,6 +131,7 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "key": "wald",
         "label": "Wald",
         "hinweis": "Dickicht, Wurzeln und Lichtungen — was wächst und was verdeckt.",
+        "format": "hoch",
         "szene": "deep woodland seen from within, trunks receding into depth",
         "textur": {
             "weich": "moss, soft bark, deep leaf litter",
@@ -144,6 +149,7 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "key": "himmel",
         "label": "Himmel",
         "hinweis": "Wetter, Weite und Ferne — Stimmung ohne Boden.",
+        "format": "breit",
         "szene": "an expanse of sky seen from below, with weather and depth",
         "textur": {
             "weich": "soft diffuse cloud, hazy light",
@@ -160,6 +166,7 @@ BILDWELTEN: tuple[dict[str, Any], ...] = (
         "key": "faden",
         "label": "Faden",
         "hinweis": "Gewebe, Knoten und Risse — was hält und was reißt.",
+        "format": "quadrat",
         "szene": "a large woven textile seen close up, its structure visible",
         "textur": {
             "weich": "soft worn wool, gently frayed",
@@ -795,9 +802,16 @@ def fuehrendes_muster(werte: dict[str, Any], schichten: set[str]) -> str | None:
 
 
 #: Anläufe, die ein Modell einem Satz voranstellt, obwohl ein Satzteil gefragt war.
+#:
+#: Alle aus echten Antworten, nicht gesammelt auf Verdacht. Ein Modell ist darauf trainiert,
+#: in ganzen Sätzen zu reden, und das Feld hat es nach einem Satzteil gefragt.
 _ANLAEUFE = (
     "this is ", "it is ", "the image is ", "the scene is ", "we see ", "we are looking at ",
     "seen is ", "there is ", "an image of ", "a picture of ", "a view of ",
+    # Beim Wagnis sagt es gern erst, DASS es eine Entscheidung ist, und dann welche.
+    "the bold decision is that ", "the bold decision is ", "the one bold decision is that ",
+    "the one bold decision is ", "the break with realism is that ",
+    "the break with realism is ", "the deliberate break is that ", "my bold decision is ",
 )
 
 
@@ -835,9 +849,16 @@ def _regie_teile(
     Sinnbilder sein dürfen, ob eine Gestalt vorkommt. Die abgeleiteten Schichten treten
     zurück: Sie würden das Bild wieder in die Mitte ziehen, aus der es gerade herauskommt.
     """
+    # **„Setting:" und nicht „It is set in".**
+    #
+    # Im Betrieb stand im Prompt „It is set in in a flat open landscape": Das Modell hatte
+    # „In a flat open landscape …" geschrieben, und meine Vorlage brachte die Präposition
+    # schon mit. Dasselbe wäre mit „inside an old house" passiert. Eine Vorlage, die keine
+    # Präposition stellt, nimmt jede Form an, die ein Modell liefert — statt zu hoffen, dass
+    # es die eine trifft, die hineinpasst.
     teile = [
         f"A single image. The subject is {_einfuegbar(regie['motiv'])}.",
-        f"It is set in {_einfuegbar(regie['ort'])}. Colour: {farbe}.",
+        f"Setting: {_einfuegbar(regie['ort'])}. Colour: {farbe}.",
     ]
 
     dinge = [g["was"].rstrip(".") for g in regie.get("gegenstaende") or [] if g.get("was")]
@@ -865,7 +886,7 @@ def _regie_teile(
     if regie.get("wagnis"):
         teile.append(
             "One deliberate break with realism, and only this one: "
-            + regie["wagnis"].rstrip(".") + ".")
+            + _einfuegbar(regie["wagnis"]) + ".")
     return teile
 
 
