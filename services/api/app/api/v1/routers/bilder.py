@@ -233,6 +233,9 @@ async def malen(
             else:
                 material["szenen"] = await dienst.szenen_streuen(
                     conn, user_id=user_id, case_id=case_id,
+                    # Das Gewicht steuert auch die MENGE und nicht nur das Wort im Prompt.
+                    anzahl=dienst.SZENEN_JE_GEWICHT.get(
+                        gewichte["szenen"], dienst.MAX_SZENEN_JE_BILD),
                     bevorzugt=[str(u) for u in body.szenen][:MAX_GEWAEHLTE_SZENEN])
                 gewaehlte_titel = [
                     z["titel"] for z in await dienst.szenen_liste(

@@ -2185,3 +2185,29 @@ async def test_die_szenenliste_traegt_keinen_text(person, db):
     assert "Tuer" not in repr(liste)
     # Und nur das eigene.
     assert await dienst.szenen_liste(db, user_id=uuid.uuid4(), case_id=fall) == []
+
+
+@pytest.mark.asyncio
+async def test_das_gewicht_der_szenen_steuert_auch_die_menge(person, db):
+    """**Ohne das war meine eigene Dokumentation falsch.**
+
+    In `bild_katalog` steht, die Gewichte steuerten "was ueberhaupt geladen wird" - und das
+    stimmte nur fuer `aus`: "Am Rand" und "Darum geht es" holten beide 24 Szenen, weil
+    `szenen_streuen` seine Vorgabe behielt. Ein Satz, der mehr verspricht als der Code haelt,
+    ist schlimmer als keiner: Der naechste Leser glaubt ihm.
+    """
+    fall = await _fall(db, person)
+    for i in range(30):
+        await _szene(db, fall, person, titel=f"S{i}", tage_zurueck=i * 3, text="x" * 80)
+
+    mengen = {}
+    for stufe, erwartet in dienst.SZENEN_JE_GEWICHT.items():
+        gezogen = await dienst.szenen_streuen(
+            db, user_id=person, case_id=fall, anzahl=erwartet)
+        mengen[stufe] = len(gezogen)
+        assert len(gezogen) == erwartet, stufe
+
+    # Die Stufen unterscheiden sich wirklich - sonst waere die Zuordnung Zierde.
+    assert len(set(mengen.values())) == len(dienst.SZENEN_JE_GEWICHT)
+    assert mengen["wenig"] < mengen["normal"] < mengen["viel"]
+    assert mengen["viel"] == dienst.MAX_SZENEN_JE_BILD

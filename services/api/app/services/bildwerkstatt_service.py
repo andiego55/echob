@@ -404,6 +404,18 @@ async def gemaltes_anlegen(
 #: ignoriert den Rest — mehr Material macht das Bild nicht reicher, nur den Aufruf teurer.
 MAX_SZENEN_JE_BILD = 24
 
+#: Wie viele Szenen zu welchem Gewicht gehoeren.
+#:
+#: **Ohne das war die Behauptung falsch.** In `bild_katalog` steht, die Gewichte steuerten,
+#: "was ueberhaupt geladen wird" — und das stimmte nur fuer `aus`: "Am Rand" und "Darum geht
+#: es" holten beide 24 Szenen, weil `szenen_streuen` seine Vorgabe behielt. Ein Dokumentations-
+#: satz, der mehr verspricht als der Code haelt, ist schlimmer als keiner: Der naechste Leser
+#: glaubt ihm.
+#:
+#: Dieselben drei Stufen wie beim Podcast (`_SZENEN_JE_GEWICHT`), nur kleiner — ein Bild traegt
+#: weniger Material als eine Folge.
+SZENEN_JE_GEWICHT: dict[str, int] = {"wenig": 8, "normal": 16, "viel": MAX_SZENEN_JE_BILD}
+
 #: Aus wie vielen früheren Bildern die Motive gemieden werden.
 FRUEHERE_BILDER = 4
 

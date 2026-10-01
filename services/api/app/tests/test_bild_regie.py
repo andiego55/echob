@@ -273,15 +273,26 @@ def test_zwei_faelle_ergeben_mit_regie_deutlich_verschiedene_prompts():
     hier nicht die Schönheit, sondern der Anteil: Was aus dem Fall kommt, muss den Prompt
     tragen und nicht darin vorkommen.
     """
+    # **Zwei Auftraege, die sich in ALLEN Feldern unterscheiden** - so sieht ein echtes Paar
+    # aus (am Modell nachgesehen). Die erste Fassung variierte nur Motiv, Ort und Gegenstaende
+    # und liess Licht, Wagnis und Komposition aus dem Mock gleich; damit wurde sie rot, als
+    # eine weitere gemeinsame Zeile dazukam (der Abstraktionsgrad) - und das war ein Fehler
+    # der Pruefung, nicht der Sache.
     a = bild_regie.pruefen(_regie(
         motiv="a kitchen chair pulled out from a table in a dark flat",
         ort="a small kitchen late at night, seen from the hallway",
+        licht="one overhead bulb, cold and too bright, everything else in blue dark",
+        komposition="the chair near the middle, a wide band of bare floor in front of it",
+        wagnis="the kitchen floor is an inch deep in still black water",
         gegenstaende=[
             {"was": "a packed bag in the hallway", "zeigt": "Die Tasche", "woher": "x"},
             {"was": "a cold cup on the table", "zeigt": "Die Tasse", "woher": "y"}]))
     b = bild_regie.pruefen(_regie(
         motiv="a garden gate left open onto a field of wet grass",
         ort="the edge of a garden at first light, seen from the house",
+        licht="thin grey dawn after rain, no sun yet, everything holding water",
+        komposition="the gate far off and slightly left, the wet lawn filling the foreground",
+        wagnis="the gate stands in the open field with no fence on either side of it",
         gegenstaende=[
             {"was": "a child's bicycle lying on the path", "zeigt": "Das Rad", "woher": "x"},
             {"was": "a rope swing hanging still", "zeigt": "Die Schaukel", "woher": "y"}]))
@@ -1083,3 +1094,30 @@ def test_die_gewaehlten_szenen_stehen_im_auftrag():
         szenen_wunsch=["Der Abend mit dem Schluessel", "Das Telefon auf dem Tisch"]))
     assert "Der Abend mit dem Schluessel" in modell.user
     assert "the subject comes from here" in modell.user
+
+
+def test_ein_besitz_ist_kein_abgebildeter_mensch():
+    """**Die dritte Sperre dieser Art, die normale Sprache getroffen hat.**
+
+    `child(ren)?'s` hat im Betrieb jeden Auftrag eines Falls mit Kindern verworfen, zweimal
+    hintereinander - "a child's bicycle lying on the path" ist der natuerliche Weg, das zu
+    sagen, und das Fahrrad ist ein GEGENSTAND. Das Kind steht nicht im Bild. Auch der zweite
+    Versuch half nicht, weil die Formulierung keine Alternative hat.
+
+    Die Reihe ist lehrreich: "eye" aus meinem eigenen Prompt, "the face of the hill", jetzt
+    "a child's bicycle". Jedes Mal hat eine Sperre Sprache getroffen statt Inhalt - und jedes
+    Mal sah es von aussen so aus, als koenne das Werkzeug es nicht.
+    """
+    harmlos = (
+        "a child's bicycle lying on the path",
+        "the children's room with the door ajar",
+        "a woman's coat left over the chair",
+        "the partner's boots by the door",
+    )
+    for satz in harmlos:
+        assert bild_regie._verbotene(satz) == [], satz
+        assert bild_regie.personen_zu_nah(satz) == [], satz
+
+    # **Was ein Kind im Bild wirklich verhindert, haengt anderswo** - und das bleibt.
+    assert bild_regie.personen_zu_nah("two children right beside the chair")
+    assert bild_regie._verbotene("a child's face at the window")

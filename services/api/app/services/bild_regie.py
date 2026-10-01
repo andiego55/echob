@@ -129,7 +129,17 @@ WENDUNGEN: tuple[tuple[str, str], ...] = (
     (r"\bgaz(e|ing)\s+(of|at|back|toward)", "a gaze"),
     (r"\bfacial\s+expression\b", "an expression"),
     # Ein Mensch im Bild. „man-made" und „management" sind keine.
-    (r"\bchild(ren)?'s\b", "a child as an owner"),
+    # **Hier stand `child(ren)?'s` — und das war die dritte Sperre dieser Art, die normale
+    # Sprache getroffen hat.** Im Betrieb hat sie jeden Auftrag eines Falls mit Kindern
+    # verworfen, zweimal hintereinander: „a child's bicycle lying on the path" ist der
+    # natürliche Weg, das zu sagen, und das Fahrrad ist ein GEGENSTAND — das Kind steht nicht
+    # im Bild. Auch der zweite Versuch half nicht, weil die Formulierung keine Alternative hat.
+    #
+    # Was ich damit eigentlich wollte („nenne den Gegenstand, nicht den Besitzer"), ist eine
+    # Stilfrage und keine Sicherheitsregel. Sie steht als Bitte in den Regeln. Was ein Kind im
+    # Bild wirklich verhindert, hängt anderswo: an `personen_zu_nah` (ein beschriebenes Kind
+    # muss fern sein), an der Gesichtssperre, und bei einem Fall ÜBER ein Kind an
+    # `kinder_erlaubt`.
     # Lesbares. „signs of wear", „a note of green" und „a trace of" sind keins.
     (r"\b(a|the|one|small|wooden|metal|painted|handwritten)\s+"
      r"(sign|note|label|letter|placard|poster|plaque|banner)s?\b", "something readable"),
@@ -186,7 +196,8 @@ def personen_zu_nah(text: str) -> list[str]:
     Menschen" früher eine Eigenschaft der Eingabe war.
     """
     gefunden: list[str] = []
-    for teil in re.split(r"[;.]", text.lower()):
+    for roh in re.split(r"[;.]", text.lower()):
+        teil = ohne_besitz(roh)
         wer = [w for w in PERSONEN_WORTE if re.search(rf"\b{re.escape(w)}\b", teil)]
         if not wer:
             continue
@@ -194,6 +205,26 @@ def personen_zu_nah(text: str) -> list[str]:
             continue
         gefunden.append(f"{wer[0]} shown close instead of far away and indistinct")
     return list(dict.fromkeys(gefunden))
+
+
+def ohne_besitz(text: str) -> str:
+    """Besitzformen weg — **ein Besitz ist kein abgebildeter Mensch.**
+
+    „a child's bicycle lying on the path" nennt ein Fahrrad. Das Kind steht nicht im Bild, und
+    die Wendung ist der natürliche Weg, das zu sagen. Im Betrieb hat genau sie jeden Auftrag
+    eines Falls mit Kindern verworfen — zweimal hintereinander, auch nach dem zweiten Versuch,
+    weil es keine andere Formulierung gibt.
+
+    Dieselbe Mechanik wie `IDIOME`: Die harmlose Stelle wird vor dem Prüfen aus dem Text
+    genommen, statt das Muster immer komplizierter zu machen.
+
+    **Was ein Mensch im Bild bleibt, bleibt es.** „the woman's face" verliert hier nur das
+    „woman's" — das Gesicht fällt eine Ebene höher, in `WENDUNGEN`.
+    """
+    for wort in PERSONEN_WORTE:
+        text = re.sub(rf"\b{re.escape(wort)}'s\b", " ", text)
+        text = re.sub(rf"\b{re.escape(wort)}s'\b", " ", text)
+    return text
 
 
 def personen_ueberhaupt(text: str) -> list[str]:
