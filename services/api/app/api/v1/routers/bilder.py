@@ -209,10 +209,21 @@ async def malen(
         # OpenAI arbeitet - das ist die bekannte Engstelle, und hier wird sie nicht
         # wiederholt: lesen, loslassen, Modelle arbeiten lassen.
         material: dict | None = None
+        fruehere: list[str] = []
         if body.quelle == "fall":
             from app.services import podcast_service
             material = await podcast_service.material_laden(
                 conn, user_id=user_id, case_id=case_id, gewichte=REGIE_GEWICHTE)
+            # **Die Szenen kommen NICHT aus dem Podcast-Lader.**
+            #
+            # Der holt die dreissig neuesten, immer dieselben - fuer eine Folge ueber den
+            # Verlauf richtig, fuer ein Bild falsch. Bei einem Fall mit siebzig Szenen bekam
+            # das Modell jedes Mal dieselbe Auswahl und nahm daraus dieselben Motive: Zwei
+            # Bilder hintereinander zeigten drei gemeinsame, und es sah aus wie ein Zufall.
+            material["szenen"] = await dienst.szenen_streuen(
+                conn, user_id=user_id, case_id=case_id)
+            fruehere = await dienst.fruehere_motive(
+                conn, user_id=user_id, case_id=case_id)
 
     regie = None
     if material is not None:
@@ -225,7 +236,8 @@ async def malen(
                 wunsch=str(einstellungen.get("wunsch") or ""),
                 # „Niemand ist auf dem Bild" gilt auch fuer die Regie: Wer das gewaehlt hat,
                 # soll keine Gestalten im Bild finden, auch keine fernen.
-                menschen=body.figur != "keine")
+                menschen=body.figur != "keine",
+                fruehere=fruehere)
         if regie is None:
             # **Kein Fehler, ein Rueckfall.** Eine Regie, die nicht taugt - zu wenig
             # Material, ein verbotenes Wort, ein Verdacht auf einen Namen -, darf kein Bild

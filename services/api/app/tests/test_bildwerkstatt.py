@@ -1840,3 +1840,113 @@ def test_die_legende_sagt_bei_der_sichtbaren_gestalt_dass_sie_erfunden_ist():
     assert "kein Abbild von dir" in zeile["wofuer"]
     # Und die Linie, die bleibt.
     assert "kommt nie mit Gesicht vor und nie nah" in zeile["wofuer"]
+
+
+# == Die immer gleiche Auswahl =================================================
+#
+# Gemeldet aus dem Betrieb: "Ich habe bei einem Klienten der ueber 70 Szenen hat 2 Bilder
+# erstellen lassen. 3 Szenen kommen als Motive in 2 Bildern vor. Wie kommt es, dass 2 mal die
+# gleiche Auswahl von Szenen erfolgt?"
+#
+# Weil die Bildregie sich den Lader des Podcasts lieh, und der holt
+# `ORDER BY scene_date DESC LIMIT 30` - immer dieselben dreissig neuesten. Fuer eine Folge
+# ueber den Verlauf richtig, fuer ein Bild falsch.
+
+
+@pytest.mark.asyncio
+async def test_zwei_bilder_sehen_nicht_dieselben_szenen(person, db):
+    """**Der Waechter zu dem gemeldeten Fehler.**
+
+    Ein Bild soll die Lage zeigen, ein zweites eine andere Stelle davon. Bei einem Fall mit
+    vielen Szenen darf die Auswahl deshalb nicht feststehen.
+    """
+    fall = await _fall(db, person)
+    for i in range(40):
+        await _szene(db, fall, person, titel=f"S{i}", tage_zurueck=i * 3,
+                     text=f"Text der Szene {i}. " + "x" * 60)
+
+    ziehungen = [
+        {z["title"] for z in await dienst.szenen_streuen(
+            db, user_id=person, case_id=fall, anzahl=10)}
+        for _ in range(5)
+    ]
+    assert all(len(z) == 10 for z in ziehungen)
+    # Fuenf Ziehungen von zehn aus vierzig: Dass ALLE gleich sind, waere kein Zufall mehr.
+    assert len({frozenset(z) for z in ziehungen}) > 1, "die Auswahl steht fest"
+
+
+@pytest.mark.asyncio
+async def test_gestreut_wird_ueber_den_ganzen_fall(person, db):
+    """Nicht nur die neuesten: Die aelteste Szene muss erreichbar sein, sonst ist der halbe
+    Fall fuer jedes Bild unsichtbar."""
+    fall = await _fall(db, person)
+    await _szene(db, fall, person, titel="Die aelteste", tage_zurueck=900, text="x" * 80)
+    for i in range(12):
+        await _szene(db, fall, person, titel=f"Neu {i}", tage_zurueck=i, text="y" * 80)
+
+    gesehen = set()
+    for _ in range(12):
+        gesehen |= {z["title"] for z in await dienst.szenen_streuen(
+            db, user_id=person, case_id=fall, anzahl=4)}
+    assert "Die aelteste" in gesehen
+
+
+@pytest.mark.asyncio
+async def test_gestreut_wird_nur_das_eigene_und_nur_bestaetigtes(person, db):
+    """Dieselben zwei Grenzen wie ueberall: Eigentum und „ein Entwurf ist keine Angabe"."""
+    fall = await _fall(db, person)
+    await _szene(db, fall, person, titel="Bestaetigt", tage_zurueck=5, text="x" * 80)
+    await db.execute(
+        "INSERT INTO scenes (case_id, user_id, title, description, confirmed_by_user) "
+        "VALUES ($1,$2,'Entwurf',$3,false)", fall, person, crypto.encrypt("noch nichts"))
+
+    fremd = uuid.uuid4()
+    gezogen = await dienst.szenen_streuen(db, user_id=person, case_id=fall)
+    assert [z["title"] for z in gezogen] == ["Bestaetigt"]
+    # Und der Text kommt entschluesselt heraus, sonst bekaeme das Modell Geheimtext.
+    assert gezogen[0]["description"].startswith("x")
+    assert await dienst.szenen_streuen(db, user_id=fremd, case_id=fall) == []
+
+
+@pytest.mark.asyncio
+async def test_die_motive_der_letzten_bilder_sind_abrufbar(person, db):
+    """**Die zweite Haelfte derselben Behebung.**
+
+    Streuen allein genuegt nicht: Eine Szene, die stark ist, ist in jeder Auswahl stark, und
+    ein Modell greift zu ihr. Also muss die Regie erfahren, was schon im Bild war.
+    """
+    fall = await _fall(db, person)
+    for nummer in range(2):
+        await dienst.gemaltes_anlegen(
+            db, user_id=person, case_id=fall, einstellungen={},
+            bild=b"PNG", bild_typ="image/png", prompt="x",
+            regie={
+                "motiv": f"a locked door number {nummer}",
+                "gegenstaende": [{"was": f"a packed bag {nummer}",
+                                  "zeigt": f"Die Tasche {nummer}", "woher": "y"}],
+                "symbole": [{"was": f"an open gate {nummer}", "zeigt": "Das Tor",
+                             "woher": "z"}],
+            })
+
+    motive = await dienst.fruehere_motive(db, user_id=person, case_id=fall)
+
+    for erwartet in ("a locked door number 0", "a packed bag 1", "an open gate 0"):
+        assert erwartet in motive, erwartet
+    # **Englisch, nicht deutsch:** Die Liste geht an das Sprachmodell. Die deutschen Zeilen
+    # sind die Legende fuer die Person und haben hier nichts zu suchen.
+    assert not any("Tasche" in m for m in motive)
+    assert not any("Tor" in m for m in motive)
+
+
+@pytest.mark.asyncio
+async def test_ohne_frueheres_bild_gibt_es_keine_motive(person, db):
+    """Eine leere Liste und keine Ueberschrift im Prompt - sonst stuende dort „Motifs the
+    earlier images already used" mit nichts darunter, und das ist eine Aufforderung."""
+    fall = await _fall(db, person)
+    assert await dienst.fruehere_motive(db, user_id=person, case_id=fall) == []
+
+    # Ein Bild aus dem Baukasten hat keine Regie und zaehlt deshalb nicht.
+    await dienst.gemaltes_anlegen(
+        db, user_id=person, case_id=fall, einstellungen={},
+        bild=b"PNG", bild_typ="image/png", prompt="x", regie=None)
+    assert await dienst.fruehere_motive(db, user_id=person, case_id=fall) == []

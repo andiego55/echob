@@ -943,3 +943,37 @@ def test_die_regeln_raten_vom_wort_gesicht_ab():
     Anweisung sorgt dafuer, dass es meistens gar nicht kommt."""
     assert "Avoid the word" in bild_regie.SYSTEM_REGELN
     assert "figures turned away" in bild_regie.SYSTEM_REGELN
+
+
+def test_die_fruehreren_motive_stehen_im_auftrag():
+    """Die Regie muss erfahren, was schon im Bild war - sonst nimmt sie es wieder."""
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material,
+        fruehere=["a locked apartment door", "a packed bag in the hallway"]))
+
+    assert "a locked apartment door" in modell.user
+    assert "should show a different part of it" in modell.user
+
+
+def test_ohne_fruehere_motive_steht_die_ueberschrift_nicht_da():
+    """Eine Ueberschrift mit nichts darunter ist eine Aufforderung an das Modell, sich etwas
+    auszudenken - dieselbe Ueberlegung wie beim leeren Wunsch."""
+    material = _material()
+    for leer in (None, []):
+        modell = _Modell()
+        asyncio.run(bild_regie.fuehren(
+            modell, fall=material["fall"], material=material, fruehere=leer))
+        assert "earlier images" not in modell.user, repr(leer)
+
+
+def test_die_bitte_verbietet_das_motiv_nicht():
+    """Wenn ein Gegenstand das Zentrum des Falls ist, darf er wiederkommen. Was nicht
+    wiederkommen soll, ist dieselbe Auswahl aus Traegheit."""
+    material = _material()
+    modell = _Modell()
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material, fruehere=["a locked door"]))
+    assert "it may come back" in modell.user
+    assert "not out of habit" in modell.user

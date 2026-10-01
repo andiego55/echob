@@ -599,6 +599,7 @@ MAX_WUNSCH = 400
 async def fuehren(
     echo_service: Any, *, fall: dict[str, Any], material: dict[str, Any],
     welt: dict[str, Any] | None = None, wunsch: str = "", menschen: bool = True,
+    fruehere: list[str] | None = None,
 ) -> dict[str, Any] | None:
     """Der Bildauftrag zu diesem Fall — oder ``None``, wenn es keinen gibt, der taugt.
 
@@ -637,6 +638,26 @@ async def fuehren(
             "bag can stand on a jetty, a kitchen chair can sit in a clearing. If an object "
             "cannot plausibly be there, choose a different object rather than a different "
             "place."
+        )
+
+    # ── Was schon im Bild war ───────────────────────────────────────────────
+    #
+    # **Die zweite Hälfte einer Fehlerbehebung.** Die Szenen werden jetzt gestreut statt immer
+    # die neuesten dreißig zu nehmen (siehe `bildwerkstatt_service.szenen_streuen`) — aber
+    # eine Szene, die stark ist, ist in jeder Auswahl stark, und ein Modell greift zu ihr.
+    # Deshalb steht hier, was die letzten Bilder dieses Falls schon gezeigt haben.
+    #
+    # Als Bitte und nicht als Verbot: Wenn ein Gegenstand das Zentrum dieses Falls ist, darf
+    # er wiederkommen. Was nicht wiederkommen soll, ist dieselbe Auswahl aus Trägheit.
+    if fruehere:
+        text += (
+            "\n\n## Motifs the earlier images of this case already used\n"
+            + "; ".join(fruehere[:30])
+            + "\n\nThis is the next image of the same case, and it should show a different "
+              "part of it. Reach for material you have not used here: another room, another "
+              "time of day, another object, another season. If one of these motifs is truly "
+              "the centre of this case, it may come back — but not out of habit, and not as "
+              "the leading subject twice in a row."
         )
 
     # ── Der Wunsch der Person ───────────────────────────────────────────────

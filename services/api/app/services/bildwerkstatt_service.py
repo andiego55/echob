@@ -455,6 +455,84 @@ async def gemaltes_anlegen(
     return _bild(zeile)
 
 
+#: Wie viele Szenen in einen Bildauftrag gehen.
+#:
+#: Nicht mehr: Ein Sprachmodell, das 70 Szenen bekommt, nimmt die drei auffälligsten und
+#: ignoriert den Rest — mehr Material macht das Bild nicht reicher, nur den Aufruf teurer.
+MAX_SZENEN_JE_BILD = 24
+
+#: Aus wie vielen früheren Bildern die Motive gemieden werden.
+FRUEHERE_BILDER = 4
+
+
+async def szenen_streuen(
+    conn: asyncpg.Connection, *, user_id: UUID | str, case_id: UUID | str,
+    anzahl: int = MAX_SZENEN_JE_BILD,
+) -> list[dict[str, Any]]:
+    """Eine ZUFÄLLIGE Auswahl bestätigter Szenen — **und das ist eine Fehlerbehebung.**
+
+    Vorher lieh sich die Bildregie den Lader des Podcasts, und der holt
+    ``ORDER BY scene_date DESC LIMIT 30``: immer dieselben dreißig neuesten. Bei einem Fall
+    mit über siebzig Szenen bekam das Modell also jedes Mal dieselbe Auswahl — und nahm daraus
+    jedes Mal die auffälligsten. Zwei Bilder hintereinander zeigten drei gemeinsame Motive,
+    und es sah aus wie ein Zufall, der keiner war.
+
+    **Für einen Podcast ist die Reihenfolge richtig**, dort erzählt man den Verlauf. Ein Bild
+    soll die Lage zeigen, und ein zweites Bild soll eine andere Stelle davon zeigen. Also
+    streuen: über die ganze Breite des Falls, jedes Mal neu.
+
+    Mitgenommen wird nur, was ein Bildauftrag braucht — Titel, Text, eigene Reaktion und das
+    Datum. Die Belastung kommt über die Schicht ``szenen`` als Zahl.
+    """
+    zeilen = await conn.fetch(
+        "SELECT title, description, user_reaction, scene_date, created_at "
+        "  FROM scenes "
+        " WHERE case_id = $1 AND user_id = $2 AND confirmed_by_user = true "
+        " ORDER BY random() LIMIT $3",
+        case_id, user_id, max(1, anzahl),
+    )
+    return [
+        crypto.decrypt_fields(dict(z), "description", "user_reaction") for z in zeilen
+    ]
+
+
+async def fruehere_motive(
+    conn: asyncpg.Connection, *, user_id: UUID | str, case_id: UUID | str,
+    bilder: int = FRUEHERE_BILDER,
+) -> list[str]:
+    """Die Motive der letzten Bilder dieses Falls — damit das nächste andere nimmt.
+
+    **Die zweite Hälfte derselben Fehlerbehebung.** Streuen allein genügt nicht: Eine Szene,
+    die stark ist, ist in jeder Auswahl stark, und ein Modell greift zu ihr. Hier steht, was
+    schon im Bild war, und die Regie bekommt es als „nimm diesmal etwas anderes" mit.
+
+    Gelesen wird aus der gespeicherten Regie (``case_bilder.regie``) — genau dafür liegt sie
+    da. Englisch, weil es an das Sprachmodell geht und nicht an die Person.
+    """
+    zeilen = await conn.fetch(
+        "SELECT regie FROM case_bilder "
+        " WHERE case_id = $1 AND user_id = $2 AND regie IS NOT NULL "
+        " ORDER BY created_at DESC LIMIT $3",
+        case_id, user_id, max(0, bilder),
+    )
+    motive: list[str] = []
+    for zeile in zeilen:
+        try:
+            regie = json.loads(crypto.decrypt(zeile["regie"]) or "{}")
+        except (ValueError, TypeError):
+            continue
+        if not isinstance(regie, dict):
+            continue
+        for schluessel in ("gegenstaende", "symbole"):
+            for eintrag in regie.get(schluessel) or []:
+                if isinstance(eintrag, dict) and eintrag.get("was"):
+                    motive.append(str(eintrag["was"]))
+        if regie.get("motiv"):
+            motive.append(str(regie["motiv"]))
+    # Reihenfolge erhalten, Doppelte weg: Was zweimal vorkam, steht trotzdem nur einmal da.
+    return list(dict.fromkeys(motive))[:40]
+
+
 async def datei_holen(
     conn: asyncpg.Connection, *, user_id: UUID | str, bild_id: UUID | str,
 ) -> tuple[bytes, str] | None:
