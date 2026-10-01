@@ -231,7 +231,7 @@ def test_mit_regie_fuehrt_der_fall_und_nicht_der_katalog():
     ohne = prompt_bauen(werte, EINST)
     muster = muster_bild("guilt_shifting", "landschaft").rstrip(".")
 
-    assert f"The subject is {bild_regie.MOCK['motiv']}" in mit
+    assert f"Subject: {bild_regie.MOCK['motiv']}" in mit
     assert muster in ohne
     assert muster not in mit, "der Katalog redet trotzdem mit"
 
@@ -796,7 +796,7 @@ def test_der_prompt_liest_sich_als_ein_satz():
     })
     prompt = prompt_bauen(_werte(), EINST, regie)
 
-    assert "The subject is an old passage with a newly changed lock." in prompt
+    assert "Subject: an old passage with a newly changed lock." in prompt
     assert "is This is" not in prompt
     # **Keine Praeposition in der Vorlage.** Im Betrieb stand im Prompt "It is set in in a
     # flat open landscape": Das Modell hatte "In a flat open landscape ..." geschrieben, und
@@ -848,3 +848,19 @@ def test_ein_feld_am_satzanfang_ist_kein_name():
     # Und ein echter Name mitten im Feld wird weiter gefunden.
     assert bild_regie.pruefen({**bild_regie.MOCK,
                                "ort": "a courtyard in Kassel at dusk"}) is None
+
+
+def test_ein_ganzer_satz_als_motiv_bleibt_lesbar():
+    """**Dieselbe Lehre wie bei der Praeposition, eine Zeile hoeher.**
+
+    Das Modell schrieb "A locked apartment door stands alone in a wet october field", und
+    daraus wurde "The subject is a locked apartment door stands alone". Eine Vorlage, die nur
+    benennt, nimmt jede Form an - und das ist zuverlaessiger als eine Bitte um Satzteile.
+    """
+    for motiv in ("A locked apartment door stands alone in a wet october field",
+                  "a locked door alone in a wet field",
+                  "The image shows a chair pulled out from a table"):
+        regie = bild_regie.pruefen({**bild_regie.MOCK, "motiv": motiv})
+        prompt = prompt_bauen(_werte(), EINST, regie)
+        assert "Subject: " in prompt, motiv
+        assert "is a locked apartment door stands" not in prompt, motiv

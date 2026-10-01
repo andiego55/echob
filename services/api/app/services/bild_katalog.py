@@ -857,7 +857,11 @@ def _regie_teile(
     # Präposition stellt, nimmt jede Form an, die ein Modell liefert — statt zu hoffen, dass
     # es die eine trifft, die hineinpasst.
     teile = [
-        f"A single image. The subject is {_einfuegbar(regie['motiv'])}.",
+        # **Keine Kopula in der Vorlage, aus demselben Grund wie die fehlende Praeposition
+        # darunter.** Das Modell schrieb "A locked apartment door stands alone in a field",
+        # und daraus wurde "The subject is a locked apartment door stands alone". Eine
+        # Vorlage, die nur benennt, nimmt jede Form an.
+        f"A single image. Subject: {_einfuegbar(regie['motiv'])}.",
         f"Setting: {_einfuegbar(regie['ort'])}. Colour: {farbe}.",
     ]
 

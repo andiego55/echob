@@ -224,9 +224,12 @@ SYSTEM_SCHEMA = """\
 Answer as JSON, with exactly these keys:
 
 {
-  "motiv": "one English sentence: the single thing this image is OF. The strongest, most
-            specific thing in the case. This becomes the first instruction to the painter.",
-  "ort": "one English sentence: where this is, and from what vantage point it is seen.",
+  "motiv": "the single thing this image is OF, in English — the strongest, most specific
+            thing in the case. A noun phrase, not a whole sentence: 'a locked door alone in a
+            wet october field', not 'the door stands alone'. This becomes the first
+            instruction to the painter.",
+  "ort": "where this is and from what vantage point it is seen, in English, as a phrase
+          rather than a sentence.",
   "gegenstaende": [
     {"was": "one concrete object or feature, English, short phrase — this goes to the painter",
      "zeigt": "the same thing named in German, two to five words, as it would be pointed at
