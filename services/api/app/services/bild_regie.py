@@ -182,7 +182,49 @@ FERNE_WORTE: tuple[str, ...] = (
 )
 
 
-def personen_zu_nah(text: str) -> list[str]:
+#: Woerter fuer ein Kind.
+#:
+#: Mehr als in `PERSONEN_WORTE` steht: „kid", „baby", „toddler" sind fuer die Entfernungsregel
+#: unwichtig (sie tauchen in einer Bildregie kaum auf), fuer das VERBOT aber nicht — dort darf
+#: kein Wort fehlen.
+KINDER_WORTE: tuple[str, ...] = (
+    "child", "children", "kid", "kids", "boy", "boys", "girl", "girls",
+    "baby", "babies", "infant", "toddler", "toddlers",
+)
+
+
+#: Wendungen, mit denen eine Regie auf die EIGENE Gestalt verweist.
+#:
+#: Die setzt die App selbst (aus der Selbstauskunft), und die Regie soll sie nicht beschreiben
+#: — aber sie darf sich auf sie beziehen: „a child on a swing right in front of the figure"
+#: ist genau die richtige Formulierung. Ohne diese Liste schlaegt die Entfernungsregel auf das
+#: Wort „figure" an und verwirft den Auftrag; der vierte Fall dieser Art.
+#:
+#: **Nur bei `personen_zu_nah`, nicht bei `personen_ueberhaupt`.** Wer „Niemand ist auf dem
+#: Bild" gewaehlt hat, hat keine eigene Gestalt — dort beschreibt „the figure" jemanden.
+EIGENE_GESTALT: tuple[str, ...] = (
+    r"\bthe figures?(?:'s)?\b",
+    r"\bthat figures?\b",
+    r"\bthe viewer(?:'s)?\b",
+    r"\bthe (?:standing|walking|waiting) figure\b",
+)
+
+
+def kinder_im_bild(text: str) -> list[str]:
+    """Jedes Wort fuer ein Kind — **fuer einen Fall, der VON einem Kind handelt.**
+
+    Dort darf kein Kind vorkommen: Es waere genau die Person, die nicht abgebildet werden
+    darf, erzeugt aus den Angaben eines Elternteils.
+
+    **Das stand bisher nur als Anweisung im Prompt.** Die schaerfste Regel des Moduls hing
+    damit am Gehorsam eines Modells — und genau dafuer gibt es in dieser Datei den Satz, dass
+    eine Anweisung eine Bitte und eine Pruefung eine Grenze ist. Hier wird sie eine.
+    """
+    tief = ohne_besitz(text.lower())
+    return [w for w in KINDER_WORTE if re.search(rf"\b{re.escape(w)}\b", tief)]
+
+
+def personen_zu_nah(text: str, *, kinder_duerfen_nah: bool = True) -> list[str]:
     """Menschen, bei denen nicht dasteht, dass sie fern oder undeutlich sind.
 
     **Die Regel, die die alte Sperre ersetzt.** „Es dürfen auch andere Personen in dem Bild
@@ -195,10 +237,22 @@ def personen_zu_nah(text: str) -> list[str]:
     der Eingabe und keine Bitte an das Bildmodell — dieselbe Überlegung, aus der „keine
     Menschen" früher eine Eigenschaft der Eingabe war.
     """
+    # **Ein Kind darf nah sein, wenn der Fall nicht von einem handelt.**
+    #
+    # Aus dem Betrieb: Eine Szene auf dem Spielplatz — jemand schiebt die Schaukel — wurde
+    # zweimal verworfen, weil ein Kind dort naturgemaess nah ist. Die Entfernungsregel gibt es,
+    # weil die Regie nicht weiss, welcher beschriebene Mensch die Fallperson ist, und ein
+    # ERWACHSENER es sein koennte. Ein Kind kann es nur in einem Fall ueber ein Kind sein —
+    # und dort steht es gar nicht erst im Bild (`kinder_im_bild`).
+    ausser = set(KINDER_WORTE) if kinder_duerfen_nah else set()
+
     gefunden: list[str] = []
     for roh in re.split(r"[;.]", text.lower()):
         teil = ohne_besitz(roh)
-        wer = [w for w in PERSONEN_WORTE if re.search(rf"\b{re.escape(w)}\b", teil)]
+        for verweis in EIGENE_GESTALT:
+            teil = re.sub(verweis, " ", teil)
+        wer = [w for w in PERSONEN_WORTE
+               if w not in ausser and re.search(rf"\b{re.escape(w)}\b", teil)]
         if not wer:
             continue
         if any(re.search(rf"\b{re.escape(f)}\b", teil) for f in FERNE_WORTE):
@@ -451,7 +505,9 @@ def _verbotene(text: str) -> list[str]:
     return list(dict.fromkeys(gefunden))
 
 
-def pruefen(roh: Any, *, menschen: bool = True) -> dict[str, Any] | None:
+def pruefen(
+    roh: Any, *, menschen: bool = True, kinder: bool = True,
+) -> dict[str, Any] | None:
     """Die Antwort des Modells — geprüft, beschnitten, oder verworfen.
 
     **Eine Anweisung ist eine Bitte, eine Prüfung ist eine Grenze.** Im Systemtext stehen
@@ -461,6 +517,10 @@ def pruefen(roh: Any, *, menschen: bool = True) -> dict[str, Any] | None:
     ``menschen`` ist die Wahl der Person: Wer „Niemand ist auf dem Bild" gewählt hat, bekommt
     auch von der Regie keinen — dort ist jedes Wort für einen Menschen verboten. Sonst gilt
     `personen_zu_nah`.
+
+    ``kinder`` kommt aus der Beziehungsart und nicht aus einer Wahl: Handelt der Fall VON einem
+    Kind, darf keines vorkommen (siehe `kinder_im_bild`). Sonst darf ein Kind auch nah stehen —
+    es kann dort nicht die Person sein, um die es geht.
 
     Gibt ``None`` zurück, wenn die Antwort nicht taugt. Dann malt das Bild aus dem Katalog wie
     vorher — ein Bild mit weniger Eigenart ist besser als eines, das eine Grenze verletzt.
@@ -547,8 +607,18 @@ def pruefen(roh: Any, *, menschen: bool = True) -> dict[str, Any] | None:
         logger.warning("Bildregie verworfen: Begleitung mit %s.", schlimm_nah[:3])
         return None
 
+    # Die Begleitung gehoert zur eigenen Gestalt und steht absichtlich nah — fuer sie gilt
+    # die Entfernungsregel nicht, das Kinderverbot aber schon.
+    alles = hinaus + ". " + nah_erlaubt
+
+    if not kinder:
+        if wer := kinder_im_bild(alles):
+            logger.warning("Bildregie verworfen: Kind in einem Fall ueber ein Kind %s.",
+                           wer[:3])
+            return None
+
     if menschen:
-        if nah := personen_zu_nah(hinaus):
+        if nah := personen_zu_nah(hinaus, kinder_duerfen_nah=kinder):
             logger.warning("Bildregie verworfen: %s.", nah[:3])
             return None
     elif wer := personen_ueberhaupt(hinaus):
@@ -830,7 +900,7 @@ async def fuehren(
             logger.exception("Bildregie: Modellaufruf gescheitert.")
             return None
 
-        regie = pruefen(roh, menschen=menschen)
+        regie = pruefen(roh, menschen=menschen, kinder=kinder_erlaubt)
         if regie is not None:
             if versuch == 2:
                 logger.info("Bildregie: im zweiten Versuch durchgekommen.")
@@ -841,8 +911,9 @@ async def fuehren(
             stoerer = (
                 _verbotene(roh_text)
                 or verdacht_auf_namen(roh_text)
-                or (personen_zu_nah(roh_text) if menschen
-                    else personen_ueberhaupt(roh_text))
+                or (kinder_im_bild(roh_text) if not kinder_erlaubt else [])
+                or (personen_zu_nah(roh_text, kinder_duerfen_nah=kinder_erlaubt)
+                    if menschen else personen_ueberhaupt(roh_text))
             )
             if not stoerer:
                 # Nicht die Wortprüfung, sondern die Form: zu dünn, zu wenige Gegenstände.

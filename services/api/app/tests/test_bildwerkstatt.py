@@ -779,9 +779,16 @@ def test_keine_bildwelt_setzt_einen_menschen_ins_bild():
         # und fand es in „surface" - genau der Fehler, den dieses Projekt schon einmal
         # gemacht hat („user_id" steckt in „owner_user_id"). Ein Waechter, der bei jedem
         # Wasserbild anschlaegt, wird weggeklickt.
+        # **Und mit denselben Ausnahmen wie die Bildregie.** „a body of water" ist die
+        # Bildwelt „Wasser" selbst - derselbe Fall wie „the face of the hill". Dieser Test war
+        # bis 01.10. durch ein Backspace-Zeichen im Muster blind (ein Heredoc hatte den
+        # Backslash gefressen); als er zu pruefen anfing, schlug er sofort darauf an, und das
+        # war kein Mensch im Bild, sondern eine zu grobe Liste.
+        for idiom in (r"\bbod(y|ies) of water\b", r"\bbod(y|ies) of the water\b"):
+            alles = re.sub(idiom, " ", alles)
         for gestalt in ("person", "figure", "someone", "child", "woman", "man",
                         "chair", "bed", "portrait", "face", "body"):
-            assert not re.search(rf"{gestalt}s?", alles), f'{b["key"]}: {gestalt}'
+            assert not re.search(rf"\b{gestalt}s?\b", alles), f'{b["key"]}: {gestalt}'
 
 
 def test_jede_handschrift_ergibt_einen_anderen_prompt():

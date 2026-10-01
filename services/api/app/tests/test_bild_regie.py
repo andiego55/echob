@@ -111,9 +111,17 @@ def test_ein_mensch_ohne_entfernung_verwirft_die_regie():
     for schlimm in ("a man standing at the water",
                     "a woman sitting at the table",
                     "a couple at the kitchen counter",
-                    "two children right beside the chair"):
+                    "a mother at the kitchen counter"):
         assert bild_regie.pruefen(_regie(ort=f"a long shore at dusk, {schlimm}")) is None, \
             schlimm
+
+    # **Kinder sind die Ausnahme, und zwar eine ueberlegte.** Die Regel gibt es, weil die
+    # Regie nicht weiss, welcher beschriebene Mensch die Fallperson ist, und ein ERWACHSENER
+    # es sein koennte. Ein Kind kann es nur in einem Fall ueber ein Kind sein - und dort steht
+    # es gar nicht erst im Bild, siehe
+    # `test_in_einem_fall_ueber_ein_kind_wird_jedes_kind_verworfen`.
+    assert bild_regie.pruefen(
+        _regie(ort="a long shore at dusk, two children right beside the chair")) is not None
 
 
 def test_ein_ferner_mensch_ist_erlaubt():
@@ -1016,7 +1024,10 @@ def test_eine_nahe_begleitung_scheitert_nicht_an_der_entfernungsregel():
     auch unter der Entfernungsregel durchgekommen. Ein Test, der ohne die Ausnahme gruen
     bleibt, prueft die Ausnahme nicht.
     """
-    nah = "a child holding on to the coat"
+    # Ein ERWACHSENER in der Begleitung, damit die Probe traegt: Kinder sind inzwischen
+    # ohnehin von der Entfernungsregel ausgenommen, und ein Test, der das nutzt, pruefte die
+    # Ausnahme fuer die Begleitung nicht mehr.
+    nah = "a woman holding on to the coat"
     assert bild_regie.personen_zu_nah(nah), "die Probe traegt nicht"
 
     regie = bild_regie.pruefen(_regie(begleitung=nah))
@@ -1119,8 +1130,10 @@ def test_ein_besitz_ist_kein_abgebildeter_mensch():
         assert bild_regie.personen_zu_nah(satz) == [], satz
 
     # **Was ein Kind im Bild wirklich verhindert, haengt anderswo** - und das bleibt.
-    assert bild_regie.personen_zu_nah("two children right beside the chair")
     assert bild_regie._verbotene("a child's face at the window")
+    assert bild_regie.kinder_im_bild("a child's bicycle") == [], (
+        "ein Besitz ist auch fuer das Kinderverbot kein Kind im Bild"
+    )
 
 
 def test_das_begleitungs_feld_nennt_seine_ausnahme():
@@ -1140,3 +1153,96 @@ def test_das_begleitungs_feld_nennt_seine_ausnahme():
     # Und die Pruefung bleibt, wie sie ist: nah ja, Gesicht nein.
     assert bild_regie.pruefen(_regie(begleitung="a child holding on to the coat")) is not None
     assert bild_regie.pruefen(_regie(begleitung="a child with a bright face")) is None
+
+
+# == Kinder: nah erlaubt, oder ganz verboten ===================================
+
+def test_ein_kind_darf_nah_stehen():
+    """**Aus dem Betrieb: eine Spielplatz-Szene wurde zweimal verworfen.**
+
+    Jemand schiebt die Schaukel - da ist ein Kind naturgemaess nah. Die Entfernungsregel gibt
+    es, weil die Regie nicht weiss, welcher beschriebene Mensch die Fallperson ist, und ein
+    ERWACHSENER es sein koennte. Ein Kind kann es nur in einem Fall ueber ein Kind sein, und
+    dort steht es gar nicht erst im Bild.
+    """
+    nah = (
+        "a child on a swing right in front of the figure",
+        "two children holding on to the coat",
+        "a small girl at the table",
+    )
+    for satz in nah:
+        assert bild_regie.personen_zu_nah(satz) == [], satz
+        assert bild_regie.pruefen(_regie(ort=f"a playground at dusk, {satz}")) is not None
+
+    # Ein Erwachsener bleibt an die Entfernung gebunden.
+    assert bild_regie.personen_zu_nah("a woman on a swing in front of the figure")
+
+    # Und mit `kinder_duerfen_nah=False` gilt es auch fuer Kinder.
+    assert bild_regie.personen_zu_nah(nah[0], kinder_duerfen_nah=False)
+
+
+def test_in_einem_fall_ueber_ein_kind_wird_jedes_kind_verworfen():
+    """**Die schaerfste Regel des Moduls - und sie stand bisher nur als Anweisung im Prompt.**
+
+    Handelt der Fall VON einem Kind, waere die Kindfigur genau die Person, die nicht
+    abgebildet werden darf, erzeugt aus den Angaben eines Elternteils. Das hing am Gehorsam
+    eines Modells. In dieser Datei steht der Satz, dass eine Anweisung eine Bitte und eine
+    Pruefung eine Grenze ist; hier ist sie jetzt eine.
+    """
+    fuer_kinder = (
+        "a child in the far distance at the treeline",
+        "a small bicycle and a toddler beside it",
+        "two kids barely visible in the background",
+        "a blanket and the baby asleep on it",
+    )
+    for satz in fuer_kinder:
+        assert bild_regie.kinder_im_bild(satz), satz
+        # Mit Kindern erlaubt geht es durch, ohne nicht.
+        assert bild_regie.pruefen(_regie(ort=f"a garden, {satz}"), kinder=True) is not None
+        assert bild_regie.pruefen(_regie(ort=f"a garden, {satz}"), kinder=False) is None
+
+    # Auch in der Begleitung, die sonst von der Entfernungsregel ausgenommen ist.
+    assert bild_regie.pruefen(
+        _regie(begleitung="two small children"), kinder=False) is None
+    assert bild_regie.pruefen(
+        _regie(begleitung="two small children"), kinder=True) is not None
+
+    # Ein Gegenstand ohne Kind bleibt erlaubt.
+    assert bild_regie.pruefen(
+        _regie(ort="a garden with a small bicycle on the path"), kinder=False) is not None
+
+
+def test_der_zweite_versuch_nennt_auch_das_kinderverbot():
+    """Ein Hinweis, der das eigentliche Problem nicht nennt, bringt dieselbe Antwort zurueck."""
+    material = _material()
+    mit_kind = {**bild_regie.MOCK, "ort": "a garden with a child at the gate"}
+    modell = _ZweiAntworten(mit_kind, bild_regie.MOCK)
+
+    asyncio.run(bild_regie.fuehren(
+        modell, fall=material["fall"], material=material, kinder_erlaubt=False))
+
+    assert len(modell.systeme) == 2
+    assert "child" in modell.systeme[1]
+    assert "rejected" in modell.systeme[1]
+
+
+def test_der_verweis_auf_die_eigene_gestalt_ist_kein_zweiter_mensch():
+    """**Der vierte Fall dieser Art, und mein eigener Test hat ihn gefunden.**
+
+    Die eigene Gestalt setzt die App aus der Selbstauskunft. Die Regie soll sie nicht
+    beschreiben, darf sich aber auf sie beziehen - "a child on a swing right in front of the
+    figure" ist genau die richtige Formulierung. Ohne die Ausnahme schlaegt die
+    Entfernungsregel auf das Wort "figure" an und verwirft den Auftrag.
+    """
+    for satz in ("a child on a swing right in front of the figure",
+                 "a dog asleep at the figure's feet",
+                 "a cup on the table beside the viewer"):
+        assert bild_regie.personen_zu_nah(satz) == [], satz
+
+    # Eine FREMDE Gestalt bleibt an die Entfernung gebunden.
+    assert bild_regie.personen_zu_nah("a figure at the window")
+    assert bild_regie.personen_zu_nah("another figure close by")
+
+    # **Und bei „Niemand ist auf dem Bild" gilt die Ausnahme nicht:** Dort gibt es keine
+    # eigene Gestalt, also beschreibt „the figure" jemanden.
+    assert bild_regie.personen_ueberhaupt("a child in front of the figure")
