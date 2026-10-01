@@ -55,6 +55,12 @@ export const CATEGORY_ELEMENTS: ShareElementType[] = [
   // also mit — anders als bei der Traumbeziehung, die im eigenen Raum ohne einen
   // Fall vor Augen geschrieben wird.
   'podcasts',
+  // Die Bilder, aus demselben Grund wie die Folgen: Sie entstehen AN diesem Fall.
+  //
+  // **Sie gehen nur zum Ansehen hinaus.** In das Kontextband der Fachperson geht von ihnen
+  // nichts ein, auch nicht ihr Titel — ein Bild ist eine Deutung in Bildform, und als Text in
+  // einem Prompt würde daraus eine Behauptung, der niemand widersprechen kann.
+  'bilder',
   // Aus dem Kompass. „satz“ fehlt hier mit Absicht — Sätze wählt man einzeln aus,
   // siehe die eigene Liste weiter unten.
   ...KOMPASS_ELEMENTE,

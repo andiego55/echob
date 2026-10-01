@@ -919,6 +919,11 @@ export type ShareElementType =
   // Die Skizze der gewünschten Beziehung — und zwar nur die zur Art DIESES Falls.
   | 'traumbeziehung'
   | 'podcasts'
+  // Die Bilder aus der Bildwerkstatt — **das einzige Element, von dem NICHTS in das
+  // Kontextband geht.** Nicht der Titel, nicht der Satz, nicht die Legende, nicht die Zahl.
+  // Ein Bild ist eine Deutung in Bildform, die ein Mensch ansieht und einordnet; als Text in
+  // einem Prompt wuerde daraus eine Behauptung, der niemand widersprechen kann.
+  | 'bilder'
 
 export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   case_info:       'Fallinformationen',
@@ -942,6 +947,8 @@ export const SHARE_ELEMENT_LABELS: Record<ShareElementType, string> = {
   // Skizze, die zu DIESEM Fall passt — nicht das ganze Wunschbild eines Lebens.
   traumbeziehung:  'Meine Traumbeziehung (nur die zu dieser Beziehungsart)',
   podcasts:        'Meine Podcast-Folgen (als Text, ohne die Tonaufnahmen)',
+  // Nur zum Ansehen: Die Bilder gehen in kein Gespraech mit Echo ein, auch nicht ihr Titel.
+  bilder:          'Meine Bilder aus der Bildwerkstatt (nur zum Ansehen)',
   krisenplan:      'Mein Notfallplan',
   artifacts:       'Festgehaltene Erkenntnisse',
   satz:            'Einzelne Sätze über dich',

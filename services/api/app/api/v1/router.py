@@ -51,6 +51,7 @@ from app.api.v1.routers import (
     podcasts,
     professional,
     professional_archiv,
+    professional_bilder,
     professional_collab,
     professional_couple_room,
     professional_couples,
@@ -137,6 +138,7 @@ v1_router.include_router(professional_archiv.router)
 v1_router.include_router(professional_couples.router)
 v1_router.include_router(professional_couple_room.router)
 v1_router.include_router(professional_collab.router)
+v1_router.include_router(professional_bilder.router)
 v1_router.include_router(professional_notes.router)
 v1_router.include_router(professional_reports.router)
 v1_router.include_router(professional_templates.router)

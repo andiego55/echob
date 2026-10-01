@@ -32,6 +32,15 @@ ShareElementType = Literal[
     # manche nie teilen wollen. Bei einem Sammelwort muesste man alles geben - und
     # gaebe dann gar nichts.
     "verlauf", "vorhaben", "krisenplan",
+    # Die Bilder aus der Bildwerkstatt — **das einzige Element, von dem NICHTS in das
+    # Kontextband geht.** Nicht der Titel, nicht der Satz, nicht die Legende, nicht die Zahl.
+    #
+    # Ein Bild ist eine Deutung in Bildform, die ein Mensch ansieht und einordnet. Als Text in
+    # einem Prompt würde daraus eine Behauptung über den Fall, formuliert von uns und zitiert
+    # von einem Modell — und niemand könnte ihr widersprechen. Deshalb liegen die Bilder nicht
+    # im ``SharedBundle``: Was nicht im Bündel ist, kann nicht in das Band geraten, das daraus
+    # entsteht. Es gibt keinen Weg, nicht nur keine Absicht.
+    "bilder",
 ]
 
 

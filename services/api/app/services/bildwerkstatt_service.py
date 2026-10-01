@@ -539,6 +539,75 @@ async def fruehere_motive(
     return list(dict.fromkeys(motive))[:40]
 
 
+async def fuer_freigabe(
+    conn: asyncpg.Connection, *, owner_user_id: UUID | str, case_id: UUID | str,
+) -> list[dict[str, Any]]:
+    """Die Bilder dieses Falls — für die Fachperson, **ohne die Bytes.**
+
+    Was mitgeht: Kennung, Art, der Satz der Person, die Legende, die Bildwelt und das Datum.
+    Die Bytes holt die Anzeige einzeln über ihren eigenen Endpunkt, wenn ein Bild sichtbar
+    wird; zwanzig Megabyte in einer Antwort wären eine Wartezeit, die niemand versteht.
+
+    **Die Legende geht mit, und das ist nicht Beigabe.** Ein Bild ohne sie ist eine
+    Projektionsfläche: Eine Fachperson, die nicht weiß, dass die Tür im Flur aus einer
+    bestimmten Szene kommt, deutet sie — und deutet dann unser Bild statt der Lage.
+
+    **Der Prompt wird NICHT mitgegeben.** Er ist die Auskunft darüber, woraus ein Bild
+    entstanden ist, und gehört der Person: Darin stehen ihre Gegenstände in der Sprache, in
+    der wir sie an ein Bildmodell geschickt haben. Für das Ansehen braucht es ihn nicht.
+
+    Gebunden an ``owner_user_id``: Die Freigabe nennt den Fall, und der Fall gehört einem
+    Menschen. Eine Abfrage nur über ``case_id`` wäre eine Zeile, auf die sich später jemand
+    verlässt.
+    """
+    zeilen = await conn.fetch(
+        # Das `svg` gehoert dazu: Bei einem alten Datenbild IST es das Bild, und es ist
+        # wenige Kilobyte. Die BYTES eines gemalten Bildes nicht - die holt die Anzeige
+        # einzeln, wenn eines sichtbar wird.
+        "SELECT id, art, einstellungen, satz, legende, svg, created_at, "
+        "       (bild IS NOT NULL) AS hat_datei "
+        "  FROM case_bilder WHERE case_id = $1 AND user_id = $2 "
+        " ORDER BY created_at DESC",
+        case_id, owner_user_id,
+    )
+    raus: list[dict[str, Any]] = []
+    for zeile in zeilen:
+        d = _bild(zeile) or {}
+        # Das SVG alter Datenbilder geht mit — es ist wenige Kilobyte und das Bild selbst.
+        raus.append({
+            k: v for k, v in d.items()
+            if k in ("id", "art", "einstellungen", "satz", "legende", "created_at",
+                     "hat_datei", "svg")
+        })
+    return raus
+
+
+async def datei_fuer_freigabe(
+    conn: asyncpg.Connection, *, owner_user_id: UUID | str, case_id: UUID | str,
+    bild_id: UUID | str,
+) -> tuple[bytes, str] | None:
+    """Die Bytes eines Bildes — für eine Fachperson, die diesen Fall freigegeben bekommen hat.
+
+    **Der zweite Ausliefer-Endpunkt dieses Moduls, und der einzige Grund, dass es ihn gibt.**
+    Beim Podcast war die Abwägung umgekehrt: Dort IST der Text die Folge, die Tonspur nur ihre
+    Aufnahme — ein zweiter Weg mit eigener Rechteprüfung hätte nichts gebracht. Hier sind die
+    Bytes der Inhalt, und es gibt keinen Text, der sie ersetzt.
+
+    Geprüft wird hier das EIGENTUM (Fall + Besitzer); dass die Fachperson diesen Fall sehen
+    darf, prüft der Router davor über ``require_active_share`` und die freigegebenen Elemente.
+    Beides zusammen, und beides in derselben Abfrage wie die Bytes: Eine Prüfung, die vorher
+    stattfindet und dann eine zweite Abfrage macht, lässt eine Lücke zwischen beiden.
+    """
+    zeile = await conn.fetchrow(
+        "SELECT bild, bild_typ FROM case_bilder "
+        " WHERE id = $1 AND case_id = $2 AND user_id = $3 AND bild IS NOT NULL",
+        bild_id, case_id, owner_user_id,
+    )
+    if not zeile:
+        return None
+    return bytes(zeile["bild"]), zeile["bild_typ"] or "image/png"
+
+
 async def datei_holen(
     conn: asyncpg.Connection, *, user_id: UUID | str, bild_id: UUID | str,
 ) -> tuple[bytes, str] | None:

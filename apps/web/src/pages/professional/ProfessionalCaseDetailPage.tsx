@@ -37,6 +37,7 @@ import Absprachen from '@/components/app/Absprachen'
 import {
   KrisenplanKarte, SaetzeKarte, VorhabenKarte, VerlaufKarte, TraumbeziehungKarte,
 } from '@/components/professional/KompassPanel'
+import BilderKarte from '@/components/professional/BilderKarte'
 import PodcastKarte from '@/components/professional/PodcastKarte'
 
 const TOPIC_LABELS: Record<string, string> = {
@@ -481,7 +482,7 @@ export default function ProfessionalCaseDetailPage() {
         {!bundle.is_demo && !bundle.activated && <CaseActivationGate caseId={caseId!} />}
         {!bundle.is_demo && bundle.activated && <CaseSeatActive caseId={caseId!} />}
 
-        {tab === 'ueber' && <OverviewPanel bundle={bundle} />}
+        {tab === 'ueber' && <OverviewPanel bundle={bundle} caseId={caseId!} />}
         {tab === 'faq' && <FallFaqPanel caseId={caseId!} bundle={bundle} />}
         {tab === 'collab' && (
           <div className="space-y-5">
@@ -662,7 +663,12 @@ function CouplePanel({ caseId }: { caseId: string }) {
   )
 }
 
-function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
+function OverviewPanel({ bundle, caseId }: {
+  bundle: SharedCaseBundle
+  // Fuer die Bilder: Sie kommen NICHT aus dem Buendel, sondern holen sich selbst - und
+  // brauchen dafuer die Kennung des Falls.
+  caseId: string
+}) {
   const has = (t: SharedCaseBundle['allowed'][number]) => bundle.allowed.includes(t)
   return (
     <div>
@@ -742,6 +748,14 @@ function OverviewPanel({ bundle }: { bundle: SharedCaseBundle }) {
 
         {/* Vor den Sätzen: Was jemand WILL, ordnet das, was er über sich sagt. */}
         {has('podcasts') && <PodcastKarte folgen={bundle.podcasts} />}
+        {/* **Dezent und zugeklappt.** Ein Bild draengt sich auf: Es steht in einer Akte aus
+            Text und zieht den Blick, bevor man gelesen hat. Die Person hat es fuer sich
+            gemacht; dass sie es herzeigt, heisst nicht, dass es den Fall anfuehren soll.
+
+            Und es holt sich selbst - die Bilder kommen NICHT aus dem Buendel. Was nicht im
+            Buendel ist, kann nicht in das Kontextband geraten, das daraus fuer das Gespraech
+            mit Echo gebaut wird. */}
+        {has('bilder') && <BilderKarte caseId={caseId} />}
         {has('traumbeziehung') && <TraumbeziehungKarte ideal={bundle.traumbeziehung} />}
         {has('satz') && <SaetzeKarte saetze={bundle.saetze} />}
         {has('vorhaben') && <VorhabenKarte vorhaben={bundle.vorhaben} />}
