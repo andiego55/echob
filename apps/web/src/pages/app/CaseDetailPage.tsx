@@ -11,6 +11,7 @@ import MarkdownMessage from '@/components/app/MarkdownMessage'
 import { casesApi } from '@/api/cases'
 import { scenesApi } from '@/api/scenes'
 import { personProfileApi } from '@/api/personProfile'
+import { bilderApi } from '@/api/bilder'
 import { podcastApi } from '@/api/podcast'
 import { topicSummariesApi, type TopicSummary } from '@/api/topicSummaries'
 import { testResultsApi } from '@/api/testResults'
@@ -69,6 +70,14 @@ export default function CaseDetailPage() {
     enabled: !!caseId,
   })
 
+  // **Derselbe Schluessel, den die Bildwerkstatt selbst benutzt.** Damit kostet die Kachel
+  // keinen zweiten Abruf: Wer von hier hineingeht, findet die Galerie schon geladen.
+  const { data: bilder = [] } = useQuery({
+    queryKey: ['bilder', caseId],
+    queryFn: () => bilderApi.galerie(caseId!),
+    enabled: !!caseId,
+  })
+
   if (isLoading || !caseData) {
     return (
       <AppShell>
@@ -85,6 +94,7 @@ export default function CaseDetailPage() {
   const podcastOffen = podcasts.filter(
     f => f.status === 'skript' || f.status === 'fehler').length
   const coreSummaryCount = topicSummaries.filter((s) => !s.topic.startsWith('content_')).length
+  const bildCount = bilder.length
 
   return (
     <AppShell>
@@ -198,6 +208,27 @@ export default function CaseDetailPage() {
                   : 'Folgen anhören'
             }
             icon={<QuickIcon><path d="M12 3v11" /><path d="M8.5 6.5a5 5 0 0 0 0 7" /><path d="M15.5 6.5a5 5 0 0 1 0 7" /><path d="M7 19h10" /></QuickIcon>}
+          />
+          {/* **„Das zweite daneben legen" ist keine Deko.**
+              Der Wert eines zweiten Bildes liegt im Vergleich mit dem ersten — eine
+              Veraenderung, die man sieht, kann einem sonst niemand zeigen. Das ist der
+              einzige Ort, an dem man das sagen kann, bevor jemand ueberhaupt eins hat. */}
+          <QuickCard
+            title="Bild"
+            value={
+              bildCount === 0
+                ? 'Deine Lage als Bild'
+                : bildCount === 1
+                  ? '1 Bild'
+                  : `${bildCount} Bilder`
+            }
+            to={`/app/cases/${caseId}/bild`}
+            cta={
+              bildCount === 0 ? 'Malen lassen'
+                : bildCount === 1 ? 'Zweites daneben legen'
+                  : 'Galerie ansehen'
+            }
+            icon={<QuickIcon><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="M21 16l-5-5-5.5 5.5L8 14l-5 5" /></QuickIcon>}
           />
         </div>
 
