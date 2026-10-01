@@ -77,9 +77,16 @@ LAENGEN: dict[str, int] = {
 VERBOTEN: tuple[str, ...] = (
     # Gesichter, eindeutig.
     "facial", "portrait", "portraits", "selfie", "smiling", "eyebrow", "eyelid",
-    # Eine zweite erwachsene Gestalt wäre die Person, um die es im Fall geht.
-    "couple", "partner", "husband", "wife", "boyfriend", "girlfriend", "woman", "women",
-    "mother", "father", "parents", "person", "people", "figure", "figures", "silhouette",
+    # **Hier standen alle Wörter für einen Menschen — und das ist auf Zuruf geändert.**
+    #
+    # „Es dürfen auch andere Personen in dem Bild auftauchen." Damit kann die Sperre nicht
+    # bleiben: Eine Regie, die kein Wort für einen Menschen benutzen darf, kann keinen
+    # beschreiben, und der Rückfall auf den Katalog wäre die Regel geworden.
+    #
+    # Was an ihre Stelle tritt, ist strenger als es klingt: `personen_zu_nah` verlangt, dass
+    # in demselben Satzteil steht, DASS die Person fern oder undeutlich ist. Die Entfernung
+    # ist damit eine Eigenschaft der Eingabe und nicht eine Bitte an das Bildmodell. Das
+    # Gesicht bleibt verboten (siehe `WENDUNGEN`) — das ist die Linie, die bleibt.
     # Lesbares im Bild: ein Bildmodell schreibt Wörter falsch, und ein falsch geschriebener
     # Satz über das eigene Leben ist schlimmer als keiner.
     "handwriting", "handwritten", "signage", "lettering", "calendar", "logo", "caption",
@@ -114,8 +121,6 @@ WENDUNGEN: tuple[tuple[str, str], ...] = (
     (r"\bgaz(e|ing)\s+(of|at|back|toward)", "a gaze"),
     (r"\bfacial\s+expression\b", "an expression"),
     # Ein Mensch im Bild. „man-made" und „management" sind keine.
-    (r"\bman\b(?!\s*-\s*made)", "a man"),
-    (r"\bmen\b", "men"),
     (r"\bchild(ren)?'s\b", "a child as an owner"),
     # Lesbares. „signs of wear", „a note of green" und „a trace of" sind keins.
     (r"\b(a|the|one|small|wooden|metal|painted|handwritten)\s+"
@@ -131,6 +136,63 @@ WENDUNGEN: tuple[tuple[str, str], ...] = (
     (r"\bpills?\b", "pills"),
     (r"\b(hospital|medical|morgue|autopsy)\b", "a medical scene"),
 )
+
+#: Wörter, die einen Menschen im Bild bezeichnen.
+#:
+#: Gebraucht von `personen_zu_nah`. „someone" und „somebody" stehen bewusst nicht dabei: Sie
+#: kommen fast nur in Spuren vor („a coat someone left behind"), und eine Spur ist kein
+#: Mensch im Bild.
+PERSONEN_WORTE: tuple[str, ...] = (
+    "person", "people", "man", "men", "woman", "women", "adult", "adults", "child",
+    "children", "boy", "girl", "figure", "figures", "couple", "partner", "husband", "wife",
+    "boyfriend", "girlfriend", "mother", "father", "parents", "stranger", "strangers",
+    "crowd", "passer-by", "passers-by", "neighbour", "neighbor", "colleague", "colleagues",
+)
+
+#: Wörter, die eine Person fern oder undeutlich machen.
+#:
+#: **Großzügig mit Absicht.** Die harte Linie ist das Gesicht, und die hält `WENDUNGEN`. Hier
+#: geht es darum, dass eine Regie die Entfernung überhaupt ausspricht — ein Modell, das
+#: „two figures in the distance" schreibt, hat die Regel verstanden; eines, das „a woman at
+#: the table" schreibt, nicht.
+FERNE_WORTE: tuple[str, ...] = (
+    "far", "farther", "further", "distant", "distance", "afar", "beyond", "horizon",
+    "background", "small", "smaller", "tiny", "silhouette", "silhouettes", "silhouetted",
+    "indistinct", "blurred", "blurry", "faint", "faintly", "vague", "shape", "shapes",
+    "outline", "outlines", "shadow", "shadows", "behind", "away", "turned", "obscured",
+    "half-hidden", "barely", "dim", "unclear",
+)
+
+
+def personen_zu_nah(text: str) -> list[str]:
+    """Menschen, bei denen nicht dasteht, dass sie fern oder undeutlich sind.
+
+    **Die Regel, die die alte Sperre ersetzt.** „Es dürfen auch andere Personen in dem Bild
+    auftauchen" — aber die Person, um die es im Fall geht, darf nur „in der Ferne,
+    schemenhaft, von hinten" vorkommen. Und weil eine Regie nicht weiß, welcher beschriebene
+    Mensch das ist, gilt es für jeden, den sie beschreibt.
+
+    Geprüft wird je Satzteil: Steht darin ein Wort für einen Menschen, muss darin auch stehen,
+    dass er fern, klein, abgewandt oder undeutlich ist. So ist die Entfernung eine Eigenschaft
+    der Eingabe und keine Bitte an das Bildmodell — dieselbe Überlegung, aus der „keine
+    Menschen" früher eine Eigenschaft der Eingabe war.
+    """
+    gefunden: list[str] = []
+    for teil in re.split(r"[;.]", text.lower()):
+        wer = [w for w in PERSONEN_WORTE if re.search(rf"\b{re.escape(w)}\b", teil)]
+        if not wer:
+            continue
+        if any(re.search(rf"\b{re.escape(f)}\b", teil) for f in FERNE_WORTE):
+            continue
+        gefunden.append(f"{wer[0]} shown close instead of far away and indistinct")
+    return list(dict.fromkeys(gefunden))
+
+
+def personen_ueberhaupt(text: str) -> list[str]:
+    """Jeder Mensch — für den Fall, dass die Person „Niemand" gewählt hat."""
+    tief = text.lower()
+    return [w for w in PERSONEN_WORTE if re.search(rf"\b{re.escape(w)}\b", tief)]
+
 
 #: Wendungen, die **erst weggenommen** werden, damit sie unten nicht anschlagen.
 #:
@@ -183,16 +245,20 @@ metaphors. A worn kitchen chair at two in the morning says more than "a lonely p
 
 Rules you must follow, without exception:
 
-1. NOBODY IS DEPICTED. Do not describe any human being or any part of one. The app adds one
-   figure of its own afterwards, seen from behind; that is not your job. The other person in
-   this case is NEVER shown: not as a body, not as a shape in the distance, not as a shadow,
-   not as a reflection. They may be present only as weather, as a force, as a mass, as a
-   direction, or as traces they left — an object, a door left open, a distance.
-   Do not use ANY noun for a human being in the English fields — not man, woman, partner,
-   husband, wife, mother, father, parents, couple, person, people, figure, silhouette, nor a
-   possessive referring to one. Traces are allowed, but name the object and not its owner:
-   "a coat left over a chair", never "his coat". A brief containing such a noun is discarded
-   whole and the person gets a duller picture, so this matters.
+1. PEOPLE MAY APPEAR, AND EVERY ONE OF THEM IS FAR AWAY AND INDISTINCT. Never a face, never
+   a portrait, never anybody close enough to be read as an individual. Whenever you name a
+   person, say in the same phrase that they are distant, small, turned away, a silhouette or
+   barely visible: "two figures far off at the treeline", never "a woman at the table". A
+   phrase that names a person without saying that is discarded, and then the person gets a
+   duller picture — so this matters.
+   Do not describe the viewer. The app adds one figure of its own afterwards, from the
+   person's own account of themselves; that is not your job and a second one would collide
+   with it.
+   The person this case is about must never be recognisable: no face, never close, never an
+   individual you could describe to someone. They are better present as weather, as a force,
+   as a mass, as a direction, or as traces they left — an object, a door left open, a
+   distance. Where you do name a person, prefer the object to the owner: "a coat left over a
+   chair", not "his coat".
 2. NOTHING READABLE. Nothing in the image may carry writing of any kind — no signs, labels,
    letters, numbers, calendars, clocks or logos.
 3. NO NAMES of people, places, companies, brands or streets — not in any field. Write in
@@ -306,12 +372,16 @@ def _verbotene(text: str) -> list[str]:
     return list(dict.fromkeys(gefunden))
 
 
-def pruefen(roh: Any) -> dict[str, Any] | None:
+def pruefen(roh: Any, *, menschen: bool = True) -> dict[str, Any] | None:
     """Die Antwort des Modells — geprüft, beschnitten, oder verworfen.
 
     **Eine Anweisung ist eine Bitte, eine Prüfung ist eine Grenze.** Im Systemtext stehen
     dieselben Regeln noch einmal, und das ist richtig: Ein Modell, dem man sagt, was gewollt
     ist, liefert besser. Aber die Regel gilt erst, wenn sie hier durchgesetzt wird.
+
+    ``menschen`` ist die Wahl der Person: Wer „Niemand ist auf dem Bild" gewählt hat, bekommt
+    auch von der Regie keinen — dort ist jedes Wort für einen Menschen verboten. Sonst gilt
+    `personen_zu_nah`.
 
     Gibt ``None`` zurück, wenn die Antwort nicht taugt. Dann malt das Bild aus dem Katalog wie
     vorher — ein Bild mit weniger Eigenart ist besser als eines, das eine Grenze verletzt.
@@ -379,6 +449,16 @@ def pruefen(roh: Any) -> dict[str, Any] | None:
         return None
     if namen := verdacht_auf_namen(hinaus):
         logger.warning("Bildregie verworfen: Verdacht auf Namen %s.", namen[:5])
+        return None
+
+    if menschen:
+        if nah := personen_zu_nah(hinaus):
+            logger.warning("Bildregie verworfen: %s.", nah[:3])
+            return None
+    elif wer := personen_ueberhaupt(hinaus):
+        # „Niemand ist auf dem Bild" ist eine Wahl und keine Vorliebe.
+        logger.warning("Bildregie verworfen: Menschen, obwohl niemand gewollt war: %s.",
+                       wer[:3])
         return None
 
     return regie
@@ -492,7 +572,7 @@ MAX_WUNSCH = 400
 
 async def fuehren(
     echo_service: Any, *, fall: dict[str, Any], material: dict[str, Any],
-    welt: dict[str, Any] | None = None, wunsch: str = "",
+    welt: dict[str, Any] | None = None, wunsch: str = "", menschen: bool = True,
 ) -> dict[str, Any] | None:
     """Der Bildauftrag zu diesem Fall — oder ``None``, wenn es keinen gibt, der taugt.
 
@@ -505,6 +585,15 @@ async def fuehren(
     kommen jetzt IN den gewählten Ort hinein; das ist die interessantere Aufgabe und nicht die
     engere.
     """
+    # **Die Wahl der Person steht vor der Freiheit der Regie.** Wer "Niemand ist auf dem
+    # Bild" gewaehlt hat, bekommt auch von der Regie keinen - und erfaehrt es hier, statt
+    # dass die Pruefung es nachher stumm verwirft.
+    system = SYSTEM if menschen else SYSTEM + (
+        "\n\nFOR THIS IMAGE: the person has asked that NOBODY appears in it. Describe no "
+        "human being at all, not even far away, not as a silhouette, not as a shadow. "
+        "Everything that would otherwise be a person becomes a trace, an object or weather."
+    )
+
     eigenes = eigener_text(material)
     if eigenes < MINDESTENS_EIGENER_TEXT:
         # Ein Fall, in dem noch fast nichts steht, ergibt keine Regie, sondern Erfindung.
@@ -558,7 +647,7 @@ async def fuehren(
     for versuch in (1, 2):
         try:
             roh = await echo_service.generate_json(
-                system=SYSTEM + hinweis,
+                system=system + hinweis,
                 user=text,
                 max_tokens=1800,
                 # **`mock` bleibt leer, und das ist keine Kleinigkeit.**
@@ -575,15 +664,20 @@ async def fuehren(
             logger.exception("Bildregie: Modellaufruf gescheitert.")
             return None
 
-        regie = pruefen(roh)
+        regie = pruefen(roh, menschen=menschen)
         if regie is not None:
             if versuch == 2:
                 logger.info("Bildregie: im zweiten Versuch durchgekommen.")
             return regie
 
         if versuch == 1:
-            stoerer = _verbotene(_hinausgehendes(roh)) or verdacht_auf_namen(
-                _hinausgehendes(roh))
+            roh_text = _hinausgehendes(roh)
+            stoerer = (
+                _verbotene(roh_text)
+                or verdacht_auf_namen(roh_text)
+                or (personen_zu_nah(roh_text) if menschen
+                    else personen_ueberhaupt(roh_text))
+            )
             if not stoerer:
                 # Nicht die Wortprüfung, sondern die Form: zu dünn, zu wenige Gegenstände.
                 # Dagegen hilft ein Hinweis auf Wörter nicht.

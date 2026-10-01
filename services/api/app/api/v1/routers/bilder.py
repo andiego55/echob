@@ -187,7 +187,7 @@ async def malen(
             conn, user_id=user_id, case_id=case_id, schichten=gewaehlt)
         # Die Selbstauskunft nur, wenn eine Figur gewuenscht ist: Was nicht gebraucht wird,
         # wird nicht abgefragt.
-        if body.figur == "ich":
+        if katalog.zeigt_mich(einstellungen):
             selbst = await dienst.selbstauskunft(conn, user_id=user_id)
             einstellungen["selbst"] = selbst
             # **Die Begleitung wird HIER entschieden, nicht im Browser.**
@@ -222,7 +222,10 @@ async def malen(
                 echo_svc, fall=material["fall"], material=material,
                 welt=next((b for b in katalog.BILDWELTEN
                            if b["key"] == body.bildwelt), None),
-                wunsch=str(einstellungen.get("wunsch") or ""))
+                wunsch=str(einstellungen.get("wunsch") or ""),
+                # „Niemand ist auf dem Bild" gilt auch fuer die Regie: Wer das gewaehlt hat,
+                # soll keine Gestalten im Bild finden, auch keine fernen.
+                menschen=body.figur != "keine")
         if regie is None:
             # **Kein Fehler, ein Rueckfall.** Eine Regie, die nicht taugt - zu wenig
             # Material, ein verbotenes Wort, ein Verdacht auf einen Namen -, darf kein Bild

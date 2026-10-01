@@ -96,15 +96,45 @@ def test_ein_gesicht_in_der_regie_verwirft_sie():
             _regie(motiv=f"a kitchen at night, {schlimm} across the room")) is None, schlimm
 
 
-def test_eine_zweite_erwachsene_gestalt_verwirft_sie():
-    """Sie wäre als die Person lesbar, um die es im Fall geht — eine Abbildung eines echten
-    Menschen aus den Angaben einer Seite."""
+def test_ein_mensch_ohne_entfernung_verwirft_die_regie():
+    """**Die Regel, die die alte Sperre ersetzt.**
+
+    Vorher war jedes Wort fuer einen Menschen verboten. Auf Zuruf duerfen andere Personen
+    jetzt vorkommen - aber die Person, um die es im Fall geht, nur "in der Ferne, schemenhaft,
+    von hinten". Und weil eine Regie nicht weiss, welcher beschriebene Mensch das ist, gilt es
+    fuer jeden, den sie beschreibt.
+
+    Geprueft wird je Satzteil: Steht darin ein Wort fuer einen Menschen, muss darin auch
+    stehen, dass er fern, klein, abgewandt oder undeutlich ist. Damit ist die Entfernung eine
+    Eigenschaft der Eingabe und keine Bitte an das Bildmodell.
+    """
     for schlimm in ("a man standing at the water",
-                    "a woman in the far distance",
-                    "a couple walking away",
-                    "the husband's coat on a chair"):
+                    "a woman sitting at the table",
+                    "a couple at the kitchen counter",
+                    "two children right beside the chair"):
         assert bild_regie.pruefen(_regie(ort=f"a long shore at dusk, {schlimm}")) is None, \
             schlimm
+
+
+def test_ein_ferner_mensch_ist_erlaubt():
+    """Die Gegenprobe - und der Grund fuer den ganzen Umbau. "Es duerfen auch andere Personen
+    in dem Bild auftauchen."
+    """
+    for gut in ("a woman in the far distance",
+                "two figures silhouetted at the treeline",
+                "a small shape turned away on the path",
+                "a couple walking away toward the horizon",
+                "children barely visible in the background"):
+        assert bild_regie.pruefen(
+            _regie(ort=f"a long shore at dusk, {gut}")) is not None, gut
+
+
+def test_bei_niemand_ist_auch_ein_ferner_mensch_zu_viel():
+    """„Niemand ist auf dem Bild" ist eine Wahl und keine Vorliebe. Wer sie trifft, soll auch
+    keine fernen Gestalten finden."""
+    regie = _regie(ort="a long shore at dusk, two figures far off at the treeline")
+    assert bild_regie.pruefen(regie, menschen=True) is not None
+    assert bild_regie.pruefen(regie, menschen=False) is None
 
 
 def test_lesbares_im_bild_verwirft_sie():
@@ -506,13 +536,18 @@ def test_die_wendungen_beissen_trotzdem():
     schlimm = {
         "her face turned away from the window": "a face",
         "two dark eyes in the glass": "eyes",
-        "a man standing at the end of the jetty": "a man",
         "a small wooden sign at the gate": "something readable",
         "a name written on the door": "something readable",
         "a clock on the wall": "a clock",
     }
     for satz, erwartet in schlimm.items():
         assert erwartet in bild_regie._verbotene(satz), satz
+
+    # **Ein Mensch ist hier NICHT mehr dabei.** Er wird nicht ueber das Wort verworfen,
+    # sondern ueber die fehlende Entfernung - sonst koennte eine Regie ueberhaupt keinen
+    # beschreiben, und genau das ist jetzt gewollt.
+    assert bild_regie._verbotene("a man standing at the end of the jetty") == []
+    assert bild_regie.personen_zu_nah("a man standing at the end of the jetty")
 
 
 # == Der zweite Versuch ========================================================
@@ -552,7 +587,7 @@ def test_ein_verworfener_auftrag_bekommt_einen_zweiten_versuch():
     assert regie is not None, "der zweite Versuch kam nicht durch"
     assert len(modell.systeme) == 2, "es gab keinen zweiten Versuch"
     # Und der zweite Versuch weiss, woran der erste gescheitert ist.
-    assert "a man" in modell.systeme[1]
+    assert "man shown close" in modell.systeme[1]
     assert "rejected" in modell.systeme[1]
     # Der erste nicht - sonst waere der Hinweis Teil des normalen Auftrags.
     assert "rejected" not in modell.systeme[0]
@@ -727,15 +762,19 @@ def test_ein_wunsch_nach_einem_menschen_ergibt_keinen_menschen():
     """Die Regie bekommt gesagt, dass die Regeln den Wunsch ueberstimmen - und wenn sie es
     trotzdem tut, faellt der Auftrag durch die Pruefung. Zwei Sicherungen, nicht eine."""
     material = _material()
-    # Ein Modell, das dem Wunsch folgt statt den Regeln - zweimal, damit auch der zweite
-    # Versuch nichts rettet.
+    # **Was der Wunsch nicht erreichen kann, ist ein Gesicht.** Eine abgewandte Gestalt in
+    # der Ferne darf er erreichen - das ist seit dem Umbau ausdruecklich erlaubt, und "zeig,
+    # wie er weggeht" ist genau das: von hinten.
+    #
+    # Ein Modell, das dem Wunsch ueber die Regeln hinaus folgt - zweimal, damit auch der
+    # zweite Versuch nichts rettet.
     folgsam = {**bild_regie.MOCK,
-               "motiv": "a man walking away down the hallway, seen from the kitchen"}
+               "motiv": "his face turned back toward the kitchen from the hallway"}
     modell = _ZweiAntworten(folgsam, folgsam)
 
     assert asyncio.run(bild_regie.fuehren(
         modell, fall=material["fall"], material=material,
-        wunsch="Zeig, wie er weggeht")) is None
+        wunsch="Zeig sein Gesicht")) is None
 
 
 # == Korrekturen aus dem Betrieb ===============================================

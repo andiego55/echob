@@ -276,8 +276,8 @@ export default function BildwerkstattPage() {
                   <h2 className="card-title-lg">Ein Bildmodell malen lassen</h2>
                   <p className="mt-1.5 max-w-[62ch] text-[0.86rem] leading-relaxed text-brand-muted">
                     Du wählst ein Gleichnis — eine Landschaft, ein Haus, Wasser — und
-                    bestimmst, wie gemalt wird. Es kommt kein anderer Mensch darin vor, und
-                    nichts Lesbares.
+                    bestimmst, wie gemalt wird. Nichts Lesbares kommt darin vor, und
+                    höchstens ein Gesicht: deins, wenn du das willst.
                   </p>
                   <p className="mt-2 max-w-[62ch] text-[0.8rem] leading-relaxed text-brand-muted">
                     Das kostet — anders als das Datenbild — von deinem Monatskontingent, und
@@ -412,14 +412,17 @@ export default function BildwerkstattPage() {
                     </div>
                   </div>
 
-                  {/* **Höchstens EINE Gestalt, und sie bist du.**
-                      Eine zweite wäre als die andere Person lesbar — eine Abbildung eines
-                      echten Menschen aus deinen Angaben, und die soll hier nie entstehen.
-                      Deshalb steht das hier auch so dabei: Wer es liest, weiß, warum es nur
-                      diese eine Wahl gibt. */}
+                  {/* **Drei Möglichkeiten, und genau EIN Gesicht.**
+                      Das Gesicht gehört der Person selbst — und sein Aussehen ist frei
+                      erfunden, weil die App kein Bild von ihr hat. Dass es erfunden ist,
+                      steht an der Wahl und nicht im Kleingedruckten: Wer es nicht liest,
+                      hält die Gestalt für ein Abbild.
+
+                      Andere Menschen dürfen vorkommen, aber nur fern und undeutlich. Die
+                      Person, um die es im Fall geht, nie nah und nie mit Gesicht. */}
                   <div className="mt-5">
                     <span className="label">Kommst du vor?</span>
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <div className="mt-2 grid gap-2 sm:grid-cols-3">
                       {(bildwelten.data?.figur ?? []).map(f => (
                         <button
                           key={f.key}
@@ -441,7 +444,7 @@ export default function BildwerkstattPage() {
                         </button>
                       ))}
                     </div>
-                    {figur === 'ich' && (
+                    {figur !== 'keine' && (
                       <>
                         <div className="mt-3">
                           <span className="label">Was tust du?</span>
@@ -493,14 +496,31 @@ export default function BildwerkstattPage() {
                           </div>
                         )}
 
-                        <p className="mt-3 text-[0.72rem] leading-snug text-brand-muted">
-                          Aus deiner Selbstauskunft kommen nur Altersspanne und Geschlecht —
-                          mehr weiß sie über dein Aussehen nicht, und mehr wird auch nicht
-                          erfunden. Alle Gestalten sind von hinten und ohne Gesicht. Die
-                          Person, um die es in diesem Fall geht, kommt nicht vor: keine
-                          zweite erwachsene Gestalt, auch kein Schatten und keine
-                          Spiegelung.
-                        </p>
+                        {figur === 'ich_sichtbar' ? (
+                          <p className="mt-3 rounded-brand border border-accent/30 bg-accent/[0.05] p-3 text-[0.74rem] leading-relaxed text-brand-text">
+                            <strong className="font-semibold">Dein Aussehen wird frei
+                            erfunden.</strong> Aus deiner Selbstauskunft kommen nur
+                            Altersspanne und Geschlecht — Haare, Gesicht, Statur und Kleidung
+                            denkt sich das Bildmodell aus. Die Gestalt ist also eine Figur
+                            und kein Abbild von dir, und sie wird dir vermutlich nicht
+                            ähneln.
+                            <br />
+                            <span className="mt-1.5 block text-brand-muted">
+                              Die Person, um die es in diesem Fall geht, kommt nie mit
+                              Gesicht und nie nah vor — höchstens fern, schemenhaft oder von
+                              hinten. Andere Menschen dürfen auftauchen, aber genauso: fern
+                              und undeutlich.
+                            </span>
+                          </p>
+                        ) : (
+                          <p className="mt-3 text-[0.72rem] leading-snug text-brand-muted">
+                            Aus deiner Selbstauskunft kommen nur Altersspanne und Geschlecht —
+                            mehr weiß sie über dein Aussehen nicht. Deine Gestalt ist von
+                            hinten und ohne Gesicht. Die Person, um die es in diesem Fall
+                            geht, kommt nie mit Gesicht und nie nah vor; andere Menschen
+                            dürfen auftauchen, aber nur fern und undeutlich.
+                          </p>
+                        )}
                       </>
                     )}
                   </div>

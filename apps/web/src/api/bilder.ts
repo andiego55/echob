@@ -117,7 +117,14 @@ export const bilderApi = {
     palette: string
     schichten: string[]
     symbolik: string
-    /** „keine" oder „ich". Die Person, um die es im Fall geht, wird nie eine Gestalt. */
+    /**
+     * Wer im Bild vorkommt: „keine", „ich" (von hinten) oder „ich_sichtbar" (mit Gesicht).
+     *
+     * Bei „ich_sichtbar" ist das Aussehen **frei erfunden** — aus der Selbstauskunft kommen
+     * nur Altersspanne und Geschlecht. Die Person, um die es im Fall geht, kommt nie mit
+     * Gesicht und nie nah vor; andere Menschen dürfen auftauchen, aber nur fern und
+     * undeutlich.
+     */
     figur: string
     /** Was die Gestalt tut — eine Aussage der Person, keine Ableitung aus den Daten. */
     haltung: string

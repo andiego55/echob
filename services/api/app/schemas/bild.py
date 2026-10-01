@@ -55,11 +55,18 @@ class BildMalen(BaseModel):
     schichten: list[str] = Field(default_factory=list)
     #: Wie deutlich Sinnbilder werden: keine · zurueckhaltend · deutlich.
     symbolik: str = "zurueckhaltend"
-    #: Ob die Person selbst vorkommt: keine · ich (Rückenfigur, ohne Gesicht, in Entfernung).
+    #: Ob die Person selbst vorkommt:
     #:
-    #: Es gibt hoechstens EINE Figur, und sie ist die Person selbst. Eine zweite waere als
-    #: die andere Person lesbar — eine Abbildung eines echten Menschen aus den Angaben einer
-    #: Seite, und die darf hier nie entstehen.
+    #: ``keine``         Es kommt kein Mensch im Bild vor.
+    #: ``ich``           Rückenfigur, ohne Gesicht, in Entfernung.
+    #: ``ich_sichtbar``  Nah genug, dass man sie ansehen kann — **ihr Aussehen ist frei
+    #:                   erfunden**, aus der Selbstauskunft kommen nur Altersspanne und
+    #:                   Geschlecht. Deshalb kann die Gestalt der Person nicht ähneln, und
+    #:                   deshalb steht das an der Wahl und in der Legende.
+    #:
+    #: Genau EIN Gesicht darf im Bild sein, und es ist dieses. Andere Menschen dürfen
+    #: vorkommen, aber nur fern und undeutlich; die Person, um die es im Fall geht, nie nah
+    #: und nie mit Gesicht.
     figur: str = "keine"
     #: Was die Gestalt tut. Eine Haltung ist eine Aussage — und sie kommt von der Person.
     haltung: str = "stehend"

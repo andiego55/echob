@@ -487,16 +487,24 @@ STANDARD_SYMBOLIK = "zurueckhaltend"
 
 # ── Die Figur ────────────────────────────────────────────────────────────────
 #
-# **Es gibt hoechstens EINE, und sie ist die Person selbst.**
+# **Genau EIN Gesicht, und es gehoert der Person selbst.**
 #
-# Das ist die Grenze, an der alles haengt. Eine zweite Gestalt waere als die andere Person
-# lesbar — und eine Abbildung eines echten, namentlich bekannten Menschen aus den Angaben
-# einer Seite ist genau das, was hier nie entstehen darf. Ob im Bild zwei Menschen stehen, ist
-# deshalb keine Geschmacksfrage.
+# Die Linie hat sich zweimal verschoben, und jedes Mal auf Zuruf. Erst galt: hoechstens eine
+# Gestalt, von hinten, nirgends ein Gesicht. Dann durfte ein Kind daneben stehen, um das sich
+# jemand kuemmert. Jetzt duerfen andere Menschen vorkommen, und die Person selbst darf zu
+# sehen sein.
 #
-# **Kein Gesicht.** Von hinten, in Entfernung, klein im Bild. Ein Gesicht waere ein Portraet
-# von jemandem, der nie dafuer sass — und es laedt zum Wiedererkennen ein, mit allem, was
-# daran haengt: Haltung, Groesse, Ausdruck. Alles davon waere erfunden.
+# **Was das moeglich macht, ist nicht Nachlaessigkeit, sondern dass die Erscheinung erfunden
+# ist.** Diese App hat kein Bild von niemandem. Aus der Selbstauskunft kommen Altersspanne und
+# Geschlecht, alles Weitere denkt sich das Bildmodell aus — die Gestalt kann der Person also
+# gar nicht aehneln. Entscheidend ist, dass das DASTEHT: an der Wahl, in der Legende und im
+# Prompt. Eine erfundene Erscheinung, die als Abbild gelesen wird, waere schlimmer als keine.
+#
+# **Was bleibt: die Person, um die es im Fall geht, nie nah und nie mit Gesicht.** Ein
+# Portraet von jemandem, der nie dafuer sass, laedt zum Wiedererkennen ein — mit allem, was
+# daran haengt: Haltung, Groesse, Ausdruck. Fern, schemenhaft, von hinten ist erlaubt; ein
+# Gesicht nicht. Und weil eine Bildregie nicht weiss, welcher beschriebene Mensch das ist,
+# gilt die Entfernung fuer jeden, den sie beschreibt (`bild_regie.personen_zu_nah`).
 #
 # **Die Erscheinung kommt aus der Selbstauskunft und nur daraus.** Sie kennt Altersspanne und
 # Geschlecht (letzteres freiwillig) — mehr nicht. Fuer eine Rueckenfigur in der Ferne reicht
@@ -504,10 +512,25 @@ STANDARD_SYMBOLIK = "zurueckhaltend"
 
 FIGUR_STUFEN: tuple[dict[str, str], ...] = (
     {"key": "keine", "label": "Niemand",
-     "hinweis": "Der Ort ist leer."},
+     "hinweis": "Der Ort ist leer — es kommt kein Mensch darin vor."},
     {"key": "ich", "label": "Ich, von hinten",
-     "hinweis": "Eine einzelne Gestalt in der Ferne, ohne Gesicht."},
+     "hinweis": "Eine Gestalt in der Ferne, abgewandt und ohne Gesicht."},
+    {"key": "ich_sichtbar", "label": "Ich, zu sehen",
+     "hinweis": "Eine Gestalt, die man ansehen kann. Ihr Aussehen ist frei erfunden."},
 )
+
+#: Die Stufen, bei denen eine eigene Gestalt im Bild steht.
+#:
+#: **Als Menge und nicht als vier Vergleiche mit „ich".** Vorher stand `figur == "ich"` an
+#: vier Stellen — im Prompt, in beiden Legenden und im Router. Beim Dazukommen der dritten
+#: Stufe hätte jede einzelne davon still die neue Wahl übersehen: Die Gestalt wäre im Prompt
+#: erschienen und in der Legende nicht, oder umgekehrt.
+MIT_GESTALT = frozenset({"ich", "ich_sichtbar"})
+
+
+def zeigt_mich(einstellungen: dict[str, Any] | None) -> bool:
+    """Ob die Person selbst im Bild vorkommt — in welcher der beiden Formen auch immer."""
+    return str((einstellungen or {}).get("figur") or "") in MIT_GESTALT
 
 FIGUR_SCHLUESSEL = {f["key"] for f in FIGUR_STUFEN}
 STANDARD_FIGUR = "keine"
@@ -521,20 +544,32 @@ STANDARD_FIGUR = "keine"
 HALTUNGEN: tuple[dict[str, str], ...] = (
     {"key": "stehend", "label": "Stehen",
      "hinweis": "Ruhig, in die Ferne sehend.",
-     "prompt": "standing still, looking out into the distance"},
+     "prompt": "standing still, looking out into the distance",
+     "prompt_sichtbar": "standing still, head turned slightly to look out across the scene"},
     {"key": "gehend", "label": "Gehen",
-     "hinweis": "Unterwegs, weg vom Betrachter.",
-     "prompt": "walking away from the viewer, further into the scene"},
+     "hinweis": "Unterwegs.",
+     "prompt": "walking away from the viewer, further into the scene",
+     # **Nicht „weg vom Betrachter".** Eine Gestalt, die man ansehen soll, kann nicht
+     # gleichzeitig von hier weggehen - und genau so stand es einen Moment im Prompt, neben
+     # „the face is visible". Ein Bildmodell loest so einen Widerspruch still auf, und dann
+     # stimmt entweder die Haltung nicht oder das Gesicht fehlt.
+     "prompt_sichtbar": "walking across the scene from one side, mid-stride, in profile"},
     {"key": "schuetzend", "label": "Schützen",
      "hinweis": "Zugewandt, schirmend — über jemanden oder etwas.",
      "prompt": "leaning protectively over what is beside them, sheltering it with their "
-               "body and turned toward it"},
+               "body and turned toward it",
+     "prompt_sichtbar": "leaning protectively over what is beside them, sheltering it with "
+                        "their body, their face turned down toward it"},
     {"key": "abgewandt", "label": "Abwenden",
      "hinweis": "Weg von dem, was drückt.",
-     "prompt": "turned away from the side the weather comes from, shoulders raised"},
+     "prompt": "turned away from the side the weather comes from, shoulders raised",
+     "prompt_sichtbar": "turned away from the side the weather comes from, shoulders raised, "
+                        "face in three-quarter view away from it"},
     {"key": "wartend", "label": "Warten",
      "hinweis": "Stillstehend, ohne Richtung.",
-     "prompt": "standing motionless with no direction of travel, as if waiting"},
+     "prompt": "standing motionless with no direction of travel, as if waiting",
+     "prompt_sichtbar": "standing motionless with no direction of travel, as if waiting, "
+                        "looking at nothing in particular"},
 )
 
 HALTUNG_SCHLUESSEL = {h["key"] for h in HALTUNGEN}
@@ -589,11 +624,22 @@ def begleitung_moeglich(selbst: dict[str, Any] | None, beziehungsart: str | None
 def figur_beschreibung(
     selbst: dict[str, Any] | None, einstellungen: dict[str, Any] | None = None,
 ) -> str:
-    """Die Rueckenfigur, aus der Selbstauskunft — und aus nichts sonst.
+    """Die eigene Gestalt, aus der Selbstauskunft — in einer von zwei Formen.
 
-    Ohne Angaben bleibt sie unbestimmt. **Eine erfundene Erscheinung waere schlimmer als
-    keine**: Wer sich in einer Gestalt nicht wiedererkennt, liest das Bild als Aussage ueber
-    jemand anderen.
+    ``ich``            Von hinten, in der Ferne, ohne Gesicht.
+    ``ich_sichtbar``   Nah genug, dass man sie ansehen kann, mit Gesicht.
+
+    **Hier stand: „Eine erfundene Erscheinung wäre schlimmer als keine" — wer sich in einer
+    Gestalt nicht wiedererkennt, liest das Bild als Aussage über jemand anderen.**
+
+    Das stimmt für eine Erscheinung, die unausgesprochen bleibt. Es stimmt nicht mehr, wenn
+    daneben steht, dass sie erfunden ist: Dann ist die Gestalt eine Figur und keine Behauptung
+    über einen Körper. Genau deshalb ist der Satz „dein Aussehen ist frei erfunden" keine
+    Fußnote, sondern die Bedingung, unter der es diese Stufe überhaupt gibt — er steht in der
+    Oberfläche an der Wahl, in der Legende am Bild und hier im Prompt.
+
+    Aus der Selbstauskunft kommen weiter nur Altersspanne und Geschlecht. Alles Weitere —
+    Haare, Kleidung, Statur — erfindet das Bildmodell, und das ist gesagt.
     """
     teile: list[str] = []
     alter = (selbst or {}).get("age_range")
@@ -632,15 +678,27 @@ def figur_beschreibung(
         (b for b in BEGLEITUNGEN if b["key"] == (einstellungen or {}).get("begleitung")),
         BEGLEITUNGEN[0])
 
-    satz = (
-        f"In the scene there is one adult figure, seen from a distance: {', '.join(teile)}, "
-        f"{haltung['prompt']}. The figure is seen entirely from behind, small in the frame, "
-        "and no facial features are visible or implied."
-    )
+    sichtbar = str((einstellungen or {}).get("figur") or "") == "ich_sichtbar"
+    if sichtbar:
+        satz = (
+            f"In the scene there is one adult figure, close enough to be seen clearly: "
+            f"{', '.join(teile)}, {haltung['prompt_sichtbar']}. The figure is seen from the "
+            "side or "
+            "three-quarters, turned into the scene rather than toward the viewer, and the "
+            "face is visible, calm and unremarkable. THE APPEARANCE IS INVENTED: hair, "
+            "clothing and build are the painter's free choice within the age and gender "
+            "given, and this is not a likeness of any real person. No portrait framing and "
+            "no posing — the figure belongs to the place."
+        )
+    else:
+        satz = (
+            f"In the scene there is one adult figure, seen from a distance: "
+            f"{', '.join(teile)}, {haltung['prompt']}. The figure is seen entirely from "
+            "behind, small in the frame, and no facial features are visible or implied."
+        )
+
     if begleitung["prompt"]:
         satz += " " + begleitung["prompt"]
-    else:
-        satz += " There is no one else anywhere in the image."
     return satz
 
 
@@ -713,13 +771,17 @@ FARBWORTE: dict[str, str] = {
 
 GRENZE = (
     "Important constraints:\n"
-    "- Only the figures explicitly described above may appear — no one else, anywhere. "
-    "Never an additional adult, not in the distance, not as a shadow, not as a reflection, "
-    "not implied by a second set of belongings.\n"
-    "- There is never a second adult besides the one described. The person this image is "
-    "about is not depicted and must not be suggested in any form.\n"
-    "- No faces, no facial features, nobody turned toward the viewer, no portrait, no "
-    "reflection showing a face. Every figure is seen from behind or from far away.\n"
+    "- At most ONE face may be visible anywhere in this image: that of the single figure "
+    "described above as the viewer, and only if that description explicitly says the face is "
+    "visible. Its appearance is invented and is not a likeness of anyone.\n"
+    "- Other people may appear only where the description above puts them, and every one of "
+    "them is far away, small in the frame, turned away, or an indistinct silhouette. No "
+    "facial features on them, not even suggested or implied, no portrait of them, nobody "
+    "among them turned toward the viewer. Where the description above mentions no people, "
+    "there are none.\n"
+    "- The person this image is about is never shown close and never with a face — at most a "
+    "distant, indistinct shape, seen from behind.\n"
+    "- No reflection and no shadow may show a face that the rules above do not allow.\n"
     "- Animals may appear as described above; they are calm and at a distance, never "
     "threatening, never menacing, never looking at the viewer.\n"
     "- No letters, numbers, words, writing, signatures, logos or frames.\n"
@@ -1044,8 +1106,18 @@ def prompt_bauen(
             if zeichen:
                 teile.append("Somewhere in the scene: " + "; ".join(zeichen) + ".")
 
-    if einstellungen.get("figur") == "ich":
+    if zeigt_mich(einstellungen):
         teile.append(figur_beschreibung(einstellungen.get("selbst"), einstellungen))
+    else:
+        # **„Niemand" muss gesagt werden, seit andere Menschen vorkommen dürfen.**
+        #
+        # Solange die Grenze jede Gestalt verbot, war die leere Wahl der Normalfall und
+        # brauchte keinen Satz. Jetzt erlaubt die Grenze Menschen „where the description
+        # above puts them" — ohne diesen Satz wäre „Niemand" nur noch das Fehlen einer
+        # Erwähnung, und ein Bildmodell füllt eine leere Stelle gern mit einer Gestalt.
+        teile.append(
+            "There are no people anywhere in this image, and nothing that implies one: no "
+            "figure, no silhouette, no shadow of a person, no reflection of one.")
 
     # ── Komposition ─────────────────────────────────────────────────────────
     #
@@ -1112,7 +1184,7 @@ def _regie_legende(
                   "Licht und Gegenstände kommen aus dem, was du selbst erzählt hast. Ein "
                   "zweites Bild zu denselben Angaben sieht deshalb wieder anders aus",
     })
-    if einstellungen.get("figur") == "ich":
+    if zeigt_mich(einstellungen):
         zeilen.append(_gestalt_zeile(einstellungen))
     return zeilen
 
@@ -1124,13 +1196,26 @@ def _gestalt_zeile(einstellungen: dict[str, Any]) -> dict[str, str]:
     haltung = next(
         (h["label"].lower() for h in HALTUNGEN
          if h["key"] == einstellungen.get("haltung")), "stehen")
+    sichtbar = str(einstellungen.get("figur") or "") == "ich_sichtbar"
+    kinder = " und die Kinder" if begleitung in ("kind", "kinder") else ""
+
+    if sichtbar:
+        return {
+            "was": "Die Gestalt" + kinder,
+            "wofuer": (
+                f"Du beim {haltung.capitalize()}{wer.get(begleitung, '')}. "
+                "**Ihr Aussehen ist frei erfunden** — aus deiner Selbstauskunft kommen nur "
+                "Altersspanne und Geschlecht, alles Weitere hat das Bildmodell sich "
+                "ausgedacht. Es ist kein Abbild von dir. Die Person, um die es in diesem "
+                "Fall geht, kommt nie mit Gesicht vor und nie nah"
+            ),
+        }
     return {
-        "was": "Die Gestalt von hinten" + (
-            " und die Kinder" if begleitung in ("kind", "kinder") else ""),
+        "was": "Die Gestalt von hinten" + kinder,
         "wofuer": (
             f"Du beim {haltung.capitalize()}{wer.get(begleitung, '')} — nach deiner "
             "Selbstauskunft, ohne Gesicht und in Entfernung. Die Person, um die es in "
-            "diesem Fall geht, kommt nicht als Gestalt vor"
+            "diesem Fall geht, kommt nie mit Gesicht vor und nie nah"
         ),
     }
 
@@ -1274,7 +1359,7 @@ def legende(
                 "wofuer": "Sinnbilder, keine Aussagen — eine Schwelle steht für etwas, das "
                           "fehlt und erreichbar wäre. Was sie dir bedeuten, entscheidest du",
             })
-    if einstellungen.get("figur") == "ich":
+    if zeigt_mich(einstellungen):
         zeilen.append(_gestalt_zeile(einstellungen))
 
     # **Der Rückfall wird gesagt, nicht verschwiegen.**

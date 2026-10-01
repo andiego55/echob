@@ -430,38 +430,45 @@ def test_der_prompt_traegt_nur_struktur_und_keine_geschichte():
     for verraeterisch in ("boundary", "violation", "devaluation", "verlaesslichkeit"):
         assert verraeterisch not in prompt, verraeterisch
     # Und kein Wort ueber eine Beziehung.
-    for wort in ("relationship", "partner", "beziehung", "conflict", "abuse", "person"):
+    #
+    # „person" steht nicht mehr dabei: Seit „Niemand ist auf dem Bild" ausdruecklich gesagt
+    # werden muss („no shadow of a person"), kommt das Wort im Prompt vor - als Verbot und
+    # nicht als Material. Der Test wuerde sonst eine Regel verbieten, statt eine Geschichte.
+    for wort in ("relationship", "partner", "beziehung", "conflict", "abuse"):
         assert wort not in prompt, wort
 
 
-def test_die_grenze_laesst_hoechstens_EINE_gestalt_zu():
-    """**Die Grenze, an der alles haengt.**
+def test_die_grenze_laesst_genau_EIN_gesicht_zu():
+    """**Die Grenze, an der alles haengt — dritte Fassung, und die Linie hat sich verschoben.**
 
-    Eine zweite Gestalt waere als die andere Person lesbar — eine Abbildung eines echten,
-    namentlich bekannten Menschen aus den Angaben einer Seite. Ob im Bild zwei Menschen
-    stehen, ist deshalb keine Geschmacksfrage.
+    Erst galt: hoechstens eine Gestalt, kein Gesicht, nirgends. Dann: keine zweite ERWACHSENE
+    Gestalt (ein Kind, um das sich jemand kuemmert, gehoert zum Leben der Person). Jetzt gilt
+    auf Zuruf: Andere Menschen duerfen vorkommen, und die Person selbst darf mit Gesicht zu
+    sehen sein - **ihr Aussehen ist frei erfunden**, die App hat kein Bild von ihr.
 
-    Und kein Gesicht: Ein Portraet von jemandem, der nie dafuer sass, laedt zum
-    Wiedererkennen ein — mit allem, was daran haengt: Haltung, Groesse, Ausdruck. Alles davon
-    waere erfunden.
+    Was BLEIBT, ist die eine Linie: genau ein Gesicht im Bild, und zwar das der eigenen
+    Gestalt. Jeder andere Mensch ist fern und undeutlich. Die Person, um die es im Fall geht,
+    nie nah und nie mit Gesicht - ein Portraet von jemandem, der nie dafuer sass, laedt zum
+    Wiedererkennen ein.
     """
     from app.services.bild_katalog import GRENZE
 
     tief = GRENZE.lower()
-    # **Die Regel schuetzt EINE Person: die, um die es im Fall geht.**
-    # Sie hiess frueher „hoechstens eine Gestalt" und war damit zu grob - ein Kind, um das
-    # sich jemand kuemmert, gehoert zum Leben der Person und nicht zur Gegenseite.
-    assert "never a second adult" in tief
-    assert "is not depicted and must not be suggested" in tief
-    for verboten in ("not as a shadow", "not as a reflection",
-                     "not implied by a second set of belongings"):
-        assert verboten in tief, verboten
-    # Auch nicht als Schatten oder Spiegelung - das sind die Schlupfloecher.
-    assert "not as a shadow" in tief
-    assert "not as a reflection" in tief
-    # Und kein Gesicht, auch nicht in einer Spiegelung.
-    assert "no face" in tief
-    assert "no reflection showing a face" in tief
+    # Genau ein Gesicht, und nur das der eigenen Gestalt.
+    assert "at most one face" in tief
+    assert "described above as the viewer" in tief
+    assert "its appearance is invented" in tief
+    # Alle anderen: fern und ohne Gesicht.
+    for regel in ("far away, small in the frame, turned away, or an indistinct silhouette",
+                  "no facial features on them",
+                  "nobody among them turned toward the viewer"):
+        assert regel in tief, regel
+    # Und ausdruecklich die Person, um die es geht.
+    assert "never shown close and never with a face" in tief
+    # Die Schlupfloecher bleiben zu.
+    assert "no reflection and no shadow may show a face" in tief
+    # „Niemand" bleibt eine Wahl: Wo nichts von Menschen steht, sind keine.
+    assert "where the description above mentions no people, there are none" in tief
 
 
 def test_die_grenze_erlaubt_jetzt_tiere_und_gegenstaende():
@@ -507,7 +514,7 @@ def test_die_figur_kommt_aus_der_selbstauskunft_und_nur_daraus():
     for text in (frau, unbestimmt, figur_beschreibung({"age_range": "18-25"})):
         assert "entirely from behind" in text
         assert "no facial features" in text
-        assert "no one else anywhere in the image" in text
+        assert "no facial features are visible or implied" in text
 
 
 def test_die_altersspannen_der_selbstauskunft_treffen_die_richtige_stufe():
@@ -606,8 +613,8 @@ def test_die_legende_loest_auch_symbolik_und_figur_auf():
     assert "Schwelle" in text
     assert "Tier" in text
     assert "Gestalt von hinten" in text
-    # Wer NICHT vorkommt, steht ausdruecklich da.
-    assert "kommt nicht als Gestalt vor" in text
+    # Wer NICHT mit Gesicht vorkommt, steht ausdruecklich da.
+    assert "kommt nie mit Gesicht vor und nie nah" in text
     # Und die Sinnbilder werden ausdruecklich NICHT gedeutet.
     assert "entscheidest du" in text
 
@@ -1509,7 +1516,10 @@ def test_die_begleitung_steht_neben_der_gestalt_und_ohne_gesicht():
 
     allein = figur_beschreibung({}, {"begleitung": "keine"})
     assert "child" not in allein
-    assert "no one else anywhere in the image" in allein
+    # **Hier stand „no one else anywhere in the image".** Der Satz ist aus der Gestalt raus,
+    # weil andere Menschen jetzt vorkommen duerfen - gesagt wird das zentral, bei der Wahl
+    # „Niemand", und nicht an jeder Gestalt. Was bleibt: ohne Begleitung steht kein Kind da.
+    assert "child" not in allein
 
 
 def test_jede_haltung_ergibt_eine_andere_gestalt():
@@ -1546,8 +1556,8 @@ def test_die_legende_sagt_wer_im_bild_ist_und_wer_nicht():
     assert "Kinder" in gestalt["was"]
     assert "Kind neben dir" in gestalt["wofuer"]
     assert "Schützen" in gestalt["wofuer"]
-    # Und ausdruecklich, wer NICHT vorkommt.
-    assert "kommt nicht als Gestalt vor" in gestalt["wofuer"]
+    # Und ausdruecklich, wie die Person, um die es geht, NICHT vorkommt.
+    assert "kommt nie mit Gesicht vor und nie nah" in gestalt["wofuer"]
 
 
 # == Das Bildmodell ============================================================
@@ -1679,3 +1689,154 @@ def test_ein_unbekanntes_format_ergibt_ein_bild_und_keinen_fehler():
     bilder = _Bilder()
     asyncio.run(_modell(bilder).malen("ein Prompt", format_="gibtesnicht"))
     assert bilder.rufe[0]["size"] == GROESSE
+
+
+# == Drei Moeglichkeiten fuer die eigene Gestalt ===============================
+#
+# Auf Zuruf dazugekommen: "Es muss ein Button dazu, mit dem der User sagen kann, dass man
+# selbst auch in dem Bild erscheinen darf. Allerdings muss die Botschaft klar sein, dass die
+# visuellen Merkmale frei erfunden sind."
+#
+# Das ist die Bedingung und keine Fussnote: Die App hat kein Bild von der Person, also kann
+# die Gestalt ihr auch nicht aehneln. Was sie zeigt, ist eine Figur - und das steht an der
+# Wahl, in der Legende und im Prompt.
+
+
+def test_es_gibt_genau_drei_moeglichkeiten():
+    from app.services.bild_katalog import FIGUR_SCHLUESSEL, FIGUR_STUFEN
+
+    assert [f["key"] for f in FIGUR_STUFEN] == ["keine", "ich", "ich_sichtbar"]
+    assert FIGUR_SCHLUESSEL == {"keine", "ich", "ich_sichtbar"}
+    for f in FIGUR_STUFEN:
+        assert f["label"] and f["hinweis"], f["key"]
+    # Und die dritte sagt schon in ihrem Hinweis, dass das Aussehen erfunden ist.
+    sichtbar = next(f for f in FIGUR_STUFEN if f["key"] == "ich_sichtbar")
+    assert "erfunden" in sichtbar["hinweis"]
+
+
+def test_die_sichtbare_gestalt_sagt_dass_ihr_aussehen_erfunden_ist():
+    """**Die Bedingung, unter der es diese Stufe gibt.**
+
+    Nicht nur in der Oberflaeche - auch im Prompt. Ein Bildmodell, dem man sagt "invent the
+    appearance", erfindet eher frei; eines, dem man nur Alter und Geschlecht gibt, greift zum
+    naechstliegenden Klischee. Und in der Legende steht es, damit niemand sein eigenes Bild
+    fuer ein Abbild haelt.
+    """
+    from app.services.bild_katalog import figur_beschreibung
+
+    satz = figur_beschreibung({"age_range": "36-45", "gender": "weiblich"},
+                              {"figur": "ich_sichtbar", "haltung": "stehend"})
+    assert "THE APPEARANCE IS INVENTED" in satz
+    assert "not a likeness of any real person" in satz
+    assert "the face is visible" in satz
+    # Kein Portraet: Die Gestalt gehoert in den Ort und posiert nicht darin.
+    assert "No portrait framing" in satz
+    assert "turned into the scene rather than toward the viewer" in satz
+    # Und das Aussehen kommt weiter nur aus der Selbstauskunft.
+    assert "a woman" in satz
+    assert "in middle life" in satz
+
+
+def test_von_hinten_bleibt_von_hinten():
+    """Die zweite Stufe aendert sich nicht, weil daneben eine dritte dazukommt."""
+    from app.services.bild_katalog import figur_beschreibung
+
+    satz = figur_beschreibung({"age_range": "36-45", "gender": "weiblich"},
+                              {"figur": "ich", "haltung": "stehend"})
+    assert "seen entirely from behind" in satz
+    assert "no facial features are visible or implied" in satz
+    assert "INVENTED" not in satz
+
+
+def test_jede_haltung_hat_eine_fassung_fuer_beide_formen():
+    """**Sonst steht ein Widerspruch im Prompt.**
+
+    Genau so lag es einen Moment: "walking away from the viewer, further into the scene" neben
+    "the face is visible". Ein Bildmodell loest so etwas still auf - und dann stimmt entweder
+    die Haltung nicht oder das Gesicht fehlt.
+    """
+    from app.services.bild_katalog import HALTUNGEN
+
+    for h in HALTUNGEN:
+        assert len(h["prompt"]) > 20, h["key"]
+        assert len(h["prompt_sichtbar"]) > 20, h["key"]
+        tief = h["prompt_sichtbar"].lower()
+        # Keine Fassung fuer die sichtbare Gestalt dreht ihr den Ruecken zu.
+        for widerspruch in ("away from the viewer", "entirely from behind", "back to the"):
+            assert widerspruch not in tief, f'{h["key"]}: {widerspruch}'
+
+
+def test_die_sichtbare_gestalt_nimmt_die_passende_haltung():
+    from app.services.bild_katalog import HALTUNGEN, figur_beschreibung
+
+    gehend = next(h for h in HALTUNGEN if h["key"] == "gehend")
+    satz = figur_beschreibung({}, {"figur": "ich_sichtbar", "haltung": "gehend"})
+    assert gehend["prompt_sichtbar"] in satz
+    assert gehend["prompt"] not in satz
+
+    ruecken = figur_beschreibung({}, {"figur": "ich", "haltung": "gehend"})
+    assert gehend["prompt"] in ruecken
+    assert gehend["prompt_sichtbar"] not in ruecken
+
+
+def test_niemand_wird_ausdruecklich_gesagt():
+    """**Seit andere Menschen vorkommen duerfen, ist das Fehlen einer Erwaehnung zu wenig.**
+
+    Die Grenze erlaubt Menschen "where the description above puts them". Ohne diesen Satz
+    waere "Niemand" nur noch eine Luecke - und ein Bildmodell fuellt eine leere Stelle gern
+    mit einer Gestalt.
+    """
+    from app.services.bild_katalog import prompt_bauen
+
+    einst = {"bildwelt": "haus", "handschrift": "oel", "palette": "nacht",
+             "symbolik": "keine", "haltung": "stehend", "begleitung": "keine",
+             "schichten": []}
+
+    leer = prompt_bauen({}, {**einst, "figur": "keine"})
+    assert "There are no people anywhere in this image" in leer
+    assert "no shadow of a person" in leer
+
+    # Mit Gestalt steht der Satz nicht da - er wuerde ihr widersprechen.
+    for figur in ("ich", "ich_sichtbar"):
+        mit = prompt_bauen({}, {**einst, "figur": figur,
+                                "selbst": {"age_range": "36-45", "gender": "weiblich"}})
+        assert "There are no people anywhere" not in mit, figur
+
+
+def test_beide_formen_kommen_in_der_legende_vor():
+    """**Der Waechter gegen die halbe Verdrahtung.**
+
+    Vorher stand `figur == "ich"` an vier Stellen: im Prompt, in beiden Legenden und im
+    Router. Beim Dazukommen der dritten Stufe haette jede einzelne davon still die neue Wahl
+    uebersehen - die Gestalt waere im Bild erschienen und in der Legende nicht. Dieselbe Art
+    Fehler wie das Freigabe-Element, das an vier von fuenf Stellen stand.
+    """
+    from app.services.bild_katalog import legende, zeigt_mich
+
+    assert zeigt_mich({"figur": "ich"}) is True
+    assert zeigt_mich({"figur": "ich_sichtbar"}) is True
+    assert zeigt_mich({"figur": "keine"}) is False
+    assert zeigt_mich(None) is False
+
+    einst = {"bildwelt": "landschaft", "schichten": ALLE_SCHICHTEN, "symbolik": "keine",
+             "haltung": "stehend", "begleitung": "keine"}
+    for figur in ("ich", "ich_sichtbar"):
+        zeilen = legende({**einst, "figur": figur}, _werte_beispiel())
+        assert any("Gestalt" in z["was"] for z in zeilen), figur
+
+    ohne = legende({**einst, "figur": "keine"}, _werte_beispiel())
+    assert not any("Gestalt" in z["was"] for z in ohne)
+
+
+def test_die_legende_sagt_bei_der_sichtbaren_gestalt_dass_sie_erfunden_ist():
+    """Niemand soll sein eigenes Bild fuer ein Abbild halten."""
+    from app.services.bild_katalog import legende
+
+    einst = {"bildwelt": "landschaft", "schichten": ALLE_SCHICHTEN, "symbolik": "keine",
+             "haltung": "stehend", "begleitung": "keine", "figur": "ich_sichtbar"}
+    zeile = next(z for z in legende(einst, _werte_beispiel()) if "Gestalt" in z["was"])
+
+    assert "frei erfunden" in zeile["wofuer"]
+    assert "kein Abbild von dir" in zeile["wofuer"]
+    # Und die Linie, die bleibt.
+    assert "kommt nie mit Gesicht vor und nie nah" in zeile["wofuer"]
