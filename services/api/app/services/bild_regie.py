@@ -200,6 +200,29 @@ def personen_ueberhaupt(text: str) -> list[str]:
 #: Muster immer komplizierter zu machen, wird die harmlose Stelle vorher aus dem Text
 #: genommen — man kann die Liste lesen und prüfen, ob sie stimmt.
 IDIOME: tuple[str, ...] = (
+    # **Ein Gesicht, von dem dasteht, dass man es NICHT sieht.**
+    #
+    # Aus dem Betrieb, und der Fall war lehrreich: Die Szene der Person sagte selbst „die
+    # Gesichter wurden unscharf" — eine Dissoziation, ihr eigenes Wort. Die Regie schrieb das
+    # pflichtgemäß als „blurred faces", und meine Sperre verwarf den ganzen Auftrag, zweimal.
+    #
+    # Gesperrt ist ein LESBARES Gesicht. „Schemenhaft" ist ausdrücklich erlaubt (so lautet die
+    # Vorgabe für die Person, um die es im Fall geht), und ein Gesicht, das verschwimmt, ist
+    # genau das. Die eine lesbare Ausnahme setzt die App selbst, aus der Selbstauskunft.
+    # Vor dem Wort: ein Eigenschaftswort, das es unlesbar macht.
+    r"\b(blurred|blurry|indistinct|faint|featureless|shadowed|darkened|hidden|obscured|"
+    r"unseen|averted|unclear|unreadable|smudged|dissolving|half-hidden|turned[- ]away|"
+    r"no|without)\s+faces?\b",
+    # Dahinter dasselbe, mit Wortstamm statt Partizip: „faces dissolve" kam aus dem Betrieb
+    # und wurde von „dissolving" nicht getroffen.
+    #
+    # **„turned away" steht hier NICHT**, obwohl es vorne steht: „her face turned away from
+    # the window" heisst auf Englisch genauso gut, dass sie sich vom Fenster weg DEM
+    # BETRACHTER zuwendet. Vorne ist „turned-away faces" eindeutig, hinten nicht — und bei
+    # einem Gesicht entscheidet die strengere Lesart.
+    r"\bfaces?\s+(?:that\s+|which\s+)?(blur\w*|dissolv\w*|fad\w*|obscur\w*|vanish\w*|"
+    r"disappear\w*|hidden|unseen|featureless|indistinct|averted|lost|smudged|"
+    r"out of focus|in shadow|in deep shadow|in darkness)\b",
     # Eine Wand, ein Hang, ein Gebäude hat ein „face". Ein Mensch auch — deshalb ist das Wort
     # gesperrt und stehen hier die Dinge, die keines haben können.
     r"\b(rock|cliff|stone|wall|mountain|glacier|ice|water|sheer|north|south|east|west|barn"
@@ -245,12 +268,15 @@ metaphors. A worn kitchen chair at two in the morning says more than "a lonely p
 
 Rules you must follow, without exception:
 
-1. PEOPLE MAY APPEAR, AND EVERY ONE OF THEM IS FAR AWAY AND INDISTINCT. Never a face, never
-   a portrait, never anybody close enough to be read as an individual. Whenever you name a
-   person, say in the same phrase that they are distant, small, turned away, a silhouette or
-   barely visible: "two figures far off at the treeline", never "a woman at the table". A
-   phrase that names a person without saying that is discarded, and then the person gets a
-   duller picture — so this matters.
+1. PEOPLE MAY APPEAR, AND EVERY ONE OF THEM IS FAR AWAY AND INDISTINCT. Never a portrait,
+   never anybody close enough to be read as an individual. Whenever you name a person, say in
+   the same phrase that they are distant, small, turned away, a silhouette or barely visible:
+   "two figures far off at the treeline", never "a woman at the table". A phrase that names a
+   person without saying that is discarded, and then the person gets a duller picture — so
+   this matters.
+   Avoid the word "face" entirely. If the material speaks of faces — of them blurring, of not
+   being able to read them — write that as figures turned away, as silhouettes, or as shapes
+   too far off to make out. The same image, without the one word that gets a brief thrown out.
    Do not describe the viewer. The app adds one figure of its own afterwards, from the
    person's own account of themselves; that is not your job and a second one would collide
    with it.

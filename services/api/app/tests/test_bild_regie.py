@@ -534,7 +534,7 @@ def test_die_normale_sprache_einer_bildregie_wird_nicht_verworfen():
 def test_die_wendungen_beissen_trotzdem():
     """Die Gegenprobe: Was gemeint war, wird weiter verworfen."""
     schlimm = {
-        "her face turned away from the window": "a face",
+        "her face lit by the window": "a face",
         "two dark eyes in the glass": "eyes",
         "a small wooden sign at the gate": "something readable",
         "a name written on the door": "something readable",
@@ -903,3 +903,43 @@ def test_ein_ganzer_satz_als_motiv_bleibt_lesbar():
         prompt = prompt_bauen(_werte(), EINST, regie)
         assert "Subject: " in prompt, motiv
         assert "is a locked apartment door stands" not in prompt, motiv
+
+
+def test_ein_gesicht_das_man_nicht_sieht_ist_erlaubt():
+    """**Aus dem Betrieb, und der Fall war lehrreich.**
+
+    Die Szene der Person sagte selbst "die Gesichter wurden unscharf" - eine Dissoziation, ihr
+    eigenes Wort. Die Regie schrieb das pflichtgemaess als "blurred faces", und meine Sperre
+    verwarf den ganzen Auftrag, zweimal; die Person bekam ein Bild aus dem Baukasten.
+
+    Gesperrt ist ein LESBARES Gesicht. "Schemenhaft" ist ausdruecklich erlaubt - so lautet die
+    Vorgabe fuer die Person, um die es im Fall geht -, und ein Gesicht, das verschwimmt, ist
+    genau das.
+    """
+    erlaubt = (
+        "two figures with blurred faces far off across the room",
+        "turned-away faces at the long table in the distance",
+        "a distant group with featureless faces",
+        "no faces anywhere in the scene",
+        "shapes whose faces dissolve into the light",
+    )
+    for satz in erlaubt:
+        assert bild_regie._verbotene(satz) == [], satz
+
+    # Ein lesbares Gesicht bleibt gesperrt.
+    for satz in ("her face turned to the window", "a face at the glass",
+                 "the sleeping face in the chair"):
+        assert "a face" in bild_regie._verbotene(satz), satz
+
+    # **Und die mehrdeutige Richtung bleibt streng.** "her face turned away from the window"
+    # heisst auf Englisch genauso gut, dass sie sich vom Fenster weg dem Betrachter zuwendet.
+    # Bei einem Gesicht entscheidet die strengere Lesart; "turned-away faces" ist eindeutig
+    # und darum oben erlaubt.
+    assert "a face" in bild_regie._verbotene("her face turned away from the window")
+
+
+def test_die_regeln_raten_vom_wort_gesicht_ab():
+    """Zwei Sicherungen, nicht eine: Die Ausnahmen oben fangen es ab, wenn es doch kommt - die
+    Anweisung sorgt dafuer, dass es meistens gar nicht kommt."""
+    assert "Avoid the word" in bild_regie.SYSTEM_REGELN
+    assert "figures turned away" in bild_regie.SYSTEM_REGELN
