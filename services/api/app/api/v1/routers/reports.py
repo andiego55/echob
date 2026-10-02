@@ -17,7 +17,7 @@ from app.schemas.report import (
     ReportListResponse,
     ReportResponse,
 )
-from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
+from app.services import subscription_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/reports", tags=["reports"])
@@ -54,8 +54,10 @@ async def create_report(
 
     async with pool.acquire() as conn:
         case_row = await _assert_case_owner(case_id, user_id, conn, return_row=True)
-        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest)
-        await enforce_ai_usage_limit(user_id, conn, "report")
+        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest). Der Platz wird gehalten,
+        # solange das Modell schreibt: Zehn gleichzeitige Aufrufe sahen bis heute alle
+        # dasselbe freie Kontingent und liefen alle durch.
+        schein = await subscription_service.reservieren(user_id, conn, "report")
         report_count = await conn.fetchval(
             "SELECT COUNT(*) FROM reports WHERE case_id = $1", case_id
         )
@@ -101,17 +103,18 @@ async def create_report(
     hypotheses_data = [crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows]
 
     if echo_svc:
-        content = await echo_svc.generate_report(
-            report_type=body.report_type,
-            case_context=case_context,
-            scenes=scenes_data,
-            scale_scores=scale_data,
-            onboarding=onboarding_data,
-            user_profile=user_profile_data,
-            person_profile=person_profile_data,
-            topic_summaries=topic_summaries_data,
-            hypotheses=hypotheses_data,
-        )
+        async with subscription_service.zuruecknahme_bei_fehler(schein, pool):
+            content = await echo_svc.generate_report(
+                report_type=body.report_type,
+                case_context=case_context,
+                scenes=scenes_data,
+                scale_scores=scale_data,
+                onboarding=onboarding_data,
+                user_profile=user_profile_data,
+                person_profile=person_profile_data,
+                topic_summaries=topic_summaries_data,
+                hypotheses=hypotheses_data,
+            )
     else:
         content = {
             "sections": [{"heading": "Hinweis", "text": "Echo-Service nicht verfügbar."}],
@@ -130,7 +133,7 @@ async def create_report(
             """,
             case_id, user_id, body.report_type, title, content_json,
         )
-        await log_ai_usage(user_id, conn, "report")
+        await subscription_service.bestaetigen(schein, conn)
 
     logger.info("Bericht erstellt: report_id=%s case_id=%s type=%s", row["id"], case_id, body.report_type)
     return row_to_report(row)

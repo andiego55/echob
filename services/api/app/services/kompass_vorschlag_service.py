@@ -274,7 +274,7 @@ async def vorschlagen(
     nichts ablegen dürfte, darf kein Geld ausgeben — und keine Kontingenteinheit
     verbrauchen, die die Person später wirklich braucht.
 
-    Wirft 403 über ``enforce_ai_usage_limit``, wenn das Monatskontingent leer ist. Das ist
+    Wirft 403 über ``reservieren``, wenn das Monatskontingent leer ist. Das ist
     hier richtig (anders als beim Fall-FAQ): Die Person hat den Knopf selbst gedrückt und
     soll erfahren, warum nichts kommt.
     """
@@ -295,13 +295,17 @@ async def vorschlagen(
                        "mehr, und es lässt sich etwas erkennen.",
         }
 
-    await subscription_service.enforce_ai_usage_limit(str(user_id), conn, KONTINGENT_ART)
+    # Reserviert statt nur geprüft: Zwischen Prüfung und Verbuchung lag der ganze
+    # Modellaufruf, und in dieser Zeit sah ein zweiter Aufruf dasselbe freie Kontingent.
+    schein = await subscription_service.reservieren(
+        str(user_id), conn, KONTINGENT_ART)
 
     sichtbare = await kompass_saetze_service.liste(conn, user_id=user_id)
     # Verworfene gehen bewusst NICHT mit in den Prompt (siehe Modulkopf) - wohl aber in
     # die Messlatte weiter unten.
     eingabe = als_prompt_eingabe(stoff, sichtbare)
-    antwort = await echo.kompass_saetze_vorschlagen(eingabe=eingabe)
+    async with subscription_service.zuruecknahme_bei_fehler(schein, conn):
+        antwort = await echo.kompass_saetze_vorschlagen(eingabe=eingabe)
 
     vorhandene = await _alle_texte(conn, user_id=user_id)
     angelegt: list[dict[str, Any]] = []
@@ -327,7 +331,7 @@ async def vorschlagen(
         # in zwei Formulierungen ablegen.
         vorhandene.append(kandidat["text"])
 
-    await subscription_service.log_ai_usage(str(user_id), conn, KONTINGENT_ART)
+    await subscription_service.bestaetigen(schein, conn)
 
     hinweis = antwort.get("hinweis")
     if not angelegt and not hinweis:

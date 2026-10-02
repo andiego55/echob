@@ -23,7 +23,7 @@ from app.schemas.report import ReportResponse
 from app.services import kompass_ideal_katalog as katalog
 from app.services import kompass_ideal_service as dienst
 from app.services import kompass_ideal_vergleich as vergleich
-from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
+from app.services import subscription_service
 
 router = APIRouter(prefix="/me/kompass/ideale", tags=["kompass"])
 
@@ -217,7 +217,7 @@ async def vergleich_erzeugen(
     echo_svc = getattr(request.app.state, "echo_service", None)
 
     async with pool.acquire() as conn:
-        await enforce_ai_usage_limit(user_id, conn, "report")
+        schein = await subscription_service.reservieren(user_id, conn, "report")
         material = await vergleich.material_laden(
             conn, user_id=user_id, art=art, case_id=case_id)
 
@@ -228,17 +228,18 @@ async def vergleich_erzeugen(
         )
 
     ideal = material["ideal"]
-    inhalt = await echo_svc.generate_ideal_delta(
-        ideal_text=dienst.als_prompt_eingabe(ideal),
-        case_context=material["fall"],
-        scenes=material["szenen"],
-        scale_scores=material["skalen"],
-        onboarding=material["einstieg"],
-    )
+    async with subscription_service.zuruecknahme_bei_fehler(schein, pool):
+        inhalt = await echo_svc.generate_ideal_delta(
+            ideal_text=dienst.als_prompt_eingabe(ideal),
+            case_context=material["fall"],
+            scenes=material["szenen"],
+            scale_scores=material["skalen"],
+            onboarding=material["einstieg"],
+        )
 
     async with pool.acquire() as conn:
         zeile = await vergleich.bericht_ablegen(
             conn, user_id=user_id, case_id=case_id, ideal=ideal, inhalt=inhalt)
-        await log_ai_usage(user_id, conn, "report")
+        await subscription_service.bestaetigen(schein, conn)
 
     return row_to_report(zeile)

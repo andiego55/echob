@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import pathlib
 import re
 import uuid
 
@@ -1026,8 +1027,8 @@ async def test_das_bild_kontingent_zaehlt_in_stueck(person, db):
     from app.core.config import settings
     from app.services.subscription_service import (
         _count_ai_usage_this_month,
-        enforce_ai_usage_limit,
         log_ai_usage,
+        reservieren,
     )
 
     for _ in range(settings.bild_limit):
@@ -1035,9 +1036,29 @@ async def test_das_bild_kontingent_zaehlt_in_stueck(person, db):
     assert await _count_ai_usage_this_month(str(person), db, "bild") == settings.bild_limit
 
     with pytest.raises(HTTPException) as fehler:
-        await enforce_ai_usage_limit(str(person), db, "bild")
+        await reservieren(str(person), db, "bild")
     assert fehler.value.status_code == 403
     assert "BILD_LIMIT_REACHED" in fehler.value.detail
+
+
+def test_unter_einem_bild_steht_nichts_was_die_anwendung_geschrieben_hat():
+    """**Die Regie schreibt einen Titel, und er bleibt im Haus.**
+
+    Bis zum 02.10. stand er als Vorschlag unter dem Bild. Das ist ein Handgriff und sieht
+    freundlich aus - aber es ist genau die Behauptung ohne Vorbehalt, die dieses Projekt
+    sonst ueberall vermeidet: Ein erzeugter Satz unter einem erfundenen Bild sagt der
+    Person in der Stimme der Anwendung, was sie da sieht. Wer einen Satz will, schreibt
+    seinen eigenen.
+
+    Geprueft an der Stelle, an der es wieder passieren wuerde: beim Anlegen.
+    """
+    quelle = (
+        pathlib.Path(__file__).resolve().parents[1]
+        / "api" / "v1" / "routers" / "bilder.py"
+    ).read_text(encoding="utf-8")
+    anlegen = quelle[quelle.index("dienst.gemaltes_anlegen("):]
+    anlegen = anlegen[:anlegen.index(")" + chr(10))]
+    assert "satz" not in anlegen, "Es wird wieder ein Satz vorgeschlagen"
 
 
 def test_der_gerechnete_weg_hat_kein_kontingent():

@@ -1,11 +1,17 @@
 """Subscription-Service: Trial-Limits und Plan-Status."""
 from __future__ import annotations
 
+import contextlib
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 
 from app.core.config import settings
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 TRIAL_DAYS = 3
 TRIAL_MAX_SCENES = 5
@@ -145,6 +151,12 @@ def _next_month_start(now: datetime) -> datetime:
                        hour=0, minute=0, second=0, microsecond=0)
 
 
+#: Zaehlt eine Zeile gegen das Kontingent? Verbuchtes immer, Laufendes solange es frisch
+#: ist. Als Textstueck, damit Zaehlung und Reservierung garantiert dieselbe Bedingung
+#: benutzen - zwei Fassungen davon waeren zwei Kontingente.
+_NUR_GUELTIGE = "AND (vorlaeufig_bis IS NULL OR vorlaeufig_bis > NOW())"
+
+
 async def _count_ai_usage_this_month(user_id: str, conn, kind: str) -> int:
     """Zählt KI-Aktionen seit Beginn des laufenden Kalendermonats (UTC).
 
@@ -157,63 +169,211 @@ async def _count_ai_usage_this_month(user_id: str, conn, kind: str) -> int:
     # Ein COUNT hier hiesse: eine Folge ist eine Folge, ob fünf Minuten oder zwanzig.
     count = await conn.fetchval(
         "SELECT COALESCE(SUM(menge), 0) FROM ai_usage_log "
-        "WHERE user_id = $1 AND kind = $2 AND created_at >= $3",
+        "WHERE user_id = $1 AND kind = $2 AND created_at >= $3 "
+        + _NUR_GUELTIGE,
         user_id, kind, month_start,
     )
     return int(count or 0)
 
 
-async def enforce_ai_usage_limit(user_id: str, conn, kind: str) -> None:
-    """Kostenschutz für kostenintensive KI-Aktionen (Berichte, Skalen).
+# -- Die Reservierung ---------------------------------------------------------
+#
+# **Was hier kaputt war.** Jede teure KI-Aktion lief so: pruefen, ob noch Kontingent frei
+# ist - Modell arbeiten lassen - verbuchen. Zwischen Pruefung und Verbuchung lagen bei
+# einem Bild zwei Minuten, und in dieser Zeit stand das Kontingent unveraendert da. Zehn
+# gleichzeitige Aufrufe sahen alle dasselbe freie Kontingent, liefen alle durch und wurden
+# danach alle verbucht. Ein doppelter Klick genuegte.
+#
+# **Was jetzt passiert.** Die Zeile entsteht VOR dem Modell und traegt einen Ablauf. Sie
+# zaehlt damit sofort gegen das Kontingent, obwohl noch nichts geliefert ist. Gelingt die
+# Arbeit, wird der Ablauf auf NULL gesetzt - aus der Reservierung wird die Buchung.
+# Scheitert sie, wird die Zeile geloescht. Stirbt der Prozess, verfaellt sie von selbst.
+#
+# **Warum ``enforce_ai_usage_limit`` nicht mehr existiert.** Es waere die bequemere
+# Aenderung gewesen, die Reservierung daneben zu legen und die alte Pruefung zu lassen.
+# Dann haette der naechste neue Aufrufer wieder die alte genommen - sie ist kuerzer, sie
+# sieht richtig aus, und die Luecke faellt an keiner Stelle auf. Die Funktion ist deshalb
+# weg, und nicht nur abgeraten.
 
-    Monatliches Kontingent pro Nutzer. 0 = deaktiviert.
+#: Wie lange eine Reservierung gilt, wenn sie niemand aufloest.
+#:
+#: Die Spanne ist ein Kompromiss. Zu kurz, und sie verfaellt, waehrend das Modell noch
+#: arbeitet - dann kaeme ein zweiter Aufruf doch durch. Zu lang, und ein abgestuerzter
+#: Lauf nimmt jemandem lange ein Kontingent weg, das er nie verbraucht hat. Fuenfzehn
+#: Minuten sind mehr als der laengste Lauf, den dieses Projekt kennt - ein Podcast gilt
+#: nach zwoelf Minuten selbst als verwaist -, und kurz genug, dass ein Absturz niemandem
+#: den Tag verdirbt.
+#:
+#: Ein Ablauf kann nie eine Buchung verlieren: ``bestaetigen`` setzt NULL, ohne nach dem
+#: Ablauf zu fragen. Wer geliefert bekommt, wird verbucht - auch nach einer Stunde.
+RESERVIERUNG_SEKUNDEN = 900
+
+#: Namensraum der Vorrang-Sperre. Advisory Locks teilen sich im ganzen Cluster einen
+#: Zahlenraum; ohne eigenen Raum koennte eine spaetere Sperre anderswo zufaellig denselben
+#: Schluessel treffen und sich an diesem Kontingent anstellen.
+_SPERR_RAUM = 19279
+
+#: Legt die Zeile an - **aber nur, wenn das Kontingent es hergibt.**
+#:
+#: Pruefung und Anlage in EINER Anweisung. Zwei Anweisungen (zaehlen, dann einfuegen)
+#: waeren genau die Luecke wieder, nur kleiner: Zwei Verbindungen koennten beide zaehlen,
+#: bevor eine einfuegt. Kommt keine Zeile zurueck, ist das Kontingent voll.
+_RESERVIEREN = (
+    "INSERT INTO ai_usage_log (user_id, kind, menge, vorlaeufig_bis) "
+    # $3 traegt zwei Rollen - Spaltenwert und Summand. Ohne Guss leitet Postgres daraus
+    # zwei Typen ab (integer gegen bigint) und weist die Anweisung zurueck.
+    "SELECT $1::uuid, $2, $3::int, NOW() + ($4 || ' seconds')::interval "
+    " WHERE ( SELECT COALESCE(SUM(menge), 0) FROM ai_usage_log "
+    "          WHERE user_id = $1::uuid AND kind = $2 AND created_at >= $5 "
+    f"           {_NUR_GUELTIGE} ) + $3::int <= $6::bigint "
+    "RETURNING id"
+)
+
+
+@dataclass
+class Reservierung:
+    """Der Platz im Kontingent, den ein laufender Aufruf haelt.
+
+    ``id is None`` heisst: Fuer diese Art ist kein Kontingent eingestellt (Grenze 0). Dann
+    gibt es nichts zu halten, und ``bestaetigen`` und ``zuruecknehmen`` tun nichts - die
+    Aufrufer brauchen dafuer keine Sonderbehandlung.
     """
-    setting_name, error_code, _label = _AI_USAGE_LIMITS[kind]
-    limit = getattr(settings, setting_name)
-    if limit <= 0:
-        return
-    count = await _count_ai_usage_this_month(user_id, conn, kind)
-    if count >= limit:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=error_code,
-        )
+
+    user_id: str
+    kind: str
+    menge: int
+    id: object | None = None
+    bestaetigt: bool = False
 
 
-async def enforce_ai_usage_menge(user_id: str, conn, kind: str, menge: int) -> None:
-    """Wie ``enforce_ai_usage_limit``, aber für eine bekannte Menge — und der Unterschied
-    ist keine Feinheit.
+async def reservieren(user_id: str, conn, kind: str, menge: int = 1) -> Reservierung:
+    """Haelt ``menge`` im Monatskontingent - oder wirft 403, wenn nichts mehr frei ist.
 
-    ``enforce_ai_usage_limit`` fragt „hast du noch etwas übrig?". Bei allem, was in Stück
-    zählt, ist das genau richtig: Ein Bericht ist ein Bericht. Bei Podcast-Minuten nicht.
-    Wer 28 von 30 Minuten verbraucht hat, kommt dort durch — und verbucht dann zwanzig. Das
-    Kontingent stünde am Ende auf 48 von 30, und niemand hätte etwas falsch gemacht.
+    **Vor dem Modellaufruf, und das ist der ganze Punkt.** Der Platz ist ab hier belegt,
+    auch wenn noch nichts geliefert ist. Danach gehoert zu jedem Aufruf genau eines von
+    beidem: ``bestaetigen`` (es ist etwas entstanden, es zaehlt) oder ``zuruecknehmen``
+    (es ist nichts entstanden, es zaehlt nicht).
 
-    Diese Fassung fragt stattdessen: **reicht es für DAS hier?** Und sie sagt in der
-    Fehlermeldung, wie viel übrig ist, weil „Kontingent aufgebraucht" bei 12 freien Minuten
-    einfach nicht stimmt.
+    Die Verbindung wird nur fuer diesen Augenblick gebraucht. Sie darf **nicht** in einer
+    langen Transaktion des Aufrufers stehen: Eine Reservierung, die niemand sonst sieht,
+    haelt auch niemanden auf.
     """
     setting_name, error_code, label = _AI_USAGE_LIMITS[kind]
     limit = getattr(settings, setting_name)
+    menge = max(1, int(menge))
     if limit <= 0:
-        return
-    verbraucht = await _count_ai_usage_this_month(user_id, conn, kind)
-    frei = max(0, limit - verbraucht)
-    if menge > frei:
-        einheit = _EINHEIT.get(kind, "")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            # Der Code bleibt derselbe, damit die Oberfläche ihn kennt; der Klartext
-            # dahinter sagt, woran es liegt.
-            detail=(
-                f"{error_code}: Dafür bräuchte es {menge} {einheit}, frei sind noch "
-                f"{frei} von {limit}. ({label})"
-            ).strip(),
+        return Reservierung(user_id=str(user_id), kind=kind, menge=menge)
+
+    month_start = _month_start(datetime.now(UTC))
+    # **Die Sperre, und warum sie trotz der einen Anweisung noetig ist.** Unter READ
+    # COMMITTED nimmt jede Anweisung ihren Blick auf die Daten beim Start. Zwei Aufrufe,
+    # die im selben Millisekundenfenster starten, koennten beide noch Platz sehen. Das
+    # Fenster ist winzig - aber genau diese Art Fenster hat die Luecke ausgemacht. Die
+    # Sperre haelt eine Zehntelmillisekunde und gilt je Person und Art: Zwei Menschen
+    # stehen sich nie im Weg.
+    async with conn.transaction():
+        await conn.execute(
+            "SELECT pg_advisory_xact_lock($1::int, hashtext($2::text))",
+            _SPERR_RAUM, f"{user_id}:{kind}",
         )
+        neu = await conn.fetchval(
+            _RESERVIEREN, str(user_id), kind, menge,
+            str(RESERVIERUNG_SEKUNDEN), month_start, limit,
+        )
+
+    if neu is None:
+        verbraucht = await _count_ai_usage_this_month(user_id, conn, kind)
+        frei = max(0, limit - verbraucht)
+        # **Eine Menge ueber 1 braucht ihren eigenen Satz.** „Kontingent aufgebraucht"
+        # stimmt bei zwoelf freien Podcast-Minuten einfach nicht - es fehlt, dass diese
+        # Folge zwanzig braucht. Der Code bleibt derselbe, damit die Oberflaeche ihn kennt.
+        if menge > 1:
+            einheit = _EINHEIT.get(kind, "")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    f"{error_code}: Dafür bräuchte es {menge} {einheit}, frei sind noch "
+                    f"{frei} von {limit}. ({label})"
+                ).strip(),
+            )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=error_code)
+
+    return Reservierung(user_id=str(user_id), kind=kind, menge=menge, id=neu)
+
+
+async def bestaetigen(res: Reservierung, conn, menge: int | None = None) -> None:
+    """Aus der Reservierung wird die Buchung - es ist etwas entstanden.
+
+    ``menge`` nur, wenn erst jetzt bekannt ist, wie viel es wirklich war: Ein Podcast
+    reserviert die geschaetzten Minuten und verbucht die tatsaechlichen. Alles, was in
+    Stueck zaehlt, laesst sie weg.
+
+    **Ohne Blick auf den Ablauf.** Ein Lauf, der laenger gebraucht hat als die
+    Reservierung gilt, wird trotzdem verbucht: Geliefert ist geliefert.
+    """
+    res.bestaetigt = True
+    if res.id is None:
+        return
+    # **Die Kennung steht mit in der Bedingung**, obwohl die Id eindeutig ist und aus
+    # dieser Anfrage stammt. Der Zugriffs-Waechter verlangt es, und er hat recht: Eine
+    # Schreibanweisung auf Nutzerdaten, die nur eine Id kennt, ist genau einen Umbau davon
+    # entfernt, eine fremde Zeile zu treffen.
+    await conn.execute(
+        "UPDATE ai_usage_log SET vorlaeufig_bis = NULL, menge = COALESCE($2::int, menge) "
+        "WHERE id = $1 AND user_id = $3::uuid",
+        res.id, None if menge is None else max(1, int(menge)), res.user_id,
+    )
+
+
+async def zuruecknehmen(res: Reservierung, conn) -> None:
+    """Es ist nichts entstanden - der Platz wird wieder frei.
+
+    ``AND vorlaeufig_bis IS NOT NULL`` ist der Sicherheitsgurt: Eine Zuruecknahme darf
+    unter keinen Umstaenden eine Buchung loeschen. Stimmt die Reihenfolge im Aufrufer
+    einmal nicht, fehlt danach Geld in der Zaehlung und niemand sieht es.
+    """
+    if res.id is None or res.bestaetigt:
+        return
+    await conn.execute(
+        "DELETE FROM ai_usage_log WHERE id = $1 AND user_id = $2::uuid "
+        "  AND vorlaeufig_bis IS NOT NULL",
+        res.id, res.user_id)
+
+
+@asynccontextmanager
+async def zuruecknahme_bei_fehler(res: Reservierung, pool_oder_conn):
+    """Was hierin scheitert, kostet nichts.
+
+    **Warum ein eigener Baustein und nicht ein ``try`` je Aufrufer.** Ohne Zuruecknahme
+    waere ein gescheiterter Aufruf nicht falsch verbucht - die Reservierung verfaellt ja -,
+    aber er haette bis dahin einen Platz belegt. Wer bei 9 von 10 Berichten steht und einen
+    Fehler bekommt, sieht sonst zehn Minuten lang ein leeres Kontingent und glaubt, der
+    Fehler habe ihn Geld gekostet.
+
+    **Pool oder Verbindung, beides.** Die Router geben den Pool: Sie haben ihre Verbindung
+    vor dem Modellaufruf bewusst losgelassen und brauchen im Fehlerfall eine neue. Die zwei
+    Kompass-Dienste bekommen nur eine Verbindung herein und halten sie - dort wird dieselbe
+    benutzt. Eine zweite Fassung dieses Bausteins fuer den zweiten Fall waere ein zweiter
+    Ort, an dem man die Zuruecknahme vergessen kann.
+
+    Im Normalfall wird gar keine Verbindung geholt: dann kostet das hier nichts.
+    """
+    try:
+        yield res
+    except BaseException:
+        # Ein Fehler beim Zuruecknehmen darf den eigentlichen Fehler nicht ersetzen - sonst
+        # liest die Person „Verbindung weg" statt „Bild liess sich nicht malen".
+        with contextlib.suppress(Exception):
+            if hasattr(pool_oder_conn, "acquire"):
+                async with pool_oder_conn.acquire() as conn:
+                    await zuruecknehmen(res, conn)
+            else:
+                await zuruecknehmen(res, pool_oder_conn)
+        raise
 
 
 async def has_ai_usage_left(user_id: str, conn, kind: str) -> bool:
-    """Wie ``enforce_ai_usage_limit``, aber ohne 403 — für Aktionen, die *nebenbei* laufen.
+    """Wie ``reservieren``, aber ohne 403 und ohne Platzhalter — für Aktionen *nebenbei*.
 
     Der Unterschied ist nicht kosmetisch. Ein Bericht ist das, was die Person angefordert
     hat: Ist das Kontingent leer, gehört ein Fehler auf den Schirm. Das Fall-FAQ hängt

@@ -697,19 +697,25 @@ async def test_das_kontingent_prueft_die_menge_und_nicht_nur_den_rest(person, db
     Zwanzigminueter durch und stuende danach auf 48 von 30 — ohne etwas falsch gemacht zu
     haben.
     """
-    from app.services.subscription_service import enforce_ai_usage_menge, log_ai_usage
+    from app.services.subscription_service import (
+        log_ai_usage,
+        reservieren,
+        zuruecknehmen,
+    )
 
     await log_ai_usage(person, db, "podcast", menge=28)
 
-    # Zwei Minuten sind noch frei: eine geht.
-    await enforce_ai_usage_menge(str(person), db, "podcast", 2)
+    # Zwei Minuten sind noch frei: eine Folge mit zwei Minuten geht. Zuruecknehmen, weil
+    # sie nicht gesprochen wird — danach sind wieder zwei frei.
+    schein = await reservieren(str(person), db, "podcast", 2)
+    await zuruecknehmen(schein, db)
 
     # Zwanzig nicht — und die Meldung sagt, wie viel wirklich frei ist.
     with pytest.raises(HTTPException) as fehler:
-        await enforce_ai_usage_menge(str(person), db, "podcast", 20)
+        await reservieren(str(person), db, "podcast", 20)
     assert fehler.value.status_code == 403
     assert "PODCAST_LIMIT_REACHED" in fehler.value.detail
-    assert "2" in fehler.value.detail, "die Meldung nennt den Rest nicht"
+    assert "frei sind noch 2 von" in fehler.value.detail, fehler.value.detail
     assert "Minuten" in fehler.value.detail
 
 
@@ -717,12 +723,13 @@ async def test_das_kontingent_prueft_die_menge_und_nicht_nur_den_rest(person, db
 async def test_ein_abgeschaltetes_kontingent_laesst_alles_durch(person, db):
     """0 heisst „deaktiviert" — dieselbe Regel wie bei allen anderen Arten."""
     from app.core.config import settings
-    from app.services.subscription_service import enforce_ai_usage_menge
+    from app.services.subscription_service import reservieren
 
     alt = settings.podcast_minuten_limit
     try:
         settings.podcast_minuten_limit = 0
-        await enforce_ai_usage_menge(str(person), db, "podcast", 9999)
+        schein = await reservieren(str(person), db, "podcast", 9999)
+        assert schein.id is None, "ohne Kontingent entsteht keine Zeile"
     finally:
         settings.podcast_minuten_limit = alt
 

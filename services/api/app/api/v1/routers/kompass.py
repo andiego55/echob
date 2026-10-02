@@ -606,14 +606,15 @@ async def portrait_schreiben(
         if not daten["bereit"]:
             return PortraitVorschlag(text="", hinweis=daten["grund"])
 
-        await subscription_service.enforce_ai_usage_limit(str(user_id), conn, art)
+        schein = await subscription_service.reservieren(str(user_id), conn, art)
         eingabe = await kompass_portrait_service.als_prompt_eingabe(
             conn, user_id=user_id)
 
-    roh = await echo.kompass_portrait_schreiben(eingabe=eingabe)
+    async with subscription_service.zuruecknahme_bei_fehler(schein, pool):
+        roh = await echo.kompass_portrait_schreiben(eingabe=eingabe)
 
     async with pool.acquire() as conn:
-        await subscription_service.log_ai_usage(str(user_id), conn, art)
+        await subscription_service.bestaetigen(schein, conn)
 
     return PortraitVorschlag(
         text=(roh.get("text") or "")[: kompass_portrait_service.MAX_ZEICHEN],

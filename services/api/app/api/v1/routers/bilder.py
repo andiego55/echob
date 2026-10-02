@@ -24,9 +24,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.bild import BildMalen, BildSatz
 from app.services import bild_katalog as katalog
-from app.services import bild_modell, bild_regie
+from app.services import bild_modell, bild_regie, subscription_service
 from app.services import bildwerkstatt_service as dienst
-from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
 
 logger = logging.getLogger(__name__)
 
@@ -195,7 +194,10 @@ async def malen(
     }
 
     async with pool.acquire() as conn:
-        await enforce_ai_usage_limit(user_id, conn, "bild")
+        # **Der Platz im Kontingent wird gehalten, nicht nur geprueft.** Ein Bild braucht
+        # zwei Minuten; ein zweiter Klick in dieser Zeit sah bis heute dasselbe freie
+        # Kontingent und malte ein zweites Bild auf Kosten des ersten.
+        schein = await subscription_service.reservieren(user_id, conn, "bild")
         werte = await dienst.werte_laden(
             conn, user_id=user_id, case_id=case_id, schichten=gewaehlt)
         # Die Selbstauskunft nur, wenn eine Figur gewuenscht ist: Was nicht gebraucht wird,
@@ -245,64 +247,68 @@ async def malen(
             fruehere = await dienst.fruehere_motive(
                 conn, user_id=user_id, case_id=case_id)
 
-    regie = None
-    if material is not None:
-        echo_svc = getattr(request.app.state, "echo_service", None)
-        if echo_svc is not None:
-            stufe_abs = next(
-                (a for a in katalog.ABSTRAKTION_STUFEN
-                 if a["key"] == body.abstraktion), None)
-            regie = await bild_regie.fuehren(
-                echo_svc, fall=material["fall"], material=material,
-                welt=next((b for b in katalog.BILDWELTEN
-                           if b["key"] == body.bildwelt), None),
-                wunsch=str(einstellungen.get("wunsch") or ""),
-                # „Niemand ist auf dem Bild" gilt auch fuer die Regie: Wer das gewaehlt hat,
-                # soll keine Gestalten im Bild finden, auch keine fernen.
-                menschen=body.figur != "keine",
-                fruehere=fruehere,
-                gewichte=[
-                    m for m in (katalog.gewicht_marke(e["key"], gewichte)
-                                for e in katalog.ELEMENTE) if m
-                ],
-                abstraktion=(stufe_abs or {}).get("prompt", ""),
-                stimmungen=[
-                    st["prompt"] for st in katalog.STIMMUNGEN
-                    if st["key"] in set(stimmungen)
-                ],
-                szenen_wunsch=gewaehlte_titel,
-                begleitung_wunsch=(
-                    str(einstellungen.get("begleitung_text") or "")
-                    if body.begleitung == "freitext" else ""
-                ),
-                # **Handelt der Fall VON einem Kind, kommt kein Kind ins Bild.** Es waere
-                # genau die Person, die nicht abgebildet werden darf - und die Regie kann das
-                # nicht wissen, weil sie die Beziehungsart nicht liest. Die Regel steht im
-                # Katalog und nicht hier: Sie ist zu wichtig, um als Vergleich in einer Zeile
-                # zu stehen, die jemand beim Umbauen uebersieht.
-                kinder_erlaubt=katalog.kinder_erlaubt(werte.get("beziehungsart")))
-        if regie is None:
-            # **Kein Fehler, ein Rueckfall.** Eine Regie, die nicht taugt - zu wenig
-            # Material, ein verbotenes Wort, ein Verdacht auf einen Namen -, darf kein Bild
-            # verhindern. Dann malt der Katalog wie vorher, und die Legende sagt das.
-            logger.info("Bildwerkstatt: ohne Regie gemalt (Fall %s).", case_id)
+    # **Was hierin scheitert, kostet nichts.** Beide Modellaufrufe stehen darin: die
+    # Regie, die den Bildauftrag schreibt, und das Malen selbst. Der Satz „dein
+    # Kontingent ist unberuehrt" unten ist dadurch wahr und nicht nur gut gemeint.
+    async with subscription_service.zuruecknahme_bei_fehler(schein, pool):
+        regie = None
+        if material is not None:
+            echo_svc = getattr(request.app.state, "echo_service", None)
+            if echo_svc is not None:
+                stufe_abs = next(
+                    (a for a in katalog.ABSTRAKTION_STUFEN
+                     if a["key"] == body.abstraktion), None)
+                regie = await bild_regie.fuehren(
+                    echo_svc, fall=material["fall"], material=material,
+                    welt=next((b for b in katalog.BILDWELTEN
+                               if b["key"] == body.bildwelt), None),
+                    wunsch=str(einstellungen.get("wunsch") or ""),
+                    # „Niemand ist auf dem Bild" gilt auch fuer die Regie: Wer das gewaehlt hat,
+                    # soll keine Gestalten im Bild finden, auch keine fernen.
+                    menschen=body.figur != "keine",
+                    fruehere=fruehere,
+                    gewichte=[
+                        m for m in (katalog.gewicht_marke(e["key"], gewichte)
+                                    for e in katalog.ELEMENTE) if m
+                    ],
+                    abstraktion=(stufe_abs or {}).get("prompt", ""),
+                    stimmungen=[
+                        st["prompt"] for st in katalog.STIMMUNGEN
+                        if st["key"] in set(stimmungen)
+                    ],
+                    szenen_wunsch=gewaehlte_titel,
+                    begleitung_wunsch=(
+                        str(einstellungen.get("begleitung_text") or "")
+                        if body.begleitung == "freitext" else ""
+                    ),
+                    # **Handelt der Fall VON einem Kind, kommt kein Kind ins Bild.** Es waere
+                    # genau die Person, die nicht abgebildet werden darf - und die Regie kann das
+                    # nicht wissen, weil sie die Beziehungsart nicht liest. Die Regel steht im
+                    # Katalog und nicht hier: Sie ist zu wichtig, um als Vergleich in einer Zeile
+                    # zu stehen, die jemand beim Umbauen uebersieht.
+                    kinder_erlaubt=katalog.kinder_erlaubt(werte.get("beziehungsart")))
+            if regie is None:
+                # **Kein Fehler, ein Rueckfall.** Eine Regie, die nicht taugt - zu wenig
+                # Material, ein verbotenes Wort, ein Verdacht auf einen Namen -, darf kein Bild
+                # verhindern. Dann malt der Katalog wie vorher, und die Legende sagt das.
+                logger.info("Bildwerkstatt: ohne Regie gemalt (Fall %s).", case_id)
 
-    prompt = katalog.prompt_bauen(werte, einstellungen, regie)
+        prompt = katalog.prompt_bauen(werte, einstellungen, regie)
 
-    try:
-        bytes_ = await modell.malen(
-            prompt,
-            # Das Seitenverhaeltnis gehoert zur gewaehlten Bildwelt: Eine Landschaft wird
-            # breit, ein Gang im Haus hochkant.
-            format_=str(next((b["format"] for b in katalog.BILDWELTEN
-                              if b["key"] == body.bildwelt), "quadrat")),
-        )
-    except Exception as fehler:  # noqa: BLE001 — der Grund gehört in die Meldung
-        raise HTTPException(
-            status.HTTP_502_BAD_GATEWAY,
-            detail="Das Bild ließ sich nicht malen. Versuch es noch einmal — "
-                   "dein Kontingent ist unberührt.",
-        ) from fehler
+        try:
+            bytes_ = await modell.malen(
+                prompt,
+                # Das Seitenverhaeltnis gehoert zur gewaehlten Bildwelt: Eine Landschaft wird
+                # breit, ein Gang im Haus hochkant.
+                format_=str(next((b["format"] for b in katalog.BILDWELTEN
+                                  if b["key"] == body.bildwelt), "quadrat")),
+            )
+        except Exception as fehler:  # noqa: BLE001 — der Grund gehört in die Meldung
+            raise HTTPException(
+                status.HTTP_502_BAD_GATEWAY,
+                detail="Das Bild ließ sich nicht malen. Versuch es noch einmal — "
+                       "dein Kontingent ist unberührt.",
+            ) from fehler
 
     # **Die Selbstauskunft wird nicht mitgespeichert.** Sie diente dem Prompt und gehoert
     # nicht in die Einstellungen einer Galerie-Zeile — dort steht, WAS gewaehlt wurde, nicht,
@@ -317,10 +323,8 @@ async def malen(
         bild = await dienst.gemaltes_anlegen(
             conn, user_id=user_id, case_id=case_id, einstellungen=zum_ablegen,
             bild=bytes_, bild_typ=bild_modell.INHALTSTYP, prompt=prompt,
-            legende=legende, regie=regie,
-            # Der Titel der Regie als erster Satz - ein Vorschlag, den man ueberschreibt.
-            satz=str((regie or {}).get("titel") or ""))
-        await log_ai_usage(user_id, conn, "bild")
+            legende=legende, regie=regie)
+        await subscription_service.bestaetigen(schein, conn)
     return bild
 
 

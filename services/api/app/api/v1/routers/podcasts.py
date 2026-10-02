@@ -29,7 +29,7 @@ from app.schemas.podcast import PodcastAnlegen, PodcastUmbenennen
 from app.services import podcast_katalog as katalog
 from app.services import podcast_service as dienst
 from app.services import podcast_stimme as stimm_modul
-from app.services.subscription_service import enforce_ai_usage_menge, log_ai_usage
+from app.services import subscription_service
 
 router = APIRouter(prefix="/cases/{case_id}/podcasts", tags=["podcasts"])
 
@@ -282,7 +282,9 @@ async def sprechen(
         # Wiederaufnahme zahlt niemand für das, was schon gesprochen ist.
         noetig = math.ceil(
             sum(stimm_modul.sekunden_schaetzen(k["text"]) for k in offen) / 60)
-        await enforce_ai_usage_menge(user_id, conn, "podcast", noetig)
+        # Reserviert: Die Minuten sind ab hier belegt, nicht erst nach dem Sprechen. Zwei
+        # Folgen gleichzeitig zu starten ging bis heute auch dann, wenn nur eine hineinpasste.
+        schein = await subscription_service.reservieren(user_id, conn, "podcast", noetig)
 
         # **Der Riegel, und er steht NACH der Kontingentprüfung.** Wer abgewiesen wird,
         # weil nichts frei ist, soll die Folge nicht in einem Zustand hinterlassen, in dem
@@ -321,7 +323,7 @@ async def sprechen(
                     typ=stimm_modul.INHALTSTYP, sekunden=sekunden)
     except Exception as fehler:  # noqa: BLE001 — der Grund gehört in die Zeile
         async with pool.acquire() as conn:
-            await _verbuchen(conn, user_id, sekunden_neu)
+            await _verbuchen(conn, schein, sekunden_neu)
             await dienst.stand_setzen(
                 conn, user_id=user_id, podcast_id=podcast_id, status_neu="fehler",
                 fehler=str(fehler)[:500])
@@ -332,21 +334,29 @@ async def sprechen(
         ) from fehler
 
     async with pool.acquire() as conn:
-        await _verbuchen(conn, user_id, sekunden_neu)
+        await _verbuchen(conn, schein, sekunden_neu)
         await dienst.stand_setzen(
             conn, user_id=user_id, podcast_id=podcast_id, status_neu="fertig")
         return await dienst.holen(conn, user_id=user_id, podcast_id=podcast_id)
 
 
-async def _verbuchen(conn, user_id: str, sekunden: int) -> None:
+async def _verbuchen(conn, schein, sekunden: int) -> None:
     """Angefangene Minuten, und gar nichts bei gar nichts.
 
     Aufgerundet: Eine Folge von viereinhalb Minuten kostet fünf. Abgerundet hiesse, dass
     viele kurze Folgen billiger wären als ihre Summe — und genau das lädt dazu ein, das
     Kontingent in Häppchen zu umgehen.
+
+    **Verbucht wird, was wirklich gesprochen wurde — nicht, was reserviert war.** Bricht
+    die Sprachausgabe nach dem dritten von zehn Kapiteln ab, kostet sie drei Kapitel. Der
+    Rest der Reservierung wird dabei frei, weil die Buchung sie ersetzt. Und ist gar nichts
+    entstanden, wird sie zurückgenommen: dann ist das Kontingent unberührt.
     """
     if sekunden > 0:
-        await log_ai_usage(user_id, conn, "podcast", menge=math.ceil(sekunden / 60))
+        await subscription_service.bestaetigen(
+            schein, conn, menge=math.ceil(sekunden / 60))
+    else:
+        await subscription_service.zuruecknehmen(schein, conn)
 
 
 @router.get("/{podcast_id}/kapitel/{kapitel_id}/ton")

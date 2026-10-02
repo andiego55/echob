@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from app.core import crypto
 from app.core.dependencies import get_current_user, get_pool
 from app.schemas.scale import SCALE_DEFINITIONS, SCALE_LABELS, ScalesOverviewResponse
-from app.services.subscription_service import enforce_ai_usage_limit, log_ai_usage
+from app.services import subscription_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/cases/{case_id}/scales", tags=["scales"])
@@ -89,8 +89,10 @@ async def calculate_scales(
         if not case_row:
             raise HTTPException(status_code=404, detail="Fall nicht gefunden.")
 
-        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest)
-        await enforce_ai_usage_limit(user_id, conn, "scale_calc")
+        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest). Reserviert, nicht nur
+        # geprüft: Zwei gleichzeitige Aufrufe sahen bis heute beide dasselbe freie
+        # Kontingent und rechneten beide.
+        schein = await subscription_service.reservieren(user_id, conn, "scale_calc")
 
         scenes = await conn.fetch(
             "SELECT * FROM scenes WHERE case_id = $1 AND confirmed_by_user = true ORDER BY scene_date DESC NULLS LAST",
@@ -113,23 +115,24 @@ async def calculate_scales(
             "SELECT COUNT(*) FROM scenes WHERE case_id = $1 AND confirmed_by_user = true", case_id
         )
 
-    scales = await echo_svc.calculate_scales(
-        case_context=dict(case_row),
-        scenes=[dict(r) for r in scenes],
-        onboarding=(
-            crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
-            if onboarding_row else None
-        ),
-        person_profile=dict(person_profile_row) if person_profile_row else None,
-        topic_summaries=[
-            crypto.decrypt_fields(dict(r), "summary_text") for r in topic_summary_rows
-        ],
-        hypotheses=[crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows],
-    )
+    async with subscription_service.zuruecknahme_bei_fehler(schein, pool):
+        scales = await echo_svc.calculate_scales(
+            case_context=dict(case_row),
+            scenes=[dict(r) for r in scenes],
+            onboarding=(
+                crypto.decrypt_fields(dict(onboarding_row), *crypto.ONBOARDING_FIELDS)
+                if onboarding_row else None
+            ),
+            person_profile=dict(person_profile_row) if person_profile_row else None,
+            topic_summaries=[
+                crypto.decrypt_fields(dict(r), "summary_text") for r in topic_summary_rows
+            ],
+            hypotheses=[crypto.decrypt_fields(dict(r), "summary_text") for r in hypothesis_rows],
+        )
 
     # Alle bisherigen Werte ersetzen, neu einfügen
     async with pool.acquire() as conn:
-        await log_ai_usage(user_id, conn, "scale_calc")
+        await subscription_service.bestaetigen(schein, conn)
         # Alte Werte VOR dem Ersetzen lesen (für das Änderungs-Log alt→neu)
         old_scores = {
             r["scale_key"]: r["score"]

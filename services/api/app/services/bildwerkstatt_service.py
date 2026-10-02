@@ -328,6 +328,13 @@ async def gemaltes_anlegen(
     prompt: str,
     legende: list[dict[str, str]] | None = None,
     regie: dict[str, Any] | None = None,
+    # **Der Satz bleibt leer, und das ist eine Entscheidung.**
+    #
+    # Die Regie schreibt einen Titel, und es waere ein Handgriff, ihn als Vorschlag
+    # darunterzusetzen - er stand bis zum 02.10. dort. Aber ein erzeugter Satz unter einem
+    # erfundenen Bild ist genau die Behauptung ohne Vorbehalt, die dieses Projekt
+    # vermeidet: Er sagt der Person, was sie sieht, und zwar in der Stimme der Anwendung.
+    # Wer einen Satz dazuschreiben will, schreibt seinen eigenen; das Feld bleibt frei.
     satz: str = "",
 ) -> dict[str, Any] | None:
     """Legt ein GEMALTES Bild ab — Bytes statt SVG.

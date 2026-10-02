@@ -185,12 +185,15 @@ async def abschliessen(
                        "Dafür ist noch zu wenig da. Tipp wenigstens ein paar Paare an.",
         }
 
-    await subscription_service.enforce_ai_usage_limit(str(user_id), conn, KONTINGENT_ART)
-
-    antwort = await echo.kompass_uebung_auswerten(
-        eingabe=als_prompt_eingabe(uebung, paare)
-    )
-    await subscription_service.log_ai_usage(str(user_id), conn, KONTINGENT_ART)
+    # Reserviert statt nur geprüft: Zwischen Prüfung und Verbuchung lag der ganze
+    # Modellaufruf, und in dieser Zeit sah ein zweiter Aufruf dasselbe freie Kontingent.
+    schein = await subscription_service.reservieren(
+        str(user_id), conn, KONTINGENT_ART)
+    async with subscription_service.zuruecknahme_bei_fehler(schein, conn):
+        antwort = await echo.kompass_uebung_auswerten(
+            eingabe=als_prompt_eingabe(uebung, paare)
+        )
+    await subscription_service.bestaetigen(schein, conn)
 
     roh = antwort.get("ergebnis")
     hinweis = antwort.get("hinweis")
