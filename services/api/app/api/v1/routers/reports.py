@@ -54,10 +54,6 @@ async def create_report(
 
     async with pool.acquire() as conn:
         case_row = await _assert_case_owner(case_id, user_id, conn, return_row=True)
-        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest). Der Platz wird gehalten,
-        # solange das Modell schreibt: Zehn gleichzeitige Aufrufe sahen bis heute alle
-        # dasselbe freie Kontingent und liefen alle durch.
-        schein = await subscription_service.reservieren(user_id, conn, "report")
         report_count = await conn.fetchval(
             "SELECT COUNT(*) FROM reports WHERE case_id = $1", case_id
         )
@@ -66,6 +62,13 @@ async def create_report(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Maximale Anzahl von 20 Berichten erreicht. Bitte lösche einen Bericht, bevor du einen neuen erstellst.",
             )
+        # Kostenschutz Entwicklungsphase (nutzerweit, löschfest). Der Platz wird gehalten,
+        # solange das Modell schreibt: Zehn gleichzeitige Aufrufe sahen bis heute alle
+        # dasselbe freie Kontingent und liefen alle durch.
+        #
+        # **Nach dem Deckel, nicht davor.** Wer schon zwanzig Berichte hat, bekommt hier ein
+        # 422 — und soll dafür nicht auch noch eine Viertelstunde ein Kontingent halten.
+        schein = await subscription_service.reservieren(user_id, conn, "report")
         scenes = await conn.fetch(
             "SELECT * FROM scenes WHERE case_id = $1 AND confirmed_by_user = true ORDER BY scene_date DESC",
             case_id,

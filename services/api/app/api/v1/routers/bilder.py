@@ -194,10 +194,6 @@ async def malen(
     }
 
     async with pool.acquire() as conn:
-        # **Der Platz im Kontingent wird gehalten, nicht nur geprueft.** Ein Bild braucht
-        # zwei Minuten; ein zweiter Klick in dieser Zeit sah bis heute dasselbe freie
-        # Kontingent und malte ein zweites Bild auf Kosten des ersten.
-        schein = await subscription_service.reservieren(user_id, conn, "bild")
         werte = await dienst.werte_laden(
             conn, user_id=user_id, case_id=case_id, schichten=gewaehlt)
         # Die Selbstauskunft nur, wenn eine Figur gewuenscht ist: Was nicht gebraucht wird,
@@ -246,6 +242,15 @@ async def malen(
                 ][:MAX_GEWAEHLTE_SZENEN]
             fruehere = await dienst.fruehere_motive(
                 conn, user_id=user_id, case_id=case_id)
+
+    # **Der Platz im Kontingent wird gehalten, nicht nur geprueft.** Ein Bild braucht zwei
+    # Minuten; ein zweiter Klick in dieser Zeit sah bis heute dasselbe freie Kontingent und
+    # malte ein zweites Bild auf Kosten des ersten.
+    #
+    # **Hier und nicht oben:** Das Laden prueft noch den Fall und wirft 404 auf einen
+    # fremden. Reserviert wird als Letztes vor dem Modell, nach allen Pruefungen.
+    async with pool.acquire() as conn:
+        schein = await subscription_service.reservieren(user_id, conn, "bild")
 
     # **Was hierin scheitert, kostet nichts.** Beide Modellaufrufe stehen darin: die
     # Regie, die den Bildauftrag schreibt, und das Malen selbst. Der Satz „dein

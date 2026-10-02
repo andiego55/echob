@@ -289,15 +289,18 @@ async def sprechen(
         # **Der Riegel, und er steht NACH der Kontingentprüfung.** Wer abgewiesen wird,
         # weil nichts frei ist, soll die Folge nicht in einem Zustand hinterlassen, in dem
         # sie eine Viertelstunde lang niemand anfassen kann.
-        if not await dienst.sprechen_beginnen(
-                conn, user_id=user_id, podcast_id=podcast_id):
-            raise HTTPException(
-                status.HTTP_409_CONFLICT,
-                detail=(
-                    "Diese Folge wird gerade gesprochen. Lass die andere Seite offen — "
-                    "die fertigen Kapitel erscheinen von allein."
-                ),
-            )
+        # Die Klammer darum: Wer hier abgewiesen wird, soll nicht auch noch eine
+        # Reservierung tragen, die eine Viertelstunde lang mitzählt.
+        async with subscription_service.zuruecknahme_bei_fehler(schein, conn):
+            if not await dienst.sprechen_beginnen(
+                    conn, user_id=user_id, podcast_id=podcast_id):
+                raise HTTPException(
+                    status.HTTP_409_CONFLICT,
+                    detail=(
+                        "Diese Folge wird gerade gesprochen. Lass die andere Seite offen — "
+                        "die fertigen Kapitel erscheinen von allein."
+                    ),
+                )
 
     anweisung = stimm_modul.anweisung(
         folge["format"], folge["ansprache"], folge["stimme"])

@@ -216,16 +216,18 @@ async def vergleich_erzeugen(
     user_id = current["user_id"]
     echo_svc = getattr(request.app.state, "echo_service", None)
 
-    async with pool.acquire() as conn:
-        schein = await subscription_service.reservieren(user_id, conn, "report")
-        material = await vergleich.material_laden(
-            conn, user_id=user_id, art=art, case_id=case_id)
-
     if echo_svc is None:  # pragma: no cover - nur ohne konfigurierten Dienst
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Echo ist gerade nicht erreichbar. Versuch es später noch einmal.",
         )
+
+    async with pool.acquire() as conn:
+        # **Erst laden, dann reservieren.** `material_laden` wirft 422, wenn am Fall schon
+        # zwanzig Berichte liegen — davor reserviert, hielte dieses 422 ein Kontingent.
+        material = await vergleich.material_laden(
+            conn, user_id=user_id, art=art, case_id=case_id)
+        schein = await subscription_service.reservieren(user_id, conn, "report")
 
     ideal = material["ideal"]
     async with subscription_service.zuruecknahme_bei_fehler(schein, pool):

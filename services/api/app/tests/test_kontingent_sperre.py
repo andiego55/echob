@@ -345,6 +345,36 @@ def test_wer_reserviert_nimmt_im_fehlerfall_zurueck():
                     or "zuruecknehmen(" in text), f"{pfad.name} nimmt nie zurück"
 
 
+def test_zwischen_reservierung_und_modell_wird_nichts_mehr_abgewiesen():
+    """**Reserviert wird als Letztes vor dem Modell, nach allen Prüfungen.**
+
+    Das ist nicht Kosmetik, und es ist beim Nachsehen gefunden worden, nicht von einem Test:
+    In drei von neun Aufrufern lag noch eine Prüfung zwischen Reservierung und Modell. Der
+    Zwanzig-Berichte-Deckel (422), das Laden eines fremden Falls (404), der Riegel auf einer
+    Folge, die schon gesprochen wird (409). Wer dort abgewiesen wurde, hätte eine
+    Viertelstunde lang ein Kontingent gehalten, ohne etwas bekommen zu haben — und hätte den
+    Fehler für die Ursache gehalten.
+
+    Geprüft wird die Strecke zwischen ``reservieren(`` und der Klammer, die zurücknimmt: Dort
+    darf kein ``raise`` stehen. Danach ist alles abgedeckt, davor kostet nichts.
+    """
+    for pfad, text in _quellen():
+        if "_service.reservieren(" not in text:
+            continue
+        start = text.index("_service.reservieren(")
+        # **Die Klammer ist Pflicht, nicht Gelegenheit.** Fehlte sie, hätte dieser Wächter
+        # die Datei stillschweigend übersprungen — und genau das hat die Mutationsprobe
+        # gezeigt: Klammer weg, Prüfung grün. Ein Wächter, der seine eigene Voraussetzung
+        # nicht prüft, wird vom ersten Umbau abgeschaltet.
+        assert "zuruecknahme_bei_fehler(" in text[start:], (
+            f"{pfad.name} reserviert ohne die Klammer — ohne sie ist die Strecke bis zum "
+            "Modell nicht prüfbar")
+        strecke = text[start:start + text[start:].index("zuruecknahme_bei_fehler(")]
+        assert "raise " not in strecke, (
+            f"{pfad.name}: zwischen Reservierung und Klammer wird noch abgewiesen — "
+            "entweder die Prüfung davor, oder die Klammer darum")
+
+
 def test_zaehlung_und_reservierung_benutzen_dieselbe_bedingung():
     """**Zwei Fassungen davon wären zwei Kontingente.**
 
