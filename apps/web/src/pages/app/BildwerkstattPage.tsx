@@ -12,7 +12,7 @@
  * Baustein (`BildMenue`) — die Seite hält den Zustand, löst das Malen aus und zeigt, was
  * dabei herauskommt.
  */
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
@@ -23,6 +23,7 @@ import { useBestaetigen } from '@/components/Bestaetigung'
 import BildMenue from '@/components/app/bild/BildMenue'
 import GemaltesBild from '@/components/app/bild/GemaltesBild'
 import Lichtkasten from '@/components/app/bild/Lichtkasten'
+import { profileApi } from '@/api/profile'
 import {
   bilderApi,
   type Bildwahl,
@@ -87,6 +88,21 @@ export default function BildwerkstattPage() {
     queryFn: () => bilderApi.galerie(caseId!),
     enabled: !!caseId,
   })
+
+  /**
+   * Der Sicherheitshinweis — **und er ist hier dringender als beim Podcast.**
+   *
+   * Eine Tonaufnahme muss man abspielen; ein Bild sieht man im Vorbeigehen. Es liegt nach
+   * dem Herunterladen im Fotoalbum des Telefons, zwischen Urlaubsbildern, und wer das
+   * Telefon in die Hand nimmt, scrollt daran vorbei.
+   *
+   * Dieselbe Bedingung wie dort: nur wenn im Profil ein Anhaltspunkt steht. Ein Hinweis, der
+   * immer erscheint, wird nicht gelesen — und bei jemandem ohne Anhaltspunkt wäre er eine
+   * Unterstellung.
+   */
+  const profil = useQuery({ queryKey: ['profile'], queryFn: () => profileApi.get() })
+  const sicherheitshinweis =
+    (profil.data?.safety_status ?? 'no_indication') !== 'no_indication' 
 
   const malen = useMutation({
     mutationFn: () => bilderApi.malen(caseId!, {
@@ -210,6 +226,15 @@ export default function BildwerkstattPage() {
                 also wird es gleich aufgehoben.
               </p>
 
+              {sicherheitshinweis && (
+                <p className="mt-3 rounded-brand border border-amber-300/60 bg-amber-50 px-4 py-3 text-[0.82rem] leading-relaxed text-amber-900">
+                  Ein Bild sieht man im Vorbeigehen — anders als einen Text, den man öffnen
+                  muss. Wenn du es herunterlädst, liegt es danach in der Galerie deines
+                  Geräts, zwischen allen anderen Bildern. Überleg kurz, wer dieses Gerät in
+                  die Hand nimmt.
+                </p>
+              )}
+
               {/* **Die Legende, direkt nach dem Bild.**
                   Eine Metapher, die niemand auflöst, bleibt Dekoration — daran ist der erste
                   Entwurf gescheitert. Sie sagt, was wofür steht, und deutet nichts. */}
@@ -239,9 +264,12 @@ export default function BildwerkstattPage() {
         {(galerie.data?.length ?? 0) > 0 && (
           <section className="mt-12">
             <h2 className="card-title-lg">Deine Bilder</h2>
+            {/* **Ein Satz zum Mitnehmen, ohne Ausrufezeichen.** Nicht als Warnung, sondern
+                als Auskunft darüber, was man gerade tut — den eindringlichen Hinweis gibt es
+                oben, und nur dann, wenn im Profil ein Anhaltspunkt steht. */}
             <p className="mt-1 max-w-[62ch] text-[0.82rem] leading-relaxed text-brand-muted">
               Leg das zweite neben das erste. Eine Veränderung, die man sieht, kann dir sonst
-              niemand zeigen.
+              niemand zeigen. Was du mitnimmst, liegt danach in der Galerie deines Geräts.
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {galerie.data!.map(b => (
@@ -291,6 +319,28 @@ function BildKarte({ bild, onSatz, onLoeschen, onGross }: {
 }) {
   const [entwurf, setEntwurf] = useState<string | null>(null)
 
+  /**
+   * Die Adresse des angezeigten Bildes — **fuer das Mitnehmen.**
+   *
+   * Es gab dafuer nie einen Knopf: Die alten PNG- und SVG-Knoepfe galten dem gerechneten Weg
+   * und sind mit ihm gegangen. Eine Galerie aus Bildern, die man nicht speichern, drucken
+   * oder zeigen kann, ist ein Album hinter Glas — und ein Bild herzuzeigen ist genau das,
+   * wofuer viele es machen.
+   */
+  const [adresse, setAdresse] = useState<string | null>(
+    bild.art === 'gerechnet' && bild.svg ? alsBildAdresse(bild.svg) : null,
+  )
+
+  const mitnehmen = useCallback(() => {
+    if (!adresse) return
+    const name = (bild.satz || 'Bild').replace(/[^\p{L}\p{N} _-]/gu, '').trim().slice(0, 60)
+    const a = document.createElement('a')
+    a.href = adresse
+    // Das gemalte Bild ist ein PNG, das alte Datenbild ein SVG.
+    a.download = `${name || 'Bild'}.${bild.art === 'gerechnet' ? 'svg' : 'png'}`
+    a.click()
+  }, [adresse, bild.satz, bild.art])
+
   return (
     <figure className="m-0 overflow-hidden rounded-brand-lg border border-brand-border bg-white">
       {/* Zwei Arten, zwei Wege zum Bild: Das gemalte muss als Datei geholt werden, das alte
@@ -312,7 +362,7 @@ function BildKarte({ bild, onSatz, onLoeschen, onGross }: {
       )}
       {bild.art === 'erzeugt' && (
         <GemaltesBild caseId={bild.case_id} bildId={bild.id}
-          alt={bild.satz || 'Gemaltes Bild'} onGross={onGross} />
+          alt={bild.satz || 'Gemaltes Bild'} onGross={onGross} onBereit={setAdresse} />
       )}
 
       <figcaption className="border-t border-brand-border p-3">
@@ -346,6 +396,12 @@ function BildKarte({ bild, onSatz, onLoeschen, onGross }: {
             {new Date(bild.created_at).toLocaleDateString('de-DE')}
           </time>
           {bild.einstellungen.bildwelt && <span>{bild.einstellungen.bildwelt}</span>}
+          {/* Erst da, wenn das Bild da ist — ein Knopf, der ins Leere lädt, ist schlimmer
+              als keiner. */}
+          {adresse && (
+            <button type="button" onClick={mitnehmen}
+              className="text-accent hover:underline">mitnehmen</button>
+          )}
           <button type="button" onClick={onLoeschen}
             className="ml-auto hover:text-red-600">löschen</button>
         </div>

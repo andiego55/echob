@@ -33,11 +33,20 @@ export const CODE_TEXTS: Record<string, string> = {
   SCALE_LIMIT_REACHED:
     'Du hast dein Monatskontingent an Skalen-Analysen erreicht. ' +
     'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  // **Hier fehlte der erste Satz**, seit es die Meldung gibt: Sie begann mit „Es setzt sich
+  // zurück" und sagte nie, WAS aufgebraucht ist. Gezählt werden Minuten und nicht Folgen —
+  // das steht dabei, weil „ein Kontingent an Podcasts" bei 12 freien Minuten das Falsche
+  // erwarten lässt.
   PODCAST_LIMIT_REACHED:
-    'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+    'Du hast dein Monatskontingent an gesprochenen Podcast-Minuten erreicht. '
+    + 'Skripte kannst du weiter schreiben lassen — die kosten nichts. '
+    + 'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  // **Hier stand ein Ausweg, den es nicht mehr gibt:** „Gerechnete Bilder kannst du weiter
+  // machen, so viele du willst". Der gerechnete Weg ist am 01.10. entfernt worden. Jemandem
+  // beim Erreichen des Kontingents eine Tür zu zeigen, die zugemauert ist, ist schlimmer als
+  // ihm nur zu sagen, dass Schluss ist.
   BILD_LIMIT_REACHED:
-    'Du hast dein Monatskontingent an gemalten Bildern erreicht. Gerechnete Bilder kannst '
-    + 'du weiter machen, so viele du willst — die kosten nichts. '
+    'Du hast dein Monatskontingent an Bildern erreicht. '
     + 'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
   // Diese drei fehlten, seit es sie gibt. Ein Wächter auf der Python-Seite hat sie gemeldet
   // (test_podcast.py), als der Podcast-Code dazukam: Zwei davon werden im Kompass wirklich

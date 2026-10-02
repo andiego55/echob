@@ -18,7 +18,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { bilderApi } from '@/api/bilder'
 
-export default function GemaltesBild({ caseId, bildId, alt, onGross }: {
+export default function GemaltesBild({ caseId, bildId, alt, onGross, onBereit }: {
   caseId: string
   bildId: string
   alt: string
@@ -29,6 +29,13 @@ export default function GemaltesBild({ caseId, bildId, alt, onGross }: {
    * Browser; ein zweiter Abruf wäre ein zweites Megabyte für dasselbe Bild.
    */
   onGross?: (url: string) => void
+  /**
+   * Zum Mitnehmen — bekommt dieselbe Adresse wie `onGross`.
+   *
+   * **Der Baustein hat sie schon.** Ein zweiter Abruf fuer dasselbe Bild waere ein zweites
+   * Megabyte; und ein Knopf, der erst laedt, wenn man ihn drueckt, fuehlt sich kaputt an.
+   */
+  onBereit?: (url: string) => void
 }) {
   const [url, setUrl] = useState<string | null>(null)
   const [fehler, setFehler] = useState(false)
@@ -48,6 +55,7 @@ export default function GemaltesBild({ caseId, bildId, alt, onGross }: {
         const blob = await bilderApi.datei(caseId, bildId)
         eigeneUrl = URL.createObjectURL(blob)
         setUrl(eigeneUrl)
+        onBereit?.(eigeneUrl)
       } catch {
         // Ein Bild, das sich nicht laden lässt, ist kein Absturz — aber die leere Stelle
         // braucht eine Erklärung, sonst hält man sie für einen Fehler der Galerie.
@@ -74,7 +82,7 @@ export default function GemaltesBild({ caseId, bildId, alt, onGross }: {
       beobachter.disconnect()
       if (eigeneUrl) URL.revokeObjectURL(eigeneUrl)
     }
-  }, [caseId, bildId])
+  }, [caseId, bildId, onBereit])
 
   return (
     <div ref={rahmen} className="relative aspect-square w-full bg-brand-bg">

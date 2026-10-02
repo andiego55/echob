@@ -179,12 +179,18 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
   },
 
   // ── Berichte und Profile ─────────────────────────────────────────────────
+  // **Dieser Text beschrieb bis 02.10. das Werkzeug von vorher** \u2014 inklusive \u201eKein Mensch,
+  // kein Raum, kein Gegenstand", also dem Gegenteil von dem, was das Bild heute kann. Eine
+  // Seitenhilfe ist das Erste, was jemand \u00f6ffnet, der unsicher ist; dort etwas Falsches \u00fcber
+  // das eigene Bild zu lesen ist schlimmer als keine Hilfe.
   '/app/cases/:caseId/bild': {
     titel: 'Bild',
-    zweck: 'Deine Lage als Form \u2014 wie viel, wann, wie dicht und was fehlt. '
-      + 'Kein Mensch, kein Raum, kein Gegenstand.',
-    schritte: ['Anordnung w\u00e4hlen', 'Regler ziehen \u2014 das Bild folgt sofort',
-      'Einen Satz dazuschreiben und aufheben'],
+    zweck: 'Ein Bild aus deinem Fall \u2014 ein Ort, der deine Lage tr\u00e4gt. Gegenst\u00e4nde, '
+      + 'Licht und Wetter kommen aus dem, was du selbst erz\u00e4hlt hast. Nichts Lesbares '
+      + 'kommt darin vor, und h\u00f6chstens ein Gesicht: deins, wenn du das willst.',
+    schritte: ['Gleichnis w\u00e4hlen und wie konkret es werden soll',
+      'Gewichte, Stimmung, bestimmte Szenen \u2014 oder nichts davon',
+      'Malen lassen (ein bis zwei Minuten) und einen Satz dazuschreiben'],
     tipp: 'Der Wert kommt mit dem zweiten Bild: Leg es neben das erste, und du siehst '
       + 'eine Ver\u00e4nderung, die dir sonst niemand zeigen kann.',
   },
