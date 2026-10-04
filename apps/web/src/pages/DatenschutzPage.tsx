@@ -511,7 +511,13 @@ export default function DatenschutzPage() {
             <p className="text-brand-muted text-sm mt-3">
               Im Bereich <strong className="text-navy">„Datenschutz"</strong> kannst du jederzeit selbst deine
               Daten exportieren (Art. 15/20), einzelne Fälle endgültig löschen sowie dein Konto vollständig
-              löschen (Art. 17). Die Kontolöschung gilt zugleich als Widerruf der erteilten Einwilligungen.
+              löschen (Art. 17). Dort kannst du auch deine{' '}
+              <strong className="text-navy">Einwilligung in die KI-Verarbeitung einzeln widerrufen</strong>{' '}
+              und jederzeit wieder erteilen — ohne dein Konto zu löschen und ohne dass wir
+              nach einem Grund fragen (Art. 7 Abs. 3 DSGVO). Nach einem Widerruf stehen die
+              KI-Funktionen nicht mehr zur Verfügung; deine gespeicherten Inhalte bleiben,
+              bis du sie selbst löschst. Die Kontolöschung gilt darüber hinaus als Widerruf
+              aller erteilten Einwilligungen.
             </p>
             <p className="text-brand-muted text-sm mt-2">
               <strong className="text-navy">Hinweis:</strong> Nach einer Löschung können Daten für eine kurze

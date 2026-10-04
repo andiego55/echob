@@ -24,7 +24,8 @@ _USER_TABLES = (
     "cases", "onboarding_answers", "scenes", "echo_messages", "scale_scores",
     "reports", "topic_summaries", "case_reviews", "case_hypotheses",
     "person_profiles", "echo_chat_sessions", "user_profiles", "payments",
-    "ai_usage_log", "user_consents", "kauf_einwilligungen", "professional_profiles",
+    "ai_usage_log", "user_consents", "kauf_einwilligungen",
+    "einwilligung_widerrufe", "professional_profiles",
     "professional_assignments", "professional_appointments",
     "scene_resonance", "feeling_snapshots",
     # Podcast-Folgen. Sie fielen ueber cases ohnehin mit - hier stehen sie, damit die
@@ -372,6 +373,11 @@ _DELETE_STEPS = (
     ("pseudonymous_accounts", "user_id = $1"),
     ("user_profiles", "user_id = $1"),
     ("user_consents", "user_id = $1"),
+    # Die Widerrufe gehoeren zur selben Reihe wie die Einwilligungen und fallen mit
+    # ihnen: Ein Nachweis ueber eine Entscheidung zu Daten, die es nicht mehr gibt,
+    # ist kein Nachweis mehr, sondern ein Datensatz ueber einen Menschen, der
+    # gegangen ist.
+    ("einwilligung_widerrufe", "user_id = $1"),
     # ── Ausbildung ───────────────────────────────────────────────────────────
     # Als Studierende:r: die eigene Zuordnung (Arbeitskopien und Einreichungen hängen
     # daran). Als Institut: das Institut selbst — mitsamt allem, was es traegt. Das ist

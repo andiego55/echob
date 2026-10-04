@@ -60,6 +60,13 @@ export const CODE_TEXTS: Record<string, string> = {
   FAQ_LIMIT_REACHED:
     'Das Kontingent für Fall-Fragebögen ist diesen Monat erschöpft. ' +
     'Es setzt sich zu Beginn des nächsten Monats zurück. Fragen? kontakt@echo-b.de',
+  // Kein Fehler, sondern die Folge einer eigenen Entscheidung. Deshalb sagt die Meldung,
+  // WER das entschieden hat und WO es zurückzunehmen ist — sonst liest sich ein 403 wie
+  // eine Panne, und die Person sucht an der falschen Stelle.
+  KI_EINWILLIGUNG_WIDERRUFEN:
+    'Du hast deine Einwilligung in die KI-Verarbeitung widerrufen — deshalb stehen die '
+    + 'KI-Funktionen gerade nicht zur Verfügung. Unter Einstellungen → Datenschutz kannst '
+    + 'du sie jederzeit wieder erteilen.',
   TRIAL_EXPIRED: 'Dein Testzeitraum ist abgelaufen. Wähle einen Plan, um fortzufahren.',
   TRIAL_SCENE_LIMIT: 'Im Testzugang sind maximal 5 Szenen möglich.',
   TRIAL_CASE_LIMIT: 'Im Testzugang ist maximal 1 Fall möglich.',

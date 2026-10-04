@@ -41,3 +41,24 @@ export async function recordConsent(body: {
   const res = await apiClient.post('/account/consent', body)
   return res.data
 }
+
+/**
+ * Einwilligungen erteilen und widerrufen (Art. 7 Abs. 3 DSGVO).
+ *
+ * Der Widerruf muss so einfach sein wie die Erteilung — ein Aufruf, keine Rueckfrage,
+ * keine Begruendung. Umgekehrt genauso: Wer wieder einwilligt, soll das in einem Klick
+ * koennen.
+ */
+export interface EinwilligungsStand {
+  ki_verarbeitung_widerrufen: boolean
+  ki_verarbeitung_widerrufen_am: string | null
+}
+
+export const einwilligungenApi = {
+  stand: () =>
+    apiClient.get<EinwilligungsStand>('/account/einwilligungen').then(r => r.data),
+  widerrufen: (was: string) =>
+    apiClient.post('/account/einwilligungen/widerrufen', { was }).then(r => r.data),
+  erteilen: (was: string) =>
+    apiClient.post('/account/einwilligungen/erteilen', { was }).then(r => r.data),
+}

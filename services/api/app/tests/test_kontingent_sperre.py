@@ -300,14 +300,27 @@ async def test_was_in_der_klammer_gelingt_bleibt_reserviert(db, grenze):
 
 _APP = pathlib.Path(__file__).resolve().parents[1]
 
-#: Wer reserviert, muss auch bestätigen und zurücknehmen können. Der Dienst selbst und
-#: diese Datei sind ausgenommen: Dort steht die Mechanik.
-_NICHT_PRUEFEN = {"subscription_service.py", "test_kontingent_sperre.py"}
+#: Der Dienst selbst ist ausgenommen: Dort steht die Mechanik.
+_NICHT_PRUEFEN = {"subscription_service.py"}
 
 
 def _quellen():
+    """Die Aufrufer im Produktionscode — **ohne Tests.**
+
+    Das war zuerst anders, und der Fehlalarm kam prompt: ``test_einwilligung_widerruf.py``
+    ruft ``reservieren``, um eine Lage herzustellen („vorher ging es, nachher nicht"), und
+    wurde dafür angemahnt, nicht zu bestätigen und keine Klammer zu setzen. Ein Test ist
+    aber kein Aufrufer im gemeinten Sinn: Er verbraucht kein Kontingent, das jemandem
+    gehört, und er lässt kein Modell laufen.
+
+    Vorher war das nur deshalb nicht aufgefallen, weil diese Datei sich selbst namentlich
+    ausgenommen hatte — eine Ausnahme, die zufällig die einzige Testdatei traf, die
+    reservierte. Eine Ausnahmeliste, die zufällig passt, ist keine.
+    """
     for pfad in _APP.rglob("*.py"):
         if "__pycache__" in pfad.parts or pfad.name in _NICHT_PRUEFEN:
+            continue
+        if "tests" in pfad.parts or pfad.name.startswith("test_"):
             continue
         yield pfad, pfad.read_text(encoding="utf-8")
 

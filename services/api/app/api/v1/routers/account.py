@@ -4,12 +4,13 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from supabase import Client as SupabaseClient
 
 from app.core.dependencies import get_current_user, get_pool, get_supabase
+from app.services import einwilligung_service
 from app.services.account_service import (
     delete_user_data,
     export_user_data,
@@ -84,6 +85,56 @@ class ConsentBody(BaseModel):
     sensitive_ai: bool
     age_confirmed: bool
     items: dict | None = None
+
+
+class WiderrufBody(BaseModel):
+    """Welche Einwilligung widerrufen oder wieder erteilt werden soll."""
+
+    was: str = "ki_verarbeitung"
+
+
+@router.get("/einwilligungen")
+async def get_einwilligungen(
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Was gilt gerade — für den Datenschutz-Bereich."""
+    async with pool.acquire() as conn:
+        return await einwilligung_service.stand(conn, current_user["user_id"])
+
+
+@router.post("/einwilligungen/widerrufen")
+async def post_widerruf(
+    body: WiderrufBody,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Art. 7 Abs. 3 DSGVO — Widerruf, ohne Rückfrage und ohne Begründung.
+
+    **Ohne Bestätigungsdialog, mit Absicht.** Der Widerruf muss so einfach sein wie die
+    Erteilung, und die war ein Häkchen. Rückgängig machen kann die Person ihn jederzeit
+    selbst; eine Rückfrage wäre die Hürde, die die Norm meint.
+    """
+    async with pool.acquire() as conn:
+        return await einwilligung_service.widerrufen(
+            conn, current_user["user_id"], body.was,
+            ip=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
+
+
+@router.post("/einwilligungen/erteilen")
+async def post_erneut(
+    body: WiderrufBody,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Einen Widerruf aufheben — die Person willigt wieder ein."""
+    async with pool.acquire() as conn:
+        return await einwilligung_service.erneut_einwilligen(
+            conn, current_user["user_id"], body.was)
 
 
 @router.get("/consent")

@@ -24,6 +24,12 @@ async def enforce_echo_prompt_limit(user_id: str, conn) -> None:
     Zählt alle Nutzer-Nachrichten über sämtliche Echo-Chats (Fall-Echo,
     Themendialoge, Szenen-Erfassung, Profil-Dialoge). Beide Grenzen: 0 = aus.
     """
+    # **Das Einwilligungs-Tor steht vor dem Kostenschutz, nicht dahinter.** Wer die
+    # KI-Einwilligung widerrufen hat, soll das lesen — und nicht „Kontingent erschöpft",
+    # was etwas anderes bedeutet und zum Warten statt zum Einstellungen-Öffnen führt.
+    from app.services import einwilligung_service
+    await einwilligung_service.require_ki_einwilligung(conn, user_id)
+
     total_limit = settings.echo_prompt_limit
     if total_limit > 0:
         total = await conn.fetchval(
@@ -258,6 +264,13 @@ async def reservieren(user_id: str, conn, kind: str, menge: int = 1) -> Reservie
     langen Transaktion des Aufrufers stehen: Eine Reservierung, die niemand sonst sieht,
     haelt auch niemanden auf.
     """
+    # **Vor dem Kontingent, aus demselben Grund.** Und VOR dem Kurzschluss bei
+    # abgeschaltetem Kontingent: Sonst liefe bei `limit <= 0` jeder Aufruf durch, obwohl
+    # die Person widerrufen hat — ein Tor, das von einer Kosteneinstellung abhängt, ist
+    # keines.
+    from app.services import einwilligung_service
+    await einwilligung_service.require_ki_einwilligung(conn, user_id)
+
     setting_name, error_code, label = _AI_USAGE_LIMITS[kind]
     limit = getattr(settings, setting_name)
     menge = max(1, int(menge))

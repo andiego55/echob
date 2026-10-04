@@ -9,6 +9,7 @@ import AppShell from '@/components/app/AppShell'
 import { useLock } from '@/contexts/LockContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { exportMyData, deleteMyAccount } from '@/api/account'
+import EinwilligungenCard from '@/components/settings/EinwilligungenCard'
 
 export default function PrivacySettingsPage() {
   const { enabled, enable, disable, lock } = useLock()
@@ -156,6 +157,11 @@ export default function PrivacySettingsPage() {
             Du hast jederzeit Zugriff auf alle Daten, die EchoB über dich speichert – und kannst sie
             vollständig löschen.
           </p>
+
+          {/* Die Einwilligungen zuerst: Art. 7 Abs. 3 verlangt, dass der Widerruf so
+              einfach ist wie die Erteilung — er gehört nach oben und nicht unter die
+              Kontolöschung, wo er wie deren kleine Schwester ausähe. */}
+          <EinwilligungenCard />
 
           {/* Export */}
           <div className="flex flex-wrap items-center justify-between gap-3 py-3 border-t border-brand-border">
