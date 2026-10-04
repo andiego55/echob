@@ -2,6 +2,17 @@
 
 Dieses Dokument gilt für alle Texte: Website, App, Marketing, AI-Outputs, Reports, E-Mails.
 
+> **Seit 04.10.2026 wird es erzwungen, nicht nur gelesen.** `apps/web/tests/claims.test.ts`
+> liest die Verbotstabelle unten und prüft die Seiten, auf denen EchoB in **eigener Stimme**
+> spricht. Die Wissensplattform ist ausgenommen: Dort geht es sachlich um Narzissmus,
+> Gaslighting und Diagnosen, und ein Wortfilter darüber wäre dasselbe Unglück wie das Wort
+> „eye" im Bildregie-Filter, das einmal jeden Bildauftrag abgelehnt hat.
+>
+> Warum das hier hängt und nicht an einem guten Vorsatz: Ob EchoB ein Medizinprodukt ist,
+> entscheidet sich an dem, was wir über das Produkt **sagen**. Es kippt nicht in einer
+> Produktentscheidung, sondern in einem Marketingtext, den jemand schnell schreibt. Die
+> ausführliche Begründung steht in [`zweckbestimmung.md`](zweckbestimmung.md).
+
 ---
 
 ## Nicht erlaubt
@@ -47,8 +58,18 @@ Diese Formulierungen sind zulässig und entsprechen dem Produktprinzip:
 
 Dieser Text muss auf allen öffentlichen Seiten und in allen Reports erscheinen:
 
-> EchoB ersetzt keine Psychotherapie, keine medizinische Diagnostik und keine Notfallhilfe.
-> Bei akuter Gefahr wende dich bitte an die Telefonseelsorge (0800 111 0 111) oder den Notruf (110 / 112).
+> EchoB ersetzt keine Psychotherapie, Diagnostik oder Notfallhilfe.
+> In einer Krise: [Notruf & Krisennummern](https://echo-b.de/wissen/krisentelefone).
+
+**Umgesetzt ist das im Fuß** (`components/layout/Footer.tsx`) — also auf allen 617 Seiten
+auf einmal, statt Seite für Seite. Genau deshalb hält es: Eine Pflicht, die an einer Stelle
+hängt, kann man nicht auf einer neuen Seite vergessen.
+
+*Die Nummern stehen nicht im Fuß, sondern auf der verlinkten Seite.* Das ist eine bewusste
+Änderung gegenüber der ersten Fassung dieses Dokuments: Zwei Nummern in einer Fußzeile
+helfen weniger als eine Seite, die nach Lage und Situation sortiert — und ein Dokument, das
+etwas anderes verlangt, als das Produkt tut, ist entweder falsch oder macht das Produkt
+falsch.
 
 ---
 
