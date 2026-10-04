@@ -219,6 +219,13 @@ export default function DatenschutzPage() {
               Nachvollziehbarkeit da.
             </p>
             <p className="text-brand-muted text-sm mb-3">
+              <strong className="text-navy">Beide tragen eine Kennzeichnung</strong>, dass
+              sie mit KI erzeugt wurden — maschinenlesbar in der Datei selbst (Bild und
+              Tonspur), nicht als Schriftzug im Bild. Das verlangt Artikel 50 der
+              KI-Verordnung, und es bleibt auch dann erhalten, wenn du die Datei
+              herunterlädst und weitergibst.
+            </p>
+            <p className="text-brand-muted text-sm mb-3">
               Diese erzeugten Inhalte sind Teil deines Falls und unterliegen denselben Rechten
               (Auskunft, Löschung) und derselben Freigabe-Logik. Sie sind{' '}
               <strong className="text-navy">nicht öffentlich erreichbar</strong>: Es gibt keine

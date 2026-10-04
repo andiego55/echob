@@ -21,6 +21,7 @@ import logging
 from typing import Any
 
 from app.core.config import settings
+from app.services import kennzeichnung
 from app.services import podcast_katalog as katalog
 
 logger = logging.getLogger(__name__)
@@ -170,7 +171,11 @@ class PodcastStimme:
             )
             teile.append(antwort.read() if hasattr(antwort, "read") else antwort.content)
 
-        return b"".join(teile), sekunden_schaetzen(text)
+        # Artikel 50 Abs. 2 der KI-Verordnung: erzeugte Tonspuren sind maschinenlesbar
+        # als solche zu markieren. Hier, weil hier die Tonspur entsteht — und nicht
+        # beim Ablegen oder Ausliefern, wo es mehrere Stellen wären.
+        return (kennzeichnung.mp3_kennzeichnen(b"".join(teile)),
+                sekunden_schaetzen(text))
 
     async def probe(self, stimme: str) -> bytes:
         """Eine Hörprobe — zwei Sätze, damit niemand eine Stimme blind wählen muss.

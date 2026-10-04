@@ -269,7 +269,7 @@ export default function BildwerkstattPage() {
                 oben, und nur dann, wenn im Profil ein Anhaltspunkt steht. */}
             <p className="mt-1 max-w-[62ch] text-[0.82rem] leading-relaxed text-brand-muted">
               Leg das zweite neben das erste. Eine Veränderung, die man sieht, kann dir sonst
-              niemand zeigen. Was du mitnimmst, liegt danach in der Galerie deines Geräts.
+              niemand zeigen. Was du mitnimmst, liegt danach in der Galerie deines Geräts — und trägt in der Datei den Vermerk, dass es mit KI erzeugt wurde.
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {galerie.data!.map(b => (

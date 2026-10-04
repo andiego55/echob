@@ -15,6 +15,7 @@ import logging
 from typing import Any
 
 from app.core.config import settings
+from app.services import kennzeichnung
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,17 @@ class BildModell:
         return self._client is not None
 
     async def malen(self, prompt: str, format_: str = "quadrat") -> bytes:
+        """Ein gekennzeichnetes Bild — die einzige Ausfahrt dieses Moduls.
+
+        **Warum die Kennzeichnung hier sitzt und nicht beim Ablegen.** Artikel 50 Abs. 2
+        der KI-Verordnung verlangt sie für jeden erzeugten Bildinhalt. Hier entsteht das
+        Bild, und hier gibt es genau eine Stelle; weiter unten im Ablauf sind es mehrere
+        (anlegen, ausliefern, freigeben an die Fachperson, herunterladen), und dann hängt
+        die Pflicht daran, dass niemand eine davon vergisst.
+        """
+        return kennzeichnung.png_kennzeichnen(await self._malen_roh(prompt, format_))
+
+    async def _malen_roh(self, prompt: str, format_: str = "quadrat") -> bytes:
         """Ein Bild als PNG-Bytes.
 
         **Die Antwort kommt je Modell unterschiedlich zurück** — als Base64 im Feld
