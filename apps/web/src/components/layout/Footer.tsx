@@ -42,6 +42,7 @@ export default function Footer() {
               <Link to="/datenschutz" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Datenschutz</Link>
               <Link to="/impressum" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Impressum</Link>
               <Link to="/agb" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">AGB</Link>
+              <Link to="/agb-fachpersonen" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">AGB für Praxen</Link>
               <Link to="/widerruf" className="block text-[0.84rem] text-white/50 hover:text-white transition-colors mb-2 no-underline">Widerruf</Link>
               {/* § 312k Abs. 2 S. 1 BGB: Die Schaltfläche muss mit nichts anderem
                   als diesen zwei Wörtern beschriftet sein. Nicht umbenennen. */}

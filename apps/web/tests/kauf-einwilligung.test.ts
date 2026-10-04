@@ -58,9 +58,15 @@ describe('Kauf-Einwilligung (§ 357 Abs. 8 BGB)', () => {
   })
 
   it('der Kauf-Aufruf schickt die Einwilligung und die Fassungen mit', () => {
+    // **Genau die drei Dokumente, die neben dem Häkchen verlinkt sind** — nicht alle, die
+    // es gibt. Die erste Fassung lief über `Object.keys(RECHTSSTAND)` und verlangte, als
+    // die Praxis-AGB dazukamen, deren Fassung auch im Verbraucher-Kauf. Ein Nachweis soll
+    // festhalten, was die Person gesehen hat, und sie hat diese drei gesehen.
     const api = lies('api', 'subscription.ts')
     expect(api).toContain('einwilligung')
-    for (const schluessel of Object.keys(RECHTSSTAND)) {
+    for (const schluessel of ['agb', 'widerruf', 'datenschutz'] as const) {
+      expect(RECHTSSTAND, `"${schluessel}" fehlt in rechtsstand.ts`)
+        .toHaveProperty(schluessel)
       expect(api, `Fassung "${schluessel}" wird nicht mitgeschickt`)
         .toContain(`RECHTSSTAND.${schluessel}.fassung`)
     }

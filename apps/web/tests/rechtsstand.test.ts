@@ -53,7 +53,12 @@ describe('Rechtsstand', () => {
       // `agb-2026-10` oder `agb-2026-10b` — der Buchstabe für eine zweite Fassung im
       // selben Monat. Ohne ihn wären zwei Änderungen in einem Monat nicht unterscheidbar,
       // und genau darauf kommt es beim Nachweis an.
-      expect(eintrag.fassung).toMatch(new RegExp(`^${key}-\\d{4}-\\d{2}[a-z]?$`))
+      // Der Schlüssel ist camelCase (`agbFachpersonen`), die Fassung lesbar mit
+      // Bindestrichen (`agb-fachpersonen-2026-10`). Verglichen wird der umgewandelte
+      // Schlüssel: Die Absicht ist, dass die Fassung IHR Dokument nennt — nicht, dass
+      // zwei Schreibweisen gleich aussehen.
+      const slug = key.replace(/[A-Z]/g, (b) => `-${b.toLowerCase()}`)
+      expect(eintrag.fassung).toMatch(new RegExp(`^${slug}-\\d{4}-\\d{2}[a-z]?$`))
       expect(eintrag.stand).toMatch(/^\d{1,2}\. [A-Za-zä]+ \d{4}$/)
     }
   })

@@ -29,9 +29,14 @@ export interface Rechtsstand {
   stand: string
 }
 
-export const RECHTSSTAND: Record<'datenschutz' | 'agb' | 'widerruf', Rechtsstand> = {
+export const RECHTSSTAND: Record<
+  'datenschutz' | 'agb' | 'agbFachpersonen' | 'widerruf', Rechtsstand
+> = {
   datenschutz: { fassung: 'datenschutz-2026-10', stand: '4. Oktober 2026' },
   agb: { fassung: 'agb-2026-10', stand: '4. Oktober 2026' },
+  // Eigenes Dokument fuer Unternehmer: andere Adressaten, andere Regeln (kein
+  // Widerrufsrecht, Nettopreise, AVV als Bestandteil).
+  agbFachpersonen: { fassung: 'agb-fachpersonen-2026-10', stand: '4. Oktober 2026' },
   widerruf: { fassung: 'widerruf-2026-10', stand: '4. Oktober 2026' },
 }
 

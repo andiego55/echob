@@ -53,6 +53,7 @@ const EIGENE_STIMME = [
   'WaitlistPage.tsx',
   'AppPage.tsx',
   'AGBPage.tsx',
+  'AGBFachpersonenPage.tsx',
 ]
 
 /**

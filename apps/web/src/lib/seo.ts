@@ -110,6 +110,12 @@ export const ROUTE_META: Record<string, PageMeta> = {
     title: 'AGB – EchoB',
     description: 'Allgemeine Geschäftsbedingungen von EchoB.',
   },
+  '/agb-fachpersonen': {
+    title: 'Geschäftsbedingungen für Praxen und Institute – EchoB',
+    description:
+      'Bedingungen für Verträge mit Praxen, Instituten und Ausbildungsstätten: '
+      + 'Abrechnung nach aktivem Fall, Auftragsverarbeitung, Schweigepflicht nach § 203 StGB.',
+  },
   '/widerruf': {
     title: 'Widerrufsbelehrung – EchoB',
     description: 'Widerrufsrecht und Widerrufsbelehrung für Verträge mit EchoB.',

@@ -40,6 +40,13 @@ export default function AGBPage() {
               Nutzenden („Kund:innen") geschlossen werden. Verbraucher:in ist jede natürliche Person,
               die das Geschäft zu überwiegend privaten Zwecken abschließt (§ 13 BGB).
             </p>
+            <p>
+              Für <strong>Unternehmen</strong> — Praxen, Institute, Ausbildungsstätten —
+              gelten ausschließlich die{' '}
+              <Link to="/agb-fachpersonen" className="text-accent hover:underline">
+                Geschäftsbedingungen für Praxen und Institute
+              </Link>.
+            </p>
           </Section>
 
           <Section title="§ 2 Vertragsgegenstand und Leistungen">
@@ -109,8 +116,18 @@ export default function AGBPage() {
           <Section title="§ 8 Verfügbarkeit und Änderungen">
             <p>
               Wir bemühen uns um eine möglichst unterbrechungsfreie Verfügbarkeit, schulden diese aber
-              nicht zu 100 %. Wartungsarbeiten, Weiterentwicklungen oder Änderungen einzelner Funktionen
-              bleiben vorbehalten, soweit der wesentliche Leistungsumfang erhalten bleibt.
+              nicht zu 100 %. Wartungsarbeiten bleiben vorbehalten.
+            </p>
+            <p>
+              <strong>Änderungen am Leistungsumfang</strong> nehmen wir nur vor, soweit ein
+              triftiger Grund besteht (etwa technische Weiterentwicklung, Sicherheit oder
+              rechtliche Vorgaben), dir dadurch keine zusätzlichen Kosten entstehen und du
+              rechtzeitig in Textform informiert wirst. Beeinträchtigt eine Änderung deinen
+              Zugang zu den Funktionen oder deren Nutzbarkeit{' '}
+              <strong>mehr als nur unerheblich</strong>, kannst du den Vertrag innerhalb von
+              30 Tagen kostenfrei beenden (§ 327r BGB). Für den vereinbarten Zeitraum
+              stellen wir die <strong>Aktualisierungen</strong> bereit, die nötig sind, damit
+              EchoB vertragsgemäß bleibt (§ 327f BGB).
             </p>
           </Section>
 
