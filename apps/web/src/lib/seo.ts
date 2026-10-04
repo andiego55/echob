@@ -114,6 +114,13 @@ export const ROUTE_META: Record<string, PageMeta> = {
     title: 'Widerrufsbelehrung – EchoB',
     description: 'Widerrufsrecht und Widerrufsbelehrung für Verträge mit EchoB.',
   },
+  '/kuendigen': {
+    title: 'Verträge kündigen – EchoB',
+    description:
+      'Kündige deinen EchoB-Vertrag direkt hier – ohne Anmeldung, in einem Schritt. '
+      + 'Die Kündigung wirkt mit dem Eingang; du bekommst sofort eine Bestätigung mit '
+      + 'Datum und Uhrzeit.',
+  },
   '/auth': {
     title: 'Anmelden oder registrieren – EchoB',
     description: 'Melde dich bei EchoB an oder starte deinen kostenlosen Testzugang.',

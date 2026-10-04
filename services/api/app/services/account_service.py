@@ -24,7 +24,7 @@ _USER_TABLES = (
     "cases", "onboarding_answers", "scenes", "echo_messages", "scale_scores",
     "reports", "topic_summaries", "case_reviews", "case_hypotheses",
     "person_profiles", "echo_chat_sessions", "user_profiles", "payments",
-    "ai_usage_log", "user_consents", "professional_profiles",
+    "ai_usage_log", "user_consents", "kauf_einwilligungen", "professional_profiles",
     "professional_assignments", "professional_appointments",
     "scene_resonance", "feeling_snapshots",
     # Podcast-Folgen. Sie fielen ueber cases ohnehin mit - hier stehen sie, damit die
@@ -349,6 +349,13 @@ _DELETE_STEPS = (
     ("professional_invites", "inviter_user_id = $1 OR professional_user_id = $1"),
     ("professional_profiles", "user_id = $1"),
     ("payments", "user_id = $1"),
+    # Die Einwilligung vor dem Kauf. Sie faellt MIT dem Konto, bewusst und mit einem
+    # Nachteil: Wer kauft, widerruft, das Konto loescht und danach Wertersatz bestreitet,
+    # hinterlaesst uns ohne den Nachweis aus § 357 Abs. 8 BGB. Dieselbe Abwaegung wie bei
+    # payments und user_consents, die hier ebenfalls fallen — die Buecher liegen bei
+    # Stripe, nicht bei uns. Wer die Abwaegung anders treffen will, nimmt diese Zeile
+    # heraus und traegt eine Aufbewahrungsfrist in die Datenschutzerklaerung ein.
+    ("kauf_einwilligungen", "user_id = $1"),
     ("ai_usage_log", "user_id = $1"),
     ("test_results", "user_id = $1"),
     # Die Tagesordnung zuerst: Sie verweist auf Saetze, Pulse und Portraets. Die
@@ -450,6 +457,38 @@ def _affected(status: str) -> int:
         return int(status.rsplit(" ", 1)[-1])
     except (ValueError, AttributeError):
         return 0
+
+
+async def record_kauf_einwilligung(
+    conn: asyncpg.Connection,
+    user_id: str,
+    produkt: str,
+    einwilligung,
+    *,
+    ip: str | None = None,
+    user_agent: str | None = None,
+) -> None:
+    """Haelt die Einwilligung vor einem Kauf fest (append-only).
+
+    **Vor der Stripe-Session, nicht danach.** Der Nachweis muss auch dann existieren, wenn
+    der Bezahlvorgang abgebrochen wird — sonst haetten wir Einwilligungen nur von denen,
+    die auch gezahlt haben, und ausgerechnet im Streitfall keine.
+
+    Eine eigene Tabelle und nicht `user_consents`: Dort filtert `get_latest_consent` nicht
+    nach der Fassung und wuerde eine Kauf-Zeile fuer die juengste datenschutzrechtliche
+    Einwilligung halten — der Einwilligungs-Dialog erschiene beim naechsten Laden erneut.
+    """
+    await conn.execute(
+        """
+        INSERT INTO kauf_einwilligungen
+          (user_id, produkt, text, agb_fassung, widerruf_fassung, datenschutz_fassung,
+           ip_address, user_agent)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        """,
+        user_id, produkt, einwilligung.text.strip(),
+        einwilligung.agb_fassung, einwilligung.widerruf_fassung,
+        einwilligung.datenschutz_fassung, ip, (user_agent or "")[:500] or None,
+    )
 
 
 # ── Einwilligungen (DSGVO Art. 7 Nachweispflicht) ───────────────────────────

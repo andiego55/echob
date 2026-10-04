@@ -7,6 +7,7 @@ const ImpressumPage = lazy(() => import('@/pages/ImpressumPage'))
 const DatenschutzPage = lazy(() => import('@/pages/DatenschutzPage'))
 const AGBPage = lazy(() => import('@/pages/AGBPage'))
 const WiderrufPage = lazy(() => import('@/pages/WiderrufPage'))
+const KuendigenPage = lazy(() => import('@/pages/KuendigenPage'))
 import AuthPage             from '@/pages/AuthPage'
 const ClientInvitePage = lazy(() => import('@/pages/ClientInvitePage'))
 const PseudonymAuthPage = lazy(() => import('@/pages/PseudonymAuthPage'))
@@ -236,6 +237,8 @@ export function AppRoutes({ suspense = true }: { suspense?: boolean } = {}) {
       <Route path="/datenschutz" element={<DatenschutzPage />} />
       <Route path="/agb"         element={<AGBPage />} />
       <Route path="/widerruf"    element={<WiderrufPage />} />
+      {/* Der Kuendigungsknopf nach § 312k BGB: oeffentlich, ohne Anmeldung. */}
+      <Route path="/kuendigen"   element={<KuendigenPage />} />
       <Route path="/auth"        element={<AuthPage />} />
       <Route path="/pseudonym"   element={<PseudonymAuthPage />} />
       <Route path="/einladung/:token" element={<ClientInvitePage />} />

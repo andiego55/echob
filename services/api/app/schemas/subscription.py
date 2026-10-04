@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 PlanType = Literal["trial", "early_bird", "regular", "annual"]
 
@@ -48,8 +48,34 @@ class AiUsageStatus(BaseModel):
     quotas: list[AiUsageQuota]
 
 
+class KaufEinwilligung(BaseModel):
+    """Was die Person vor dem Kauf bestaetigt hat — als Nachweis, nicht als Zierde.
+
+    **Warum das serverseitig verlangt wird und nicht nur im Browser steht.** Das Haekchen
+    auf der Kaufseite entschied bis zum 04.10.2026 allein darueber, ob jemand informiert
+    war; ein direkter Aufruf des Endpunkts ging daran vorbei, und ein Nachweis existierte
+    nicht. § 357 Abs. 8 BGB verlangt fuer den Wertersatz aber genau diesen Nachweis:
+    ausdrueckliche Zustimmung zum sofortigen Beginn UND bestaetigte Kenntnis vom
+    Erloeschen des Widerrufsrechts.
+
+    Dasselbe Muster wie `require_schweigepflicht_hinweis` im Fachpersonenbereich, wo im
+    Code schon steht, warum: „Sonst entschiede die Oberflaeche darueber, ob jemand
+    informiert war."
+    """
+
+    #: Der Wortlaut, den die Person gesehen hat. Ein Nachweis, der nur „zugestimmt" sagt,
+    #: belegt nicht, WOZU.
+    text: str = Field(..., min_length=40, max_length=2000)
+    #: Welche Fassungen daneben verlinkt waren (aus `lib/rechtsstand.ts`).
+    agb_fassung: str = Field(..., min_length=3, max_length=60)
+    widerruf_fassung: str = Field(..., min_length=3, max_length=60)
+    datenschutz_fassung: str = Field(..., min_length=3, max_length=60)
+
+
 class CheckoutRequest(BaseModel):
     product: ProductType
+    #: Pflicht. Ohne Einwilligung kein Bezahlvorgang — und das entscheidet der Server.
+    einwilligung: KaufEinwilligung
 
 
 class CheckoutResponse(BaseModel):

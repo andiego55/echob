@@ -486,6 +486,11 @@ VERTRAUT_DEM_AUFRUFER = {
         "owner_user_id/professional_user_id … RETURNING case_id — es werden nur die "
         "zurückgegebenen Fälle freigegeben).",
     # ── Konto, Nutzung, Fallgenerierung ──────────────────────────────────────────────
+    "account_service.record_kauf_einwilligung":
+        "Protokolliert die Einwilligung vor einem Kauf (§ 357 Abs. 8 BGB). Einziger "
+        "Aufrufer ist subscription.py:create_checkout und reicht current_user['user_id'] "
+        "durch — dieselbe Id, die eingefügt wird. Es wird eine neue Zeile für genau diese "
+        "Person geschrieben, nichts gelesen; eine fremde Id kommt auf diesem Weg nicht vor.",
     "account_service.record_consent":
         "Protokolliert eine erteilte Einwilligung (DSGVO Art. 7). Einziger Aufrufer ist "
         "account.py:post_consent und reicht current_user['user_id'] durch. Es wird eine "

@@ -16,8 +16,8 @@ from app.schemas.subscription import (
     PortalResponse,
     SubscriptionStatus,
 )
+from app.services import account_service, billing_service
 from app.services import billing_entitlement as entitlement
-from app.services import billing_service
 from app.services.subscription_service import get_ai_usage_status, get_subscription_status
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,7 @@ async def ai_usage_status(
 @router.post("/checkout", response_model=CheckoutResponse)
 async def create_checkout(
     body: CheckoutRequest,
+    request: Request,
     current_user: dict = Depends(get_current_user),
     pool=Depends(get_pool),
 ) -> CheckoutResponse:
@@ -61,6 +62,15 @@ async def create_checkout(
 
     user_id = current_user["user_id"]
     async with pool.acquire() as conn:
+        # **Der Nachweis zuerst.** Ohne ihn gibt es keinen Wertersatz nach § 357 Abs. 8
+        # BGB — und bis zum 04.10.2026 entschied allein das Haekchen im Browser darueber,
+        # ob jemand informiert war. Festgehalten wird VOR der Stripe-Session: Ein
+        # abgebrochener Bezahlvorgang soll den Nachweis nicht verschlucken.
+        await account_service.record_kauf_einwilligung(
+            conn, user_id, body.product, body.einwilligung,
+            ip=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
         # Doppelabo verhindern: Wer schon über einen anderen Weg zahlt (App-Store,
         # Rechnung ...), würde hier ein zweites Mal belastet — und könnte das eine
         # davon bei uns nicht einmal kündigen.

@@ -34,3 +34,20 @@ export const RECHTSSTAND: Record<'datenschutz' | 'agb' | 'widerruf', Rechtsstand
   agb: { fassung: 'agb-2026-10', stand: '4. Oktober 2026' },
   widerruf: { fassung: 'widerruf-2026-10', stand: '4. Oktober 2026' },
 }
+
+/**
+ * Der Wortlaut der Einwilligung vor einem Kauf.
+ *
+ * **Warum er hier steht und nicht im JSX der Kaufseite.** Er wird an zwei Stellen
+ * gebraucht: angezeigt und als Nachweis an den Server geschickt. Zwei Fassungen davon
+ * waeren ein Nachweis, der etwas anderes belegt als dastand — und das faellt niemandem
+ * auf, weil beide Texte fuer sich richtig aussehen.
+ *
+ * § 357 Abs. 8 BGB verlangt fuer den Wertersatz die ausdrueckliche Zustimmung zum
+ * sofortigen Beginn UND die bestaetigte Kenntnis vom Erloeschen des Widerrufsrechts.
+ * Beides muss in diesem Satz stehen; wer ihn kuerzt, nimmt den Nachweis mit.
+ */
+export const KAUF_EINWILLIGUNG_TEXT =
+  'Ich akzeptiere die AGB und die Widerrufsbelehrung. Mir ist bekannt, dass die Leistung '
+  + 'mit dem Kauf sofort beginnt und mein Widerrufsrecht bei vollständiger Erfüllung '
+  + 'erlischt. Es gilt die Datenschutzerklärung.'

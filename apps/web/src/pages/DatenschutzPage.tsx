@@ -286,6 +286,25 @@ export default function DatenschutzPage() {
               lit. b und lit. f DSGVO.
             </p>
 
+            <h3 className="font-semibold text-navy mb-1">Kündigungen</h3>
+            <p className="text-brand-muted text-sm mb-3">
+              Über den Kündigungsknopf („Verträge kündigen", ohne Anmeldung erreichbar)
+              verarbeiten wir die Angaben, die § 312k BGB dafür vorsieht: Art der Kündigung
+              und ggf. Grund, Bezeichnung des Vertrags, E-Mail-Adresse, optional Name und
+              Kunden- oder Rechnungsnummer, der gewünschte Zeitpunkt und der{' '}
+              <strong className="text-navy">Zeitpunkt des Zugangs</strong>. Dazu
+              IP-Adresse und Browserkennung zur Abwehr von Missbrauch.
+            </p>
+            <p className="text-brand-muted text-sm mb-3">
+              Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragsabwicklung) und lit. c
+              (rechtliche Verpflichtung aus § 312k BGB). Du bekommst den Wortlaut deiner
+              Erklärung mit Datum und Uhrzeit per E-Mail und zum Herunterladen — das ist
+              dein Nachweis, und wir behalten ihn als unseren. Weil eine Kündigung zur
+              Vertragshistorie gehört, löschen wir sie{' '}
+              <strong className="text-navy">nicht</strong> zusammen mit dem Konto, sondern
+              nach den gesetzlichen Aufbewahrungsfristen.
+            </p>
+
             <h3 className="font-semibold text-navy mb-1">Verzeichnis der Fachpersonen</h3>
             <p className="text-brand-muted text-sm mb-3">
               Auf <strong className="text-navy">/fachpersonen</strong> führen wir ein öffentliches
@@ -486,6 +505,7 @@ export default function DatenschutzPage() {
               <li><strong className="text-navy">Server- und Sicherheitsprotokolle:</strong> kurzfristig (in der Regel wenige Tage bis Wochen).</li>
               <li><strong className="text-navy">Kontaktanfragen und Warteliste:</strong> bis zur Erledigung bzw. bis zum Widerruf, danach kurzfristig gelöscht.</li>
               <li><strong className="text-navy">Zahlungs- und Rechnungsunterlagen:</strong> gesetzliche Aufbewahrungsfristen (bis zu 10 Jahre, §§ 147 AO, 257 HGB).</li>
+              <li><strong className="text-navy">Kündigungserklärungen:</strong> als Teil der Vertragshistorie nach den gesetzlichen Aufbewahrungsfristen — bewusst nicht mit dem Konto gelöscht (Art. 17 Abs. 3 lit. b DSGVO).</li>
               <li><strong className="text-navy">Einwilligungsnachweise:</strong> solange zur Nachweisführung erforderlich.</li>
             </ul>
             <p className="text-brand-muted text-sm mt-3">

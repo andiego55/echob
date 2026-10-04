@@ -47,6 +47,8 @@ const VERARBEITUNGEN: ReadonlyArray<[string, string, readonly string[]]> = [
   ['Paarraum', 'services/api/app/services/couple_therapy_service.py', ['Paarraum']],
   ['Fall-Freigabe', 'services/api/app/services/sharing_service.py', ['Freigabe']],
   ['Zahlungen', 'services/api/app/services/billing_service.py', ['Stripe']],
+  ['Kündigungsknopf', 'services/api/app/services/kuendigung_service.py',
+    ['Kündigung', '§ 312k']],
   ['E-Mail-Versand', 'services/api/app/services/notify_service.py', ['Resend']],
 ]
 
