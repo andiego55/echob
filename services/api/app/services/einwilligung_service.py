@@ -38,9 +38,17 @@ from fastapi import HTTPException, status
 #: in der Produktion (vgl. ``gotcha_echo_threadtype``). Ein Wächter vergleicht beide.
 ARTEN = ("ki_verarbeitung",)
 
-#: Der Fehlercode, den die Oberfläche kennt. Kein 403 ohne Erklärung: Wer selbst widerrufen
-#: hat, soll lesen, dass es seine eigene Entscheidung war und wie er sie zurücknimmt.
+#: Zwei Codes, nicht einer — und der Unterschied ist für die lesende Person der ganze
+#: Unterschied. „Du hast widerrufen" ist für jemanden, der nie eingewilligt hat, schlicht
+#: falsch; und „bitte erteile die Einwilligung" liest sich für jemanden, der eben bewusst
+#: widerrufen hat, wie eine Aufforderung, es zurückzunehmen.
 KI_WIDERRUFEN = "KI_EINWILLIGUNG_WIDERRUFEN"
+KI_FEHLT = "KI_EINWILLIGUNG_FEHLT"
+
+#: Die Fassung des Einwilligungs-Dialogs. Ab hier sind „sensible Inhalte" und
+#: „KI-Verarbeitung" getrennte Felder; ältere Zeilen tragen beides gebündelt in
+#: ``sensitive_ai``. Wer hochzählt, holt alle Einwilligungen neu ein.
+AKTUELLE_FASSUNG = "2026-10-04-v2"
 
 
 async def offene_widerrufe(conn: asyncpg.Connection, user_id: str) -> set[str]:
@@ -53,9 +61,35 @@ async def offene_widerrufe(conn: asyncpg.Connection, user_id: str) -> set[str]:
     return {z["was"] for z in zeilen}
 
 
+async def ki_eingewilligt(conn: asyncpg.Connection, user_id: str) -> bool:
+    """Wurde die KI-Einwilligung überhaupt **erteilt**?
+
+    **Warum das eine zweite Frage ist.** Ein Widerruf setzt eine Einwilligung voraus. Ohne
+    diese Prüfung hieße „kein offener Widerruf" automatisch „darf" — und eine Person, die
+    nie zugestimmt hat, bekäme alle KI-Funktionen. Dass der Einwilligungs-Dialog davor
+    steht, ist dabei kein Argument: Er ist Oberfläche, und über Oberflächen geht man
+    hinweg.
+
+    Ältere Zeilen (Fassungen bis ``2026-06-16-v1``) tragen die gebündelte Zustimmung in
+    ``sensitive_ai``; sie gilt auch für die KI, denn genau so war sie formuliert.
+    """
+    zeile = await conn.fetchrow(
+        "SELECT version, sensitive_ai, ki FROM user_consents "
+        "WHERE user_id = $1 AND art = 'zugang' ORDER BY accepted_at DESC LIMIT 1",
+        str(user_id),
+    )
+    if zeile is None:
+        return False
+    if zeile["ki"] is not None:
+        return bool(zeile["ki"])
+    return bool(zeile["sensitive_ai"])
+
+
 async def ki_erlaubt(conn: asyncpg.Connection, user_id: str) -> bool:
-    """Darf für diese Person ein Modell laufen?"""
-    return "ki_verarbeitung" not in await offene_widerrufe(conn, user_id)
+    """Darf für diese Person ein Modell laufen? Erteilt UND nicht widerrufen."""
+    if "ki_verarbeitung" in await offene_widerrufe(conn, user_id):
+        return False
+    return await ki_eingewilligt(conn, user_id)
 
 
 async def require_ki_einwilligung(conn: asyncpg.Connection, user_id: str) -> None:
@@ -64,12 +98,12 @@ async def require_ki_einwilligung(conn: asyncpg.Connection, user_id: str) -> Non
     Steht an den zwei Stellen, durch die ohnehin jeder teure Aufruf muss — und nicht an
     jedem Endpunkt einzeln, wo es beim nächsten Feature fehlen würde.
     """
-    if await ki_erlaubt(conn, user_id):
-        return
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail=KI_WIDERRUFEN,
-    )
+    if "ki_verarbeitung" in await offene_widerrufe(conn, user_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=KI_WIDERRUFEN)
+    if not await ki_eingewilligt(conn, user_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=KI_FEHLT)
 
 
 async def widerrufen(

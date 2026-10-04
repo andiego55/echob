@@ -36,7 +36,8 @@ export default function ConsentGate() {
   })
 
   const [privacy, setPrivacy] = useState(false)
-  const [sensitive, setSensitive] = useState(false)
+  const [inhalte, setInhalte] = useState(false)
+  const [ki, setKi] = useState(false)
   const [age, setAge] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -47,11 +48,12 @@ export default function ConsentGate() {
     !!data &&
     data.version === CONSENT_VERSION &&
     data.privacy_policy &&
-    data.sensitive_ai &&
+    data.inhalte &&
+    data.ki &&
     data.age_confirmed
   if (consented) return null
 
-  const allChecked = privacy && sensitive && age
+  const allChecked = privacy && inhalte && ki && age
 
   const submit = async () => {
     setError(null)
@@ -60,7 +62,12 @@ export default function ConsentGate() {
       await recordConsent({
         version: CONSENT_VERSION,
         privacy_policy: privacy,
-        sensitive_ai: sensitive,
+        // **`sensitive_ai` bleibt in der Nutzlast und traegt die Buendelung aus den alten
+        // Fassungen nach.** Die Spalte ist Teil des Nachweises und wird nicht geloescht;
+        // sie hier wegzulassen hiesse, dass eine neue Zeile weniger aussagt als eine alte.
+        sensitive_ai: inhalte && ki,
+        inhalte,
+        ki,
         age_confirmed: age,
       })
       await queryClient.invalidateQueries({ queryKey: ['consent'] })
@@ -106,10 +113,15 @@ export default function ConsentGate() {
               </Link>.
             </span>
           </label>
+          {/* **Zwei Haekchen statt einem, und das ist der Kern dieser Fassung.** Bis
+              2026-10-04 steckte beides in einem Feld - und damit war der in der
+              Datenschutzerklaerung versprochene getrennte Widerruf der KI-Einwilligung
+              technisch unmoeglich: Er haette die Grundlage fuer alles mitgenommen, was
+              schon gespeichert ist. */}
           <label className="flex gap-2.5 text-sm text-brand-text cursor-pointer">
             <input
-              type="checkbox" checked={sensitive}
-              onChange={(e) => setSensitive(e.target.checked)}
+              type="checkbox" checked={inhalte}
+              onChange={(e) => setInhalte(e.target.checked)}
               className="mt-0.5 h-4 w-4 flex-shrink-0 accent-accent"
             />
             <span>
@@ -117,7 +129,20 @@ export default function ConsentGate() {
               {isProfessional
                 ? 'die von Klient:innen für mich freigegebenen besonderen Daten'
                 : 'meine besonderen Daten'}{' '}
-              (Art. 9 DSGVO) KI-gestützt verarbeitet – inkl. Übermittlung an OpenAI (USA).
+              (Art. 9 DSGVO) <strong>speichert und verarbeitet</strong>.
+            </span>
+          </label>
+          <label className="flex gap-2.5 text-sm text-brand-text cursor-pointer">
+            <input
+              type="checkbox" checked={ki}
+              onChange={(e) => setKi(e.target.checked)}
+              className="mt-0.5 h-4 w-4 flex-shrink-0 accent-accent"
+            />
+            <span>
+              Ich willige <strong>ausdrücklich</strong> ein, dass diese Daten für die
+              KI-Funktionen an unseren KI-Anbieter <strong>in die USA übermittelt</strong>{' '}
+              werden. Diese Einwilligung kannst du später einzeln widerrufen – unter
+              Einstellungen → Datenschutz.
             </span>
           </label>
           <label className="flex gap-2.5 text-sm text-brand-text cursor-pointer">

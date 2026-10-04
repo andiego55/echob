@@ -486,6 +486,11 @@ VERTRAUT_DEM_AUFRUFER = {
         "owner_user_id/professional_user_id … RETURNING case_id — es werden nur die "
         "zurückgegebenen Fälle freigegeben).",
     # ── Konto, Nutzung, Fallgenerierung ──────────────────────────────────────────────
+    "account_service.record_audio_consent":
+        "Protokolliert die Audio-Einwilligung beim ersten Aufnahmeversuch. Einziger "
+        "Aufrufer ist account.py:post_audio_einwilligung und reicht "
+        "current_user['user_id'] durch — dieselbe Id, die eingefuegt wird. Es entsteht "
+        "eine neue Zeile fuer genau diese Person; gelesen wird nichts.",
     "einwilligung_service.widerrufen":
         "Haelt einen Widerruf fest (Art. 7 Abs. 3 DSGVO). Einziger Aufrufer ist "
         "account.py:post_widerruf und reicht current_user['user_id'] durch — dieselbe Id, "

@@ -26,6 +26,7 @@ from fastapi import HTTPException
 
 from app.services import einwilligung_service as dienst
 from app.services import subscription_service
+from app.tests.einwilligung_hilfe import mit_ki_einwilligung
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
 
@@ -46,9 +47,16 @@ async def db():
 
 @pytest.fixture
 async def person(db):
+    """Eine Person, die eingewilligt HAT — sonst prüfte dieser Test den falschen Zustand.
+
+    Der Widerruf setzt eine Einwilligung voraus. Ohne sie fiele das Tor schon wegen der
+    fehlenden Einwilligung (``KI_EINWILLIGUNG_FEHLT``), und die Tests unten würden grün,
+    ohne dass der Widerruf irgendetwas bewirkt hätte.
+    """
     uid = uuid.uuid4()
     await db.execute(
         "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Probe')", uid)
+    await mit_ki_einwilligung(db, uid)
     return str(uid)
 
 

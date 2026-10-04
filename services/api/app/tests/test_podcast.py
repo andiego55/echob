@@ -27,6 +27,7 @@ from fastapi import HTTPException
 from app.core import crypto
 from app.services import podcast_katalog as katalog
 from app.services import podcast_service as dienst
+from app.tests.einwilligung_hilfe import mit_ki_einwilligung
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
 
@@ -140,6 +141,8 @@ async def person(db):
     user_id = uuid.uuid4()
     await db.execute(
         "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Probe')", user_id)
+    # Das Tor vor jedem Modellaufruf verlangt sie (04.10.2026).
+    await mit_ki_einwilligung(db, user_id)
     return user_id
 
 

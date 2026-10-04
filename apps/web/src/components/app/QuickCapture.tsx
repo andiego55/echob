@@ -3,6 +3,8 @@
  * Die Aufnahme wird nur zur Transkription gesendet und nicht gespeichert.
  */
 import { useRef, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { audioEinwilligung } from '@/api/account'
 import { scenesApi } from '@/api/scenes'
 import type { SceneDraft } from '@/types'
 
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export default function QuickCapture({ caseId, onDraft }: Props) {
+  const queryClient = useQueryClient()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [audioReady, setAudioReady] = useState(false)
@@ -40,9 +43,43 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
     return ''
   }
 
-  const startRecording = async () => {
+  /**
+   * Die Audio-Einwilligung — **vor** dem Mikrofon, nicht an der Tuer.
+   *
+   * Eine Einwilligung soll fuer einen bestimmten Zweck und informiert sein (Art. 4 Nr. 11
+   * DSGVO). Im Einwilligungs-Dialog beim ersten Anmelden abgefragt, wo niemand weiss, ob
+   * er je ein Mikrofon benutzt, waere sie beides nicht. Hier steht sie an der Sache, und
+   * sie ist die einzige Einwilligung bei EchoB, die man folgenlos ablehnen kann: Wer nicht
+   * spricht, tippt in dasselbe Feld.
+   *
+   * **Vor `getUserMedia`, nicht danach.** Der Browser fragt selbst nach dem Mikrofon —
+   * aber das ist die Erlaubnis des GERAETS, nicht die Einwilligung in die Uebermittlung
+   * der Aufnahme zur Transkription. Zwei verschiedene Fragen, und nur eine davon stellt
+   * der Browser.
+   */
+  const [fragtAudio, setFragtAudio] = useState(false)
+
+  const audioErlaubt = useQuery({
+    queryKey: ['audio-einwilligung'],
+    queryFn: audioEinwilligung.stand,
+  })
+
+  const audioZustimmen = useMutation({
+    mutationFn: audioEinwilligung.erteilen,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['audio-einwilligung'] })
+      setFragtAudio(false)
+      void startRecording(true)
+    },
+  })
+
+  const startRecording = async (schonGefragt = false) => {
     setError(null)
     setLastTranscript(null)
+    if (!schonGefragt && !audioErlaubt.data?.audio) {
+      setFragtAudio(true)
+      return
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mimeType = pickRecorderMime()
@@ -96,6 +133,42 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
     }
   }
 
+
+  if (fragtAudio) {
+    return (
+      <div className="rounded-brand border border-brand-border bg-white p-5">
+        <h3 className="text-sm font-semibold text-navy">Aufnahme und Transkription</h3>
+        <p className="mt-2 text-sm leading-relaxed text-brand-muted">
+          Wenn du sprichst, wird die Aufnahme zur Umwandlung in Text an unseren KI-Anbieter
+          in die USA übermittelt. Sie wird dort nur dafür verarbeitet und{' '}
+          <strong className="text-navy">nicht dauerhaft gespeichert</strong> – weder bei uns
+          noch beim Anbieter. Gespeichert wird allein der Text, den du danach siehst und
+          bearbeiten kannst.
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-brand-muted">
+          Du kannst das ablehnen und stattdessen tippen – es geht dir nichts verloren.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => audioZustimmen.mutate()}
+            disabled={audioZustimmen.isPending}
+            className="btn-primary !py-2 disabled:opacity-60"
+          >
+            {audioZustimmen.isPending ? 'Einen Moment …' : 'Einverstanden, Aufnahme starten'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setFragtAudio(false)}
+            className="rounded-brand border border-brand-border px-4 py-2 text-sm text-navy"
+          >
+            Lieber tippen
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="rounded-brand border border-accent/30 bg-accent/[0.04] p-4">
       <div className="flex items-center gap-2 mb-1.5">
@@ -128,7 +201,7 @@ export default function QuickCapture({ caseId, onDraft }: Props) {
           ) : (
             <button
               type="button"
-              onClick={startRecording}
+              onClick={() => void startRecording()}
               className="inline-flex items-center gap-2 rounded-brand border border-brand-border bg-white px-3 py-1.5 text-xs font-medium text-navy hover:border-accent hover:text-accent transition-colors"
             >
               ● {audioReady ? 'Neu aufnehmen' : 'Aufnahme starten'}

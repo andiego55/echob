@@ -115,12 +115,39 @@ export default function DatenschutzPage() {
             </p>
             <p className="text-brand-muted text-sm">
               Wir holen deine Einwilligungen <strong className="text-navy">getrennt nach Zweck</strong> ein und
-              protokollieren sie – insbesondere für (a) die Verarbeitung deiner sensiblen Reflexionsinhalte,
-              (b) die KI-Verarbeitung einschließlich Übermittlung in die USA (Abschnitt 5), (c) eine etwaige
-              Audioaufnahme (Abschnitt 5) und (d) eine Freigabe an eine bestimmte Fachperson (Abschnitt 12).
-              Du kannst jede Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen. Widerrufst du die
-              Einwilligung in die KI-Verarbeitung, stehen die darauf beruhenden Funktionen (Echo-Dialog,
-              Zusammenfassungen, Skalen, Berichte) nicht mehr zur Verfügung.
+              protokollieren sie einzeln, mit Fassung und Zeitpunkt:
+            </p>
+            <ul className="text-brand-muted text-sm space-y-2 list-disc pl-5 mb-3">
+              <li>
+                <strong className="text-navy">(a) Speicherung und Verarbeitung deiner
+                sensiblen Inhalte</strong> – beim ersten Anmelden.
+              </li>
+              <li>
+                <strong className="text-navy">(b) KI-Verarbeitung einschließlich
+                Übermittlung in die USA</strong> (Abschnitt 5) – ebenfalls beim ersten
+                Anmelden, aber als <strong className="text-navy">eigenes Häkchen</strong>,
+                damit du sie einzeln widerrufen kannst.
+              </li>
+              <li>
+                <strong className="text-navy">(c) Sprachaufnahme zur Transkription</strong>{' '}
+                – nicht an der Tür, sondern beim{' '}
+                <strong className="text-navy">ersten Aufnahmeversuch</strong>, direkt am
+                Mikrofon. Sie ist die einzige, die du folgenlos ablehnen kannst: Wer nicht
+                spricht, tippt.
+              </li>
+              <li>
+                <strong className="text-navy">(d) Freigabe an eine bestimmte
+                Fachperson</strong> (Abschnitt 12) – jedes Mal einzeln, je Fall und je
+                Person.
+              </li>
+            </ul>
+            <p className="text-brand-muted text-sm">
+              Du kannst jede Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen –
+              unter <strong className="text-navy">Einstellungen → Datenschutz</strong>, ohne
+              dein Konto zu löschen. Widerrufst du die Einwilligung in die KI-Verarbeitung,
+              stehen die darauf beruhenden Funktionen (Echo-Dialog, Zusammenfassungen,
+              Skalen, Berichte, Podcast, Bildwerkstatt) nicht mehr zur Verfügung; deine
+              gespeicherten Inhalte bleiben davon unberührt.
             </p>
           </div>
 

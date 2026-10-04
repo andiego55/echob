@@ -63,6 +63,11 @@ export const CODE_TEXTS: Record<string, string> = {
   // Kein Fehler, sondern die Folge einer eigenen Entscheidung. Deshalb sagt die Meldung,
   // WER das entschieden hat und WO es zurückzunehmen ist — sonst liest sich ein 403 wie
   // eine Panne, und die Person sucht an der falschen Stelle.
+  // Zwei Codes, weil der Unterschied fuer die lesende Person der ganze Unterschied ist:
+  // „Du hast widerrufen" ist fuer jemanden, der nie eingewilligt hat, schlicht falsch.
+  KI_EINWILLIGUNG_FEHLT:
+    'Für die KI-Funktionen fehlt deine Einwilligung in die KI-Verarbeitung. '
+    + 'Unter Einstellungen → Datenschutz kannst du sie erteilen.',
   KI_EINWILLIGUNG_WIDERRUFEN:
     'Du hast deine Einwilligung in die KI-Verarbeitung widerrufen — deshalb stehen die '
     + 'KI-Funktionen gerade nicht zur Verfügung. Unter Einstellungen → Datenschutz kannst '

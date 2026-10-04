@@ -28,6 +28,7 @@ from fastapi import HTTPException
 from app.services import kompass_katalog as katalog
 from app.services import kompass_uebung_service as dienst
 from app.services import kompass_uebungen
+from app.tests.einwilligung_hilfe import mit_ki_einwilligung
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
 
@@ -158,6 +159,8 @@ async def _person(conn) -> uuid.UUID:
     uid = uuid.uuid4()
     await conn.execute(
         "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Probe')", uid)
+    # Das Tor vor jedem Modellaufruf verlangt sie (04.10.2026).
+    await mit_ki_einwilligung(conn, uid)
     return uid
 
 

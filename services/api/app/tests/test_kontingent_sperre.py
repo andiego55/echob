@@ -39,6 +39,7 @@ from fastapi import HTTPException
 
 from app.core.config import settings
 from app.services import subscription_service as dienst
+from app.tests.einwilligung_hilfe import mit_ki_einwilligung
 
 _DSN = os.environ.get("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
 
@@ -76,6 +77,8 @@ async def _person(conn):
     user_id = uuid.uuid4()
     await conn.execute(
         "INSERT INTO user_profiles (user_id, display_name) VALUES ($1,'Probe')", user_id)
+    # Das Tor vor jedem Modellaufruf verlangt sie (04.10.2026).
+    await mit_ki_einwilligung(conn, user_id)
     return str(user_id)
 
 
@@ -100,6 +103,9 @@ async def test_zwei_gleichzeitige_aufrufe_bekommen_nur_einen_platz(grenze):
     a = await asyncpg.connect(_DSN)
     b = await asyncpg.connect(_DSN)
     try:
+        # Festgeschrieben, damit BEIDE Verbindungen sie sehen — und weil das Tor vor dem
+        # Reservieren eine erteilte Einwilligung verlangt.
+        await mit_ki_einwilligung(a, person)
         ergebnisse = await asyncio.gather(
             dienst.reservieren(person, a, ART),
             dienst.reservieren(person, b, ART),
@@ -117,6 +123,7 @@ async def test_zwei_gleichzeitige_aufrufe_bekommen_nur_einen_platz(grenze):
             "SELECT COUNT(*) FROM ai_usage_log WHERE user_id = $1", uuid.UUID(person)) == 1
     finally:
         await a.execute("DELETE FROM ai_usage_log WHERE user_id = $1", uuid.UUID(person))
+        await a.execute("DELETE FROM user_consents WHERE user_id = $1", uuid.UUID(person))
         await a.close()
         await b.close()
 
@@ -137,6 +144,7 @@ async def test_die_reservierung_nimmt_wirklich_eine_vorrang_sperre(grenze):
     haelt = await asyncpg.connect(_DSN)
     wartet = await asyncpg.connect(_DSN)
     try:
+        await mit_ki_einwilligung(haelt, person)
         await haelt.execute(
             "SELECT pg_advisory_lock($1::int, hashtext($2::text))",
             dienst._SPERR_RAUM, f"{person}:{ART}")
@@ -145,6 +153,8 @@ async def test_die_reservierung_nimmt_wirklich_eine_vorrang_sperre(grenze):
     finally:
         await haelt.execute("SELECT pg_advisory_unlock_all()")
         await haelt.execute("DELETE FROM ai_usage_log WHERE user_id = $1",
+                            uuid.UUID(person))
+        await haelt.execute("DELETE FROM user_consents WHERE user_id = $1",
                             uuid.UUID(person))
         await haelt.close()
         await wartet.close()

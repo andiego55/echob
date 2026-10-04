@@ -15,6 +15,8 @@ from app.services.account_service import (
     delete_user_data,
     export_user_data,
     get_latest_consent,
+    hat_audio_einwilligung,
+    record_audio_consent,
     record_consent,
 )
 
@@ -84,6 +86,10 @@ class ConsentBody(BaseModel):
     privacy_policy: bool
     sensitive_ai: bool
     age_confirmed: bool
+    #: Ab Fassung 2026-10-04-v2 getrennt. Optional, damit alte Clients nicht brechen —
+    #: der Gate prueft ohnehin auf die aktuelle Fassung.
+    inhalte: bool | None = None
+    ki: bool | None = None
     items: dict | None = None
 
 
@@ -137,6 +143,35 @@ async def post_erneut(
             conn, current_user["user_id"], body.was)
 
 
+class AudioEinwilligungBody(BaseModel):
+    version: str
+
+
+@router.get("/audio-einwilligung")
+async def get_audio_einwilligung(
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Darf ein Mikrofon benutzt werden?"""
+    async with pool.acquire() as conn:
+        return {"audio": await hat_audio_einwilligung(conn, current_user["user_id"])}
+
+
+@router.post("/audio-einwilligung")
+async def post_audio_einwilligung(
+    body: AudioEinwilligungBody,
+    current_user: dict = Depends(get_current_user),
+    pool=Depends(get_pool),
+) -> dict:
+    """Die Audio-Einwilligung, beim ersten Aufnahmeversuch erteilt.
+
+    Eigene Zeile mit ``art = 'audio'`` — sonst hielte die Abfrage der jüngsten Einwilligung
+    sie für den Zugang und schlüge den Einwilligungs-Dialog erneut auf.
+    """
+    async with pool.acquire() as conn:
+        return await record_audio_consent(conn, current_user["user_id"], body.version)
+
+
 @router.get("/consent")
 async def get_consent(
     current_user: dict = Depends(get_current_user),
@@ -163,4 +198,6 @@ async def post_consent(
             body.sensitive_ai,
             body.age_confirmed,
             body.items,
+            inhalte=body.inhalte,
+            ki=body.ki,
         )

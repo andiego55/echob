@@ -497,13 +497,34 @@ async def record_kauf_einwilligung(
     )
 
 
+async def hat_audio_einwilligung(conn: asyncpg.Connection, user_id: str) -> bool:
+    """Darf ein Mikrofon benutzt werden?
+
+    Eigene Abfrage statt eines Feldes in ``get_latest_consent``: Die Audio-Einwilligung
+    kommt an einem anderen Tag und wird nie mit dem Zugang zusammen erteilt.
+    """
+    return bool(await conn.fetchval(
+        "SELECT TRUE FROM user_consents "
+        "WHERE user_id = $1 AND art = 'audio' AND audio IS TRUE LIMIT 1",
+        user_id,
+    ))
+
+
 # ── Einwilligungen (DSGVO Art. 7 Nachweispflicht) ───────────────────────────
 
 async def get_latest_consent(conn: asyncpg.Connection, user_id: str) -> dict | None:
-    """Neueste erteilte Einwilligung der Person, oder None."""
+    """Neueste erteilte Einwilligung der Person, oder None.
+
+    **Die alte Spalte kommt mit und wird nicht umgerechnet.** Zeilen aus Fassungen bis
+    ``2026-06-16-v1`` tragen die gebuendelte Zustimmung in ``sensitive_ai``; die neuen
+    Spalten sind dort leer. Eine nachtraegliche Aufteilung waere eine Faelschung des
+    Nachweises — wer wissen will, was erklaert wurde, liest die Fassung dazu.
+    """
     row = await conn.fetchrow(
-        "SELECT version, privacy_policy, sensitive_ai, age_confirmed, accepted_at "
-        "FROM user_consents WHERE user_id = $1 ORDER BY accepted_at DESC LIMIT 1",
+        "SELECT version, privacy_policy, sensitive_ai, age_confirmed, "
+        "       inhalte, ki, audio, accepted_at "
+        "FROM user_consents WHERE user_id = $1 AND art = 'zugang' "
+        "ORDER BY accepted_at DESC LIMIT 1",
         user_id,
     )
     return dict(row) if row else None
@@ -517,13 +538,44 @@ async def record_consent(
     sensitive_ai: bool,
     age_confirmed: bool,
     items: dict | None,
+    *,
+    inhalte: bool | None = None,
+    ki: bool | None = None,
+    audio: bool | None = None,
 ) -> dict:
-    """Protokolliert eine erteilte Einwilligung (append-only)."""
+    """Protokolliert eine erteilte Einwilligung (append-only).
+
+    ``inhalte`` und ``ki`` loesen ``sensitive_ai`` ab (Fassung ``2026-10-04-v2``), ``audio``
+    kommt getrennt und spaeter — beim ersten Aufnahmeversuch. Die alten Felder bleiben in
+    der Unterschrift, weil die Tabelle append-only ist und aeltere Zeilen sie tragen.
+    """
     row = await conn.fetchrow(
         "INSERT INTO user_consents "
-        "(user_id, version, privacy_policy, sensitive_ai, age_confirmed, items) "
-        "VALUES ($1, $2, $3, $4, $5, $6::jsonb) "
-        "RETURNING version, privacy_policy, sensitive_ai, age_confirmed, accepted_at",
-        user_id, version, privacy_policy, sensitive_ai, age_confirmed, json.dumps(items or {}),
+        "(user_id, version, privacy_policy, sensitive_ai, age_confirmed, items, "
+        " inhalte, ki, audio) "
+        "VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9) "
+        "RETURNING version, privacy_policy, sensitive_ai, age_confirmed, "
+        "          inhalte, ki, audio, accepted_at",
+        user_id, version, privacy_policy, sensitive_ai, age_confirmed,
+        json.dumps(items or {}), inhalte, ki, audio,
+    )
+    return dict(row)
+
+
+async def record_audio_consent(conn: asyncpg.Connection, user_id: str, version: str) -> dict:
+    """Die Audio-Einwilligung, beim ersten Aufnahmeversuch erteilt.
+
+    **Eine eigene Zeile und kein Nachtrag an der alten.** Die Tabelle ist append-only, und
+    die zwei Einwilligungen sind an verschiedenen Tagen zu verschiedenen Zwecken erklaert
+    worden — genau das soll der Nachweis zeigen. Die uebrigen Felder stehen auf ``false``:
+    Diese Zeile erklaert nichts ueber sie.
+    """
+    row = await conn.fetchrow(
+        "INSERT INTO user_consents "
+        "(user_id, version, privacy_policy, sensitive_ai, age_confirmed, items, "
+        " audio, art) "
+        "VALUES ($1, $2, false, false, false, '{}'::jsonb, true, 'audio') "
+        "RETURNING version, audio, accepted_at",
+        user_id, version,
     )
     return dict(row)

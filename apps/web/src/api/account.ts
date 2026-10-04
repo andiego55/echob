@@ -14,12 +14,20 @@ export async function deleteMyAccount(): Promise<{ deleted: boolean; rows: Recor
 }
 
 /** Aktuelle Version des Einwilligungstexts. Bei inhaltlicher Änderung erhöhen → erneute Einwilligung. */
-export const CONSENT_VERSION = '2026-06-16-v1'
+// Hochgezaehlt am 04.10.2026: „sensible Inhalte" und „KI-Verarbeitung" sind ab
+// hier getrennte Einwilligungen (vorher beide im Feld `sensitive_ai`). Wer
+// hochzaehlt, holt alle Einwilligungen neu ein - das ist Absicht und der Grund,
+// warum die Fassung ueberhaupt im Nachweis steht.
+export const CONSENT_VERSION = '2026-10-04-v2'
 
 export interface ConsentRecord {
   version: string
   privacy_policy: boolean
+  /** Alte Fassungen (bis 2026-06-16-v1): Inhalte UND KI gebuendelt. Bleibt im Nachweis. */
   sensitive_ai: boolean
+  /** Ab 2026-10-04-v2 getrennt. `null` bei aelteren Zeilen. */
+  inhalte: boolean | null
+  ki: boolean | null
   age_confirmed: boolean
   accepted_at: string
 }
@@ -35,6 +43,8 @@ export async function recordConsent(body: {
   version: string
   privacy_policy: boolean
   sensitive_ai: boolean
+  inhalte?: boolean
+  ki?: boolean
   age_confirmed: boolean
   items?: Record<string, unknown>
 }): Promise<ConsentRecord> {
@@ -61,4 +71,22 @@ export const einwilligungenApi = {
     apiClient.post('/account/einwilligungen/widerrufen', { was }).then(r => r.data),
   erteilen: (was: string) =>
     apiClient.post('/account/einwilligungen/erteilen', { was }).then(r => r.data),
+}
+
+/**
+ * Die Audio-Einwilligung — beim ERSTEN Aufnahmeversuch, nicht an der Tuer.
+ *
+ * Eine Einwilligung soll fuer einen bestimmten Zweck und informiert sein (Art. 4 Nr. 11
+ * DSGVO). Im Einwilligungs-Dialog abgefragt, wo niemand weiss, ob er je ein Mikrofon
+ * benutzt, waere sie beides nicht. Sie ist ausserdem die einzige der vier, die man
+ * folgenlos ablehnen kann: Wer nicht spricht, tippt.
+ */
+export const AUDIO_CONSENT_VERSION = 'audio-2026-10-04-v1'
+
+export const audioEinwilligung = {
+  stand: () =>
+    apiClient.get<{ audio: boolean }>('/account/audio-einwilligung').then(r => r.data),
+  erteilen: () =>
+    apiClient.post('/account/audio-einwilligung', { version: AUDIO_CONSENT_VERSION })
+      .then(r => r.data),
 }
