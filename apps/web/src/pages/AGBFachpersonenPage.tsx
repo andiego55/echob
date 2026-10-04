@@ -116,11 +116,9 @@ export default function AGBFachpersonenPage() {
 
           <Section title="§ 4 Preise, Umsatzsteuer, Zahlung">
             <p>
-              Alle Preise verstehen sich <strong>netto</strong>,{' '}
-              <Offen>zuzüglich der jeweils geltenden gesetzlichen Umsatzsteuer — sofern
-              der Anbieter umsatzsteuerpflichtig ist; bei Anwendung der
-              Kleinunternehmerregelung (§ 19 UStG) wird keine Umsatzsteuer ausgewiesen.
-              Diese Stelle ist vor dem Verkauf festzulegen.</Offen>
+              Alle Preise verstehen sich <strong>netto</strong>, zuzüglich der jeweils
+              geltenden gesetzlichen Umsatzsteuer. Die Umsatzsteuer wird in der Rechnung
+              gesondert ausgewiesen.
             </p>
             <p>
               Die Entgelte sind zu Beginn des jeweiligen Abrechnungszeitraums im Voraus
