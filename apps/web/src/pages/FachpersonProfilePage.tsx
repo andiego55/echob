@@ -5,6 +5,7 @@ import PageLayout from '@/components/layout/PageLayout'
 import { directoryApi } from '@/api/directory'
 import { formatLabel, tierBadge } from '@/directory/taxonomy'
 import ContactDialog from '@/components/directory/ContactDialog'
+import EintragHinweis from '@/components/directory/EintragHinweis'
 import ProfileText from '@/components/directory/ProfileText'
 
 function initials(name: string): string {
@@ -170,6 +171,13 @@ export default function FachpersonProfilePage() {
               EchoB vermittelt keine Behandlung und übernimmt keine Gewähr. Die Angaben stammen von der Fachperson bzw. aus öffentlichen Quellen.
             </p>
           </aside>
+        </div>
+
+        {/* Die Information und der Widerspruch für die Person, um die es hier geht.
+            Ohne diese Stelle stünde die Berufung auf Art. 14 Abs. 5 lit. b in der
+            Datenschutzerklärung ohne Deckung — siehe EintragHinweis. */}
+        <div className="mx-auto max-w-[1100px]">
+          <EintragHinweis name={p.display_name} slug={p.slug} eigen={p.contactable} />
         </div>
       </section>
 

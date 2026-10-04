@@ -1,4 +1,5 @@
 import PageLayout from '@/components/layout/PageLayout'
+import { RECHTSSTAND } from '@/lib/rechtsstand'
 import { Link } from 'react-router-dom'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -94,7 +95,7 @@ export default function WiderrufPage() {
               <p>— Datum: __________</p>
               <p className="text-brand-muted text-xs">(*) Unzutreffendes streichen.</p>
             </div>
-            <p className="text-xs text-brand-muted">Stand: {new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })} · Entwurf, anwaltlich zu prüfen.</p>
+            <p className="text-xs text-brand-muted">Stand: {RECHTSSTAND.widerruf.stand} · Fassung {RECHTSSTAND.widerruf.fassung} · Entwurf, anwaltlich zu prüfen.</p>
           </Section>
 
         </div>

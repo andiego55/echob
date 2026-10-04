@@ -1,4 +1,5 @@
 import PageLayout from '@/components/layout/PageLayout'
+import { RECHTSSTAND } from '@/lib/rechtsstand'
 
 export default function DatenschutzPage() {
   return (
@@ -11,7 +12,7 @@ export default function DatenschutzPage() {
             Datenschutzerklärung
           </h1>
           <p className="mt-2 text-[0.95rem] text-brand-blue">
-            Stand: {new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}
+            Stand: {RECHTSSTAND.datenschutz.stand} · Fassung {RECHTSSTAND.datenschutz.fassung}
           </p>
         </div>
       </section>
@@ -84,7 +85,7 @@ export default function DatenschutzPage() {
               nutzen – insbesondere, wenn dich eine Fachperson einlädt, ist eine Anmeldung ohne Angabe deines
               Klarnamens gegenüber EchoB möglich. Das ist ein hohes Maß an Privatheit, aber
               <strong className="text-navy"> keine Anonymität im rechtlichen Sinne</strong>: Deine Inhalte können
-              persönliche Bezüge enthalten, ein interner Zugriff ist technisch möglich (Abschnitt 10), und im
+              persönliche Bezüge enthalten, ein interner Zugriff ist technisch möglich (Abschnitt 11), und im
               Fachpersonen-Weg kennt die Fachperson deine Identität. Es gelten daher weiterhin die Regelungen
               dieser Erklärung.
             </p>
@@ -97,7 +98,13 @@ export default function DatenschutzPage() {
             </h2>
             <p className="text-brand-muted text-sm mb-3">
               Im geschützten Bereich erfasst du u. a. Fälle, Szenen, Gespräche mit „Echo", Skalen, Berichte,
-              Hypothesen und Profile. Diese Inhalte können Angaben zu deiner Gesundheit, deinem psychischen
+              Hypothesen und Profile. Dazu kommt ein <strong className="text-navy">fallfreier
+              Bereich („Mein Kompass")</strong>, der nicht an eine einzelne Beziehung gebunden ist:
+              Stimmungs- und Anspannungswerte im Verlauf, Sätze über dich selbst, Vorhaben, ein
+              Selbstporträt, Skizzen deiner Wunschbeziehung, ein Gefühlsbild – und ein{' '}
+              <strong className="text-navy">Krisenplan</strong>, in dem stehen kann, was dir hilft
+              und wen du dann erreichen willst. Diese Angaben gehören dir und nicht einem Fall;
+              freigegeben wird daraus nur, was du Stück für Stück auswählst (Abschnitt 12). Diese Inhalte können Angaben zu deiner Gesundheit, deinem psychischen
               Befinden und deinem Privat- oder Sexualleben enthalten und gelten damit als
               <strong className="text-navy"> besondere Kategorien personenbezogener Daten</strong>.
             </p>
@@ -110,7 +117,7 @@ export default function DatenschutzPage() {
               Wir holen deine Einwilligungen <strong className="text-navy">getrennt nach Zweck</strong> ein und
               protokollieren sie – insbesondere für (a) die Verarbeitung deiner sensiblen Reflexionsinhalte,
               (b) die KI-Verarbeitung einschließlich Übermittlung in die USA (Abschnitt 5), (c) eine etwaige
-              Audioaufnahme (Abschnitt 5) und (d) eine Freigabe an eine bestimmte Fachperson (Abschnitt 11).
+              Audioaufnahme (Abschnitt 5) und (d) eine Freigabe an eine bestimmte Fachperson (Abschnitt 12).
               Du kannst jede Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen. Widerrufst du die
               Einwilligung in die KI-Verarbeitung, stehen die darauf beruhenden Funktionen (Echo-Dialog,
               Zusammenfassungen, Skalen, Berichte) nicht mehr zur Verfügung.
@@ -127,8 +134,15 @@ export default function DatenschutzPage() {
               wird zusätzlich eine Audioaufnahme zur Transkription übermittelt.
             </p>
             <p className="text-brand-muted text-sm mb-3">
+              Derselbe Anbieter erbringt auch die Funktionen, die etwas Neues herstellen:
+              die <strong className="text-navy">Sprachausgabe</strong> des Podcast-Studios (aus dem
+              geschriebenen Folgentext wird eine Tonspur) und die
+              <strong className="text-navy"> Bilderzeugung</strong> der Bildwerkstatt (aus einem
+              Bildauftrag wird ein Bild). Was dabei übermittelt wird, steht in Abschnitt 6.
+            </p>
+            <p className="text-brand-muted text-sm mb-3">
               Die dauerhafte Speicherung deiner Fallinhalte erfolgt verschlüsselt auf Servern in der EU
-              (Abschnitt 17). Für die KI-Verarbeitung werden die jeweils benötigten Inhalte in die USA
+              (Abschnitt 18). Für die KI-Verarbeitung werden die jeweils benötigten Inhalte in die USA
               übermittelt und dort in <strong className="text-navy">unverschlüsselter Form</strong> verarbeitet –
               sie müssen für das KI-Modell lesbar sein. Die Übertragung selbst erfolgt stets über
               transportverschlüsselte (TLS) Verbindungen. Wir setzen bewusst leistungsfähige, aktuelle
@@ -150,9 +164,51 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 6. Angaben über andere Personen */}
+          {/* 6. Erzeugte Inhalte: Tonspuren und Bilder */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">6. Angaben über andere Personen</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">6. Erzeugte Inhalte: Tonspuren und Bilder</h2>
+            <p className="text-brand-muted text-sm mb-3">
+              Zwei Funktionen stellen aus deinem Fall etwas her, das danach bei uns liegt:
+            </p>
+            <ul className="text-brand-muted text-sm space-y-2 list-disc pl-5 mb-3">
+              <li>
+                <strong className="text-navy">Podcast-Studio:</strong> Aus dem Material deines Falls
+                entsteht ein geschriebener Folgentext und daraus eine
+                <strong className="text-navy"> gesprochene Tonspur</strong>. Beides wird bei uns
+                gespeichert – der Text als Kapitel, die Tonspur als Audiodatei in der Datenbank.
+              </li>
+              <li>
+                <strong className="text-navy">Bildwerkstatt:</strong> Aus dem Material deines Falls
+                entsteht ein Bildauftrag und daraus ein <strong className="text-navy">Bild</strong>.
+                Gespeichert werden das Bild selbst, der verwendete Bildauftrag und die Legende, die
+                erklärt, woher jede Entscheidung im Bild kommt.
+              </li>
+            </ul>
+            <p className="text-brand-muted text-sm mb-3">
+              <strong className="text-navy">Warum wir Auftrag und Text mitspeichern:</strong> Ein Bild
+              und eine Tonspur lassen sich nicht reproduzieren – dasselbe Ergebnis zweimal gibt es
+              nicht. Der mitgespeicherte Auftrag ist deshalb die einzige Auskunft darüber,
+              <em> woraus</em> etwas entstanden ist. Ohne ihn stünde ein erzeugtes Bild ohne jede
+              Nachvollziehbarkeit da.
+            </p>
+            <p className="text-brand-muted text-sm mb-3">
+              Diese erzeugten Inhalte sind Teil deines Falls und unterliegen denselben Rechten
+              (Auskunft, Löschung) und derselben Freigabe-Logik. Sie sind{' '}
+              <strong className="text-navy">nicht öffentlich erreichbar</strong>: Es gibt keine
+              Adresse, über die ein Bild oder eine Tonspur ohne Anmeldung abrufbar wäre.
+            </p>
+            <p className="text-brand-muted text-sm">
+              <strong className="text-navy">Zum Mitnehmen gedacht – und das hat eine Folge:</strong> Du
+              kannst Bild und Tonspur herunterladen. Was du herunterlädst, liegt danach auf deinem
+              Gerät (z. B. in der Fotogalerie deines Telefons) und damit außerhalb unseres
+              Einflussbereichs. Rechtsgrundlage für die Erzeugung: deine Einwilligung nach Art. 9
+              Abs. 2 lit. a DSGVO sowie Art. 6 Abs. 1 lit. b DSGVO.
+            </p>
+          </div>
+
+          {/* 8. Angaben über andere Personen */}
+          <div>
+            <h2 className="text-lg font-bold text-navy mb-3">7. Angaben über andere Personen</h2>
             <p className="text-brand-muted text-sm mb-3">
               In deinen Fällen beschreibst du zwangsläufig auch andere Personen (z. B. Partner:innen,
               Ex-Partner:innen, Familienangehörige). Deren Angaben können ebenfalls personenbezogene – teils
@@ -174,9 +230,9 @@ export default function DatenschutzPage() {
             </ul>
           </div>
 
-          {/* 7. Automatisierte Auswertung */}
+          {/* 8. Automatisierte Auswertung */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">7. Automatisierte Auswertung und Musterbildung</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">8. Automatisierte Auswertung und Musterbildung</h2>
             <p className="text-brand-muted text-sm mb-3">
               EchoB macht wiederkehrende Muster sichtbar und erzeugt u. a. Skalen, Hypothesen und Berichte.
               Diese Auswertungen beruhen auf deinen eigenen Angaben und dienen ausschließlich deiner Reflexion.
@@ -188,9 +244,9 @@ export default function DatenschutzPage() {
             </ul>
           </div>
 
-          {/* 8. Weitere Verarbeitungen */}
+          {/* 9. Weitere Verarbeitungen */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">8. Weitere Verarbeitungen</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">9. Weitere Verarbeitungen</h2>
 
             <h3 className="font-semibold text-navy mb-1">Zahlungen</h3>
             <p className="text-brand-muted text-sm mb-4">
@@ -230,6 +286,47 @@ export default function DatenschutzPage() {
               lit. b und lit. f DSGVO.
             </p>
 
+            <h3 className="font-semibold text-navy mb-1">Verzeichnis der Fachpersonen</h3>
+            <p className="text-brand-muted text-sm mb-3">
+              Auf <strong className="text-navy">/fachpersonen</strong> führen wir ein öffentliches
+              Verzeichnis, damit Nutzende eine passende Fachperson finden. Es enthält zwei Arten von
+              Einträgen, und der Unterschied ist wichtig:
+            </p>
+            <ul className="text-brand-muted text-sm space-y-2 list-disc pl-5 mb-3">
+              <li>
+                <strong className="text-navy">Einträge mit Zustimmung:</strong> Die Fachperson hat
+                sich eingetragen oder einen recherchierten Eintrag übernommen und pflegt ihn selbst.
+                Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) bzw. lit. b.
+              </li>
+              <li>
+                <strong className="text-navy">Recherchierte Einträge:</strong> Angaben, die wir aus{' '}
+                <strong className="text-navy">öffentlich zugänglichen Quellen</strong> (insbesondere
+                der eigenen Praxis-Website) zusammengetragen haben – Name, Berufsbezeichnung, Ort,
+                Schwerpunkte, Website. Hier liegt <strong className="text-navy">keine Zustimmung</strong>{' '}
+                vor. Rechtsgrundlage ist unser berechtigtes Interesse an einem brauchbaren Verzeichnis
+                und das Interesse Hilfesuchender, Angebote zu finden (Art. 6 Abs. 1 lit. f DSGVO).
+                Diese Einträge tragen keinen Kontakt-Knopf; die Kontaktaufnahme läuft über die eigene
+                Website der Fachperson.
+              </li>
+            </ul>
+            <p className="text-brand-muted text-sm mb-3">
+              <strong className="text-navy">Information und Widerspruch für betroffene Fachpersonen:</strong>{' '}
+              Eine Einzelbenachrichtigung aller recherchierten Einträge nehmen wir regelmäßig nicht
+              vor (Art. 14 Abs. 5 lit. b DSGVO – unverhältnismäßiger Aufwand); stattdessen steht diese
+              Information öffentlich hier und an jedem Eintrag. Jede Fachperson kann ihren Eintrag{' '}
+              <strong className="text-navy">jederzeit korrigieren, übernehmen oder vollständig
+              entfernen lassen</strong> – ohne Begründung und ohne Nachteil. Ein Hinweis darauf steht
+              an jedem Eintrag; es genügt eine E-Mail an{' '}
+              <a href="mailto:kontakt@echo-b.de" className="text-accent hover:underline">kontakt@echo-b.de</a>.
+              Das ist zugleich das Widerspruchsrecht nach Art. 21 DSGVO.
+            </p>
+            <p className="text-brand-muted text-sm mb-3">
+              <strong className="text-navy">Kontaktanfragen über das Verzeichnis</strong> leiten wir an
+              die gewählte Fachperson weiter; die Kontakt-E-Mail-Adresse der Fachperson wird dabei{' '}
+              <strong className="text-navy">nie an die anfragende Person ausgeliefert</strong>.
+              Rechtsgrundlage: Art. 6 Abs. 1 lit. a und lit. b DSGVO.
+            </p>
+
             <h3 className="font-semibold text-navy mb-1">Serverprotokolle</h3>
             <p className="text-brand-muted text-sm">
               Beim Aufruf der Website werden technisch notwendige Protokolldaten verarbeitet (z. B. Browsertyp,
@@ -238,9 +335,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 9. Empfänger / Auftragsverarbeiter */}
+          {/* 10. Empfänger / Auftragsverarbeiter */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">9. Empfänger, Auftragsverarbeiter und Rollen</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">10. Empfänger, Auftragsverarbeiter und Rollen</h2>
             <p className="text-brand-muted text-sm mb-3">
               <strong className="text-navy">Auftragsverarbeiter</strong> (Art. 28 DSGVO), die in unserem Auftrag
               und nach unserer Weisung verarbeiten:
@@ -250,7 +347,7 @@ export default function DatenschutzPage() {
               <li><strong className="text-navy">Supabase</strong> – Authentifizierung</li>
               <li><strong className="text-navy">Cloudflare</strong> – Auslieferung und Absicherung der Website</li>
               <li><strong className="text-navy">OpenAI</strong> – KI-gestützte Verarbeitung (USA, siehe Abschnitt 5)</li>
-              <li><strong className="text-navy">Resend</strong> – Versand von System-E-Mails (EU-Region Irland, siehe Abschnitt 8)</li>
+              <li><strong className="text-navy">Resend</strong> – Versand von System-E-Mails (EU-Region Irland, siehe Abschnitt 9)</li>
             </ul>
             <p className="text-brand-muted text-sm mt-4 mb-3">
               <strong className="text-navy">Eigenständig Verantwortliche</strong> für ihren jeweiligen Teil der
@@ -258,7 +355,7 @@ export default function DatenschutzPage() {
             </p>
             <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5">
               <li><strong className="text-navy">Stripe</strong> – Zahlungsabwicklung (eigenverantwortlich)</li>
-              <li><strong className="text-navy">Von dir ausgewählte Fachpersonen</strong> – verarbeiten freigegebene Inhalte für ihre eigenen Zwecke (siehe Abschnitt 11)</li>
+              <li><strong className="text-navy">Von dir ausgewählte Fachpersonen</strong> – verarbeiten freigegebene Inhalte für ihre eigenen Zwecke (siehe Abschnitt 12)</li>
               <li><strong className="text-navy">Google</strong> – nur bei Anmeldung über Google, für den Anmeldevorgang</li>
             </ul>
             <p className="text-brand-muted text-sm mt-3">
@@ -267,7 +364,7 @@ export default function DatenschutzPage() {
             </p>
             <p className="text-brand-muted text-sm mt-3">
               <strong className="text-navy">Rollen bei Nutzung über eine Fachperson:</strong> Ist eine Fachperson
-              die Verantwortliche (Abschnitt 1 und 11), handeln wir als ihr Auftragsverarbeiter. Die vorstehend
+              die Verantwortliche (Abschnitt 1 und 12), handeln wir als ihr Auftragsverarbeiter. Die vorstehend
               genannten Auftragsverarbeiter – insbesondere <strong className="text-navy">OpenAI</strong> – sind in
               dieser Konstellation <strong className="text-navy">Unterauftragsverarbeiter</strong>, die wir mit
               Genehmigung der Fachperson einsetzen und nach Art. 28 Abs. 4 DSGVO auf dieselben Datenschutzpflichten
@@ -276,9 +373,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 10. Pseudonymisierung & Zugriff */}
+          {/* 11. Pseudonymisierung & Zugriff */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">10. Pseudonymisierung und interner Zugriff</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">11. Pseudonymisierung und interner Zugriff</h2>
             <p className="text-brand-muted text-sm">
               Deine Inhalte werden in der Anwendungsdatenbank nur unter einer pseudonymen Kennung gespeichert;
               Klarname und E-Mail liegen getrennt im Authentifizierungssystem. Sensible Freitext-Inhalte werden
@@ -289,9 +386,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 11. Freigabe an Fachpersonen */}
+          {/* 12. Freigabe an Fachpersonen */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">11. Freigabe an Fachpersonen</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">12. Freigabe an Fachpersonen</h2>
             <p className="text-brand-muted text-sm mb-3">
               Du kannst einzelne Inhalte eines Falls gezielt an eine registrierte Fachperson freigeben. Es wird
               ausschließlich das übermittelt, was du auswählst. Rechtsgrundlage: Art. 6 Abs. 1 lit. a / Art. 9
@@ -313,9 +410,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 12. Paartherapie */}
+          {/* 13. Paartherapie */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">12. Paartherapie: der gemeinsame Raum zu zweit</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">13. Paartherapie: der gemeinsame Raum zu zweit</h2>
             <p className="text-brand-muted text-sm mb-3">
               Du kannst dich mit einer anderen Person, die ebenfalls ein Konto hat, freiwillig zu einem
               gemeinsamen <strong className="text-navy">Paarraum</strong> verbinden. Dazu erzeugt eine Seite
@@ -363,27 +460,29 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 13. Nutzung nur durch Volljährige */}
+          {/* 14. Nutzung nur durch Volljährige */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">13. Nutzung nur durch Volljährige</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">14. Nutzung nur durch Volljährige</h2>
             <p className="text-brand-muted text-sm">
               EchoB richtet sich ausschließlich an volljährige Personen (ab 18 Jahren). Mit der Nutzung
               bestätigst du, dass du volljährig bist.
             </p>
           </div>
 
-          {/* 14. Speicherdauer, Widerruf & Löschung */}
+          {/* 15. Speicherdauer, Widerruf & Löschung */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">14. Speicherdauer, Widerruf und Löschung</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">15. Speicherdauer, Widerruf und Löschung</h2>
             <p className="text-brand-muted text-sm mb-2">
               Wir speichern Daten nur so lange, wie es für den jeweiligen Zweck erforderlich ist:
             </p>
             <ul className="list-disc list-inside text-sm text-brand-muted space-y-1.5">
               <li><strong className="text-navy">Fall- und Reflexionsinhalte:</strong> bis zu deiner Löschung (einzelner Fall oder Konto).</li>
               <li><strong className="text-navy">Konto- und Anmeldedaten:</strong> für die Dauer des Kontos.</li>
-              <li><strong className="text-navy">Paarraum-Inhalte:</strong> bis eine der beiden Personen den Raum löscht oder ihr Konto löscht (Abschnitt 12).</li>
+              <li><strong className="text-navy">Paarraum-Inhalte:</strong> bis eine der beiden Personen den Raum löscht oder ihr Konto löscht (Abschnitt 13).</li>
               <li><strong className="text-navy">KI-Übermittlungen:</strong> beim Anbieter bis zu 30 Tage (Missbrauchserkennung), danach Löschung (Abschnitt 5).</li>
-              <li><strong className="text-navy">Audioaufnahmen:</strong> nur zur Transkription verarbeitet und nicht dauerhaft gespeichert.</li>
+              <li><strong className="text-navy">Audioaufnahmen von dir</strong> (Sprach-Schnellerfassung): nur zur Transkription verarbeitet und nicht dauerhaft gespeichert.</li>
+              <li><strong className="text-navy">Erzeugte Tonspuren und Bilder</strong> (Podcast, Bildwerkstatt): bis zu deiner Löschung – als Teil des jeweiligen Falls (Abschnitt 6).</li>
+              <li><strong className="text-navy">Verzeichnis-Einträge von Fachpersonen:</strong> bis zum Widerspruch bzw. zur Löschung des Eintrags (Abschnitt 9).</li>
               <li><strong className="text-navy">Server- und Sicherheitsprotokolle:</strong> kurzfristig (in der Regel wenige Tage bis Wochen).</li>
               <li><strong className="text-navy">Kontaktanfragen und Warteliste:</strong> bis zur Erledigung bzw. bis zum Widerruf, danach kurzfristig gelöscht.</li>
               <li><strong className="text-navy">Zahlungs- und Rechnungsunterlagen:</strong> gesetzliche Aufbewahrungsfristen (bis zu 10 Jahre, §§ 147 AO, 257 HGB).</li>
@@ -397,14 +496,14 @@ export default function DatenschutzPage() {
             <p className="text-brand-muted text-sm mt-2">
               <strong className="text-navy">Hinweis:</strong> Nach einer Löschung können Daten für eine kurze
               Übergangszeit noch in verschlüsselten Sicherungskopien (Backups) enthalten sein, bis diese im
-              regulären Turnus überschrieben werden. Gesetzliche Aufbewahrungspflichten (z. B. für Rechnungen)
+              regulären Turnus überschrieben werden – das geschieht spätestens nach 15 Tagen. Gesetzliche Aufbewahrungspflichten (z. B. für Rechnungen)
               bleiben unberührt.
             </p>
           </div>
 
-          {/* 15. Cookies und Tracking */}
+          {/* 16. Cookies und Tracking */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">15. Cookies und Tracking</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">16. Cookies und Tracking</h2>
             <p className="text-brand-muted text-sm">
               EchoB verwendet <strong className="text-navy">keine Tracking-Cookies</strong>, kein Google Analytics
               und keine Werbedienste. Es werden nur technisch notwendige Daten verarbeitet (z. B. für die
@@ -413,9 +512,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 16. Deine Rechte */}
+          {/* 17. Deine Rechte */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">16. Deine Rechte</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">17. Deine Rechte</h2>
             <p className="text-brand-muted text-sm mb-3">
               Du hast hinsichtlich deiner personenbezogenen Daten folgende Rechte:
             </p>
@@ -435,9 +534,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 17. Datensicherheit */}
+          {/* 18. Datensicherheit */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">17. Datensicherheit</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">18. Datensicherheit</h2>
             <p className="text-brand-muted text-sm">
               Wir setzen technische und organisatorische Maßnahmen ein, um deine Daten gegen Verlust,
               Manipulation und unberechtigten Zugriff zu schützen. Dazu gehören:
@@ -456,9 +555,9 @@ export default function DatenschutzPage() {
             </p>
           </div>
 
-          {/* 18. Änderungen */}
+          {/* 19. Änderungen */}
           <div>
-            <h2 className="text-lg font-bold text-navy mb-3">18. Änderungen dieser Erklärung</h2>
+            <h2 className="text-lg font-bold text-navy mb-3">19. Änderungen dieser Erklärung</h2>
             <p className="text-brand-muted text-sm">
               Wir passen diese Datenschutzerklärung an, sobald sich die Rechtslage oder unsere Verarbeitungen
               ändern. Die jeweils aktuelle Version ist stets auf dieser Seite abrufbar.

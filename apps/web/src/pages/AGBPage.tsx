@@ -1,4 +1,5 @@
 import PageLayout from '@/components/layout/PageLayout'
+import { RECHTSSTAND } from '@/lib/rechtsstand'
 import { Link } from 'react-router-dom'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -141,10 +142,10 @@ export default function AGBPage() {
 
           <Section title="§ 12 Streitbeilegung">
             <p>
-              Die EU-Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">ec.europa.eu/consumers/odr</a>.
               Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
-              sind wir nicht verpflichtet und grundsätzlich nicht bereit.
+              sind wir nicht verpflichtet und grundsätzlich nicht bereit (§ 36 VSBG). Bei Fragen oder
+              Beschwerden wende dich bitte zuerst direkt an uns – die Kontaktdaten stehen im
+              Impressum.
             </p>
           </Section>
 
@@ -155,7 +156,7 @@ export default function AGBPage() {
               Kund:in bleiben unberührt. Sollten einzelne Bestimmungen unwirksam sein, bleibt die
               Wirksamkeit der übrigen Bestimmungen unberührt.
             </p>
-            <p className="text-xs text-brand-muted">Stand: {new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })} · Entwurf, anwaltlich zu prüfen.</p>
+            <p className="text-xs text-brand-muted">Stand: {RECHTSSTAND.agb.stand} · Fassung {RECHTSSTAND.agb.fassung} · Entwurf, anwaltlich zu prüfen.</p>
           </Section>
 
         </div>
