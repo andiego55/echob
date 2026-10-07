@@ -31,13 +31,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-/** Eine Stelle, an der eine Entscheidung aussteht — sichtbar statt stillschweigend gefüllt. */
-function Offen({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-amber-900">{children}</span>
-  )
-}
-
 export default function AGBFachpersonenPage() {
   return (
     <PageLayout>
@@ -58,7 +51,6 @@ export default function AGBFachpersonenPage() {
 
           <div className="rounded-brand border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
             <strong>Hinweis (Entwurf):</strong> Ein noch nicht anwaltlich geprüftes Gerüst.
-            Gelb markierte Stellen sind offene Entscheidungen, keine Formulierungsfragen.
           </div>
 
           <Section title="§ 1 Geltungsbereich">
@@ -216,19 +208,24 @@ export default function AGBFachpersonenPage() {
               Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei
               Verletzung von Leben, Körper und Gesundheit. Bei einfacher Fahrlässigkeit
               haften wir nur bei Verletzung wesentlicher Vertragspflichten und der Höhe nach
-              begrenzt auf den vertragstypisch vorhersehbaren Schaden,{' '}
-              <Offen>höchstens jedoch auf das in den vorangegangenen zwölf Monaten
-              gezahlte Entgelt — die Obergrenze ist eine unternehmerische Entscheidung und
-              festzulegen.</Offen> Im Übrigen ist die Haftung ausgeschlossen.
+              begrenzt auf den vertragstypisch vorhersehbaren Schaden, höchstens jedoch auf
+              das in den vorangegangenen zwölf Monaten gezahlte Entgelt, mindestens aber
+              2.500 €. Im Übrigen ist die Haftung ausgeschlossen.
+            </p>
+            <p>
+              Unberührt bleiben Ansprüche betroffener Personen nach Art. 82 DSGVO: Sie
+              richten sich gegen den jeweils Verantwortlichen und lassen sich durch diesen
+              Vertrag nicht begrenzen.
             </p>
           </Section>
 
           <Section title="§ 11 Schlussbestimmungen">
             <p>
               Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des
-              UN-Kaufrechts.{' '}
-              <Offen>Gerichtsstand: gegenüber Kaufleuten frei vereinbar — Sitz des
-              Anbieters oder ein anderer Ort; festzulegen.</Offen> Sollten einzelne
+              UN-Kaufrechts. Ausschließlicher Gerichtsstand für alle Streitigkeiten aus
+              diesem Vertrag ist — soweit die Kundin Kauffrau, juristische Person des
+              öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen ist —{' '}
+              <strong>Kassel</strong>. Sollten einzelne
               Bestimmungen unwirksam sein, bleibt die Wirksamkeit der übrigen unberührt.
             </p>
             <p className="text-sm text-brand-muted">
