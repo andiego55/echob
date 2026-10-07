@@ -14,7 +14,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel as _BaseModel
 
 from app.core import berufsgruppen, crypto
-from app.core.dependencies import get_current_professional, get_current_user, get_pool
+from app.core.dependencies import (
+    get_current_professional,
+    get_current_professional_vor_mfa,
+    get_current_user,
+    get_pool,
+)
 from app.schemas.professional import (
     AgreementAccept,
     AnzeigenameUpdate,
@@ -247,7 +252,10 @@ async def _avv_abgeschlossen(conn, pid) -> bool:
 
 @router.get("/me", response_model=ProfessionalProfileResponse)
 async def get_me(
-    current: dict = Depends(get_current_professional),
+    # **Bewusst OHNE das Zwei-Faktor-Tor.** Dieser Endpunkt sagt der Oberflaeche, in
+    # welchem Zustand sie ist — auch „du musst noch einen zweiten Faktor einrichten".
+    # Waere er mitgesperrt, koennte niemand zur Einrichtung gelangen.
+    current: dict = Depends(get_current_professional_vor_mfa),
     pool=Depends(get_pool),
 ) -> ProfessionalProfileResponse:
     """Profil der eingeloggten Fachperson (403, wenn kein Fachpersonen-Zugang).
@@ -257,7 +265,14 @@ async def get_me(
     """
     async with pool.acquire() as conn:
         await ensure_demo_for_professional(current["user_id"], conn)
-    return ProfessionalProfileResponse(**_mit_berufsgruppe(current["professional"]), **current["zustimmungen"])
+    from app.core.config import settings
+    return ProfessionalProfileResponse(
+        **_mit_berufsgruppe(current["professional"]),
+        **current["zustimmungen"],
+        mfa_eingerichtet=bool(current.get("mfa_eingerichtet")),
+        mfa_bestaetigt=current.get("aal") == "aal2",
+        mfa_pflicht=settings.professional_mfa_required,
+    )
 
 
 @router.post("/register", response_model=ProfessionalProfileResponse)

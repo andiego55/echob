@@ -51,6 +51,18 @@ class Settings(BaseSettings):
     # Verzeichnis-Admin (Fachpersonen anlegen/einladen) nutzen. Leer = Admin aus.
     admin_user_id: str = ""
 
+    # ── Zwei-Faktor-Anmeldung fuer Fachpersonen ─────────────────────────────
+    #
+    # Pflicht, nicht Angebot: Ein Fachpersonenkonto liest die Fallakten mehrerer fremder
+    # Patient:innen, und freiwilliges 2FA schaltet erfahrungsgemaess niemand ein. Mit der
+    # ersten AVV-Unterschrift wird die Massnahme ausserdem vertraglich zugesagt.
+    #
+    # Der Schalter steht hier als **Notausgang**: Sollte die Anmeldung die Sicherungsstufe
+    # nicht so melden, wie `dependencies._aal` sie liest, waere sonst der ganze
+    # Fachpersonenbereich gesperrt. Eine Umgebungsvariable ist in dem Moment schneller als
+    # ein Deploy.
+    professional_mfa_required: bool = True
+
     # ── Auth / Sicherheit ──────────────────────────────────────────────
     secret_key: str = _INSECURE_KEY
     # Feldverschlüsselung sensibler Freitexte (Art. 32). Fernet-Key (urlsafe-base64).

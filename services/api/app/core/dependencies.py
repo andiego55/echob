@@ -2,6 +2,9 @@
 FastAPI Dependencies für EchoB.
 Werden per `Depends()` in Routen injiziert.
 """
+import base64
+import json
+
 import asyncpg
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -81,7 +84,53 @@ async def get_current_user(
         "user_id": user.id,
         "email":   user.email,
         "role":    user.role,
+        # Fuer das Zwei-Faktor-Tor. Beide Angaben kommen aus derselben, eben geprueften
+        # Anmeldung: ob ueberhaupt ein zweiter Faktor eingerichtet ist (aus dem
+        # Nutzerobjekt) und ob DIESE Sitzung ihn benutzt hat (aus dem Token).
+        "mfa_eingerichtet": _hat_bestaetigten_faktor(user),
+        "aal": _aal(credentials.credentials),
     }
+
+
+# ── Zwei-Faktor-Anmeldung ────────────────────────────────────────────────────
+
+def _hat_bestaetigten_faktor(user) -> bool:
+    """Hat diese Person einen zweiten Faktor eingerichtet UND bestaetigt?
+
+    Ein angefangener, nicht bestaetigter Faktor zaehlt nicht: Wer die Einrichtung
+    abbricht, hat keinen zweiten Faktor — und duerfte sonst ohne einen hinein.
+    """
+    return any(
+        getattr(f, "status", None) == "verified"
+        for f in (getattr(user, "factors", None) or [])
+    )
+
+
+def _aal(token: str) -> str:
+    """Die Sicherungsstufe DIESER Sitzung, aus dem Token.
+
+    **Warum hier ohne Signaturpruefung gelesen wird.** Der Aufrufer hat den Token eine
+    Zeile zuvor von Supabase pruefen lassen; waere er gefaelscht, waeren wir nicht hier.
+    Es wird also kein Vertrauen hinzugefuegt, sondern eine Angabe aus einem bereits
+    bewiesenen Token entnommen. Eine zweite, eigene Signaturpruefung braeuchte das
+    JWT-Geheimnis in dieser Anwendung — ein Geheimnis mehr, ohne einen Gewinn.
+
+    Fehlt die Angabe, gilt die niedrigste Stufe. Das Tor faellt damit **zu**, nicht auf.
+    """
+    try:
+        nutzlast = token.split(".")[1]
+        nutzlast += "=" * (-len(nutzlast) % 4)
+        daten = json.loads(base64.urlsafe_b64decode(nutzlast))
+    except Exception:  # noqa: BLE001 - ein unlesbarer Token ist kein zweiter Faktor
+        return "aal1"
+    stufe = daten.get("aal")
+    if stufe:
+        return str(stufe)
+    # Manche Fassungen fuehren die Stufe nicht, aber die benutzten Verfahren.
+    for eintrag in daten.get("amr") or []:
+        if isinstance(eintrag, dict) and eintrag.get("method") in ("totp", "mfa"):
+            return "aal2"
+    return "aal1"
 
 
 async def get_optional_user(
@@ -116,7 +165,7 @@ def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
     return current_user
 
 
-async def get_current_professional(
+async def get_current_professional_vor_mfa(
     current_user: dict = Depends(get_current_user),
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
@@ -151,6 +200,51 @@ async def get_current_professional(
         "org_id": org["org_id"], "org_role": org["role"],
         "zustimmungen": zustimmungen,
     }
+
+
+#: Fehlercodes, die die Oberflaeche kennt. Zwei, weil die Antwort darauf verschieden ist:
+#: einrichten oder bestaetigen.
+MFA_EINRICHTEN = "MFA_EINRICHTEN"
+MFA_BESTAETIGEN = "MFA_BESTAETIGEN"
+
+
+async def get_current_professional(
+    current: dict = Depends(get_current_professional_vor_mfa),
+) -> dict:
+    """Eine Fachperson **mit** zweitem Faktor — das Tor vor dem Fachpersonenbereich.
+
+    **Warum hier und nicht an jedem Endpunkt.** Ein Fachpersonenkonto liest die Fallakten
+    mehrerer fremder Patient:innen. Mit der ersten Unterschrift unter den
+    Auftragsverarbeitungsvertrag werden die technischen Massnahmen aus Anlage 1
+    **vertraglich zugesagt**, und ein zweiter Faktor ist die erste, nach der eine
+    Aufsichtsbehoerde fragt. Haenge die Pruefung an den einzelnen Endpunkten, haenge sie
+    daran, dass niemand einen davon vergisst — in diesem Projekt schon einmal passiert
+    (vgl. das Freigabe-Element, das monatelang unsichtbar blieb).
+
+    **Zwei Stufen, zwei Antworten.** Wer keinen Faktor eingerichtet hat, soll ihn
+    einrichten; wer einen hat, aber diese Sitzung nicht bestaetigt hat, soll bestaetigen.
+    Ein gemeinsamer Fehlercode schickte die Haelfte an die falsche Stelle.
+
+    **Die eine Ausnahme ist ``/professional/me``.** Dieser Endpunkt benutzt bewusst
+    ``get_current_professional_vor_mfa``: Er ist der, dessen Aufgabe es ist, der
+    Oberflaeche zu sagen, in welchem Zustand sie ist. Waere er mitgesperrt, koennte
+    niemand zur Einrichtung gelangen — ein Tor, das den Weg zu seinem eigenen Schluessel
+    versperrt.
+
+    **Der Notausgang.** ``professional_mfa_required=false`` schaltet die Pruefung ab. Das
+    ist fuer den Fall, dass die Anmeldung die Stufe nicht so meldet, wie wir sie hier
+    lesen — besser ein Schalter als eine ausgesperrte Praxis am Freitagabend.
+    """
+    from app.core.config import settings
+    if not settings.professional_mfa_required:
+        return current
+    if not current.get("mfa_eingerichtet"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=MFA_EINRICHTEN)
+    if current.get("aal") != "aal2":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=MFA_BESTAETIGEN)
+    return current
 
 
 async def require_schweigepflicht_hinweis(

@@ -4,6 +4,7 @@
  */
 import { NavLink, useNavigate } from 'react-router-dom'
 import AvvBanner from '@/components/professional/AvvBanner'
+import MfaGate from '@/components/professional/MfaGate'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
 import { professionalApi } from '@/api/professional'
@@ -15,6 +16,10 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const { data: postfach } = useQuery({ queryKey: ['prof-postfach'], queryFn: professionalApi.postfach })
+  // `/professional/me` ist der einzige Endpunkt des Bereichs, der VOR dem
+  // Zwei-Faktor-Tor antwortet - genau dafuer ist er da: Er sagt, in welchem Zustand
+  // wir sind. Alles andere wuerde hier 403 liefern.
+  const { data: profil } = useQuery({ queryKey: ['prof-me'], queryFn: professionalApi.me })
   const unread = (postfach?.attention ?? []).filter(a => a.unread).length
 
   const handleSignOut = async () => {
@@ -84,8 +89,23 @@ export default function ProfessionalShell({ children }: { children: React.ReactN
       <main className="flex-1">
         {/* Steht in der Schale, damit der Hinweis auf jeder Seite des Bereichs
             sichtbar ist - nicht nur dort, wo man ihn ohnehin vermutet. */}
-        <AvvBanner />
-        {children}
+        {/* Das Zwei-Faktor-Tor liegt VOR dem AVV-Hinweis und vor allem anderen:
+            Solange es zu ist, antwortet kein Endpunkt des Bereichs, und jeder
+            Hinweis darunter liefe ins Leere. Durchgesetzt wird es im Backend;
+            das hier ist der Weg dorthin, nicht der Schutz. */}
+        {profil && profil.mfa_pflicht && !(profil.mfa_eingerichtet && profil.mfa_bestaetigt) ? (
+          <MfaGate
+            eingerichtet={profil.mfa_eingerichtet}
+            bestaetigt={profil.mfa_bestaetigt}
+          >
+            {children}
+          </MfaGate>
+        ) : (
+          <>
+            <AvvBanner />
+            {children}
+          </>
+        )}
       </main>
     </div>
   )

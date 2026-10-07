@@ -58,6 +58,13 @@ class ProfessionalProfileResponse(BaseModel):
     profession_group_label: str | None = None
     unterliegt_203: bool | None = None
 
+    # Zwei-Faktor-Anmeldung: steuert das Tor vor dem Fachpersonenbereich. Dieser
+    # Endpunkt ist der einzige, der VOR der Einrichtung antwortet — er muss der
+    # Oberflaeche deshalb sagen, woran sie ist.
+    mfa_eingerichtet: bool = False
+    mfa_bestaetigt: bool = False
+    mfa_pflicht: bool = True
+
     # Auftragsverarbeitung (Art. 28 DSGVO): steuert das AVV-Zustimmungs-Gate.
     avv_current_version: str | None = None
     avv_accepted: bool = False

@@ -965,6 +965,10 @@ export interface ProfessionalProfile {
   profession_group_label?: string | null
   unterliegt_203?: boolean | null
   avv_current_version?: string | null
+  /** Zwei-Faktor-Anmeldung: steuert das Tor vor dem Fachpersonenbereich. */
+  mfa_eingerichtet: boolean
+  mfa_bestaetigt: boolean
+  mfa_pflicht: boolean
   avv_accepted?: boolean
   avv_accepted_version?: string | null
   avv_accepted_at?: string | null
