@@ -93,7 +93,49 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 6 Widerrufsrecht">
+          <Section title="§ 6 Datenmitnahme und Anbieterwechsel">
+            <p>
+              Du kannst jederzeit alle bei uns gespeicherten Daten mitnehmen — zu einem
+              anderen Anbieter oder auf deine eigenen Geräte. Den vollständigen Export
+              startest du selbst in deinem Konto unter „Schutz“ → „Deine Daten“; du musst
+              dafür nicht kündigen, nicht fragen und keine Frist einhalten.
+            </p>
+            <p>
+              <strong>Was mitgeht:</strong> alle Texte und strukturierten Daten als eine
+              JSON-Datei — Konto- und Profilangaben, Fälle und Szenen, Echo-Gespräche,
+              Berichte, Hypothesen, Skalenwerte, Notizen, „Mein Kompass", Beiträge aus
+              einem Paarraum, Testergebnisse, Einwilligungen und Zahlungsvorgänge.
+              Verschlüsselt gespeicherte Felder entschlüsseln wir für den Export.
+            </p>
+            <p>
+              <strong>Was nicht in der JSON-Datei steckt:</strong> die erzeugten Tonspuren
+              und Bilder. Sie liegen als Binärdaten und würden die Datei unlesbar groß
+              machen. Du lädst sie stattdessen einzeln herunter — jede Podcast-Folge über
+              „Als Datei herunterladen", jedes Bild über den Download in der
+              Bildwerkstatt. Der gesprochene Text einer Folge steht zusätzlich als
+              Kapiteltext in der JSON-Datei, der Bildauftrag ebenso.
+            </p>
+            <p>
+              <strong>Fristen beim Wechsel.</strong> Du kannst den Wechsel mit einer Frist
+              von höchstens zwei Monaten verlangen. Danach unterstützen wir dich
+              30 Kalendertage lang dabei; reicht das aus technischen Gründen nicht, wird
+              dieser Zeitraum auf das Nötige verlängert, höchstens auf sieben Monate, und
+              du kannst ihn einmal selbst verlängern. Nach seinem Ablauf kannst du deine
+              Daten noch mindestens 30 weitere Tage abrufen. Erst danach löschen wir sie
+              vollständig.
+            </p>
+            <p>
+              <strong>Kosten:</strong> keine. Für den Export, den Wechsel und unsere
+              Unterstützung dabei berechnen wir nichts.
+            </p>
+            <p className="text-sm text-brand-muted">
+              Diese Rechte stehen dir nach Kapitel VI der Verordnung (EU) 2023/2854
+              (Datenverordnung) zu. Dein Recht auf Datenübertragbarkeit nach Art. 20 DSGVO
+              und dein Recht auf Löschung nach Art. 17 DSGVO bleiben davon unberührt.
+            </p>
+          </Section>
+
+          <Section title="§ 7 Widerrufsrecht">
             <p>
               Verbraucher:innen steht ein gesetzliches Widerrufsrecht zu. Einzelheiten und das
               Muster-Widerrufsformular finden sich in der{' '}
@@ -104,7 +146,7 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 7 Coaching-Leistungen">
+          <Section title="§ 8 Coaching-Leistungen">
             <p>
               Separat gebuchte Coaching-Stunden werden nach gesonderter Terminvereinbarung online
               durchgeführt. Sie ersetzen keine Psychotherapie, keine Heilbehandlung und keine
@@ -113,7 +155,7 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 8 Verfügbarkeit und Änderungen">
+          <Section title="§ 9 Verfügbarkeit und Änderungen">
             <p>
               Wir bemühen uns um eine möglichst unterbrechungsfreie Verfügbarkeit, schulden diese aber
               nicht zu 100 %. Wartungsarbeiten bleiben vorbehalten.
@@ -131,7 +173,7 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 9 Pflichten der Nutzenden">
+          <Section title="§ 10 Pflichten der Nutzenden">
             <p>
               Die Nutzenden verpflichten sich, <strong>keine Klarnamen oder identifizierenden Daten
               dritter Personen</strong> einzugeben (Pseudonyme verwenden) und die App nicht für
@@ -139,7 +181,7 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 10 Kein Ersatz für Therapie oder Notfallhilfe">
+          <Section title="§ 11 Kein Ersatz für Therapie oder Notfallhilfe">
             <p>
               EchoB ist kein Medizinprodukt und stellt keine Diagnosen. Die Inhalte sind
               Reflexionshilfen und ersetzen weder Psychotherapie noch ärztliche Behandlung noch
@@ -148,7 +190,7 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 11 Haftung">
+          <Section title="§ 12 Haftung">
             <p>
               Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei Verletzung von
               Leben, Körper und Gesundheit.
@@ -166,7 +208,7 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 12 Streitbeilegung">
+          <Section title="§ 13 Streitbeilegung">
             <p>
               Zur Teilnahme an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
               sind wir nicht verpflichtet und grundsätzlich nicht bereit (§ 36 VSBG). Bei Fragen oder
@@ -175,7 +217,7 @@ export default function AGBPage() {
             </p>
           </Section>
 
-          <Section title="§ 13 Schlussbestimmungen">
+          <Section title="§ 14 Schlussbestimmungen">
             <p>
               Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts.
               Zwingende verbraucherschützende Vorschriften des Staates des gewöhnlichen Aufenthalts der

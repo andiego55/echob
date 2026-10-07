@@ -13,7 +13,7 @@
  * Text, den ein Gericht im Zweifel streng liest. Getrennte Adressaten, getrennte
  * Dokumente.
  *
- * **Warum in § 10 keine Haftungssumme steht.** Erste Fassung begrenzte auf das
+ * **Warum in § 11 keine Haftungssumme steht.** Erste Fassung begrenzte auf das
  * Jahresentgelt, mindestens 2.500 € — nach Marktpraxis gedacht und für AGB falsch.
  * Eine summenmäßige Begrenzung ist nach § 307 BGB nur wirksam, wenn der Betrag den
  * vertragstypisch vorhersehbaren Schaden übersteigt; liegt er darunter, fällt die
@@ -153,7 +153,49 @@ export default function AGBFachpersonenPage() {
             </p>
           </Section>
 
-          <Section title="§ 6 Datenschutz: Auftragsverarbeitung und Schweigepflicht">
+          <Section title="§ 6 Datenmitnahme und Anbieterwechsel">
+            <p>
+              Die Kundin kann jederzeit alle Daten mitnehmen, die ihrem Konto zugeordnet
+              sind — zu einem anderen Anbieter oder auf eigene Systeme. Den vollständigen
+              Export startet sie selbst im Konto; sie muss dafür nicht kündigen und keine
+              Frist einhalten.
+            </p>
+            <p>
+              <strong>Was mitgeht:</strong> alle Texte und strukturierten Daten als eine
+              JSON-Datei — Konto- und Praxisangaben, die eigene Dokumentation,
+              Sitzungsnotizen, Berichte, Vorlagen, Hypothesen, Befunde, Fachpersonen-Echo
+              und Abrechnungsvorgänge. Verschlüsselt gespeicherte Felder entschlüsseln wir
+              dafür.
+            </p>
+            <p>
+              <strong>Was nicht mitgeht:</strong> die Konten und Inhalte der Klient:innen.
+              Sie gehören diesen und nicht der Kundin; die Kundin erhält nur, was ihr
+              freigegeben wurde, und nur solange die Freigabe besteht. Ebenfalls nicht in
+              der JSON-Datei: erzeugte Tonspuren und Bilder — sie liegen als Binärdaten und
+              werden einzeln heruntergeladen.
+            </p>
+            <p>
+              <strong>Fristen beim Wechsel.</strong> Die Kundin kann den Wechsel mit einer
+              Frist von höchstens zwei Monaten verlangen. Danach unterstützen wir
+              30 Kalendertage lang; reicht das aus technischen Gründen nicht, verlängert
+              sich dieser Zeitraum auf das Nötige, höchstens auf sieben Monate, und die
+              Kundin kann ihn einmal selbst verlängern. Nach seinem Ablauf bleiben die
+              Daten mindestens 30 weitere Tage abrufbar; erst danach löschen wir sie
+              vollständig.
+            </p>
+            <p>
+              <strong>Kosten:</strong> keine. Für Export, Wechsel und Unterstützung
+              berechnen wir kein Entgelt.
+            </p>
+            <p className="text-sm text-brand-muted">
+              Diese Rechte folgen aus Kapitel VI der Verordnung (EU) 2023/2854
+              (Datenverordnung). Pflichten aus dem Auftragsverarbeitungsvertrag — besonders
+              zur Rückgabe und Löschung der Daten der Klient:innen — bleiben unberührt und
+              gehen diesem Paragrafen vor.
+            </p>
+          </Section>
+
+          <Section title="§ 7 Datenschutz: Auftragsverarbeitung und Schweigepflicht">
             <p>
               Für die von Klient:innen freigegebenen Inhalte ist die Kundin{' '}
               <strong>Verantwortliche</strong> im Sinne der DSGVO; EchoB verarbeitet insoweit
@@ -178,7 +220,7 @@ export default function AGBFachpersonenPage() {
             </p>
           </Section>
 
-          <Section title="§ 7 Pflichten der Kundin">
+          <Section title="§ 8 Pflichten der Kundin">
             <p>
               Zugangsdaten sind vertraulich zu behandeln und nicht weiterzugeben; jedes
               Mitglied der Praxis nutzt ein eigenes Konto. Die Kundin gibt keine Klarnamen
@@ -191,7 +233,7 @@ export default function AGBFachpersonenPage() {
             </p>
           </Section>
 
-          <Section title="§ 8 Verfügbarkeit und Weiterentwicklung">
+          <Section title="§ 9 Verfügbarkeit und Weiterentwicklung">
             <p>
               Wir bemühen uns um eine möglichst unterbrechungsfreie Verfügbarkeit, schulden
               sie aber nicht zu 100 % und sagen keine Verfügbarkeitsquote zu. Wartung,
@@ -202,7 +244,7 @@ export default function AGBFachpersonenPage() {
             </p>
           </Section>
 
-          <Section title="§ 9 Kein Medizinprodukt">
+          <Section title="§ 10 Kein Medizinprodukt">
             <p>
               EchoB ist <strong>kein Medizinprodukt</strong> und stellt keine Diagnosen. Die
               Werkzeuge dienen der Strukturierung, Dokumentation und Vorbereitung; die
@@ -218,7 +260,7 @@ export default function AGBFachpersonenPage() {
             </p>
           </Section>
 
-          <Section title="§ 10 Haftung">
+          <Section title="§ 11 Haftung">
             <p>
               Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei
               Verletzung von Leben, Körper und Gesundheit.
@@ -242,7 +284,7 @@ export default function AGBFachpersonenPage() {
             </p>
           </Section>
 
-          <Section title="§ 11 Schlussbestimmungen">
+          <Section title="§ 12 Schlussbestimmungen">
             <p>
               Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des
               UN-Kaufrechts. Ausschließlicher Gerichtsstand für alle Streitigkeiten aus

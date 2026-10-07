@@ -1,4 +1,5 @@
 import PageLayout from '@/components/layout/PageLayout'
+import { ANBIETER } from '@/lib/anbieter'
 
 export default function ImpressumPage() {
   return (
@@ -20,20 +21,37 @@ export default function ImpressumPage() {
           <div>
             <h2 className="text-lg font-bold text-navy mb-3">Angaben gemäß § 5 DDG</h2>
             <p>
-              Andreas Wygrabek<br />
-              Diemelweg 8A<br />
-              34317 Habichtswald<br />
-              Deutschland
+              {ANBIETER.name}<br />
+              {ANBIETER.strasse}<br />
+              {ANBIETER.plz} {ANBIETER.ort}<br />
+              {ANBIETER.land}
             </p>
+            {/* § 5 Abs. 1 Nr. 6 DDG: Pflicht, sobald eine erteilt ist. Die Steuernummer
+                gehoert hier ausdruecklich NICHT hin. */}
+            {ANBIETER.ustIdNr && (
+              <p className="mt-3">
+                Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG:<br />
+                {ANBIETER.ustIdNr}
+              </p>
+            )}
           </div>
 
           <div>
             <h2 className="text-lg font-bold text-navy mb-3">Kontakt</h2>
             <p>
               E-Mail:{' '}
-              <a href="mailto:kontakt@echo-b.de" className="text-accent hover:underline">
-                kontakt@echo-b.de
+              <a
+                href={`mailto:${ANBIETER.email}`}
+                className="text-accent hover:underline"
+              >
+                {ANBIETER.email}
               </a>
+              {ANBIETER.telefon && (
+                <>
+                  <br />
+                  Telefon: {ANBIETER.telefon}
+                </>
+              )}
             </p>
           </div>
 
@@ -42,9 +60,9 @@ export default function ImpressumPage() {
               Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV
             </h2>
             <p>
-              Andreas Wygrabek<br />
-              Diemelweg 8A<br />
-              34317 Habichtswald
+              {ANBIETER.name}<br />
+              {ANBIETER.strasse}<br />
+              {ANBIETER.plz} {ANBIETER.ort}
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 import PageLayout from '@/components/layout/PageLayout'
+import { ANBIETER, ANBIETER_ZEILE } from '@/lib/anbieter'
 import { RECHTSSTAND } from '@/lib/rechtsstand'
-import { Link } from 'react-router-dom'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -38,8 +38,9 @@ export default function WiderrufPage() {
               widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsschlusses.
             </p>
             <p>
-              Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Anbieter, Anschrift siehe{' '}
-              <Link to="/impressum" className="text-accent hover:underline">Impressum</Link>) mittels
+              Um Ihr Widerrufsrecht auszuüben, müssen Sie uns ({ANBIETER.name},{' '}
+              {ANBIETER.strasse}, {ANBIETER.plz} {ANBIETER.ort}, {ANBIETER.land}, E-Mail:{' '}
+              {ANBIETER.email}) mittels
               einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder eine E-Mail)
               über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das
               untenstehende Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.
@@ -84,7 +85,7 @@ export default function WiderrufPage() {
               Sie es zurück.)
             </p>
             <div className="rounded-brand border border-brand-border bg-white px-5 py-4 text-sm text-brand-text space-y-2">
-              <p>An: [Anbieter – Name und Anschrift siehe Impressum], E-Mail: [siehe Impressum]</p>
+              <p>An: {ANBIETER_ZEILE}</p>
               <p>
                 Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den
                 Kauf der folgenden Leistung (*):

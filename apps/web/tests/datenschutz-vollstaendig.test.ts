@@ -98,3 +98,76 @@ describe('Datenschutzerklärung deckt die Verarbeitungen ab', () => {
     expect(text).toContain('Erzeugte Tonspuren und Bilder')
   })
 })
+
+/**
+ * Fehlerberichte an Sentry — die Verarbeitung, die heute nicht stattfindet.
+ *
+ * **Warum das hier steht, obwohl nichts passiert.** `@sentry/react` liegt im Quellbaum
+ * und initialisiert sich in `main.tsx`, sobald `VITE_SENTRY_DSN` gesetzt ist. Im Build
+ * steht keiner, also fliesst heute nichts — in der Datenschutzerklärung steht Sentry
+ * deshalb zu Recht nicht. Aber es ist **eine Umgebungsvariable** bis zu einem
+ * Drittlandtransfer an einen US-Anbieter, der in keiner Erklärung und in keinem
+ * Auftragsverarbeitungsvertrag vorkommt. Wer die Variable setzt, denkt an das Monitoring,
+ * nicht an Art. 13 und Art. 44 DSGVO.
+ *
+ * **Warum der grosse Wächter oben das nicht fängt.** Dessen Bedingung ist „Modul liegt im
+ * Quellbaum" — und der Beleg ist dort absichtlich das Modul auf dem SERVER. Sentry ist
+ * Frontend, und die Verarbeitung hängt nicht am Vorhandensein der Datei, sondern an der
+ * Konfiguration. Dieselbe Prüfung hätte hier also ewig rot gestanden, ohne dass etwas
+ * passiert. Die Bedingung muss die Konfiguration sein.
+ *
+ * **Was dieser Wächter NICHT kann:** Er sieht nur eingecheckte Dateien. Eine Variable, die
+ * jemand direkt in der Cloudflare-Oberfläche setzt, erreicht er nicht. Dafür sichert er
+ * die zweite Hälfte: dass die Initialisierung überhaupt an der Bedingung hängt und keine
+ * personenbezogenen Daten mitschickt. Vor dem Scharfschalten gehören ausserdem ein
+ * Auftragsverarbeitungsvertrag und ein Abschnitt in der Erklärung dazu — das kann ein
+ * Test nicht prüfen, weil `__private/dpas` nicht im Repository liegt.
+ */
+describe('Fehlerberichte (Sentry)', () => {
+  const haupt = (): string =>
+    readFileSync(join(WEB, 'src', 'main.tsx'), 'utf-8')
+
+  /** Eingecheckte Stellen, an denen ein DSN stehen könnte. */
+  const KONFIGURATION = [
+    join(WEB, '.env'),
+    join(WEB, '.env.production'),
+    join(WEB, '.env.local'),
+    join(WURZEL, '.github', 'workflows', 'ci.yml'),
+    join(WURZEL, 'apps', 'web', 'wrangler.toml'),
+  ]
+
+  const dsnGesetzt = (): string | null => {
+    for (const pfad of KONFIGURATION) {
+      if (!existsSync(pfad)) continue
+      // Ein leerer Wert zählt nicht: `VITE_SENTRY_DSN=` schaltet nichts scharf.
+      const treffer = readFileSync(pfad, 'utf-8')
+        .match(/VITE_SENTRY_DSN\s*[:=]\s*["']?(\S+)/)
+      if (treffer && treffer[1] && !/^["']?$/.test(treffer[1])) return pfad
+    }
+    return null
+  }
+
+  it('ist ein DSN eingecheckt, kennt die Erklärung auch Sentry', () => {
+    const pfad = dsnGesetzt()
+    if (!pfad) return  // Nichts scharf, nichts zu erklären.
+    expect(erklaerung(), `DSN in ${pfad}, aber Sentry fehlt in der Erklärung`)
+      .toContain('Sentry')
+  })
+
+  it('die Initialisierung hängt an der Bedingung', () => {
+    // Fiele die Bedingung weg, liefe Sentry mit dem eingebauten Standard-DSN-Verhalten
+    // los, sobald irgendwo einer auftaucht — und zwar ohne dass jemand es entscheidet.
+    const q = haupt()
+    expect(q).toContain('VITE_SENTRY_DSN')
+    expect(q).toMatch(/if\s*\(\s*sentryDsn\s*\)/)
+  })
+
+  it('schickt keine personenbezogenen Daten mit', () => {
+    // `sendDefaultPii: true` nimmt IP-Adresse, Cookies und Nutzerkennung mit. Das ist eine
+    // Zeile, und sie verwandelt ein technisches Protokoll in eine Verarbeitung
+    // personenbezogener Daten.
+    const q = haupt()
+    expect(q).toContain('sendDefaultPii: false')
+    expect(q).toContain('delete event.request.data')
+  })
+})
