@@ -29,6 +29,10 @@ const SEITEN: ReadonlyArray<[keyof typeof RECHTSSTAND, string]> = [
   ['datenschutz', 'DatenschutzPage.tsx'],
   ['agb', 'AGBPage.tsx'],
   ['widerruf', 'WiderrufPage.tsx'],
+  // Nachgetragen am 07.10.2026: Die Seite gab es seit dem 04.10. und stand NICHT in
+  // dieser Liste. Der Wächter sah drei von vier Rechtstexten — ein neues Dokument fällt
+  // hier nicht von selbst auf, es muss eingetragen werden.
+  ['agbFachpersonen', 'AGBFachpersonenPage.tsx'],
 ]
 
 function quelle(datei: string): string {

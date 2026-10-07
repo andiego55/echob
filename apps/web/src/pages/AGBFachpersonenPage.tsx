@@ -13,9 +13,24 @@
  * Text, den ein Gericht im Zweifel streng liest. Getrennte Adressaten, getrennte
  * Dokumente.
  *
- * **Was hier NICHT entschieden wird.** An drei Stellen steht eine Entscheidung aus, die
- * nicht meine ist; sie sind im Text sichtbar markiert statt stillschweigend gefüllt:
- * die Umsatzsteuer (hängt am Status), die Haftungshöhe und der Gerichtsstand.
+ * **Warum in § 10 keine Haftungssumme steht.** Erste Fassung begrenzte auf das
+ * Jahresentgelt, mindestens 2.500 € — nach Marktpraxis gedacht und für AGB falsch.
+ * Eine summenmäßige Begrenzung ist nach § 307 BGB nur wirksam, wenn der Betrag den
+ * vertragstypisch vorhersehbaren Schaden übersteigt; liegt er darunter, fällt die
+ * Klausel **ganz** weg (keine geltungserhaltende Reduktion, § 306 Abs. 2 BGB) und es
+ * gilt § 276 BGB: unbeschränkte Haftung. Eine Zahl kauft Berechenbarkeit und riskiert
+ * dafür die Begrenzung selbst. Die abstrakte Formel ohne Summe ist vom BGH gebilligt
+ * (VIII ZR 337/11 vom 18.07.2012) — und zwar gegenüber einem Verbraucher, also am
+ * strengeren Maßstab. Eine Obergrenze gehört in einen ausgehandelten Einzelvertrag
+ * (§ 305 Abs. 1 S. 3 BGB) und sollte an der Versicherungsdeckung hängen, nicht hier.
+ *
+ * **Und „wesentliche Vertragspflicht" wird erklärt, nicht benutzt.** Der Begriff steht
+ * nicht im Gesetz; ohne Erläuterung verstößt er gegen das Transparenzgebot (§ 307
+ * Abs. 1 S. 2 BGB) — OLG Celle 11 U 78/08 vom 30.10.2008, und das gilt auch gegenüber
+ * Unternehmen. Derselbe Mangel lag in den Verbraucher-AGB und ist dort mitbehoben.
+ *
+ * **Was hier NICHT entschieden wird.** Die Umsatzsteuer hängt am Status; der
+ * Gerichtsstand bindet nur Kaufleute und damit nicht die typische Praxis.
  */
 import { Link } from 'react-router-dom'
 
@@ -206,11 +221,19 @@ export default function AGBFachpersonenPage() {
           <Section title="§ 10 Haftung">
             <p>
               Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei
-              Verletzung von Leben, Körper und Gesundheit. Bei einfacher Fahrlässigkeit
-              haften wir nur bei Verletzung wesentlicher Vertragspflichten und der Höhe nach
-              begrenzt auf den vertragstypisch vorhersehbaren Schaden, höchstens jedoch auf
-              das in den vorangegangenen zwölf Monaten gezahlte Entgelt, mindestens aber
-              2.500 €. Im Übrigen ist die Haftung ausgeschlossen.
+              Verletzung von Leben, Körper und Gesundheit.
+            </p>
+            <p>
+              Bei einfacher Fahrlässigkeit haften wir nur bei der Verletzung einer
+              wesentlichen Vertragspflicht. Wesentlich ist eine Pflicht, deren Erfüllung die
+              ordnungsgemäße Durchführung dieses Vertrags überhaupt erst ermöglicht und auf
+              deren Einhaltung die Kundin regelmäßig vertrauen darf. In diesem Fall ist die
+              Haftung auf den bei Vertragsschluss vorhersehbaren, vertragstypischen Schaden
+              begrenzt.
+            </p>
+            <p>
+              Im Übrigen ist die Haftung ausgeschlossen. Die Haftung nach dem
+              Produkthaftungsgesetz bleibt unberührt.
             </p>
             <p>
               Unberührt bleiben Ansprüche betroffener Personen nach Art. 82 DSGVO: Sie

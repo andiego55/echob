@@ -151,9 +151,18 @@ export default function AGBPage() {
           <Section title="§ 11 Haftung">
             <p>
               Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei Verletzung von
-              Leben, Körper und Gesundheit. Bei einfacher Fahrlässigkeit haften wir nur bei Verletzung
-              wesentlicher Vertragspflichten (Kardinalpflichten) und der Höhe nach begrenzt auf den
-              vertragstypisch vorhersehbaren Schaden. Im Übrigen ist die Haftung ausgeschlossen.
+              Leben, Körper und Gesundheit.
+            </p>
+            <p>
+              Bei einfacher Fahrlässigkeit haften wir nur bei der Verletzung einer wesentlichen
+              Vertragspflicht. Wesentlich ist eine Pflicht, deren Erfüllung die ordnungsgemäße
+              Durchführung dieses Vertrags überhaupt erst ermöglicht und auf deren Einhaltung du
+              regelmäßig vertrauen darfst. In diesem Fall ist die Haftung auf den bei Vertragsschluss
+              vorhersehbaren, vertragstypischen Schaden begrenzt.
+            </p>
+            <p>
+              Im Übrigen ist die Haftung ausgeschlossen. Die Haftung nach dem Produkthaftungsgesetz
+              bleibt unberührt.
             </p>
           </Section>
 
