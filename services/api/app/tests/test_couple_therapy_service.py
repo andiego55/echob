@@ -2389,3 +2389,67 @@ async def test_overview_carries_no_content(db):
     assert ueberblick["elements"] == ["summaries"]
     assert "GEHEIMES_THEMA" not in str(ueberblick)
     assert topic is not None
+
+# ── Was zwischen den Partner:innen uebertritt (07.10./09.10.2026) ────────────
+#
+# Beide Tests hier sind aus Mutationsproben entstanden, die GRUEN blieben. Die
+# Isolation war an diesen zwei Stellen richtig gebaut und unbewacht — und das ist
+# derselbe Zustand, in dem jeder stille Rueckfall beginnt.
+
+
+async def test_eigener_fall_nur_mit_eigentuemerschaft(db):
+    """Die ZWEITE Sperre im Fall-Laden, einzeln geprueft.
+
+    ``build_private_context`` holt den Fall ueber ``own_case_id``; dass dabei der
+    richtige herauskommt, prueft ``test_private_echo_sees_only_own_case``. Darunter
+    liegt eine zweite Sperre: ``load_own_case_context`` filtert zusaetzlich auf
+    ``user_id``. Die Mutationsprobe „``AND user_id = $2`` entfernt" blieb gruen —
+    die erste Sperre allein trug den Test.
+
+    **Zwei Schloesser, von denen nur eines geprueft wird, sind eineinhalb.** Faellt
+    die Herleitung der Fall-Kennung jemals falsch aus, ist dieser Filter das Einzige,
+    was den Fall der anderen Person aus dem Prompt haelt.
+    """
+    user_a, case_a, user_b, case_b, _ = await _linked_pair(db)
+
+    eigen = await cps.load_own_case_context(db, case_a, user_a)
+    assert "DESC_AAA" in eigen
+
+    # Dieselbe Funktion, fremde Fall-Kennung: muss leer bleiben, nicht etwa laden.
+    fremd = await cps.load_own_case_context(db, case_b, user_a)
+    assert fremd == "", "Fall der anderen Person wurde geladen"
+    assert "DESC_BBB" not in fremd
+    assert "CONCERN_BBB" not in fremd
+
+    # Und in die Gegenrichtung.
+    assert await cps.load_own_case_context(db, case_a, user_b) == ""
+
+
+async def test_partnerprofil_gibt_nur_name_und_avatar_heraus(db):
+    """Was von der einen Person bei der anderen ankommt — abschliessend aufgezaehlt.
+
+    ``user_profiles`` enthaelt ``safety_status`` (den Krisenstand), ``summary`` (Echos
+    Bild der Person), ``echo_custom_steering`` und die Stripe-Kennungen. Die Funktion
+    baut ihr Rueckgabe-Dict heute aus genau zwei Feldern und ist damit richtig — aber
+    die Mutationsprobe „``return dict(row)``" blieb gruen. Ein Refactoring in diese
+    Richtung sieht harmlos aus und gaebe der anderen Person den Krisenstand.
+
+    Deshalb wird hier die MENGE der Schluessel festgenagelt, nicht ihr Inhalt: Ein neues
+    Feld muss eine Entscheidung sein, kein Nebeneffekt.
+    """
+    user_a, _, user_b, _, couple_id = await _linked_pair(db)
+    link = await cts.require_couple_member(db, couple_id, user_a)
+
+    profil = await cts.load_partner_profile(db, link, user_a)
+    assert set(profil) == {"display_name", "avatar"}, (
+        f"Es treten mehr Felder ueber als vorgesehen: {sorted(set(profil))}")
+    assert profil["display_name"] == "Rio"
+
+    # Die heikelsten Spalten namentlich — damit die Fehlermeldung sagt, worum es geht.
+    for verboten in ("safety_status", "summary", "echo_custom_steering",
+                     "stripe_customer_id", "plan", "user_id"):
+        assert verboten not in profil, f"{verboten} tritt zur anderen Person ueber"
+
+    # Der Anzeigename ist der einzige Wert, der bewusst hinuebergeht.
+    assert await cts.load_partner_display_name(db, link, user_a) == "Rio"
+    assert await cts.load_partner_display_name(db, link, user_b) == "Alex"
