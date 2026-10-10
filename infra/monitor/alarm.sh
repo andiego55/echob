@@ -31,14 +31,6 @@ BETREFF="${1:?alarm.sh \"Betreff\" \"Text\"}"
 TEXT="${2:-}"
 
 ENV_FILE="${ECHOB_ENV_FILE:-/opt/echob/.env.docker}"
-# Kommt aus der .env.docker. Bewusst OHNE Vorgabewert: Das Repo ist oeffentlich, und
-# eine private Adresse darin waere ein Geschenk an jeden Adress-Sammler. Fehlt sie,
-# wird das laut ins Protokoll geschrieben statt still nichts zu tun.
-# MEHRERE ADRESSEN, mit Komma getrennt. Das ist die halbe Loesung fuer C-14 (Bus-Faktor):
-# Ein Alarm, der nur eine Person erreicht, nuetzt genau dann nichts, wenn diese Person der
-# Grund fuer den Ausfall ist. Eine Adresse bleibt weiter gueltig - es aendert sich fuer
-# bestehende Installationen nichts.
-EMPFAENGER="${ALARM_TO_EMAIL:-}"
 # Neben die uebrigen echob-Logs. Frueher zeigte das auf /opt/echob/backups - ein
 # Verzeichnis, das seinen Zweck verlor, als klar wurde, dass die Backups nach
 # /var/backups/echob gehen.
@@ -58,6 +50,24 @@ fi
 
 SCHLUESSEL="${RESEND_API_KEY:-}"
 ABSENDER="${ALARM_FROM_EMAIL:-${LEAD_FROM_EMAIL:-leads@echo-b.de}}"
+# Kommt aus der .env.docker. Bewusst OHNE Vorgabewert: Das Repo ist oeffentlich, und
+# eine private Adresse darin waere ein Geschenk an jeden Adress-Sammler. Fehlt sie,
+# wird das laut ins Protokoll geschrieben statt still nichts zu tun.
+# MEHRERE ADRESSEN, mit Komma getrennt. Das ist die halbe Loesung fuer C-14 (Bus-Faktor):
+# Ein Alarm, der nur eine Person erreicht, nuetzt genau dann nichts, wenn diese Person der
+# Grund fuer den Ausfall ist. Eine Adresse bleibt weiter gueltig - es aendert sich fuer
+# bestehende Installationen nichts.
+#
+# **DIESE ZEILE STAND BIS ZUM 10.10.2026 ELF ZEILEN WEITER OBEN** - also VOR dem Einlesen
+# der Umgebungsdatei. Damit war der Empfaenger immer leer, und jeder Alarm endete mit
+# "KEIN ALARM_TO_EMAIL - niemand wird benachrichtigt". Zugestellt wurde in der ganzen
+# Laufzeit des Waechters: nichts. Schluessel und Absender standen danach und
+# funktionierten, deshalb sah die Datei beim Lesen vollstaendig aus.
+#
+# Die Lehre steht schon im Kopf dieser Datei: "Eine Ueberwachung, die nur protokolliert,
+# ist keine." Sie galt fuer die Ueberwachung selbst. Wer hier etwas aendert, prueft mit
+# `probe-zustellung.sh`, ob wirklich eine Mail ankommt - nicht, ob das Skript durchlaeuft.
+EMPFAENGER="${ALARM_TO_EMAIL:-}"
 
 # Immer zuerst ins Log. Auch wenn der Versand scheitert, ist die Meldung dann festgehalten.
 notiz "$BETREFF — ${TEXT//$'\n'/ }"
