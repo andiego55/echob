@@ -45,7 +45,10 @@ export default function AppShell({ children }: Props) {
               Ausgang: Man kam ohne Abmelden nicht zurück zu Wissen, Szenen oder Glossar. */}
           <EchoBLogo />
 
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Ab 1024 px, nicht ab 768: Sechs Punkte, Logo und die rechte Gruppe brauchen
+              gemessen rund 940 px. Ab 768 lief die Leiste ueber, und die ganze Seite
+              liess sich seitwaerts schieben. Darunter traegt die untere Leiste. */}
+          <nav className="hidden lg:flex items-center gap-1">
             {[
               { to: '/app',          label: 'Meine Fälle',        end: true },
               { to: '/app/inbox',    label: 'Postfach',            end: false },
@@ -92,7 +95,9 @@ export default function AppShell({ children }: Props) {
             >
               <GearIcon />
             </NavLink>
-            <span className="hidden sm:block text-xs text-white/40">{user?.email}</span>
+            {/* Erst ab 1280 px und gekuerzt: Die Adresse allein brauchte 155 px - genau
+                die, die zwischen 1024 und 1280 fehlten. */}
+            <span className="hidden xl:block max-w-[14rem] truncate text-xs text-white/40" title={user?.email ?? undefined}>{user?.email}</span>
             <button
               onClick={handleSignOut}
               className="hidden text-xs text-white/50 transition-colors hover:text-white sm:block"
@@ -104,7 +109,7 @@ export default function AppShell({ children }: Props) {
       </header>
 
       {/* Inhalt. Unten Platz fuer die Leiste am Telefon, damit sie das Letzte nicht deckt. */}
-      <main className="flex-1 pb-[76px] md:pb-0">
+      <main className="flex-1 pb-[76px] lg:pb-0">
         {children}
       </main>
 

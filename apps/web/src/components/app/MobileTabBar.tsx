@@ -18,6 +18,11 @@
  *
  * Gemessen bei 375 px: fünf Zellen à 75 px, die breiteste Beschriftung („Kompass") 42 px.
  * Ein sechster Platz ginge nicht mehr aus.
+ *
+ * **Bis 1024 px, nicht bis 768.** Die Kopfzeile mit sechs Punkten braucht gemessen rund
+ * 940 px. Zwischen 768 und 1024 lief sie über und schob die ganze Seite seitwärts; dort
+ * trägt jetzt diese Leiste. Die Grenze steht in `AppShell` ein zweites Mal (Kopfzeile und
+ * Abstand unten) — wer sie ändert, ändert beide.
  */
 import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
@@ -79,7 +84,7 @@ export default function MobileTabBar({ inboxUnread = 0 }: { inboxUnread?: number
     <>
       {mehrOffen && (
         <div
-          className="fixed inset-0 z-40 bg-navy/40 md:hidden"
+          className="fixed inset-0 z-40 bg-navy/40 lg:hidden"
           onClick={() => setMehrOffen(false)}
           aria-hidden="true"
         />
@@ -87,7 +92,7 @@ export default function MobileTabBar({ inboxUnread = 0 }: { inboxUnread?: number
 
       {mehrOffen && (
         <div
-          className="fixed inset-x-0 bottom-[60px] z-40 border-t border-brand-border bg-white p-2 shadow-brand-lg md:hidden"
+          className="fixed inset-x-0 bottom-[60px] z-40 border-t border-brand-border bg-white p-2 shadow-brand-lg lg:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Weitere Bereiche"
@@ -133,7 +138,7 @@ export default function MobileTabBar({ inboxUnread = 0 }: { inboxUnread?: number
       {/* `pb-[env(safe-area-inset-bottom)]` hält die Leiste über der Wischleiste des
           iPhones — sonst liegt der unterste Millimeter unter der Systemgeste. */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-brand-border bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_12px_rgba(15,30,46,0.06)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-brand-border bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_12px_rgba(15,30,46,0.06)] lg:hidden"
         aria-label="Hauptbereiche"
       >
         <div className="flex">
