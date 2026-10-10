@@ -312,7 +312,10 @@ export function BelegVerweis({ beleg, children }: { beleg: Beleg; children: Reac
         className="rounded-[5px] border-b border-dotted border-accent/60 bg-accent/[0.07] px-1 py-px font-medium text-accent no-underline transition-colors hover:bg-accent/[0.14] hover:text-accent-hover"
       >
         {children}
-        <span className="sr-only"> — {ziel.titel}</span>
+        {/* Nur bei Nummern: „Szene 12" sagt einem Screenreader nichts, der Titel schon.
+            Ein Name steht bereits im Text - angehängt hieß es „Themendialog „Schuld“ —
+            Themendialog „Schuld“" (gefunden beim Browsertest). */}
+        {'nr' in beleg && <span className="sr-only"> — {ziel.titel}</span>}
       </Link>
 
       {offen && ort && createPortal(
