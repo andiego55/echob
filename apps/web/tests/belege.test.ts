@@ -6,7 +6,10 @@
  * gierig greift und mitten im Fließtext Wörter verlinkt, die keine Belege sind.
  */
 import { describe, expect, it } from 'vitest'
-import { belegAusHref, belegUrlTransform, belegeVerlinken } from '../src/lib/belege'
+import { belegAusHref, belegUrlTransform, belegeVerlinken, namePasst } from '../src/lib/belege'
+import ReactMarkdown from 'react-markdown'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { createElement } from 'react'
 import { defaultUrlTransform } from 'react-markdown'
 
 describe('belegeVerlinken', () => {
@@ -85,6 +88,85 @@ describe('belegAusHref', () => {
     const raus = belegeVerlinken('Szene 7')
     const href = raus.match(/\(([^)]+)\)/)![1]
     expect(belegAusHref(href)).toEqual({ art: 'szene', nr: 7 })
+  })
+})
+
+describe('Belege mit Namen', () => {
+  it('verlinkt einen Themendialog', () => {
+    expect(belegeVerlinken('Im Themendialog „Schuld“ hast du gesagt …'))
+      .toBe('Im [Themendialog „Schuld“](echob:themendialog/Schuld) hast du gesagt …')
+  })
+
+  it('verlinkt eine Hypothese — auch mit geraden Anführungszeichen', () => {
+    expect(belegeVerlinken('Die Hypothese "Bindungsmuster" trägt hier.'))
+      .toBe('Die [Hypothese "Bindungsmuster"](echob:hypothese/Bindungsmuster) trägt hier.')
+  })
+
+  it('verlinkt einen Selbsttest', () => {
+    expect(belegeVerlinken('Dein Selbsttest „Bindungsstil“ sagt etwas anderes.'))
+      .toBe('Dein [Selbsttest „Bindungsstil“](echob:selbsttest/Bindungsstil) sagt etwas anderes.')
+  })
+
+  it('verlinkt das Gefühlsbild', () => {
+    expect(belegeVerlinken('Dein Gefühlsbild sagt etwas anderes.'))
+      .toBe('Dein [Gefühlsbild](echob:gefuehlsbild) sagt etwas anderes.')
+  })
+
+  it('greift ohne Anführung nicht — „die Hypothese, dass" ist ein Gedanke', () => {
+    const text = 'Die Hypothese, dass er sich zurückzieht, bleibt offen. Ein Themendialog wäre gut.'
+    expect(belegeVerlinken(text)).toBe(text)
+  })
+
+  it('greift nicht in Ableitungen', () => {
+    const text = 'Gefühlsbilder und des Gefühlsbildes'
+    expect(belegeVerlinken(text)).toBe(text)
+  })
+
+  it('übersteht Klammern im Namen', () => {
+    // Eine rohe, unausgeglichene Klammer im Ziel beendet den Markdown-Link mitten im
+    // Namen (ausgeglichene vertraegt CommonMark - deshalb steht hier die gekuerzte Form,
+    // die das Modell tatsaechlich schreibt).
+    const raus = belegeVerlinken('Hypothese „Persönlichkeitsstruktur (Cluster-B“')
+    const html = renderToStaticMarkup(createElement(ReactMarkdown, {
+      urlTransform: (u: string) => belegUrlTransform(u, defaultUrlTransform),
+    }, raus))
+    const href = html.match(/href="([^"]+)"/)![1]
+    expect(belegAusHref(href)).toEqual({
+      art: 'hypothese', name: 'Persönlichkeitsstruktur (Cluster-B',
+    })
+  })
+
+  it('belegAusHref passt zu dem, was belegeVerlinken erzeugt', () => {
+    for (const [text, erwartet] of [
+      ['Themendialog „Über die Fallperson“', { art: 'themendialog', name: 'Über die Fallperson' }],
+      ['Hypothese „Prägungen & Trauma“', { art: 'hypothese', name: 'Prägungen & Trauma' }],
+      ['Gefühlsbild', { art: 'gefuehlsbild' }],
+    ] as const) {
+      const href = belegeVerlinken(text).match(/\]\(([^)]+)\)$/)![1]
+      expect(belegAusHref(href)).toEqual(erwartet)
+    }
+  })
+
+  it('verträgt eine kaputte Kodierung', () => {
+    expect(belegAusHref('echob:hypothese/%E0%A4%A')).toBeNull()
+    expect(belegAusHref('echob:themendialog/')).toBeNull()
+  })
+})
+
+describe('namePasst', () => {
+  it('erkennt den gleichen Namen trotz Schreibweise', () => {
+    expect(namePasst('über mich', 'Über mich')).toBe(true)
+    expect(namePasst('Prägungen und Trauma', 'Prägungen & Trauma')).toBe(false)
+    expect(namePasst('Prägungen & Trauma', 'Prägungen & Trauma')).toBe(true)
+  })
+
+  it('erkennt eine Kürzung', () => {
+    expect(namePasst('Persönlichkeitsstruktur', 'Persönlichkeitsstruktur (Cluster-B-Spektrum)')).toBe(true)
+  })
+
+  it('lässt ein Bruchstück nicht auf alles passen', () => {
+    expect(namePasst('Üb', 'Über mich')).toBe(false)
+    expect(namePasst('Schuld', 'Verantwortung')).toBe(false)
   })
 })
 

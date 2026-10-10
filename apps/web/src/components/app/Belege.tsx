@@ -23,7 +23,11 @@ import { useQuery } from '@tanstack/react-query'
 import { scenesApi } from '@/api/scenes'
 import { caseDocumentsApi, KIND_LABELS } from '@/api/caseDocuments'
 import { caseArtifactsApi } from '@/api/caseArtifacts'
-import type { Beleg } from '@/lib/belege'
+import { topicSummariesApi } from '@/api/topicSummaries'
+import { hypothesesApi } from '@/api/hypotheses'
+import { gefuehlsbildApi } from '@/api/gefuehlsbild'
+import { testResultsApi } from '@/api/testResults'
+import { namePasst, type Beleg } from '@/lib/belege'
 
 interface Ziel {
   href: string
@@ -97,9 +101,13 @@ function sicherheitsWarnung(stufe: string | null | undefined): string | null {
 /**
  * Stellt die Auflösung für einen Fall bereit.
  *
- * Die drei Abfragen teilen sich die Zwischenspeicher-Schlüssel mit den übrigen Seiten
- * (`scenes`, `case-documents`, `case-artifacts`) — wer von der Szenenliste kommt, löst
- * hier keine neue Anfrage aus.
+ * Die Abfragen teilen sich die Zwischenspeicher-Schlüssel mit den übrigen Seiten
+ * (`scenes`, `case-documents`, `case-artifacts`, `topic-summaries`, `hypotheses`,
+ * `gefuehlsbild-ueberblick`, `test-results`) — wer von der Fallübersicht kommt, löst hier keine neue
+ * Anfrage aus.
+ *
+ * Beim Gefühlsbild bewusst `ueberblick` und nicht `stand`: `stand` legt einen Entwurf an.
+ * Ein Gespräch zu öffnen darf keinen anlegen.
  */
 export function BelegeProvider({ caseId, children }: { caseId: string; children: ReactNode }) {
   const { data: szenen } = useQuery({
@@ -115,6 +123,27 @@ export function BelegeProvider({ caseId, children }: { caseId: string; children:
   const { data: erkenntnisse } = useQuery({
     queryKey: ['case-artifacts', caseId],
     queryFn: () => caseArtifactsApi.list(caseId),
+    enabled: !!caseId, retry: false, staleTime: 60_000,
+  })
+  const { data: themen } = useQuery({
+    queryKey: ['topic-summaries', caseId],
+    queryFn: () => topicSummariesApi.list(caseId),
+    enabled: !!caseId, retry: false, staleTime: 60_000,
+  })
+  const { data: hypothesen } = useQuery({
+    queryKey: ['hypotheses', caseId],
+    queryFn: () => hypothesesApi.list(caseId),
+    enabled: !!caseId, retry: false, staleTime: 60_000,
+  })
+  // Am Konto, nicht am Fall - deshalb ohne caseId im Schluessel, wie auf der Uebersicht.
+  const { data: tests } = useQuery({
+    queryKey: ['test-results'],
+    queryFn: () => testResultsApi.list(),
+    retry: false, staleTime: 60_000,
+  })
+  const { data: gefuehlsbild } = useQuery({
+    queryKey: ['gefuehlsbild-ueberblick', caseId],
+    queryFn: () => gefuehlsbildApi.ueberblick(caseId),
     enabled: !!caseId, retry: false, staleTime: 60_000,
   })
 
@@ -157,9 +186,78 @@ export function BelegeProvider({ caseId, children }: { caseId: string; children:
       })
     }
 
-    return (beleg) =>
-      (beleg.art === 'szene' ? s : beleg.art === 'dokument' ? d : e).get(beleg.nr) ?? null
-  }, [caseId, szenen, dokumente, erkenntnisse])
+    const themenZiele = (themen ?? [])
+      .filter(t => t.summary_text?.trim())
+      .map(t => ({
+        name: t.topic_label,
+        ziel: {
+          href: `/app/cases/${caseId}/topics/${t.topic}`,
+          titel: `Themendialog „${t.topic_label}“`,
+          zeile: 'deine bestätigte Zusammenfassung',
+          text: kuerzen(t.summary_text),
+          marken: [],
+        } satisfies Ziel,
+      }))
+
+    const hypothesenZiele = (hypothesen ?? [])
+      .filter(h => h.summary_text?.trim())
+      .map(h => ({
+        name: h.label,
+        ziel: {
+          href: `/app/cases/${caseId}/hypotheses/${h.hypothesis_type}`,
+          titel: `Hypothese „${h.label}“`,
+          zeile: `zuletzt bearbeitet am ${datum(h.updated_at)}`,
+          text: kuerzen(h.summary_text),
+          marken: ['tastend, keine Diagnose'],
+        } satisfies Ziel,
+      }))
+
+    const testZiele = (tests ?? []).map(t => {
+      const r = t.result
+      const kern = r.mode === 'typology' && r.primary
+        ? `am stärksten: ${r.primary.name}`
+        : r.overall ? `Gesamt ${Math.round(r.overall.score)}/100${r.overall.band ? ` · ${r.overall.band.label}` : ''}` : ''
+      return {
+        name: t.title,
+        ziel: {
+          // Springt auf der Fall-Uebersicht zur Karte und klappt genau dieses Ergebnis auf.
+          href: `/app/cases/${caseId}#selbsttest-${t.slug}`,
+          titel: `Selbsttest „${t.title}“`,
+          zeile: `ausgefüllt am ${datum(r.answeredAt ?? t.updated_at)}${kern ? ` · ${kern}` : ''}`,
+          text: kuerzen(r.dimensions.map(d => `${d.name}: ${Math.round(d.score)}${r.mode === 'typology' ? ' %' : '/100'}`).join(' · ')),
+          marken: ['Selbsteinschätzung, kein Befund'],
+          warnung: r.flags.length > 0 ? 'Enthält Angaben, die ernst zu nehmen sind' : null,
+        } satisfies Ziel,
+      }
+    })
+
+    // Nur ein BESTÄTIGTES Bild ist ein Beleg. Ein Entwurf ist noch nicht ihre Aussage.
+    const bild = gefuehlsbild?.aktuell
+    const bildZiel: Ziel | null = bild?.bericht?.trim()
+      ? {
+          href: `/app/cases/${caseId}/gefuehlsbild`,
+          titel: 'Dein Gefühlsbild',
+          zeile: `festgehalten am ${datum(bild.bestaetigt_at)}${bild.ecke ? ` · ${bild.ecke}` : ''}`,
+          text: kuerzen(bild.bericht),
+          marken: bild.woerter_labels.slice(0, 4).map(w => w.label),
+        }
+      : null
+
+    return (beleg) => {
+      switch (beleg.art) {
+        case 'szene': return s.get(beleg.nr) ?? null
+        case 'dokument': return d.get(beleg.nr) ?? null
+        case 'erkenntnis': return e.get(beleg.nr) ?? null
+        case 'themendialog':
+          return themenZiele.find(t => namePasst(beleg.name, t.name))?.ziel ?? null
+        case 'hypothese':
+          return hypothesenZiele.find(h => namePasst(beleg.name, h.name))?.ziel ?? null
+        case 'selbsttest':
+          return testZiele.find(t => namePasst(beleg.name, t.name))?.ziel ?? null
+        case 'gefuehlsbild': return bildZiel
+      }
+    }
+  }, [caseId, szenen, dokumente, erkenntnisse, themen, hypothesen, tests, gefuehlsbild])
 
   return <BelegeKontextProvider aufloesen={aufloesen}>{children}</BelegeKontextProvider>
 }
@@ -170,7 +268,7 @@ export const belegHelfer = { datum, kuerzen, sicherheitsWarnung }
 /**
  * Ein Verweis im Fließtext.
  *
- * Zeiger darüber (oder Tastaturfokus) zeigt die Szene; ein Klick öffnet sie ganz. Auf
+ * Zeiger darüber (oder Tastaturfokus) zeigt den Eintrag; ein Klick öffnet sie ganz. Auf
  * Geräten ohne Zeiger gibt es keinen Schwebezustand — dort bleibt der Klick, und das ist
  * der richtige Rückfall.
  */

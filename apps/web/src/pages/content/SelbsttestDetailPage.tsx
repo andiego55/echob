@@ -1,3 +1,4 @@
+import SelbsttestMitlesen from '@/components/selftests/SelbsttestMitlesen'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
@@ -210,18 +211,23 @@ function ResultView({ test, result, onRetake, loggedIn, savedState }: {
       <div className="mx-auto max-w-[720px]">
         <span className="label">Dein Ergebnis</span>
 
-        {loggedIn ? (
+        {loggedIn && (
           <p className="mb-4 text-xs text-brand-muted">
             {savedState === 'saved'
-              ? '✓ In deinem Profil gespeichert – sichtbar in der Fall-Übersicht, optional für deine Fachperson freigebbar.'
+              ? '✓ In deinem Profil gespeichert – sichtbar in der Fall-Übersicht, optional für deine Fachperson freigebbar. Ob Echo es in euren Gesprächen kennt, entscheidest du.'
               : savedState === 'error'
                 ? 'Konnte nicht im Profil gespeichert werden.'
                 : 'Wird in deinem Profil gespeichert …'}
           </p>
-        ) : (
+        )}
+        {loggedIn && savedState === 'saved' && (
+          <div className="mb-5"><SelbsttestMitlesen form="frage" /></div>
+        )}
+        {!loggedIn && (
           <p className="mb-4 text-xs text-brand-muted">
             <Link to="/auth" state={{ defaultTab: 'signup' }} className="font-medium text-accent hover:underline">Melde dich an</Link>,
-            um dein Ergebnis zu speichern und mit deiner Fachperson zu teilen.
+            um dein Ergebnis zu speichern, mit deiner Fachperson zu teilen – und, wenn du willst,
+            Echo in euren Gesprächen daran anknüpfen zu lassen.
           </p>
         )}
 

@@ -12,17 +12,9 @@ from app.services import topic_summary_gate, topic_summary_service
 
 router = APIRouter(prefix="/cases/{case_id}/topic-summaries", tags=["topic-summaries"])
 
-TOPIC_LABELS = {
-    "topic_self":           "Über mich",
-    "topic_person":         "Über die Fallperson",
-    "topic_responsibility": "Verantwortung",
-    "topic_guilt":          "Schuld",
-    # Blog-Themen
-    "blog_beziehungsmuster":     "Beziehungsmuster erkennen",
-    "blog_beobachtung_gefuehl":  "Beobachtung, Gefühl, Interpretation",
-    "blog_professionelle_hilfe": "Wann professionelle Hilfe sinnvoll ist",
-    "blog_krisentelefone":       "Krisentelefone & Anlaufstellen",
-}
+# Eine Tabelle fuer Kontext und API - zwei hiessen zwei Namen fuer dasselbe Thema, und
+# Echos Verweis `Themendialog „…“` liefe in der Oberflaeche ins Leere.
+TOPIC_LABELS = topic_summary_service.TOPIC_LABELS
 
 
 class TopicSummaryUpsert(BaseModel):

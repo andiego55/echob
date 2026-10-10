@@ -42,8 +42,10 @@ from app.services import (
     profi_material,
     seat_service,
     sharing_service,
+    topic_summary_service,
 )
 from app.services.demo_service import ensure_demo_for_professional
+from app.services.hypothesis_service import HYPOTHESIS_LABELS
 from app.services.professional_account import ensure_professional_account
 from app.services.sharing_service import load_shared_bundle, require_active_share
 
@@ -109,6 +111,24 @@ def _build_attention(assignments: list[dict], case_info: dict) -> list[dict]:
     items.sort(key=lambda x: x["at"] or floor, reverse=True)
     items.sort(key=lambda x: x["unread"], reverse=True)   # ungelesen zuerst
     return items
+
+
+def themen_mit_namen(themen: list[dict]) -> list[dict]:
+    """Themendialoge mit dem Namen, unter dem Echo sie nennt (`Themendialog „…“`).
+
+    Dieselbe Ableitung wie die Ueberschrift im Prompt (`build_topic_context`), sonst laeuft
+    der Verweis in der Oberflaeche ins Leere. Und nie der rohe Schluessel - `content_…`
+    stand schon als Ueberschrift in einer Akte.
+    """
+    return [{**t, "topic_label": topic_summary_service.etikett(t["topic"])} for t in themen]
+
+
+def hypothesen_mit_namen(hypothesen: list[dict]) -> list[dict]:
+    """Hypothesen mit dem Namen, unter dem Echo sie nennt (`Hypothese „…“`)."""
+    return [
+        {**h, "label": HYPOTHESIS_LABELS.get(h["hypothesis_type"], h["hypothesis_type"])}
+        for h in hypothesen
+    ]
 
 
 def _public_row(row, fields: tuple[str, ...] = ()):
@@ -981,8 +1001,8 @@ async def case_detail(
         "scenes": [_public_row(s, ("pattern_tags",)) for s in bundle.scenes],
         "scales": [_public_row(s) for s in bundle.scale_scores],
         "reports": [_public_row(r, ("content",)) for r in bundle.reports],
-        "topic_summaries": bundle.topic_summaries,
-        "hypotheses": bundle.hypotheses,
+        "topic_summaries": themen_mit_namen(bundle.topic_summaries),
+        "hypotheses": hypothesen_mit_namen(bundle.hypotheses),
         "person_profile": _public_profile(bundle.person_profile),
         "self_profile": _public_profile(bundle.self_profile),
         "test_results": bundle.test_results,

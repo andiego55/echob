@@ -41,5 +41,7 @@ def build_hypothesis_context(hypotheses: list[dict[str, Any]]) -> str:
     )
     for htype in HYPOTHESIS_ORDER:
         if text := by_type.get(htype):
-            lines.append(f"### {HYPOTHESIS_LABELS.get(htype, htype)}\n{text}\n")
+            # Ueberschrift = Kennung: `Hypothese „Bindungsmuster“` wird in der Oberflaeche
+            # ein Verweis (siehe `lib/belege.ts`), aufgeloest ueber `label` der API.
+            lines.append(f"### Hypothese „{HYPOTHESIS_LABELS.get(htype, htype)}“\n{text}\n")
     return "\n".join(lines)

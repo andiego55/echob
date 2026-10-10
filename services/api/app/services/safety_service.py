@@ -168,7 +168,9 @@ class Triage:
     meta: dict = field(default_factory=dict)
 
 
-async def triage_pruefen(echo_svc, *, text: str, ausgenommen: bool = False) -> Triage:
+async def triage_pruefen(
+    echo_svc, *, text: str, ausgenommen: bool = False, nur_anhaengen: bool = False,
+) -> Triage:
     """Aktive Krisenerkennung statt passivem Disclaimer.
 
     ``ausgenommen`` schaltet sie ab, wo niemand frei schreibt: Steuertoken der Oberflaeche
@@ -179,6 +181,13 @@ async def triage_pruefen(echo_svc, *, text: str, ausgenommen: bool = False) -> T
     kurze Wartezeit, bevor das erste Wort erscheint - und die ist richtig so: Wer in akuter
     Not schreibt, darf keine reflektierende Antwort entgegenstroemen bekommen, waehrend im
     Hintergrund noch geprueft wird.
+
+    ``nur_anhaengen`` ersetzt Echos Antwort auch bei ``acute`` nicht, sondern haengt die
+    Hilfe an. Fuer den Szenendialog: Dort schildert man Vergangenes - „er hat mich
+    geschlagen" -, und die Schlagwort-Untergrenze kennt keine Zeitform. Ersetzt wuerde dort
+    jede Antwort durch die feste Meldung, und keine Szene liesse sich mehr erfassen. Bis
+    Oktober 2026 war der Szenendialog deshalb ganz ausgenommen - und wer dort Gewalt
+    schilderte, bekam gar keinen Hinweis auf Hilfe.
     """
     if ausgenommen:
         return Triage()
@@ -187,6 +196,12 @@ async def triage_pruefen(echo_svc, *, text: str, ausgenommen: bool = False) -> T
     level = risk.get("level", "none")
     kategorie = risk.get("category")
 
+    if level == "acute" and nur_anhaengen:
+        return Triage(
+            level=level,
+            nachtrag=build_safety_message("acute", category=kategorie),
+            meta={"safety": {"level": "acute", "category": kategorie, "mode": "appended"}},
+        )
     if level == "acute":
         return Triage(
             level=level,

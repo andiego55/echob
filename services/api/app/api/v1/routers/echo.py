@@ -26,6 +26,7 @@ from app.services import (
     kompass_auswahl,
     resonanz_service,
     resonanz_uebungen,
+    selbsttest_kontext,
     topic_summary_gate,
 )
 from app.services.case_artifacts import build_artifact_context
@@ -196,6 +197,21 @@ async def _vorbereiten(pool, case_id, user_id, body) -> ChatVorbereitung:
     )
 
 
+def _triage_regeln(body) -> dict:
+    """Wie die Krisen-Triage fuer diese Nachricht laeuft - EINE Stelle fuer beide Wege.
+
+    * Steuertoken (``__…__``) sind Anweisungen der Oberflaeche, kein Text der Person:
+      ausgenommen.
+    * Im Szenendialog schildert man Vergangenes. Die Triage laeuft, ersetzt Echos Frage
+      aber nie, sondern haengt die Hilfe an (siehe ``triage_pruefen``).
+    * Alles andere: volle Triage.
+    """
+    return {
+        "ausgenommen": body.message.startswith("__"),
+        "nur_anhaengen": body.thread_type == "scene",
+    }
+
+
 async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
     """Selbstauskunft, Personenprofil, Zusammenfassungen, Hypothesen, Aussteuerung.
 
@@ -342,6 +358,32 @@ async def _kontext_bauen(pool, case_id, user_id, body, v: ChatVorbereitung):
             vorhaben_ctx = kompass_auswahl.vorhaben_block(offene)
             if vorhaben_ctx:
                 context_parts.append(vorhaben_ctx)
+
+        # Selbsttest-Ergebnisse. Am Konto, nicht am Fall - wie Saetze und Vorhaben; der
+        # Abschnitt sagt dem Modell, dass es erst nachfragt, worauf ein Test sich bezog.
+        # Nur im eigenen Echo: Der Fachpersonen-Echo liest sie nicht (sharing_service).
+        #
+        # `is True`, nicht bloss wahr: NULL heisst „nie gefragt", und bis Oktober 2026
+        # stand unter jedem Ergebnis, dass es NICHT einfliesst (zz_149).
+        selbsttests_erlaubt = bool(
+            user_profile_row and user_profile_row.get("echo_selbsttests") is True)
+        if selbsttests_erlaubt and "selbsttests" not in ohne:
+            async with pool.acquire() as conn:
+                test_rows = await conn.fetch(
+                    "SELECT slug, title, result, updated_at FROM test_results "
+                    "WHERE user_id = $1 ORDER BY updated_at DESC LIMIT $2",
+                    user_id, selbsttest_kontext.MAX_TESTS,
+                )
+            tests = []
+            for r in test_rows:
+                try:
+                    ergebnis = _json.loads(crypto.decrypt(r["result"]) or "{}")
+                except (ValueError, TypeError):
+                    continue
+                tests.append({**dict(r), "result": ergebnis})
+            test_ctx = selbsttest_kontext.kontext_block(tests)
+            if test_ctx:
+                context_parts.append(test_ctx)
 
         # Themendialog-Zusammenfassungen
         if topic_summaries and "themen" not in ohne:
@@ -594,9 +636,7 @@ async def chat(
 
     triage = await triage_pruefen(
         echo_svc, text=body.message,
-        # Steuertoken sind Anweisungen der Oberflaeche, und im gefuehrten Szenendialog
-        # beantwortet man Fragen, statt frei zu schreiben.
-        ausgenommen=body.thread_type == "scene" or body.message.startswith("__"),
+        **_triage_regeln(body),
     )
     if triage.statt_echo is not None:
         answer = triage.statt_echo
@@ -677,9 +717,7 @@ async def chat_stream(
         pool, case_id, user_id, body, vorbereitung)
     triage = await triage_pruefen(
         echo_svc, text=body.message,
-        # Steuertoken sind Anweisungen der Oberflaeche, und im gefuehrten Szenendialog
-        # beantwortet man Fragen, statt frei zu schreiben.
-        ausgenommen=body.thread_type == "scene" or body.message.startswith("__"),
+        **_triage_regeln(body),
     )
 
     echo_argumente = {
@@ -1050,6 +1088,14 @@ async def get_context_overview(
                 "SELECT LEAST(COUNT(*), $2) FROM selbst_vorhaben "
                 "WHERE user_id = $1 AND art = 'ziel' AND stand = 'laufend'",
                 user_id, kompass_auswahl.MAX_VORHABEN_JE_AUFRUF),
+            # Die Zahl, die wirklich mitgeht - wie bei Saetzen und Vorhaben. Ohne
+            # ausdrueckliche Erlaubnis geht nichts mit, also steht hier dann 0.
+            "selbsttests": await conn.fetchval(
+                "SELECT CASE WHEN p.echo_selbsttests IS TRUE "
+                "THEN LEAST((SELECT COUNT(*) FROM test_results WHERE user_id = $1), $2) "
+                "ELSE 0 END FROM (SELECT $1::uuid AS uid) x "
+                "LEFT JOIN user_profiles p ON p.user_id = x.uid",
+                user_id, selbsttest_kontext.MAX_TESTS),
         }
 
     return KontextAntwort(parts=[

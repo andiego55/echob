@@ -109,6 +109,18 @@ export default function DatenschutzPage() {
               <strong className="text-navy"> besondere Kategorien personenbezogener Daten</strong>.
             </p>
             <p className="text-brand-muted text-sm mb-3">
+              <strong className="text-navy">Selbsttests:</strong> Die öffentlichen Selbsttests
+              werden in deinem Browser ausgewertet; ohne Anmeldung speichern wir dabei nichts. Bist du
+              angemeldet, legen wir dein Ergebnis (Werte, Einordnung, kritische Angaben und deine
+              eigenen Freitext-Antworten) verschlüsselt an deinem Konto ab – nicht an einem Fall. Du
+              siehst es in der Fall-Übersicht, kannst es dort löschen und einer Fachperson freigeben
+              (Abschnitt 12). In deine Gespräche mit Echo fließen die Ergebnisse{' '}
+              <strong className="text-navy">nur, wenn du das ausdrücklich einschaltest</strong>;
+              dann werden sie wie die übrigen Inhalte, die Echo liest, an den KI-Anbieter übermittelt
+              (Abschnitt 5). Du kannst das jederzeit in der Fall-Übersicht wieder ausschalten und
+              einzelne Gespräche auch ohne sie führen. Der Echo deiner Fachperson liest sie nicht.
+            </p>
+            <p className="text-brand-muted text-sm mb-3">
               <strong className="text-navy">Rechtsgrundlage:</strong> deine{' '}
               <strong className="text-navy">ausdrückliche Einwilligung</strong> nach Art. 9 Abs. 2 lit. a DSGVO
               sowie Art. 6 Abs. 1 lit. b DSGVO (Vertrag).

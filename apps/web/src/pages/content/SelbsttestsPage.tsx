@@ -38,7 +38,7 @@ export default function SelbsttestsPage() {
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <a href="#tests" className="btn-primary !px-6 !py-3">Test auswählen</a>
-            <span className="text-sm text-white/45">{SELF_TESTS.length} Tests · anonym · kostenlos</span>
+            <span className="text-sm text-white/45">{SELF_TESTS.length} Tests · ohne Anmeldung · kostenlos</span>
           </div>
         </div>
       </section>

@@ -23,6 +23,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { echoKontextApi, type KontextTeil } from '@/api/echoKontext'
+import SelbsttestMitlesen from '@/components/selftests/SelbsttestMitlesen'
 
 interface Props {
   caseId: string
@@ -80,6 +81,10 @@ export default function KontextBand({ caseId, ohne, onAendern }: Props) {
           )}
           <span className={`shrink-0 transition-transform ${offen ? 'rotate-180' : ''}`} aria-hidden>▾</span>
         </button>
+
+        {/* Ausserhalb der aufgeklappten Ansicht: Die Frage muss man sehen, ohne zu suchen.
+            Sie erscheint nur, solange nie entschieden wurde. */}
+        <div className="mt-2 empty:hidden"><SelbsttestMitlesen form="frage" /></div>
 
         {offen && (
           <div className="mt-2.5 rounded-brand border border-brand-border bg-brand-bg/60 p-3">

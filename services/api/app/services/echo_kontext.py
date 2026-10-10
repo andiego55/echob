@@ -32,12 +32,13 @@ KontextTeil = Literal[
     "gefuehlsbild",
     "saetze",
     "vorhaben",
+    "selbsttests",
 ]
 
 ALLE_TEILE: tuple[str, ...] = (
     "szenen", "muster", "selbstauskunft", "fallprofil",
     "themen", "hypothesen", "erkenntnisse", "dokumente", "resonanz", "gefuehlsbild",
-    "saetze", "vorhaben",
+    "saetze", "vorhaben", "selbsttests",
 )
 
 #: Wort und Erklaerung je Teil — genau so, wie sie im Band stehen.
@@ -99,6 +100,13 @@ LABELS: dict[str, dict[str, str]] = {
     "vorhaben": {
         "label": "Deine Vorhaben",
         "hinweis": "Woran du gerade arbeitest. Echo fragt nie nach, wie weit du bist.",
+    },
+    # Wie Saetze und Vorhaben am Konto, nicht am Fall. Der Hinweis sagt das, weil ein
+    # Test ueber eine ANDERE Beziehung hier sonst ueberrascht - und weil genau das der
+    # Grund ist, ihn fuer einen Fall abzuschalten.
+    "selbsttests": {
+        "label": "Selbsttests",
+        "hinweis": "Deine gespeicherten Testergebnisse — nur, wenn du das erlaubt hast. Auch solche über eine andere Beziehung.",
     },
 }
 

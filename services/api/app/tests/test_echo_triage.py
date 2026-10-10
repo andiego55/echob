@@ -110,3 +110,38 @@ async def test_die_pruefung_laeuft_vor_der_antwort():
     t = await triage_pruefen(echo, text="Ich kann nicht mehr.")
     assert echo.aufrufe == 1
     assert t.statt_echo is not None
+
+
+@pytest.mark.asyncio
+async def test_im_szenendialog_wird_akut_angehaengt_statt_ersetzt():
+    """Wer eine Szene erfasst, schildert Vergangenes - und bekommt trotzdem Hilfe.
+
+    Bis Oktober 2026 war der Szenendialog ganz ausgenommen: Wer dort Gewalt schilderte,
+    bekam keinen einzigen Hinweis. Ersetzen geht dort aber auch nicht - die
+    Schlagwort-Untergrenze kennt keine Zeitform, und jede Antwort waere die feste Meldung.
+    """
+    echo = FakeEcho("acute", "violence")
+    t = await triage_pruefen(echo, text="Er hat mich geschlagen.", nur_anhaengen=True)
+
+    assert echo.aufrufe == 1, "Die Triage laeuft"
+    assert t.statt_echo is None, "Echos Frage bleibt stehen"
+    assert t.nachtrag and any(n in t.nachtrag for n in ("110", "112", "0800", "116"))
+    assert t.meta["safety"]["mode"] == "appended"
+
+
+def test_triage_regeln_je_dialogform():
+    from types import SimpleNamespace
+
+    from app.api.v1.routers.echo import _triage_regeln
+
+    szene = _triage_regeln(SimpleNamespace(thread_type="scene", message="Er hat mich gestoßen."))
+    assert szene == {"ausgenommen": False, "nur_anhaengen": True}
+
+    frei = _triage_regeln(SimpleNamespace(thread_type="topic", message="Ich habe Angst."))
+    assert frei == {"ausgenommen": False, "nur_anhaengen": False}
+
+    gefuehrt = _triage_regeln(SimpleNamespace(thread_type="hyp_trauma", message="Hilfe"))
+    assert gefuehrt["ausgenommen"] is False
+
+    steuer = _triage_regeln(SimpleNamespace(thread_type="scene", message="__scene_start__"))
+    assert steuer["ausgenommen"] is True

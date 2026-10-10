@@ -1,8 +1,8 @@
 /**
  * /app/cases/:caseId — Fall-Überblick
  */
-import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import AppShell from '@/components/app/AppShell'
 import CaseNav from '@/components/app/CaseNav'
@@ -16,6 +16,7 @@ import { podcastApi } from '@/api/podcast'
 import { topicSummariesApi, type TopicSummary } from '@/api/topicSummaries'
 import { testResultsApi } from '@/api/testResults'
 import SavedTestResultView from '@/components/selftests/SavedTestResultView'
+import SelbsttestMitlesen from '@/components/selftests/SelbsttestMitlesen'
 import { TEST_CATEGORY_LABELS, type TestCategory } from '@/selftests'
 import { CONTENT_MANIFEST } from '@/content/manifest.generated'
 import { hypothesesApi } from '@/api/hypotheses'
@@ -642,6 +643,18 @@ function TestResultsCard({ caseId }: { caseId: string }) {
   const qc = useQueryClient()
   const { data: results = [], isLoading } = useQuery({ queryKey: ['test-results'], queryFn: () => testResultsApi.list() })
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
+
+  // Ein Verweis aus Echo (`Selbsttest „…“`) fuehrt hierher, mit `#selbsttest-<slug>`:
+  // genau dieses Ergebnis aufklappen und hinscrollen - sonst landet man oben auf der
+  // Uebersicht und sucht.
+  const { hash } = useLocation()
+  useEffect(() => {
+    const slug = hash.startsWith('#selbsttest-') ? decodeURIComponent(hash.slice('#selbsttest-'.length)) : null
+    if (!slug || !results.some(r => r.slug === slug)) return
+    setExpanded(prev => new Set(prev).add(slug))
+    requestAnimationFrame(() => document.getElementById(`selbsttest-${slug}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+  }, [hash, results])
+
   const toggle = (slug: string) =>
     setExpanded((prev) => {
       const next = new Set(prev)
@@ -668,9 +681,11 @@ function TestResultsCard({ caseId }: { caseId: string }) {
           Ergebnisse aus den <Link to="/selbsttests" className="text-accent font-medium hover:underline">Selbsttests</Link> –
           angemeldet werden sie automatisch hier abgelegt. Über{' '}
           <Link to={`/app/cases/${caseId}/share`} className="text-accent font-medium hover:underline">Freigaben</Link> kannst du sie
-          deiner Fachperson zugänglich machen. Sie fließen nicht in Echos Kontext ein.
+          deiner Fachperson zugänglich machen. Ob Echo sie in deinen Gesprächen kennt, entscheidest du hier.
         </p>
       </div>
+
+      <div className="mb-3 empty:hidden"><SelbsttestMitlesen form="schalter" /></div>
 
       {isLoading ? (
         <ListSkeleton rows={2} label="Testergebnisse werden geladen" />
@@ -681,7 +696,7 @@ function TestResultsCard({ caseId }: { caseId: string }) {
           {results.map((r) => {
             const isOpen = expanded.has(r.slug)
             return (
-              <div key={r.slug} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3">
+              <div key={r.slug} id={`selbsttest-${r.slug}`} className="rounded-brand border border-brand-border bg-brand-bg px-4 py-3 scroll-mt-24">
                 <div className="flex items-center justify-between gap-2">
                   <button onClick={() => toggle(r.slug)} className="flex items-center gap-1.5 min-w-0 text-left">
                     <svg className={`w-3.5 h-3.5 flex-shrink-0 text-accent transition-transform ${isOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

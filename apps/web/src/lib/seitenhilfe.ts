@@ -137,7 +137,7 @@ export const SEITENHILFE: Record<string, SeitenHilfe> = {
     titel: 'Selbsttest',
     zweck: 'Eine strukturierte Selbsteinschätzung — über dein eigenes Erleben, nicht über die andere Person.',
     schritte: ['Fragen beantworten', 'Auswertung lesen', 'Ergebnis im Fall behalten'],
-    tipp: 'Das Ergebnis ist keine Diagnose und kein Urteil über jemanden. Es ordnet, was du berichtest.',
+    tipp: 'Das Ergebnis ist keine Diagnose und kein Urteil über jemanden. Es ordnet, was du berichtest. Ob Echo es in deinen Gesprächen kennt, entscheidest du selbst – einmal gefragt, jederzeit in der Fall-Übersicht änderbar.',
   },
 
   // ── Deuten ───────────────────────────────────────────────────────────────

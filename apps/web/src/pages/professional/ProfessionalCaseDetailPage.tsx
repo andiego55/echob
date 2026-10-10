@@ -10,6 +10,7 @@ import ProfessionalShell from '@/components/professional/ProfessionalShell'
 import { Spinner } from '@/components/auth/ProfessionalRoute'
 import { professionalApi } from '@/api/professional'
 import MarkdownMessage from '@/components/app/MarkdownMessage'
+import { BelegeFachpersonProvider, fachpersonAnker, istBelegAnker } from '@/components/professional/BelegeFachperson'
 import SavedTestResultView from '@/components/selftests/SavedTestResultView'
 import AssignmentTypePanel from '@/components/professional/AssignmentTypePanel'
 import type { AssignmentType } from '@/api/collab'
@@ -40,6 +41,8 @@ import {
 import BilderKarte from '@/components/professional/BilderKarte'
 import PodcastKarte from '@/components/professional/PodcastKarte'
 
+// Nur noch Rückfall, falls eine ältere API noch keinen Namen mitliefert. Maßgeblich ist
+// `topic_label` / `label` aus dem Bündel - dieselbe Ableitung wie im Prompt.
 const TOPIC_LABELS: Record<string, string> = {
   topic_self: 'Über mich', topic_person: 'Über die Fallperson',
   topic_responsibility: 'Verantwortung', topic_guilt: 'Schuld',
@@ -420,13 +423,22 @@ export default function ProfessionalCaseDetailPage() {
     const t = searchParams.get('tab')
     if (t) waehleReiter(t)
   }, [searchParams, waehleReiter])
+
+  // Ein Beleg-Verweis (`#szene-12`, `#themendialog-topic_guilt` …) zeigt auf die Übersicht -
+  // dort stehen die Einträge. Kommt er von einem anderen Reiter, etwa aus einer gespeicherten
+  // Echo-Zusammenfassung, landete er sonst auf einer Seite, auf der das Ziel nicht existiert.
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (istBelegAnker(hash)) setTab('ueber')
+  }, [hash])
   const { data: bundle, isLoading, isError } = useQuery({
     queryKey: ['prof-case', caseId],
     queryFn: () => professionalApi.caseDetail(caseId!),
     retry: false,
     enabled: !!caseId,
   })
-  useAnkerOeffnen(!!bundle)
+  // Erst wenn die Übersicht steht: Vorher gibt es das Ziel noch nicht.
+  useAnkerOeffnen(!!bundle && tab === 'ueber')
   const { data: glossary = [] } = useQuery({ queryKey: ['prof-glossary'], queryFn: professionalApi.glossary })
 
   const qc = useQueryClient()
@@ -462,6 +474,10 @@ export default function ProfessionalCaseDetailPage() {
   return (
     <ProfessionalShell>
       <CaseWorkspaceNav active={tab} onSelect={setTab} clientName={bundle.client_display_name} clientAvatar={bundle.client_avatar} />
+      {/* Um die ganze Seite: Echo-Texte stehen nicht nur im Dialog, sondern auch in den
+          gespeicherten Zusammenfassungen - und dort sind „Szene 12" und „Themendialog „…“"
+          genauso gemeint. */}
+      <BelegeFachpersonProvider caseId={caseId!} bundle={bundle}>
       <div className="mx-auto max-w-[1100px] px-6 py-10">
         {/* Fall-Kopf (Klient:in steht oben in der Leiste) */}
         <div className="mb-6 flex items-start gap-3.5">
@@ -510,6 +526,7 @@ export default function ProfessionalCaseDetailPage() {
         {tab === 'appointments' && <AppointmentsPanel caseId={caseId!} />}
         {tab === 'history' && <CaseHistoryPanel caseId={caseId!} />}
       </div>
+      </BelegeFachpersonProvider>
     </ProfessionalShell>
   )
 }
@@ -741,9 +758,11 @@ function OverviewPanel({ bundle, caseId }: {
         )}
 
         {has('gefuehlsbild') && (
-          <Section title="Gefühlsbild" icon={<IconKompass />}>
-            <GefuehlsbildPanel bild={bundle.gefuehlsbild} />
-          </Section>
+          <div id={fachpersonAnker.gefuehlsbild()} className="scroll-mt-24">
+            <Section title="Gefühlsbild" icon={<IconKompass />}>
+              <GefuehlsbildPanel bild={bundle.gefuehlsbild} />
+            </Section>
+          </div>
         )}
 
         {/* Vor den Sätzen: Was jemand WILL, ordnet das, was er über sich sagt. */}
@@ -765,9 +784,9 @@ function OverviewPanel({ bundle, caseId }: {
           <Section title="Themendialog-Zusammenfassungen" icon={<IconChat />}>
             <div className="space-y-2">
               {bundle.topic_summaries.map(t => (
-                <details key={t.topic} className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
+                <details key={t.topic} id={fachpersonAnker.themendialog(t.topic)} className="group scroll-mt-24 rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
                   <summary className="flex items-center gap-2.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent/70 before:content-[''] [&>span:first-of-type]:min-w-0 [&>span:first-of-type]:flex-1">
-                    <span className="text-sm font-medium text-navy truncate">{TOPIC_LABELS[t.topic] ?? t.topic}</span>
+                    <span className="text-sm font-medium text-navy truncate">{t.topic_label ?? TOPIC_LABELS[t.topic] ?? t.topic}</span>
                     <Chevron />
                   </summary>
                   <div className="mt-3 border-t border-brand-border pt-3 text-sm text-brand-text leading-relaxed">
@@ -783,9 +802,9 @@ function OverviewPanel({ bundle, caseId }: {
           <Section title="Hypothesen (tastend, keine Diagnose)" icon={<IconSparkles />}>
             <div className="space-y-2">
               {bundle.hypotheses.map(h => (
-                <details key={h.hypothesis_type} className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
+                <details key={h.hypothesis_type} id={fachpersonAnker.hypothese(h.hypothesis_type)} className="group scroll-mt-24 rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 hover:bg-accent/[0.02] open:border-accent/30 open:bg-accent/[0.02]">
                   <summary className="flex items-center gap-2.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent/70 before:content-[''] [&>span:first-of-type]:min-w-0 [&>span:first-of-type]:flex-1">
-                    <span className="text-sm font-medium text-navy truncate">{HYP_LABELS[h.hypothesis_type] ?? h.hypothesis_type}</span>
+                    <span className="text-sm font-medium text-navy truncate">{h.label ?? HYP_LABELS[h.hypothesis_type] ?? h.hypothesis_type}</span>
                     <Chevron />
                   </summary>
                   <div className="mt-3 border-t border-brand-border pt-3 text-sm text-brand-text leading-relaxed">
@@ -845,7 +864,7 @@ function OverviewPanel({ bundle, caseId }: {
                       die Liste eine Wand, in der man den Überblick verliert, den sie geben
                       soll. Der Titel ist die Auskunft, der Rest ist auf Abruf. */}
                   {bundle.scenes.map(s => (
-                    <details key={s.id} id={s.scene_no ? `szene-${s.scene_no}` : undefined}
+                    <details key={s.id} id={s.scene_no ? fachpersonAnker.szene(s.scene_no) : undefined}
                        className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40 open:border-accent/30 open:bg-accent/[0.02]">
                       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
                         <p className="min-w-0 flex-1 text-sm font-semibold text-navy">
@@ -899,7 +918,7 @@ function OverviewPanel({ bundle, caseId }: {
               : (
                 <div className="space-y-2.5">
                   {bundle.documents.map(d => (
-                    <details key={d.doc_no ?? d.title} id={d.doc_no ? `dokument-${d.doc_no}` : undefined}
+                    <details key={d.doc_no ?? d.title} id={d.doc_no ? fachpersonAnker.dokument(d.doc_no) : undefined}
                       className="group rounded-brand border border-brand-border bg-white px-4 py-3 transition-colors hover:border-accent/40">
                       <summary className="cursor-pointer list-none">
                         <div className="flex justify-between gap-2 flex-wrap">
@@ -928,7 +947,7 @@ function OverviewPanel({ bundle, caseId }: {
               : (
                 <div className="space-y-2.5">
                   {bundle.artifacts.map(a => (
-                    <div key={a.artifact_no ?? a.title} id={a.artifact_no ? `erkenntnis-${a.artifact_no}` : undefined}
+                    <div key={a.artifact_no ?? a.title} id={a.artifact_no ? fachpersonAnker.erkenntnis(a.artifact_no) : undefined}
                       className="rounded-brand border border-brand-border bg-white px-4 py-3">
                       <p className="text-sm font-semibold text-navy">
                         {a.artifact_no && <span className="mr-1.5 font-mono text-xs text-brand-muted">Erkenntnis {a.artifact_no}</span>}

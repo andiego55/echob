@@ -1345,8 +1345,10 @@ export interface SharedCaseBundle {
   scenes: Scene[]
   scales: ScaleScore[]
   reports: Report[]
-  topic_summaries: { topic: string; summary_text: string }[]
-  hypotheses: { hypothesis_type: string; summary_text: string }[]
+  /** `topic_label`: der Name, unter dem Echo den Dialog nennt (`Themendialog „…“`). */
+  topic_summaries: { topic: string; summary_text: string; topic_label?: string }[]
+  /** `label`: der Name, unter dem Echo die Hypothese nennt (`Hypothese „…“`). */
+  hypotheses: { hypothesis_type: string; summary_text: string; label?: string }[]
   person_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null } | null
   self_profile: { modules: Record<string, Record<string, unknown>>; summary: Record<string, unknown>; summary_text?: string | null; display_name?: string | null } | null
   test_results: import('@/selftests/scoring').SavedTestResult[]

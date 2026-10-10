@@ -38,6 +38,12 @@ _CONTACT_LABELS = {
 
 # ── Prompt-Dateien laden ──────────────────────────────────────────────────────
 
+#: Was jeder Echo-Dialog teilt: Verweise, Abschluss, Widerspruch, Sicherheit. Der freie
+#: Dialog und die gefuehrten laden dieselbe Datei - zwei Abschriften liefen auseinander,
+#: und niemand merkte es, weil beide fuer sich plausibel klingen.
+GEMEINSAME_REGELN = "echo_gemeinsam_prompt.md"
+
+
 def _load_prompt(filename: str) -> str:
     path = PROMPTS_DIR / filename
     if not path.exists():
@@ -260,8 +266,8 @@ def build_case_context(
     # ── Hinweis für Echo ──────────────────────────────────────────────────
     lines.append(
         "_Hinweis: Dieser Kontext basiert auf den Angaben der nutzenden Person. "
-        "Verweise in Antworten immer auf konkrete Szenen oder Onboarding-Aussagen "
-        "wenn du dich auf sie stützt._"
+        "Wenn du dich auf etwas daraus stützt, sag, woher es kommt. Nicht jede Antwort "
+        "braucht einen Beleg — und Szenen sind nur eine von mehreren Quellen._"
     )
 
     return "\n".join(lines)
@@ -1244,8 +1250,12 @@ class EchoService:
         """
         system_prompt = _load_prompt("echo_system_prompt.md")
 
-        # Block 1: Echo-Verhalten (stabil → OpenAI cached automatisch)
-        messages: list[dict] = [{"role": "system", "content": system_prompt}]
+        # Block 1: Echo-Verhalten (stabil → OpenAI cached automatisch) - der eigene Teil
+        # des freien Dialogs, dann die Regeln, die JEDER Echo-Dialog teilt.
+        messages: list[dict] = [
+            {"role": "system", "content": system_prompt},
+            {"role": "system", "content": _load_prompt(GEMEINSAME_REGELN)},
+        ]
 
         # Block 1b: Modus-Aussteuerung (nachrangig zum Basis-Prompt). Wirkt nur im
         # freien Reflexions-Chat; verändert nie Rolle/Sicherheit/Krisenlogik.
@@ -1466,8 +1476,15 @@ class EchoService:
             scale_scores=scale_scores,
         )
 
+        # Die gemeinsamen Regeln direkt hinter dem Dialog-Prompt. Ohne sie bekamen die
+        # gefuehrten Dialoge denselben Fallkontext wie der freie - Szenen mit Nummern,
+        # Gefuehlsbild, Hypothesen -, aber keine Zeile dazu, wie man darauf verweist, wie
+        # man auf „Widersprich mir" antwortet (der Knopf steht auch hier) oder wann eine
+        # Antwort ohne Frage enden darf. Bis Oktober 2026 verlangten sie das Gegenteil:
+        # „max. 3-4 Saetze + eine Frage", in jeder Antwort.
         messages: list[dict] = [
             {"role": "system", "content": system_prompt},
+            {"role": "system", "content": _load_prompt(GEMEINSAME_REGELN)},
             {"role": "system", "content": case_ctx},
         ]
         if extra_context:
