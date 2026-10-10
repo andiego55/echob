@@ -102,6 +102,29 @@ describe('Belege mit Namen', () => {
       .toBe('Die [Hypothese "Bindungsmuster"](echob:hypothese/Bindungsmuster) trägt hier.')
   })
 
+  it('verlinkt einen fett gesetzten Namen — so schrieb Echo im ersten echten Gespräch', () => {
+    const echt = 'Im Themendialog **„Verantwortung“** hält sie eigene Anteile fest.'
+    const raus = belegeVerlinken(echt)
+    expect(raus).toContain('(echob:themendialog/Verantwortung)')
+    const html = renderToStaticMarkup(createElement(ReactMarkdown, {
+      urlTransform: (u: string) => belegUrlTransform(u, defaultUrlTransform),
+    }, raus))
+    // Ein Link, und das Fett bleibt drin - kein aufgerissenes Sternpaar im Text.
+    expect(html).toContain('href="echob:themendialog/Verantwortung"')
+    expect(html).toContain('<strong>„Verantwortung“</strong>')
+    expect(html).not.toContain('**')
+  })
+
+  it('verlinkt kursiv und mit Unterstrich', () => {
+    expect(belegeVerlinken('Hypothese *„Bindungsmuster“*')).toContain('(echob:hypothese/Bindungsmuster)')
+    expect(belegeVerlinken('Selbsttest __„Bindungsstil“__')).toContain('(echob:selbsttest/Bindungsstil)')
+  })
+
+  it('reißt kein halbes Fett-Paar auf', () => {
+    // Öffnet fett, schließt nicht: kein Treffer, statt eines Links, der ein `**` verschluckt.
+    expect(belegeVerlinken('Themendialog **„Schuld“ und mehr')).not.toContain('echob:')
+  })
+
   it('verlinkt einen Selbsttest', () => {
     expect(belegeVerlinken('Dein Selbsttest „Bindungsstil“ sagt etwas anderes.'))
       .toBe('Dein [Selbsttest „Bindungsstil“](echob:selbsttest/Bindungsstil) sagt etwas anderes.')

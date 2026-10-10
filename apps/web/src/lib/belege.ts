@@ -63,11 +63,16 @@ const SCHEMA = 'echob:'
  * Erst die Anführung macht daraus den Namen eines gespeicherten Eintrags. Welche Zeichen
  * das Modell dafür nimmt, ist nicht verlässlich — deshalb alle üblichen.
  *
+ * Der Name darf hervorgehoben sein: Echo schrieb im ersten echten Gespräch
+ * `Themendialog **„Schuld“**` — fett, zwischen Wort und Anführung. Ohne diese Lücke im
+ * Muster blieb genau der Verweis Text, für den es gebaut wurde. Das schließende Zeichen
+ * muss dem öffnenden entsprechen (`\4`), sonst risse der Link ein halbes Fett-Paar auf.
+ *
  * Ein Durchgang mit Alternativen statt drei nacheinander: Ein zweiter Durchgang suchte in
  * den Link-Texten des ersten weiter.
  */
 const MUSTER =
-  /\b(Szene|Dokument|Erkenntnis)\s+(\d{1,3})\b|\b(Themendialog|Hypothese|Selbsttest)\s+[„“"»]([^„“”"»«\n]{2,80})[“”"«]|\bGefühlsbild\b/g
+  /\b(Szene|Dokument|Erkenntnis)\s+(\d{1,3})\b|\b(Themendialog|Hypothese|Selbsttest)\s+(\*{1,2}|_{1,2})?[„“"»]([^„“”"»«\n]{2,80})[“”"«]\4|\bGefühlsbild\b/g
 
 /**
  * Code bleibt unberührt.
@@ -93,7 +98,7 @@ export function belegeVerlinken(text: string): string {
     .split(CODE)
     .map((teil, i) => (i % 2 === 1 ? teil : teil.replace(
       MUSTER,
-      (treffer, wort?: string, nr?: string, namensWort?: string, name?: string) => {
+      (treffer, wort?: string, nr?: string, namensWort?: string, _betonung?: string, name?: string) => {
         if (wort && nr) return `[${treffer}](${SCHEMA}${WOERTER[wort]}/${nr})`
         if (namensWort && name) {
           return `[${treffer}](${SCHEMA}${NAMENS_WOERTER[namensWort]}/${zielName(name.trim())})`
