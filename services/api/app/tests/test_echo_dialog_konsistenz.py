@@ -62,9 +62,10 @@ def test_gefuehrte_dialoge_lesen_die_gemeinsamen_regeln(art):
     )
     systeme = [n["content"] for n in nachrichten if n["role"] == "system"]
     assert GEMEINSAM in systeme
-    # Direkt hinter dem Dialog-Prompt, vor dem Fallkontext: Erst wie man spricht, dann
-    # worüber.
-    assert systeme.index(GEMEINSAM) == 1
+    # Hinter dem Dialog-Prompt (bei Themendialogen hinter dessen Fuehrungsregeln), vor dem
+    # Fallkontext: Erst wie man spricht, dann worüber.
+    erwartet = 2 if art.startswith(("topic_", "blog_", "content_")) else 1
+    assert systeme.index(GEMEINSAM) == erwartet
 
 
 def _gefuehrte_prompt_dateien() -> list[Path]:

@@ -43,6 +43,11 @@ _CONTACT_LABELS = {
 #: und niemand merkte es, weil beide fuer sich plausibel klingen.
 GEMEINSAME_REGELN = "echo_gemeinsam_prompt.md"
 
+#: Wie ein Themendialog gefuehrt wird: frei im Gespraech, beim Thema bleiben, behutsam
+#: zurueckfuehren. Gilt fuer alles, dessen Zusammenfassung als Themendialog gespeichert wird.
+THEMENDIALOG_REGELN = "echo_themendialog_prompt.md"
+THEMENDIALOG_PRAEFIXE = ("topic_", "blog_", "content_")
+
 
 def _load_prompt(filename: str) -> str:
     path = PROMPTS_DIR / filename
@@ -724,23 +729,27 @@ class EchoService:
         topic: str,
         history: list[dict[str, str]],
     ) -> str:
+        from app.services.topic_summary_service import thema_der_zusammenfassung
+
         system_prompt = _load_prompt("topic_summary_prompt.md")
-        _TOPIC_LABELS = {
-            "topic_self":           "Über mich",
-            "topic_person":         "Über die Fallperson",
-            "topic_responsibility": "Verantwortung",
-            "topic_guilt":          "Schuld",
-        }
+        # Titel UND Kern: Nur wer weiss, worum es im Thema geht, kann Abstecher als solche
+        # erkennen. Vorher stand hier eine eigene Etikettentabelle mit vier Eintraegen -
+        # Wissens-, Szenen- und Testdialoge bekamen den rohen Schluessel.
+        titel, kern = thema_der_zusammenfassung(topic, history)
+        # Alle Steuernachrichten der Oberflaeche heraus (`__…__`), nicht nur drei Arten:
+        # `__test_start__|…` stand sonst mit dem ganzen Ergebnis-Seed als Satz der Person
+        # im Verlauf.
         conversation = "\n".join(
             f"{'Du' if m['role'] == 'user' else 'Echo'}: {m['content']}"
             for m in history
             if m["role"] in ("user", "assistant")
-            and not m["content"].startswith("__topic_")
-            and not m["content"].startswith("__blog_")
-            and not m["content"].startswith("__content_")
+            and not m["content"].startswith("__")
         )
+        kopf = f"Thema: {titel}"
+        if kern:
+            kopf += f"\nWorum es in diesem Thema geht: {kern}"
         user_message = (
-            f"Thema: {_TOPIC_LABELS.get(topic, topic)}\n\n"
+            f"{kopf}\n\n"
             f"Gesprächsverlauf:\n{conversation}\n\n"
             f"Erstelle jetzt die Zusammenfassung."
         )
@@ -1482,8 +1491,14 @@ class EchoService:
         # man auf „Widersprich mir" antwortet (der Knopf steht auch hier) oder wann eine
         # Antwort ohne Frage enden darf. Bis Oktober 2026 verlangten sie das Gegenteil:
         # „max. 3-4 Saetze + eine Frage", in jeder Antwort.
-        messages: list[dict] = [
-            {"role": "system", "content": system_prompt},
+        messages: list[dict] = [{"role": "system", "content": system_prompt}]
+        # Themen-, Blog- und Wissensdialoge (auch Szenen- und Selbsttest-Dialoge, die als
+        # content_<slug> laufen): freier im Gespraech, aber mit Thema - und mit einer
+        # Regel, wann Echo zurueckfuehrt. Die Hypothesen-Dialoge nicht: Sie arbeiten auf
+        # eine Arbeitshypothese hin und haben ihren eigenen, enger gefuehrten Ablauf.
+        if topic.startswith(THEMENDIALOG_PRAEFIXE):
+            messages.append({"role": "system", "content": _load_prompt(THEMENDIALOG_REGELN)})
+        messages += [
             {"role": "system", "content": _load_prompt(GEMEINSAME_REGELN)},
             {"role": "system", "content": case_ctx},
         ]
