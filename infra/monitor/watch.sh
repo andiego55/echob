@@ -43,6 +43,12 @@ PLATTE_KRITISCH_GB="${ECHOB_DISK_CRIT_GB:-1.5}"
 BACKUP_MAX_STD="${ECHOB_BACKUP_MAX_H:-36}"      # täglich um 03:30 → 36 Std. = zwei verpasst
 RESTORE_MAX_TAGE="${ECHOB_RESTORE_MAX_D:-45}"   # der Beweis laeuft von Hand, monatlich reicht
 BERICHT_ALLE_TAGE="${ECHOB_REPORT_EVERY_D:-7}"
+# Serverfehler: JEDER ist einer zu viel, solange es keine Nutzer gibt. Die zweite Grenze
+# trennt "etwas ist kaputt" von "es brennt" - ein Sturm soll eine zweite Mail ausloesen
+# duerfen, obwohl der Zustand schon warn ist.
+FEHLER_KRITISCH="${ECHOB_ERROR_CRIT:-20}"
+COMPOSE="${ECHOB_COMPOSE:-$ECHOB_DIR/docker-compose.prod.yml}"
+ZAEHLER="${ECHOB_FEHLER_ZAEHLER:-$ECHOB_DIR/infra/monitor/fehler-zaehlen.sh}"
 
 mkdir -p "$ZUSTAND_DIR" 2>/dev/null || true
 
@@ -225,6 +231,77 @@ Ein Container kann laufen und trotzdem nichts mehr beantworten - restart: unless
 startet so einen nie neu, weil er ja laeuft. Nachsehen:
   docker compose -f /opt/echob/docker-compose.prod.yml ps
   docker compose -f /opt/echob/docker-compose.prod.yml logs --tail=80 api"
+fi
+
+# ── Serverfehler: merkt es ueberhaupt jemand, wenn etwas bricht? ─────────────
+#
+# DIE LUECKE, DIE DAS SCHLIESST. Bricht die Anwendung bei einer Nutzerin ab, sieht sie
+# "Da ist etwas schiefgelaufen" und der Server schreibt eine Zeile in ein Protokoll, das
+# niemand liest. Man erfaehrt davon, wenn jemand schreibt - und die meisten schreiben
+# nicht, die sind weg. Genau so lief der Stripe-Fulfillment-Fehler lange unbemerkt:
+# bezahlt, nicht freigeschaltet, keine Meldung.
+#
+# WARUM NICHT SENTRY. Das waere das uebliche Werkzeug und koennte mehr (Gruppierung,
+# Stelle im Code, sofort statt alle vier Stunden). Es waere aber ein weiterer
+# Auftragsverarbeiter in den USA: Vertrag, Abschnitt in der Datenschutzerklaerung,
+# Eintrag ins Verarbeitungsverzeichnis. Diese Leitung hier gibt es schon und ist
+# rechtlich abgedeckt. Wer spaeter Sentry will, soll das als Entscheidung treffen - nicht
+# als Zeile, die zufaellig im Code liegt.
+#
+# WAS IN DIE MAIL DARF, steht in fehler-zaehlen.sh: Methode, Pfad, Code. Keine
+# Tracebacks, keine IP-Adressen, Kennungen maskiert - die Mail geht ueber Resend hinaus.
+#
+# WARUM DAS FENSTER IMMER WEITERRUECKT, obwohl eine misslungene Zustellung damit verloren
+# geht: Die Gegenrichtung waere schlimmer. Wuerde es stehen bleiben, solange Fehler
+# gemeldet sind, faende der naechste Lauf dieselben Fehler wieder, bliebe auf "warn" und
+# kaeme nie zur Entwarnung - ein Waechter, der sich selbst festfaehrt. Das Netz darunter
+# ist der Wochenbericht: Er nennt die Zahl, auch wenn der Uebergang verlorenging.
+blick_datei="$ZUSTAND_DIR/.letzter-log-blick"
+seit="$(cat "$blick_datei" 2>/dev/null || true)"
+# Beim ersten Lauf vier Stunden zurueck - der Taktabstand des Waechters.
+[ -z "$seit" ] && seit="$(date -u -d '4 hours ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '4h')"
+
+if [ ! -x "$ZAEHLER" ] && [ ! -r "$ZAEHLER" ]; then
+  notiz "Fehler:   Zaehler fehlt ($ZAEHLER)"
+  pruefe fehlerzaehler warn \
+    "Der Serverfehler-Zaehler liegt nicht unter $ZAEHLER.
+
+Damit wird NICHT mehr gemeldet, wenn die Anwendung abbricht - und das faellt sonst
+nicht auf, weil 'keine Fehler' und 'wird nicht geprueft' gleich aussehen."
+else
+  pruefe fehlerzaehler ok "Zaehler vorhanden."
+  roh="$(docker compose -f "$COMPOSE" logs --since "$seit" --no-log-prefix api 2>/dev/null \
+         | bash "$ZAEHLER" 2>/dev/null)"
+  # Erst JETZT weiterruecken - ein abgebrochener Logabruf soll das Fenster nicht
+  # verschlucken.
+  if [ -n "$roh" ]; then
+    date -u +%Y-%m-%dT%H:%M:%SZ > "$blick_datei" 2>/dev/null || true
+  fi
+
+  kopf="$(printf '%s' "$roh" | head -1)"
+  anzahl="$(echo "$kopf" | awk '{print $1+0}')"
+  tracebacks="$(echo "$kopf" | awk '{print $2+0}')"
+  liste="$(printf '%s' "$roh" | tail -n +2)"
+
+  notiz "Fehler:   $anzahl Serverfehler, $tracebacks Tracebacks (seit $seit)"
+
+  if [ "$anzahl" -eq 0 ] && [ "$tracebacks" -eq 0 ]; then
+    pruefe serverfehler ok "Keine Serverfehler mehr."
+  else
+    text="Seit $seit: $anzahl Antworten mit Serverfehler, $tracebacks Tracebacks.
+
+$liste
+
+Einzelheiten stehen bewusst NICHT in dieser Mail (sie geht ueber einen
+Auftragsverarbeiter). Nachsehen auf dem Server:
+  cd /opt/echob
+  docker compose -f docker-compose.prod.yml logs --since '$seit' api | grep -B5 -A30 Traceback"
+    if [ "$anzahl" -ge "$FEHLER_KRITISCH" ]; then
+      pruefe serverfehler kritisch "$text"
+    else
+      pruefe serverfehler warn "$text"
+    fi
+  fi
 fi
 
 # ── Wochenbericht: Stille ist zweideutig ─────────────────────────────────────
