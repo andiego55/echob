@@ -23,9 +23,29 @@ HIER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ALARM="${ECHOB_ALARM:-$HIER/alarm.sh}"
 LOG="${ALARM_LOG:-/var/log/echob-alarm.log}"
 
+# WARUM DAS EINE FUNKTION IST. Die erste Fassung schrieb
+#   vorher="$(grep -c 'zugestellt an' "$LOG" || echo 0)"
+# und das ist falsch: `grep -c` gibt die Null AUS *und* beendet sich mit 1. Das `|| echo 0`
+# haengt dann eine ZWEITE Null an, die Variable enthaelt "0\n0", und der Vergleich unten
+# bricht mit "integer expression expected" ab. Folge am 10.10.2026: Der Probe-Alarm kam
+# wirklich an, und dieses Skript meldete trotzdem NICHT ZUGESTELLT.
+#
+# Also genau der Fehler, vor dem dieses Skript warnen soll — nur andersherum. Eine Probe,
+# die falsch Alarm schlaegt, ist fast so schaedlich wie eine, die schweigt: Beim naechsten
+# Mal glaubt man ihr nicht mehr.
+zaehle_zustellungen() {
+  [ -f "$LOG" ] || { echo 0; return; }
+  local n
+  n="$(grep -c 'zugestellt an' "$LOG" 2>/dev/null)" || true
+  # Nur Ziffern durchlassen - leer, mehrzeilig oder Text werden zu 0.
+  case "${n:-}" in
+    ''|*[!0-9]*) echo 0 ;;
+    *)           echo "$n" ;;
+  esac
+}
+
 echo "Loese einen Probe-Alarm aus ..."
-vorher=0
-[ -f "$LOG" ] && vorher="$(grep -c 'zugestellt an' "$LOG" 2>/dev/null || echo 0)"
+vorher="$(zaehle_zustellungen)"
 
 "$ALARM" "Probe-Alarm" "Das ist eine Zustellprobe, kein Vorfall.
 
@@ -36,8 +56,7 @@ antwortet oder Serverfehler auftreten.
 Ausgeloest von Hand ueber infra/monitor/probe-zustellung.sh."
 ergebnis=$?
 
-nachher=0
-[ -f "$LOG" ] && nachher="$(grep -c 'zugestellt an' "$LOG" 2>/dev/null || echo 0)"
+nachher="$(zaehle_zustellungen)"
 
 echo
 if [ "$ergebnis" -eq 0 ] && [ "$nachher" -gt "$vorher" ]; then
